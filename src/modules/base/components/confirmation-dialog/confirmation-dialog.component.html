@@ -1,0 +1,26 @@
+<div *ngIf="isVisible" class="modal" tabindex="-1" role="dialog" [style.display]="isVisible ? 'block' : 'none'"
+    aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                <button type="button" class="close" aria-label="Close" (click)="close(false)">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <hr>
+            <div>
+                Apa anda yakin?
+            </div>
+            <div *ngIf="isCommentEnabled" class="modal-body mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Taruh komen</label>
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" [(ngModel)]="comment"
+                    name="comment"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="close(false)">No</button>
+                <button type="button" class="btn btn-primary" (click)="close(true)">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>

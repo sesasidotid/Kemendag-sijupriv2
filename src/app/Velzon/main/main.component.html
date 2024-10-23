@@ -1,0 +1,47 @@
+<div id="layout-wrapper">
+    <app-top-bar></app-top-bar>
+    <app-side-bar></app-side-bar>
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 opacity-75">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">{{title}}</h4>
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <ng-container *ngFor="let route of routeTrail; let last = last">
+                                        <li *ngIf="!last" class="breadcrumb-item">
+                                            <a [routerLink]="route.path">{{ route.title }}</a>
+                                        </li>
+                                        <li *ngIf="last" class="breadcrumb-item active">
+                                            {{ route.title }}
+                                        </li>
+                                    </ng-container>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-title-box">
+                    <ul class="nav justify-content-end nav-pills arrow-navtabs nav-success bg-light mb-3"
+                        role="tablist">
+                        <li class="nav-item me-2" *ngFor="let tab of tabs">
+                            <a class="nav-link {{tab.isActive ? 'active' : ''}}" role="tab" (click)="onTabClick(tab)">
+                                <span class="d-block d-sm-none"><i class="mdi mdi-home-variant"></i></span>
+                                <span class="d-none d-sm-block">{{ tab.label }}</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <router-outlet />
+                </div>
+                <router-outlet name="detached" />
+                <app-confirmation-dialog></app-confirmation-dialog>
+                <app-file-preview></app-file-preview>
+            </div>
+        </div>
+        <app-footer></app-footer>
+    </div>
+</div>
+<div class="toast-container position-fixed top-0 end-0 p-3">
+</div>

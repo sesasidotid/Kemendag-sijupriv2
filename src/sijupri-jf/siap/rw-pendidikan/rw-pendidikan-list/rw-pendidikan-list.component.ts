@@ -1,0 +1,54 @@
+import { Component } from '@angular/core';
+import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component';
+import { Pagable } from '../../../../modules/base/commons/pagable/pagable';
+import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../../modules/base/commons/pagable/pagable-builder';
+import { RWPendidikan } from '../../../../modules/siap/models/rw-perndidikan.model';
+import { ApiService } from '../../../../modules/base/services/api.service';
+import { AlertService } from '../../../../modules/base/services/alert.service';
+import { CommonModule } from '@angular/common';
+import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
+import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
+
+@Component({
+  selector: 'app-rw-pendidikan-list',
+  standalone: true,
+  imports: [PagableComponent, CommonModule, FileHandlerComponent],
+  templateUrl: './rw-pendidikan-list.component.html',
+  styleUrl: './rw-pendidikan-list.component.scss'
+})
+export class RwPendidikanListComponent {
+  pagable: Pagable;
+  isDetailOpen: boolean = false;
+  rwPendidikan: RWPendidikan = new RWPendidikan();
+
+  constructor(
+    private apiService: ApiService,
+    private alertService: AlertService,
+  ) {
+    this.pagable = new PagableBuilder("/api/v1/rw_pendidikan/search")
+      .addPrimaryColumn(new PrimaryColumnBuilder("Pendidikan", 'pendidikan|name').build())
+      .addActionColumn(new ActionColumnBuilder().setAction((rwPendidikan: any) => {
+        this.getRWPendidikan(rwPendidikan.id);
+        this.isDetailOpen = true;
+      }, "info").withIcon("detail").build())
+      .addFilter(new PageFilterBuilder("like").setProperty("pendidikan|name").withField("Pendidikan", "text").build())
+      .build();
+  }
+
+  getRWPendidikan(id: string) {
+    this.apiService.getData(`/api/v1/rw_pendidikan/${id}`).subscribe({
+      next: (response) => {
+        this.rwPendidikan = new RWPendidikan(response);
+      },
+      error: (error) => {
+        console.log("error", error);
+        this.alertService.showToast("Error", "gagal menerima data");
+      }
+    })
+  }
+
+  back() {
+    this.isDetailOpen = false;
+    this.rwPendidikan = new RWPendidikan();
+  }
+}

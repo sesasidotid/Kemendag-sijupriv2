@@ -1,0 +1,170 @@
+<div *ngIf="!isEditOpen">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="firstnameInput" class="form-label">
+                    First Name
+                </label>
+                <p class="border-bottom">{{jf.name}}</p>
+            </div>
+        </div>
+        <!--end col-->
+        <div *ngIf="jf.phone" class="col-lg-6">
+            <div class="mb-3">
+                <label for="lastnameInput" class="form-label">
+                    No. HP
+                </label>
+                <p class="border-bottom">{{jf.phone}}</p>
+            </div>
+        </div>
+        <div *ngIf="jf.email" class="col-lg-6">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    Email
+                </label>
+                <p class="border-bottom">{{jf.email}}</p>
+            </div>
+        </div>
+        <!--end col-->
+        <div *ngIf="jf.tempatLahir" class="col-lg-6">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    Tempat Lahir
+                </label>
+                <p class="border-bottom">{{jf.tempatLahir}}</p>
+            </div>
+        </div>
+        <div *ngIf="jf.tanggalLahir" class="col-lg-6">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    Tanggal Lahir
+                </label>
+                <p class="border-bottom">{{jf.tanggalLahir}}</p>
+            </div>
+        </div>
+        <div *ngIf="jf.jenisKelaminName" class="col-lg-6">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    Jenis Kelamin
+                </label>
+                <p class="border-bottom">{{jf.jenisKelaminName}}</p>
+            </div>
+        </div>
+        <hr>
+        <div class="col-lg-12 row">
+            <div *ngIf="jf.nik" class="col-lg-12">
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label">
+                        NIK
+                    </label>
+                    <p class="border-bottom">{{jf.nik}}</p>
+                </div>
+            </div>
+            <div *ngIf="jf.ktpUrl" class="col-lg-12">
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label">
+                        File :
+                    </label>
+                    <div class="row">
+                        <app-file-handler [inputs]="inputs"></app-file-handler>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="hstack gap-2 justify-content-end">
+                <a (click)="toggleEdit()" class="btn btn-sm btn-soft-info">Ubah</a>
+            </div>
+        </div>
+    </div>
+</div>
+<form *ngIf="isEditOpen" (submit)="submit()">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="firstnameInput" class="form-label">
+                    First Name
+                </label>
+                <input type="text" class="form-control" id="firstnameInput" placeholder="Masukkan Nama"
+                    [(ngModel)]="jf.name" name="name">
+            </div>
+        </div>
+        <!--end col-->
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="lastnameInput" class="form-label">
+                    No. HP
+                </label>
+                <input type="text" class="form-control" id="lastnameInput" placeholder="Masukkan No. HP"
+                    [(ngModel)]="jf.phone" name="phone">
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    Email
+                </label>
+                <input type="email" class="form-control" id="emailInput" placeholder="Masukkan email"
+                    [(ngModel)]="jf.email" name="email">
+            </div>
+        </div>
+        <!--end col-->
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    Tempat Lahir
+                </label>
+                <input type="text" class="form-control" id="emailInput" placeholder="Masukkan Tempat Lahir"
+                    [(ngModel)]="jf.tempatLahir" name="tempatLahir">
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    Tanggal Lahir
+                </label>
+                <input type="date" class="form-control" id="emailInput" placeholder="Masukkan Tanggal Lahir"
+                    [(ngModel)]="jf.tanggalLahir" name="tanggalLahir">
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="firstnameInput" class="form-label">
+                    Jenis Kelamin
+                </label>
+                <select class="form-select" [(ngModel)]="jf.jenisKelaminCode" name="jenisKelaminCode">
+                    <option [value]="undefined">Pilih</option>
+                    <option *ngFor="let jenisKelamin of jenisKelaminList" [value]="jenisKelamin.code">
+                        {{jenisKelamin.name}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <hr>
+        <div class="col-lg-12 row">
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label">
+                        NIK
+                    </label>
+                    <input type="text" class="form-control" id="emailInput" placeholder="Masukkan NIK"
+                        [(ngModel)]="jf.nik" name="nik">
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label">
+                        KTP
+                    </label>
+                    <app-file-handler [inputs]="inputs"></app-file-handler>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="hstack gap-2 justify-content-end">
+            <a (click)="toggleEdit()" class="btn btn-sm btn-soft-warning me-2">Kembali</a>
+            <button class="btn btn-sm btn-soft-success">Simpan</button>
+        </div>
+    </div>
+</form>

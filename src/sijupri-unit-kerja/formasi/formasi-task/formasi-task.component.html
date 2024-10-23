@@ -1,0 +1,63 @@
+<div *ngIf="!flowId || flowId == 'for_flow_1'">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Pendaftaran Formasi</h4>
+                    <div class="flex-shrink-0">
+                        <a *ngIf="pendingTask" class="btn btn-sm btn-outline-success"
+                            (click)="isRequestPage = !isRequestPage">{{
+                            isRequestPage ? "Ubah Dokumen" : "Kembali"}}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-container>
+        <div *ngIf="isRequestPage">
+            <app-formasi-request [objectTaskId]="object.objectFormasiDokumenId"></app-formasi-request>
+
+            <button type="button" class="btn btn-success float-end" (click)="submitFl1()">Simpan</button>
+        </div>
+        <div *ngIf="!isRequestPage">
+            <app-formasi-dokumen [objectTaskId]="object.objectFormasiDokumenId"></app-formasi-dokumen>
+        </div>
+    </ng-container>
+</div>
+
+<div *ngIf="flowId == 'for_flow_4'">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Perbaikan Dokumen</h4>
+                    <div class="flex-shrink-0"></div>
+                </div>
+                <div class="card-body">
+                    <form (submit)="submitFl4()">
+                        <ng-container *ngFor="let formasiDokumen of formasiDokumenList; index as i">
+                            <div *ngIf="formasiDokumen.status == 'REJECT' || formasiDokumen.status == 'PENDING'" class="row mb-3">
+                                <label for=""
+                                    class="col-sm-2 col-form-label fw-bold">{{formasiDokumen.dokumenName}}</label>
+                                <div class="col-sm-10">
+                                    <tr>
+                                        <td class="w-75">
+                                            <input type="file" class="form-control" (change)="onFileChange($event, i)"
+                                                [(ngModel)]="formasiDokumen.file_url" name=" file">
+                                        </td>
+                                        <td *ngIf="formasiDokumen.file_url">
+                                            <a class="btn btn-sm btn-info ms-2">lihat</a>
+                                        </td>
+                                    </tr>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <div class="text-center float-end">
+                            <button type="submit" class="btn btn-sm btn-success">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

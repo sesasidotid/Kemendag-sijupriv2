@@ -1,0 +1,55 @@
+import { Component } from '@angular/core';
+import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component';
+import { Pagable } from '../../../../modules/base/commons/pagable/pagable';
+import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../../modules/base/commons/pagable/pagable-builder';
+import { RWPangkat } from '../../../../modules/siap/models/rw-pangkat.model';
+import { ApiService } from '../../../../modules/base/services/api.service';
+import { AlertService } from '../../../../modules/base/services/alert.service';
+import { CommonModule } from '@angular/common';
+import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
+import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
+
+@Component({
+  selector: 'app-rw-pangkat-list',
+  standalone: true,
+  imports: [PagableComponent, CommonModule, FileHandlerComponent],
+  templateUrl: './rw-pangkat-list.component.html',
+  styleUrl: './rw-pangkat-list.component.scss'
+})
+export class RwPangkatListComponent {
+  pagable: Pagable;
+  isDetailOpen: boolean = false;
+  rwPangkat: RWPangkat = new RWPangkat();
+
+  constructor(
+    private apiService: ApiService,
+    private alertService: AlertService,
+  ) {
+    this.pagable = new PagableBuilder("/api/v1/rw_pangkat/search")
+      .addPrimaryColumn(new PrimaryColumnBuilder("Pangkat", 'pangkat|name').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder("TMT", 'tmt').build())
+      .addActionColumn(new ActionColumnBuilder().setAction((rwPangkat: any) => {
+        this.getRWPangkat(rwPangkat.id)
+        this.isDetailOpen = true;
+      }, "info").withIcon("detail").build())
+      .addFilter(new PageFilterBuilder("like").setProperty("pangkat|name").withField("Pangkat", "text").build())
+      .build();
+  }
+
+  getRWPangkat(id: string) {
+    this.apiService.getData(`/api/v1/rw_pangkat/${id}`).subscribe({
+      next: (response) => {
+        this.rwPangkat = new RWPangkat(response);
+      },
+      error: (error) => {
+        console.log("error", error);
+        this.alertService.showToast("Error", "gagal menerima data");
+      }
+    })
+  }
+
+  back() {
+    this.isDetailOpen = false;
+    this.rwPangkat = new RWPangkat();
+  }
+}

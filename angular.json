@@ -1,0 +1,141 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "fe-template-angular": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:application",
+          "options": {
+            "outputPath": "dist/fe-template-angular",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/assets/icons",
+              {
+                "glob": "**/*",
+                "input": "src/assets/tinymce/skins",
+                "output": "/assets/tinymce/skins/"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/tinymce/themes",
+                "output": "/assets/tinymce/themes/"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/tinymce/icons",
+                "output": "/assets/tinymce/icons/"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/tinymce/plugins",
+                "output": "/assets/tinymce/plugins/"
+              }
+            ],
+            "styles": [
+              "src/styles.scss",
+              "src/assets/Velzon/build/css/bootstrap.min.css",
+              "src/assets/Velzon/build/css/icons.min.css",
+              "src/assets/Velzon/build/css/app.min.css",
+              "src/assets/Velzon/build/css/custom.min.css",
+              "node_modules/leaflet/dist/leaflet.css"
+            ],
+            "scripts": [
+              "src/assets/Velzon/build/js/layout.js",
+              "src/assets/Velzon/build/libs/bootstrap/js/bootstrap.bundle.min.js",
+              "src/assets/Velzon/build/libs/simplebar/simplebar.min.js",
+              "src/assets/Velzon/build/libs/node-waves/waves.min.js",
+              "src/assets/Velzon/build/libs/feather-icons/feather.min.js",
+              "src/assets/Velzon/build/js/pages/plugins/lord-icon-2.1.0.js",
+              "src/assets/Velzon/build/js/plugins.js",
+              "src/assets/Velzon/build/js/app.js",
+              "src/assets/tinymce/tinymce.js",
+              "src/assets/tinymce/tinymce.min.js"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "fe-template-angular:build:production"
+            },
+            "development": {
+              "buildTarget": "fe-template-angular:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "fe-template-angular:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "bd3c0b11-ba44-4861-b2ae-ceca37c1dc66"
+  }
+}

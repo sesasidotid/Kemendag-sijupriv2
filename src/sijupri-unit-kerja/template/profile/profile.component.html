@@ -1,0 +1,81 @@
+<div class="row mt-5">
+    <div class="col-xxl-3">
+        <div class="card ">
+            <div class="card-body row p-4">
+                <div class="col-12">
+                    <a routerLink="" class="btn btn-sm btn-soft-danger float-end">Kembail</a>
+                </div>
+                <div class="col-12 text-center">
+                    <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
+                        <img src="../../../assets/no-profile.jpg"
+                            class="  rounded-circle avatar-xl img-thumbnail user-profile-image"
+                            alt="user-profile-image">
+                        <div routerLink="profile" class="avatar-xs p-0 rounded-circle profile-photo-edit">
+                            <a class="profile-img-file-input"></a>
+                            <label class="profile-photo-edit avatar-xs">
+                                <span class="avatar-title rounded-circle bg-light text-body">
+                                    <i class="ri-pencil-line"></i>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <h5 class="text-muted fs-10 mb-1">NIP : {{nip}}</h5>
+                    <h5 class="fs-16 mb-1">{{name}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end col-->
+    <div class="col-xxl-9">
+        <div class="card mt-xxl-n5">
+            <div class="card-body p-4">
+                <div class="tab-content">
+                    <form (submit)="submit()">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <label for="firstnameInput" class="form-label">
+                                            First Name
+                                        </label>
+                                        <input type="text" class="form-control" id="firstnameInput"
+                                            placeholder="Masukkan Nama" [(ngModel)]="userUnitKerja.name" name="name">
+                                    </div>
+                                </div>
+                                <!--end col-->
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <label for="lastnameInput" class="form-label">
+                                            No. HP
+                                        </label>
+                                        <input type="text" class="form-control" id="lastnameInput"
+                                            placeholder="Masukkan No. HP" [(ngModel)]="userUnitKerja.phone"
+                                            name="phone">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <label for="emailInput" class="form-label">
+                                            Email
+                                        </label>
+                                        <input type="email" class="form-control" id="emailInput"
+                                            placeholder="Masukkan email" [(ngModel)]="userUnitKerja.email" name="email">
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end col-->
+                            <div class="col-lg-12">
+                                <div class="hstack gap-2 justify-content-end">
+                                    <button type="submit" class="btn btn-sm btn-soft-info">ubah</button>
+                                </div>
+                            </div>
+                            <!--end col-->
+                        </div>
+                        <!--end row-->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end col-->
+</div>

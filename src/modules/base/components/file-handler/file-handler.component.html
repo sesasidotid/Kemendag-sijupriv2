@@ -1,0 +1,26 @@
+<!-- file-handler.component.html -->
+<div class="d-flex flex-nowrap overflow-auto">
+    <ng-container *ngFor="let obj of inputs.files| keyvalue">
+        <div 
+            *ngIf="obj.value.visible == null|| obj.value.visible == undefined || obj.value.visible()" class="card m-2">
+            <div class="card-body">
+                <h5 class="card-title">{{ obj.value.label }}</h5>
+
+                <!-- Preview section -->
+                <div class="file-preview" *ngIf="obj.value.source">
+                    <img [src]="isImage(obj.value.source) ? obj.value.source : defaultImage" class="img-fluid"
+                        alt="{{ obj.value.label }}">
+                </div>
+
+                <!-- Preview Button -->
+                <a class="btn btn-primary mt-2" *ngIf="obj.value.source"
+                    (click)="previewFile(obj.value.label, obj.value.source)">Preview</a>
+
+                <!-- Upload Button (only show if previewOnly is false) -->
+                <div *ngIf="!inputs.viewOnly">
+                    <input type="file" (change)="handleFileUpload($event, obj.key)" class="form-control mt-2">
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>

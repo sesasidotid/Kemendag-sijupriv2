@@ -1,0 +1,338 @@
+<div class="row container" id="accordion">
+    <div class="col-12">
+        <div *ngFor="let pendingTask of pendingTaskList" class="card row col-12">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <ng-container *ngIf="pendingTask.workflowName == 'jf_task'">
+                        Profile
+                    </ng-container>
+                    <ng-container *ngIf="pendingTask.workflowName == 'rw_pendidikan_task'">
+                        Riwayat Pendidikan
+                    </ng-container>
+                    <ng-container *ngIf="pendingTask.workflowName == 'rw_pangkat_task'">
+                        Riwayat Pangkat
+                    </ng-container>
+                    <ng-container *ngIf="pendingTask.workflowName == 'rw_jabatan_task'">
+                        Riwayat Jabatan
+                    </ng-container>
+                    <ng-container *ngIf="pendingTask.workflowName == 'rw_kompetensi_task'">
+                        Riwayat Kompetensi
+                    </ng-container>
+                    <ng-container *ngIf="pendingTask.workflowName == 'rw_sertifikasi_task'">
+                        Riwayat Sertifikasi
+                    </ng-container>
+                    <a class="btn btn-sm btn-soft-info float-end" data-bs-toggle="collapse" href="#{{pendingTask.id}}"
+                        role="button" [attr.aria-expanded]="pendingTask['isOpen'] || false"
+                        [attr.aria-controls]="pendingTask.id" (click)="toggleExpand(pendingTask)">
+                        Detail
+                    </a>
+                </h5>
+            </div>
+            <div class="collapse" [ngClass]="{
+            'show': pendingTask['isOpen'] || false,
+        }" id="{{pendingTask.id}}">
+                <div class="card-body">
+                    <div class="row">
+                        <ng-container *ngIf="pendingTask.workflowName == 'jf_task'">
+                            <div *ngIf="pendingTask['object']">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="mb-3">
+                                            <label for="firstnameInput" class="form-label">
+                                                First Name
+                                            </label>
+                                            <p class="border-bottom">{{pendingTask['object'].name}}</p>
+                                        </div>
+                                    </div>
+                                    <!--end col-->
+                                    <div *ngIf="pendingTask['object'].phone" class="col-lg-12">
+                                        <div class="mb-3">
+                                            <label for="lastnameInput" class="form-label">
+                                                No. HP
+                                            </label>
+                                            <p class="border-bottom">{{pendingTask['object'].phone}}</p>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="pendingTask['object'].email" class="col-lg-12">
+                                        <div class="mb-3">
+                                            <label for="emailInput" class="form-label">
+                                                Email
+                                            </label>
+                                            <p class="border-bottom">{{pendingTask['object'].email}}</p>
+                                        </div>
+                                    </div>
+                                    <!--end col-->
+                                    <div *ngIf="pendingTask['object'].tempatLahir" class="col-lg-12">
+                                        <div class="mb-3">
+                                            <label for="emailInput" class="form-label">
+                                                Tempat Lahir
+                                            </label>
+                                            <p class="border-bottom">{{pendingTask['object'].tempatLahir}}</p>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="pendingTask['object'].tanggalLahir" class="col-lg-12">
+                                        <div class="mb-3">
+                                            <label for="emailInput" class="form-label">
+                                                Tanggal Lahir
+                                            </label>
+                                            <p class="border-bottom">{{pendingTask['object'].tanggalLahir}}</p>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="pendingTask['object'].jenisKelaminName" class="col-lg-12">
+                                        <div class="mb-3">
+                                            <label for="emailInput" class="form-label">
+                                                Jenis Kelamin
+                                            </label>
+                                            <p class="border-bottom">{{pendingTask['object'].jenisKelaminName}}</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="col-lg-12 row">
+                                        <div *ngIf="pendingTask['object'].nik" class="col-lg-12">
+                                            <div class="mb-3">
+                                                <label for="emailInput" class="form-label">
+                                                    NIK
+                                                </label>
+                                                <p class="border-bottom">{{pendingTask['object'].nik}}</p>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="pendingTask['object'].ktpUrl" class="col-lg-12">
+                                            <div class="mb-3">
+                                                <label for="emailInput" class="form-label">
+                                                    File :
+                                                </label>
+                                                <div class="row">
+                                                    <app-file-handler [inputs]="{
+                                                        files: {
+                                                          ktp: { label: 'KTP', source: pendingTask['object'].ktpUrl },
+                                                        },
+                                                        viewOnly: true
+                                                      }"></app-file-handler>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="pendingTask.workflowName == 'rw_pendidikan_task'">
+                            <div *ngIf="pendingTask['object']" class="container">
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Institusi Pendidikan
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">
+                                        {{pendingTask['object'].institusiPendidikan}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Pendidikan</div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].pendidikanName}}
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Jurusan</div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].jurusan}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Tanggal Ijazah</div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].tanggalIjazah}}
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Preview File : </div>
+                                    <div class="ms-2">
+                                        <app-file-handler [inputs]="{
+                                            files: {ijazah: {label: 'KTP', source: pendingTask['object'].ijazahUrl}},
+                                            viewOnly: true
+                                        }"></app-file-handler>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="pendingTask.workflowName == 'rw_pangkat_task'">
+                            <div *ngIf="pendingTask['object']" class="container">
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">TMT
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].tmt}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Pangkat
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].pangkatName}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Preview File : </div>
+                                    <div class="ms-2">
+                                        <app-file-handler [inputs]="{
+                                            files: {skPangkat: {label: 'SK Pangkat', source: pendingTask['object'].skPangkatUrl}},
+                                            viewOnly: true
+                                        }"></app-file-handler>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="pendingTask.workflowName == 'rw_jabatan_task'">
+                            <div *ngIf="pendingTask['object']" class="container">
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">TMT
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].tmt}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Jabatan</div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].jabatanName}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Jenjang</div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].jenjangName}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Preview File : </div>
+                                    <div class="ms-2">
+                                        <app-file-handler [inputs]="{
+                                            files: {
+                                                skJabatan: { label: 'SK Jabatan', source: this.pendingTask['object'].skJabatanUrl }
+                                            },
+                                            viewOnly: true
+                                          }"></app-file-handler>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="pendingTask.workflowName == 'rw_kompetensi_task'">
+                            <div *ngIf="pendingTask['object']" class="container">
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Kompetensi
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].name}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Tanggal Mulai
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].dateStart}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Tanggal Selesai</div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].dateEnd}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">tanggal Sertifikat
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].tglSertifikat}}
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Kategori Pengembangan
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">
+                                        {{pendingTask['object'].kategoriPengembanganName}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Preview File : </div>
+                                    <div class="ms-2">
+                                        <app-file-handler [inputs]="{
+                                            files: {
+                                                sertifikat: { label: 'Sertifikat', source: this.pendingTask['object'].sertifikatUrl },
+                                            },
+                                            viewOnly: true
+                                          }"></app-file-handler>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="pendingTask.workflowName == 'rw_sertifikasi_task'">
+                            <div *ngIf="pendingTask['object']" class="container">
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Kategori Sertifikasi
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">
+                                        {{pendingTask['object'].kategoriSertifikasiName}}
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">No. Sk
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].noSk}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Tanggal Sk
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].tglSk}}</div>
+                                </div>
+                                <div *ngIf="pendingTask['object'].kategoriSertifikasiValue && pendingTask['object'].kategoriSertifikasiValue == 2"
+                                    class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Wilayah Kerja
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].wilayahKerja}}
+                                    </div>
+                                </div>
+                                <div *ngIf="pendingTask['object'].kategoriSertifikasiValue && pendingTask['object'].kategoriSertifikasiValue == 2"
+                                    class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Tanggal Mulai
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].dateStart}}</div>
+                                </div>
+                                <div *ngIf="pendingTask['object'].kategoriSertifikasiValue && pendingTask['object'].kategoriSertifikasiValue == 2"
+                                    class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Tanggal Selesai
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].dateEnd}}</div>
+                                </div>
+                                <div *ngIf="pendingTask['object'].kategoriSertifikasiValue && pendingTask['object'].kategoriSertifikasiValue == 2"
+                                    class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">UU Yang Dikawal
+                                    </div>
+                                    <div class="col fs-6 border-bottom pb-2">{{pendingTask['object'].uuKawalan}}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-auto font-weight-bold text-start fw-bold fs-6"
+                                        style="min-width: 150px;">Preview File : </div>
+                                    <div class="ms-2">
+                                        <app-file-handler [inputs]="{
+                                            files: {
+                                              skPengangkatan: { label: 'SK Pengankatan', source: pendingTask['object'].skPengangkatanUrl },
+                                              ktpPpns: { label: 'KTP PPNS', source: pendingTask['object'].ktpPpnsUrl, visible: visibility(pendingTask['object']) }
+                                            },
+                                            viewOnly: true
+                                          }"></app-file-handler>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="text-center float-end m-2 mt-3">
+                        <button type="button" class="btn btn-sm btn-success me-1"
+                            (click)="openConfirmationDialog(pendingTask, 'approve')">terima</button>
+                        <button type="button" class="btn btn-sm btn-danger"
+                            (click)="openConfirmationDialog(pendingTask, 'reject', true)">tolak</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

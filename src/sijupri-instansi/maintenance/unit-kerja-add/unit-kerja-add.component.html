@@ -1,0 +1,75 @@
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1">Tambah Unit Kerja</h4>
+                <div class="flex-shrink-0">
+                </div>
+            </div>
+            <div class="card-body">
+                <form (submit)="submit()">
+                    <div class="row mb-3">
+                        <label for="" class="col-sm-2 col-form-label fw-bold">Instansi</label>
+                        <div class="col-sm-10">
+                            <p><b>{{instansi.name}}</b></p>
+                        </div>
+                    </div>
+                    <div *ngIf="provinsi" class="row mb-3">
+                        <label for="" class="col-sm-2 col-form-label fw-bold">Provinsi</label>
+                        <div class="col-sm-10">
+                            <p><b>{{provinsi.name}}</b></p>
+                        </div>
+                    </div>
+                    <div *ngIf="kabKota" class="row mb-3">
+                        <label for="" class="col-sm-2 col-form-label fw-bold">Kabupaten/Kota</label>
+                        <div class="col-sm-10">
+                            <p><b>{{kabKota.name}}</b></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <label for="" class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" [(ngModel)]="unitKerja.name" name="name">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="" class="col-sm-2 col-form-label fw-bold">Email</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control" [(ngModel)]="unitKerja.email" name="email">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="" class="col-sm-2 col-form-label fw-bold">Telp</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" [(ngModel)]="unitKerja.phone" name="phone">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="" class="col-sm-2 col-form-label fw-bold">Alamat</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" [(ngModel)]="unitKerja.alamat" name="alamat">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="" class="col-sm-2 col-form-label fw-bold">Wilayah</label>
+                        <div class="col-sm-10">
+                            <select id="inputState" class="form-select" [(ngModel)]="unitKerja.wilayahCode"
+                                name="wilayahCode">
+                                <option [value]='undefined'>Pilih</option>
+                                <option *ngFor="let wilayahList of wilayahList" [value]='wilayahList.code'>
+                                    {{wilayahList.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-center float-end">
+                        <button type="submit" class="btn btn-sm btn-success">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <app-map (coordinates)="onCoordinatesReceived($event)"></app-map>
+    </div>
+</div>

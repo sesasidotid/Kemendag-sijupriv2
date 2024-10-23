@@ -1,0 +1,19 @@
+/* file-handler.component.css */
+.file-preview {
+    height: 150px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.card {
+    width: 200px;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.overflow-auto {
+    overflow-x: auto;
+    white-space: nowrap;
+}

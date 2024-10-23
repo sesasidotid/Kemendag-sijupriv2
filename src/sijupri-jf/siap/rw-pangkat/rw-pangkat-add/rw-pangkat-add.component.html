@@ -1,0 +1,41 @@
+<form (submit)="submit()">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="firstnameInput" class="form-label">
+                    Pangkat
+                </label>
+                <select class="form-select" [(ngModel)]="rwPangkat.pangkatCode" name="pangkatCode">
+                    <option [value]="undefined">Pilih</option>
+                    <option *ngFor="let pangkat of pangkatList" [value]="pangkat.code">
+                        {{pangkat.name}} ({{pangkat.golongan}})
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="lastnameInput" class="form-label">
+                    Terhitung Mulai Tanggal
+                </label>
+                <input type="date" class="form-control" [(ngModel)]="rwPangkat.tmt" name="tmt"
+                    placeholder="Masukan nama Sekolah/Universitas/Institusi">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    File :
+                </label>
+            </div>
+            <div class="row">
+                <app-file-handler [inputs]="inputs"></app-file-handler>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="hstack gap-2 justify-content-end">
+                <button type="submit" class="btn btn-sm btn-soft-success">simpan</button>
+            </div>
+        </div>
+    </div>
+</form>

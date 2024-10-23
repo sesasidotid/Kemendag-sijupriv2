@@ -1,0 +1,9 @@
+.modal.show {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-dialog {
+    max-width: 800px;
+    margin: 1.75rem auto;
+}

@@ -1,0 +1,49 @@
+<app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
+<div *ngIf="isDetailOpen" class="container">
+    <div class="row mb-2">
+        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Tanggal Mulai
+        </div>
+        <div class="col fs-6 border-bottom pb-2">{{rwKinerja.dateStart}}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Tanggal Selesai</div>
+        <div class="col fs-6 border-bottom pb-2">{{rwKinerja.dateEnd}}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Angka Kredit</div>
+        <div class="col fs-6 border-bottom pb-2">{{rwKinerja.angkaKredit}}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Rating Hasil</div>
+        <div class="col fs-6 border-bottom pb-2">{{rwKinerja.ratingHasilName}}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Rating Kinerja</div>
+        <div class="col fs-6 border-bottom pb-2">{{rwKinerja.ratingKinerjaName}}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Predikat Kinerja</div>
+        <div class="col fs-6 border-bottom pb-2">{{rwKinerja.predikatKinerjaName}}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Preview File : </div>
+        <div class="ms-2">
+            <app-file-handler [inputs]="{
+                files: {
+                  docEvaluas: { label: 'Dokumen Evaluasi', source: this.rwKinerja.docEvaluasiUrl },
+                  docPredikat: { label: 'Dokumen Predikat', source: this.rwKinerja.docPredikatUrl },
+                  docAkumulasiAk: { label: 'Dokumen Akumulasi Angka Kredit', source: this.rwKinerja.docAkumulasiAkUrl },
+                  docPenetapanAk: { label: 'Dokumen Penetapan Angka Kredit', source: this.rwKinerja.docPenetapanAkUrl },
+                },
+                viewOnly: true
+              }"></app-file-handler>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="hstack gap-2 justify-content-end">
+                <a class="btn btn-sm btn-soft-success" (click)="isDetailOpen = false">kembali</a>
+            </div>
+        </div>
+    </div>
+</div>

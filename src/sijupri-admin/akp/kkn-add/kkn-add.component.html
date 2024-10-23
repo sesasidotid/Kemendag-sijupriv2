@@ -1,0 +1,48 @@
+<form (submit)="submit()">
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Instrumen</label>
+        <div class="col-sm-10">
+            <select id="inputState" class="form-select" [(ngModel)]="kategoriInstrument.instrumentId"
+                name="instrumenId">
+                <option [value]='undefined'>Pilih</option>
+                <option *ngFor="let instrument of instrumentList" [value]='instrument.id'>
+                    {{instrument.name}}
+                </option>
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Kategori</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" [(ngModel)]="kategoriInstrument.name" name="name">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Pertanyaan</label>
+        <div class="col-sm-12">
+            <ng-container *ngFor="let pertanyaan of kategoriInstrument.pertanyaanList, index as i">
+                <div class="row mb-3 ms-2">
+                    <label for="" class="col-sm-2 col-form-label fw-bold">{{i + 1}}.</label>
+                    <div class="col-sm-8">
+                        <textarea type="text" class="form-control" [(ngModel)]="pertanyaan.name"
+                            name="pertanyaan-name{{i}}"></textarea>
+                    </div>
+                    <div class="col-sm-2">
+                        <a class="btn btn-md btn-soft-danger" (click)="remove(i)">-</a>
+                    </div>
+                </div>
+            </ng-container>
+            <div class="row mb-3">
+                <label for="" class="col-sm-2 col-form-label fw-bold">Tambah</label>
+                <div class="col-sm-4">
+                    <a class="btn btn-md btn-soft-success" (click)="add()">+</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-12">
+            <button type="submit" class="btn btn-sm btn-success float-end">Simpan</button>
+        </div>
+    </div>
+</form>

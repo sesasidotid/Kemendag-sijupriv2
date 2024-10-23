@@ -1,0 +1,45 @@
+<form (submit)="submit()">
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">NIP</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" [(ngModel)]="user.id" name="id">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Nama</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" [(ngModel)]="user.name" name="name">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Email</label>
+        <div class="col-sm-10">
+            <input type="email" class="form-control" [(ngModel)]="user.email" name="email">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Password</label>
+        <div class="col-sm-10">
+            <input type="password" class="form-control" [(ngModel)]="user.password" name="password">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Roles</label>
+        <div class="col-sm-10">
+            <select id="inputState" class="form-select" (change)="addRoleCode($event)" [(ngModel)]="roleCode"
+                name="roleCode">
+                <option [value]='""'>Pilih</option>
+                <option *ngFor="let role of roleList" [value]='role.code'>{{role.name}}</option>
+            </select>
+            <div class="mt-2">
+                <button *ngFor="let roleCode of roleCodes" class="btn btn-sm btn-outline-danger me-1"
+                    (click)="removeRoleCode(roleCode)">{{roleCode}}</button>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-12">
+            <button type="submit" class="btn btn-sm btn-success float-end">Simpan</button>
+        </div>
+    </div>
+</form>

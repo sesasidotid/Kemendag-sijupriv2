@@ -1,0 +1,101 @@
+<app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
+<form *ngIf="isDetailOpen" (submit)="submit()">
+    <div *ngIf="pendingTask.remark" class="alert alert-warning" role="alert">
+        {{pendingTask.remark}}
+    </div>
+    <div class="row">
+        <div class="row col-lg-12">
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label for="firstnameInput" class="form-label">
+                        Tahunan/Bulanan
+                    </label>
+                    <select class="form-select" [(ngModel)]="rwKinerja.type" name="type">
+                        <option [value]="undefined">Pilih</option>
+                        <option [value]="'tahunan'">tahunan</option>
+                        <option [value]="'bulanan'">bulanan</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="lastnameInput" class="form-label">
+                    Tanggal Mulai Hitung Penilaian
+                </label>
+                <input type="date" class="form-control" [(ngModel)]="rwKinerja.dateStart" name="dateStart">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="lastnameInput" class="form-label">
+                    Tanggal Selesai Hitung Penilaian
+                </label>
+                <input type="date" class="form-control" [(ngModel)]="rwKinerja.dateEnd" name="dateEnd">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="firstnameInput" class="form-label">
+                    Rating Hasil Kinerja
+                </label>
+                <select class="form-select" [(ngModel)]="rwKinerja.ratingHasilId" name="ratingHasilId">
+                    <option [value]="undefined">Pilih</option>
+                    <option *ngFor="let ratingKinerja of ratingKinerjaList" [value]="ratingKinerja.id">
+                        {{ratingKinerja.name}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="firstnameInput" class="form-label">
+                    Rating Perilaku Kinerja
+                </label>
+                <select class="form-select" [(ngModel)]="rwKinerja.ratingKinerjaId" name="ratingKinerjaId">
+                    <option [value]="undefined">Pilih</option>
+                    <option *ngFor="let ratingKinerja of ratingKinerjaList" [value]="ratingKinerja.id">
+                        {{ratingKinerja.name}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="firstnameInput" class="form-label">
+                    Predikat Kinerja
+                </label>
+                <select class="form-select" [(ngModel)]="rwKinerja.predikatKinerjaId" name="predikatKinerjaId">
+                    <option [value]="undefined">Pilih</option>
+                    <option *ngFor="let predikatKinerja of predikatKinerjaList" [value]="predikatKinerja.id">
+                        {{predikatKinerja.name}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="lastnameInput" class="form-label">
+                    Angka Kredit
+                </label>
+                <input type="number" class="form-control" [(ngModel)]="rwKinerja.angkaKredit" name="angkaKredit">
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">
+                    File :
+                </label>
+            </div>
+            <div class="row">
+                <app-file-handler [inputs]="inputs"></app-file-handler>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="hstack gap-2 justify-content-end">
+                <button type="submit" class="btn btn-sm btn-soft-warning me-2" (click)="back()">Kembali</button>
+                <button type="submit" class="btn btn-sm btn-soft-success">simpan</button>
+            </div>
+        </div>
+    </div>
+</form>

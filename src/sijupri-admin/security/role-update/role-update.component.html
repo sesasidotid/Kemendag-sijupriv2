@@ -1,0 +1,29 @@
+<div class="row">
+    <div class="col-lg-8">
+        <form (submit)="submit()">
+            <div class="row mb-3 border-bottom">
+                <label for="" class="col-sm-2 col-form-label fw-bold">Code</label>
+                <div class="col-sm-10">
+                    <p>{{role.code}}</p>
+                </div>
+            </div>
+            <div class="row mb-3 border-bottom">
+                <label for="" class="col-sm-2 col-form-label fw-bold">Nama</label>
+                <div class="col-sm-10">
+                    <p>{{role.name}}</p>
+                </div>
+            </div>
+            <div *ngIf="!editable" class="text-center float-end">
+                <a (click)="editable = true" class="btn btn-sm btn-primary ms-2">Ubah</a>
+                <a type="submit" class="btn btn-sm btn-danger ms-2">Hapus</a>
+            </div>
+            <div *ngIf="editable" class="text-center float-end">
+                <button type="submit" class="btn btn-sm btn-primary ms-2">Simpan</button>
+                <a (click)="editable = false" class="btn btn-sm btn-secondary ms-2">Kembali</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-4">
+        <app-menu-tree [menuTree]="menuTree" [disable]="!editable"></app-menu-tree>
+    </div>
+</div>

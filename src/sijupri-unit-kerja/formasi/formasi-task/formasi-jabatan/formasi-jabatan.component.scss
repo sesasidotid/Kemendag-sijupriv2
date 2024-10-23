@@ -1,0 +1,16 @@
+.unsur-item {
+    padding: 5px;
+}
+
+.unsur-item p {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.floating-btn {
+    position: fixed;
+    bottom: 60px;
+    right: 40px;
+    z-index: 1000;
+    /* You can add box-shadow or other styling if needed */
+}

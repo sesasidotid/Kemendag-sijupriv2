@@ -1,0 +1,37 @@
+.scroll-container .col-sm-4 {
+    flex: 0 0 auto;
+}
+
+th {
+    cursor: pointer;
+}
+
+.scroll-container {
+    /* Custom scrollbar styles */
+    scrollbar-width: thin;
+    /* For Firefox */
+    scrollbar-color: #6f6f6f1d #ffffff;
+    /* For Firefox */
+}
+
+.scroll-container::-webkit-scrollbar {
+    width: 8px;
+    /* Width of the scrollbar */
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    /* Track color */
+    border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: #888;
+    /* Thumb color */
+    border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* Thumb color on hover */
+}

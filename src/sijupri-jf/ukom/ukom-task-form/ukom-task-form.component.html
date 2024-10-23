@@ -1,0 +1,56 @@
+<div class="card">
+    <div class="card-body">
+        <form (submit)="submit()">
+            <div class="row">
+                <div class="col-lg-12 row">
+                    <div class="col-lg-6 mb-3">
+                        <label for="firstnameInput" class="form-label">
+                            Mengikuti Uji Kompetensi Jenis ?
+                        </label>
+                        <select class="form-select" (change)="onJenisUkomSwitch($event)" name="jabatanCode">
+                            <option [value]="undefined">Pilih</option>
+                            <option [value]="'KENAIKAN_JENJANG'">Kenaikan Jenjang</option>
+                            <option [value]="'PERPINDAHAN_JABATAN'">Perpindahan Jabatan</option>
+                        </select>
+                    </div>
+                </div>
+                <div *ngIf="pesertaUkom.jenisUkom == 'KENAIKAN_JENJANG'" class="col-lg-12 row">
+                    <div class="col-lg-6 mb-3">
+                        <label for="firstnameInput" class="form-label">
+                            Jenjang Yang Di Tuju
+                        </label>
+                        <p>{{nextJenjang.name}}</p>
+                    </div>
+                </div>
+                <div *ngIf="pesertaUkom.jenisUkom == 'PERPINDAHAN_JABATAN'" class="col-lg-12 row">
+                    <div class="col-lg-6 mb-3">
+                        <label for="firstnameInput" class="form-label">
+                            Jabatan Yang Di Tuju
+                        </label>
+                        <select class="form-select" [(ngModel)]="pesertaUkom.nextJabatanCode" name="jabatanCode">
+                            <option [value]="undefined">Pilih</option>
+                            <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
+                                {{jabatan.name}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="mb-3">
+                        <label for="emailInput" class="form-label">
+                            File :
+                        </label>
+                    </div>
+                    <div class="row">
+                        <app-file-handler [inputs]="inputs"></app-file-handler>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="hstack gap-2 justify-content-end">
+                        <button type="submit" class="btn btn-sm btn-soft-success">simpan</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

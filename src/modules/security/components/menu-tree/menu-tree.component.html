@@ -1,0 +1,18 @@
+<ul style="font-size: 0.8rem; font-weight: bold;">
+    <li *ngFor="let menu of menuTree">
+        <div class="form-check" (click)="setChecked(menu)">
+            <input class="form-check-input" [checked]="menu.checked" type="checkbox" id="flexCheckDefault"
+                [disabled]="disable">
+            <label for="flexCheckDefault">{{menu.name}}</label>
+        </div>
+        <ul>
+            <li *ngFor="let child of menu.child">
+                <div class="form-check" (click)="setChecked(child, menu)">
+                    <input class="form-check-input" [checked]="child.checked" type="checkbox" id="flexCheckDefault"
+                        [disabled]="disable">
+                    <label for="flexCheckDefault">{{child.name}}</label>
+                </div>
+            </li>
+        </ul>
+    </li>
+</ul>

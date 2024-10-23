@@ -1,0 +1,116 @@
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-center">
+                    <img src="../../../assets/no-profile.jpg"
+                        class="rounded-circle avatar-xl img-thumbnail user-profile-image" alt="user-profile-image">
+                </div>
+                <table>
+                    <tr>
+                        <td>NIP</td>
+                        <td>: {{jf.nip}}</td>
+                    </tr>
+                    <tr>
+                        <td>NIK</td>
+                        <td>: {{jf.nik}}</td>
+                    </tr>
+                    <tr>
+                        <td>Nama</td>
+                        <td>: {{jf.name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Jenis Kelamin</td>
+                        <td>: {{jf.jenisKelaminName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Tempat Lahir</td>
+                        <td>: {{jf.tempatLahir}}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Lahir</td>
+                        <td>: {{jf.tanggalLahir}}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>: {{jf.email}}</td>
+                    </tr>
+                    <tr>
+                        <td>No. Hp.</td>
+                        <td>: {{jf.phone}}</td>
+                    </tr>
+                    <tr>
+                        <td>KTP</td>
+                        <td>: {{jf.ktp}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0 flex-nowrap" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#Pendidikan">
+                            <i class="far fa-user"></i>
+                            Riwayat Pendidikan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Pangkat">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Pangkat
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Jabatan">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Jabatan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Kinerja">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Kinerja
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Kompetensi">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Kompetensi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Sertifikasi">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Sertifikasi
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="Pendidikan" role="tabpanel">
+                        <app-rw-pendidikan-list></app-rw-pendidikan-list>
+                    </div>
+                    <div class="tab-pane" id="Pangkat" role="tabpanel">
+                        <app-rw-pangkat-list></app-rw-pangkat-list>
+                    </div>
+                    <div class="tab-pane" id="Jabatan" role="tabpanel">
+                        <app-rw-jabatan-list></app-rw-jabatan-list>
+                    </div>
+                    <div class="tab-pane" id="Kinerja" role="tabpanel">
+                        <app-rw-kinerja-list></app-rw-kinerja-list>
+                    </div>
+                    <div class="tab-pane" id="Kompetensi" role="tabpanel">
+                        <app-rw-kompetensi-list></app-rw-kompetensi-list>
+                    </div>
+                    <div class="tab-pane" id="Sertifikasi" role="tabpanel">
+                        <app-rw-sertifikasi-list></app-rw-sertifikasi-list>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

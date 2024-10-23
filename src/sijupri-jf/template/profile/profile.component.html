@@ -1,0 +1,88 @@
+<div class="row">
+    <div class="col-xxl-3">
+        <div class="card">
+            <div class="card-body row p-4">
+                <div class="col-12">
+                    <a routerLink="" class="btn btn-sm btn-soft-danger float-end">Kembail</a>
+                </div>
+                <div class="col-12 text-center">
+                    <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
+                        <img src="../../../assets/no-profile.jpg"
+                            class="  rounded-circle avatar-xl img-thumbnail user-profile-image"
+                            alt="user-profile-image">
+                        <div routerLink="profile" class="avatar-xs p-0 rounded-circle profile-photo-edit">
+                            <a class="profile-img-file-input"></a>
+                            <label class="profile-photo-edit avatar-xs">
+                                <span class="avatar-title rounded-circle bg-light text-body">
+                                    <i class="ri-pencil-line"></i>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <h5 class="text-muted fs-10 mb-1">NIP : {{nip}}</h5>
+                    <h5 class="fs-16 mb-1">{{name}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end col-->
+    <div class="col-xxl-9">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile'" routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }" role="tab">
+                            <i class="fas fa-home"></i>
+                            Detail Personal
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-pendidikan'"
+                            routerLinkActive="active" role="tab">
+                            <i class="far fa-user"></i>
+                            Riwayat Pendidikan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-pangkat'"
+                            routerLinkActive="active" role="tab">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Pangkat
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-jabatan'"
+                            routerLinkActive="active" role="tab">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Jabatan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-kinerja'"
+                            routerLinkActive="active" role="tab">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Kinerja
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-kompetensi'"
+                            routerLinkActive="active" role="tab">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Kompetensi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-sertifikasi'"
+                            routerLinkActive="active" role="tab">
+                            <i class="far fa-envelope"></i>
+                            Riwayat Sertifikasi
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <router-outlet></router-outlet>
+    </div>
+    <!--end col-->
+</div>
