@@ -1,29 +1,27 @@
 <div class="row" *ngIf="pagable.filterLIst">
     <form (submit)="fetchData()">
-        <div class="row">
-            <div class="col-10 scroll-container row flex-nowrap overflow-auto">
+        <div class="filter-container">
                 <ng-container *ngFor="let fillter of pagable.filterLIst">
-                    <ng-container *ngIf="fillter.fieldType">
-                        <div class="col-sm-3 mb-0" *ngIf="fillter.fieldType == 'select'">
-                            <label class="col-form-label p-1"><b>{{fillter.label}}</b></label>
-                            <select class="form-select p-1" [(ngModel)]="fillter.value" name="{{fillter.label}}">
-                                <option [value]='""'>pilih</option>
-                                <ng-container *ngFor="let data of fillter.optionList">
-                                    <option [value]='data.value'>{{data.label}}</option>
-                                </ng-container>
-                            </select>
-                        </div>
-                        <div class="col-sm-3 mb-0" *ngIf="fillter.fieldType == 'text'">
-                            <label class="col-form-label p-1"><b>{{fillter.label}}</b></label>
-                            <input class="form-control p-1" [(ngModel)]="fillter.value" name="{{fillter.label}}" />
+                    <ng-container *ngIf="fillter.fieldType" >
+                        <div>
+                            <div class="mb-0 cursor-pointer" *ngIf="fillter.fieldType == 'select'">
+                                <label class="col-form-label p-1"><b>{{fillter.label}}</b></label>
+                                <select class="form-select p-1 cursor-pointer" [(ngModel)]="fillter.value" name="{{fillter.label}}">
+                                    <option [value]='""'>pilih</option>
+                                    <ng-container *ngFor="let data of fillter.optionList">
+                                        <option [value]='data.value'>{{data.label}}</option>
+                                    </ng-container>
+                                </select>
+                            </div>
+                            <div class="mb-0" *ngIf="fillter.fieldType == 'text'">
+                                <label class="col-form-label p-1"><b>{{fillter.label}}</b></label>
+                                <input class="form-control p-1" [(ngModel)]="fillter.value" name="{{fillter.label}}" />
+                            </div>
                         </div>
                     </ng-container>
                 </ng-container>
-            </div>
-            <div *ngIf="isSearchExist()" class="col-2">
-                <button type="submit" class="btn btn-sm btn-outline-primary float-end my-2"
-                    style="bottom: 0;">Search</button>
-            </div>
+                <button *ngIf="isSearchExist()" type="submit" class="btn btn-sm btn-outline-primary"
+                    style="bottom: 0;">Terapkan</button>
         </div>
     </form>
 </div>
@@ -47,7 +45,7 @@
         </thead>
         <tbody>
             <tr *ngIf="onLoad">
-                <td colspan="100%" class="m-1 p-1">
+                <td colspan="100%" class="m-1 p-4" >
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
@@ -56,6 +54,13 @@
                 </td>
             </tr>
             <ng-container *ngIf="!onLoad">
+                <tr *ngIf="paginator.data.length == 0">
+                    <td colspan="100%" class="m-1 p-4" >
+                        <div class="d-flex justify-content-center align-items-center">
+                            <span class="ms-2">Data tidak ditemukan</span>
+                        </div>
+                    </td>
+                </tr>
                 <tr *ngFor="let row of paginator.data; index as i">
                     <td class="fw-bold m-1 p-1">{{(i+1) + ((page * 10) - 10)}}</td>
                     <ng-container *ngFor="let column of pagable.primaryColumnList">
