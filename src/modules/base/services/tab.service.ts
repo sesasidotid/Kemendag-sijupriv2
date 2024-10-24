@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 export interface Tab {
   label: string;
   isActive?: boolean;
+  icon?: string;
   onClick: () => void;
 }
 

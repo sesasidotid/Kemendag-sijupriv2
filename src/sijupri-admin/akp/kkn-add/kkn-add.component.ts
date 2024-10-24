@@ -33,9 +33,11 @@ export class KknAddComponent {
   ngOnInit() {
     this.tabService.addTab({
       label: 'Daftar KKN',
+      icon: 'mdi-list-box',
       onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn`]),
     }).addTab({
       label: 'Tambah KKN',
+      icon: 'mdi-plus-circle',
       isActive: true,
       onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn/add`]),
     });

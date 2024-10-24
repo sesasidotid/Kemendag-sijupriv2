@@ -34,10 +34,12 @@ export class UkomAddComponent {
   ngOnInit() {
     this.tabService.addTab({
       label: 'Daftar UKom',
+      icon: 'mdi-list-box',
       onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/ukom/ukom-list'),
     }).addTab({
       label: 'Tambah UKom',
       isActive: true,
+      icon: 'mdi-plus-circle',
       onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/ukom/ukom-list/add'),
     });
   }

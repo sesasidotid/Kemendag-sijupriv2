@@ -26,10 +26,10 @@
                 <div class="page-title-box">
                     <ul class="nav justify-content-end nav-pills arrow-navtabs nav-success bg-light mb-3"
                         role="tablist">
-                        <li class="nav-item me-2" *ngFor="let tab of tabs">
+                        <li class="nav-item me-2 cursor-pointer" *ngFor="let tab of tabs">
                             <a class="nav-link {{tab.isActive ? 'active' : ''}}" role="tab" (click)="onTabClick(tab)">
-                                <span class="d-block d-sm-none"><i class="mdi mdi-home-variant"></i></span>
-                                <span class="d-none d-sm-block">{{ tab.label }}</span>
+                                <span class="" style="margin-right: 8px;"><i class="{{tab.icon ? 'mdi ' + tab.icon : 'mdi mdi-account-circle'}}"></i></span>
+                                <span class="">{{ tab.label }}</span>
                             </a>
                         </li>
                     </ul>

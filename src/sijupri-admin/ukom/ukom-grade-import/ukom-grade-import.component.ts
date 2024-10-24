@@ -54,12 +54,14 @@ export class UkomGradeImportComponent {
 
   ngOnInit() {
     this.tabService.addTab({
-      label: 'Download Template Mansoskul',
+      label: 'Template Mansoskul',
       isActive: true,
+      icon: 'mdi-file-download',
       onClick: () => this.downloadTemplate('template_mansoskul'),
     }).addTab({
-      label: 'Download Template Teknis',
+      label: 'Template Teknis',
       isActive: true,
+      icon: 'mdi-file-download',
       onClick: () => this.downloadTemplate('template_teknis'),
     });
 

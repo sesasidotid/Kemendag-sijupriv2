@@ -40,9 +40,11 @@ export class UserListComponent {
     this.tabService.addTab({
       label: 'Daftar User',
       isActive: true,
+      icon: 'mdi-list-box',
       onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/security/user`]),
     }).addTab({
       label: 'Tambah User',
+      icon: 'mdi-plus-circle',
       onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/security/user/add`]),
     });
   }

@@ -40,10 +40,12 @@ export class UserInstansiAddComponent {
   ngOnInit() {
     this.tabService.addTab({
       label: 'Daftar User Instansi',
+      icon: 'mdi-list-box',
       onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/siap/user-instansi'),
     }).addTab({
       label: 'Tambah User Instansi',
       isActive: true,
+      icon: 'mdi-plus-circle',
       onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/siap/user-instansi/add'),
     });
 

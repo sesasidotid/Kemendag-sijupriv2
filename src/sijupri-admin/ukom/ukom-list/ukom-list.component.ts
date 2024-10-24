@@ -47,9 +47,11 @@ export class UkomListComponent {
     this.tabService.addTab({
       label: 'Daftar UKom',
       isActive: true,
+      icon: 'mdi-list-box',
       onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/ukom/ukom-list']),
     }).addTab({
       label: 'Tambah UKom',
+      icon: 'mdi-plus-circle',
       onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/ukom/ukom-list/add']),
     });
   }

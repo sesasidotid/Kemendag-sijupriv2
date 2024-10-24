@@ -36,10 +36,12 @@ export class UserAddComponent {
   ngOnInit(): void {
     this.tabService.addTab({
       label: 'Daftar User',
+      icon: 'mdi-list-box',
       onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user'),
     }).addTab({
       label: 'Tambah User',
       isActive: true,
+      icon: 'mdi-plus-circle',
       onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user/add'),
     });
 

@@ -37,9 +37,11 @@ export class UserInstansiListComponent {
     this.tabService.addTab({
       label: 'Daftar User Instansi',
       isActive: true,
+      icon: 'mdi-list-box',
       onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/siap/user-instansi']),
     }).addTab({
       label: 'Tambah User Instansi',
+      icon: 'mdi-plus-circle',
       onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/siap/user-instansi/add']),
     });
   }
