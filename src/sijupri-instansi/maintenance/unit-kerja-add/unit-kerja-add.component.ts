@@ -1,19 +1,16 @@
 import { Component } from '@angular/core';
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component';
-import { UnitKerjaService } from '../../../modules/maintenance/services/unit-kerja.service';
 import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model';
 import { FormsModule } from '@angular/forms';
-import { InstansiService } from '../../../modules/maintenance/services/instansi.service';
 import { Instansi } from '../../../modules/maintenance/models/instansi.model';
 import { LoginContext } from '../../../modules/base/commons/login-context';
-import { ProvinsiService } from '../../../modules/maintenance/services/provinsi.service';
-import { KabKotaService } from '../../../modules/maintenance/services/kab-kota.service';
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model';
 import { KabKota } from '../../../modules/maintenance/models/kab-kota.model';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { WilayahService } from '../../../modules/maintenance/services/wilayah.service';
 import { Wilayah } from '../../../modules/maintenance/models/wilayah.model';
+import { TabService } from '../../../modules/base/services/tab.service';
+import { HandlerService } from '../../../modules/base/services/handler.service';
+import { ApiService } from '../../../modules/base/services/api.service';
 
 @Component({
   selector: 'app-unit-kerja-add',
@@ -31,15 +28,21 @@ export class UnitKerjaAddComponent {
   kabKota: KabKota;
 
   constructor(
-    private unitKerjaService: UnitKerjaService,
-    private instansiService: InstansiService,
-    private provinsiService: ProvinsiService,
-    private kabKotaService: KabKotaService,
-    private wilayahService: WilayahService,
-    private router: Router,
+    private apiService: ApiService,
+    private tabService: TabService,
+    private handlerService: HandlerService,
   ) { }
 
   ngOnInit() {
+    this.tabService.addTab({
+      label: 'Daftar Unit Kerja',
+      onClick: () => this.handlerService.handleNavigate(`/maintenance/unit-kerja`),
+    }).addTab({
+      label: 'Tambah Unit Kerja',
+      isActive: true,
+      onClick: () => this.handlerService.handleNavigate(`/maintenance/unit-kerja/add`),
+    });
+
     this.getInstansi();
   }
 
@@ -49,7 +52,7 @@ export class UnitKerjaAddComponent {
   }
 
   getWilayahList() {
-    this.wilayahService.findAll().subscribe({
+    this.apiService.getData(`/api/v1/wilayah`).subscribe({
       next: (wilayahList: Wilayah[]) => {
         wilayahList.forEach(wilayah => {
           if (['WL7', 'WL8', 'WL9'].includes(wilayah.code) || wilayah.code == this.provinsi.wilayahCode) {
@@ -61,7 +64,7 @@ export class UnitKerjaAddComponent {
   }
 
   getInstansi() {
-    this.instansiService.findById(this.instansiId).subscribe({
+    this.apiService.getData(`/api/v1/instansi/${this.instansiId}`).subscribe({
       next: (instansi: Instansi) => {
         this.instansi = instansi;
         this.unitKerja.instansiId = this.instansi.id;
@@ -78,7 +81,7 @@ export class UnitKerjaAddComponent {
   }
 
   getProvinsi() {
-    this.provinsiService.findById(this.instansi.provinsiId).subscribe({
+    this.apiService.getData(`/api/v1/provinsi/${this.instansi.provinsiId}`).subscribe({
       next: (provinsi: Provinsi) => {
         this.provinsi = provinsi;
         this.unitKerja.wilayahCode = this.provinsi.wilayahCode;
@@ -89,14 +92,14 @@ export class UnitKerjaAddComponent {
 
   getKabKota() {
     let kabKotaId = this.instansi.kabupatenId ?? this.instansi.kotaId;
-    this.kabKotaService.findById(kabKotaId).subscribe({
+    this.apiService.getData(`/api/v1/kab_kota/${kabKotaId}`).subscribe({
       next: (kabKota: KabKota) => this.kabKota = kabKota
     });
   }
 
   submit() {
-    this.unitKerjaService.save(this.unitKerja).subscribe({
-      next: () => this.router.navigate(['/maintenance/unit-kerja'])
+    this.apiService.postData(`/api/v1/unit_kerja`, this.unitKerja).subscribe({
+      next: () => this.handlerService.handleNavigate('/maintenance/unit-kerja')
     })
   }
 }

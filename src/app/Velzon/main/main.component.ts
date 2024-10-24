@@ -59,6 +59,12 @@ export class MainComponent implements OnInit, OnDestroy {
     });
   }
 
+  isCurrentRouteMatching(): boolean {
+    const currentUrl = this.router.url;
+    const outletPath = this.activatedRoute.routeConfig?.path || '';
+    return currentUrl === `/${outletPath}`;
+  }
+
   ngOnDestroy(): void {
     if (this.routerSubscription) this.routerSubscription.unsubscribe();
     if (this.tabSubscription) this.tabSubscription.unsubscribe();

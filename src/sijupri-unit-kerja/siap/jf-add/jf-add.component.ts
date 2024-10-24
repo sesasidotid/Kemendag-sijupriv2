@@ -2,15 +2,14 @@ import { Component } from '@angular/core';
 import { JF } from '../../../modules/siap/models/jf.model';
 import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model';
 import { Instansi } from '../../../modules/maintenance/models/instansi.model';
-import { UnitKerjaService } from '../../../modules/maintenance/services/unit-kerja.service';
-import { InstansiService } from '../../../modules/maintenance/services/instansi.service';
 import { JfService } from '../../../modules/siap/services/jf.service';
-import { Router } from '@angular/router';
 import { LoginContext } from '../../../modules/base/commons/login-context';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { JenisKelaminService } from '../../../modules/maintenance/services/jenis-kelamin.service';
 import { JenisKelamin } from '../../../modules/maintenance/models/jenis-kelamin.model';
+import { TabService } from '../../../modules/base/services/tab.service';
+import { HandlerService } from '../../../modules/base/services/handler.service';
+import { ApiService } from '../../../modules/base/services/api.service';
 
 @Component({
   selector: 'app-jf-add',
@@ -26,14 +25,23 @@ export class JfAddComponent {
   jenisKelaminList: JenisKelamin[];
 
   constructor(
+    private apiService: ApiService,
     private jfService: JfService,
-    private unitKerjaService: UnitKerjaService,
-    private instansiService: InstansiService,
-    private jenisKelaminService: JenisKelaminService,
-    private router: Router,
+    private tabService: TabService,
+    private handlerService: HandlerService,
   ) { }
 
   ngOnInit() {
+    this.tabService.addTab({
+      label: 'Daftar User Jabatan Fungsional',
+      onClick: () => this.handlerService.handleNavigate(`/siap/user-jf`),
+    }).addTab({
+      label: 'Tambah User Jabatan Fungsional',
+      isActive: true,
+      onClick: () => this.handlerService.handleNavigate(`/siap/user-jf/add`),
+    });
+
+
     this.jf.unitKerjaId = LoginContext.getUnitKerjaId();
     this.getJenisKelaminList();
     this.getInstansi();
@@ -41,26 +49,30 @@ export class JfAddComponent {
   }
 
   getInstansi() {
-    this.instansiService.findById(LoginContext.getInstansiId()).subscribe({
-      next: (instansi: Instansi) => this.instansi = instansi
+    this.apiService.getData(`/api/v1/instansi/${LoginContext.getInstansiId()}`).subscribe({
+      next: (instansi: Instansi) => this.instansi = instansi,
+      error: (error) => this.handlerService.handleException(error)
     })
   }
 
   getUnitKerja() {
-    this.unitKerjaService.findById(LoginContext.getUnitKerjaId()).subscribe({
-      next: (unitKerja: UnitKerja) => this.unitKerja = unitKerja
+    this.apiService.getData(`/api/v1/unit_kerja/${LoginContext.getUnitKerjaId()}`).subscribe({
+      next: (unitKerja: UnitKerja) => this.unitKerja = unitKerja,
+      error: (error) => this.handlerService.handleException(error)
     })
   }
 
   getJenisKelaminList() {
-    this.jenisKelaminService.findAll().subscribe({
-      next: (jenisKelaminList: JenisKelamin[]) => this.jenisKelaminList = jenisKelaminList
+    this.apiService.getData(`/api/v1/jenis_kelamin`).subscribe({
+      next: (jenisKelaminList: JenisKelamin[]) => this.jenisKelaminList = jenisKelaminList,
+      error: (error) => this.handlerService.handleException(error)
     })
   }
 
   submit() {
     this.jfService.save(this.jf).subscribe({
-      next: () => this.router.navigate(['/siap/user-jf'])
+      next: () => this.handlerService.handleNavigate(`/siap/user-jf`),
+      error: (error) => this.handlerService.handleException(error)
     })
   }
 }

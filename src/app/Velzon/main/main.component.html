@@ -35,7 +35,9 @@
                     </ul>
                     <router-outlet />
                 </div>
-                <router-outlet name="detached" />
+                <ng-container *ngIf="isCurrentRouteMatching()">
+                    <router-outlet name="detached" />
+                </ng-container>
                 <app-confirmation-dialog></app-confirmation-dialog>
                 <app-file-preview></app-file-preview>
             </div>

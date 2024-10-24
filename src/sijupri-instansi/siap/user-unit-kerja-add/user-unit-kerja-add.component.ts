@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UserUnitKerja } from '../../../modules/siap/models/user-unit-kerja.model';
-import { Router } from '@angular/router';
-import { UnitKerjaService } from '../../../modules/maintenance/services/unit-kerja.service';
-import { UserUnitKerjaService } from '../../../modules/siap/services/user-unit-kerja.service';
 import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model';
+import { HandlerService } from '../../../modules/base/services/handler.service';
+import { ApiService } from '../../../modules/base/services/api.service';
+import { TabService } from '../../../modules/base/services/tab.service';
 
 @Component({
   selector: 'app-user-unit-kerja-add',
@@ -19,24 +19,35 @@ export class UserUnitKerjaAddComponent {
   unitKerjaList: UnitKerja[];
 
   constructor(
-    private unitKerjaService: UnitKerjaService,
-    private userUnitKerjaService: UserUnitKerjaService,
-    private router: Router
+    private apiService: ApiService,
+    private handlerService: HandlerService,
+    private tabService: TabService,
   ) { }
 
   ngOnInit() {
+    this.tabService.addTab({
+      label: 'Daftar User Unit Kerja',
+      onClick: () => this.handlerService.handleNavigate(`/siap/user-unit-kerja`),
+    }).addTab({
+      label: 'Tambah User Unit Kerja',
+      isActive: true,
+      onClick: () => this.handlerService.handleNavigate(`/siap/user-unit-kerja/add`),
+    });
+
     this.getUnitKerjaList();
   }
 
   getUnitKerjaList() {
-    this.unitKerjaService.findAll().subscribe({
-      next: (unitKerjaList: UnitKerja[]) => this.unitKerjaList = unitKerjaList
+    this.apiService.getData(`/api/v1/unit_kerja`).subscribe({
+      next: (unitKerjaList: UnitKerja[]) => this.unitKerjaList = unitKerjaList,
+      error: (error) => this.handlerService.handleException(error)
     })
   }
 
   submit() {
-    this.userUnitKerjaService.save(this.userUnitKerja).subscribe({
-      next: () => this.router.navigate(['/siap/user-unit-kerja'])
+    this.apiService.postData(`/api/v1/user_unit_kerja`, this.userUnitKerja).subscribe({
+      next: () => this.handlerService.handleNavigate(`/siap/user-unit-kerja`),
+      error: (error) => this.handlerService.handleException(error)
     })
   }
 }

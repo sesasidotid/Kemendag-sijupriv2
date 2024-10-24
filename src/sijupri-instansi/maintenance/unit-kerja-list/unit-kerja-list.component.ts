@@ -3,6 +3,7 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { Router, RouterLink } from '@angular/router';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { TabService } from '../../../modules/base/services/tab.service';
 
 @Component({
   selector: 'app-unit-kerja-list',
@@ -15,7 +16,8 @@ export class UnitKerjaListComponent {
   pagable: Pagable;
 
   constructor(
-    private router: Router
+    private router: Router,
+    private tabService: TabService
   ) {
     this.pagable = new PagableBuilder("/api/v1/unit_kerja/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
@@ -26,5 +28,16 @@ export class UnitKerjaListComponent {
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("instansi|name").withField("Instansi", "text").build())
       .build();
+  }
+
+  ngOnInit() {
+    this.tabService.addTab({
+      label: 'Daftar Unit Kerja',
+      isActive: true,
+      onClick: () => this.router.navigate([`/maintenance/unit-kerja`]),
+    }).addTab({
+      label: 'Tambah Unit Kerja',
+      onClick: () => this.router.navigate([`/maintenance/unit-kerja/add`]),
+    });
   }
 }

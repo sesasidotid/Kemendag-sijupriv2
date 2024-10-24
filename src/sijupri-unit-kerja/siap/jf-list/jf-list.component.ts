@@ -4,6 +4,7 @@ import { LoginContext } from '../../../modules/base/commons/login-context';
 import { Router, RouterLink } from '@angular/router';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { TabService } from '../../../modules/base/services/tab.service';
 
 @Component({
   selector: 'app-jf-list',
@@ -17,6 +18,7 @@ export class JfListComponent {
 
   constructor(
     private router: Router,
+    private tabService: TabService,
   ) {
     this.pagable = new PagableBuilder("/api/v1/jf/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("NIP", 'nip').build())
@@ -29,5 +31,16 @@ export class JfListComponent {
       .addFilter(new PageFilterBuilder("like").setProperty("user|name").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("user|email").withField("Email", "text").build())
       .build();
+  }
+
+  ngOnInit() {
+    this.tabService.addTab({
+      label: 'Daftar User Jabatan Fungsional',
+      isActive: true,
+      onClick: () => this.router.navigate([`/siap/user-jf`]),
+    }).addTab({
+      label: 'Tambah User Jabatan Fungsional',
+      onClick: () => this.router.navigate([`/siap/user-jf/add`]),
+    });
   }
 }

@@ -83,7 +83,7 @@ export class UserInstansiAddComponent {
         })
         break;
       case 'IT5':
-        this.apiService.getData(`/api/v1/instansi/kab_kota/${this.kabupatenId}`).subscribe({
+        this.apiService.getData(`/api/v1/instansi/kab_kota/${this.kotaId}`).subscribe({
           next: (response) => this.instansiList = response.map((instansi: { [key: string]: any; }) => new Instansi(instansi)),
           error: (error) => this.handlerService.handleException(error)
         })
