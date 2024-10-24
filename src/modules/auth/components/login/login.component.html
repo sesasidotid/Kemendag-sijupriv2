@@ -1,83 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-    <title>SIJuPri | Login</title>
-</head>
-
-<body>
-
-    <main>
-        <div class="container">
-            <section
-                class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                            <div class="d-flex justify-content-center py-4">
-                                <a href="index.html" class="logo d-flex align-items-center w-auto">
-                                    <img src="assets/img/logo.png" alt="">
-                                    <span class="d-none d-lg-block">NiceAdmin</span>
-                                </a>
-                            </div><!-- End Logo -->
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <div class="pt-4 pb-2">
-                                        <h5 class="card-title text-center pb-0 fs-4">Masuk ke akun anda</h5>
-                                        <p class="text-center small">Isi username & password untuk masuk</p>
-                                    </div>
-                                    <form (submit)="submit()" class="row g-3 needs-validation" novalidate>
-                                        <div class="col-12">
-                                            <label for="nip" class="form-label">Masuk Sebagai</label>
-                                            <div class="input-group has-validation">
-                                                <a *ngFor="let application of applicationList"
-                                                    (click)="auth.applicationCode = application.code" [ngClass]="{
+<main>
+    <div class="container">
+        <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="pb-2">
+                                    <h5 class="card-title text-center pb-0 fs-4">Masuk ke akun anda</h5>
+                                    <p class="text-center small text-subtitle">Silahkan isi data dibawah untuk masuk</p>
+                                </div>
+                                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="row g-3 needs-validation">
+                                    <div class="col-12">
+                                        <label for="nip" class="form-label">Masuk Sebagai</label>
+                                        <div class="input-group has-validation">
+                                            <a *ngFor="let application of applicationList"
+                                                (click)="auth.applicationCode = application.code" [ngClass]="{
                                                         'active' : auth.applicationCode == application.code
                                                     }" class="col btn btn-sm btn-outline-primary w-100"
-                                                    style="font-size: 10px;">{{application.name}}</a>
-                                            </div>
+                                                style="font-size: 10px;">{{application.name}}</a>
                                         </div>
+                                    </div>
 
-                                        <div class="col-12">
-                                            <label for="nip" class="form-label">NIP</label>
-                                            <div class="input-group has-validation">
-                                                <span class="input-group-text" id="inputGroupPrepend">{{"@"}}</span>
-                                                <input [(ngModel)]="auth.username" type="text" name="nip"
-                                                    class="form-control" id="nip" required>
-                                                <div class="invalid-feedback">Mohon isi NIP anda.</div>
-                                            </div>
+                                    <div class="col-12">
+                                        <label for="nip" class="form-label">NIP</label>
+                                        <div class="input-group has-validation">
+                                            <input type="text" name="nip" class="form-control" id="nip"
+                                                formControlName="nip">
                                         </div>
+                                        <div class="feedback"
+                                            *ngIf="loginForm.get('nip').invalid && loginForm.get('nip').touched">
+                                            <small *ngIf="loginForm.get('nip').errors?.['required']">NIP perlu
+                                                diisi.</small>
+                                            <small *ngIf="loginForm.get('nip').errors?.['minlength']">NIP
+                                                minimal 18 karakter.</small>
+                                            <small *ngIf="loginForm.get('nip').errors?.['pattern']">NIP harus
+                                                angka.</small>
+                                        </div>
+                                    </div>
 
-                                        <div class="col-12">
-                                            <label for="password" class="form-label">Password</label>
-                                            <input [(ngModel)]="auth.password" type="password" name="password"
-                                                class="form-control" id="password" required>
-                                            <div class="invalid-feedback">Mohon isis password anda!</div>
+                                    <div class="col-12">
+                                        <label for="password" class="form-label">Kata Sandi</label>
+                                        <div class="input-group has-validation">
+                                            <input [type]="isPasswordVisible ? 'text' :'password'" name="password"
+                                                class="form-control" id="password" formControlName="password">
+                                            <span class="input-group-text cursor-pointer"
+                                                (click)="togglePasswordVisibility()"><i-lucide
+                                                    [img]="isPasswordVisible ? Eye : EyeOff" [size]="16"
+                                                    class="my-icon"></i-lucide></span>
                                         </div>
-                                        <div class="col-12">
-                                            <button class="btn btn-primary w-100" type="submit">Login</button>
+                                        <div class="feedback"
+                                            *ngIf="loginForm.get('password').invalid && loginForm.get('password').touched">
+                                            <small *ngIf="loginForm.get('password').errors?.['required']">Password
+                                                perlu diisi.</small>
                                         </div>
-                                        <div class="col-12">
+                                    </div>
+                                    <div class="col-12">
+                                        <button class="btn btn-primary w-100" type="submit"
+                                            [disabled]="loginForm.invalid">Masuk Sekarang</button>
+                                    </div>
+                                    <!-- <div class="col-12">
                                             <p class="small mb-0">Don't have account? <a
                                                     href="pages-register.html">Create an account</a></p>
-                                        </div>
-                                    </form>
-                                </div>
+                                        </div> -->
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-            </section>
+        </section>
 
-        </div>
-    </main><!-- End #main -->
-
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
-</body>
-
-</html>
+    </div>
+</main><!-- End #main -->

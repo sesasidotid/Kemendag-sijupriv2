@@ -2,17 +2,18 @@ import { Component } from '@angular/core';
 import { ApplicationService } from '../../../security/services/application.service';
 import { Application } from '../../../security/models/application.mode';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Auth } from '../../models/auth.model';
 import { AuthService } from '../../services/auth.service';
 import { AuthResponse } from '../../models/auth-response.model';
 import { LoginContext } from '../../../base/commons/login-context';
 import { Router } from '@angular/router';
+import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -20,11 +21,23 @@ export class LoginComponent {
   auth: Auth = new Auth();
   authResponse: AuthResponse;
   applicationList: Application[];
+  loginForm!: FormGroup;
+  isPasswordVisible: boolean = false;
+
+  readonly Eye = Eye;
+  readonly EyeOff = EyeOff;
 
   constructor(private applicationServce: ApplicationService, private authService: AuthService, private router: Router) { }
-
+  
   ngOnInit() {
+    if (LoginContext.getUserId()) {
+      this.router.navigate([''])
+    }
     this.getApplicationList();
+    this.loginForm = new FormGroup({
+      nip: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(18)]),
+      password: new FormControl('', [Validators.required]),
+    })
   }
 
   getApplicationList() {
@@ -35,17 +48,40 @@ export class LoginComponent {
       }
     })
   }
-
-  submit() {
-    console.log(this.auth);
-    this.authService.login(this.auth).subscribe({
-      next: (authResponse: AuthResponse) => {
-        this.authResponse = authResponse;
-        LoginContext.storeContextLocalStorage(this.authResponse);
-        this.router.navigate(['']).then(() => {
-          window.location.reload();
-        });
-      }
-    });
+  togglePasswordVisibility(): void {
+    this.isPasswordVisible = !this.isPasswordVisible; // Toggle the visibility
   }
+
+  onSubmit() {
+    if (this.loginForm.valid) {
+      console.log(this.loginForm.value);
+      this.auth.username = this.loginForm.value.nip;
+      this.auth.password = this.loginForm.value.password;
+
+      this.authService.login(this.auth).subscribe({
+        next: (authResponse: AuthResponse) => {
+          this.authResponse = authResponse;
+          LoginContext.storeContextLocalStorage(this.authResponse);
+        },
+        complete: () => {
+          this.router.navigate(['']).then(() => {
+            window.location.reload();
+          });
+        }
+      });
+    }
+  }
+
+  // submit() {
+  //   console.log(this.auth);
+  //   this.authService.login(this.auth).subscribe({
+  //     next: (authResponse: AuthResponse) => {
+  //       this.authResponse = authResponse;
+  //       LoginContext.storeContextLocalStorage(this.authResponse);
+  //       this.router.navigate(['']).then(() => {
+  //         window.location.reload();
+  //       });
+  //     }
+  //   });
+  // }
 }
