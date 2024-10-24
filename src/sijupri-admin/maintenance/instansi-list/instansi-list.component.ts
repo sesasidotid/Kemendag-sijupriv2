@@ -3,6 +3,7 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { Router } from '@angular/router';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-instansi-list',
@@ -20,7 +21,7 @@ export class InstansiListComponent {
     this.pagable = new PagableBuilder("/api/v1/instansi/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((instansi: any) => {
-        this.router.navigate([`/${instansi.nip}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/${instansi.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama Kab/Kota", "text").build())
       .build();

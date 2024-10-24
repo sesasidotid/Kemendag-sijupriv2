@@ -30,8 +30,8 @@ export class LoginComponent {
   constructor(private applicationServce: ApplicationService, private authService: AuthService, private router: Router) { }
   
   ngOnInit() {
-    if (LoginContext.getUserId()) {
-      this.router.navigate([''])
+    if (LoginContext.isLogin()) {
+      this.router.navigate([LoginContext.getUserLoginRoute()])
     }
     this.getApplicationList();
     this.loginForm = new FormGroup({
@@ -48,6 +48,7 @@ export class LoginComponent {
       }
     })
   }
+
   togglePasswordVisibility(): void {
     this.isPasswordVisible = !this.isPasswordVisible; // Toggle the visibility
   }

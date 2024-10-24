@@ -10,6 +10,7 @@ import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBu
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { Ukom } from '../../../modules/ukom/models/ukom.model';
 import { TabService } from '../../../modules/base/services/tab.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-ukom-list',
@@ -35,7 +36,7 @@ export class UkomListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Tanggal Dibuka", 'periodePendaftaran|startDate').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Tanggal Ditutup", 'periodePendaftaran|endDate').build())
       .addActionColumn(new ActionColumnBuilder().setAction((periodePendafatan: any) => {
-        this.router.navigate([`/ukom/ukom-periode/${periodePendafatan.id}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/ukom/ukom-periode/${periodePendafatan.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("equal").setProperty("periodePendaftaran|startDate").withField("Tanggal Dibuka", "text").build())
       .addFilter(new PageFilterBuilder("equal").setProperty("periodePendaftaran|endDate").withField("Tanggal Ditutup", "text").build())
@@ -46,10 +47,10 @@ export class UkomListComponent {
     this.tabService.addTab({
       label: 'Daftar UKom',
       isActive: true,
-      onClick: () => this.router.navigate(['/ukom/ukom-list']),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/ukom/ukom-list']),
     }).addTab({
       label: 'Tambah UKom',
-      onClick: () => this.router.navigate(['/ukom/ukom-list/add']),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/ukom/ukom-list/add']),
     });
   }
 

@@ -36,11 +36,11 @@ export class UnitKerjaAddComponent {
   ngOnInit() {
     this.tabService.addTab({
       label: 'Daftar Unit Kerja',
-      onClick: () => this.handlerService.handleNavigate(`/maintenance/unit-kerja`),
+      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +`/maintenance/unit-kerja`),
     }).addTab({
       label: 'Tambah Unit Kerja',
       isActive: true,
-      onClick: () => this.handlerService.handleNavigate(`/maintenance/unit-kerja/add`),
+      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +`/maintenance/unit-kerja/add`),
     });
 
     this.getInstansi();
@@ -99,7 +99,7 @@ export class UnitKerjaAddComponent {
 
   submit() {
     this.apiService.postData(`/api/v1/unit_kerja`, this.unitKerja).subscribe({
-      next: () => this.handlerService.handleNavigate('/maintenance/unit-kerja')
+      next: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/maintenance/unit-kerja')
     })
   }
 }

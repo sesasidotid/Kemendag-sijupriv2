@@ -133,11 +133,11 @@
                     </div>
                 </div>
 
-                <ng-container *ngFor="let formasi of this.formasiList">
+                <ng-container *ngFor="let formasi of formasiList">
                     <div class="col-lg-12 row">
-                        <div *ngIf="formasi.jabatanCode == 'JB11'" class="col-xl-4">
+                        <div *ngIf="jabatanMapping[formasi.jabatanCode]" class="col-xl-4">
                             <div class="card card-animate"
-                                [routerLink]="'/formasi/formasi-task-list/jabatan/'+formasi.unitKerjaId+'/'+formasi.jabatanCode">
+                                [routerLink]="getUserLoginRoute() + '/formasi/formasi-task-list/jabatan/' + formasi.unitKerjaId + '/' + formasi.jabatanCode">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-sm flex-shrink-0">
@@ -147,134 +147,12 @@
                                         </div>
                                         <div class="flex-grow-1 overflow-hidden ms-3">
                                             <div class="d-flex align-items-center mb-3">
-                                                <h4 class="flex-grow-1 mb-0"><span class="counter-value">Penera</span>
+                                                <h4 class="flex-grow-1 mb-0">
+                                                    <span class="counter-value">{{ jabatanMapping[formasi.jabatanCode] }}</span>
                                                 </h4>
-                                                <span class="badge bg-warning-subtle text-warning fs-12"><i
-                                                        class="ri-arrow-right-s-line fs-13 align-middle me-1"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div *ngIf="formasi.jabatanCode == 'JB10'" class="col-xl-4">
-                            <div class="card card-animate"
-                                [routerLink]="'/formasi/formasi-task-list/jabatan/'+formasi.unitKerjaId+'/'+formasi.jabatanCode">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2">
-                                                <i data-feather="briefcase" class="text-primary"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 overflow-hidden ms-3">
-                                            <div class="d-flex align-items-center mb-3">
-                                                <h4 class="flex-grow-1 mb-0"><span class="counter-value">Pengamat
-                                                        Tera</span>
-                                                </h4>
-                                                <span class="badge bg-warning-subtle text-warning fs-12"><i
-                                                        class="ri-arrow-right-s-line fs-13 align-middle me-1"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div *ngIf="formasi.jabatanCode == 'JB9'" class="col-xl-4">
-                            <div class="card card-animate"
-                                [routerLink]="'/formasi/formasi-task-list/jabatan/'+formasi.unitKerjaId+'/'+formasi.jabatanCode">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2">
-                                                <i data-feather="briefcase" class="text-primary"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 overflow-hidden ms-3">
-                                            <div class="d-flex align-items-center mb-3">
-                                                <h4 class="flex-grow-1 mb-0"><span class="counter-value">Pengawas
-                                                        Kemetrologian</span>
-                                                </h4>
-                                                <span class="badge bg-warning-subtle text-warning fs-12"><i
-                                                        class="ri-arrow-right-s-line fs-13 align-middle me-1"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div *ngIf="formasi.jabatanCode == 'JB7'" class="col-xl-4">
-                            <div class="card card-animate"
-                                [routerLink]="'/formasi/formasi-task-list/jabatan/'+formasi.unitKerjaId+'/'+formasi.jabatanCode">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2">
-                                                <i data-feather="briefcase" class="text-primary"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 overflow-hidden ms-3">
-                                            <div class="d-flex align-items-center mb-3">
-                                                <h4 class="flex-grow-1 mb-0"><span class="counter-value">Penguji Mutu
-                                                        Barang</span>
-                                                </h4>
-                                                <span class="badge bg-warning-subtle text-warning fs-12"><i
-                                                        class="ri-arrow-right-s-line fs-13 align-middle me-1"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div *ngIf="formasi.jabatanCode == 'JB4'" class="col-xl-4">
-                            <div class="card card-animate"
-                                [routerLink]="'/formasi/formasi-task-list/jabatan/'+formasi.unitKerjaId+'/'+formasi.jabatanCode">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2">
-                                                <i data-feather="briefcase" class="text-primary"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 overflow-hidden ms-3">
-                                            <div class="d-flex align-items-center mb-3">
-                                                <h4 class="flex-grow-1 mb-0"><span class="counter-value">Pengawas
-                                                        Perdagangan</span>
-                                                </h4>
-                                                <span class="badge bg-warning-subtle text-warning fs-12"><i
-                                                        class="ri-arrow-right-s-line fs-13 align-middle me-1"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div *ngIf="formasi.jabatanCode == 'JB1'" class="col-xl-4">
-                            <div class="card card-animate"
-                                [routerLink]="'/formasi/formasi-task-list/jabatan/'+formasi.unitKerjaId+'/'+formasi.jabatanCode">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2">
-                                                <i data-feather="briefcase" class="text-primary"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 overflow-hidden ms-3">
-                                            <div class="d-flex align-items-center mb-3">
-                                                <h4 class="flex-grow-1 mb-0"><span class="counter-value">Analis
-                                                        Perdagangan</span>
-                                                </h4>
-                                                <span class="badge bg-warning-subtle text-warning fs-12"><i
-                                                        class="ri-arrow-right-s-line fs-13 align-middle me-1"></i></span>
+                                                <span class="badge bg-warning-subtle text-warning fs-12">
+                                                    <i class="ri-arrow-right-s-line fs-13 align-middle me-1"></i>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -283,6 +161,7 @@
                         </div>
                     </div>
                 </ng-container>
+                
             </div>
         </div>
         <div class="tab-pane" id="Rekomendasi" role="tabpanel">

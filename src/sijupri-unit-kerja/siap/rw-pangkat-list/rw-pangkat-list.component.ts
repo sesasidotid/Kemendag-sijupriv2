@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-pangkat-list',
@@ -25,7 +26,7 @@ export class RwPangkatListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Pangkat", 'pangkat|name').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("TMT", 'tmt').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwPangkat: any) => {
-          this.router.navigate([`/${rwPangkat.id}`])
+          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwPangkat.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("pangkat|name").withField("Pangkat", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("nip").withDefaultValue(nip).build())

@@ -24,7 +24,7 @@ export class UserUnitKerjaListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name', ['user']).build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email', ['user']).build())
       .addActionColumn(new ActionColumnBuilder().setAction((userUnitKerja: any) => {
-        this.router.navigate([`/${userUnitKerja.id}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/${userUnitKerja.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name", ["user"]).withField("Nama", "text").build())

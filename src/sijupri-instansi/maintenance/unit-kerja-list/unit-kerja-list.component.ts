@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { TabService } from '../../../modules/base/services/tab.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-unit-kerja-list',
@@ -23,7 +24,7 @@ export class UnitKerjaListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Instansi", 'instansi|name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((unitKerja: any) => {
-        this.router.navigate([`/${unitKerja.id}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/${unitKerja.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("instansi|name").withField("Instansi", "text").build())
@@ -34,10 +35,10 @@ export class UnitKerjaListComponent {
     this.tabService.addTab({
       label: 'Daftar Unit Kerja',
       isActive: true,
-      onClick: () => this.router.navigate([`/maintenance/unit-kerja`]),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/maintenance/unit-kerja`]),
     }).addTab({
       label: 'Tambah Unit Kerja',
-      onClick: () => this.router.navigate([`/maintenance/unit-kerja/add`]),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/maintenance/unit-kerja/add`]),
     });
   }
 }

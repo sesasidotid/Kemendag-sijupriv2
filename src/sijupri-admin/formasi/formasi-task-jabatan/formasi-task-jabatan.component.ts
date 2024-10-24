@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '../../../modules/base/services/alert.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-formasi-task-jabatan',
@@ -111,7 +112,7 @@ export class FormasiTaskJabatanComponent {
     this.formasiRequest.jabatanCode = this.jabatanCode;
 
     this.pendingFormasiService.save(this.formasiRequest).subscribe({
-      next: () => this.router.navigate(['/formasi/formasi-task']),
+      next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/formasi/formasi-task']),
     })
   }
 }

@@ -3,6 +3,7 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-kompetensi-list',
@@ -27,7 +28,7 @@ export class RwKompetensiListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Sertifikat", 'tglSertifikat').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwKompetensi: any) => {
-          this.router.navigate([`/${rwKompetensi.id}`])
+          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwKompetensi.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("tglSertifikat").withField("Tgl Sertifikat", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("nip").withDefaultValue(nip).build())

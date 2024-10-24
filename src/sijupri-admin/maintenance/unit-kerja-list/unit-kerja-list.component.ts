@@ -4,6 +4,7 @@ import { Instansi } from '../../../modules/maintenance/models/instansi.model';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { Router } from '@angular/router';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-unit-kerja-list',
@@ -22,7 +23,7 @@ export class UnitKerjaListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Instansi", 'instansi|name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((unitKerja: any) => {
-        this.router.navigate([`/${unitKerja.nip}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/${unitKerja.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("instansi|name").withField("Instansi", "text").build())

@@ -3,6 +3,7 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-kinerja-list',
@@ -27,7 +28,7 @@ export class RwKinerjaListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("Angka Kredit", 'angkaKredit').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwKinerja: any) => {
-          this.router.navigate([`/${rwKinerja.id}`])
+          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwKinerja.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("pangkat|name").withField("Tahunan/Bulanan", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("dateStart").withField("Tgl Mulai", "text").build())

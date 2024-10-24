@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-jabatan-list',
@@ -27,7 +28,7 @@ export class RwJabatanListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("TMT", 'tmt').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwJabatan: any) => {
-          this.router.navigate([`/${rwJabatan.id}`])
+          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwJabatan.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("jabatan|name").withField("Jabatan", "text").build())
         .addFilter(new PageFilterBuilder("like").setProperty("jenjang|name").withField("Jenjang", "text").build())

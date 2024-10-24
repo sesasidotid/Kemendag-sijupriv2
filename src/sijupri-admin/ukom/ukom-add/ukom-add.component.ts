@@ -9,6 +9,7 @@ import { Ukom } from '../../../modules/ukom/models/ukom.model';
 import { FormsModule } from '@angular/forms';
 import { HandlerService } from '../../../modules/base/services/handler.service';
 import { TabService } from '../../../modules/base/services/tab.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-ukom-add',
@@ -33,11 +34,11 @@ export class UkomAddComponent {
   ngOnInit() {
     this.tabService.addTab({
       label: 'Daftar UKom',
-      onClick: () => this.handlerService.handleNavigate('/ukom/ukom-list'),
+      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/ukom/ukom-list'),
     }).addTab({
       label: 'Tambah UKom',
       isActive: true,
-      onClick: () => this.handlerService.handleNavigate('/ukom/ukom-list/add'),
+      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/ukom/ukom-list/add'),
     });
   }
 
@@ -48,7 +49,7 @@ export class UkomAddComponent {
 
         this.apiService.postData("/api/v1/ukom", this.ukom).subscribe({
           next: (response) => {
-            this.handlerService.handleNavigate('/ukom/ukom-list');
+            this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/ukom/ukom-list');
           },
           error: (error) => {
             this.handlerService.handleException(error);

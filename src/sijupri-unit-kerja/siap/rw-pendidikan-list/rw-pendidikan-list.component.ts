@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-pendidikan-list',
@@ -25,7 +26,7 @@ export class RwPendidikanListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Pendidikan", 'pendidikan|name').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("Tanggal Ijazah", 'tanggalIjazah').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwPendidikan: any) => {
-          this.router.navigate([`/${rwPendidikan.id}`])
+          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwPendidikan.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("pendidikan|name").withField("Pendidikan", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("nip").withDefaultValue(nip).build())

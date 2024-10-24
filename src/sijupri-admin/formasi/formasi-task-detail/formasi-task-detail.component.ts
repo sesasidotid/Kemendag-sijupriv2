@@ -11,6 +11,7 @@ import { Formasi } from '../../../modules/formasi/models/formasi.model';
 import { take } from 'rxjs';
 import { Task } from '../../../modules/workflow/models/task.model';
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-formasi-task-detail',
@@ -27,6 +28,15 @@ export class FormasiTaskDetailComponent {
   pendingTaskId: string;
   isApproveEnable: boolean = true;
 
+  jabatanMapping: { [key: string]: string } = {
+      'JB1': 'Analis Perdagangan',
+      'JB4': 'Pengawas Perdagangan',
+      'JB7': 'Penguji Mutu Barang',
+      'JB9': 'Pengawas Kemetrologian',
+      'JB10': 'Pengamat Tera',
+      'JB11': 'Penera'
+  };
+
   constructor(
     private apiService: ApiService,
     private activatedRoute: ActivatedRoute,
@@ -40,6 +50,10 @@ export class FormasiTaskDetailComponent {
 
   ngOnInit() {
     this.getPendingTask();
+  }
+
+  getUserLoginRoute() {
+    return LoginContext.getUserLoginRoute();
   }
 
   getPendingTask() {

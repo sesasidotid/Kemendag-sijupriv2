@@ -24,7 +24,7 @@ export class LoginContext {
     public static release() {
         localStorage.removeItem('instansiId');
         localStorage.removeItem('unitKerjaId');
-
+        localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userId');
         localStorage.removeItem('applicationCode');
@@ -72,5 +72,22 @@ export class LoginContext {
 
     public static getMenuCodes(): string {
         return JSON.parse(localStorage.getItem('menuCodes') || '[]');
+    }
+
+    public static getUserLoginRoute(): string {
+        switch (this.getApplicationCode()) {
+            case 'sijupri-admin':
+                return 'admin';
+            case 'sijupri-instansi':
+                return 'instansi';
+            case 'sijupri-unit-kerja':
+                return 'unit-kerja';
+            case 'sijupri-external':
+                return 'jf-external';
+            case 'sijupri-internal':
+                return 'jf-internal';
+            default:
+                return 'login';
+        }
     }
 }

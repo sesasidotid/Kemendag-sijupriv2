@@ -63,7 +63,7 @@ export class RoleUpdateComponent {
     this.role.applicationCode = 'sijupri-admin';
 
     this.roleService.update(this.role).subscribe({
-      next: () => this.router.navigate(['/security/role'])
+      next: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/security/role'])
     })
   }
 }

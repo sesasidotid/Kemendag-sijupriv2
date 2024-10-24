@@ -10,6 +10,7 @@ import { AlertService } from '../../../modules/base/services/alert.service';
 import { TabService } from '../../../modules/base/services/tab.service';
 import { ApiService } from '../../../modules/base/services/api.service';
 import { HandlerService } from '../../../modules/base/services/handler.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-user-add',
@@ -35,11 +36,11 @@ export class UserAddComponent {
   ngOnInit(): void {
     this.tabService.addTab({
       label: 'Daftar User',
-      onClick: () => this.handlerService.handleNavigate('/security/user'),
+      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user'),
     }).addTab({
       label: 'Tambah User',
       isActive: true,
-      onClick: () => this.handlerService.handleNavigate('/security/user/add'),
+      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user/add'),
     });
 
     this.roleService.findByapplicationCode("sijupri-admin").subscribe({
@@ -66,7 +67,7 @@ export class UserAddComponent {
     this.apiService.postData(`/api/v1/user`, this.user).subscribe({
       next: () => {
         this.alertService.showToast('Success', "Berhasil");
-        this.handlerService.handleNavigate('/security/user')
+        this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user')
       },
       error: (error) => this.handlerService.handleException(error)
     });

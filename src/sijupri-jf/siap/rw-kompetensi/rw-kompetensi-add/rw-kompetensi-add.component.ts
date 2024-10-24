@@ -9,6 +9,7 @@ import { ApiService } from '../../../../modules/base/services/api.service';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
+import { LoginContext } from '../../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-kompetensi-add',
@@ -61,7 +62,7 @@ export class RwKompetensiAddComponent {
         this.apiService.postData(`/api/v1/rw_kompetensi/task`, this.rwKompetensi).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate(['/profile/rw-kompetensi/pending'])
+            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-kompetensi/pending'])
           },
           error: (error) => {
             console.log("error", error);

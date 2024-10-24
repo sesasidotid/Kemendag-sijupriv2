@@ -8,6 +8,7 @@ import { AlertService } from '../../../modules/base/services/alert.service';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { TabService } from '../../../modules/base/services/tab.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-kkn',
@@ -30,7 +31,7 @@ export class KknComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Instrumen", 'instrument|name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((kkn: any) => {
-        this.router.navigate([`/akp/kkn/${kkn.id}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn/${kkn.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
       .build();
@@ -40,10 +41,10 @@ export class KknComponent {
     this.tabService.addTab({
       label: 'Daftar KKN',
       isActive: true,
-      onClick: () => this.router.navigate([`/akp/kkn`]),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn`]),
     }).addTab({
       label: 'Tambah KKN',
-      onClick: () => this.router.navigate([`/akp/kkn/add`]),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn/add`]),
     });
 
     this.getInstrumenList();

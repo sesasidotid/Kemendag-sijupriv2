@@ -9,6 +9,7 @@ import { Pertanyaan } from '../../../modules/akp/models/pertanyaan.model';
 import { Router } from '@angular/router';
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service';
 import { TabService } from '../../../modules/base/services/tab.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-kkn-add',
@@ -32,11 +33,11 @@ export class KknAddComponent {
   ngOnInit() {
     this.tabService.addTab({
       label: 'Daftar KKN',
-      onClick: () => this.router.navigate([`/akp/kkn`]),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn`]),
     }).addTab({
       label: 'Tambah KKN',
       isActive: true,
-      onClick: () => this.router.navigate([`/akp/kkn/add`]),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn/add`]),
     });
 
     this.getInstrumenList();
@@ -68,7 +69,7 @@ export class KknAddComponent {
         if (!result.confirmed) return;
 
         this.apiService.postData('/api/v1/kategori_instrument', this.kategoriInstrument).subscribe({
-          next: () => this.router.navigate(['akp/kkn']),
+          next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/akp/kkn']),
           error: (error) => {
             console.error('Error fetching data', error);
             this.alertService.showToast('Error', "Terjadi Masalah");

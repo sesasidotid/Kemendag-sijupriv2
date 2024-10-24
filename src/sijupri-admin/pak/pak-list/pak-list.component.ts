@@ -3,6 +3,7 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { Router } from '@angular/router';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-pak-list',
@@ -22,7 +23,7 @@ export class PakListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'user|name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'user|email').build())
       .addActionColumn(new ActionColumnBuilder().setAction((jf: any) => {
-        this.router.navigate([`/pak/pak-list/${jf.nip}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/pak/pak-list/${jf.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("user|name").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("user|email").withField("Email", "text").build())

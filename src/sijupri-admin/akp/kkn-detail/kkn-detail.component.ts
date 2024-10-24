@@ -7,6 +7,7 @@ import { KategoriInstrument } from '../../../modules/akp/models/kategori-instrum
 import { Pertanyaan } from '../../../modules/akp/models/pertanyaan.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-kkn-detail',
@@ -62,7 +63,7 @@ export class KknDetailComponent {
         if (!result.confirmed) return;
 
         this.apiService.deleteData(`/api/v1/kategori_instrument/${this.id}`).subscribe({
-          next: () => this.router.navigate(['akp/kkn']),
+          next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/akp/kkn']),
           error: (error) => {
             console.error('Error fetching data', error);
             this.alertService.showToast('Error', "Terjadi Masalah");
@@ -78,7 +79,7 @@ export class KknDetailComponent {
         if (!result.confirmed) return;
 
         this.apiService.putData('/api/v1/kategori_instrument', this.kategoriInstrument).subscribe({
-          next: () => this.router.navigate(['akp/kkn']),
+          next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/akp/kkn']),
           error: (error) => {
             console.error('Error fetching data', error);
             this.alertService.showToast('Error', "Terjadi Masalah");

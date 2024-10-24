@@ -10,6 +10,7 @@ import { UserInstansiService } from '../../../modules/siap/services/user-instans
 import { TabService } from '../../../modules/base/services/tab.service';
 import { HandlerService } from '../../../modules/base/services/handler.service';
 import { ApiService } from '../../../modules/base/services/api.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-user-instansi-add',
@@ -39,11 +40,11 @@ export class UserInstansiAddComponent {
   ngOnInit() {
     this.tabService.addTab({
       label: 'Daftar User Instansi',
-      onClick: () => this.handlerService.handleNavigate('/siap/user-instansi'),
+      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/siap/user-instansi'),
     }).addTab({
       label: 'Tambah User Instansi',
       isActive: true,
-      onClick: () => this.handlerService.handleNavigate('/siap/user-instansi/add'),
+      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/siap/user-instansi/add'),
     });
 
     this.getInstansiTypeList();
@@ -138,7 +139,7 @@ export class UserInstansiAddComponent {
     this.userInstansiService.save(this.userInstansi).subscribe({
       next: () => {
         this.handlerService.handleAlert('Success', "Berhasil");
-        this.handlerService.handleNavigate('/siap/user-instansi')
+        this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/siap/user-instansi')
       },
       error: (error) => this.handlerService.handleException(error)
     })

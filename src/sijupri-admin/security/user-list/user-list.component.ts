@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { TabService } from '../../../modules/base/services/tab.service';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-user-list',
@@ -26,7 +27,7 @@ export class UserListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'status').build())
       .addActionColumn(new ActionColumnBuilder().setAction((user: any) => {
-        this.router.navigate([`/${user.id}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/${user.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
@@ -39,10 +40,10 @@ export class UserListComponent {
     this.tabService.addTab({
       label: 'Daftar User',
       isActive: true,
-      onClick: () => this.router.navigate([`/security/user`]),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/security/user`]),
     }).addTab({
       label: 'Tambah User',
-      onClick: () => this.router.navigate([`/security/user/add`]),
+      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/security/user/add`]),
     });
   }
 }

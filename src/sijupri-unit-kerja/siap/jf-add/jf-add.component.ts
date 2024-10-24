@@ -71,7 +71,7 @@ export class JfAddComponent {
 
   submit() {
     this.jfService.save(this.jf).subscribe({
-      next: () => this.handlerService.handleNavigate(`/siap/user-jf`),
+      next: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +`/siap/user-jf`),
       error: (error) => this.handlerService.handleException(error)
     })
   }

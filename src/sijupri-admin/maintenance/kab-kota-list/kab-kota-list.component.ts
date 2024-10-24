@@ -3,6 +3,7 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { Router } from '@angular/router';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-kab-kota-list',
@@ -22,7 +23,7 @@ export class KabKotaListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Tipe", 'type').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Provinsi", 'provinsi|name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((kabKota: any) => {
-        this.router.navigate([`/${kabKota.nip}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() + `/${kabKota.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama Kab/Kota", "text").build())
       .addFilter(new PageFilterBuilder("equal").setProperty("type").withField("Tipe", "select").setOptionList([

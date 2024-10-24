@@ -18,6 +18,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ApiService } from '../../../modules/base/services/api.service';
 import { AlertService } from '../../../modules/base/services/alert.service';
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-jf-task-detail',
@@ -49,7 +50,7 @@ export class JfTaskDetailComponent {
   getTaskDetail() {
     this.apiService.getData(`/api/v1/jf/task/group/${this.nip}`).subscribe({
       next: (pendingTaskList: PendingTask[]) => {
-        if (pendingTaskList.length == 0) this.router.navigate(['/siap/verify-user-jf']);
+        if (pendingTaskList.length == 0) this.router.navigate([LoginContext.getUserLoginRoute() +'/siap/verify-user-jf']);
         this.pendingTaskList = pendingTaskList;
       },
       error: (error) => {

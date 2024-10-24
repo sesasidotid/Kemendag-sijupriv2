@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-sertifikasi-list',
@@ -31,7 +32,7 @@ export class RwSertifikasiListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("UU Kawalan", 'uuKawalan').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwSertifikasi: any) => {
-          this.router.navigate([`/${rwSertifikasi.id}`])
+          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwSertifikasi.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("noSk").withField("No. SK", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("tglSk").withField("Tgl SK", "text").build())

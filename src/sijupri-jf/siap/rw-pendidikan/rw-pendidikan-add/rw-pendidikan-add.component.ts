@@ -9,6 +9,7 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 import { ApiService } from '../../../../modules/base/services/api.service';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
+import { LoginContext } from '../../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-pendidikan-add',
@@ -59,7 +60,7 @@ export class RwPendidikanAddComponent {
         this.apiService.postData(`/api/v1/rw_pendidikan/task`, this.rwPendidikan).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate(['/profile/rw-pendidikan/pending'])
+            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-pendidikan/pending'])
           },
           error: (error) => {
             console.log("error", error);

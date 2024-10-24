@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { RWKinerja } from '../../../modules/siap/models/rw-kinerja.model';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-pak-detail',
@@ -31,7 +32,7 @@ export class PakDetailComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("Angka Kredit", 'angkaKredit').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwKinerja: any) => {
-          this.router.navigate([`/${rwKinerja.nip}`])
+          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwKinerja.nip}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("user|email").withField("Email", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("user|email").withField("Email", "text").build())

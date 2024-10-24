@@ -9,6 +9,7 @@ import { ApiService } from '../../../../modules/base/services/api.service';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
+import { LoginContext } from '../../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-pangkat-add',
@@ -59,7 +60,7 @@ export class RwPangkatAddComponent {
         this.apiService.postData(`/api/v1/rw_pangkat/task`, this.rwPangkat).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate(['/profile/rw-pangkat/pending'])
+            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-pangkat/pending'])
           },
           error: (error) => {
             console.log("error", error);

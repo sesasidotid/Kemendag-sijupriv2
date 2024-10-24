@@ -11,6 +11,7 @@ import { ApiService } from '../../../../modules/base/services/api.service';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
+import { LoginContext } from '../../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-rw-sertifikasi-add',
@@ -86,7 +87,7 @@ export class RwSertifikasiAddComponent {
         this.apiService.postData(`/api/v1/rw_sertifikasi/task`, this.rwSertifikasi).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate(['/profile/rw-sertifikasi/pending'])
+            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-sertifikasi/pending'])
           },
           error: (error) => {
             console.log("error", error);

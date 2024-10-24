@@ -4,6 +4,7 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { Router } from '@angular/router';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-ukom-task-list',
@@ -26,7 +27,7 @@ export class UkomTaskListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'objectName').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'flowName').build())
       .addActionColumn(new ActionColumnBuilder().setAction((pendingTask: any) => {
-        this.router.navigate([`/ukom/ukom-task-list/${pendingTask.id}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/ukom/ukom-task-list/${pendingTask.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectId").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Nama", "text").build())
