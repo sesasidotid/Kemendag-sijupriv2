@@ -13,6 +13,7 @@ import { LoginContext } from '../../../modules/base/commons/login-context';
 export class TopBarComponent {
   id: string;
   name: string;
+  role: string[];
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -20,6 +21,7 @@ export class TopBarComponent {
   ) {
     this.id = LoginContext.getUserId();
     this.name = LoginContext.getName();
+    this.role = LoginContext.getRoleCodes();
   }
 
   toggelSidebar() {
