@@ -1,23 +1,33 @@
 #scrollbarV {
-    max-height: 75vh;
+    max-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.menu-title {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 8px;
+    padding-left: 24px;
+}
+
+.x-button {
+    cursor: pointer;
+    // Hidden on screens wider than 768px (non-mobile)
+    @media (min-width: 768px) {
+        display: none;
+    }
 }
 
 #scrollbarV {
     border-right: 1px solid #ddd;
     padding-right: 5px;
-    scrollbar-width: thin;
+    scrollbar-width: thin; // For Firefox
+    scrollbar-color: #c7c7c7 transparent; // Rounded thumb with transparent track for Firefox
 }
 
-#scrollbarV::-webkit-scrollbar {
-    width: 8px;
-}
-
-#scrollbarV::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 4px;
-}
 
 .container-fluid {
     padding: 0;
