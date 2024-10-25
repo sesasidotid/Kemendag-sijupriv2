@@ -80,12 +80,12 @@
 </div>
 <nav *ngIf="paginator" aria-label="Page navigation example">
     <ul class="pagination justify-content-end">
-        <li class="page-item" [ngClass]="{'disabled': page == 1}">
+        <li class="page-item cursor-pointer" [ngClass]="{'disabled': page == 1}">
             <a class="page-link py-1 px-2" (click)="prev()">Previous</a>
         </li>
 
         <ng-container *ngFor="let item of getPages(); let i = index">
-            <li *ngIf="item !== '...'" class="page-item">
+            <li *ngIf="item !== '...'" class="page-item cursor-pointer">
                 <a class="page-link py-1 px-2" [ngClass]="{'active': page == item}" (click)="select(item)">{{ item
                     }}</a>
             </li>
@@ -94,7 +94,7 @@
             </li>
         </ng-container>
 
-        <li class="page-item" [ngClass]="{'disabled': page == paginator.lastPage}">
+        <li class="page-item cursor-pointer"[ngClass]="{'disabled': page == paginator.lastPage}">
             <a class="page-link py-1 px-2" (click)="next()">Next</a>
         </li>
     </ul>
