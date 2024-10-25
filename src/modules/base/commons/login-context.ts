@@ -3,18 +3,30 @@ import { Menu } from "../../security/models/menu.mode";
 
 export class LoginContext {
 
-    static storeContextLocalStorage(authResponse: AuthResponse) {
-        localStorage.setItem('instansiId', authResponse.instansiId);
-        localStorage.setItem('unitKerjaId', authResponse.unitKerjaId);
+    private static instansiId: string = btoa('instansiId');
+    private static unitKerjaId: string = btoa('unitKerjaId');
+    private static accessToken: string = btoa('accessToken');
+    private static refreshToken: string = btoa('refreshToken');
+    private static userId: string = btoa('userId');
+    private static applicationCode: string = btoa('applicationCode');
+    private static userName: string = btoa('name');
+    private static menus: string = btoa('menus');
+    private static roleCodes: string = btoa('roleCodes');
+    private static menuCodes: string = btoa('menuCodes');
 
-        localStorage.setItem('accessToken', authResponse.accessToken);
-        localStorage.setItem('refreshToken', authResponse.refreshToken);
-        localStorage.setItem('userId', authResponse.userId);
-        localStorage.setItem('applicationCode', authResponse.applicationCode);
-        localStorage.setItem('name', authResponse.name);
-        localStorage.setItem('menus', JSON.stringify(authResponse.menus));
-        localStorage.setItem('roleCodes', JSON.stringify(authResponse.roleCodes));
-        localStorage.setItem('menuCodes', JSON.stringify(authResponse.menuCodes));
+
+    static storeContextLocalStorage(authResponse: AuthResponse) {
+        localStorage.setItem(this.instansiId, btoa(authResponse.instansiId));
+        localStorage.setItem(this.unitKerjaId, btoa(authResponse.unitKerjaId));
+
+        localStorage.setItem(this.accessToken, btoa(authResponse.accessToken));
+        localStorage.setItem(this.refreshToken, btoa(authResponse.refreshToken));
+        localStorage.setItem(this.userId, btoa(authResponse.userId));
+        localStorage.setItem(this.applicationCode, btoa(authResponse.applicationCode));
+        localStorage.setItem(this.userName, btoa(authResponse.name));
+        localStorage.setItem(this.menus, btoa(JSON.stringify(authResponse.menus)));
+        localStorage.setItem(this.roleCodes, btoa(JSON.stringify(authResponse.roleCodes)));
+        localStorage.setItem(this.menuCodes, btoa(JSON.stringify(authResponse.menuCodes)));
     }
 
     public static isLogin(): boolean {
@@ -22,56 +34,56 @@ export class LoginContext {
     }
 
     public static release() {
-        localStorage.removeItem('instansiId');
-        localStorage.removeItem('unitKerjaId');
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('applicationCode');
-        localStorage.removeItem('name');
-        localStorage.removeItem('menus');
-        localStorage.removeItem('roleCodes');
-        localStorage.removeItem('menuCodes');
+        localStorage.removeItem(this.instansiId);
+        localStorage.removeItem(this.unitKerjaId);
+        localStorage.removeItem(this.accessToken);
+        localStorage.removeItem(this.refreshToken);
+        localStorage.removeItem(this.userId);
+        localStorage.removeItem(this.applicationCode);
+        localStorage.removeItem(this.userName);
+        localStorage.removeItem(this.menus);
+        localStorage.removeItem(this.roleCodes);
+        localStorage.removeItem(this.menuCodes);
     }
 
     public static getInstansiId(): string {
-        return localStorage.getItem('instansiId') || '';
+        return atob(localStorage.getItem(this.instansiId) || '');
     }
 
     public static getUnitKerjaId(): string {
-        return localStorage.getItem('unitKerjaId') || '';
+        return atob(localStorage.getItem(this.unitKerjaId) || '');
     }
 
     public static getAccessToken(): string {
-        return localStorage.getItem('accessToken') || '';
+        return atob(localStorage.getItem(this.accessToken) || '');
     }
 
     public static getApplicationCode(): string {
-        return localStorage.getItem('applicationCode') || '';
+        return atob(localStorage.getItem(this.applicationCode) || '');
     }
 
     public static getRefreshToken(): string {
-        return localStorage.getItem('refreshToken') || '';
+        return atob(localStorage.getItem(this.refreshToken) || '');
     }
 
     public static getUserId(): string {
-        return localStorage.getItem('userId') || '';
+        return atob(localStorage.getItem(this.userId) || '');
     }
 
     public static getName(): string {
-        return localStorage.getItem('name') || '';
+        return atob(localStorage.getItem(this.userName) || '');
     }
 
     public static getMenus(): Menu[] {
-        return JSON.parse(localStorage.getItem('menus') || '[]');
+        return JSON.parse(atob(localStorage.getItem(this.menus) || '[]'));
     }
 
     public static getRoleCodes(): string[] {
-        return JSON.parse(localStorage.getItem('roleCodes') || '[]');
+        return JSON.parse(atob(localStorage.getItem(this.roleCodes) || '[]'));
     }
 
     public static getMenuCodes(): string {
-        return JSON.parse(localStorage.getItem('menuCodes') || '[]');
+        return atob(localStorage.getItem(this.menuCodes) || '');
     }
 
     public static getUserLoginRoute(): string {
