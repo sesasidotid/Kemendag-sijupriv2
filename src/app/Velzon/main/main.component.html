@@ -11,8 +11,10 @@
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
                                     <ng-container *ngFor="let route of routeTrail; let last = last">
-                                        <li *ngIf="!last" class="breadcrumb-item">
-                                            <a [routerLink]="route.path">{{ route.title }}</a>
+                                        <li *ngIf="!last" class="breadcrumb-item active">
+                                            <!-- <a [routerLink]="route.path">{{ route.title }}</a> -->
+                                            {{ route.title }}
+
                                         </li>
                                         <li *ngIf="last" class="breadcrumb-item active">
                                             {{ route.title }}

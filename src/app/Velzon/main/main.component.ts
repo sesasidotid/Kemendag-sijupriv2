@@ -108,5 +108,10 @@ export class MainComponent implements OnInit, OnDestroy {
     }
 
     this.routeTrail.reverse();
+
+    if (this.routeTrail.length > 1) {
+      const indexToDelete = this.routeTrail.length - 2; // Index before last
+      this.routeTrail.splice(indexToDelete, 1); // Remove the element at that index
+    }
   }
 }
