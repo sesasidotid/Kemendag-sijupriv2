@@ -8,11 +8,12 @@ import { Pertanyaan } from '../../../modules/akp/models/pertanyaan.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service';
 import { LoginContext } from '../../../modules/base/commons/login-context';
+import { LucideAngularModule, FilePlus  } from 'lucide-angular';
 
 @Component({
   selector: 'app-kkn-detail',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, LucideAngularModule],
   templateUrl: './kkn-detail.component.html',
   styleUrl: './kkn-detail.component.scss'
 })
@@ -20,6 +21,8 @@ export class KknDetailComponent {
   kategoriInstrument: KategoriInstrument = new KategoriInstrument();
   id: string;
   isEdit = false;
+
+  readonly filePlus = FilePlus;
 
   constructor(
     private apiService: ApiService,
@@ -47,6 +50,10 @@ export class KknDetailComponent {
         this.alertService.showToast('Error', "Terjadi Masalah");
       }
     });
+  }
+
+  backToList() {
+    this.router.navigate([LoginContext.getUserLoginRoute() + '/akp/kkn'])
   }
 
   add() {

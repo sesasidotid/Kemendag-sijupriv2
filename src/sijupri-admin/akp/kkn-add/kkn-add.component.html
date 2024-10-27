@@ -17,25 +17,30 @@
             <input type="text" class="form-control" [(ngModel)]="kategoriInstrument.name" name="name">
         </div>
     </div>
-    <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Pertanyaan</label>
-        <div class="col-sm-12">
-            <ng-container *ngFor="let pertanyaan of kategoriInstrument.pertanyaanList, index as i">
-                <div class="row mb-3 ms-2">
-                    <label for="" class="col-sm-2 col-form-label fw-bold">{{i + 1}}.</label>
-                    <div class="col-sm-8">
-                        <textarea type="text" class="form-control" [(ngModel)]="pertanyaan.name"
+    <div class="row mb-3 question-container">
+        <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
+        <div class="col-sm-12 mt-2">
+            <ng-container *ngFor="let pertanyaan of kategoriInstrument.pertanyaanList, index as i" class="">
+                <div class="row mb-3 card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="" class=" col-form-label fw-bold">Pertanyaan {{i + 1}}</label>
+                        <a class="btn btn-sm btn-soft-danger" (click)="remove(i)">Hapus</a>
+                    </div>
+                    <div class="">
+                        <textarea type="text" class="form-control" style="height: 120px;" [(ngModel)]="pertanyaan.name"
                             name="pertanyaan-name{{i}}"></textarea>
                     </div>
-                    <div class="col-sm-2">
-                        <a class="btn btn-md btn-soft-danger" (click)="remove(i)">-</a>
-                    </div>
+                    
                 </div>
             </ng-container>
-            <div class="row mb-3">
-                <label for="" class="col-sm-2 col-form-label fw-bold">Tambah</label>
-                <div class="col-sm-4">
-                    <a class="btn btn-md btn-soft-success" (click)="add()">+</a>
+            <div class="row">
+                <!-- <label for="" class="col-sm-2 col-form-label fw-bold">Tambah</label> -->
+                <div class="card-add">
+                    <div class="d-flex flex-column align-items-center justify-content-center add-button gap-4" (click)="add()">
+                        <i-lucide [img]="filePlus" [size]="32" [color]="'#b8bbc9'"></i-lucide>
+                        <p class="fw-medium">Tambah Pertanyaan</p>
+                    </div>
+                    <!-- <a class="btn btn-soft-success p-4" (click)="add()">+</a> -->
                 </div>
             </div>
         </div>

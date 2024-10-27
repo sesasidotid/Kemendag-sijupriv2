@@ -10,17 +10,20 @@ import { Router } from '@angular/router';
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service';
 import { TabService } from '../../../modules/base/services/tab.service';
 import { LoginContext } from '../../../modules/base/commons/login-context';
+import { LucideAngularModule, FilePlus } from 'lucide-angular';
 
 @Component({
   selector: 'app-kkn-add',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './kkn-add.component.html',
   styleUrl: './kkn-add.component.scss'
 })
 export class KknAddComponent {
   instrumentList: Instrument[] = [];
   kategoriInstrument: KategoriInstrument = new KategoriInstrument();
+
+  readonly filePlus = FilePlus;
 
   constructor(
     private tabService: TabService,
