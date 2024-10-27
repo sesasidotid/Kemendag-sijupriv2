@@ -61,7 +61,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr *ngFor="let row of paginator.data; index as i">
+                <tr *ngFor="let row of paginator.data; index as i" class="table-row">
                     <td class="fw-bold m-1 p-1">{{(i+1) + ((page * 10) - 10)}}</td>
                     <ng-container *ngFor="let column of pagable.primaryColumnList">
                         <td *ngIf="column.property" class="m-1 p-1">{{ getPropertyValue(row, column.property) }}</td>
