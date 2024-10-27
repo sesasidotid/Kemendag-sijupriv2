@@ -45,7 +45,7 @@ export class RoleUpdateComponent {
 
   getMenuTree() {
     this.menuService.findTreeByRoleCodeAndApplicationCode(this.roleCode, LoginContext.getApplicationCode()).subscribe({
-      next: (menuTree: Menu[]) => this.menuTree = menuTree
+      next: (menuTree: Menu[]) => {this.menuTree = menuTree; console.log(menuTree)}
     });
   }
 

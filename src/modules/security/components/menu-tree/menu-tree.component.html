@@ -1,18 +1,27 @@
-<ul style="font-size: 0.8rem; font-weight: bold;">
-    <li *ngFor="let menu of menuTree">
-        <div class="form-check" (click)="setChecked(menu)">
-            <input class="form-check-input" [checked]="menu.checked" type="checkbox" id="flexCheckDefault"
-                [disabled]="disable">
-            <label for="flexCheckDefault">{{menu.name}}</label>
+<div class="w-100">
+    <div class="menu-tree-container d-flex flex-wrap gap-3 justify-content-start">
+      <div *ngFor="let menu of menuTree; let i = index" 
+           class="card p-3 rounded shadow-sm flex-grow-1 m-0" 
+           style="flex-basis: calc(33.33% - 1rem); min-width: 250px;">
+        <!-- Parent Checkbox -->
+        <div class="content-top mb-2">
+          <div class="form-check" (click)="setChecked(menu)">
+            <input class="form-check-input" [checked]="menu.checked" type="checkbox" 
+                   [id]="'parentCheck' + i" [disabled]="disable">
+            <label [for]="'parentCheck' + i">{{ menu.name }}</label>
+          </div>
         </div>
-        <ul>
-            <li *ngFor="let child of menu.child">
-                <div class="form-check" (click)="setChecked(child, menu)">
-                    <input class="form-check-input" [checked]="child.checked" type="checkbox" id="flexCheckDefault"
-                        [disabled]="disable">
-                    <label for="flexCheckDefault">{{child.name}}</label>
-                </div>
-            </li>
-        </ul>
-    </li>
-</ul>
+        
+        <!-- Children Checkboxes -->
+        <div class="content-bottom d-flex flex-column gap-3">
+          <div *ngFor="let child of menu.child; let j = index">
+            <div class="form-check" (click)="setChecked(child, menu)">
+              <input class="form-check-input" [checked]="child.checked" type="checkbox" 
+                     [id]="'childCheck' + i + '-' + j" [disabled]="disable">
+              <label [for]="'childCheck' + i + '-' + j">{{ child.name }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

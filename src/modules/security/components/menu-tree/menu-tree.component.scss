@@ -60,3 +60,31 @@ ul {
         }
     }
 }
+
+// .card {
+//     width: 100%;
+// }
+
+.content-top {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: white;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.133);
+}
+
+.content-bottom {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: white;
+}
+
+.menu-tree-container {
+    padding: 16px;
+    border-radius: 10px;
+    background-color: #f1f3ff;
+    height: 100%;
+}

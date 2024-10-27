@@ -1,5 +1,5 @@
-<div class="row">
-    <div class="col-lg-8">
+<div class="d-flex flex-column gap-3">
+    <div class="">
         <form (submit)="submit()">
             <div class="row mb-3 border-bottom">
                 <label for="" class="col-sm-2 col-form-label fw-bold">Code</label>
@@ -23,7 +23,7 @@
             </div>
         </form>
     </div>
-    <div class="col-4">
+    <div class="">
         <app-menu-tree [menuTree]="menuTree" [disable]="!editable"></app-menu-tree>
     </div>
 </div>
