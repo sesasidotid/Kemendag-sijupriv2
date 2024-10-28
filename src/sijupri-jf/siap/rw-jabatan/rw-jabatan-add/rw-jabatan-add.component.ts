@@ -78,7 +78,7 @@ export class RwJabatanAddComponent {
         this.apiService.postData(`/api/v1/rw_jabatan/task`, this.rwJabatan).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-jabatan/pending'])
+            this.router.navigate(['/profile/rw-jabatan/pending'])
           },
           error: (error) => {
             console.log("error", error);

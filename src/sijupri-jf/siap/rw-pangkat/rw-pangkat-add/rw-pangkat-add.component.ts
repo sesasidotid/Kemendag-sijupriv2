@@ -60,7 +60,7 @@ export class RwPangkatAddComponent {
         this.apiService.postData(`/api/v1/rw_pangkat/task`, this.rwPangkat).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-pangkat/pending'])
+            this.router.navigate(['/profile/rw-pangkat/pending'])
           },
           error: (error) => {
             console.log("error", error);

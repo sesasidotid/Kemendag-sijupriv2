@@ -26,7 +26,7 @@ export class RwPangkatListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Pangkat", 'pangkat|name').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("TMT", 'tmt').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwPangkat: any) => {
-          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwPangkat.id}`])
+          this.router.navigate([`/${rwPangkat.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("pangkat|name").withField("Pangkat", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("nip").withDefaultValue(nip).build())

@@ -112,7 +112,7 @@ export class FormasiTaskJabatanComponent {
     this.formasiRequest.jabatanCode = this.jabatanCode;
 
     this.pendingFormasiService.save(this.formasiRequest).subscribe({
-      next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/formasi/formasi-task']),
+      next: () => this.router.navigate(['/formasi/formasi-task']),
     })
   }
 }

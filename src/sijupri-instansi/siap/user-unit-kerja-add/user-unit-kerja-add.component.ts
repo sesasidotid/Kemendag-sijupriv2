@@ -28,11 +28,11 @@ export class UserUnitKerjaAddComponent {
   ngOnInit() {
     this.tabService.addTab({
       label: 'Daftar User Unit Kerja',
-      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +`/siap/user-unit-kerja`),
+      onClick: () => this.handlerService.handleNavigate(`/siap/user-unit-kerja`),
     }).addTab({
       label: 'Tambah User Unit Kerja',
       isActive: true,
-      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +`/siap/user-unit-kerja/add`),
+      onClick: () => this.handlerService.handleNavigate(`/siap/user-unit-kerja/add`),
     });
 
     this.getUnitKerjaList();
@@ -47,7 +47,7 @@ export class UserUnitKerjaAddComponent {
 
   submit() {
     this.apiService.postData(`/api/v1/user_unit_kerja`, this.userUnitKerja).subscribe({
-      next: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +`/siap/user-unit-kerja`),
+      next: () => this.handlerService.handleNavigate(`/siap/user-unit-kerja`),
       error: (error) => this.handlerService.handleException(error)
     })
   }

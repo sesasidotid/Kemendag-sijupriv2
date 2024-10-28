@@ -25,7 +25,7 @@ export class UserInstansiListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name', ['user']).build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email', ['user']).build())
       .addActionColumn(new ActionColumnBuilder().setAction((unitKerja: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/${unitKerja.id}`])
+        this.router.navigate([`/${unitKerja.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name", ["user"]).withField("Nama", "text").build())
@@ -38,11 +38,11 @@ export class UserInstansiListComponent {
       label: 'Daftar User Instansi',
       isActive: true,
       icon: 'mdi-list-box',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/siap/user-instansi']),
+      onClick: () => this.router.navigate(['/siap/user-instansi']),
     }).addTab({
       label: 'Tambah User Instansi',
       icon: 'mdi-plus-circle',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/siap/user-instansi/add']),
+      onClick: () => this.router.navigate(['/siap/user-instansi/add']),
     });
   }
 }

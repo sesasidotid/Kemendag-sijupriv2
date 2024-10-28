@@ -23,7 +23,7 @@ export class UnitKerjaListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Instansi", 'instansi|name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((unitKerja: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/${unitKerja.nip}`])
+        this.router.navigate([`/${unitKerja.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("instansi|name").withField("Instansi", "text").build())

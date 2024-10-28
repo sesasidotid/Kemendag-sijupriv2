@@ -23,7 +23,7 @@ export class KabKotaListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Tipe", 'type').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Provinsi", 'provinsi|name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((kabKota: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() + `/${kabKota.nip}`])
+        this.router.navigate([`/${kabKota.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama Kab/Kota", "text").build())
       .addFilter(new PageFilterBuilder("equal").setProperty("type").withField("Tipe", "select").setOptionList([

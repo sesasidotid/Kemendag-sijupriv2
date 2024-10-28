@@ -25,7 +25,7 @@ export class JfListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'user|name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'user|email').build())
       .addActionColumn(new ActionColumnBuilder().setAction((jf: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/siap/user-jf/${jf.nip}`])
+        this.router.navigate([`/siap/user-jf/${jf.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("user|name").withField("Nama", "text").build())
@@ -37,10 +37,10 @@ export class JfListComponent {
     this.tabService.addTab({
       label: 'Daftar User Jabatan Fungsional',
       isActive: true,
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/siap/user-jf`]),
+      onClick: () => this.router.navigate([`/siap/user-jf`]),
     }).addTab({
       label: 'Tambah User Jabatan Fungsional',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/siap/user-jf/add`]),
+      onClick: () => this.router.navigate([`/siap/user-jf/add`]),
     });
   }
 }

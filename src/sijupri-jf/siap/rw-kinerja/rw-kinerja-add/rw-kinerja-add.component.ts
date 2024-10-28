@@ -85,7 +85,7 @@ export class RwKinerjaAddComponent {
         this.apiService.postData(`/api/v1/rw_kinerja/task`, this.rwKinerja).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-kinerja/pending'])
+            this.router.navigate(['/profile/rw-kinerja/pending'])
           },
           error: (error) => {
             console.log("error", error);

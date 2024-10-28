@@ -21,7 +21,7 @@ export class InstansiListComponent {
     this.pagable = new PagableBuilder("/api/v1/instansi/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((instansi: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/${instansi.nip}`])
+        this.router.navigate([`/${instansi.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama Kab/Kota", "text").build())
       .build();

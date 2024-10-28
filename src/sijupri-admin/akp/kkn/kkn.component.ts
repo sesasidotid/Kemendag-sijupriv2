@@ -31,7 +31,7 @@ export class KknComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Instrumen", 'instrument|name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((kkn: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn/${kkn.id}`])
+        this.router.navigate([`/akp/kkn/${kkn.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
       .build();
@@ -42,11 +42,11 @@ export class KknComponent {
       label: 'Daftar KKN',
       icon: 'mdi-list-box',
       isActive: true,
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn`]),
+      onClick: () => this.router.navigate([`/akp/kkn`]),
     }).addTab({
       label: 'Tambah KKN',
       icon: 'mdi-plus-circle',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn/add`]),
+      onClick: () => this.router.navigate([`/akp/kkn/add`]),
     });
 
     this.getInstrumenList();

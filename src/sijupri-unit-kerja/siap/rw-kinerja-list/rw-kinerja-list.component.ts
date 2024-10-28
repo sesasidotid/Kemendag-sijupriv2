@@ -28,7 +28,7 @@ export class RwKinerjaListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("Angka Kredit", 'angkaKredit').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwKinerja: any) => {
-          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwKinerja.id}`])
+          this.router.navigate([`/${rwKinerja.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("pangkat|name").withField("Tahunan/Bulanan", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("dateStart").withField("Tgl Mulai", "text").build())

@@ -22,7 +22,7 @@ export class RoleListComponent {
     this.pagable = new PagableBuilder("/api/v1/role/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((role: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/security/role/${role.code}`])
+        this.router.navigate([`/security/role/${role.code}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("equal").setProperty("application|code").withDefaultValue("sijupri-admin").build())

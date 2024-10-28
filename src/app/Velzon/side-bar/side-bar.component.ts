@@ -56,7 +56,7 @@ export class SideBarComponent {
 
   isActive(menu: any): boolean {
     for (let child of menu.child) {
-      const fullPath = LoginContext.getUserLoginRoute() +`/${menu.path}/${child.path}`;
+      const fullPath =  `/${menu.path}/${child.path}`;
       if (this.router.isActive(fullPath, true)) {
         return true;
       }

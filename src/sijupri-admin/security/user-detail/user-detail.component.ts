@@ -35,7 +35,7 @@ export class UserDetailComponent {
   }
 
   backToList() {
-    this.router.navigate([LoginContext.getUserLoginRoute() + '/security/user']);
+    this.router.navigate(['/security/user']);
   }
 
   delete() {
@@ -44,7 +44,7 @@ export class UserDetailComponent {
         if (!result.confirmed) return;
 
         this.apiService.deleteData(`/api/v1/user/${this.id}`).subscribe({
-          next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/security/user']),
+          next: () => this.router.navigate(['/security/user']),
           error: (error) => {
             console.error('Error fetching data', error);
             this.alertService.showToast('Error', "Terjadi Masalah");

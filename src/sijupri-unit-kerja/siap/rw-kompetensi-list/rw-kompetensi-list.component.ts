@@ -28,7 +28,7 @@ export class RwKompetensiListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Sertifikat", 'tglSertifikat').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwKompetensi: any) => {
-          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwKompetensi.id}`])
+          this.router.navigate([`/${rwKompetensi.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("tglSertifikat").withField("Tgl Sertifikat", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("nip").withDefaultValue(nip).build())

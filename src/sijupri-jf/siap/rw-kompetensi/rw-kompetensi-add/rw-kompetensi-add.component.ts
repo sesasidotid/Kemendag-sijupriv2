@@ -62,7 +62,7 @@ export class RwKompetensiAddComponent {
         this.apiService.postData(`/api/v1/rw_kompetensi/task`, this.rwKompetensi).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-kompetensi/pending'])
+            this.router.navigate(['/profile/rw-kompetensi/pending'])
           },
           error: (error) => {
             console.log("error", error);

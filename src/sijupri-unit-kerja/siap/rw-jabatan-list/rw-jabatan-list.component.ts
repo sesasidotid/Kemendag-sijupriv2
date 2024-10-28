@@ -28,7 +28,7 @@ export class RwJabatanListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("TMT", 'tmt').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwJabatan: any) => {
-          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwJabatan.id}`])
+          this.router.navigate([`/${rwJabatan.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("jabatan|name").withField("Jabatan", "text").build())
         .addFilter(new PageFilterBuilder("like").setProperty("jenjang|name").withField("Jenjang", "text").build())

@@ -27,7 +27,7 @@ export class UserListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'status').build())
       .addActionColumn(new ActionColumnBuilder().setAction((user: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/security/user/${user.id}`])
+        this.router.navigate([`/security/user/${user.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
@@ -41,11 +41,11 @@ export class UserListComponent {
       label: 'Daftar User',
       isActive: true,
       icon: 'mdi-list-box',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/security/user`]),
+      onClick: () => this.router.navigate([`/security/user`]),
     }).addTab({
       label: 'Tambah User',
       icon: 'mdi-plus-circle',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/security/user/add`]),
+      onClick: () => this.router.navigate([`/security/user/add`]),
     });
   }
 }

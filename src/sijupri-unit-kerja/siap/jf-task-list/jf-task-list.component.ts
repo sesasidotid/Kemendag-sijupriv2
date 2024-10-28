@@ -23,7 +23,7 @@ export class JfTaskListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'user|name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'user|email').build())
       .addActionColumn(new ActionColumnBuilder().setAction((jf: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/siap/verify-user-jf/${jf.nip}`])
+        this.router.navigate([`/siap/verify-user-jf/${jf.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("user|name").withField("Nama", "text").build())

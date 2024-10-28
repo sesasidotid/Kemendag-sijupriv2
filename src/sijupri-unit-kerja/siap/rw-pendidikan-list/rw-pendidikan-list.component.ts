@@ -26,7 +26,7 @@ export class RwPendidikanListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Pendidikan", 'pendidikan|name').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("Tanggal Ijazah", 'tanggalIjazah').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwPendidikan: any) => {
-          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwPendidikan.id}`])
+          this.router.navigate([`/${rwPendidikan.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("pendidikan|name").withField("Pendidikan", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("nip").withDefaultValue(nip).build())

@@ -32,7 +32,7 @@ export class PakDetailComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("Angka Kredit", 'angkaKredit').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwKinerja: any) => {
-          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwKinerja.nip}`])
+          this.router.navigate([`/${rwKinerja.nip}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("user|email").withField("Email", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("user|email").withField("Email", "text").build())

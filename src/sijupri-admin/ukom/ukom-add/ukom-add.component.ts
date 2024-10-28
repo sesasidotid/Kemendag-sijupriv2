@@ -35,12 +35,12 @@ export class UkomAddComponent {
     this.tabService.addTab({
       label: 'Daftar UKom',
       icon: 'mdi-list-box',
-      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/ukom/ukom-list'),
+      onClick: () => this.handlerService.handleNavigate('/ukom/ukom-list'),
     }).addTab({
       label: 'Tambah UKom',
       isActive: true,
       icon: 'mdi-plus-circle',
-      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/ukom/ukom-list/add'),
+      onClick: () => this.handlerService.handleNavigate('/ukom/ukom-list/add'),
     });
   }
 
@@ -51,7 +51,7 @@ export class UkomAddComponent {
 
         this.apiService.postData("/api/v1/ukom", this.ukom).subscribe({
           next: (response) => {
-            this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/ukom/ukom-list');
+            this.handlerService.handleNavigate('/ukom/ukom-list');
           },
           error: (error) => {
             this.handlerService.handleException(error);

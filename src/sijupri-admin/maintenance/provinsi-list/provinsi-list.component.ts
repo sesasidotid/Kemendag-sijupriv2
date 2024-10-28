@@ -21,7 +21,7 @@ export class ProvinsiListComponent {
     this.pagable = new PagableBuilder("/api/v1/provinsi/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addActionColumn(new ActionColumnBuilder().setAction((provinsi: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/${provinsi.nip}`])
+        this.router.navigate([`/${provinsi.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
       .build();

@@ -41,12 +41,12 @@ export class UserInstansiAddComponent {
     this.tabService.addTab({
       label: 'Daftar User Instansi',
       icon: 'mdi-list-box',
-      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/siap/user-instansi'),
+      onClick: () => this.handlerService.handleNavigate('/siap/user-instansi'),
     }).addTab({
       label: 'Tambah User Instansi',
       isActive: true,
       icon: 'mdi-plus-circle',
-      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/siap/user-instansi/add'),
+      onClick: () => this.handlerService.handleNavigate('/siap/user-instansi/add'),
     });
 
     this.getInstansiTypeList();
@@ -141,7 +141,7 @@ export class UserInstansiAddComponent {
     this.userInstansiService.save(this.userInstansi).subscribe({
       next: () => {
         this.handlerService.handleAlert('Success', "Berhasil");
-        this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/siap/user-instansi')
+        this.handlerService.handleNavigate('/siap/user-instansi')
       },
       error: (error) => this.handlerService.handleException(error)
     })

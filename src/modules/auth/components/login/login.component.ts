@@ -31,7 +31,7 @@ export class LoginComponent {
   
   ngOnInit() {
     if (LoginContext.isLogin()) {
-      this.router.navigate([LoginContext.getUserLoginRoute()])
+      this.router.navigate([''])
     }
     this.getApplicationList();
     this.loginForm = new FormGroup({

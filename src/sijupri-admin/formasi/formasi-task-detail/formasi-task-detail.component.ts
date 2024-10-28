@@ -52,10 +52,6 @@ export class FormasiTaskDetailComponent {
     this.getPendingTask();
   }
 
-  getUserLoginRoute() {
-    return LoginContext.getUserLoginRoute();
-  }
-
   getPendingTask() {
     this.apiService.getData(`/api/v1/pending_task/${this.pendingTaskId}`).subscribe({
       next: (response) => {

@@ -37,12 +37,12 @@ export class KknAddComponent {
     this.tabService.addTab({
       label: 'Daftar KKN',
       icon: 'mdi-list-box',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn`]),
+      onClick: () => this.router.navigate([`/akp/kkn`]),
     }).addTab({
       label: 'Tambah KKN',
       icon: 'mdi-plus-circle',
       isActive: true,
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() + `/akp/kkn/add`]),
+      onClick: () => this.router.navigate([`/akp/kkn/add`]),
     });
 
     this.getInstrumenList();
@@ -74,7 +74,7 @@ export class KknAddComponent {
         if (!result.confirmed) return;
 
         this.apiService.postData('/api/v1/kategori_instrument', this.kategoriInstrument).subscribe({
-          next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/akp/kkn']),
+          next: () => this.router.navigate(['/akp/kkn']),
           error: (error) => {
             console.error('Error fetching data', error);
             this.alertService.showToast('Error', "Terjadi Masalah");

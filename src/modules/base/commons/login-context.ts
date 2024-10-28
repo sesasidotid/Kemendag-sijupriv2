@@ -86,20 +86,20 @@ export class LoginContext {
         return atob(localStorage.getItem(this.menuCodes) || '');
     }
 
-    public static getUserLoginRoute(): string {
-        switch (this.getApplicationCode()) {
-            case 'sijupri-admin':
-                return 'admin';
-            case 'sijupri-instansi':
-                return 'instansi';
-            case 'sijupri-unit-kerja':
-                return 'unit-kerja';
-            case 'sijupri-external':
-                return 'jf-external';
-            case 'sijupri-internal':
-                return 'jf-internal';
-            default:
-                return 'login';
-        }
-    }
+    // public static getUserLoginRoute(): string {
+    //     switch (this.getApplicationCode()) {
+    //         case 'sijupri-admin':
+    //             return 'admin';
+    //         case 'sijupri-instansi':
+    //             return 'instansi';
+    //         case 'sijupri-unit-kerja':
+    //             return 'unit-kerja';
+    //         case 'sijupri-external':
+    //             return 'jf-external';
+    //         case 'sijupri-internal':
+    //             return 'jf-internal';
+    //         default:
+    //             return 'login';
+    //     }
+    // }
 }

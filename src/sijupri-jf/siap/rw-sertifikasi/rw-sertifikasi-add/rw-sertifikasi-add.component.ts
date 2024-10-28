@@ -87,7 +87,7 @@ export class RwSertifikasiAddComponent {
         this.apiService.postData(`/api/v1/rw_sertifikasi/task`, this.rwSertifikasi).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/rw-sertifikasi/pending'])
+            this.router.navigate(['/profile/rw-sertifikasi/pending'])
           },
           error: (error) => {
             console.log("error", error);

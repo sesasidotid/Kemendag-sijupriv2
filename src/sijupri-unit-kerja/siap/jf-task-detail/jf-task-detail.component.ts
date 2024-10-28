@@ -50,7 +50,7 @@ export class JfTaskDetailComponent {
   getTaskDetail() {
     this.apiService.getData(`/api/v1/jf/task/group/${this.nip}`).subscribe({
       next: (pendingTaskList: PendingTask[]) => {
-        if (pendingTaskList.length == 0) this.router.navigate([LoginContext.getUserLoginRoute() +'/siap/verify-user-jf']);
+        if (pendingTaskList.length == 0) this.router.navigate(['/siap/verify-user-jf']);
         this.pendingTaskList = pendingTaskList;
       },
       error: (error) => {

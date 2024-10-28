@@ -24,7 +24,7 @@ export class JfListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'user|email').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'status').build())
       .addActionColumn(new ActionColumnBuilder().setAction((jf: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/${jf.id}`])
+        this.router.navigate([`/${jf.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("user|name").withField("Nama", "text").build())

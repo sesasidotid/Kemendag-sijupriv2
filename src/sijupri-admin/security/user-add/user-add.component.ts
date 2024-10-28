@@ -45,12 +45,12 @@ export class UserAddComponent {
     this.tabService.addTab({
       label: 'Daftar User',
       icon: 'mdi-list-box',
-      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user'),
+      onClick: () => this.handlerService.handleNavigate('/security/user'),
     }).addTab({
       label: 'Tambah User',
       isActive: true,
       icon: 'mdi-plus-circle',
-      onClick: () => this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user/add'),
+      onClick: () => this.handlerService.handleNavigate('/security/user/add'),
     });
 
     this.roleService.findByapplicationCode("sijupri-admin").subscribe({
@@ -93,7 +93,7 @@ export class UserAddComponent {
       this.apiService.postData(`/api/v1/user`, this.user).subscribe({
         next: () => {
           this.alertService.showToast('Success', "Berhasil");
-          this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user')
+          this.handlerService.handleNavigate('/security/user')
         },
         error: (error) => this.handlerService.handleException(error)
       });

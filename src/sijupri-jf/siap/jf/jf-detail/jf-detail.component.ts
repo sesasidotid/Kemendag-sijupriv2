@@ -88,7 +88,7 @@ export class JfDetailComponent {
         this.apiService.putData(`/api/v1/jf/task`, this.jf).subscribe({
           next: () => {
             this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate([LoginContext.getUserLoginRoute() +'/profile/pending'])
+            this.router.navigate(['/profile/pending'])
           }
         })
       }

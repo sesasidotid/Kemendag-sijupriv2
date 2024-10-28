@@ -53,7 +53,7 @@ export class KknDetailComponent {
   }
 
   backToList() {
-    this.router.navigate([LoginContext.getUserLoginRoute() + '/akp/kkn'])
+    this.router.navigate(['/akp/kkn'])
   }
 
   add() {
@@ -70,7 +70,7 @@ export class KknDetailComponent {
         if (!result.confirmed) return;
 
         this.apiService.deleteData(`/api/v1/kategori_instrument/${this.id}`).subscribe({
-          next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/akp/kkn']),
+          next: () => this.router.navigate(['/akp/kkn']),
           error: (error) => {
             console.error('Error fetching data', error);
             this.alertService.showToast('Error', "Terjadi Masalah");
@@ -86,7 +86,7 @@ export class KknDetailComponent {
         if (!result.confirmed) return;
 
         this.apiService.putData('/api/v1/kategori_instrument', this.kategoriInstrument).subscribe({
-          next: () => this.router.navigate([LoginContext.getUserLoginRoute() + '/akp/kkn']),
+          next: () => this.router.navigate(['/akp/kkn']),
           error: (error) => {
             console.error('Error fetching data', error);
             this.alertService.showToast('Error', "Terjadi Masalah");

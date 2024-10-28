@@ -25,7 +25,7 @@ export class UserUnitKerjaListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name', ['user']).build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email', ['user']).build())
       .addActionColumn(new ActionColumnBuilder().setAction((unitKerja: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/${unitKerja.id}`])
+        this.router.navigate([`/${unitKerja.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name", ["user"]).withField("Nama", "text").build())
@@ -37,10 +37,10 @@ export class UserUnitKerjaListComponent {
     this.tabService.addTab({
       label: 'Daftar User Unit Kerja',
       isActive: true,
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/siap/user-unit-kerja`]),
+      onClick: () => this.router.navigate([`/siap/user-unit-kerja`]),
     }).addTab({
       label: 'Tambah User Unit Kerja',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +`/siap/user-unit-kerja/add`]),
+      onClick: () => this.router.navigate([`/siap/user-unit-kerja/add`]),
     });
   }
 }

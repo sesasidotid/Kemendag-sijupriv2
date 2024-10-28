@@ -42,7 +42,7 @@ export class UkomPeriodeComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Tanggal Dibuka", 'periodePendaftaran|startDate').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Tanggal Ditutup", 'periodePendaftaran|endDate').build())
       .addActionColumn(new ActionColumnBuilder().setAction((periodePendafatan: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/ukom/ukom-periode/${periodePendafatan.id}`])
+        this.router.navigate([`/ukom/ukom-periode/${periodePendafatan.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("equal").setProperty("periodePendaftaran|startDate").withField("Tanggal Dibuka", "text").build())
       .addFilter(new PageFilterBuilder("equal").setProperty("periodePendaftaran|endDate").withField("Tanggal Ditutup", "text").build())
@@ -53,10 +53,10 @@ export class UkomPeriodeComponent {
     this.tabService.addTab({
       label: 'Daftar User Instansi',
       isActive: true,
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/ukom/ukom-periode']),
+      onClick: () => this.router.navigate(['/ukom/ukom-periode']),
     }).addTab({
       label: 'Tambah User Instansi',
-      onClick: () => this.router.navigate([LoginContext.getUserLoginRoute() +'/ukom/ukom-periode/add']),
+      onClick: () => this.router.navigate(['/ukom/ukom-periode/add']),
     });
   }
 

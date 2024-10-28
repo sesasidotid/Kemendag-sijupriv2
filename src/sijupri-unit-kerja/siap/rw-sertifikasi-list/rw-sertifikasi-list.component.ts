@@ -32,7 +32,7 @@ export class RwSertifikasiListComponent {
         .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
         .addPrimaryColumn(new PrimaryColumnBuilder("UU Kawalan", 'uuKawalan').build())
         .addActionColumn(new ActionColumnBuilder().setAction((rwSertifikasi: any) => {
-          this.router.navigate([LoginContext.getUserLoginRoute() +`/${rwSertifikasi.id}`])
+          this.router.navigate([`/${rwSertifikasi.id}`])
         }, "info").withIcon("detail").build())
         .addFilter(new PageFilterBuilder("like").setProperty("noSk").withField("No. SK", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("tglSk").withField("Tgl SK", "text").build())

@@ -23,7 +23,7 @@ export class FormasiTaskListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Unit Kerja", 'objectName').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'taskStatus').build())
       .addActionColumn(new ActionColumnBuilder().setAction((pendingTask: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() + `/formasi/formasi-task-list/${pendingTask.id}`])
+        this.router.navigate([`/formasi/formasi-task-list/${pendingTask.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Unit Kerja", "text").build())
       .build();

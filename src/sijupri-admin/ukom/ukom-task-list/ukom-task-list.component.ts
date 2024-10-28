@@ -27,7 +27,7 @@ export class UkomTaskListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'objectName').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'flowName').build())
       .addActionColumn(new ActionColumnBuilder().setAction((pendingTask: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/ukom/ukom-task-list/${pendingTask.id}`])
+        this.router.navigate([`/ukom/ukom-task-list/${pendingTask.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectId").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Nama", "text").build())
