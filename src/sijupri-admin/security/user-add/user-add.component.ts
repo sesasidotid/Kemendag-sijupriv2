@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { User } from '../../../modules/security/models/user.model';
 import { UserService } from '../../../modules/security/services/user.service';
 import { RoleService } from '../../../modules/security/services/role.service';
@@ -11,11 +11,12 @@ import { TabService } from '../../../modules/base/services/tab.service';
 import { ApiService } from '../../../modules/base/services/api.service';
 import { HandlerService } from '../../../modules/base/services/handler.service';
 import { LoginContext } from '../../../modules/base/commons/login-context';
+import { LucideAngularModule, Trash2, Eye, EyeOff } from 'lucide-angular';
 
 @Component({
   selector: 'app-user-add',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './user-add.component.html',
   styleUrl: './user-add.component.scss'
 })
@@ -24,6 +25,13 @@ export class UserAddComponent {
   roleList: Role[];
   roleCode: string = '';
   roleCodes: string[] = [];
+
+  addUserForm!: FormGroup;
+  isPasswordVisible: boolean = false;
+
+  readonly Trash2 = Trash2;
+  readonly Eye = Eye;
+  readonly EyeOff = EyeOff;
 
   constructor(
     private alertService: AlertService,
@@ -48,6 +56,17 @@ export class UserAddComponent {
     this.roleService.findByapplicationCode("sijupri-admin").subscribe({
       next: (roleList: Role[]) => this.roleList = roleList
     });
+
+    this.addUserForm = new FormGroup({
+      nip: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(18)]),
+      name: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      password: new FormControl('', [Validators.required]),
+    })
+  }
+
+  togglePasswordVisibility(): void {
+    this.isPasswordVisible = !this.isPasswordVisible; // Toggle the visibility
   }
 
   addRoleCode(event: Event) {
@@ -61,17 +80,23 @@ export class UserAddComponent {
     if (index > -1) this.roleCodes.splice(index, 1);
   }
 
-  submit() {
-    this.user.roleCodeList = this.roleCodes;
-    this.user.applicationCode = "sijupri-admin";
-    this.user.channelCodeList = ["WEB"];
+  onSubmit() {
+    if (this.addUserForm.valid) {
+      this.user.roleCodeList = this.roleCodes;
+      this.user.applicationCode = "sijupri-admin";
+      this.user.channelCodeList = ["WEB"];
+      this.user.id = this.addUserForm.value.nip;
+      this.user.name = this.addUserForm.value.name;
+      this.user.email = this.addUserForm.value.email;
+      this.user.password = this.addUserForm.value.password;
 
-    this.apiService.postData(`/api/v1/user`, this.user).subscribe({
-      next: () => {
-        this.alertService.showToast('Success', "Berhasil");
-        this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user')
-      },
-      error: (error) => this.handlerService.handleException(error)
-    });
+      this.apiService.postData(`/api/v1/user`, this.user).subscribe({
+        next: () => {
+          this.alertService.showToast('Success', "Berhasil");
+          this.handlerService.handleNavigate(LoginContext.getUserLoginRoute() +'/security/user')
+        },
+        error: (error) => this.handlerService.handleException(error)
+      });
+    }
   }
 }
