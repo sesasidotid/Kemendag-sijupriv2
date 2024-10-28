@@ -129,6 +129,10 @@ export const routes: Routes = [
                         {
                             path: 'add',
                             loadComponent: () => import('../sijupri-admin/security/user-add/user-add.component').then(m => m.UserAddComponent),
+                        },
+                        {
+                            path: ':id',
+                            loadComponent: () => import('../sijupri-admin/security/user-detail/user-detail.component').then(m => m.UserDetailComponent),
                         }
                     ]
                 },

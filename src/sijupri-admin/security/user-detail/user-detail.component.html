@@ -1,0 +1,45 @@
+<div>
+    <div class="row mb-1">
+        <label for="" class="col-sm-2 col-form-label fw-bold">NIP</label>
+        <div class="col-sm-10 pt-2">
+            <p>{{userData.id}}</p>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Nama Lengkap</label>
+        <div class="col-sm-10 pt-2">
+            <p>{{userData.name}}</p>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Alamat Email</label>
+        <div class="col-sm-10 pt-2">
+            <p>{{userData.email}}</p>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Nomor Handphone</label>
+        <div class="col-sm-10 pt-2">
+            <p>{{userData.phone ? userData.phone : '-'}}</p>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Status Akun</label>
+        <div class="col-sm-10 pt-2">
+            <span *ngIf="userData.status === 'ACTIVE'" class="badge text-bg-success">Aktif</span>
+            <span *ngIf="userData.status === 'DELETED'" class="badge text-bg-danger">Dihapus</span>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Tanggal Dibuat</label>
+        <div class="col-sm-10 pt-2">
+            <p>{{userData.dateCreated ? userData.dateCreated : '-'}}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="text-center">
+            <a type="submit" class="btn btn-sm btn-danger float-end " [ngClass]="{'disabled': userData.status === 'DELETED'}" (click)="delete()">Hapus</a>
+            <a class="btn btn-sm btn-warning me-2 float-end" (click)="backToList()">Kembali</a>
+        </div>
+    </div>
+</div>

@@ -5,6 +5,9 @@ export class User extends Serializable {
     name: string = undefined;
     email: string = undefined;
     password: string = undefined;
+    phone?: string = undefined;
+    status?: string = undefined;
+    dateCreated?: string = undefined;
     roleCodeList: string[] = undefined;
     applicationCode: string = undefined;
     channelCodeList: string[] = undefined;

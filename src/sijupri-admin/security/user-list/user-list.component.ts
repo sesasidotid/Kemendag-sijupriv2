@@ -27,7 +27,7 @@ export class UserListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'status').build())
       .addActionColumn(new ActionColumnBuilder().setAction((user: any) => {
-        this.router.navigate([LoginContext.getUserLoginRoute() +`/${user.id}`])
+        this.router.navigate([LoginContext.getUserLoginRoute() +`/security/user/${user.id}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
