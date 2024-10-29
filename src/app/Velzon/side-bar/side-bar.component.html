@@ -5,14 +5,14 @@
             <div id="two-column-menu">
             </div>
             <ul class="navbar-nav" id="navbar-nav">
-                <li class="menu-title"><img src="assets/logo/kemendag-logo.png" width="100"><i-lucide [img]="X" [size]="24" (click)="closeMobileSidebar()" class="x-button"></i-lucide></li>
+                <li class="menu-title" *ngIf="isScrollV"><img src="assets/logo/kemendag-logo-dark.png" width="120"><i-lucide [img]="X" [size]="24" (click)="closeMobileSidebar()" class="x-button"></i-lucide></li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" routerLink="">
+                    <a class="nav-link menu-link" [ngClass]="{'px-3': !isScrollV}" routerLink="">
                         <i-lucide [img]="getIcon('home')" [size]="16"></i-lucide> <span class="fw-bold">Home</span>
                     </a>
                 </li>
                 <li *ngFor="let menu of menuTree" class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebar{{menu.code}}" data-bs-toggle="collapse" role="button"
+                    <a class="nav-link menu-link" [ngClass]="{'px-3': !isScrollV}" href="#sidebar{{menu.code}}" data-bs-toggle="collapse" role="button"
                         [attr.aria-expanded]="isActive(menu) ? 'true' : 'false'"
                         [attr.aria-controls]="'sidebar'+menu.code">
                         <i-lucide [img]="getIcon(menu.code)" [size]="16"></i-lucide>
