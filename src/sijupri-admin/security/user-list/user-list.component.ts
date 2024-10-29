@@ -22,7 +22,7 @@ export class UserListComponent {
     private router: Router
   ) {
     this.pagable = new PagableBuilder("/api/v1/user/search")
-      .addPrimaryColumn(new PrimaryColumnBuilder("NIP", 'nip').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder("NIP", 'id').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'status').build())

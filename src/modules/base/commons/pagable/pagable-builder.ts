@@ -100,9 +100,9 @@ export class PrimaryColumnBuilder {
             this.label = label;
             if (parentsProperty)
                 parentsProperty.forEach(pProp => {
-                    this.property = `${pProp}|` + this.property;
+                    this.property = `${pProp}|` + property;
                 });
-            if (property) {
+            if (property && parentsProperty === undefined) {
                 this.property = this.property + property;
                 this.property = property;
             }

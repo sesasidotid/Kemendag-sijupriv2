@@ -84,6 +84,7 @@ export class JfDetailComponent {
     this.confirmationService.open(false).subscribe({
       next: (result) => {
         if (!result.confirmed) return;
+        this.jf.nip = this.nip;
 
         this.apiService.putData(`/api/v1/jf/task`, this.jf).subscribe({
           next: () => {

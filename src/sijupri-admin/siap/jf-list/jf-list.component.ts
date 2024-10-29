@@ -20,9 +20,9 @@ export class JfListComponent {
   ) {
     this.pagable = new PagableBuilder("/api/v1/jf/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("NIP", 'nip').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'user|name').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'user|email').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'status').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name', ['user']).build())
+      .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email', ['user']).build())
+      .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'status', ['user']).build())
       .addActionColumn(new ActionColumnBuilder().setAction((jf: any) => {
         this.router.navigate([`/${jf.id}`])
       }, "info").withIcon("detail").build())
