@@ -156,6 +156,14 @@ section {
         border-color: #2967be;
     }
 }
+.feedback {
+    color: rgb(235, 99, 99);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
 
 .feature-section {
     text-align: center !important;
@@ -192,7 +200,6 @@ section {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: 16px;
         color: white !important;
         max-width: 100%;
 
@@ -202,16 +209,18 @@ section {
         }
 
         @media (min-width: 768px) {
-            flex-direction: column;
+            flex-direction: row;
+            gap: 16px;
             max-width: 100%;
         }
 
         @media (min-width: 1024px) {
             flex-direction: row;
-            max-width: 85%;
+            max-width: 90%;
         }
 
         @media (min-width: 1280px) {
+            max-width: 85%;
         }
         
         .feature {
@@ -220,12 +229,13 @@ section {
             flex-direction: column;
             align-items: start;
             justify-content: center;
+            flex: 1;
             text-align: left !important;
             padding: 24px;
             background-color: #13182B;
             border-radius: 10px;
 
-            div {
+            .image {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -233,6 +243,40 @@ section {
                 border-radius: 50%;
                 padding: 16px;
                 margin-bottom: 32px;
+            }
+
+            form {
+                width: 100%;
+            }
+
+            .req-parent {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                margin-bottom: 32px;
+
+                .req-title {
+                    color: white !important;
+                    margin: 0 !important;
+                }
+
+                .req-items {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+
+                    .req-item {
+                        margin: 0 !important;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+
+                        p {
+                            padding-top: 3px;
+                            margin: 0 !important;
+                        }
+                    }
+                }
             }
     
             img {
@@ -340,6 +384,7 @@ section {
 
         @media screen and (max-width: 768px) {
             flex-direction: column;
+            gap: 1rem;
         }
     }
   
@@ -388,3 +433,7 @@ section {
     }
   }
   
+  .map-container {
+    height: 400px;
+    width: 100%;
+  }
