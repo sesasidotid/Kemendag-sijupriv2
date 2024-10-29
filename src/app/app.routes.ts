@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
 import { LoginContext } from '../modules/base/commons/login-context';
+import { authGuard } from '../modules/base/guards/auth.guard';
 
 export const routes: Routes = [
     {
         path: '',
         redirectTo: '',
+        canActivate: [authGuard],
         pathMatch: 'full',
     },
     getMenus(),
@@ -12,7 +14,10 @@ export const routes: Routes = [
         path: 'login',
         loadComponent: () => import('../modules/auth/components/login/login.component').then(m => m.LoginComponent),
     },
-
+    {
+        path: 'not-found',
+        loadComponent: () => import('./template/not-found/not-found.component').then(m => m.NotFoundComponent),
+    },
     { path: '**', redirectTo: 'not-found' }
 ];
 
@@ -45,8 +50,8 @@ function getMenus(): any {
             }
         default:
             return {
-                path: 'not-found',
-                loadComponent: () => import('./template/not-found/not-found.component').then(m => m.NotFoundComponent),
+                path: '',
+                loadComponent: () => import('../modules/landing-page/landing-page.component').then(m => m.LandingPageComponent),
             }
     }
 }

@@ -1,0 +1,98 @@
+<nav class="navbar">
+    <img src="assets/logo/kemendag-logo-light.png" width="120">
+    <div class="toggle" (click)="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <ul class="nav-links" [ngClass]="{'active': isMenuOpen}">
+        <li><a routerLink="/home">Beranda</a></li>
+        <li><a routerLink="/about">Layanan</a></li>
+        <li><a routerLink="/services">Lokasi</a></li>
+        <li><a routerLink="/contact">Kontak</a></li>
+        <li><a routerLink="/login" class="btn btn-secondary grad-button">Daftar Sekarang</a></li>
+    </ul>
+</nav>
+<section class="hero-section">
+    <h1>Selamat Datang di Sistem Informasi Fungsional Kemendag RI <span class="gradient-text">(SIjuPRI)</span></h1>
+    <p>Solusi cerdas untuk mendukung kinerja Kementrian Perdagangan Republik Indonesia</p>
+    <a routerLink="/login" class="btn btn-secondary w-fit grad-button ">Masuk Sekarang</a>
+</section>
+
+<section class="feature-section">
+    <h2>Menyediakan Fitur Pendaftaran Uji Kompetensi</h2>
+    <p>Berikut adalah beberapa fitur layanan yang tersedia pada SIjuPRI</p>
+    <div class="feature-list">
+        <div class="feature feature-1">
+            <div>
+                <img src="assets/doc-icon.svg" alt="">
+            </div>
+            <h4>Detail  Pendaftaran dan Perbaikan Dokumen</h4>
+            <p>Anda dapat melihat detail dan memperbaiki dokumen pendaftaran UKom anda dengan melakukan scan QR yang telah anda download atau dengan menginputkan kode pendaftaran dibawah ini </p>
+            <a routerLink="/login" class="btn btn-secondary grad-button">Daftar Sekarang</a>
+        </div>
+        <div class="feature feature-2">
+            <div>
+                <img src="assets/doc-icon.svg" alt="">
+            </div>
+            <h4>Detail  Pendaftaran dan Perbaikan Dokumen</h4>
+            <p>Anda dapat melihat detail dan memperbaiki dokumen pendaftaran UKom anda dengan melakukan scan QR yang telah anda download atau dengan menginputkan kode pendaftaran dibawah ini </p>
+            <a routerLink="/login" class="btn btn-secondary grad-button">Daftar Sekarang</a>
+        </div>
+        <div class="feature feature-3">
+            <div>
+                <img src="assets/doc-icon.svg" alt="">
+            </div>
+            <h4>Detail  Pendaftaran dan Perbaikan Dokumen</h4>
+            <p>Anda dapat melihat detail dan memperbaiki dokumen pendaftaran UKom anda dengan melakukan scan QR yang telah anda download atau dengan menginputkan kode pendaftaran dibawah ini </p>
+            <a routerLink="/login" class="btn btn-secondary grad-button">Daftar Sekarang</a>
+        </div>
+    </div>
+</section>
+<footer class="footer-landing">
+    <div class="footer-content">
+        <div class="footer-left">
+            <img src="assets/logo/kemendag-logo-dark.png" width="160">
+            <p class="footer-description">
+                Kementerian Perdagangan Republik Indonesia
+            </p>
+            <p>Jl. M.I. Ridwan Rais, No. 5 Daerah Khusus Ibukota Jakarta 10110, Indonesia</p>
+            <p>Phone: +62 21 350 0000</p>
+            <p>Call Center: 78123</p>
+        </div>
+
+        <div class="right-side">
+            <div class="footer-right">
+                <h3>Navigasi</h3>
+                <ul class="footer-menu">
+                    <li><a href="#">Beranda</a></li>
+                    <li><a href="#">Layanan</a></li>
+                    <li><a href="#">Lokasi</a></li>
+                    <li><a href="#">Kontak</a></li>
+                </ul>
+            </div>
+            <div class="footer-right">
+                <h3>Menu Aplikasi</h3>
+                <ul class="footer-menu">
+                    <li><a href="#">SIAP</a></li>
+                    <li><a href="#">Formasi</a></li>
+                    <li><a href="#">AKP</a></li>
+                    <li><a href="#">Kinerja</a></li>
+                    <li><a href="#">UKom</a></li>
+                </ul>
+            </div>
+            <div class="footer-right">
+                <h3>Sosial Media</h3>
+                <ul class="footer-menu">
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Instagram</a></li>
+                    <li><a href="#">Youtube</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <p class="footer-copy">© {{currentYear}} Kementerian Perdagangan Republik Indonesia</p>
+</footer>
+
