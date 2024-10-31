@@ -25,17 +25,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="page-title-box">
-                    <ul class="nav justify-content-end nav-pills arrow-navtabs nav-success bg-light mb-3"
+                <div class="card">
+                    <ul class="nav justify-content-start arrow-navtabs nav-primary bg-light mb-3"
                         role="tablist">
-                        <li class="nav-item me-2 cursor-pointer" *ngFor="let tab of tabs">
-                            <a class="nav-link {{tab.isActive ? 'active' : ''}}" role="tab" (click)="onTabClick(tab)">
+                        <li class="nav-item cursor-pointer" *ngFor="let tab of tabs">
+                            <a class="nav-link {{tab.isActive ? 'active' : 'inactive'}}" role="tab" (click)="onTabClick(tab)">
                                 <span class="" style="margin-right: 8px;"><i class="{{tab.icon ? 'mdi ' + tab.icon : 'mdi mdi-account-circle'}}"></i></span>
                                 <span class="">{{ tab.label }}</span>
                             </a>
                         </li>
                     </ul>
-                    <router-outlet />
+                    <div class="card-body">
+                        <router-outlet />
+                    </div>
                 </div>
                 <ng-container *ngIf="isCurrentRouteMatching()">
                     <router-outlet name="detached" />

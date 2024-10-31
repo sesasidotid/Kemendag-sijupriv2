@@ -4842,7 +4842,10 @@ fieldset:disabled .btn {
     --vz-card-border-width: 0;
     --vz-card-border-color: var(--vz-border-color);
     --vz-card-border-radius: var(--vz-border-radius);
-    --vz-card-box-shadow: rgba(100, 98, 92, .06) 0 0 15px 4px;
+    /* --vz-card-box-shadow: rgba(100, 98, 92, .06) 0 0 15px 4px; */
+    box-shadow: none !important;
+    border: 1px solid rgb(221, 225, 229) !important;
+    overflow: hidden !important;
     --vz-card-inner-border-radius: var(--vz-border-radius);
     --vz-card-cap-padding-y: 1rem;
     --vz-card-cap-padding-x: 1rem;
