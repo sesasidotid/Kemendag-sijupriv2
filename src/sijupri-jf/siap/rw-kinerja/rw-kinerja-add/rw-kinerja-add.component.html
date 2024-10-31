@@ -1,95 +1,134 @@
-<form (submit)="submit()">
+<form [formGroup]="rwKinerjaForm" (ngSubmit)="submit()">
     <div class="row">
         <div class="row col-lg-12">
-            <div class="col-lg-6">
+            <div class="col-lg-6 top-selector">
                 <div class="mb-3">
-                    <label for="firstnameInput" class="form-label">
-                        Tahunan/Bulanan
+                    <label for="type" class="form-label">
+                        Tahunan/Bulanan <span class="text-danger">*</span>
                     </label>
-                    <select class="form-select" [(ngModel)]="rwKinerja.type" name="type">
-                        <option [value]="undefined">Pilih</option>
-                        <option [value]="'tahunan'">tahunan</option>
-                        <option [value]="'bulanan'">bulanan</option>
+                    <select class="form-select" name="type" id="type" formControlName="type">
+                        <option selected value="" style=" display: none;">Pilih Tahunan/Bulanan</option>
+                        <option [value]="'tahunan'">Tahunan</option>
+                        <option [value]="'bulanan'">Bulanan</option>
                     </select>
+                    <div class="feedback"
+                        *ngIf="rwKinerjaForm.get('type').invalid && rwKinerjaForm.get('type').touched">
+                        <small *ngIf="rwKinerjaForm.get('type').errors?.['required']">Tipe perlu
+                            dipilih.</small>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    Tanggal Mulai Hitung Penilaian
+                <label for="dateStart" class="form-label">
+                    Tanggal Mulai Hitung Penilaian <span class="text-danger">*</span>
                 </label>
-                <input type="date" class="form-control" [(ngModel)]="rwKinerja.dateStart" name="dateStart">
+                <input type="date" class="form-control" name="dateStart" id="dateStart" formControlName="dateStart">
+                <div class="feedback"
+                    *ngIf="rwKinerjaForm.get('dateStart').invalid && rwKinerjaForm.get('dateStart').touched">
+                    <small *ngIf="rwKinerjaForm.get('dateStart').errors?.['required']">Tanggal mulai perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    Tanggal Selesai Hitung Penilaian
+                <label for="dateEnd" class="form-label">
+                    Tanggal Selesai Hitung Penilaian <span class="text-danger">*</span>
                 </label>
-                <input type="date" class="form-control" [(ngModel)]="rwKinerja.dateEnd" name="dateEnd">
+                <input type="date" class="form-control" name="dateEnd" id="dateEnd" formControlName="dateEnd">
+                <div class="feedback"
+                    *ngIf="rwKinerjaForm.get('dateEnd').invalid && rwKinerjaForm.get('dateEnd').touched">
+                    <small *ngIf="rwKinerjaForm.get('dateEnd').errors?.['required']">Tanggal selesai perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Rating Hasil Kinerja
+                <label for="ratingHasilId" class="form-label">
+                    Rating Hasil Kinerja <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" [(ngModel)]="rwKinerja.ratingHasilId" name="ratingHasilId">
-                    <option [value]="undefined">Pilih</option>
+                <select class="form-select" name="ratingHasilId" id="ratingHasilId" formControlName="ratingHasilId">
+                    <option selected value="" style=" display: none;">Pilih Rating Hasil</option>
                     <option *ngFor="let ratingKinerja of ratingKinerjaList" [value]="ratingKinerja.id">
                         {{ratingKinerja.name}}
                     </option>
                 </select>
+                <div class="feedback"
+                    *ngIf="rwKinerjaForm.get('ratingHasilId').invalid && rwKinerjaForm.get('ratingHasilId').touched">
+                    <small *ngIf="rwKinerjaForm.get('ratingHasilId').errors?.['required']">Rating hasil perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Rating Perilaku Kinerja
+                <label for="ratingKinerjaId" class="form-label">
+                    Rating Perilaku Kinerja <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" [(ngModel)]="rwKinerja.ratingKinerjaId" name="ratingKinerjaId">
-                    <option [value]="undefined">Pilih</option>
+                <select class="form-select" name="ratingKinerjaId" id="ratingKinerjaId"
+                    formControlName="ratingKinerjaId">
+                    <option selected value="" style=" display: none;">Pilih Rating Kinerja</option>
                     <option *ngFor="let ratingKinerja of ratingKinerjaList" [value]="ratingKinerja.id">
                         {{ratingKinerja.name}}
                     </option>
                 </select>
+                <div class="feedback"
+                    *ngIf="rwKinerjaForm.get('ratingKinerjaId').invalid && rwKinerjaForm.get('ratingKinerjaId').touched">
+                    <small *ngIf="rwKinerjaForm.get('ratingKinerjaId').errors?.['required']">Rating perilaku perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Predikat Kinerja
+                <label for="predikatKinerjaId" class="form-label">
+                    Predikat Kinerja <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" [(ngModel)]="rwKinerja.predikatKinerjaId" name="predikatKinerjaId">
-                    <option [value]="undefined">Pilih</option>
+                <select class="form-select" name="predikatKinerjaId" id="predikatKinerjaId"
+                    formControlName="predikatKinerjaId">
+                    <option selected value="" style=" display: none;">Pilih Predikat Kinerja</option>
                     <option *ngFor="let predikatKinerja of predikatKinerjaList" [value]="predikatKinerja.id">
                         {{predikatKinerja.name}}
                     </option>
                 </select>
+                <div class="feedback"
+                    *ngIf="rwKinerjaForm.get('predikatKinerjaId').invalid && rwKinerjaForm.get('predikatKinerjaId').touched">
+                    <small *ngIf="rwKinerjaForm.get('predikatKinerjaId').errors?.['required']">Predikat kinerja perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    Angka Kredit
+                <label for="angkaKredit" class="form-label">
+                    Angka Kredit <span class="text-danger">*</span>
                 </label>
-                <input type="number" class="form-control" [(ngModel)]="rwKinerja.angkaKredit" name="angkaKredit">
+                <input type="text" class="form-control" name="angkaKredit" id="angkaKredit"
+                    formControlName="angkaKredit" placeholder="Masukkan angka kredit">
+                <div class="feedback"
+                    *ngIf="rwKinerjaForm.get('angkaKredit').invalid && rwKinerjaForm.get('angkaKredit').touched">
+                    <small *ngIf="rwKinerjaForm.get('angkaKredit').errors?.['required']">Angka kredit perlu
+                        diisi.</small>
+                    <small *ngIf="rwKinerjaForm.get('angkaKredit').errors?.['pattern']">Angka kredit harus angka.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-12">
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="emailInput" class="form-label">
                     File :
                 </label>
-            </div>
+            </div> -->
             <div class="row">
                 <app-file-handler [inputs]="inputs"></app-file-handler>
             </div>
         </div>
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <button type="submit" class="btn btn-sm btn-soft-success">simpan</button>
+                <button type="submit" class="btn btn-primary" [disabled]="rwKinerjaForm.invalid">Simpan</button>
             </div>
         </div>
     </div>

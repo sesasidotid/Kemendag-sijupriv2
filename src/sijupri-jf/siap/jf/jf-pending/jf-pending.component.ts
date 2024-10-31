@@ -8,7 +8,7 @@ import { PendingTask } from '../../../../modules/workflow/models/pending-task.mo
 import { JF } from '../../../../modules/siap/models/jf.model';
 import { LoginContext } from '../../../../modules/base/commons/login-context';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Task } from '../../../../modules/workflow/models/task.model';
 import { HandlerService } from '../../../../modules/base/services/handler.service';
@@ -16,7 +16,7 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
 @Component({
   selector: 'app-jf-pending',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
+  imports: [CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
   templateUrl: './jf-pending.component.html',
   styleUrl: './jf-pending.component.scss'
 })
@@ -25,6 +25,8 @@ export class JfPendingComponent {
   jenisKelaminList: JenisKelamin[] = [];
   pendingTask: PendingTask;
   nip: string = LoginContext.getUserId();
+
+  jfDetailForm!: FormGroup;
 
   inputs: FIleHandler = {
     files: {},
@@ -43,7 +45,18 @@ export class JfPendingComponent {
     private apiService: ApiService,
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService,
-  ) { }
+    private alertService: AlertService,
+  ) {
+    this.jfDetailForm = new FormGroup({
+      name: new FormControl(this.jf.name, [Validators.required]),
+      phone: new FormControl(this.jf.phone, [Validators.required, Validators.pattern('^[0-9]+$')]),
+      email: new FormControl(this.jf.email, [Validators.required, Validators.email]),
+      tempatLahir: new FormControl(this.jf.tempatLahir, [Validators.required]),
+      tanggalLahir: new FormControl(this.jf.tanggalLahir, [Validators.required]),
+      jenisKelaminCode: new FormControl(this.jf.jenisKelaminCode, [Validators.required]),
+      nik: new FormControl(this.jf.nik, [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(13)],),
+    });
+  }
 
   getPendingTask() {
     this.apiService.getData(`/api/v1/jf/expect_pending/${this.nip}`).subscribe({
@@ -51,10 +64,21 @@ export class JfPendingComponent {
         this.pendingTask = new PendingTask(response);
         this.jf = new JF(this.pendingTask.objectTask.object);
 
-        this.inputs.files['ktp'] = { label: "KTP", source: this.jf.ktpUrl };
+        this.jfDetailForm.patchValue({
+          name: this.jf.name,
+          phone: this.jf.phone,
+          email: this.jf.email,
+          tempatLahir: this.jf.tempatLahir,
+          tanggalLahir: this.jf.tanggalLahir,
+          jenisKelaminCode: this.jf.jenisKelaminCode,
+          nik: this.jf.nik,
+        })
+
+        this.inputs.files['ktp'] = { label: "Upload Dokumen KTP", source: this.jf.ktpUrl, required: true };
         this.inputs.viewOnly = this.pendingTask.flowId == 'siap_flow_1'
       },
       error: (error) => {
+        this.alertService.showToast('Error', "Gagal mendapatkan data profil!");
         this.handlerService.handleException(error);
       }
     })
@@ -72,21 +96,32 @@ export class JfPendingComponent {
   }
 
   submit() {
-    this.confirmationService.open(false).subscribe({
-      next: (result) => {
-        if (!result.confirmed) return;
-        const task = new Task();
-        task.id = this.pendingTask.id;
-        task.taskAction = 'approve';
-        task.object = this.jf;
+    if (this.jfDetailForm.valid) {
+      this.jf.name = this.jfDetailForm.value.name;
+      this.jf.phone = this.jfDetailForm.value.phone;
+      this.jf.email = this.jfDetailForm.value.email;
+      this.jf.tempatLahir = this.jfDetailForm.value.tempatLahir;
+      this.jf.tanggalLahir = this.jfDetailForm.value.tanggalLahir;
+      this.jf.jenisKelaminCode = this.jfDetailForm.value.jenisKelaminCode;
+      this.jf.nik = this.jfDetailForm.value.nik;
 
-        this.apiService.postData(`/api/v1/jf/task/submit`, task).subscribe({
-          next: () => {
-            this.handlerService.handleAlert('Success', "Berhasil");
-            window.location.reload();
-          }
-        })
-      }
-    })
+      this.confirmationService.open(false).subscribe({
+        next: (result) => {
+          if (!result.confirmed) return;
+          const task = new Task();
+          task.id = this.pendingTask.id;
+          task.taskAction = 'approve';
+          task.object = this.jf;
+  
+          this.apiService.postData(`/api/v1/jf/task/submit`, task).subscribe({
+            next: () => {
+              this.handlerService.handleAlert('Success', "Berhasil mengajukan perubahan data.");
+              window.location.reload();
+            }
+          })
+        }
+      })
+    }
+
   }
 }

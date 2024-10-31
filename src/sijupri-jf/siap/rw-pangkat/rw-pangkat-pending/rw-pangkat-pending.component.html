@@ -1,45 +1,50 @@
 <app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
-<form *ngIf="isDetailOpen" (submit)="submit()">
+<form *ngIf="isDetailOpen" [formGroup]="rwPangkatForm" (ngSubmit)="submit()">
     <div *ngIf="pendingTask.remark" class="alert alert-warning" role="alert">
-        {{pendingTask.remark}}
+        <strong>Catatan Revisi : </strong> "{{pendingTask.remark}}"
     </div>
     <div class="row">
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Pangkat
+                <label for="pangkatCode" class="form-label">
+                    Pangkat <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" [(ngModel)]="rwPangkat.pangkatCode" name="pangkatCode">
-                    <option [value]="undefined">Pilih</option>
+                <select class="form-select" name="pangkatCode" id="pangkatCode" formControlName="pangkatCode">
+                    <option selected value="" style=" display: none;">Pilih Pangkat</option>
                     <option *ngFor="let pangkat of pangkatList" [value]="pangkat.code">
                         {{pangkat.name}} ({{pangkat.golongan}})
                     </option>
                 </select>
+                <div class="feedback"
+                *ngIf="rwPangkatForm.get('pangkatCode').invalid && rwPangkatForm.get('pangkatCode').touched">
+                <small *ngIf="rwPangkatForm.get('pangkatCode').errors?.['required']">Pangkat perlu
+                    dipilih.</small>
+            </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    Terhitung Mulai Tanggal
+                <label for="tmt" class="form-label">
+                    Terhitung Mulai Tanggal <span class="text-danger">*</span>
                 </label>
-                <input type="date" class="form-control" [(ngModel)]="rwPangkat.tmt" name="tmt"
+                <input type="date" class="form-control" name="tmt" id="tmt" formControlName="tmt"
                     placeholder="Masukan nama Sekolah/Universitas/Institusi">
+                    <div class="feedback"
+                    *ngIf="rwPangkatForm.get('tmt').invalid && rwPangkatForm.get('tmt').touched">
+                    <small *ngIf="rwPangkatForm.get('tmt').errors?.['required']">Tanggal mulai perlu
+                        diisi.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    File :
-                </label>
-            </div>
             <div class="row">
                 <app-file-handler [inputs]="inputs"></app-file-handler>
             </div>
         </div>
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <button type="submit" class="btn btn-sm btn-soft-warning me-2" (click)="back()">Kembali</button>
-                <button type="submit" class="btn btn-sm btn-soft-success">simpan</button>
+                <button type="button" class="btn btn-soft-secondary" (click)="back()">Kembali</button>
+                <button type="submit" class="btn btn-primary" [disabled]="rwPangkatForm.invalid">Simpan</button>
             </div>
         </div>
     </div>

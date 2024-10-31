@@ -1,71 +1,185 @@
 <div *ngIf="!isEditOpen">
+    <div class="container my-4">
+        <div class="row">
+            <!-- First Name -->
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label">
+                    <i class="mdi mdi-account-circle text-muted me-2"></i>Nama Lengkap
+                </label>
+                <p class="border-bottom pb-2">{{jf.name}}</p>
+            </div>
+
+            <!-- No. HP -->
+            <div *ngIf="jf.phone" class="col-md-6 mb-3">
+                <label for="phoneInput" class="form-label">
+                    <i class="mdi mdi-phone text-muted me-2"></i> No. HP
+                </label>
+                <p class="border-bottom pb-2">{{jf.phone}}</p>
+            </div>
+            <!-- Email -->
+            <div *ngIf="jf.email" class="col-md-6 mb-3">
+                <label for="emailInput" class="form-label">
+                    <i class="mdi mdi-email text-muted me-2"></i> Email
+                </label>
+                <p class="border-bottom pb-2">{{jf.email}}</p>
+            </div>
+
+            <!-- Tempat Lahir -->
+            <div *ngIf="jf.tempatLahir" class="col-md-6 mb-3">
+                <label for="birthplaceInput" class="form-label">
+                    <i class="mdi mdi-map-marker text-muted me-2"></i> Tempat Lahir
+                </label>
+                <p class="border-bottom pb-2">{{jf.tempatLahir}}</p>
+            </div>
+
+            <!-- Tanggal Lahir -->
+            <div *ngIf="jf.tanggalLahir" class="col-md-6 mb-3">
+                <label for="birthdateInput" class="form-label">
+                    <i class="mdi mdi-calendar-range text-muted me-2"></i> Tanggal Lahir
+                </label>
+                <p class="border-bottom pb-2">{{jf.tanggalLahir}}</p>
+            </div>
+
+            <!-- Jenis Kelamin -->
+            <div *ngIf="jf.jenisKelaminName" class="col-md-6 mb-3">
+                <label for="genderInput" class="form-label">
+                    <i class="mdi mdi-gender-male-female text-muted me-2"></i> Jenis Kelamin
+                </label>
+                <p class="border-bottom pb-2">{{jf.jenisKelaminName}}</p>
+            </div>
+
+            <!-- NIK -->
+            <div *ngIf="jf.nik" class="col-md-6 mb-3">
+                <label for="nikInput" class="form-label">
+                    <i class="mdi mdi-card-account-details text-muted me-2"></i> NIK
+                </label>
+                <p class="border-bottom pb-2">{{jf.nik}}</p>
+            </div>
+
+            <!-- File Upload -->
+            <div *ngIf="jf.ktpUrl" class="col-md-6 mb-3">
+                <app-file-handler [inputs]="inputs"></app-file-handler>
+            </div>
+        </div>
+
+        <!-- Edit Button -->
+        <div class="row">
+            <div class="col-12 d-flex justify-content-end mt-3">
+                <a (click)="toggleEdit()" class="btn btn-info">Ubah</a>
+            </div>
+        </div>
+    </div>
+</div>
+<form *ngIf="isEditOpen" [formGroup]="jfDetailForm" (ngSubmit)="submit()">
     <div class="row">
         <div class="col-lg-12">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    First Name
+                <label for="name" class="form-label">
+                    Nama Lengkap <span class="text-danger">*</span>
                 </label>
-                <p class="border-bottom">{{jf.name}}</p>
-            </div>
-        </div>
-        <!--end col-->
-        <div *ngIf="jf.phone" class="col-lg-6">
-            <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    No. HP
-                </label>
-                <p class="border-bottom">{{jf.phone}}</p>
-            </div>
-        </div>
-        <div *ngIf="jf.email" class="col-lg-6">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Email
-                </label>
-                <p class="border-bottom">{{jf.email}}</p>
-            </div>
-        </div>
-        <!--end col-->
-        <div *ngIf="jf.tempatLahir" class="col-lg-6">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Tempat Lahir
-                </label>
-                <p class="border-bottom">{{jf.tempatLahir}}</p>
-            </div>
-        </div>
-        <div *ngIf="jf.tanggalLahir" class="col-lg-6">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Tanggal Lahir
-                </label>
-                <p class="border-bottom">{{jf.tanggalLahir}}</p>
-            </div>
-        </div>
-        <div *ngIf="jf.jenisKelaminName" class="col-lg-6">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Jenis Kelamin
-                </label>
-                <p class="border-bottom">{{jf.jenisKelaminName}}</p>
-            </div>
-        </div>
-        <hr>
-        <div class="col-lg-12 row">
-            <div *ngIf="jf.nik" class="col-lg-12">
-                <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                        NIK
-                    </label>
-                    <p class="border-bottom">{{jf.nik}}</p>
+                <input type="text" class="form-control" id="name" placeholder="Masukkan nama lengkap" name="name"
+                    formControlName="name">
+                <div class="feedback" *ngIf="jfDetailForm.get('name').invalid && jfDetailForm.get('name').touched">
+                    <small *ngIf="jfDetailForm.get('name').errors?.['required']">Nama lengkap perlu
+                        diisi.</small>
                 </div>
             </div>
-            <div *ngIf="jf.ktpUrl" class="col-lg-12">
+            <!--end col-->
+            <div class="col-lg-12">
                 <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                        File :
+                    <label for="phone" class="form-label">
+                        No. HP <span class="text-danger">*</span>
                     </label>
-                    <div class="row">
+                    <input type="text" class="form-control" id="phone" placeholder="Masukkan No. HP" name="phone"
+                        formControlName="phone">
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('phone').invalid && jfDetailForm.get('phone').touched">
+                        <small *ngIf="jfDetailForm.get('phone').errors?.['required']">No. HP perlu
+                            diisi.</small>
+                        <small *ngIf="jfDetailForm.get('phone').errors?.['pattern']">No. HP harus angka.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="email" class="form-label">
+                        Email <span class="text-danger">*</span>
+                    </label>
+                    <input type="email" class="form-control" id="email" placeholder="Masukkan email" name="email"
+                        formControlName="email">
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('email').invalid && jfDetailForm.get('email').touched">
+                        <small *ngIf="jfDetailForm.get('email').errors?.['required']">Email perlu
+                            diisi.</small>
+                        <small *ngIf="jfDetailForm.get('email').errors?.['email']">Email tidak valid.</small>
+                    </div>
+                </div>
+            </div>
+            <!--end col-->
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="tempatLahir" class="form-label">
+                        Tempat Lahir <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="tempatLahir" placeholder="Masukkan Tempat Lahir"
+                        name="tempatLahir" formControlName="tempatLahir">
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('tempatLahir').invalid && jfDetailForm.get('tempatLahir').touched">
+                        <small *ngIf="jfDetailForm.get('tempatLahir').errors?.['required']">Tempat Lahir perlu
+                            diisi.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="tanggalLahir" class="form-label">
+                        Tanggal Lahir <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" class="form-control" id="tanggalLahir" placeholder="Masukkan Tanggal Lahir"
+                        name="tanggalLahir" formControlName="tanggalLahir">
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('tanggalLahir').invalid && jfDetailForm.get('tanggalLahir').touched">
+                        <small *ngIf="jfDetailForm.get('tanggalLahir').errors?.['required']">Tanggal Lahir perlu
+                            diisi.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="jenisKelaminCode" class="form-label">
+                        Jenis Kelamin <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select" name="jenisKelaminCode" formControlName="jenisKelaminCode">
+                        <option selected value="" style=" display: none;">Pilih Jenis Kelamin</option>
+                        <option *ngFor="let jenisKelamin of jenisKelaminList" [value]="jenisKelamin.code">
+                            {{jenisKelamin.name}}
+                        </option>
+                    </select>
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('jenisKelaminCode').invalid && jfDetailForm.get('jenisKelaminCode').touched">
+                        <small *ngIf="jfDetailForm.get('jenisKelaminCode').errors?.['required']">Jenis Kelamin perlu
+                            dipilih.</small>
+                    </div>
+                </div>
+            </div>
+            <div class=" row">
+                <div class="">
+                    <div class="mb-3">
+                        <label for="nik" class="form-label">
+                            NIK <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="nik" placeholder="Masukkan NIK" name="nik"
+                            formControlName="nik">
+                        <div class="feedback"
+                            *ngIf="jfDetailForm.get('nik').invalid && jfDetailForm.get('nik').touched">
+                            <small *ngIf="jfDetailForm.get('nik').errors?.['required']">NIK perlu
+                                diisi.</small>
+                            <small *ngIf="jfDetailForm.get('nik').errors?.['pattern']">NIK harus angka.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="mb-3">
                         <app-file-handler [inputs]="inputs"></app-file-handler>
                     </div>
                 </div>
@@ -73,98 +187,9 @@
         </div>
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <a (click)="toggleEdit()" class="btn btn-sm btn-soft-info">Ubah</a>
+                <a (click)="toggleEdit()" class="btn btn-warning me-1">Kembali</a>
+                <button type="submit" class="btn btn-primary" [disabled]="jfDetailForm.invalid">Simpan</button>
             </div>
-        </div>
-    </div>
-</div>
-<form *ngIf="isEditOpen" (submit)="submit()">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    First Name
-                </label>
-                <input type="text" class="form-control" id="firstnameInput" placeholder="Masukkan Nama"
-                    [(ngModel)]="jf.name" name="name">
-            </div>
-        </div>
-        <!--end col-->
-        <div class="col-lg-12">
-            <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    No. HP
-                </label>
-                <input type="text" class="form-control" id="lastnameInput" placeholder="Masukkan No. HP"
-                    [(ngModel)]="jf.phone" name="phone">
-            </div>
-        </div>
-        <div class="col-lg-12">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Email
-                </label>
-                <input type="email" class="form-control" id="emailInput" placeholder="Masukkan email"
-                    [(ngModel)]="jf.email" name="email">
-            </div>
-        </div>
-        <!--end col-->
-        <div class="col-lg-12">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Tempat Lahir
-                </label>
-                <input type="text" class="form-control" id="emailInput" placeholder="Masukkan Tempat Lahir"
-                    [(ngModel)]="jf.tempatLahir" name="tempatLahir">
-            </div>
-        </div>
-        <div class="col-lg-12">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Tanggal Lahir
-                </label>
-                <input type="date" class="form-control" id="emailInput" placeholder="Masukkan Tanggal Lahir"
-                    [(ngModel)]="jf.tanggalLahir" name="tanggalLahir">
-            </div>
-        </div>
-        <div class="col-lg-12">
-            <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Jenis Kelamin
-                </label>
-                <select class="form-select" [(ngModel)]="jf.jenisKelaminCode" name="jenisKelaminCode">
-                    <option [value]="undefined">Pilih</option>
-                    <option *ngFor="let jenisKelamin of jenisKelaminList" [value]="jenisKelamin.code">
-                        {{jenisKelamin.name}}
-                    </option>
-                </select>
-            </div>
-        </div>
-        <hr>
-        <div class="col-lg-12 row">
-            <div class="col-lg-12">
-                <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                        NIK
-                    </label>
-                    <input type="text" class="form-control" id="emailInput" placeholder="Masukkan NIK"
-                        [(ngModel)]="jf.nik" name="nik">
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                        KTP
-                    </label>
-                    <app-file-handler [inputs]="inputs"></app-file-handler>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-12">
-        <div class="hstack gap-2 justify-content-end">
-            <a (click)="toggleEdit()" class="btn btn-sm btn-soft-warning me-2">Kembali</a>
-            <button class="btn btn-sm btn-soft-success">Simpan</button>
         </div>
     </div>
 </form>

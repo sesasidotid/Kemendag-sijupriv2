@@ -6,7 +6,7 @@ import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model';
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle';
 import { JenjangService } from '../../../../modules/maintenance/services/jenjang.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RwJabatanService } from '../../../../modules/siap/services/rw-jabatan.service';
 import { AlertService } from '../../../../modules/base/services/alert.service';
 import { ApiService } from '../../../../modules/base/services/api.service';
@@ -18,7 +18,7 @@ import { LoginContext } from '../../../../modules/base/commons/login-context';
 @Component({
   selector: 'app-rw-jabatan-add',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
+  imports: [CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
   templateUrl: './rw-jabatan-add.component.html',
   styleUrl: './rw-jabatan-add.component.scss'
 })
@@ -27,19 +27,27 @@ export class RwJabatanAddComponent {
   jabatanList: Jabatan[];
   jenjangList: Jenjang[];
 
+  rwJabatanForm!: FormGroup;
+
   constructor(
     private apiService: ApiService,
     private alertService: AlertService,
     private confirmationService: ConfirmationService,
     private router: Router
   ) {
+    this.rwJabatanForm = new FormGroup({
+      jabatanCode: new FormControl('', [Validators.required]),
+      jenjangCode: new FormControl('', [Validators.required]),
+      tmt: new FormControl('', [Validators.required]),
+    })
+
     this.getJabatanList();
     this.getJenjangList();
   }
 
   inputs: FIleHandler = {
     files: {
-      ijazah: { label: "SK Jabatan", source: this.rwJabatan.skJabatanUrl }
+      ijazah: { label: "Upload Dokumen SK Jabatan", source: this.rwJabatan.skJabatanUrl, required: true }
     },
     listen: (key: string, source: string, base64Data: string) => {
       this.rwJabatan.fileSkJabatan = base64Data;
@@ -53,7 +61,7 @@ export class RwJabatanAddComponent {
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data jabatan!");
       }
     })
   }
@@ -65,27 +73,36 @@ export class RwJabatanAddComponent {
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data jenjang!");
       }
     })
   }
 
   submit() {
-    this.confirmationService.open(false).subscribe({
-      next: (result) => {
-        if (!result.confirmed) return;
+    if(this.rwJabatanForm.valid) {
+      this.rwJabatan.jabatanCode = this.rwJabatanForm.value.jabatanCode;
+      this.rwJabatan.jenjangCode = this.rwJabatanForm.value.jenjangCode;
+      this.rwJabatan.tmt = this.rwJabatanForm.value.tmt
 
-        this.apiService.postData(`/api/v1/rw_jabatan/task`, this.rwJabatan).subscribe({
-          next: () => {
-            this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate(['/profile/rw-jabatan/pending'])
-          },
-          error: (error) => {
-            console.log("error", error);
-            this.alertService.showToast("Error", "gagal mengirim data");
-          }
-        })
-      }
-    });
+      this.confirmationService.open(false).subscribe({
+        next: (result) => {
+          if (!result.confirmed) return;
+  
+          this.apiService.postData(`/api/v1/rw_jabatan/task`, this.rwJabatan).subscribe({
+            next: () => {
+              this.alertService.showToast('Success', "Berhasil menambahkan riwayat jabatan.");
+              setTimeout(() => {
+                this.router.navigate(['/profile/rw-jabatan/pending']);
+              }, 2000); // Adjust the delay as needed
+            },
+            error: (error) => {
+              console.log("error", error);
+              this.alertService.showToast("Error", "Gagal menambahkan riwayat jebatan!");
+            }
+          })
+        }
+      });
+    }
+
   }
 }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Pangkat } from '../../../../modules/maintenance/models/pangkat.model';
 import { RWPangkat } from '../../../../modules/siap/models/rw-pangkat.model';
 import { Router } from '@angular/router';
@@ -14,17 +14,18 @@ import { LoginContext } from '../../../../modules/base/commons/login-context';
 @Component({
   selector: 'app-rw-pangkat-add',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
+  imports: [CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
   templateUrl: './rw-pangkat-add.component.html',
   styleUrl: './rw-pangkat-add.component.scss'
 })
 export class RwPangkatAddComponent {
   rwPangkat: RWPangkat = new RWPangkat();
   pangkatList: Pangkat[];
+  rwPangkatForm!: FormGroup;
 
   inputs: FIleHandler = {
     files: {
-      docEvaluas: { label: "SK Pangkat", source: this.rwPangkat.skPangkatUrl },
+      docEvaluas: { label: "Upload Dokumen SK Pangkat", source: this.rwPangkat.skPangkatUrl, required: true },
     },
     listen: (key: string, source: string, base64Data: string) => {
       this.rwPangkat.fileSkPangkat = base64Data;
@@ -37,6 +38,10 @@ export class RwPangkatAddComponent {
     private alertService: AlertService,
     private router: Router
   ) {
+    this.rwPangkatForm = new FormGroup({
+      pangkatCode: new FormControl('', [Validators.required]),
+      tmt: new FormControl('', [Validators.required]),
+    })
     this.getPangkatList();
   }
 
@@ -47,27 +52,35 @@ export class RwPangkatAddComponent {
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data pangkat!");
       }
     })
   }
 
   submit() {
-    this.confirmationService.open(false).subscribe({
-      next: (result) => {
-        if (!result.confirmed) return;
+    if (this.rwPangkatForm.valid) {
+      // console.log(this.rwPendidikanForm.value);
+      this.rwPangkat.pangkatCode = this.rwPangkatForm.value.pangkatCode;
+      this.rwPangkat.tmt = this.rwPangkatForm.value.tmt;
 
-        this.apiService.postData(`/api/v1/rw_pangkat/task`, this.rwPangkat).subscribe({
-          next: () => {
-            this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate(['/profile/rw-pangkat/pending'])
-          },
-          error: (error) => {
-            console.log("error", error);
-            this.alertService.showToast("Error", "gagal mengirim data");
-          }
-        });
-      }
-    });
+      this.confirmationService.open(false).subscribe({
+        next: (result) => {
+          if (!result.confirmed) return;
+          
+          this.apiService.postData(`/api/v1/rw_pangkat/task`, this.rwPangkat).subscribe({
+            next: () => {
+              this.alertService.showToast('Success', "Berhasil menambahkan riwayat pangkat.");
+              setTimeout(() => {
+                this.router.navigate(['/profile/rw-pangkat/pending']);
+              }, 2000); // Adjust the delay as needed
+            },
+            error: (error) => {
+              console.log("error", error);
+              this.alertService.showToast("Error", "Gagal menambahkan riwayat pangkat!");
+            }
+          });
+        }
+      });
+    }
   }
 }

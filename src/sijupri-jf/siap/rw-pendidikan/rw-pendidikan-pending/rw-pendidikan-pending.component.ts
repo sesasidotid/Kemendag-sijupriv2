@@ -10,7 +10,7 @@ import { RWPendidikan } from '../../../../modules/siap/models/rw-perndidikan.mod
 import { Pendidikan } from '../../../../modules/maintenance/models/pendidikan.model';
 import { Task } from '../../../../modules/workflow/models/task.model';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { PageColumn } from '../../../../modules/base/commons/pagable/page-column';
@@ -18,7 +18,7 @@ import { PageColumn } from '../../../../modules/base/commons/pagable/page-column
 @Component({
   selector: 'app-rw-pendidikan-pending',
   standalone: true,
-  imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent],
+  imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
   templateUrl: './rw-pendidikan-pending.component.html',
   styleUrl: './rw-pendidikan-pending.component.scss'
 })
@@ -29,9 +29,11 @@ export class RwPendidikanPendingComponent {
   pendidikanList: Pendidikan[] = []
   pendingTask: PendingTask;
 
+  rwPendidikanForm!: FormGroup;
+
   inputs: FIleHandler = {
     files: {
-      ijazah: { label: "Ijaza", source: this.rwPendidikan.ijazahUrl }
+      ijazah: { label: "Upload Dokumen Ijazah", source: this.rwPendidikan.ijazahUrl, required: true}
     },
     listen: (key: string, source: string, base64Data: string) => {
       this.rwPendidikan.fileIjazah = base64Data;
@@ -54,9 +56,16 @@ export class RwPendidikanPendingComponent {
           this.getPendidikanList()
           this.isDetailOpen = true;
         }
-      }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("detail").build())
+      }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("update").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Pendidikan", "text").build())
       .build();
+
+      this.rwPendidikanForm = new FormGroup({
+        institusiPendidikan: new FormControl('', [Validators.required]),
+        pendidikanCode: new FormControl('', [Validators.required]),
+        jurusan: new FormControl('', [Validators.required]),
+        tanggalIjazah: new FormControl('', [Validators.required]),
+      })
   }
 
   getPendidikanList() {
@@ -66,7 +75,7 @@ export class RwPendidikanPendingComponent {
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data pendidikan!");
       }
     })
   }
@@ -76,10 +85,16 @@ export class RwPendidikanPendingComponent {
       next: (response) => {
         const pendingTask = new PendingTask(response);
         this.rwPendidikan = new RWPendidikan(pendingTask.objectTask.object);
+        this.rwPendidikanForm.patchValue({
+          institusiPendidikan: this.rwPendidikan.institusiPendidikan,
+          pendidikanCode: this.rwPendidikan.pendidikanCode,
+          jurusan: this.rwPendidikan.jurusan,
+          tanggalIjazah: this.rwPendidikan.tanggalIjazah
+        })
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data pendidikan!");
       }
     });
   }
@@ -92,23 +107,33 @@ export class RwPendidikanPendingComponent {
   }
 
   submit() {
-    this.confirmationService.open(false).subscribe({
-      next: (result) => {
-        if (!result.confirmed) return;
+    if (this.rwPendidikanForm.valid) {
+      this.rwPendidikan.pendidikanCode = this.rwPendidikanForm.value.pendidikanCode;
+      this.rwPendidikan.institusiPendidikan = this.rwPendidikanForm.value.institusiPendidikan;
+      this.rwPendidikan.jurusan = this.rwPendidikanForm.value.jurusan;
+      this.rwPendidikan.tanggalIjazah = this.rwPendidikanForm.value.tanggalIjazah;
 
-        const task = new Task();
-        task.id = this.pendingTask.id;
-        task.taskAction = "approve";
-        task.object = this.rwPendidikan;
-
-        this.apiService.postData(`/api/v1/rw_pendidikan/task/submit`, task).subscribe({
-          next: () => this.isDetailOpen = false,
-          error: (error) => {
-            console.log("error", error);
-            this.alertService.showToast("Error", "gagal mengirim data");
-          }
-        })
-      }
-    });
+      this.confirmationService.open(false).subscribe({
+        next: (result) => {
+          if (!result.confirmed) return;
+  
+          const task = new Task();
+          task.id = this.pendingTask.id;
+          task.taskAction = "approve";
+          task.object = this.rwPendidikan;
+  
+          this.apiService.postData(`/api/v1/rw_pendidikan/task/submit`, task).subscribe({
+            next: () => {
+              this.alertService.showToast('Success', "Berhasil memperbarui pengajuan riwayat pendidikan.");
+              this.back();
+            },
+            error: (error) => {
+              console.log("error", error);
+              this.alertService.showToast("Error", "Gagal memperbarui riwayat pendidikan!");
+            }
+          })
+        }
+      });
+    }
   }
 }

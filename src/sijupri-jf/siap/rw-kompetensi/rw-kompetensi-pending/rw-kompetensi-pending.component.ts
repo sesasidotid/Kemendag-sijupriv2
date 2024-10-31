@@ -9,7 +9,7 @@ import { AlertService } from '../../../../modules/base/services/alert.service';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
 import { Task } from '../../../../modules/workflow/models/task.model';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { KategoriPengembangan } from '../../../../modules/maintenance/models/kategori-pengembangan.model';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
@@ -17,7 +17,7 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 @Component({
   selector: 'app-rw-kompetensi-pending',
   standalone: true,
-  imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent],
+  imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
   templateUrl: './rw-kompetensi-pending.component.html',
   styleUrl: './rw-kompetensi-pending.component.scss'
 })
@@ -28,9 +28,11 @@ export class RwKompetensiPendingComponent {
   kategoriPengembanganList: KategoriPengembangan[] = []
   pendingTask: PendingTask;
 
+  rwKompetensiForm!: FormGroup;
+
   inputs: FIleHandler = {
     files: {
-      docEvaluas: { label: "Sertifikat", source: this.rwKompetensi.sertifikatUrl },
+      docEvaluas: { label: "Upload Dokumen Sertifikat", source: this.rwKompetensi.sertifikatUrl, required: true},
     },
     listen: (key: string, source: string, base64Data: string) => {
       this.rwKompetensi.fileSertifikat = base64Data;
@@ -45,7 +47,6 @@ export class RwKompetensiPendingComponent {
     this.pagable = new PagableBuilder("/api/v1/rw_kompetensi/task/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("Tanggal", 'dateCreated').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Kompetensi", 'objectName').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("Tipe Reques", 'taskType').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'taskStatus').build())
       .addActionColumn(new ActionColumnBuilder().setAction((pendingTask: PendingTask) => {
         this.pendingTask = pendingTask;
@@ -54,9 +55,17 @@ export class RwKompetensiPendingComponent {
           this.getKategoriPengembanganList()
           this.isDetailOpen = true;
         }
-      }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("detail").build())
+      }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("update").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Kompetensi", "text").build())
       .build();
+
+      this.rwKompetensiForm = new FormGroup({
+        name: new FormControl('', [Validators.required]),
+        kategoriPengembanganId: new FormControl('', [Validators.required]),
+        dateStart: new FormControl('', [Validators.required]),
+        dateEnd: new FormControl('', [Validators.required]),
+        tglSertifikat: new FormControl('', [Validators.required]),
+      })
   }
 
   getKategoriPengembanganList() {
@@ -66,7 +75,7 @@ export class RwKompetensiPendingComponent {
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data kategori pengembangan!");
       }
     })
   }
@@ -76,10 +85,17 @@ export class RwKompetensiPendingComponent {
       next: (response) => {
         const pendingTask = new PendingTask(response);
         this.rwKompetensi = new RWKompetensi(pendingTask.objectTask.object);
+        this.rwKompetensiForm.patchValue({
+          name: this.rwKompetensi.name,
+          kategoriPengembanganId: this.rwKompetensi.kategoriPengembanganId,
+          dateStart: this.rwKompetensi.dateStart,
+          dateEnd: this.rwKompetensi.dateEnd,
+          tglSertifikat: this.rwKompetensi.tglSertifikat,
+        });
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data riwayat Kompetensi!");
       }
     });
   }
@@ -92,23 +108,34 @@ export class RwKompetensiPendingComponent {
   }
 
   submit() {
-    this.confirmationService.open(false).subscribe({
-      next: (result) => {
-        if (!result.confirmed) return;
+    if (this.rwKompetensiForm.valid) {
+      this.rwKompetensi.name = this.rwKompetensiForm.value.name;
+      this.rwKompetensi.kategoriPengembanganId = this.rwKompetensiForm.value.kategoriPengembanganId;
+      this.rwKompetensi.dateStart = this.rwKompetensiForm.value.dateStart;
+      this.rwKompetensi.dateEnd = this.rwKompetensiForm.value.dateEnd;
+      this.rwKompetensi.tglSertifikat = this.rwKompetensiForm.value.tglSertifikat;
 
-        const task = new Task();
-        task.id = this.pendingTask.id;
-        task.taskAction = "approve";
-        task.object = this.rwKompetensi;
-
-        this.apiService.postData(`/api/v1/rw_kompetensi/task/submit`, task).subscribe({
-          next: () => this.isDetailOpen = false,
-          error: (error) => {
-            console.log("error", error);
-            this.alertService.showToast("Error", "gagal mengirim data");
-          }
-        })
-      }
-    })
+      this.confirmationService.open(false).subscribe({
+        next: (result) => {
+          if (!result.confirmed) return;
+  
+          const task = new Task();
+          task.id = this.pendingTask.id;
+          task.taskAction = "approve";
+          task.object = this.rwKompetensi;
+  
+          this.apiService.postData(`/api/v1/rw_kompetensi/task/submit`, task).subscribe({
+            next: () => {
+              this.alertService.showToast('Success', "Berhasil menambahkan riwayat kompetensi.");
+              this.back();
+            },
+            error: (error) => {
+              console.log("error", error);
+              this.alertService.showToast("Error", "gagal mengirim data");
+            }
+          })
+        }
+      })
+    }
   }
 }

@@ -1,94 +1,125 @@
-<form *ngIf="pendingTask" (submit)="submit()">
+<form *ngIf="pendingTask" [formGroup]="jfDetailForm" (ngSubmit)="submit()">
     <div *ngIf="pendingTask.remark" class="alert alert-warning" role="alert">
-        {{pendingTask.remark}}
+        <strong>Catatan Revisi : </strong>"{{pendingTask.remark}}"
     </div>
     <div class="row">
         <div class="col-lg-12">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    First Name
+                <label for="name" class="form-label">
+                    Nama Lengkap <span class="text-danger">*</span>
                 </label>
-                <input [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'" type="text" class="form-control"
-                    id="firstnameInput" placeholder="Masukkan Nama" [(ngModel)]="jf.name" name="name">
+                <input type="text" class="form-control" id="name" placeholder="Masukkan nama lengkap" name="name"
+                    formControlName="name" [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'">
+                <div class="feedback" *ngIf="jfDetailForm.get('name').invalid && jfDetailForm.get('name').touched">
+                    <small *ngIf="jfDetailForm.get('name').errors?.['required']">Nama lengkap perlu
+                        diisi.</small>
+                </div>
             </div>
-        </div>
-        <!--end col-->
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    No. HP
-                </label>
-                <input [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'" type="text" class="form-control"
-                    id="lastnameInput" placeholder="Masukkan No. HP" [(ngModel)]="jf.phone" name="phone">
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Email
-                </label>
-                <input [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'" type="email" class="form-control"
-                    id="emailInput" placeholder="Masukkan email" [(ngModel)]="jf.email" name="email">
-            </div>
-        </div>
-        <!--end col-->
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Tempat Lahir
-                </label>
-                <input [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'" type="text" class="form-control"
-                    id="emailInput" placeholder="Masukkan Tempat Lahir" [(ngModel)]="jf.tempatLahir" name="tempatLahir">
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    Tanggal Lahir
-                </label>
-                <input [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'" type="date" class="form-control"
-                    id="emailInput" placeholder="Masukkan Tanggal Lahir" [(ngModel)]="jf.tanggalLahir"
-                    name="tanggalLahir">
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Jenis Kelamin
-                </label>
-                <select [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'" class="form-select"
-                    [(ngModel)]="jf.jenisKelaminCode" name="jenisKelaminCode">
-                    <option [value]="undefined">Pilih</option>
-                    <option *ngFor="let jenisKelamin of jenisKelaminList" [value]="jenisKelamin.code">
-                        {{jenisKelamin.name}}
-                    </option>
-                </select>
-            </div>
-        </div>
-        <hr>
-        <div class="col-lg-12 row">
+            <!--end col-->
             <div class="col-lg-12">
                 <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                        NIK
+                    <label for="phone" class="form-label">
+                        No. HP <span class="text-danger">*</span>
                     </label>
-                    <input [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'" type="text"
-                        class="form-control" id="emailInput" placeholder="Masukkan NIK" [(ngModel)]="jf.nik" name="nik">
+                    <input type="text" class="form-control" id="phone" placeholder="Masukkan No. HP" name="phone"
+                        formControlName="phone" [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'">
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('phone').invalid && jfDetailForm.get('phone').touched">
+                        <small *ngIf="jfDetailForm.get('phone').errors?.['required']">No. HP perlu
+                            diisi.</small>
+                        <small *ngIf="jfDetailForm.get('phone').errors?.['pattern']">No. HP harus angka.</small>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-12">
                 <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                        KTP
+                    <label for="email" class="form-label">
+                        Email <span class="text-danger">*</span>
                     </label>
-                    <app-file-handler [inputs]="inputs"></app-file-handler>
+                    <input type="email" class="form-control" id="email" placeholder="Masukkan email" name="email"
+                        formControlName="email" [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'">
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('email').invalid && jfDetailForm.get('email').touched">
+                        <small *ngIf="jfDetailForm.get('email').errors?.['required']">Email perlu
+                            diisi.</small>
+                        <small *ngIf="jfDetailForm.get('email').errors?.['email']">Email tidak valid.</small>
+                    </div>
+                </div>
+            </div>
+            <!--end col-->
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="tempatLahir" class="form-label">
+                        Tempat Lahir <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="tempatLahir" placeholder="Masukkan Tempat Lahir"
+                        name="tempatLahir" formControlName="tempatLahir" [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'">
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('tempatLahir').invalid && jfDetailForm.get('tempatLahir').touched">
+                        <small *ngIf="jfDetailForm.get('tempatLahir').errors?.['required']">Tempat Lahir perlu
+                            diisi.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="tanggalLahir" class="form-label">
+                        Tanggal Lahir <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" class="form-control" id="tanggalLahir" placeholder="Masukkan Tanggal Lahir"
+                        name="tanggalLahir" formControlName="tanggalLahir" [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'">
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('tanggalLahir').invalid && jfDetailForm.get('tanggalLahir').touched">
+                        <small *ngIf="jfDetailForm.get('tanggalLahir').errors?.['required']">Tanggal Lahir perlu
+                            diisi.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="mb-3">
+                    <label for="jenisKelaminCode" class="form-label">
+                        Jenis Kelamin <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select" name="jenisKelaminCode" formControlName="jenisKelaminCode" [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'">
+                        <option selected value="" style=" display: none;">Pilih Jenis Kelamin</option>
+                        <option *ngFor="let jenisKelamin of jenisKelaminList" [value]="jenisKelamin.code">
+                            {{jenisKelamin.name}}
+                        </option>
+                    </select>
+                    <div class="feedback"
+                        *ngIf="jfDetailForm.get('jenisKelaminCode').invalid && jfDetailForm.get('jenisKelaminCode').touched">
+                        <small *ngIf="jfDetailForm.get('jenisKelaminCode').errors?.['required']">Jenis Kelamin perlu
+                            dipilih.</small>
+                    </div>
+                </div>
+            </div>
+            <div class=" row">
+                <div class="">
+                    <div class="mb-3">
+                        <label for="nik" class="form-label">
+                            NIK <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="nik" placeholder="Masukkan NIK" name="nik"
+                            formControlName="nik" [disabled]="pendingTask && pendingTask.flowId == 'siap_flow_1'">
+                        <div class="feedback"
+                            *ngIf="jfDetailForm.get('nik').invalid && jfDetailForm.get('nik').touched">
+                            <small *ngIf="jfDetailForm.get('nik').errors?.['required']">NIK perlu
+                                diisi.</small>
+                            <small *ngIf="jfDetailForm.get('nik').errors?.['pattern']">NIK harus angka.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="mb-3">
+                        <app-file-handler [inputs]="inputs"></app-file-handler>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div *ngIf="pendingTask && pendingTask.flowId != 'siap_flow_1'" class="col-lg-12">
-        <div class="hstack gap-2 justify-content-end">
-            <button type="submit" class="btn btn-sm btn-soft-success">Simpan</button>
+        <div *ngIf="pendingTask && pendingTask.flowId != 'siap_flow_1'" class="col-lg-12">
+            <div class="hstack gap-2 justify-content-end">
+                <button type="submit" class="btn btn-primary" [disabled]="jfDetailForm.invalid">Simpan</button>
+            </div>
         </div>
     </div>
 </form>

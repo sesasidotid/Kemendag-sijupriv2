@@ -12,14 +12,14 @@ import { Task } from '../../../../modules/workflow/models/task.model';
 import { RWPangkat } from '../../../../modules/siap/models/rw-pangkat.model';
 import { PendingTask } from '../../../../modules/workflow/models/pending-task.model';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 
 @Component({
   selector: 'app-rw-pangkat-pending',
   standalone: true,
-  imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent],
+  imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
   templateUrl: './rw-pangkat-pending.component.html',
   styleUrl: './rw-pangkat-pending.component.scss'
 })
@@ -29,10 +29,11 @@ export class RwPangkatPendingComponent {
   rwPangkat: RWPangkat = new RWPangkat();
   pangkatList: Pangkat[] = []
   pendingTask: PendingTask;
+  rwPangkatForm!: FormGroup;
 
   inputs: FIleHandler = {
     files: {
-      docEvaluas: { label: "SK Pangkat", source: this.rwPangkat.skPangkatUrl },
+      docEvaluas: { label: "Upload Dokumen SK Pangkat", source: this.rwPangkat.skPangkatUrl, required: true},
     },
     listen: (key: string, source: string, base64Data: string) => {
       this.rwPangkat.fileSkPangkat = base64Data;
@@ -47,7 +48,6 @@ export class RwPangkatPendingComponent {
     this.pagable = new PagableBuilder("/api/v1/rw_pangkat/task/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("Tanggal", 'dateCreated').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Pangkat", 'objectName').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("Tipe Reques", 'taskType').build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'taskStatus').build())
       .addActionColumn(new ActionColumnBuilder().setAction((pendingTask: PendingTask) => {
         this.pendingTask = pendingTask;
@@ -56,9 +56,14 @@ export class RwPangkatPendingComponent {
           this.getPangkatList()
           this.isDetailOpen = true;
         }
-      }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("detail").build())
+      }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("update").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Pangkat", "text").build())
       .build();
+
+      this.rwPangkatForm = new FormGroup({
+        pangkatCode: new FormControl('', [Validators.required]),
+        tmt: new FormControl('', [Validators.required]),
+      })
   }
 
   getPangkatList() {
@@ -68,7 +73,7 @@ export class RwPangkatPendingComponent {
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data pangkat!");
       }
     })
   }
@@ -78,10 +83,14 @@ export class RwPangkatPendingComponent {
       next: (response) => {
         const pendingTask = new PendingTask(response);
         this.rwPangkat = new RWPangkat(pendingTask.objectTask.object);
+        this.rwPangkatForm.patchValue({
+          pangkatCode: this.rwPangkat.pangkatCode,
+          tmt: this.rwPangkat.tmt
+        })
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mandapatkan data pangat!");
       }
     });
   }
@@ -94,23 +103,31 @@ export class RwPangkatPendingComponent {
   }
 
   submit() {
-    this.confirmationService.open(false).subscribe({
-      next: (result) => {
-        if (!result.confirmed) return;
+    if (this.rwPangkatForm.valid) {
+      this.rwPangkat.pangkatCode = this.rwPangkatForm.value.pangkatCode;
+      this.rwPangkat.tmt = this.rwPangkatForm.value.tmt;
 
-        const task = new Task();
-        task.id = this.pendingTask.id;
-        task.taskAction = "approve";
-        task.object = this.rwPangkat;
+      this.confirmationService.open(false).subscribe({
+        next: (result) => {
+          if (!result.confirmed) return;
 
-        this.apiService.postData(`/api/v1/rw_pangkat/task/submit`, task).subscribe({
-          next: () => this.isDetailOpen = false,
-          error: (error) => {
-            console.log("error", error);
-            this.alertService.showToast("Error", "gagal mengirim data");
-          }
-        })
-      }
-    })
+          const task = new Task();
+          task.id = this.pendingTask.id;
+          task.taskAction = "approve";
+          task.object = this.rwPangkat;
+
+          this.apiService.postData(`/api/v1/rw_pangkat/task/submit`, task).subscribe({
+            next: () => {
+              this.alertService.showToast("Success", "Berhasil memperbarui riwayat pangkat.");
+              this.back();
+            },
+            error: (error) => {
+              console.log("error", error);
+              this.alertService.showToast("Error", "Gagal memperbarui riwayat pangkat!");
+            }
+          })
+        }
+      })
+    }
   }
 }

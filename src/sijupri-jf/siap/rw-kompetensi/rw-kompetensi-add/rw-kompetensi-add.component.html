@@ -1,66 +1,86 @@
-<form (submit)="submit()">
+<form [formGroup]="rwKompetensiForm" (ngSubmit)="submit()">
     <div class="row">
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    Nama Kompetensi
+                <label for="name" class="form-label">
+                    Nama Kompetensi <span class="text-danger">*</span>
                 </label>
-                <input type="text" class="form-control" [(ngModel)]="rwKompetensi.name" name="name"
+                <input type="text" class="form-control" name="name" id="name" formControlName="name"
                     placeholder="Masukan nama Kompetensi">
+                    <div class="feedback"
+                    *ngIf="rwKompetensiForm.get('name').invalid && rwKompetensiForm.get('name').touched">
+                    <small *ngIf="rwKompetensiForm.get('name').errors?.['required']">Nama kompetensi perlu
+                        diisi.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Pangkat
+                <label for="kategoriPengembanganId" class="form-label">
+                    Kategori Pengembangan <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" [(ngModel)]="rwKompetensi.kategoriPengembanganId"
+                <select class="form-select" id="kategoriPengembanganId" formControlName="kategoriPengembanganId"
                     name="kategoriPengembanganId">
-                    <option [value]="undefined">Pilih</option>
+                    <option selected value="" style=" display: none;">Pilih Kategori Pengembangan</option>
                     <option *ngFor="let kategoriPengembangan of kategoriPengembanganList"
                         [value]="kategoriPengembangan.id">
                         {{kategoriPengembangan.name}}
                     </option>
                 </select>
+                <div class="feedback"
+                *ngIf="rwKompetensiForm.get('kategoriPengembanganId').invalid && rwKompetensiForm.get('kategoriPengembanganId').touched">
+                <small *ngIf="rwKompetensiForm.get('kategoriPengembanganId').errors?.['required']">Kategori pengembangan perlu
+                    dipilih.</small>
+            </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="dateStart" class="form-label">
+                    Tanggal Mulai <span class="text-danger">*</span>
+                </label>
+                <input type="date" class="form-control" name="dateStart" id="dateStart" formControlName="dateStart" >
+                <div class="feedback"
+                    *ngIf="rwKompetensiForm.get('dateStart').invalid && rwKompetensiForm.get('dateStart').touched">
+                    <small *ngIf="rwKompetensiForm.get('dateStart').errors?.['required']">Tanggal mulai perlu
+                        dipilih.</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <label for="dateEnd" class="form-label">
+                    Tanggal Berakhir <span class="text-danger">*</span>
+                </label>
+                <input type="date" class="form-control" name="dateEnd" id="dateEnd" formControlName="dateEnd">
+                <div class="feedback"
+                    *ngIf="rwKompetensiForm.get('dateEnd').invalid && rwKompetensiForm.get('dateEnd').touched">
+                    <small *ngIf="rwKompetensiForm.get('dateEnd').errors?.['required']">Tanggal berakhir perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
                 <label for="lastnameInput" class="form-label">
-                    Tanggal Mulai
+                    Tanggal Sertifikat <span class="text-danger">*</span>
                 </label>
-                <input type="date" class="form-control" [(ngModel)]="rwKompetensi.dateStart" name="dateStart">
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    Tanggal Mulai
-                </label>
-                <input type="date" class="form-control" [(ngModel)]="rwKompetensi.dateEnd" name="dateEnd">
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="lastnameInput" class="form-label">
-                    Tanggal Sertifikat
-                </label>
-                <input type="date" class="form-control" [(ngModel)]="rwKompetensi.tglSertifikat" name="tglSertifikat">
+                <input type="date" class="form-control"name="tglSertifikat" id="tglSertifikat" formControlName="tglSertifikat" >
+                <div class="feedback"
+                    *ngIf="rwKompetensiForm.get('tglSertifikat').invalid && rwKompetensiForm.get('tglSertifikat').touched">
+                    <small *ngIf="rwKompetensiForm.get('tglSertifikat').errors?.['required']">Tanggal sertifikat perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-12">
-            <div class="mb-3">
-                <label for="emailInput" class="form-label">
-                    File :
-                </label>
-            </div>
             <div class="row">
                 <app-file-handler [inputs]="inputs"></app-file-handler>
             </div>
         </div>
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <button type="submit" class="btn btn-sm btn-soft-success">simpan</button>
+                <button type="submit" class="btn btn-primary" [disabled]="rwKompetensiForm.invalid">Simpan</button>
             </div>
         </div>
     </div>

@@ -1,35 +1,36 @@
 <app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
-<div *ngIf="isDetailOpen" class="container">
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Kompetensi
+<div *ngIf="isDetailOpen" class="container my-4">
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label">
+                Kompetensi
+            </label>
+            <p class="border-bottom pb-2">{{rwKompetensi.name}}</p>
         </div>
-        <div class="col fs-6 border-bottom pb-2">{{rwKompetensi.name}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Tanggal Mulai
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label
+                ">Tanggal Mulai</label>
+            <p class="border-bottom pb-2">{{rwKompetensi.dateStart}}</p>
         </div>
-        <div class="col fs-6 border-bottom pb-2">{{rwKompetensi.dateStart}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Tanggal Selesai</div>
-        <div class="col fs-6 border-bottom pb-2">{{rwKompetensi.dateEnd}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">tanggal Sertifikat
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label
+                ">Tanggal Selesai</label>
+            <p class="border-bottom pb-2">{{rwKompetensi.dateEnd}}</p>
         </div>
-        <div class="col fs-6 border-bottom pb-2">{{rwKompetensi.tglSertifikat}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Kategori Pengembangan
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label
+                ">tanggal Sertifikat</label>
+            <p class="border-bottom pb-2">{{rwKompetensi.tglSertifikat}}</p>
         </div>
-        <div class="col fs-6 border-bottom pb-2">{{rwKompetensi.kategoriPengembanganName}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Preview File : </div>
-        <div class="ms-2">
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label
+                ">Kategori Pengembangan</label>
+            <p class="border-bottom pb-2">{{rwKompetensi.kategoriPengembanganName}}</p>
+        </div>
+        <div class="col-md-6 mb-3">
             <app-file-handler [inputs]="{
                 files: {
-                  sertifikat: { label: 'Sertifikat', source: this.rwKompetensi.sertifikatUrl },
+                  sertifikat: { label: 'Preview Sertifikat', source: this.rwKompetensi.sertifikatUrl },
                 },
                 viewOnly: true
               }"></app-file-handler>
@@ -38,7 +39,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <a class="btn btn-sm btn-soft-success" (click)="isDetailOpen = false">kembali</a>
+                <a class="btn btn-secondary" (click)="isDetailOpen = false">Kembali</a>
             </div>
         </div>
     </div>

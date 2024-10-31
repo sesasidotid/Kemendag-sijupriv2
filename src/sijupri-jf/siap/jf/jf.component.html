@@ -1,18 +1,18 @@
 <div class="card card-body">
     <div class="tab-content">
-        <div class="row">
+        <div class="row" style="margin-left: 0;">
             <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" [routerLink]="currentPath" routerLinkActive="active"
                         [routerLinkActiveOptions]="{ exact: true }" role="tab">
-                        <i class="fas fa-home"></i>
-                        Data
+                        <i class="mdi mdi-home-account me-1"></i>
+                        Informasi Saya                        
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" [routerLink]="currentPath + '/pending'"
                         routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" role="tab">
-                        <i class="far fa-user"></i>
+                        <i class="mdi mdi-account-clock me-1"></i>
                         Data Pending
                     </a>
                 </li>

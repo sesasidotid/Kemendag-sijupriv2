@@ -1,37 +1,40 @@
 <app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
 <div *ngIf="isDetailOpen" class="container">
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Institusi Pendidikan
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label">
+                Institusi Pendidikan
+            </label>
+            <p class="border-bottom pb-2">{{rwPendidikan.institusiPendidikan}}</p>
         </div>
-        <div class="col fs-6 border-bottom pb-2">{{rwPendidikan.institusiPendidikan}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Pendidikan</div>
-        <div class="col fs-6 border-bottom pb-2">{{rwPendidikan.pendidikanName}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Jurusan</div>
-        <div class="col fs-6 border-bottom pb-2">{{rwPendidikan.jurusan}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Tanggal Ijazah</div>
-        <div class="col fs-6 border-bottom pb-2">{{rwPendidikan.tanggalIjazah}}</div>
-    </div>
-    <div class="row mb-2">
-        <div class="col-auto font-weight-bold text-start fw-bold fs-6" style="min-width: 150px;">Preview File : </div>
-        <div class="ms-2">
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label
+                ">Pendidikan</label>
+            <p class="border-bottom pb-2">{{rwPendidikan.pendidikanName}}</p>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label
+                ">Jurusan</label>
+            <p class="border-bottom pb-2">{{rwPendidikan.jurusan}}</p>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="firstnameInput" class="form-label
+                ">Tanggal Ijazah</label>
+            <p class="border-bottom pb-2">{{rwPendidikan.tanggalIjazah}}</p>
+        </div>
+        <div class="col-md-6 mb-3">
             <app-file-handler [inputs]="{
                 files: {
-                  ijazah: { label: 'Ijaza', source: this.rwPendidikan.ijazahUrl }
+                  ijazah: { label: 'Preview Ijazah', source: this.rwPendidikan.ijazahUrl }
                 },
                 viewOnly: true
               }"></app-file-handler>
         </div>
-    </div>
+    </div>    
     <div class="row">
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <a class="btn btn-sm btn-soft-success" (click)="isDetailOpen = false">kembali</a>
+                <a class="btn btn-secondary" (click)="isDetailOpen = false">Kembali</a>
             </div>
         </div>
     </div>

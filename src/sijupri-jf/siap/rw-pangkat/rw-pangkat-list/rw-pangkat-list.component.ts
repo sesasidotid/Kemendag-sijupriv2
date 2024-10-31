@@ -27,7 +27,7 @@ export class RwPangkatListComponent {
   ) {
     this.pagable = new PagableBuilder("/api/v1/rw_pangkat/search")
       .addPrimaryColumn(new PrimaryColumnBuilder("Pangkat", 'pangkat|name').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("TMT", 'tmt').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder("Terhitung Mulai", 'tmt').build())
       .addActionColumn(new ActionColumnBuilder().setAction((rwPangkat: any) => {
         this.getRWPangkat(rwPangkat.id)
         this.isDetailOpen = true;

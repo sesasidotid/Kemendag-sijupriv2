@@ -1,47 +1,60 @@
-<form (submit)="submit()">
+<form [formGroup]="rwJabatanForm" (ngSubmit)="submit()">
     <div class="row">
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Jabatan
+                <label for="jabatanCode" class="form-label">
+                    Jabatan <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" [(ngModel)]="rwJabatan.jabatanCode" name="jabatanCode">
-                    <option [value]="undefined">Pilih</option>
+                <select class="form-select" name="jabatanCode" id="jabatanCode" formControlName="jabatanCode">
+                    <option selected value="" style=" display: none;">Pilih Jabatan</option>
                     <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
                         {{jabatan.name}}
                     </option>
                 </select>
+                <div class="feedback"
+                    *ngIf="rwJabatanForm.get('jabatanCode').invalid && rwJabatanForm.get('jabatanCode').touched">
+                    <small *ngIf="rwJabatanForm.get('jabatanCode').errors?.['required']">Jabatan perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Jenjang
+                <label for="jenjangCode" class="form-label">
+                    Jenjang <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" [(ngModel)]="rwJabatan.jenjangCode" name="jenjangCode">
-                    <option [value]="undefined">Pilih</option>
-                    <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code">
+                <select class="form-select" name="jenjangCode" id="jenjangCode" formControlName="jenjangCode">
+                    <option selected value="" style=" display: none;">Pilih Jenjang</option>
+                    <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code"
+                        style="text-transform: capitalize;">
                         {{jenjang.name}}
                     </option>
                 </select>
+                <div class="feedback"
+                    *ngIf="rwJabatanForm.get('jenjangCode').invalid && rwJabatanForm.get('jenjangCode').touched">
+                    <small *ngIf="rwJabatanForm.get('jenjangCode').errors?.['required']">Jenjang perlu
+                        dipilih.</small>
+                </div>
             </div>
         </div>
         <div class="row col-lg-6">
             <div class="col-lg-12">
                 <div class="mb-3">
-                    <label for="lastnameInput" class="form-label">
-                        Terhitung Mulai Tanggal
+                    <label for="tmt" class="form-label">
+                        Terhitung Mulai Tanggal <span class="text-danger">*</span>
                     </label>
-                    <input type="date" class="form-control" [(ngModel)]="rwJabatan.tmt" name="tmt"
+                    <input type="date" class="form-control" name="tmt" id="tmt" formControlName="tmt"
                         placeholder="Masukan nama Sekolah/Universitas/Institusi">
+                    <div class="feedback" *ngIf="rwJabatanForm.get('tmt').invalid && rwJabatanForm.get('tmt').touched">
+                        <small *ngIf="rwJabatanForm.get('tmt').errors?.['required']">Tanggal mulai perlu
+                            diisi.</small>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                        File :
-                    </label>
-                </div>
+            <div class="col-12">
+                <!-- <label for="emailInput" class="form-label">
+                    Upload Dokumen SK Jabatan : <span class="text-danger">*</span>
+                </label> -->
                 <div class="row">
                     <app-file-handler [inputs]="inputs"></app-file-handler>
                 </div>
@@ -49,7 +62,7 @@
         </div>
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <button type="submit" class="btn btn-sm btn-soft-success">simpan</button>
+                <button type="submit" class="btn btn-primary" [disabled]="rwJabatanForm.invalid">Simpan</button>
             </div>
         </div>
     </div>

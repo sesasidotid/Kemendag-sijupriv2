@@ -1,11 +1,11 @@
 <app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
-<form *ngIf="isDetailOpen" (submit)="submit()">
+<form *ngIf="isDetailOpen" [formGroup]="rwSertifikasiForm" (ngSubmit)="submit()">
     <div *ngIf="pendingTask.remark" class="alert alert-warning" role="alert">
-        {{pendingTask.remark}}
+        <strong>Catatan Revisi : </strong>"{{pendingTask.remark}}"
     </div>
     <div class="row">
         <div class="col-lg-12">
-            <div class="col-lg-6">
+            <!-- <div class="col-lg-6">
                 <div class="mb-3">
                     <label for="firstnameInput" class="form-label">
                         Kategori Sertifikasi
@@ -19,64 +19,101 @@
                         </option>
                     </select>
                 </div>
+            </div> -->
+            <div *ngIf="kategoriSertifikasiList" class="category-list">
+                <label>
+                    Kategori Sertifikasi :
+                </label>
+                <div *ngFor="let kategoriSertifikasi of kategoriSertifikasiList">
+                    <a (click)="setKategori(kategoriSertifikasi.value, kategoriSertifikasi.id)" class="btn"
+                        [ngClass]="{'btn-success' : this.kategori === kategoriSertifikasi.value, 'btn-soft-success' : this.kategori !== kategoriSertifikasi.value }">{{kategoriSertifikasi.name}}</a>
+                </div>
+
             </div>
         </div>
         <ng-container *ngIf="kategori == 1 || kategori == 2">
             <div class="col-lg-6">
                 <div class="mb-3">
-                    <label for="lastnameInput" class="form-label">
-                        No. SK
+                    <label for="noSk" class="form-label">
+                        No. SK <span class="text-danger">*</span>
                     </label>
-                    <input type="text" class="form-control" [(ngModel)]="rwSertifikasi.noSk" name="noSk">
+                    <input type="text" class="form-control" name="noSk" id="noSk" formControlName="noSk"
+                        placeholder="Masukkan nomor SK">
+                    <div class="feedback"
+                        *ngIf="rwSertifikasiForm.get('noSk').invalid && rwSertifikasiForm.get('noSk').touched">
+                        <small *ngIf="rwSertifikasiForm.get('noSk').errors?.['required']">Nomor SK perlu
+                            diisi.</small>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="mb-3">
-                    <label for="lastnameInput" class="form-label">
-                        Tanggal SK
+                    <label for="tglSk" class="form-label">
+                        Tanggal SK <span class="text-danger">*</span>
                     </label>
-                    <input type="date" class="form-control" [(ngModel)]="rwSertifikasi.tglSk" name="tglSk">
+                    <input type="date" class="form-control" name="tglSk" id="tglSk" formControlName="tglSk">
+                    <div class="feedback"
+                        *ngIf="rwSertifikasiForm.get('tglSk').invalid && rwSertifikasiForm.get('tglSk').touched">
+                        <small *ngIf="rwSertifikasiForm.get('tglSk').errors?.['required']">Tanggal SK perlu
+                            dipilih.</small>
+                    </div>
                 </div>
             </div>
             <div *ngIf="kategori == 2" class="col-lg-6">
                 <div class="mb-3">
-                    <label for="lastnameInput" class="form-label">
-                        Wilayah Kerja
+                    <label for="wilayahKerja" class="form-label">
+                        Wilayah Kerja <span class="text-danger">*</span>
                     </label>
-                    <input type="text" class="form-control" [(ngModel)]="rwSertifikasi.wilayahKerja"
-                        name="wilayahKerja">
+                    <input type="text" class="form-control" id="wilayahKerja" formControlName="wilayahKerja"
+                        name="wilayahKerja" placeholder="Masukkan wilayah kerja">
+                    <div class="feedback"
+                        *ngIf="rwSertifikasiForm.get('wilayahKerja').invalid && rwSertifikasiForm.get('wilayahKerja').touched">
+                        <small *ngIf="rwSertifikasiForm.get('wilayahKerja').errors?.['required']">Wilayah kerja perlu
+                            diisi.</small>
+                    </div>
                 </div>
             </div>
             <div *ngIf="kategori == 2" class="col-lg-6">
                 <div class="mb-3">
-                    <label for="lastnameInput" class="form-label">
-                        UU yang dikawal
+                    <label for="uuKawalan" class="form-label">
+                        UU yang dikawal <span class="text-danger">*</span>
                     </label>
-                    <input type="text" class="form-control" [(ngModel)]="rwSertifikasi.uuKawalan" name="uuKawalan">
+                    <input type="text" class="form-control" name="uuKawalan" id="uuKawalan" formControlName="uuKawalan"
+                        placeholder="Masukkan UU yang dikawal">
+                    <div class="feedback"
+                        *ngIf="rwSertifikasiForm.get('uuKawalan').invalid && rwSertifikasiForm.get('uuKawalan').touched">
+                        <small *ngIf="rwSertifikasiForm.get('uuKawalan').errors?.['required']">UU yang dikawal perlu
+                            diisi.</small>
+                    </div>
                 </div>
             </div>
             <div *ngIf="kategori == 2" class="col-lg-6">
                 <div class="mb-3">
-                    <label for="lastnameInput" class="form-label">
-                        Tanggal Berlaku Mulai
+                    <label for="dateStart" class="form-label">
+                        Tanggal Berlaku Mulai <span class="text-danger">*</span>
                     </label>
-                    <input type="date" class="form-control" [(ngModel)]="rwSertifikasi.dateStart" name="dateStart">
+                    <input type="date" class="form-control" name="dateStart" id="dateStart" formControlName="dateStart">
+                    <div class="feedback"
+                        *ngIf="rwSertifikasiForm.get('dateStart').invalid && rwSertifikasiForm.get('dateStart').touched">
+                        <small *ngIf="rwSertifikasiForm.get('dateStart').errors?.['required']">Tanggal mulai perlu
+                            dipilih.</small>
+                    </div>
                 </div>
             </div>
             <div *ngIf="kategori == 2" class="col-lg-6">
                 <div class="mb-3">
-                    <label for="lastnameInput" class="form-label">
-                        Tanggal Berlaku Sampai
+                    <label for="dateEnd" class="form-label">
+                        Tanggal Berlaku Sampai <span class="text-danger">*</span>
                     </label>
-                    <input type="date" class="form-control" [(ngModel)]="rwSertifikasi.dateEnd" name="dateEnd">
+                    <input type="date" class="form-control" name="dateEnd" id="dateEnd" formControlName="dateEnd">
+                    <div class="feedback"
+                        *ngIf="rwSertifikasiForm.get('dateEnd').invalid && rwSertifikasiForm.get('dateEnd').touched">
+                        <small *ngIf="rwSertifikasiForm.get('dateEnd').errors?.['required']">Tanggal berakhir perlu
+                            dipilih.</small>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="mb-3">
-                    <label for="emailInput" class="form-label">
-                        File :
-                    </label>
-                </div>
                 <div class="row">
                     <app-file-handler [inputs]="inputs"></app-file-handler>
                 </div>
@@ -84,8 +121,8 @@
         </ng-container>
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <button type="submit" class="btn btn-sm btn-soft-warning me-2" (click)="back()">Kembali</button>
-                <button type="submit" class="btn btn-sm btn-soft-success">simpan</button>
+                <button type="button" class="btn btn-soft-secondary" (click)="back()">Kembali</button>
+                <button type="submit" class="btn btn-primary" [disabled]="rwSertifikasiForm.invalid">Simpan</button>
             </div>
         </div>
     </div>

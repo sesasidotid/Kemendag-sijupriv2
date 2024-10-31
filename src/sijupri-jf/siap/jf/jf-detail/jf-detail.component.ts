@@ -3,7 +3,7 @@ import { JF } from '../../../../modules/siap/models/jf.model';
 import { AlertService } from '../../../../modules/base/services/alert.service';
 import { LoginContext } from '../../../../modules/base/commons/login-context';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
@@ -16,7 +16,7 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 @Component({
   selector: 'app-jf-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
+  imports: [CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
   templateUrl: './jf-detail.component.html',
   styleUrl: './jf-detail.component.scss'
 })
@@ -26,9 +26,11 @@ export class JfDetailComponent {
   nip: string = LoginContext.getUserId();
   isEditOpen: boolean = false;
 
+  jfDetailForm!: FormGroup;
+
   inputs: FIleHandler = {
     files: {
-      ktp: { label: "KTP", source: this.jf.ktpUrl },
+      ktp: { label: "Upload Dokumen KTP", source: this.jf.ktpUrl, required: true },
     },
     viewOnly: true,
     listen: (key: string, source: string, base64Data: string) => {
@@ -41,7 +43,17 @@ export class JfDetailComponent {
     private alertService: AlertService,
     private confirmationService: ConfirmationService,
     private router: Router,
-  ) { }
+  ) {
+    this.jfDetailForm = new FormGroup({
+      name: new FormControl(this.jf.name, [Validators.required]),
+      phone: new FormControl(this.jf.phone, [Validators.required, Validators.pattern('^[0-9]+$')]),
+      email: new FormControl(this.jf.email, [Validators.required, Validators.email]),
+      tempatLahir: new FormControl(this.jf.tempatLahir, [Validators.required]),
+      tanggalLahir: new FormControl(this.jf.tanggalLahir, [Validators.required]),
+      jenisKelaminCode: new FormControl(this.jf.jenisKelaminCode, [Validators.required]),
+      nik: new FormControl(this.jf.nik, [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(13)],),
+    });
+  }
 
   ngOnInit() {
     this.getJf();
@@ -52,10 +64,20 @@ export class JfDetailComponent {
       next: (response) => {
         this.jf = new JF(response);
         this.inputs.files['ktp'].source = this.jf.ktpUrl
+
+        this.jfDetailForm.setValue({
+          name: this.jf.name,
+          phone: this.jf.phone,
+          email: this.jf.email,
+          tempatLahir: this.jf.tempatLahir,
+          tanggalLahir: this.jf.tanggalLahir,
+          jenisKelaminCode: this.jf.jenisKelaminCode,
+          nik: this.jf.nik,
+        });
       },
       error: (error) => {
         console.error('Error fetching data', error);
-        this.alertService.showToast('Error', "gagal menerima data");
+        this.alertService.showToast('Error', "Gagal mendapatkan data profil!");
       }
     })
   }
@@ -67,7 +89,7 @@ export class JfDetailComponent {
       },
       error: (error) => {
         console.error('Error fetching data', error);
-        this.alertService.showToast('Error', "gagal menerima data");
+        this.alertService.showToast('Error', "Gagal mendapatkan data jenis kelamin!");
       }
     })
   }
@@ -81,18 +103,28 @@ export class JfDetailComponent {
   }
 
   submit() {
-    this.confirmationService.open(false).subscribe({
-      next: (result) => {
-        if (!result.confirmed) return;
-        this.jf.nip = this.nip;
+    if (this.jfDetailForm.valid) {
+      this.jf.name = this.jfDetailForm.value.name;
+      this.jf.phone = this.jfDetailForm.value.phone;
+      this.jf.email = this.jfDetailForm.value.email;
+      this.jf.tempatLahir = this.jfDetailForm.value.tempatLahir;
+      this.jf.tanggalLahir = this.jfDetailForm.value.tanggalLahir;
+      this.jf.jenisKelaminCode = this.jfDetailForm.value.jenisKelaminCode;
+      this.jf.nik = this.jfDetailForm.value.nik;
 
-        this.apiService.putData(`/api/v1/jf/task`, this.jf).subscribe({
-          next: () => {
-            this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate(['/profile/pending'])
-          }
-        })
-      }
-    })
+      this.confirmationService.open(false).subscribe({
+        next: (result) => {
+          if (!result.confirmed) return;
+          this.jf.nip = this.nip;
+
+          this.apiService.putData(`/api/v1/jf/task`, this.jf).subscribe({
+            next: () => {
+              this.alertService.showToast('Success', "Berhasil mengajukan perubahan data.");
+              this.router.navigate(['/profile/pending'])
+            }
+          })
+        }
+      })
+    }
   }
 }

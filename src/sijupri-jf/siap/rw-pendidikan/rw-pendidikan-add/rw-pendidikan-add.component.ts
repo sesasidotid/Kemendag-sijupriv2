@@ -3,7 +3,7 @@ import { RWPendidikan } from '../../../../modules/siap/models/rw-perndidikan.mod
 import { Pendidikan } from '../../../../modules/maintenance/models/pendidikan.model';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AlertService } from '../../../../modules/base/services/alert.service';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
 import { ApiService } from '../../../../modules/base/services/api.service';
@@ -14,13 +14,14 @@ import { LoginContext } from '../../../../modules/base/commons/login-context';
 @Component({
   selector: 'app-rw-pendidikan-add',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
+  imports: [CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
   templateUrl: './rw-pendidikan-add.component.html',
   styleUrl: './rw-pendidikan-add.component.scss'
 })
 export class RwPendidikanAddComponent {
   rwPendidikan: RWPendidikan = new RWPendidikan();
   pendidikanList: Pendidikan[];
+  rwPendidikanForm!: FormGroup;
 
   constructor(
     private apiService: ApiService,
@@ -28,12 +29,19 @@ export class RwPendidikanAddComponent {
     private alertService: AlertService,
     private router: Router
   ) {
+    this.rwPendidikanForm = new FormGroup({
+      institusiPendidikan: new FormControl('', [Validators.required]),
+      pendidikanCode: new FormControl('', [Validators.required]),
+      jurusan: new FormControl('', [Validators.required]),
+      tanggalIjazah: new FormControl('', [Validators.required]),
+    })
     this.getPendidikanList();
   }
 
+
   inputs: FIleHandler = {
     files: {
-      ijazah: { label: "Ijaza", source: this.rwPendidikan.ijazahUrl }
+      ijazah: { label: 'Upload Dokumen Ijazah', source: this.rwPendidikan.ijazahUrl, required: true }
     },
     listen: (key: string, source: string, base64Data: string) => {
       this.rwPendidikan.fileIjazah = base64Data;
@@ -47,27 +55,36 @@ export class RwPendidikanAddComponent {
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data pendidikan!");
       }
     })
   }
 
   submit() {
-    this.confirmationService.open(false).subscribe({
-      next: (result) => {
-        if (!result.confirmed) return;
+    if (this.rwPendidikanForm.valid) {
+      this.rwPendidikan.pendidikanCode = this.rwPendidikanForm.value.pendidikanCode;
+      this.rwPendidikan.institusiPendidikan = this.rwPendidikanForm.value.institusiPendidikan;
+      this.rwPendidikan.jurusan = this.rwPendidikanForm.value.jurusan;
+      this.rwPendidikan.tanggalIjazah = this.rwPendidikanForm.value.tanggalIjazah;
 
-        this.apiService.postData(`/api/v1/rw_pendidikan/task`, this.rwPendidikan).subscribe({
-          next: () => {
-            this.alertService.showToast('Success', "Berhasil");
-            this.router.navigate(['/profile/rw-pendidikan/pending'])
-          },
-          error: (error) => {
-            console.log("error", error);
-            this.alertService.showToast("Error", "gagal mengirim data");
-          }
-        });
-      }
-    });
+      this.confirmationService.open(false).subscribe({
+        next: (result) => {
+          if (!result.confirmed) return;
+  
+          this.apiService.postData(`/api/v1/rw_pendidikan/task`, this.rwPendidikan).subscribe({
+            next: () => {
+              this.alertService.showToast('Success', "Berhasil menambahkan riwayat pendidikan.");
+              setTimeout(() => {
+                this.router.navigate(['/profile/rw-pendidikan/pending']);
+              }, 2000); // Adjust the delay as needed
+            },
+            error: (error) => {
+              console.log("error", error);
+              this.alertService.showToast("Error", "Gagal menambahkan riwayat pendidikan!");
+            }
+          });
+        }
+      });
+    }
   }
 }
