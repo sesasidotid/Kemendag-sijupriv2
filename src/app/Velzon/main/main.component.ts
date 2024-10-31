@@ -9,6 +9,7 @@ import { Tab, TabService } from '../../../modules/base/services/tab.service';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { filter, map } from 'rxjs/operators';
+import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
   selector: 'app-main',
@@ -33,6 +34,8 @@ export class MainComponent implements OnInit, OnDestroy {
   private routerSubscription: Subscription;
   private tabSubscription: Subscription;
   tabs: Tab[] = [];
+
+  applicationCode: string = LoginContext.getApplicationCode();
 
   constructor(
     private router: Router,
