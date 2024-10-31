@@ -1,25 +1,25 @@
 <!-- file-handler.component.html -->
-<div class="d-flex flex-nowrap overflow-auto">
+<div class="file-parent">
     <ng-container *ngFor="let obj of inputs.files| keyvalue">
-        <div 
-            *ngIf="obj.value.visible == null|| obj.value.visible == undefined || obj.value.visible()" class="card m-2">
-            <div class="card-body">
-                <h5 class="card-title">{{ obj.value.label }}</h5>
-
+        <div class="mb-4"
+            *ngIf="obj.value.visible == null|| obj.value.visible == undefined || obj.value.visible()">
+            <!-- <h6 class="">{{ obj.value.label }}</h6> -->
+            <label class="form-label">
+                {{ obj.value.label }} <span *ngIf="obj.value.required" class="text-danger">*</span>
+            </label>
+            <div class="d-flex gap-3">
                 <!-- Preview section -->
-                <div class="file-preview" *ngIf="obj.value.source">
-                    <img [src]="isImage(obj.value.source) ? obj.value.source : defaultImage" class="img-fluid"
+                <!-- <div class="file-preview" *ngIf="obj.value.source">
+                    <img [src]="isImage(obj.value.source) ? obj.value.source : defaultImage" class="w-fit"
                         alt="{{ obj.value.label }}">
-                </div>
-
-                <!-- Preview Button -->
-                <a class="btn btn-primary mt-2" *ngIf="obj.value.source"
-                    (click)="previewFile(obj.value.label, obj.value.source)">Preview</a>
-
+                </div> -->
                 <!-- Upload Button (only show if previewOnly is false) -->
                 <div *ngIf="!inputs.viewOnly">
-                    <input type="file" (change)="handleFileUpload($event, obj.key)" class="form-control mt-2">
+                    <input type="file" (change)="handleFileUpload($event, obj.key)" class="form-control">
                 </div>
+                <!-- Preview Button -->
+                <a class="btn btn-soft-success" *ngIf="obj.value.source"
+                    (click)="previewFile(obj.value.label, obj.value.source)">Preview</a>
             </div>
         </div>
     </ng-container>

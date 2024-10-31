@@ -5,7 +5,8 @@ export class FIleHandler {
 }
 
 export class EygileFile {
-    label: string;
+    label?: string;
     source?: string;
     visible?: Function;
+    required?: boolean;
 }

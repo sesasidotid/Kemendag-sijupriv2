@@ -70,7 +70,7 @@
                     <td *ngIf="pagable.actionColumnList && pagable.actionColumnList.length > 0" class="m-1 p-1">
                         <div class="btn-group" role="group" aria-label="Basic example">
                             <a *ngFor="let action of pagable.actionColumnList" (click)="action.process(row)"
-                                class="text-light btn btn-sm btn-{{(action.inactive && action.inactive(row)) ? 'dark' : action.color}} {{action.icon}}"></a>
+                                class="text-light btn btn-sm btn-{{(action.inactive && action.inactive(row)) ? 'grey disabled' : action.color}} {{action.icon}}"></a>
                         </div>
                     </td>
                 </tr>

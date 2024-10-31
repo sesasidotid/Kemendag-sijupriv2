@@ -154,7 +154,7 @@ export class ActionColumnBuilder {
         return this;
     }
 
-    withIcon(icon: "create" | "detail" | "danger"): ActionColumnBuilder {
+    withIcon(icon: "create" | "detail" | "danger" | "update"): ActionColumnBuilder {
         this.icon = this.icons[icon];
         return this;
     }
