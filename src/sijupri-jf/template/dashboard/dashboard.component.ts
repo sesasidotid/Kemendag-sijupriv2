@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { LoginContext } from '../../../modules/base/commons/login-context';
 import { RouterLink } from '@angular/router';
-import { ProfileCardComponent } from '../profile-card/profile-card.component';
+import { ProfileCardComponent } from '../../../modules/base/components/profile-card/profile-card.component';
+
 
 @Component({
   selector: 'app-dashboard',

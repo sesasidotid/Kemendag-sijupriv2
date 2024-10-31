@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { LoginContext } from '../../../modules/base/commons/login-context';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { LoginContext } from '../../commons/login-context';
 
 @Component({
   selector: 'app-profile-card',
