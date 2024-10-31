@@ -12,11 +12,14 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CommonModule } from '@angular/common';
 import { Task } from '../../../../modules/workflow/models/task.model';
 import { HandlerService } from '../../../../modules/base/services/handler.service';
+import { BehaviorSubject } from 'rxjs';
+import { EmptyStateComponent } from '../../../../modules/base/components/empty-state/empty-state.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-jf-pending',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, FileHandlerComponent, ReactiveFormsModule, EmptyStateComponent],
   templateUrl: './jf-pending.component.html',
   styleUrl: './jf-pending.component.scss'
 })
@@ -25,6 +28,8 @@ export class JfPendingComponent {
   jenisKelaminList: JenisKelamin[] = [];
   pendingTask: PendingTask;
   nip: string = LoginContext.getUserId();
+
+  loading$ = new BehaviorSubject<boolean>(true);
 
   jfDetailForm!: FormGroup;
 
@@ -39,6 +44,8 @@ export class JfPendingComponent {
   ngOnInit() {
     this.getPendingTask();
     this.getJenisKelamin();
+
+    console.log(this.pendingTask)
   }
 
   constructor(
@@ -46,6 +53,7 @@ export class JfPendingComponent {
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService,
     private alertService: AlertService,
+    private router: Router
   ) {
     this.jfDetailForm = new FormGroup({
       name: new FormControl(this.jf.name, [Validators.required]),
@@ -59,6 +67,7 @@ export class JfPendingComponent {
   }
 
   getPendingTask() {
+    this.loading$.next(true);
     this.apiService.getData(`/api/v1/jf/expect_pending/${this.nip}`).subscribe({
       next: (response) => {
         this.pendingTask = new PendingTask(response);
@@ -76,10 +85,22 @@ export class JfPendingComponent {
 
         this.inputs.files['ktp'] = { label: "Upload Dokumen KTP", source: this.jf.ktpUrl, required: true };
         this.inputs.viewOnly = this.pendingTask.flowId == 'siap_flow_1'
+
+        if (this.pendingTask.flowId == 'siap_flow_1') {
+          this.jfDetailForm.get('name')?.disable()
+          this.jfDetailForm.get('phone')?.disable()
+          this.jfDetailForm.get('email')?.disable()
+          this.jfDetailForm.get('tempatLahir')?.disable()
+          this.jfDetailForm.get('tanggalLahir')?.disable()
+          this.jfDetailForm.get('jenisKelaminCode')?.disable()
+          this.jfDetailForm.get('nik')?.disable()
+        }
+        this.loading$.next(false);
       },
       error: (error) => {
-        this.alertService.showToast('Error', "Gagal mendapatkan data profil!");
+        // this.alertService.showToast('Error', "Gagal mendapatkan data profil!");
         this.handlerService.handleException(error);
+        this.loading$.next(false);
       }
     })
   }
@@ -93,6 +114,10 @@ export class JfPendingComponent {
         this.handlerService.handleException(error);
       }
     })
+  }
+
+  ajukanPerubahan() {
+    this.router.navigate(['/profile']);
   }
 
   submit() {

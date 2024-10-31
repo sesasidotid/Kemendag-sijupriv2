@@ -11,6 +11,7 @@ import { ApiService } from '../../../../modules/base/services/api.service';
 import { PendingTask } from '../../../../modules/workflow/models/pending-task.model';
 import { JenisKelamin } from '../../../../modules/maintenance/models/jenis-kelamin.model';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
+import { BehaviorSubject } from 'rxjs';
 
 
 @Component({
@@ -25,6 +26,8 @@ export class JfDetailComponent {
   jenisKelaminList: JenisKelamin[] = [];
   nip: string = LoginContext.getUserId();
   isEditOpen: boolean = false;
+
+  loading$ = new BehaviorSubject<boolean>(true);
 
   jfDetailForm!: FormGroup;
 
@@ -60,6 +63,7 @@ export class JfDetailComponent {
   }
 
   getJf() {
+    this.loading$.next(true)
     this.apiService.getData(`/api/v1/jf/${this.nip}`).subscribe({
       next: (response) => {
         this.jf = new JF(response);
@@ -74,8 +78,10 @@ export class JfDetailComponent {
           jenisKelaminCode: this.jf.jenisKelaminCode,
           nik: this.jf.nik,
         });
+        this.loading$.next(false)
       },
       error: (error) => {
+        this.loading$.next(false)
         console.error('Error fetching data', error);
         this.alertService.showToast('Error', "Gagal mendapatkan data profil!");
       }

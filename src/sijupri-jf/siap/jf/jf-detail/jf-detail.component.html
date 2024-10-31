@@ -1,75 +1,83 @@
-<div *ngIf="!isEditOpen">
-    <div class="container my-4">
-        <div class="row">
-            <!-- First Name -->
-            <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label">
-                    <i class="mdi mdi-account-circle text-muted me-2"></i>Nama Lengkap
-                </label>
-                <p class="border-bottom pb-2">{{jf.name}}</p>
-            </div>
+<div *ngIf="loading$ | async; else hadItem" class="d-flex justify-content-center">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 
-            <!-- No. HP -->
-            <div *ngIf="jf.phone" class="col-md-6 mb-3">
-                <label for="phoneInput" class="form-label">
-                    <i class="mdi mdi-phone text-muted me-2"></i> No. HP
-                </label>
-                <p class="border-bottom pb-2">{{jf.phone}}</p>
+<ng-template #hadItem>
+    <div *ngIf="!isEditOpen">
+        <div class="">
+            <div class="row">
+                <!-- First Name -->
+                <div class="col-md-6 mb-3">
+                    <label for="firstnameInput" class="form-label">
+                        <i class="mdi mdi-account-circle text-muted me-2"></i>Nama Lengkap
+                    </label>
+                    <p class="border-bottom pb-2">{{jf.name}}</p>
+                </div>
+    
+                <!-- No. HP -->
+                <div *ngIf="jf.phone" class="col-md-6 mb-3">
+                    <label for="phoneInput" class="form-label">
+                        <i class="mdi mdi-phone text-muted me-2"></i> No. HP
+                    </label>
+                    <p class="border-bottom pb-2">{{jf.phone}}</p>
+                </div>
+                <!-- Email -->
+                <div *ngIf="jf.email" class="col-md-6 mb-3">
+                    <label for="emailInput" class="form-label">
+                        <i class="mdi mdi-email text-muted me-2"></i> Email
+                    </label>
+                    <p class="border-bottom pb-2">{{jf.email}}</p>
+                </div>
+    
+                <!-- Tempat Lahir -->
+                <div *ngIf="jf.tempatLahir" class="col-md-6 mb-3">
+                    <label for="birthplaceInput" class="form-label">
+                        <i class="mdi mdi-map-marker text-muted me-2"></i> Tempat Lahir
+                    </label>
+                    <p class="border-bottom pb-2">{{jf.tempatLahir}}</p>
+                </div>
+    
+                <!-- Tanggal Lahir -->
+                <div *ngIf="jf.tanggalLahir" class="col-md-6 mb-3">
+                    <label for="birthdateInput" class="form-label">
+                        <i class="mdi mdi-calendar-range text-muted me-2"></i> Tanggal Lahir
+                    </label>
+                    <p class="border-bottom pb-2">{{jf.tanggalLahir}}</p>
+                </div>
+    
+                <!-- Jenis Kelamin -->
+                <div *ngIf="jf.jenisKelaminName" class="col-md-6 mb-3">
+                    <label for="genderInput" class="form-label">
+                        <i class="mdi mdi-gender-male-female text-muted me-2"></i> Jenis Kelamin
+                    </label>
+                    <p class="border-bottom pb-2">{{jf.jenisKelaminName}}</p>
+                </div>
+    
+                <!-- NIK -->
+                <div *ngIf="jf.nik" class="col-md-6 mb-3">
+                    <label for="nikInput" class="form-label">
+                        <i class="mdi mdi-card-account-details text-muted me-2"></i> NIK
+                    </label>
+                    <p class="border-bottom pb-2">{{jf.nik}}</p>
+                </div>
+    
+                <!-- File Upload -->
+                <div *ngIf="jf.ktpUrl" class="col-md-6 mb-3">
+                    <app-file-handler [inputs]="inputs"></app-file-handler>
+                </div>
             </div>
-            <!-- Email -->
-            <div *ngIf="jf.email" class="col-md-6 mb-3">
-                <label for="emailInput" class="form-label">
-                    <i class="mdi mdi-email text-muted me-2"></i> Email
-                </label>
-                <p class="border-bottom pb-2">{{jf.email}}</p>
-            </div>
-
-            <!-- Tempat Lahir -->
-            <div *ngIf="jf.tempatLahir" class="col-md-6 mb-3">
-                <label for="birthplaceInput" class="form-label">
-                    <i class="mdi mdi-map-marker text-muted me-2"></i> Tempat Lahir
-                </label>
-                <p class="border-bottom pb-2">{{jf.tempatLahir}}</p>
-            </div>
-
-            <!-- Tanggal Lahir -->
-            <div *ngIf="jf.tanggalLahir" class="col-md-6 mb-3">
-                <label for="birthdateInput" class="form-label">
-                    <i class="mdi mdi-calendar-range text-muted me-2"></i> Tanggal Lahir
-                </label>
-                <p class="border-bottom pb-2">{{jf.tanggalLahir}}</p>
-            </div>
-
-            <!-- Jenis Kelamin -->
-            <div *ngIf="jf.jenisKelaminName" class="col-md-6 mb-3">
-                <label for="genderInput" class="form-label">
-                    <i class="mdi mdi-gender-male-female text-muted me-2"></i> Jenis Kelamin
-                </label>
-                <p class="border-bottom pb-2">{{jf.jenisKelaminName}}</p>
-            </div>
-
-            <!-- NIK -->
-            <div *ngIf="jf.nik" class="col-md-6 mb-3">
-                <label for="nikInput" class="form-label">
-                    <i class="mdi mdi-card-account-details text-muted me-2"></i> NIK
-                </label>
-                <p class="border-bottom pb-2">{{jf.nik}}</p>
-            </div>
-
-            <!-- File Upload -->
-            <div *ngIf="jf.ktpUrl" class="col-md-6 mb-3">
-                <app-file-handler [inputs]="inputs"></app-file-handler>
-            </div>
-        </div>
-
-        <!-- Edit Button -->
-        <div class="row">
-            <div class="col-12 d-flex justify-content-end mt-3">
-                <a (click)="toggleEdit()" class="btn btn-info">Ubah</a>
+    
+            <!-- Edit Button -->
+            <div class="row">
+                <div class="col-12 d-flex justify-content-end mt-3">
+                    <a (click)="toggleEdit()" class="btn btn-primary">Ajukan Perubahan</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</ng-template>
 <form *ngIf="isEditOpen" [formGroup]="jfDetailForm" (ngSubmit)="submit()">
     <div class="row">
         <div class="col-lg-12">
@@ -188,7 +196,7 @@
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
                 <a (click)="toggleEdit()" class="btn btn-warning me-1">Kembali</a>
-                <button type="submit" class="btn btn-primary" [disabled]="jfDetailForm.invalid">Simpan</button>
+                <button type="submit" class="btn btn-primary" [disabled]="jfDetailForm.invalid">Ajukan</button>
             </div>
         </div>
     </div>
