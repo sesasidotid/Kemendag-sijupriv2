@@ -24,7 +24,7 @@ export class JfListComponent {
       .addPrimaryColumn(new PrimaryColumnBuilder("Email", 'email', ['user']).build())
       .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'status', ['user']).build())
       .addActionColumn(new ActionColumnBuilder().setAction((jf: any) => {
-        this.router.navigate([`/${jf.id}`])
+        this.router.navigate([`/siap/user-jf/${jf.nip}`])
       }, "info").withIcon("detail").build())
       .addFilter(new PageFilterBuilder("like").setProperty("nip").withField("NIP", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("user|name").withField("Nama", "text").build())

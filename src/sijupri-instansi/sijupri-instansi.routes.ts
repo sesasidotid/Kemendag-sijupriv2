@@ -24,7 +24,13 @@ export const routes: Routes = [
             },
             "SIAP": {
                 "User JF": {
-                    components: () => import('../sijupri-instansi/siap/jf-list/jf-list.component').then(m => m.JfListComponent)
+                    components: () => import('../sijupri-instansi/siap/jf-list/jf-list.component').then(m => m.JfListComponent),
+                    routes: [
+                        {
+                            path: ':id',
+                            loadComponent: () => import('../sijupri-instansi/siap/jf-detail/jf-detail.component').then(m => m.JfDetailComponent),
+                        }
+                    ]
                 },
                 "User Instansi": {
                     components: () => import('../sijupri-instansi/siap/user-instansi-list/user-instansi-list.component').then(m => m.UserInstansiListComponent),

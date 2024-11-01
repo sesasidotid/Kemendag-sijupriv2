@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+
 import { JfService } from '../../../modules/siap/services/jf.service';
 import { JF } from '../../../modules/siap/models/jf.model';
 import { CommonModule } from '@angular/common';

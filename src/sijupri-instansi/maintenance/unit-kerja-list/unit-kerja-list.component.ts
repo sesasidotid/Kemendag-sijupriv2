@@ -32,6 +32,10 @@ export class UnitKerjaListComponent {
   }
 
   ngOnInit() {
+    if(this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs();
+    }
+    
     this.tabService.addTab({
       label: 'Daftar Unit Kerja',
       isActive: true,
