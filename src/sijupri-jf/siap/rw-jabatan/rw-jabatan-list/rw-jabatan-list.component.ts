@@ -9,6 +9,7 @@ import { ApiService } from '../../../../modules/base/services/api.service';
 import { AlertService } from '../../../../modules/base/services/alert.service';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-jabatan-list',
@@ -21,6 +22,8 @@ export class RwJabatanListComponent {
   pagable: Pagable;
   isDetailOpen: boolean = false;
   rwJabatan: RWJabatan = new RWJabatan();
+
+  loading$ = new BehaviorSubject<boolean>(true);
 
   constructor(
     private apiService: ApiService,
@@ -40,13 +43,16 @@ export class RwJabatanListComponent {
   }
 
   getRWJabatan(id: string) {
+    this.loading$.next(true);
     this.apiService.getData(`/api/v1/rw_jabatan/${id}`).subscribe({
       next: (response) => {
         this.rwJabatan = new RWJabatan(response);
+        this.loading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data riwayat");
+        this.loading$.next(false);
       }
     })
   }

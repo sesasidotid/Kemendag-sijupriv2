@@ -1,41 +1,49 @@
 <app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
 <div *ngIf="isDetailOpen" class="container">
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label">
-                Institusi Pendidikan
-            </label>
-            <p class="border-bottom pb-2">{{rwPendidikan.institusiPendidikan}}</p>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label
-                ">Pendidikan</label>
-            <p class="border-bottom pb-2">{{rwPendidikan.pendidikanName}}</p>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label
-                ">Jurusan</label>
-            <p class="border-bottom pb-2">{{rwPendidikan.jurusan}}</p>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label
-                ">Tanggal Ijazah</label>
-            <p class="border-bottom pb-2">{{rwPendidikan.tanggalIjazah}}</p>
-        </div>
-        <div class="col-md-6 mb-3">
-            <app-file-handler [inputs]="{
-                files: {
-                  ijazah: { label: 'Preview Ijazah', source: this.rwPendidikan.ijazahUrl }
-                },
-                viewOnly: true
-              }"></app-file-handler>
-        </div>
-    </div>    
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="hstack gap-2 justify-content-end">
-                <a class="btn btn-secondary" (click)="isDetailOpen = false">Kembali</a>
-            </div>
+    <div *ngIf="loading$ | async; else hadItem" class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
     </div>
+    
+    <ng-template #hadItem>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label">
+                    Institusi Pendidikan
+                </label>
+                <p class="border-bottom pb-2">{{rwPendidikan.institusiPendidikan}}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label
+                    ">Pendidikan</label>
+                <p class="border-bottom pb-2">{{rwPendidikan.pendidikanName}}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label
+                    ">Jurusan</label>
+                <p class="border-bottom pb-2">{{rwPendidikan.jurusan}}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label
+                    ">Tanggal Ijazah</label>
+                <p class="border-bottom pb-2">{{rwPendidikan.tanggalIjazah}}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <app-file-handler [inputs]="{
+                    files: {
+                      ijazah: { label: 'Preview Ijazah', source: this.rwPendidikan.ijazahUrl }
+                    },
+                    viewOnly: true
+                  }"></app-file-handler>
+            </div>
+        </div>    
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="hstack gap-2 justify-content-end">
+                    <a class="btn btn-secondary" (click)="isDetailOpen = false">Kembali</a>
+                </div>
+            </div>
+        </div>
+    </ng-template>
 </div>

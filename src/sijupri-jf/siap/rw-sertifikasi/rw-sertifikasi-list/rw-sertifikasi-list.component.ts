@@ -8,6 +8,7 @@ import { AlertService } from '../../../../modules/base/services/alert.service';
 import { CommonModule } from '@angular/common';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-sertifikasi-list',
@@ -20,6 +21,8 @@ export class RwSertifikasiListComponent {
   pagable: Pagable;
   isDetailOpen: boolean = false;
   rwSertifikasi: RWSertifikasi = new RWSertifikasi();
+
+  loading$ = new BehaviorSubject<boolean>(true);
 
   constructor(
     private apiService: ApiService,
@@ -43,13 +46,16 @@ export class RwSertifikasiListComponent {
   }
 
   getRWSertifikasi(id: string) {
+    this.loading$.next(true);
     this.apiService.getData(`/api/v1/rw_sertifikasi/${id}`).subscribe({
       next: (response) => {
         this.rwSertifikasi = new RWSertifikasi(response);
+        this.loading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gaagal mendapatkan data riwayat");
+        this.loading$.next(false);
       }
     })
   }

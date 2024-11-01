@@ -8,6 +8,7 @@ import { AlertService } from '../../../../modules/base/services/alert.service';
 import { CommonModule } from '@angular/common';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-pendidikan-list',
@@ -20,6 +21,8 @@ export class RwPendidikanListComponent {
   pagable: Pagable;
   isDetailOpen: boolean = false;
   rwPendidikan: RWPendidikan = new RWPendidikan();
+
+  loading$ = new BehaviorSubject<boolean>(true);
 
   constructor(
     private apiService: ApiService,
@@ -36,13 +39,16 @@ export class RwPendidikanListComponent {
   }
 
   getRWPendidikan(id: string) {
+    this.loading$.next(true);
     this.apiService.getData(`/api/v1/rw_pendidikan/${id}`).subscribe({
       next: (response) => {
         this.rwPendidikan = new RWPendidikan(response);
+        this.loading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data riwayat");
+        this.loading$.next(false);
       }
     })
   }

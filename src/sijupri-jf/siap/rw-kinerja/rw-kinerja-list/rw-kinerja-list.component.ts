@@ -8,6 +8,7 @@ import { RWKinerja } from '../../../../modules/siap/models/rw-kinerja.model';
 import { ApiService } from '../../../../modules/base/services/api.service';
 import { AlertService } from '../../../../modules/base/services/alert.service';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-kinerja-list',
@@ -20,6 +21,8 @@ export class RwKinerjaListComponent {
   pagable: Pagable;
   isDetailOpen: boolean = false;
   rwKinerja: RWKinerja = new RWKinerja();
+
+  loading$ = new BehaviorSubject<boolean>(true);
 
   constructor(
     private apiService: ApiService,
@@ -41,13 +44,16 @@ export class RwKinerjaListComponent {
   }
 
   getRWKinerja(id: string) {
+    this.loading$.next(true);
     this.apiService.getData(`/api/v1/rw_Kinerja/${id}`).subscribe({
       next: (response) => {
         this.rwKinerja = new RWKinerja(response);
+        this.loading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data riwayat");
+        this.loading$.next(false);
       }
     })
   }
