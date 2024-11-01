@@ -8,6 +8,7 @@ import { RwKompetensiListComponent } from '../rw-kompetensi-list/rw-kompetensi-l
 import { RwSertifikasiListComponent } from '../rw-sertifikasi-list/rw-sertifikasi-list.component';
 import { JfService } from '../../../modules/siap/services/jf.service';
 import { JF } from '../../../modules/siap/models/jf.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-jf-detail',
@@ -18,7 +19,8 @@ import { JF } from '../../../modules/siap/models/jf.model';
     RwJabatanListComponent,
     RwKinerjaListComponent,
     RwKompetensiListComponent,
-    RwSertifikasiListComponent
+    RwSertifikasiListComponent,
+    CommonModule
   ],
   templateUrl: './jf-detail.component.html',
   styleUrl: './jf-detail.component.scss'
@@ -34,9 +36,6 @@ export class JfDetailComponent {
     this.activatedRoute.paramMap.subscribe(params => {
       this.nip = params.get('id');
     });
-  }
-
-  ngOnInit() {
     this.getJF();
   }
 

@@ -20,6 +20,7 @@ export class PendingTask extends Serializable {
     objectTaskId: string = undefined;
     assignee: any[] = undefined;
     flowId: string = undefined;
+    lastUpdated?: Date = undefined;
 
     objectTask: ObjectTask = undefined;
     [key: string]: any;

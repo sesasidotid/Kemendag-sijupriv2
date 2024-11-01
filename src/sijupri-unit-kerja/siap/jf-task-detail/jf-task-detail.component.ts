@@ -19,6 +19,8 @@ import { ApiService } from '../../../modules/base/services/api.service';
 import { AlertService } from '../../../modules/base/services/alert.service';
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component';
 import { LoginContext } from '../../../modules/base/commons/login-context';
+import { ConverterService } from '../../../modules/base/services/converter.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-jf-task-detail',
@@ -30,6 +32,13 @@ import { LoginContext } from '../../../modules/base/commons/login-context';
 export class JfTaskDetailComponent {
   nip: string;
   pendingTaskList: PendingTask[] = [];
+  jf: JF = new JF();
+
+  openedAccordion: string[] = [];
+
+  pendingTaskloading$ = new BehaviorSubject<boolean>(true);
+  detailTaskloading$ = new BehaviorSubject<boolean>(true);
+
 
   constructor(
     private apiService: ApiService,
@@ -37,6 +46,8 @@ export class JfTaskDetailComponent {
     private confirmationService: ConfirmationService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private converterService: ConverterService,
+    private jfService: JfService
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.nip = params.get('id');
@@ -44,27 +55,40 @@ export class JfTaskDetailComponent {
   }
 
   ngOnInit() {
+    this.getJF();
     this.getTaskDetail();
   }
 
   getTaskDetail() {
+    this.pendingTaskloading$.next(true);
     this.apiService.getData(`/api/v1/jf/task/group/${this.nip}`).subscribe({
       next: (pendingTaskList: PendingTask[]) => {
         if (pendingTaskList.length == 0) this.router.navigate(['/siap/verify-user-jf']);
         this.pendingTaskList = pendingTaskList;
+        this.pendingTaskloading$.next(false);
       },
       error: (error) => {
         console.error('Error fetching data', error);
-        this.alertService.showToast('Error', error.message);
-        this.getTaskDetail();
+        this.alertService.showToast('Error', "Gagal mendapatkan data verifikasi user JF!");
+        
+        this.pendingTaskloading$.next(false);
+        // this.getTaskDetail();
       }
     })
   }
 
   toggleExpand(pendingTask: PendingTask) {
     pendingTask['isOpen'] = !(pendingTask['isOpen'] || false);
-
+    
     if ((pendingTask['isOpen'] || false) && !pendingTask.hasOwnProperty("object")) {
+      this.detailTaskloading$.next(true);
+      if (pendingTask['isOpen']) {
+        // this.openedAccordion.push(pendingTask.id);
+        this.openedAccordion = [pendingTask.id];
+        // console.log(this.openedAccordion);
+      }
+      // console.log(this.openedAccordion.includes(pendingTask.id))
+
       this.apiService.getData(`/api/v1/object_task/${pendingTask.objectTaskId}`).subscribe({
         next: (objectTask: ObjectTask) => {
           switch (pendingTask.workflowName) {
@@ -87,10 +111,12 @@ export class JfTaskDetailComponent {
               pendingTask['object'] = new RWSertifikasi(objectTask.object);
               break;
           }
+          this.detailTaskloading$.next(false);
         },
         error: (error) => {
           console.error('Error fetching data', error);
-          this.alertService.showToast('Error', error.message);
+          this.alertService.showToast('Error', "Gagal mendapatkan data detail task!");
+          this.detailTaskloading$.next(false);
         }
       })
     }
@@ -114,17 +140,39 @@ export class JfTaskDetailComponent {
     return () => rwSertifikasi.kategoriSertifikasiValue == 2
   }
 
+  getTaskDate(date: string) {
+    return this.converterService.dateToHumanReadable(date);
+  }
+
+  getJF() {
+    this.jfService.findByNip(this.nip).subscribe({
+      next: (jf: JF) => this.jf = jf,
+    })
+  }
+
   submit(pendingTask: PendingTask) {
     const task = new Task();
     task.id = pendingTask.id;
     task.taskAction = pendingTask.taskAction;
     task.remark = (pendingTask.remark ?? null)
+    console.log(task.taskAction)
 
     this.apiService.postData(`/api/v1/${pendingTask.workflowName.replace("_task", "")}/task/submit`, task).subscribe({
-      next: () => this.getTaskDetail(),
+      next: () => {
+        if (task.taskAction == "approve") {
+          this.alertService.showToast('Success', 'Berhasil menyetujui!');
+        } else {
+          this.alertService.showToast('Success', 'Berhasil menolak!');
+        }
+        this.getTaskDetail()
+      },
       error: (error) => {
         console.error('Error fetching data', error);
-        this.alertService.showToast('Error', error.message);
+        if(task.taskAction == "approve") {
+          this.alertService.showToast('Error', 'Gagal menyetujui!');
+        } else {
+          this.alertService.showToast('Error', 'Gagal menolak!');
+        }
       }
     });
   }

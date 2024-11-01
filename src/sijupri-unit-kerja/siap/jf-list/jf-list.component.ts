@@ -34,12 +34,17 @@ export class JfListComponent {
   }
 
   ngOnInit() {
+    if(this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs();
+    }
     this.tabService.addTab({
       label: 'Daftar User Jabatan Fungsional',
+      icon: 'mdi-list-box',
       isActive: true,
       onClick: () => this.router.navigate([`/siap/user-jf`]),
     }).addTab({
       label: 'Tambah User Jabatan Fungsional',
+      icon: 'mdi-plus-circle',
       onClick: () => this.router.navigate([`/siap/user-jf/add`]),
     });
   }

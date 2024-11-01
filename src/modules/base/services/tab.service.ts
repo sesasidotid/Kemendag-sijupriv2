@@ -24,5 +24,9 @@ export class TabService {
   clearTabs(): void {
     this.tabsSubject.next([]);
   }
+
+  getTabsLength(): number {
+    return this.tabsSubject.getValue().length;
+  }
 }
 

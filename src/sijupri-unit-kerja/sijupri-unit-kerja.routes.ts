@@ -13,7 +13,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                outlet: 'detached',
+                // outlet: 'detached',
                 loadComponent: () => import('../sijupri-unit-kerja/template/dashboard/dashboard.component').then(m => m.DashboardComponent),
             },
             {
@@ -42,7 +42,6 @@ export const routes: Routes = [
                             },
                             {
                                 path: ':id',
-                                outlet: 'detached',
                                 loadComponent: () => import('../sijupri-unit-kerja/siap/jf-detail/jf-detail.component').then(m => m.JfDetailComponent),
                             }
                         ]

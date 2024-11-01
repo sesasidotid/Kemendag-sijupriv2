@@ -1,55 +1,93 @@
-<form (submit)="submit()">
+<form [formGroup]="jfAddForm" (ngSubmit)="submit()">
     <div class="row mb-3">
         <label for="" class="col-sm-2 col-form-label fw-bold">Instansi</label>
         <div class="col-sm-10">
-            <p><b>{{instansi.name}}</b></p>
+            <div *ngIf="loadingInstansi$ | async; else instansiItem" class="d-flex">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <ng-template #instansiItem>
+                <p class="mt-2"><b>{{instansi.name}}</b></p>
+            </ng-template>
         </div>
     </div>
     <div class="row mb-3">
         <label for="" class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
         <div class="col-sm-10">
-            <p><b>{{unitKerja.name}}</b></p>
+            <div *ngIf="loadingUnitKerja$ | async; else unitItem" class="d-flex">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <ng-template #unitItem>
+                <p class="mt-2"><b>{{unitKerja.name}}</b></p>
+            </ng-template>
         </div>
     </div>
     <hr>
     <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">NIP</label>
+        <label for="nip" class="col-sm-2 col-form-label fw-bold">NIP</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" [(ngModel)]="jf.nip" name="nip">
+            <input type="text" class="form-control" name="nip" id="nip" formControlName="nip">
+            <div class="feedback" *ngIf="jfAddForm.get('nip').invalid && jfAddForm.get('nip').touched">
+                <small *ngIf="jfAddForm.get('nip').errors?.['required']">NIP perlu
+                    diisi.</small>
+                <small *ngIf="jfAddForm.get('nip').errors?.['pattern']">NIP harus berupa angka.</small>
+                <small *ngIf="jfAddForm.get('nip').errors?.['minlength']">NIP minimal 18 karakter.</small>
+            </div>
         </div>
     </div>
     <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Nama</label>
+        <label for="name" class="col-sm-2 col-form-label fw-bold">Nama Lengkap</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" [(ngModel)]="jf.name" name="name">
+            <input type="text" class="form-control" name="name" id="name" formControlName="name">
+            <div class="feedback" *ngIf="jfAddForm.get('name').invalid && jfAddForm.get('name').touched">
+                <small *ngIf="jfAddForm.get('name').errors?.['required']">Nama Lengkap perlu
+                    diisi.</small>
+            </div>
         </div>
     </div>
     <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Email</label>
+        <label for="email" class="col-sm-2 col-form-label fw-bold">Email</label>
         <div class="col-sm-10">
-            <input type="email" class="form-control" [(ngModel)]="jf.email" name="email">
+            <input type="email" class="form-control" name="email" id="email" formControlName="email">
+            <div class="feedback" *ngIf="jfAddForm.get('email').invalid && jfAddForm.get('email').touched">
+                <small *ngIf="jfAddForm.get('email').errors?.['required']">Email perlu
+                    diisi.</small>
+                <small *ngIf="jfAddForm.get('email').errors?.['email']">Email tidak valid.</small>
+            </div>
         </div>
     </div>
     <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Password</label>
+        <label for="password" class="col-sm-2 col-form-label fw-bold">Password</label>
         <div class="col-sm-10">
-            <input type="password" class="form-control" [(ngModel)]="jf.password" name="password">
+            <input type="password" class="form-control" name="password" id="password" formControlName="password">
+            <div class="feedback" *ngIf="jfAddForm.get('password').invalid && jfAddForm.get('password').touched">
+                <small *ngIf="jfAddForm.get('password').errors?.['required']">Password perlu
+                    diisi.</small>
+                <!-- <small *ngIf="jfAddForm.get('password').errors?.['minlength']">Password minimal 6 karakter.</small> -->
+            </div>
         </div>
     </div>
     <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Jenis Kelamin</label>
+        <label for="kelamin" class="col-sm-2 col-form-label fw-bold">Jenis Kelamin</label>
         <div class="col-sm-10">
-            <select id="inputState" class="form-select" [(ngModel)]="jf.jenisKelaminCode" name="instansiId">
-                <option [value]='undefined'>Pilih</option>
+            <select id="inputState" class="form-select" name="instansiId" formControlName="jenisKelaminCode" id="kelamin">
+                <option selected value="" style=" display: none;">Pilih Jenis Kelamin</option>
                 <option *ngFor="let jenisKelamin of jenisKelaminList" [value]='jenisKelamin.code'>
                     {{jenisKelamin.name}}
                 </option>
             </select>
+            <div class="feedback" *ngIf="jfAddForm.get('jenisKelaminCode').invalid && jfAddForm.get('jenisKelaminCode').touched">
+                <small *ngIf="jfAddForm.get('jenisKelaminCode').errors?.['required']">Jenis Kelamin perlu
+                    dipilih.</small>
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="text-center col">
-            <button type="submit" class="btn btn-sm btn-success float-end">Simpan</button>
+            <button type="submit" class="btn btn-primary float-end" [disabled]="jfAddForm.invalid">Simpan</button>
         </div>
     </div>
 </form>
