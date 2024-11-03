@@ -3,15 +3,24 @@
         <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                    <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
                         <div class="card mb-3">
-                            <div class="card-body">
+                            <div class="card-body py-4">
+                                <div class="p-3 border rounded-circle w-fit w-fit mx-auto mb-3">
+                                    <img src="assets/logo/kemendag-logo.svg" alt="" width="32">
+                                </div>
                                 <div class="pb-2">
-                                    <h5 class="card-title text-center pb-0 fs-4">Masuk ke akun anda</h5>
-                                    <p class="text-center small text-subtitle">Silahkan isi data dibawah untuk masuk</p>
+                                    <h5 class="card-title text-center pb-0 fs-3">Masuk ke akun anda</h5>
+                                    <p class="text-center small text-subtitle mt-2">Silahkan isi data dibawah untuk
+                                        masuk</p>
+                                </div>
+                                <div *ngIf="loginMessage$ | async as loginMessage">
+                                    <div *ngIf="loginMessage.status !== ''" class="alert" [ngClass]="loginMessage.status === 'error' ? 'alert-danger' : 'alert-success'" role="alert">
+                                        {{loginMessage.message}}
+                                    </div>
                                 </div>
                                 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="row g-3 needs-validation">
-                                    <div class="col-12">
+                                    <!-- <div class="col-12">
                                         <label for="nip" class="form-label">Masuk Sebagai</label>
                                         <div class="input-group has-validation">
                                             <a *ngFor="let application of applicationList"
@@ -20,7 +29,7 @@
                                                     }" class="col btn btn-sm btn-outline-primary w-100"
                                                 style="font-size: 10px;">{{application.name}}</a>
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     <div class="col-12">
                                         <label for="nip" class="form-label">NIP</label>
@@ -55,17 +64,22 @@
                                                 perlu diisi.</small>
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        <button class="btn btn-primary w-100" type="submit"
-                                            [disabled]="loginForm.invalid">Masuk Sekarang</button>
+                                    <div class="col-12 pt-3">
+                                        <button *ngIf="!(isLoginLoading$ | async)" class="btn grad-button w-100" type="submit"
+                                            [disabled]="loginForm.invalid">Masuk
+                                            Sekarang</button>
+                                        <button *ngIf="(isLoginLoading$ | async)" class="btn grad-button w-100" disabled>
+                                            <div class="spinner-border" style="width: 19px; height: 19px;"
+                                                role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </button>
                                     </div>
-                                    <!-- <div class="col-12">
-                                            <p class="small mb-0">Don't have account? <a
-                                                    href="pages-register.html">Create an account</a></p>
-                                        </div> -->
                                 </form>
                             </div>
                         </div>
+                        <small class="text-muted text-center">Copyright &copy; Kementerian Perdagangan Republik
+                            Indonesia</small>
                     </div>
                 </div>
             </div>

@@ -9,6 +9,8 @@ import { AuthResponse } from '../../models/auth-response.model';
 import { LoginContext } from '../../../base/commons/login-context';
 import { Router } from '@angular/router';
 import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular';
+import { BehaviorSubject } from 'rxjs';
+import { AlertService } from '../../../base/services/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -24,15 +26,19 @@ export class LoginComponent {
   loginForm!: FormGroup;
   isPasswordVisible: boolean = false;
 
+  isLoginLoading$ = new BehaviorSubject<boolean>(false);
+  loginMessage$ = new BehaviorSubject<{status: string, message: string}>({status: '', message: ''});
+
   readonly Eye = Eye;
   readonly EyeOff = EyeOff;
 
-  constructor(private applicationServce: ApplicationService, private authService: AuthService, private router: Router) { }
+  constructor(private applicationServce: ApplicationService, private authService: AuthService, private router: Router, private alertService: AlertService) {
+    if (LoginContext.isLogin()) {
+      this.router.navigate(['/'])
+    }
+  }
   
   ngOnInit() {
-    if (LoginContext.isLogin()) {
-      this.router.navigate([''])
-    }
     this.getApplicationList();
     this.loginForm = new FormGroup({
       nip: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(18)]),
@@ -44,7 +50,7 @@ export class LoginComponent {
     this.applicationServce.findAll().subscribe({
       next: (applicationList: Application[]) => {
         this.applicationList = applicationList;
-        this.auth.applicationCode = this.applicationList[0].code;
+        // this.auth.applicationCode = this.applicationList[0].code;
       }
     })
   }
@@ -54,6 +60,7 @@ export class LoginComponent {
   }
 
   onSubmit() {
+    this.isLoginLoading$.next(true);
     if (this.loginForm.valid) {
       console.log(this.loginForm.value);
       this.auth.username = this.loginForm.value.nip;
@@ -63,11 +70,20 @@ export class LoginComponent {
         next: (authResponse: AuthResponse) => {
           this.authResponse = authResponse;
           LoginContext.storeContextLocalStorage(this.authResponse);
+          this.loginMessage$.next({status: 'success', message: 'Login berhasil, tunggu sebentar...'});
         },
         complete: () => {
-          this.router.navigate(['']).then(() => {
-            window.location.reload();
-          });
+          this.isLoginLoading$.next(false);
+          setTimeout(() => {
+            this.router.navigate(['']).then(() => {
+              window.location.reload();
+            });
+          }, 1500);
+        },
+        error: (error) => {
+          this.isLoginLoading$.next(false);
+          console.log("error", error);
+          this.loginMessage$.next({status: 'error', message: 'Login gagal, tolong coba lagi.'});
         }
       });
     }

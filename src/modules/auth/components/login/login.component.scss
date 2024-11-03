@@ -14,3 +14,30 @@
 .text-subtitle {
     opacity: 0.6;
 }
+
+main {
+    background-color: #13182B;
+     /* SVG pattern overlay */
+     background-image: 
+     url('/assets/wave.svg');
+
+     /* Cover styling */
+     background-size: contain;
+     background-repeat: repeat;
+     background-blend-mode: overlay;
+}
+
+.grad-button {
+    color: white !important;
+    background: linear-gradient(45deg, #2967be, #49AB49) !important;
+    border: none !important;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: linear-gradient(90deg, #49AB49, #2967be) !important;
+    }
+}
+
+.w-fit {
+    width: fit-content;
+}

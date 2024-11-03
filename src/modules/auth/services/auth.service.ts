@@ -17,11 +17,12 @@ export class AuthService {
   ) { }
 
   login(auth: Auth): Observable<AuthResponse> {
-    auth.clientId = auth.applicationCode;
-    auth.clientSecret = `${auth.applicationCode}P@ssw0rd`;
+    // auth.clientId = auth.applicationCode;
+    // auth.clientSecret = `${auth.applicationCode}P@ssw0rd`;
     auth.grantType = "password";
+    auth.channel_code = "WEB";
 
-    return this.apiService.auth(this.BASE_PATH, auth).pipe(
+    return this.apiService.auth(this.BASE_PATH, auth, {'Authorization': 'Basic c2lqdXByaS13ZWI6c2lqdXByaS13ZWJQQHNzdzByZA=='}).pipe(
       map((response: any) => new AuthResponse(response)),
       catchError((error) => {
         console.error('Error login', error);
