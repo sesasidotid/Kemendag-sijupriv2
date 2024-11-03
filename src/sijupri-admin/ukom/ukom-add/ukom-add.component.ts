@@ -32,6 +32,10 @@ export class UkomAddComponent {
   ) { }
 
   ngOnInit() {
+    if (this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs();
+    }
+
     this.tabService.addTab({
       label: 'Daftar UKom',
       icon: 'mdi-list-box',

@@ -34,6 +34,10 @@ export class KknAddComponent {
   ) { }
 
   ngOnInit() {
+    if (this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs();
+    }
+
     this.tabService.addTab({
       label: 'Daftar KKN',
       icon: 'mdi-list-box',

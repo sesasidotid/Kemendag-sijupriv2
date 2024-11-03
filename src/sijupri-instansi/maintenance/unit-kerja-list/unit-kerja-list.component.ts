@@ -39,9 +39,11 @@ export class UnitKerjaListComponent {
     this.tabService.addTab({
       label: 'Daftar Unit Kerja',
       isActive: true,
+      icon: 'mdi-list-box',
       onClick: () => this.router.navigate([`/maintenance/unit-kerja`]),
     }).addTab({
       label: 'Tambah Unit Kerja',
+      icon: 'mdi-plus-circle',
       onClick: () => this.router.navigate([`/maintenance/unit-kerja/add`]),
     });
   }

@@ -34,12 +34,18 @@ export class UserUnitKerjaListComponent {
   }
 
   ngOnInit() {
+    if (this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs();
+    }
+
     this.tabService.addTab({
       label: 'Daftar User Unit Kerja',
       isActive: true,
+      icon: 'mdi-list-box',
       onClick: () => this.router.navigate([`/siap/user-unit-kerja`]),
     }).addTab({
       label: 'Tambah User Unit Kerja',
+      icon: 'mdi-plus-circle',
       onClick: () => this.router.navigate([`/siap/user-unit-kerja/add`]),
     });
   }

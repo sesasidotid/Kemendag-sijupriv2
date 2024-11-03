@@ -11,8 +11,8 @@
                 
                 <!-- Conditional Comment Section -->
                 <div *ngIf="isCommentEnabled" class="mb-3">
-                    <label for="commentTextarea" class="form-label fw-semibold">Add a Comment</label>
-                    <textarea class="form-control" id="commentTextarea" rows="3" [(ngModel)]="comment" name="comment"></textarea>
+                    <label for="commentTextarea" class="form-label fw-semibold">Catatan</label>
+                    <textarea class="form-control" id="commentTextarea" rows="3" [(ngModel)]="comment" name="comment" placeholder="Tuliskan catatan atau revisi"></textarea>
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-end gap-1 border-top-0">

@@ -50,12 +50,18 @@ export class UkomPeriodeComponent {
   }
 
   ngOnInit() {
+    if (this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs();
+    }
+    
     this.tabService.addTab({
       label: 'Daftar User Instansi',
       isActive: true,
+      icon: 'mdi-list-box',
       onClick: () => this.router.navigate(['/ukom/ukom-periode']),
     }).addTab({
       label: 'Tambah User Instansi',
+      icon: 'mdi-plus-circle',
       onClick: () => this.router.navigate(['/ukom/ukom-periode/add']),
     });
   }

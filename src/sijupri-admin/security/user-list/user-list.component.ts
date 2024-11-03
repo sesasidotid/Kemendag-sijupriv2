@@ -37,6 +37,10 @@ export class UserListComponent {
   }
 
   ngOnInit() {
+    if (this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs();
+    }
+
     this.tabService.addTab({
       label: 'Daftar User',
       isActive: true,
