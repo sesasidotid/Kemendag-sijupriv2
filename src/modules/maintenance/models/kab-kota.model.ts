@@ -4,6 +4,7 @@ export class KabKota extends Serializable {
     id: string = undefined;
     name: string = undefined;
     provinsiId: string = undefined;
+    type: string = undefined;
 
     constructor(object?: { [key: string]: any }) {
         super();
