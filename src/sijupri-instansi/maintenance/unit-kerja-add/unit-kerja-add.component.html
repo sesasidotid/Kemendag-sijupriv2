@@ -116,7 +116,7 @@
                     </div>
                 </div>
             </div>
-            <div class="alert alert-warning" role="alert">
+            <div *ngIf="!(loadingKabKota$ | async) && ((kabKotaName$ | async) || (provinceName$ | async) || instansi?.kotaId)" class="alert alert-warning" role="alert">
                 Jangan lupa memilih titik lokasi pada peta.
             </div>
             <div class="text-center float-end">
