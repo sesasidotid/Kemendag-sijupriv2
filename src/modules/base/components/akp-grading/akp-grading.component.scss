@@ -1,0 +1,43 @@
+.card-profile {
+    background-color: #13182B;
+     /* SVG pattern overlay */
+     background-image: 
+     url('/assets/sun.svg');
+
+     /* Cover styling */
+     background-size: contain;
+     background-repeat: repeat;
+     background-blend-mode: overlay;
+}
+.parent {
+    @media screen and (max-width: 768px) {
+        margin-left: 16px !important;
+        margin-right: 16px !important;
+        padding: 16px !important;
+    }
+
+    @media screen and (min-width: 768px) {
+        margin-left: 32px !important;
+        margin-right: 32px !important;
+        padding: 16px !important;
+    }
+
+    @media screen and (min-width: 1200px) {
+        margin-left: 200px !important;
+        margin-right: 200px !important;
+        padding: 32px !important;
+    }
+
+    margin-left: 160px !important;
+    margin-right: 160px !important;
+    margin-top: 24px;
+}
+
+.gradient-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px; /* Adjust the height of the gradient line as needed */
+    background: linear-gradient(45deg, #2967be, #49AB49) !important;
+}

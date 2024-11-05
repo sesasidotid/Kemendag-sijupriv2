@@ -18,6 +18,10 @@ export const routes: Routes = [
         path: 'not-found',
         loadComponent: () => import('./template/not-found/not-found.component').then(m => m.NotFoundComponent),
     },
+    {
+        path: 'akp-grading/:whoIs/:id',
+        loadComponent: () => import('../modules/base/components/akp-grading/akp-grading.component').then(m => m.AKPGradingComponent),
+    },
     { path: '**', redirectTo: 'not-found' }
 ];
 

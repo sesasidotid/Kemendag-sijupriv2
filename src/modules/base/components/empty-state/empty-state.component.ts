@@ -16,10 +16,13 @@ export class EmptyStateComponent {
   @Input() buttonText: string;
   @Input() buttonAction: () => void = () => {};
   @Input() buttonIcon: string;
+  @Input() icon: string = 'mdi-folder-open-outline';
+  @Input() iconColor: string = 'primary';
 
   constructor(private router: Router) {}
 
   handleButtonClick() {
+    console.log(this.buttonAction)
     if (this.buttonAction) {
       this.buttonAction();
     }

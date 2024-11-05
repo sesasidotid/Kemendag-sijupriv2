@@ -159,8 +159,14 @@ export const routes: Routes = [
                                 loadComponent: () => import('../sijupri-jf/ukom/ukom-task-form/ukom-task-form.component').then(m => m.UkomTaskFormComponent),
                             }
                         ]
-                    }
+                    },
                 },
+                "AKP": {
+                    "Penilaian AKP": {
+                        components: () => import('../sijupri-jf/akp/akp-task/akp-task.component').then(m => m.AkpTaskComponent)
+                    }
+
+                }
 
             }) ?? []
         ],
