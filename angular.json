@@ -56,7 +56,9 @@
               "src/assets/Velzon/build/css/icons.min.css",
               "src/assets/Velzon/build/css/app.min.css",
               "src/assets/Velzon/build/css/custom.min.css",
-              "node_modules/leaflet/dist/leaflet.css"
+              "node_modules/leaflet/dist/leaflet.css",
+              "node_modules/ag-grid-community/styles/ag-grid.css",
+              "node_modules/ag-grid-community/styles/ag-theme-alpine.css"
             ],
             "scripts": [
               "src/assets/Velzon/build/js/layout.js",
