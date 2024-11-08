@@ -1,1 +1,64 @@
 <app-pagable [pagable]="pagable"></app-pagable>
+
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Verifikasi Pengajuan AKP'" (toggle)="toggleModal()" [enableFooter]="false">
+    <form [formGroup]="form">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="category-list">
+                    <label>
+                        Aksi :
+                    </label>
+                    <a (click)="action$.next('approve')" class="btn"
+                        [ngClass]="{'btn-success' : (action$ | async) === 'approve', 'btn-soft-success' :  (action$ | async) === 'reject'}">Terima</a>
+                    <a (click)="action$.next('reject')" class="btn"
+                        [ngClass]="{'btn-danger' : (action$ | async) === 'reject', 'btn-soft-danger' :  (action$ | async) === 'approve'}">Tolak</a>
+                </div>
+                <ng-container *ngIf="(action$ | async) === 'approve'">
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <label for="nama_atasan" class="form-label">
+                                Nama Atasan <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="nama_atasan" placeholder="Masukkan Nama Atasan"
+                                name="name" formControlName="nama_atasan">
+                            <div class="feedback"
+                                *ngIf="form.get('nama_atasan').invalid && form.get('nama_atasan').touched">
+                                <small *ngIf="form.get('nama_atasan').errors?.['required']">Nama atasan perlu
+                                    diisi.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <label for="email_atasan" class="form-label">
+                                Email Atasan <span class="text-danger">*</span>
+                            </label>
+                            <input type="email" class="form-control" id="email_atasan" placeholder="Masukkan Email Atasan"
+                                name="email_atasan" formControlName="email_atasan">
+                            <div class="feedback"
+                                *ngIf="form.get('email_atasan').invalid && form.get('email_atasan').touched">
+                                <small *ngIf="form.get('email_atasan').errors?.['required']">Email perlu
+                                    diisi.</small>
+                                <small *ngIf="form.get('email_atasan').errors?.['email']">Email tidak valid.</small>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <div *ngIf="(action$ | async) === 'reject'" class="mb-3">
+                    <label for="commentTextarea" class="form-label fw-semibold">Catatan <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="commentTextarea" rows="3" formControlName="remark" name="comment" placeholder="Tuliskan catatan atau revisi"></textarea>
+                    <div class="feedback"
+                                *ngIf="form.get('remark').invalid && form.get('remark').touched">
+                                <small *ngIf="form.get('remark').errors?.['required']">Catatan perlu
+                                    diisi.</small>
+                            </div>
+                </div>
+                <div class="float-end">
+                    <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">Batal</button>
+                    <button *ngIf="(action$ | async) === 'approve'" class="btn btn-primary" (click)="handleSave()" [disabled]="form.get('email_atasan').invalid || form.get('nama_atasan').invalid">Simpan</button>
+                    <button *ngIf="(action$ | async) === 'reject'" class="btn btn-primary" (click)="handleSave()" [disabled]="form.get('remark').invalid">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</app-modal>

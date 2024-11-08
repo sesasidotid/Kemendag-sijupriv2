@@ -176,7 +176,7 @@
                 </div>
             </div>
             <div class="card">
-                <div class="stepper-wrapper">
+                <div class="stepper-wrapper text-center">
                     <div class="stepper-item"
                         [ngClass]="{'active': (currentAKPStep$ | async) === 1, 'completed': (currentAKPStep$ | async) > 1}"
                         (click)="handleStepClick(1)">
@@ -202,7 +202,47 @@
                         <div class="step-name">Rekomendasi AKP</div>
                     </div>
                 </div>
-                <div class="card" style="margin-bottom: 12px !important;" *ngIf="(akpStep$ | async) === 1">
+                <div *ngIf="isPersonalReview$ | async" class="card">
+                    <app-akp-grading-personal [AKPId]="AKPTask.akpId" [backButonAction]="togglePersonalReview.bind(this)"></app-akp-grading-personal>
+                </div>
+                <ng-container *ngIf="!(isPersonalReview$ | async)">
+                    <ng-container *ngFor="let task of groupedPendingTaskHistory | keyvalue; let i = index">
+                        <div style="margin-bottom: 12px !important;" *ngIf="(akpStep$ | async) === i+1">
+                            <div class="d-flex flex-column mt-2 gap-3"
+                                *ngIf="task.key">
+                                <ng-container *ngFor="let history of task.value">
+                                    <div class="card m-0 p-4 d-flex flex-row align-items-center justify-content-between">
+                                        <div class="d-flex flex-row align-items-center gap-3">
+                                            <div class="p-3 border rounded-circle d-flex flex-column justify-content-center" style="height: 58px;">
+
+                                                <i *ngIf="history.flowId === 'akp_flow_1'" class="mdi mdi-clipboard-multiple-outline mdi-24px text-muted"></i>
+                                                <i *ngIf="history.flowId === 'akp_flow_2'" class="mdi mdi-account-multiple mdi-24px text-muted"></i>
+                                                <i *ngIf="history.flowId === 'akp_flow_3'" class="mdi mdi-account mdi-24px text-muted"></i>
+                                                <i *ngIf="history.flowId === 'akp_flow_4'" class="mdi mdi-bookmark-box mdi-24px text-muted"></i>
+
+                                            </div>
+                                            <div class="">
+                                                <ng-container *ngIf="history.taskStatus === 'COMPLETED'">
+                                                    <h5 class="">{{history.flowName}} <span class="badge rounded-pill text-bg-success ms-2">{{(history.flowId === 'akp_flow_2' || history.flowId === 'akp_flow_3') ?'Sudah Dinilai' : ''}}{{history.flowId === 'akp_flow_1' ? 'Sudah Diverifikasi' : ''}}{{history.flowId === 'akp_flow_4' ? 'Sudah Diberikan Rekomendasi' : ''}}</span></h5>
+                                                </ng-container>
+                                                <ng-container *ngIf="history.taskStatus === 'PENDING'">
+                                                    <h5 class="">{{history.flowName}} <span class="badge rounded-pill text-bg-info ms-2">{{(history.flowId === 'akp_flow_2' || history.flowId === 'akp_flow_3') ?'Belum Dinilai' : ''}}{{history.flowId === 'akp_flow_1' ? 'Belum Diverifikasi' : ''}}{{history.flowId === 'akp_flow_4' ? 'Belum Ada Rekomendasi' : ''}}</span></h5>
+                                                </ng-container>
+                                                <ng-container *ngIf="history.taskStatus === 'REJECTED'">
+                                                    <h5 class="">{{history.flowName}} <span class="badge rounded-pill text-bg-danger ms-2">Ditolak</span></h5>
+                                                </ng-container>
+                                                <p class="text-muted m-0">{{convertDate(history.lastUpdated)}}</p>
+                                            </div>
+                                        </div>
+                                        <button *ngIf="history.flowId == 'akp_flow_3'" class="btn btn-soft-primary float-end" (click)="togglePersonalReview()">Mulai Penilaian</button>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+
+                <!-- <div class="card" style="margin-bottom: 12px !important;" *ngIf="(akpStep$ | async) === 1">
                     <div class="p-3 d-flex flex-column align-items-center my-5"
                         *ngIf="AKPTask.pendingTaskHistory[0].taskStatus === 'PENDING'">
                         <div class="p-3 border rounded-circle mx-auto mb-3 d-flex flex-column justify-content-center"
@@ -244,6 +284,39 @@
                             dilanjutkan ke tahap selanjutnya.</p>
                     </div>
                 </div>
+                <div class="card" style="margin-bottom: 12px !important;" *ngIf="(akpStep$ | async) === 3">
+                    <div *ngIf="(currentAKPStep$ | async) === 3">
+                        <app-akp-grading-personal [AKPId]="AKPTask.objectTask?.object?.id"></app-akp-grading-personal>
+                    </div>
+                    <div class="p-3 d-flex flex-column align-items-center my-5" *ngIf="(currentAKPStep$ | async) > 3">
+                        <div class="p-3 border rounded-circle mx-auto mb-3 d-flex flex-column justify-content-center"
+                            style="height: 82px;">
+                            <i class="mdi mdi-account-check mdi-48px text-success"></i>
+                        </div>
+                        <h4 class="mt-3 text-center">Penilaian AKP Oleh Diri Sendiri Sudah Kamu Nilai</h4>
+                        <p class="text-muted text-center">Pengajuan AKP kamu sudah dinilai oleh atasan/rekan. Proses
+                            dilanjutkan ke tahap selanjutnya.</p>
+                    </div>
+                </div>
+                <div class="card" style="margin-bottom: 12px !important;" *ngIf="(akpStep$ | async) === 4">
+                    <div class="p-3 d-flex flex-column align-items-center my-5" *ngIf="(currentAKPStep$ | async) === 4">
+                        <div class="p-3 border rounded-circle mx-auto mb-3 d-flex flex-column justify-content-center"
+                            style="height: 82px;">
+                            <i class="mdi mdi-book-clock mdi-48px text-muted"></i>
+                        </div>
+                        <h4 class="mt-3 text-center">Menunggu Rekomendasi AKP Dari Administrator</h4>
+                        <p class="text-muted text-center">Proses peninjauan AKP sedang berlangsung, tunggu hingga administrator memberikan rekomendasi AKP Anda.</p>
+                    </div>
+                    <div class="p-3 d-flex flex-column align-items-center my-5" *ngIf="(currentAKPStep$ | async) > 4">
+                        <div class="p-3 border rounded-circle mx-auto mb-3 d-flex flex-column justify-content-center"
+                            style="height: 82px;">
+                            <i class="mdi mdi-account-multiple-check mdi-48px text-success"></i>
+                        </div>
+                        <h4 class="mt-3 text-center">Penilaian AKP Sudah Dinilai Oleh Atasan/Rekan</h4>
+                        <p class="text-muted text-center">Pengajuan AKP kamu sudah dinilai oleh atasan/rekan. Proses
+                            dilanjutkan ke tahap selanjutnya.</p>
+                    </div>
+                </div> -->
             </div>
         </ng-template>
     </div>

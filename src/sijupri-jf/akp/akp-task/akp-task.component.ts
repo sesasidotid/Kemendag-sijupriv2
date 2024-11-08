@@ -10,24 +10,28 @@ import { EmptyStateComponent } from '../../../modules/base/components/empty-stat
 import { AlertService } from '../../../modules/base/services/alert.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+import { AKPGradingPersonalComponent } from '../../../modules/base/components/akp-grading-personal/akp-grading-personal.component';
+import { ConverterService } from '../../../modules/base/services/converter.service';
+import { AKPTaskDetail } from '../../../modules/akp/models/akp-task-detail.modal';
 
 @Component({
   selector: 'app-akp-task',
   standalone: true,
-  imports: [CommonModule, EmptyStateComponent],
+  imports: [CommonModule, EmptyStateComponent, AKPGradingPersonalComponent],
   templateUrl: './akp-task.component.html',
   styleUrl: './akp-task.component.scss'
 })
 export class AkpTaskComponent {
   jf: JF = new JF();
-  AKPTask: AKPTask = new AKPTask();
+  AKPTask: AKPTaskDetail = new AKPTaskDetail();
+  groupedPendingTaskHistory: { [key: string]: any[] } = {};
 
   wannaRequest: boolean = false;
 
   akpDataLoading$ = new BehaviorSubject<boolean>(true);
   akpStep$ = new BehaviorSubject<number>(1);
   currentAKPStep$ = new BehaviorSubject<number>(1); //static
-
+  isPersonalReview$ = new BehaviorSubject<boolean>(false);
 
   constructor(
     private apiService: ApiService,
@@ -35,6 +39,7 @@ export class AkpTaskComponent {
     private handlerService: HandlerService,
     private alertService: AlertService,
     private router: Router,
+    private converterService: ConverterService,
   ) { }
 
   ngOnInit() {
@@ -55,7 +60,8 @@ export class AkpTaskComponent {
     this.akpDataLoading$.next(true);
     this.akpTaskService.findByNip(LoginContext.getUserId()).subscribe({
       next: (response) => {
-        this.AKPTask = new AKPTask(response)
+        this.AKPTask = response
+        console.log("AKPTask",this.AKPTask)
 
         switch (this.AKPTask.flowId) {
           case 'akp_flow_1':
@@ -78,8 +84,11 @@ export class AkpTaskComponent {
             break
         }
 
+        if(this.AKPTask.pendingTaskHistory.length > 0) {
+          this.groupedPendingTaskHistory = this.groupAndSortTasksByFlowId(this.AKPTask.pendingTaskHistory);
+        }
+        console.log(this.groupedPendingTaskHistory)
         this.akpDataLoading$.next(false);
-        console.log(this.currentAKPStep$)
       },
       error: (error) => {
         this.akpDataLoading$.next(false);
@@ -112,6 +121,39 @@ export class AkpTaskComponent {
       }
     });
   }
+
+  groupAndSortTasksByFlowId(tasks: any[]): { [key: string]: any[] } {
+    const grouped = tasks.reduce((acc, task) => {
+      // Initialize array for each flowId if it doesn't exist
+      if (!acc[task.flowId]) {
+        acc[task.flowId] = [];
+      }
+      // Push each task into its respective flowId group
+      acc[task.flowId].push(task);
+      return acc;
+    }, {} as { [key: string]: any[] });
+  
+    // Sort each group by lastUpdated in descending order
+    Object.keys(grouped).forEach(flowId => {
+      grouped[flowId].sort((a: any, b: any) => {
+        const dateA = new Date(a.lastUpdated).getTime();
+        const dateB = new Date(b.lastUpdated).getTime();
+        return dateA - dateB; // Sort in descending order
+      });
+    });
+  
+    return grouped;
+  }
+
+  convertDate(date: string) {
+    return this.converterService.dateToHumanReadable(date);
+  }
+
+  togglePersonalReview() {
+    this.isPersonalReview$.next(!this.isPersonalReview$.value);
+    console.log(this.isPersonalReview$.value)
+  }
+  
 
   ngOnDestroy() {
     this.akpDataLoading$.unsubscribe();

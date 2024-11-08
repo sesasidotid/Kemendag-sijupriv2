@@ -62,11 +62,12 @@ export const routes: Routes = [
                 },
                 "Pengajuan AKP": {
                     components: () => import('../sijupri-admin/akp/akp-task-list/akp-task-list.component').then(m => m.AKPTaskComponent),
-                //     routes: [
-                //         {
-
-                //     }
-                // ]
+                    routes: [
+                        {
+                            path: ':id',
+                            loadComponent: () => import('../sijupri-admin/akp/akp-task-detail/akp-task-detail.component').then(m => m.AkpTaskDetailComponent),
+                        }
+                ]
                 }
             },
             "UKom": {

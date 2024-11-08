@@ -1,0 +1,63 @@
+<div *ngIf="AKPLoading$ | async else hadItem" class="d-flex justify-content-center my-4 ">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<ng-template #hadItem>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-3">
+        <div *ngFor="let question of AKPGrading.dataPertanyaanList; let i = index">
+            <!-- Only display the heading if it's the first question or the kategoriInstrumentName has changed -->
+            <div *ngIf="i === 0 || question.kategoriInstrumentName !== AKPGrading.dataPertanyaanList[i - 1].kategoriInstrumentName">
+                <hr *ngIf="i !== 0" class="text-muted"/>
+                <h4>
+                    {{ question.kategoriInstrumentName }}
+                </h4>
+            </div>
+            <label class="mb-1 mt-2">{{ question.pertanyaanName }}</label>
+            <div>
+                <div *ngFor="let option of optionsM1">
+                    <!-- Use a combination of question id, option id, and index for unique ids -->
+                    <input type="radio" [formControlName]="question.pertanyaanId+'_nilaiYbs'" [value]="option.id"
+                        [id]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i" class="me-2" />
+                    <label [for]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i">{{ option.label }}</label>
+                </div>
+            </div>
+            <div *ngIf="(this.form.get(question.pertanyaanId+'_nilaiYbs')?.value + question.nilaiAtasan + question.nilaiRekan) < 7" class="card p-3 m-0">
+                <div class="alert alert-danger">
+                    {{'Kamu dinilai '}} <strong>{{'Belum '+question.pertanyaanName}}</strong> {{' Menurut anda, apakah penyebab ketidakmampuan tersebut.'}}
+                </div>
+                <div *ngFor="let M2Question of matrix2_3Questions.M2; let i = index">
+                    <label class="mb-1 mt-2">{{ M2Question.question }}</label>
+                    <div>
+                        <div *ngFor="let option of M2Question.options">
+                            <!-- Generate unique ids for M2Question inputs -->
+                            <input type="radio" [formControlName]="question.pertanyaanId+'_'+M2Question.formControlName" [value]="option.id"
+                                [id]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i" class="me-2" />
+                            <label [for]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i">{{ option.label }}</label>
+                        </div>
+                    </div>
+                </div>
+                <div *ngFor="let M3Question of matrix2_3Questions.M3; let i = index">
+                    <label class="mb-1 mt-2">{{ M3Question.question }}</label>
+                    <div>
+                        <div *ngFor="let option of M3Question.options">
+                            <!-- Generate unique ids for M3Question inputs -->
+                            <input type="radio" [formControlName]="question.pertanyaanId+'_'+M3Question.formControlName" [value]="option.id"
+                                [id]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i" class="me-2" />
+                            <label [for]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i">{{ option.label }}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="text-muted"/>
+        <div class="alert alert-warning">
+            Periksa dan pastikan semua jawaban diatas sudah benar, jika sudah benar silahkan tekan tombol
+            Kirim Penilaian.
+        </div>
+        <div class="float-end mb-3">
+            <button *ngIf="backButonAction" type="submit" class="btn btn-soft-secondary me-2" (click)="backButonAction()">Kembali</button>
+            <button type="submit" class="btn btn-primary">Kirim Penilaian</button>
+        </div>
+    </form>
+</ng-template>

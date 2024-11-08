@@ -14,7 +14,7 @@ interface Option {
 }
 
 @Component({
-    selector: 'app-akp-grading-boss',
+    selector: 'app-akp-grading',
     standalone: true,
     imports: [RouterLink, ReactiveFormsModule, CommonModule, EmptyStateComponent],
     templateUrl: './akp-grading.component.html',

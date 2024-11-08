@@ -3,8 +3,10 @@ import { ApiService } from '../../base/services/api.service';
 import { HandlerService } from '../../base/services/handler.service';
 import { AlertService } from '../../base/services/alert.service';
 import { catchError, map, Observable } from 'rxjs';
-import { AKPTask } from '../models/akp-task.model';
 import { AKPByReviewer } from '../models/akp-by-reviewer.model';
+import { AKPByPersonal } from '../models/akp-by-personal.model';
+import { VerifAKPTask } from '../models/verif-akp-task.model';
+import { AKPTaskDetail } from '../models/akp-task-detail.modal';
 
 @Injectable({
   providedIn: 'root'
@@ -19,11 +21,12 @@ export class AkpTaskService {
     private alertService: AlertService
   ) { }
 
-  findByNip(id: string): Observable<AKPTask> {
-    return this.apiService.getData(`${this.BASE_PATH_TASK}/${id}`).pipe(
-      map((response: any) => {
-        return new AKPTask(response);
-      }),
+  findByNip(nip: string): Observable<AKPTaskDetail> {
+    return this.apiService.getData(`${this.BASE_PATH_TASK}/nip/${nip}`).pipe(
+      // map((response: any) => {
+      //   console.log(new AKPTaskDetail(response))
+      //   return new AKPTaskDetail(response);
+      // }),
       catchError((error) => {
         console.error('Error fetching data', error);
         throw error;
@@ -53,6 +56,28 @@ export class AkpTaskService {
     );
   }
 
+  getAKPByPersonal(id: string): Observable<AKPByPersonal> {
+    return this.apiService.getData(`${this.BASE_PATH_AKP}/personal/${id}`).pipe(
+      map((response: any) => {
+        return new AKPByPersonal(response);
+      }),
+      catchError((error) => {
+        this.alertService.showToast('Error', error.message);
+        throw error;
+      })
+    );
+  }
+
+  saveAKPReviewBySelf(review: any): Observable<any> {
+    return this.apiService.postData(`${this.BASE_PATH_AKP}/matrix/personal`, review).pipe(
+      catchError((error) => {
+        console.error('error', error);
+        this.alertService.showToast('Error', error.error.message);
+        throw error;
+      })
+    );
+  }
+
   saveAKPReviewByBoss(review: any): Observable<any> {
     return this.apiService.postData(`${this.BASE_PATH_AKP}/matrix/atasan`, review).pipe(
       catchError((error) => {
@@ -62,6 +87,7 @@ export class AkpTaskService {
       })
     );
   }
+
   saveAKPReviewByColleague(review: any): Observable<any> {
     return this.apiService.postData(`${this.BASE_PATH_AKP}/matrix/rekan`, review).pipe(
       catchError((error) => {
@@ -70,5 +96,24 @@ export class AkpTaskService {
         throw error;
       })
     );
+  }
+
+  verifAKPTask(payload: VerifAKPTask): Observable<any> {
+    return this.apiService.postData(`${this.BASE_PATH_TASK}/submit`, payload).pipe(
+      catchError((error) => {
+        console.error('error', error);
+        this.alertService.showToast('Error', error.error.message);
+        throw error;
+      })
+    );
+  }
+
+  getAKPTaskDetailById(id: string): Observable<any> {
+    return this.apiService.getData(`${this.BASE_PATH_AKP}/task/${id}`).pipe(
+      catchError((error) => {
+        console.error('error', error);
+        this.alertService.showToast('Error', error.error.message);
+        throw error;
+      }));
   }
 }
