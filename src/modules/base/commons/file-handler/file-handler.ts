@@ -6,6 +6,7 @@ export class FIleHandler {
 
 export class EygileFile {
     label?: string;
+    fileName?: string;
     source?: string;
     visible?: Function;
     required?: boolean;

@@ -23,13 +23,31 @@
     padding: 0 !important;
 }
 
+.form-control {
+  padding-right: 0 !important;
+}
+
+.file-name {
+  // margin-left: -24px;
+  max-width: 100%; /* Ensure it respects the container width */
+  white-space: nowrap; /* Prevents the text from wrapping to a new line */
+  overflow: hidden; /* Hides the overflow text */
+  text-overflow: ellipsis; /* Adds ellipsis (…) to the truncated text */
+
+  // /* Optional: Adjust width on smaller screens */
+  // @media (max-width: 576px) {  /* Adjust for mobile screens */
+  //   max-width: 150px; /* Set a smaller width for very narrow screens */
+  // }
+}
+
+
 input[type="file"] {
     position: relative;
     border: none !important;
   }
   
   input[type="file"]::file-selector-button {
-    width: 112px;
+    width: 100%;
     color: transparent;
   }
   
@@ -49,9 +67,10 @@ input[type="file"] {
     position: absolute;
     pointer-events: none;
     top: 11px;
-    left: 40px;
+    left: 52px;
     color: #0964b0;
     content: "Pilih File";
+    font-size: 14px;
   }
   
   /* ------- From Step 1 ------- */
@@ -78,3 +97,6 @@ input[type="file"] {
   input[type="file"]::file-selector-button:active {
     background-color: #e5e7eb;
   }
+
+  input[type='file'] { font-size: 0; }
+::file-selector-button { font-size: initial; }

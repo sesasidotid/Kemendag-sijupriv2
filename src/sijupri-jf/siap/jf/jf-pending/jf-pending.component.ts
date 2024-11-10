@@ -15,6 +15,7 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
 import { BehaviorSubject } from 'rxjs';
 import { EmptyStateComponent } from '../../../../modules/base/components/empty-state/empty-state.component';
 import { Router } from '@angular/router';
+import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
 
 @Component({
   selector: 'app-jf-pending',
@@ -37,7 +38,7 @@ export class JfPendingComponent {
     files: {},
     viewOnly: true,
     listen: (key: string, source: string, base64Data: string) => {
-      this.jf.fileKtp = base64Data;
+      this.jfDetailForm.patchValue({ fileKtp: base64Data });
     }
   }
 
@@ -63,6 +64,7 @@ export class JfPendingComponent {
       tanggalLahir: new FormControl(this.jf.tanggalLahir, [Validators.required]),
       jenisKelaminCode: new FormControl(this.jf.jenisKelaminCode, [Validators.required]),
       nik: new FormControl(this.jf.nik, [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(13)],),
+      fileKtp: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
     });
   }
 
@@ -129,6 +131,7 @@ export class JfPendingComponent {
       this.jf.tanggalLahir = this.jfDetailForm.value.tanggalLahir;
       this.jf.jenisKelaminCode = this.jfDetailForm.value.jenisKelaminCode;
       this.jf.nik = this.jfDetailForm.value.nik;
+      this.jf.ktpUrl = this.jfDetailForm.value.fileKtp;
 
       this.confirmationService.open(false).subscribe({
         next: (result) => {

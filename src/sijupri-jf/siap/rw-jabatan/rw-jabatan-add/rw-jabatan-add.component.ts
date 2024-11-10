@@ -14,6 +14,8 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { LoginContext } from '../../../../modules/base/commons/login-context';
+import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-jabatan-add',
@@ -27,6 +29,8 @@ export class RwJabatanAddComponent {
   jabatanList: Jabatan[];
   jenjangList: Jenjang[];
 
+  jenjangLoading$ = new BehaviorSubject<boolean>(false);
+
   rwJabatanForm!: FormGroup;
 
   constructor(
@@ -39,10 +43,19 @@ export class RwJabatanAddComponent {
       jabatanCode: new FormControl('', [Validators.required]),
       jenjangCode: new FormControl('', [Validators.required]),
       tmt: new FormControl('', [Validators.required]),
+      fileSkJabatan: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
     })
 
     this.getJabatanList();
-    this.getJenjangList();
+
+    this.rwJabatanForm.get('jabatanCode').valueChanges.subscribe(jabatanCode => {
+      if (jabatanCode) {
+        this.getJenjangList(jabatanCode);
+      } else {
+        this.jenjangList = []; // Clear jenjang list if no jabatan selected
+        this.rwJabatanForm.get('jenjangCode').setValue('');
+      }
+    });
   }
 
   inputs: FIleHandler = {
@@ -50,7 +63,9 @@ export class RwJabatanAddComponent {
       ijazah: { label: "Upload Dokumen SK Jabatan", source: this.rwJabatan.skJabatanUrl, required: true }
     },
     listen: (key: string, source: string, base64Data: string) => {
-      this.rwJabatan.fileSkJabatan = base64Data;
+      this.rwJabatanForm.patchValue({
+        fileSkJabatan: base64Data
+      })
     }
   }
 
@@ -66,12 +81,15 @@ export class RwJabatanAddComponent {
     })
   }
 
-  getJenjangList() {
-    this.apiService.getData(`/api/v1/jenjang`).subscribe({
+  getJenjangList(jabatanId: string) {
+    this.jenjangLoading$.next(true);
+    this.apiService.getData(`/api/v1/jenjang/jabatan/${jabatanId}`).subscribe({
       next: (response) => {
         this.jenjangList = response.map((jenjang: { [key: string]: any; }) => new Jenjang(jenjang))
+        this.jenjangLoading$.next(false);
       },
       error: (error) => {
+        this.jenjangLoading$.next(false);
         console.log("error", error);
         this.alertService.showToast("Error", "Gagal mendapatkan data jenjang!");
       }
@@ -82,7 +100,8 @@ export class RwJabatanAddComponent {
     if(this.rwJabatanForm.valid) {
       this.rwJabatan.jabatanCode = this.rwJabatanForm.value.jabatanCode;
       this.rwJabatan.jenjangCode = this.rwJabatanForm.value.jenjangCode;
-      this.rwJabatan.tmt = this.rwJabatanForm.value.tmt
+      this.rwJabatan.tmt = this.rwJabatanForm.value.tmt;
+      this.rwJabatan.fileSkJabatan = this.rwJabatanForm.value.fileSkJabatan;
 
       this.confirmationService.open(false).subscribe({
         next: (result) => {

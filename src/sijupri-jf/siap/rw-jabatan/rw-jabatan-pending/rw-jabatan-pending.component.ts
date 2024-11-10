@@ -14,6 +14,8 @@ import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model';
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
+import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-jabatan-pending',
@@ -30,16 +32,13 @@ export class RwJabatanPendingComponent {
   jenjangList: Jenjang[] = [];
   pendingTask: PendingTask;
 
+  jenjangLoading$ = new BehaviorSubject<boolean>(false);
+  rwJabatanLoading$ = new BehaviorSubject<boolean>(false);
+
+
   rwJabatanForm!: FormGroup;
 
-  inputs: FIleHandler = {
-    files: {
-      ijazah: { label: "Upload Dokumen SK Jabatan", source: this.rwJabatan.skJabatanUrl, required: true }
-    },
-    listen: (key: string, source: string, base64Data: string) => {
-      this.rwJabatan.fileSkJabatan = base64Data;
-    }
-  }
+  inputs: FIleHandler;
 
   constructor(
     private apiService: ApiService,
@@ -55,18 +54,40 @@ export class RwJabatanPendingComponent {
         if (pendingTask.flowId == 'siap_flow_2') {
           this.getPendingRWJabatan(this.pendingTask.id)
           this.getJabatanList()
-          this.getJenjangList()
+          // this.getJenjangList()
           this.isDetailOpen = true;
         }
       }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("update").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Jabatan | Jenjang", "text").build())
       .build();
 
-      this.rwJabatanForm = new FormGroup({
-        jabatanCode: new FormControl('', [Validators.required]),
-        jenjangCode: new FormControl('', [Validators.required]),
-        tmt: new FormControl('', [Validators.required]),
-      })
+    this.rwJabatanForm = new FormGroup({
+      jabatanCode: new FormControl('', [Validators.required]),
+      jenjangCode: new FormControl('', [Validators.required]),
+      tmt: new FormControl('', [Validators.required]),
+      fileSkJabatan: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
+    })
+
+    this.rwJabatanForm.get('jabatanCode').valueChanges.subscribe(jabatanCode => {
+      if (jabatanCode) {
+        this.getJenjangList(jabatanCode);
+      } else {
+        this.jenjangList = []; // Clear jenjang list if no jabatan selected
+        this.rwJabatanForm.get('jenjangCode').setValue('');
+      }
+    });
+  }
+  fileLoadHandler() {
+    this.inputs = {
+      files: {
+        ijazah: { label: "Upload Dokumen SK Jabatan", fileName: this.rwJabatan.skJabatan, source: this.rwJabatan.skJabatanUrl, required: true }
+      },
+      listen: (key: string, source: string, base64Data: string) => {
+        this.rwJabatanForm.patchValue({
+          fileSkJabatan: base64Data
+        })
+      }
+    }
   }
 
   getJabatanList() {
@@ -81,31 +102,40 @@ export class RwJabatanPendingComponent {
     })
   }
 
-  getJenjangList() {
-    this.apiService.getData(`/api/v1/jenjang`).subscribe({
+  getJenjangList(jabatanId: string) {
+    this.jenjangLoading$.next(true);
+    this.apiService.getData(`/api/v1/jenjang/jabatan/${jabatanId}`).subscribe({
       next: (response) => {
         this.jenjangList = response.map((jenjang: { [key: string]: any; }) => new Jenjang(jenjang))
+        this.rwJabatanForm.get('jenjangCode').patchValue(this.jenjangList[0].code);
+        this.jenjangLoading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
+        this.jenjangLoading$.next(false);
         this.alertService.showToast("Error", "Gagal mendapatkan data jenjang!");
       }
     })
   }
 
   getPendingRWJabatan(id: string) {
+    this.rwJabatanLoading$.next(true);
     this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
       next: (response) => {
         const pendingTask = new PendingTask(response);
         this.rwJabatan = new RWJabatan(pendingTask.objectTask.object);
+        this.getJenjangList(this.rwJabatan.jabatanCode);
         this.rwJabatanForm.patchValue({
           jabatanCode: this.rwJabatan.jabatanCode,
           jenjangCode: this.rwJabatan.jenjangCode,
           tmt: this.rwJabatan.tmt
         })
+        this.fileLoadHandler();
+        this.rwJabatanLoading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
+        this.rwJabatanLoading$.next(false);
         this.alertService.showToast("Error", "Gagal mendapatkan data jabatan!");
       }
     });
@@ -123,7 +153,8 @@ export class RwJabatanPendingComponent {
     if (this.rwJabatanForm.valid) {
       this.rwJabatan.jabatanCode = this.rwJabatanForm.value.jabatanCode;
       this.rwJabatan.jenjangCode = this.rwJabatanForm.value.jenjangCode;
-      this.rwJabatan.tmt = this.rwJabatanForm.value.tmt
+      this.rwJabatan.tmt = this.rwJabatanForm.value.tmt;
+      this.rwJabatan.fileSkJabatan = this.rwJabatanForm.value.fileSkJabatan;
 
       this.confirmationService.open(false).subscribe({
         next: (result) => {

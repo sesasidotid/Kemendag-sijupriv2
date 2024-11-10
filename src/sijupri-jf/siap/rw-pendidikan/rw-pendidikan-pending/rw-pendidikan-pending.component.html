@@ -1,84 +1,101 @@
 <app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
-<form *ngIf="isDetailOpen" [formGroup]="rwPendidikanForm" (ngSubmit)="submit()">
-    <div *ngIf="pendingTask.remark" class="alert alert-warning" role="alert">
-        <strong>Catatan Revisi : </strong>"{{pendingTask.remark}}"
+<div *ngIf="rwPendidikanLoading$ | async; else akpHadItem" class="d-flex justify-content-center my-5">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
     </div>
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="pendidikanCode" class="form-label">
-                    Pendidikan <span class="text-danger">*</span>
-                </label>
-                <select class="form-select" formControlName="pendidikanCode" id="pendidikanCode" name="pendidikanCode">
-                    <option selected value="" style=" display: none;">Pilih Pendidikan</option>
-                    <option *ngFor="let pendidikan of pendidikanList" [ngValue]="pendidikan.code">
-                        {{pendidikan.name}}
-                    </option>
-                </select>
-                <div class="feedback"
-                    *ngIf="rwPendidikanForm.get('pendidikanCode').invalid && rwPendidikanForm.get('pendidikanCode').touched">
-                    <small *ngIf="rwPendidikanForm.get('pendidikanCode').errors?.['required']">Pendidikan perlu
-                        dipilih.</small>
+</div>
+
+<ng-template #akpHadItem>
+    <form *ngIf="isDetailOpen" [formGroup]="rwPendidikanForm" (ngSubmit)="submit()">
+        <div *ngIf="pendingTask.remark" class="alert alert-warning" role="alert">
+            <strong>Catatan Revisi : </strong>"{{pendingTask.remark}}"
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label for="pendidikanCode" class="form-label">
+                        Pendidikan <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select" formControlName="pendidikanCode" id="pendidikanCode" name="pendidikanCode">
+                        <option selected value="" style=" display: none;">Pilih Pendidikan</option>
+                        <option *ngFor="let pendidikan of pendidikanList" [ngValue]="pendidikan.code">
+                            {{pendidikan.name}}
+                        </option>
+                    </select>
+                    <div class="feedback"
+                        *ngIf="rwPendidikanForm.get('pendidikanCode').invalid && rwPendidikanForm.get('pendidikanCode').touched">
+                        <small *ngIf="rwPendidikanForm.get('pendidikanCode').errors?.['required']">Pendidikan perlu
+                            dipilih.</small>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="institusiPendidikan" class="form-label">
-                    Sekolah/Universitas/Institusi <span class="text-danger">*</span>
-                </label>
-                <input type="text" class="form-control" name="institusiPendidikan"
-                    placeholder="Masukan nama Sekolah/Universitas/Institusi" id="institusiPendidikan"
-                    formControlName="institusiPendidikan">
-                <div class="feedback"
-                    *ngIf="rwPendidikanForm.get('institusiPendidikan').invalid && rwPendidikanForm.get('institusiPendidikan').touched">
-                    <small *ngIf="rwPendidikanForm.get('institusiPendidikan').errors?.['required']">Institusi pendidikan
-                        perlu
-                        diisi.</small>
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label for="institusiPendidikan" class="form-label">
+                        Sekolah/Universitas/Institusi <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" name="institusiPendidikan"
+                        placeholder="Masukan nama Sekolah/Universitas/Institusi" id="institusiPendidikan"
+                        formControlName="institusiPendidikan">
+                    <div class="feedback"
+                        *ngIf="rwPendidikanForm.get('institusiPendidikan').invalid && rwPendidikanForm.get('institusiPendidikan').touched">
+                        <small *ngIf="rwPendidikanForm.get('institusiPendidikan').errors?.['required']">Institusi pendidikan
+                            perlu
+                            diisi.</small>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="jurusan" class="form-label">
-                    Jurusan/Program Studi <span class="text-danger">*</span>
-                </label>
-                <input type="text" class="form-control" name="jurusan" placeholder="Masukkan jurusan" id="jurusan"
-                    formControlName="jurusan">
-                <div class="feedback"
-                    *ngIf="rwPendidikanForm.get('jurusan').invalid && rwPendidikanForm.get('jurusan').touched">
-                    <small *ngIf="rwPendidikanForm.get('jurusan').errors?.['required']">Jurusan perlu
-                        diisi.</small>
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label for="jurusan" class="form-label">
+                        Jurusan/Program Studi <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" name="jurusan" placeholder="Masukkan jurusan" id="jurusan"
+                        formControlName="jurusan">
+                    <div class="feedback"
+                        *ngIf="rwPendidikanForm.get('jurusan').invalid && rwPendidikanForm.get('jurusan').touched">
+                        <small *ngIf="rwPendidikanForm.get('jurusan').errors?.['required']">Jurusan perlu
+                            diisi.</small>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label for="tanggalIjazah" class="form-label">
-                    Tanggal Ijazah <span class="text-danger">*</span>
-                </label>
-                <input type="date" class="form-control" name="tanggalIjazah" placeholder="Masukkan Tanggal Ijazah"
-                    id="tanggalIjazah" formControlName="tanggalIjazah">
-                <div class="feedback"
-                    *ngIf="rwPendidikanForm.get('tanggalIjazah').invalid && rwPendidikanForm.get('tanggalIjazah').touched">
-                    <small *ngIf="rwPendidikanForm.get('tanggalIjazah').errors?.['required']">Tanggal ijazah perlu
-                        diisi.</small>
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label for="tanggalIjazah" class="form-label">
+                        Tanggal Ijazah <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" class="form-control" name="tanggalIjazah" placeholder="Masukkan Tanggal Ijazah"
+                        id="tanggalIjazah" formControlName="tanggalIjazah">
+                    <div class="feedback"
+                        *ngIf="rwPendidikanForm.get('tanggalIjazah').invalid && rwPendidikanForm.get('tanggalIjazah').touched">
+                        <small *ngIf="rwPendidikanForm.get('tanggalIjazah').errors?.['required']">Tanggal ijazah perlu
+                            diisi.</small>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12">
-            <div class="row">
-                <app-file-handler [inputs]="inputs"></app-file-handler>
+            <div class="col-12">
+                <div class="row">
+                    <app-file-handler [inputs]="inputs"></app-file-handler>
+                    <div class="feedback"
+                        *ngIf="rwPendidikanForm.get('fileIjazah').invalid">
+                        <small *ngIf="rwPendidikanForm.get('fileIjazah').errors?.['required']">File dokumen ijazah perlu
+                            diunggah.</small>
+                        <small *ngIf="rwPendidikanForm.get('fileIjazah')?.hasError('invalidFileType')">File dokumen ijazah harus
+                            format .pdf</small>
+                        <div *ngIf="rwPendidikanForm.get('fileIjazah')?.hasError('fileTooLarge')">File dokumen ijazah lebih dari 2MB.
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <!--end col-->
-        <div class="col-lg-12">
-            <div class="hstack gap-2 justify-content-end">
-                <button (click)="back()" class="btn btn-soft-secondary">Kembali</button>
-                <button type="submit" class="btn btn-primary" [disabled]="rwPendidikanForm.invalid">Simpan</button>
+            <!--end col-->
+            <div class="col-lg-12">
+                <div class="hstack gap-2 justify-content-end">
+                    <button (click)="back()" class="btn btn-soft-secondary">Kembali</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="rwPendidikanForm.invalid">Simpan</button>
+                </div>
             </div>
+            <!--end col-->
         </div>
-        <!--end col-->
-    </div>
-    <!--end row-->
-</form>
+        <!--end row-->
+    </form>
+</ng-template>

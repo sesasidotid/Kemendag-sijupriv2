@@ -9,7 +9,7 @@ import { ApiService } from '../../../../modules/base/services/api.service';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
-import { LoginContext } from '../../../../modules/base/commons/login-context';
+import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
 
 @Component({
   selector: 'app-rw-pangkat-add',
@@ -28,7 +28,9 @@ export class RwPangkatAddComponent {
       docEvaluas: { label: "Upload Dokumen SK Pangkat", source: this.rwPangkat.skPangkatUrl, required: true },
     },
     listen: (key: string, source: string, base64Data: string) => {
-      this.rwPangkat.fileSkPangkat = base64Data;
+      this.rwPangkatForm.patchValue({
+        fileSkPangkat: base64Data
+      });
     }
   }
 
@@ -41,6 +43,7 @@ export class RwPangkatAddComponent {
     this.rwPangkatForm = new FormGroup({
       pangkatCode: new FormControl('', [Validators.required]),
       tmt: new FormControl('', [Validators.required]),
+      fileSkPangkat: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
     })
     this.getPangkatList();
   }
@@ -59,9 +62,9 @@ export class RwPangkatAddComponent {
 
   submit() {
     if (this.rwPangkatForm.valid) {
-      // console.log(this.rwPendidikanForm.value);
       this.rwPangkat.pangkatCode = this.rwPangkatForm.value.pangkatCode;
       this.rwPangkat.tmt = this.rwPangkatForm.value.tmt;
+      this.rwPangkat.fileSkPangkat = this.rwPangkatForm.value.fileSkPangkat;
 
       this.confirmationService.open(false).subscribe({
         next: (result) => {

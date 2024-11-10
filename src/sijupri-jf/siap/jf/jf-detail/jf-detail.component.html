@@ -15,7 +15,7 @@
                     </label>
                     <p class="border-bottom pb-2">{{jf.name}}</p>
                 </div>
-    
+
                 <!-- No. HP -->
                 <div *ngIf="jf.phone" class="col-md-6 mb-3">
                     <label for="phoneInput" class="form-label">
@@ -30,7 +30,7 @@
                     </label>
                     <p class="border-bottom pb-2">{{jf.email}}</p>
                 </div>
-    
+
                 <!-- Tempat Lahir -->
                 <div *ngIf="jf.tempatLahir" class="col-md-6 mb-3">
                     <label for="birthplaceInput" class="form-label">
@@ -38,7 +38,7 @@
                     </label>
                     <p class="border-bottom pb-2">{{jf.tempatLahir}}</p>
                 </div>
-    
+
                 <!-- Tanggal Lahir -->
                 <div *ngIf="jf.tanggalLahir" class="col-md-6 mb-3">
                     <label for="birthdateInput" class="form-label">
@@ -46,7 +46,7 @@
                     </label>
                     <p class="border-bottom pb-2">{{jf.tanggalLahir}}</p>
                 </div>
-    
+
                 <!-- Jenis Kelamin -->
                 <div *ngIf="jf.jenisKelaminName" class="col-md-6 mb-3">
                     <label for="genderInput" class="form-label">
@@ -54,7 +54,7 @@
                     </label>
                     <p class="border-bottom pb-2">{{jf.jenisKelaminName}}</p>
                 </div>
-    
+
                 <!-- NIK -->
                 <div *ngIf="jf.nik" class="col-md-6 mb-3">
                     <label for="nikInput" class="form-label">
@@ -62,13 +62,13 @@
                     </label>
                     <p class="border-bottom pb-2">{{jf.nik}}</p>
                 </div>
-    
+
                 <!-- File Upload -->
                 <div *ngIf="jf.ktpUrl" class="col-md-6 mb-3">
                     <app-file-handler [inputs]="inputs"></app-file-handler>
                 </div>
             </div>
-    
+
             <!-- Edit Button -->
             <div class="row">
                 <div class="col-12 d-flex justify-content-end mt-3">
@@ -189,6 +189,15 @@
                 <div class="col-lg-12">
                     <div class="mb-3">
                         <app-file-handler [inputs]="inputs"></app-file-handler>
+                        <div class="feedback" *ngIf="jfDetailForm.get('fileKtp').invalid">
+                            <small *ngIf="jfDetailForm.get('fileKtp').errors?.['required']">Dokumen KTP perlu
+                                diunggah.</small>
+                            <small *ngIf="jfDetailForm.get('fileKtp')?.hasError('invalidFileType')">Dokumen KTP harus
+                                format .pdf</small>
+                            <div *ngIf="jfDetailForm.get('fileKtp')?.hasError('fileTooLarge')">Dokumen KTP lebih dari
+                                2MB.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

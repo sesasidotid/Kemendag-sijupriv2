@@ -65,6 +65,15 @@
         <div class="col-12">
             <div class="row">
                 <app-file-handler [inputs]="inputs"></app-file-handler>
+                <div class="feedback"
+                    *ngIf="rwPendidikanForm.get('fileIjazah').invalid">
+                    <small *ngIf="rwPendidikanForm.get('fileIjazah').errors?.['required']">File dokumen ijazah perlu
+                        diunggah.</small>
+                    <small *ngIf="rwPendidikanForm.get('fileIjazah')?.hasError('invalidFileType')">File dokumen ijazah harus
+                        format .pdf</small>
+                    <div *ngIf="rwPendidikanForm.get('fileIjazah')?.hasError('fileTooLarge')">File dokumen ijazah lebih dari 2MB.
+                    </div>
+                </div>
             </div>
         </div>
         <!--end col-->

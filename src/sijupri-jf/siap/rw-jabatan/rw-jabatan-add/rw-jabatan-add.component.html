@@ -19,11 +19,18 @@
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="mb-3">
+            <div class="mb-3 d-flex flex-column">
                 <label for="jenjangCode" class="form-label">
                     Jenjang <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" name="jenjangCode" id="jenjangCode" formControlName="jenjangCode">
+                <div class="spinner-border" role="status" *ngIf="jenjangLoading$ | async">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <select disabled *ngIf="!jenjangList && !(jenjangLoading$ | async)" class="form-select">
+                    <option selected value="" style=" display: none;">Jabatan perlu dipilih</option>
+                </select>
+                <select class="form-select" name="jenjangCode" id="jenjangCode" formControlName="jenjangCode"
+                    *ngIf="jenjangList && !(jenjangLoading$ | async)">
                     <option selected value="" style=" display: none;">Pilih Jenjang</option>
                     <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code"
                         style="text-transform: capitalize;">
@@ -57,6 +64,17 @@
                 </label> -->
                 <div class="row">
                     <app-file-handler [inputs]="inputs"></app-file-handler>
+                    <div class="feedback" *ngIf="rwJabatanForm.get('fileSkJabatan').invalid">
+                        <small *ngIf="rwJabatanForm.get('fileSkJabatan').errors?.['required']">File dokumen SK jabatan
+                            perlu
+                            diunggah.</small>
+                        <small *ngIf="rwJabatanForm.get('fileSkJabatan')?.hasError('invalidFileType')">File dokumen SK
+                            jabatan harus
+                            format .pdf</small>
+                        <div *ngIf="rwJabatanForm.get('fileSkJabatan')?.hasError('fileTooLarge')">File dokumen SK
+                            jabatan lebih dari 2MB.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -10,6 +10,7 @@ import { ApiService } from '../../../../modules/base/services/api.service';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { LoginContext } from '../../../../modules/base/commons/login-context';
+import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
 
 @Component({
   selector: 'app-rw-pendidikan-add',
@@ -34,6 +35,7 @@ export class RwPendidikanAddComponent {
       pendidikanCode: new FormControl('', [Validators.required]),
       jurusan: new FormControl('', [Validators.required]),
       tanggalIjazah: new FormControl('', [Validators.required]),
+      fileIjazah: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
     })
     this.getPendidikanList();
   }
@@ -44,7 +46,9 @@ export class RwPendidikanAddComponent {
       ijazah: { label: 'Upload Dokumen Ijazah', source: this.rwPendidikan.ijazahUrl, required: true }
     },
     listen: (key: string, source: string, base64Data: string) => {
-      this.rwPendidikan.fileIjazah = base64Data;
+      this.rwPendidikanForm.patchValue({
+        fileIjazah: base64Data
+      })
     }
   }
 
@@ -66,6 +70,7 @@ export class RwPendidikanAddComponent {
       this.rwPendidikan.institusiPendidikan = this.rwPendidikanForm.value.institusiPendidikan;
       this.rwPendidikan.jurusan = this.rwPendidikanForm.value.jurusan;
       this.rwPendidikan.tanggalIjazah = this.rwPendidikanForm.value.tanggalIjazah;
+      this.rwPendidikan.fileIjazah = this.rwPendidikanForm.value.fileIjazah;
 
       this.confirmationService.open(false).subscribe({
         next: (result) => {

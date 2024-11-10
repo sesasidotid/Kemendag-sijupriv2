@@ -1,4 +1,3 @@
-
 <div *ngIf="loading$ | async; else hadItem" class="d-flex justify-content-center">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -123,6 +122,17 @@
                     <div class="col-lg-12">
                         <div class="mb-3">
                             <app-file-handler [inputs]="inputs"></app-file-handler>
+                            <div class="feedback" *ngIf="jfDetailForm.get('fileKtp').invalid">
+                                <small *ngIf="jfDetailForm.get('fileKtp').errors?.['required']">Dokumen KTP perlu
+                                    diunggah.</small>
+                                <small *ngIf="jfDetailForm.get('fileKtp')?.hasError('invalidFileType')">Dokumen KTP
+                                    harus
+                                    format .pdf</small>
+                                <div *ngIf="jfDetailForm.get('fileKtp')?.hasError('fileTooLarge')">Dokumen KTP lebih
+                                    dari
+                                    2MB.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -136,6 +146,9 @@
     </form>
 
     <ng-template #emptyBlock>
-        <app-empty-state [title]="'Belum ada pengajuan perubahan profil'" [description]="'Kamu bisa mengajukan perubahan profil dengan menekan tombol dibawah ini.'" [buttonText]="'Ajukan Perubahan'" [buttonAction]="ajukanPerubahan" [buttonIcon]="'mdi-pencil'"></app-empty-state>
+        <app-empty-state [title]="'Belum ada pengajuan perubahan profil'"
+            [description]="'Kamu bisa mengajukan perubahan profil dengan menekan tombol dibawah ini.'"
+            [buttonText]="'Ajukan Perubahan'" [buttonAction]="ajukanPerubahan"
+            [buttonIcon]="'mdi-pencil'"></app-empty-state>
     </ng-template>
 </ng-template>

@@ -12,6 +12,7 @@ import { PendingTask } from '../../../../modules/workflow/models/pending-task.mo
 import { JenisKelamin } from '../../../../modules/maintenance/models/jenis-kelamin.model';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
 import { BehaviorSubject } from 'rxjs';
+import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
 
 
 @Component({
@@ -37,7 +38,7 @@ export class JfDetailComponent {
     },
     viewOnly: true,
     listen: (key: string, source: string, base64Data: string) => {
-      this.jf.fileKtp = base64Data;
+      this.jfDetailForm.patchValue({fileKtp: base64Data});
     }
   }
 
@@ -55,6 +56,7 @@ export class JfDetailComponent {
       tanggalLahir: new FormControl(this.jf.tanggalLahir, [Validators.required]),
       jenisKelaminCode: new FormControl(this.jf.jenisKelaminCode, [Validators.required]),
       nik: new FormControl(this.jf.nik, [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(13)],),
+      fileKtp: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
     });
   }
 
@@ -66,10 +68,10 @@ export class JfDetailComponent {
     this.loading$.next(true)
     this.apiService.getData(`/api/v1/jf/${this.nip}`).subscribe({
       next: (response) => {
-        this.jf = new JF(response);
+        this.jf = response
         this.inputs.files['ktp'].source = this.jf.ktpUrl
 
-        this.jfDetailForm.setValue({
+        this.jfDetailForm.patchValue({
           name: this.jf.name,
           phone: this.jf.phone,
           email: this.jf.email,
@@ -117,6 +119,7 @@ export class JfDetailComponent {
       this.jf.tanggalLahir = this.jfDetailForm.value.tanggalLahir;
       this.jf.jenisKelaminCode = this.jfDetailForm.value.jenisKelaminCode;
       this.jf.nik = this.jfDetailForm.value.nik;
+      this.jf.fileKtp = this.jfDetailForm.value.fileKtp;
 
       this.confirmationService.open(false).subscribe({
         next: (result) => {

@@ -15,6 +15,8 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
+import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-pangkat-pending',
@@ -30,15 +32,9 @@ export class RwPangkatPendingComponent {
   pangkatList: Pangkat[] = []
   pendingTask: PendingTask;
   rwPangkatForm!: FormGroup;
+  rwPangkatLoading$ = new BehaviorSubject<boolean>(false);
 
-  inputs: FIleHandler = {
-    files: {
-      docEvaluas: { label: "Upload Dokumen SK Pangkat", source: this.rwPangkat.skPangkatUrl, required: true},
-    },
-    listen: (key: string, source: string, base64Data: string) => {
-      this.rwPangkat.fileSkPangkat = base64Data;
-    }
-  }
+  inputs: FIleHandler;
 
   constructor(
     private apiService: ApiService,
@@ -60,10 +56,23 @@ export class RwPangkatPendingComponent {
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Pangkat", "text").build())
       .build();
 
-      this.rwPangkatForm = new FormGroup({
-        pangkatCode: new FormControl('', [Validators.required]),
-        tmt: new FormControl('', [Validators.required]),
-      })
+    this.rwPangkatForm = new FormGroup({
+      pangkatCode: new FormControl('', [Validators.required]),
+      tmt: new FormControl('', [Validators.required]),
+      fileSkPangkat: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
+    })
+  }
+  fileLoadHandler() {
+    this.inputs = {
+      files: {
+        docEvaluas: { label: "Upload Dokumen SK Pangkat", fileName: this.rwPangkat.skPangkat, source: this.rwPangkat.skPangkatUrl, required: true },
+      },
+      listen: (key: string, source: string, base64Data: string) => {
+        this.rwPangkatForm.patchValue({
+          fileSkPangkat: base64Data
+        });
+      }
+    }
   }
 
   getPangkatList() {
@@ -79,6 +88,7 @@ export class RwPangkatPendingComponent {
   }
 
   getPendingRWPangkat(id: string) {
+    this.rwPangkatLoading$.next(true);
     this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
       next: (response) => {
         const pendingTask = new PendingTask(response);
@@ -87,9 +97,12 @@ export class RwPangkatPendingComponent {
           pangkatCode: this.rwPangkat.pangkatCode,
           tmt: this.rwPangkat.tmt
         })
+        this.fileLoadHandler();
+        this.rwPangkatLoading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
+        this.rwPangkatLoading$.next(false);
         this.alertService.showToast("Error", "Gagal mandapatkan data pangat!");
       }
     });
@@ -106,6 +119,7 @@ export class RwPangkatPendingComponent {
     if (this.rwPangkatForm.valid) {
       this.rwPangkat.pangkatCode = this.rwPangkatForm.value.pangkatCode;
       this.rwPangkat.tmt = this.rwPangkatForm.value.tmt;
+      this.rwPangkat.fileSkPangkat = this.rwPangkatForm.value.fileSkPangkat;
 
       this.confirmationService.open(false).subscribe({
         next: (result) => {
