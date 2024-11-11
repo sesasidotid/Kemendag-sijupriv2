@@ -29,25 +29,22 @@ export class JfDetailComponent {
   isEditOpen: boolean = false;
 
   loading$ = new BehaviorSubject<boolean>(true);
+  submitLoading$ = new BehaviorSubject<boolean>(false);
 
   jfDetailForm!: FormGroup;
 
-  inputs: FIleHandler = {
-    files: {
-      ktp: { label: "Upload Dokumen KTP", source: this.jf.ktpUrl, required: true },
-    },
-    viewOnly: true,
-    listen: (key: string, source: string, base64Data: string) => {
-      this.jfDetailForm.patchValue({fileKtp: base64Data});
-    }
-  }
+  inputs: FIleHandler;
 
   constructor(
     private apiService: ApiService,
     private alertService: AlertService,
     private confirmationService: ConfirmationService,
     private router: Router,
-  ) {
+  ) {  }
+
+  ngOnInit() {
+    this.getJf();
+
     this.jfDetailForm = new FormGroup({
       name: new FormControl(this.jf.name, [Validators.required]),
       phone: new FormControl(this.jf.phone, [Validators.required, Validators.pattern('^[0-9]+$')]),
@@ -60,17 +57,15 @@ export class JfDetailComponent {
     });
   }
 
-  ngOnInit() {
-    this.getJf();
-  }
-
   getJf() {
     this.loading$.next(true)
     this.apiService.getData(`/api/v1/jf/${this.nip}`).subscribe({
       next: (response) => {
         this.jf = response
+        this.fileLoadHandler();
         this.inputs.files['ktp'].source = this.jf.ktpUrl
-
+        
+        
         this.jfDetailForm.patchValue({
           name: this.jf.name,
           phone: this.jf.phone,
@@ -80,6 +75,7 @@ export class JfDetailComponent {
           jenisKelaminCode: this.jf.jenisKelaminCode,
           nik: this.jf.nik,
         });
+        
         this.loading$.next(false)
       },
       error: (error) => {
@@ -88,6 +84,18 @@ export class JfDetailComponent {
         this.alertService.showToast('Error', "Gagal mendapatkan data profil!");
       }
     })
+  }
+
+  fileLoadHandler() {
+    this.inputs = {
+      files: {
+        ktp: { label: "Upload Dokumen KTP", fileName: this.jf.ktp, source: this.jf.ktpUrl, required: true },
+      },
+      viewOnly: true,
+      listen: (key: string, source: string, base64Data: string) => {
+        this.jfDetailForm.patchValue({fileKtp: base64Data});
+      }
+    }
   }
 
   getJenisKelamin() {
@@ -124,12 +132,20 @@ export class JfDetailComponent {
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
+          this.submitLoading$.next(true);
           this.jf.nip = this.nip;
 
           this.apiService.putData(`/api/v1/jf/task`, this.jf).subscribe({
             next: () => {
               this.alertService.showToast('Success', "Berhasil mengajukan perubahan data.");
+              this.submitLoading$.next(false);
               this.router.navigate(['/profile/pending'])
+            },
+            error: (error) => {
+              if (error.error.message == 'WFL00002') {
+                this.alertService.showToast('Error', "Sudah ada perubahan data yang sedang menunggu persetujuan.");
+              }
+              this.submitLoading$.next(false);
             }
           })
         }

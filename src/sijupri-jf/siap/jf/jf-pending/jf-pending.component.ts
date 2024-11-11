@@ -31,31 +31,16 @@ export class JfPendingComponent {
   nip: string = LoginContext.getUserId();
 
   loading$ = new BehaviorSubject<boolean>(true);
+  submitLoading$ = new BehaviorSubject<boolean>(false);
 
   jfDetailForm!: FormGroup;
 
-  inputs: FIleHandler = {
-    files: {},
-    viewOnly: true,
-    listen: (key: string, source: string, base64Data: string) => {
-      this.jfDetailForm.patchValue({ fileKtp: base64Data });
-    }
-  }
+  inputs: FIleHandler;
 
   ngOnInit() {
     this.getPendingTask();
     this.getJenisKelamin();
 
-    console.log(this.pendingTask)
-  }
-
-  constructor(
-    private apiService: ApiService,
-    private handlerService: HandlerService,
-    private confirmationService: ConfirmationService,
-    private alertService: AlertService,
-    private router: Router
-  ) {
     this.jfDetailForm = new FormGroup({
       name: new FormControl(this.jf.name, [Validators.required]),
       phone: new FormControl(this.jf.phone, [Validators.required, Validators.pattern('^[0-9]+$')]),
@@ -66,6 +51,28 @@ export class JfPendingComponent {
       nik: new FormControl(this.jf.nik, [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(13)],),
       fileKtp: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
     });
+  }
+
+  constructor(
+    private apiService: ApiService,
+    private handlerService: HandlerService,
+    private confirmationService: ConfirmationService,
+    private alertService: AlertService,
+    private router: Router
+  ) {
+    
+  }
+
+  fileLoadHandler() {
+    this.inputs = {
+      files: {
+        ktp: { label: "Upload Dokumen KTP", fileName: this.jf.ktp, source: this.jf.ktpUrl}
+      },
+      viewOnly: true,
+      listen: (key: string, source: string, base64Data: string) => {
+        this.jfDetailForm.patchValue({ fileKtp: base64Data });
+      }
+    }
   }
 
   getPendingTask() {
@@ -85,7 +92,7 @@ export class JfPendingComponent {
           nik: this.jf.nik,
         })
 
-        this.inputs.files['ktp'] = { label: "Upload Dokumen KTP", source: this.jf.ktpUrl, required: true };
+        this.fileLoadHandler();
         this.inputs.viewOnly = this.pendingTask.flowId == 'siap_flow_1'
 
         if (this.pendingTask.flowId == 'siap_flow_1') {
@@ -136,6 +143,8 @@ export class JfPendingComponent {
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
+          this.submitLoading$.next(true);
+
           const task = new Task();
           task.id = this.pendingTask.id;
           task.taskAction = 'approve';
@@ -144,6 +153,7 @@ export class JfPendingComponent {
           this.apiService.postData(`/api/v1/jf/task/submit`, task).subscribe({
             next: () => {
               this.handlerService.handleAlert('Success', "Berhasil mengajukan perubahan data.");
+              this.submitLoading$.next(false);
               window.location.reload();
             }
           })

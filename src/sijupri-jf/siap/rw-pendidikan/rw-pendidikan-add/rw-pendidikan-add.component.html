@@ -79,7 +79,17 @@
         <!--end col-->
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <button type="submit" class="btn btn-primary" [disabled]="rwPendidikanForm.invalid">Simpan</button>
+                <ng-container *ngIf="(submitLoading$ | async) else noLoading">
+                    <button class="btn btn-primary" disabled>
+                        <div class="spinner-border" style="width: 19px; height: 19px;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </ng-container>
+                <ng-template #noLoading>
+                    <button type="submit" class="btn btn-primary"
+                        [disabled]="rwPendidikanForm.invalid || (submitLoading$ | async)">Simpan</button>
+                </ng-template>
             </div>
         </div>
         <!--end col-->

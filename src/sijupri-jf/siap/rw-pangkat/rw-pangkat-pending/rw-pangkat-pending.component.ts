@@ -33,6 +33,7 @@ export class RwPangkatPendingComponent {
   pendingTask: PendingTask;
   rwPangkatForm!: FormGroup;
   rwPangkatLoading$ = new BehaviorSubject<boolean>(false);
+  submitLoading$ = new BehaviorSubject<boolean>(false);
 
   inputs: FIleHandler;
 
@@ -124,6 +125,7 @@ export class RwPangkatPendingComponent {
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
+          this.submitLoading$.next(true);
 
           const task = new Task();
           task.id = this.pendingTask.id;
@@ -133,6 +135,7 @@ export class RwPangkatPendingComponent {
           this.apiService.postData(`/api/v1/rw_pangkat/task/submit`, task).subscribe({
             next: () => {
               this.alertService.showToast("Success", "Berhasil memperbarui riwayat pangkat.");
+              this.submitLoading$.next(false);
               this.back();
             },
             error: (error) => {

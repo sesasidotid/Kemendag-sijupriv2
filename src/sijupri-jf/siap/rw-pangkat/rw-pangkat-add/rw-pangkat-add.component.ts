@@ -10,6 +10,7 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-pangkat-add',
@@ -22,6 +23,8 @@ export class RwPangkatAddComponent {
   rwPangkat: RWPangkat = new RWPangkat();
   pangkatList: Pangkat[];
   rwPangkatForm!: FormGroup;
+
+  submitLoading$ = new BehaviorSubject<boolean>(false)
 
   inputs: FIleHandler = {
     files: {
@@ -69,13 +72,15 @@ export class RwPangkatAddComponent {
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
+          this.submitLoading$.next(true)
           
           this.apiService.postData(`/api/v1/rw_pangkat/task`, this.rwPangkat).subscribe({
             next: () => {
               this.alertService.showToast('Success', "Berhasil menambahkan riwayat pangkat.");
+              this.submitLoading$.next(false)
               setTimeout(() => {
                 this.router.navigate(['/profile/rw-pangkat/pending']);
-              }, 2000); // Adjust the delay as needed
+              }, 1000); // Adjust the delay as needed
             },
             error: (error) => {
               console.log("error", error);

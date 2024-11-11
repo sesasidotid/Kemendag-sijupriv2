@@ -1,19 +1,15 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { JabatanService } from '../../../../modules/maintenance/services/jabatan.service';
 import { RWJabatan } from '../../../../modules/siap/models/rw-jabatan.model';
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model';
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle';
-import { JenjangService } from '../../../../modules/maintenance/services/jenjang.service';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RwJabatanService } from '../../../../modules/siap/services/rw-jabatan.service';
 import { AlertService } from '../../../../modules/base/services/alert.service';
 import { ApiService } from '../../../../modules/base/services/api.service';
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
-import { LoginContext } from '../../../../modules/base/commons/login-context';
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
 import { BehaviorSubject } from 'rxjs';
 
@@ -30,6 +26,7 @@ export class RwJabatanAddComponent {
   jenjangList: Jenjang[];
 
   jenjangLoading$ = new BehaviorSubject<boolean>(false);
+  submitLoading$ = new BehaviorSubject<boolean>(false);
 
   rwJabatanForm!: FormGroup;
 
@@ -106,13 +103,15 @@ export class RwJabatanAddComponent {
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
+          this.submitLoading$.next(true);
   
           this.apiService.postData(`/api/v1/rw_jabatan/task`, this.rwJabatan).subscribe({
             next: () => {
               this.alertService.showToast('Success', "Berhasil menambahkan riwayat jabatan.");
+              this.submitLoading$.next(false);
               setTimeout(() => {
                 this.router.navigate(['/profile/rw-jabatan/pending']);
-              }, 2000); // Adjust the delay as needed
+              }, 1000); // Adjust the delay as needed
             },
             error: (error) => {
               console.log("error", error);

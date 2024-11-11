@@ -11,6 +11,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { LoginContext } from '../../../../modules/base/commons/login-context';
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-rw-pendidikan-add',
@@ -23,6 +24,8 @@ export class RwPendidikanAddComponent {
   rwPendidikan: RWPendidikan = new RWPendidikan();
   pendidikanList: Pendidikan[];
   rwPendidikanForm!: FormGroup;
+
+  submitLoading$ = new BehaviorSubject<boolean>(false);
 
   constructor(
     private apiService: ApiService,
@@ -75,13 +78,15 @@ export class RwPendidikanAddComponent {
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
+          this.submitLoading$.next(true);
   
           this.apiService.postData(`/api/v1/rw_pendidikan/task`, this.rwPendidikan).subscribe({
             next: () => {
               this.alertService.showToast('Success', "Berhasil menambahkan riwayat pendidikan.");
+              this.submitLoading$.next(false);
               setTimeout(() => {
                 this.router.navigate(['/profile/rw-pendidikan/pending']);
-              }, 2000); // Adjust the delay as needed
+              }, 1000); // Adjust the delay as needed
             },
             error: (error) => {
               console.log("error", error);

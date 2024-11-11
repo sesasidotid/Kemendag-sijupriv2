@@ -34,6 +34,7 @@ export class RwPendidikanPendingComponent {
   rwPendidikanForm!: FormGroup;
 
   rwPendidikanLoading$ = new BehaviorSubject<boolean>(false);
+  submitLoading$ = new BehaviorSubject<boolean>(false);
 
   inputs: FIleHandler;
 
@@ -128,10 +129,11 @@ export class RwPendidikanPendingComponent {
       this.rwPendidikan.jurusan = this.rwPendidikanForm.value.jurusan;
       this.rwPendidikan.tanggalIjazah = this.rwPendidikanForm.value.tanggalIjazah;
       this.rwPendidikan.fileIjazah = this.rwPendidikanForm.value.fileIjazah;
-
+      
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
+          this.submitLoading$.next(true);
   
           const task = new Task();
           task.id = this.pendingTask.id;
@@ -141,6 +143,7 @@ export class RwPendidikanPendingComponent {
           this.apiService.postData(`/api/v1/rw_pendidikan/task/submit`, task).subscribe({
             next: () => {
               this.alertService.showToast('Success', "Berhasil memperbarui pengajuan riwayat pendidikan.");
+              this.submitLoading$.next(false);
               this.back();
             },
             error: (error) => {

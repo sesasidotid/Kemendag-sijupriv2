@@ -34,6 +34,7 @@ export class RwJabatanPendingComponent {
 
   jenjangLoading$ = new BehaviorSubject<boolean>(false);
   rwJabatanLoading$ = new BehaviorSubject<boolean>(false);
+  submitLoading$ = new BehaviorSubject<boolean>(false);
 
 
   rwJabatanForm!: FormGroup;
@@ -54,7 +55,6 @@ export class RwJabatanPendingComponent {
         if (pendingTask.flowId == 'siap_flow_2') {
           this.getPendingRWJabatan(this.pendingTask.id)
           this.getJabatanList()
-          // this.getJenjangList()
           this.isDetailOpen = true;
         }
       }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("update").build())
@@ -159,6 +159,7 @@ export class RwJabatanPendingComponent {
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
+          this.submitLoading$.next(true);
 
           const task = new Task();
           task.id = this.pendingTask.id;
@@ -168,6 +169,7 @@ export class RwJabatanPendingComponent {
           this.apiService.postData(`/api/v1/rw_jabatan/task/submit`, task).subscribe({
             next: () => {
               this.alertService.showToast('Success', "Berhasil memperbarui riwayat jabatan.");
+              this.submitLoading$.next(false);
               this.back();
             },
             error: (error) => {
