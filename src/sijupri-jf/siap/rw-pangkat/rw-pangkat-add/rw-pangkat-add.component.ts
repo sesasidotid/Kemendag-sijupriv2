@@ -24,6 +24,7 @@ export class RwPangkatAddComponent {
   pangkatList: Pangkat[];
   rwPangkatForm!: FormGroup;
 
+  pangkatListLoading$ = new BehaviorSubject<boolean>(false);
   submitLoading$ = new BehaviorSubject<boolean>(false)
 
   inputs: FIleHandler = {
@@ -52,13 +53,16 @@ export class RwPangkatAddComponent {
   }
 
   getPangkatList() {
+    this.pangkatListLoading$.next(true)
     this.apiService.getData(`/api/v1/pangkat`).subscribe({
       next: (response) => {
         this.pangkatList = response.map((pangkat: { [key: string]: any; }) => new Pangkat(pangkat))
+        this.pangkatListLoading$.next(false)
       },
       error: (error) => {
         console.log("error", error);
         this.alertService.showToast("Error", "Gagal mendapatkan data pangkat!");
+        this.pangkatListLoading$.next(false)
       }
     })
   }

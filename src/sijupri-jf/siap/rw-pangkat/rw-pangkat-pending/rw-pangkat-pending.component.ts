@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component';
-import { LoginContext } from '../../../../modules/base/commons/login-context';
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable';
-import { Router } from '@angular/router';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../../modules/base/commons/pagable/pagable-builder';
 import { Pangkat } from '../../../../modules/maintenance/models/pangkat.model';
 import { ApiService } from '../../../../modules/base/services/api.service';
@@ -32,6 +30,8 @@ export class RwPangkatPendingComponent {
   pangkatList: Pangkat[] = []
   pendingTask: PendingTask;
   rwPangkatForm!: FormGroup;
+
+  pangkatListLoading$ = new BehaviorSubject<boolean>(false);
   rwPangkatLoading$ = new BehaviorSubject<boolean>(false);
   submitLoading$ = new BehaviorSubject<boolean>(false);
 
@@ -77,13 +77,16 @@ export class RwPangkatPendingComponent {
   }
 
   getPangkatList() {
+    this.pangkatListLoading$.next(true);
     this.apiService.getData(`/api/v1/pangkat`).subscribe({
       next: (response) => {
         this.pangkatList = response.map((pangkat: { [key: string]: any; }) => new Pangkat(pangkat))
+        this.pangkatListLoading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
         this.alertService.showToast("Error", "Gagal mendapatkan data pangkat!");
+        this.pangkatListLoading$.next(false);
       }
     })
   }

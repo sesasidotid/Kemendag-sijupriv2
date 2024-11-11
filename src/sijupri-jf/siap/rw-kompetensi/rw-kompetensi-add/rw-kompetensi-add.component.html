@@ -19,7 +19,10 @@
                 <label for="kategoriPengembanganId" class="form-label">
                     Kategori Pengembangan <span class="text-danger">*</span>
                 </label>
-                <select class="form-select" id="kategoriPengembanganId" formControlName="kategoriPengembanganId"
+                <select disabled *ngIf="!kategoriPengembanganList || (kategoriPengembanganLoading$ | async)" class="form-select">
+                    <option selected value="" style=" display: none;">Pilih Kategori Pengembangan</option>
+                </select>
+                <select *ngIf="kategoriPengembanganList && !(kategoriPengembanganLoading$ | async)" class="form-select" id="kategoriPengembanganId" formControlName="kategoriPengembanganId"
                     name="kategoriPengembanganId">
                     <option selected value="" style=" display: none;">Pilih Kategori Pengembangan</option>
                     <option *ngFor="let kategoriPengembangan of kategoriPengembanganList"
@@ -76,11 +79,30 @@
         <div class="col-lg-12">
             <div class="row">
                 <app-file-handler [inputs]="inputs"></app-file-handler>
+                <div class="feedback"
+                        *ngIf="rwKompetensiForm.get('fileSertifikat').invalid">
+                        <small *ngIf="rwKompetensiForm.get('fileSertifikat').errors?.['required']">File dokumen sertifikat perlu
+                            diunggah.</small>
+                        <small *ngIf="rwKompetensiForm.get('fileSertifikat')?.hasError('invalidFileType')">File dokumen sertifikat harus
+                            format .pdf</small>
+                        <div *ngIf="rwKompetensiForm.get('fileSertifikat')?.hasError('fileTooLarge')">File dokumen sertifikat lebih dari 2MB.
+                        </div>
+                    </div>
             </div>
         </div>
         <div class="col-lg-12">
             <div class="hstack gap-2 justify-content-end">
-                <button type="submit" class="btn btn-primary" [disabled]="rwKompetensiForm.invalid">Simpan</button>
+                <ng-container *ngIf="(submitLoading$ | async) else noLoading">
+                    <button class="btn btn-primary" disabled>
+                        <div class="spinner-border" style="width: 19px; height: 19px;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </ng-container>
+                <ng-template #noLoading>
+                    <button type="submit" class="btn btn-primary"
+                        [disabled]="rwKompetensiForm.invalid || (submitLoading$ | async)">Simpan</button>
+                </ng-template>
             </div>
         </div>
     </div>

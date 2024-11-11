@@ -26,6 +26,7 @@ export class RwPendidikanAddComponent {
   rwPendidikanForm!: FormGroup;
 
   submitLoading$ = new BehaviorSubject<boolean>(false);
+  pendidikanListLoading$ = new BehaviorSubject<boolean>(false);
 
   constructor(
     private apiService: ApiService,
@@ -56,13 +57,16 @@ export class RwPendidikanAddComponent {
   }
 
   getPendidikanList() {
+    this.pendidikanListLoading$.next(true);
     this.apiService.getData(`/api/v1/pendidikan`).subscribe({
       next: (response) => {
         this.pendidikanList = response.map((pendidikan: { [key: string]: any; }) => new Pendidikan(pendidikan))
+        this.pendidikanListLoading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
         this.alertService.showToast("Error", "Gagal mendapatkan data pendidikan!");
+        this.pendidikanListLoading$.next(false);
       }
     })
   }

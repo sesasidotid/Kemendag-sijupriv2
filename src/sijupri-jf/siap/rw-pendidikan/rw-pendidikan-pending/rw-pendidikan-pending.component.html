@@ -16,7 +16,10 @@
                     <label for="pendidikanCode" class="form-label">
                         Pendidikan <span class="text-danger">*</span>
                     </label>
-                    <select class="form-select" formControlName="pendidikanCode" id="pendidikanCode"
+                    <select disabled *ngIf="!pendidikanList || (pendidikanListLoading$ | async)" class="form-select">
+                        <option selected value="" style=" display: none;">Pilih Pendidikan</option>
+                    </select>
+                    <select *ngIf="pendidikanList && !(pendidikanListLoading$ | async)" class="form-select" formControlName="pendidikanCode" id="pendidikanCode"
                         name="pendidikanCode">
                         <option selected value="" style=" display: none;">Pilih Pendidikan</option>
                         <option *ngFor="let pendidikan of pendidikanList" [ngValue]="pendidikan.code">

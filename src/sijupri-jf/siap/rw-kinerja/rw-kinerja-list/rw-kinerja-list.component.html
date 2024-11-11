@@ -1,5 +1,5 @@
 <app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
-<div *ngIf="isDetailOpen" class="container my-4">
+<div *ngIf="isDetailOpen" class="">
     <div *ngIf="loading$ | async; else hadItem" class="d-flex justify-content-center">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -42,10 +42,10 @@
             <div class="col-md-6 mb-3">
                     <app-file-handler [inputs]="{
                     files: {
-                      docEvaluas: { label: 'Preview Dokumen Evaluasi', source: this.rwKinerja.docEvaluasiUrl },
-                      docPredikat: { label: 'Preview Dokumen Predikat', source: this.rwKinerja.docPredikatUrl },
-                      docAkumulasiAk: { label: 'Preview Dokumen Akumulasi Angka Kredit', source: this.rwKinerja.docAkumulasiAkUrl },
-                      docPenetapanAk: { label: 'Preview Dokumen Penetapan Angka Kredit', source: this.rwKinerja.docPenetapanAkUrl },
+                      docEvaluas: { label: 'Preview Dokumen Evaluasi', fileName: this.rwKinerja.docEvaluasi, source: this.rwKinerja.docEvaluasiUrl },
+                      docPredikat: { label: 'Preview Dokumen Predikat', fileName: this.rwKinerja.docPredikat, source: this.rwKinerja.docPredikatUrl },
+                      docAkumulasiAk: { label: 'Preview Dokumen Akumulasi Angka Kredit', fileName: this.rwKinerja.docAkumulasiAk, source: this.rwKinerja.docAkumulasiAkUrl },
+                      docPenetapanAk: { label: 'Preview Dokumen Penetapan Angka Kredit', fileName: this.rwKinerja.docPenetapanAk, source: this.rwKinerja.docPenetapanAkUrl },
                     },
                     viewOnly: true
                   }"></app-file-handler>

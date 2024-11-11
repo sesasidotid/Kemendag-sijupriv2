@@ -16,7 +16,10 @@
                     <label for="pangkatCode" class="form-label">
                         Pangkat <span class="text-danger">*</span>
                     </label>
-                    <select class="form-select" name="pangkatCode" id="pangkatCode" formControlName="pangkatCode">
+                    <select disabled *ngIf="!pangkatList || (pangkatListLoading$ | async)" class="form-select">
+                        <option selected value="" style=" display: none;">Pilih Pangkat</option>
+                    </select>
+                    <select *ngIf="pangkatList && !(pangkatListLoading$ | async)" class="form-select" name="pangkatCode" id="pangkatCode" formControlName="pangkatCode">
                         <option selected value="" style=" display: none;">Pilih Pangkat</option>
                         <option *ngFor="let pangkat of pangkatList" [value]="pangkat.code">
                             {{pangkat.name}} ({{pangkat.golongan}})
@@ -46,7 +49,7 @@
             <div class="col-12">
                 <div class="row">
                     <app-file-handler [inputs]="inputs"></app-file-handler>
-                    <div class="feedback"awa
+                    <div class="feedback"
                         *ngIf="rwPangkatForm.get('fileSkPangkat').invalid">
                         <small *ngIf="rwPangkatForm.get('fileSkPangkat').errors?.['required']">File dokumen SK pangkat perlu
                             diunggah.</small>

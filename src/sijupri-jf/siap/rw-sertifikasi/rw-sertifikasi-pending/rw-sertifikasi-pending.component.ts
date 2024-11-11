@@ -13,6 +13,8 @@ import { KategoriSertifikasi } from '../../../../modules/maintenance/models/kate
 import { Task } from '../../../../modules/workflow/models/task.model';
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component';
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler';
+import { BehaviorSubject } from 'rxjs';
+import { fileValidator } from '../../../../modules/base/validators/file-format.validator';
 
 @Component({
   selector: 'app-rw-sertifikasi-pending',
@@ -27,22 +29,16 @@ export class RwSertifikasiPendingComponent {
   rwSertifikasi: RWSertifikasi = new RWSertifikasi();
   kategoriSertifikasiList: KategoriSertifikasi[] = [];
   pendingTask: PendingTask;
-  kategori: number = 1;
+
+  kategori$ = new BehaviorSubject<number>(1);
+  rwSertifikasiLoading$ = new BehaviorSubject<boolean>(false);
+  kategoriChangeLoading$ = new BehaviorSubject<boolean>(false);
+  kategoriLoading$ = new BehaviorSubject<boolean>(false);
+  submitLoading$ = new BehaviorSubject<boolean>(false);
 
   rwSertifikasiForm!: FormGroup;
 
-  inputs: FIleHandler = {
-    files: {
-      skPengangkatan: { label: "Upload Dokumen SK Pengangkatan", source: this.rwSertifikasi.skPengangkatanUrl, required: true },
-      ktpPpns: { label: "Upload Dokumen KTP PPNS", source: this.rwSertifikasi.ktpPpnsUrl, visible: () => this.kategori == 2, required: true }
-    },
-    listen: (key: string, source: string, base64Data: string) => {
-      if (key == "skPengangkatan")
-        this.rwSertifikasi.fileSkPengangkatan = base64Data;
-      else if (key == "ktpPpns")
-        this.rwSertifikasi.fileKtpPpns = base64Data;
-    }
-  }
+  inputs: FIleHandler;
 
   constructor(
     private apiService: ApiService,
@@ -58,42 +54,66 @@ export class RwSertifikasiPendingComponent {
         if (pendingTask.flowId == 'siap_flow_2') {
           this.getPendingRWSertifikasi(this.pendingTask.id)
           this.getKategoriSertifikasiList()
+          this.isDetailOpen = true;
         }
       }, "info").addInactiveCondition((pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1').withIcon("update").build())
       .addFilter(new PageFilterBuilder("like").setProperty("objectName").withField("Sertifikasi", "text").build())
       .build();
 
-      this.getKategoriSertifikasiList();
+    this.getKategoriSertifikasiList();
+  }
+
+  fileLoadHandler() {
+    this.inputs = {
+      files: {
+        skPengangkatan: { label: "Upload Dokumen SK Pengangkatan", fileName: this.rwSertifikasi.skPengangkatan, source: this.rwSertifikasi.skPengangkatanUrl, required: true },
+        ktpPpns: { label: "Upload Dokumen KTP PPNS", fileName: this.rwSertifikasi.ktpPpns, source: this.rwSertifikasi.ktpPpnsUrl, visible: () => this.kategori$.value == 2, required: true }
+      },
+      listen: (key: string, source: string, base64Data: string) => {
+        console.log('key', key);
+        if (key == "skPengangkatan"){
+          this.rwSertifikasiForm.patchValue({ fileSkPengangkatan: base64Data });
+        }
+        if (key == "ktpPpns") {
+          this.rwSertifikasiForm.patchValue({ fileKtpPpns: base64Data });
+        }
+      }
+    }
   }
 
   getKategoriSertifikasiList() {
+    this.kategoriLoading$.next(true);
     this.apiService.getData(`/api/v1/kategori_sertifikasi`).subscribe({
       next: (response) => {
         this.kategoriSertifikasiList = response.map((kategoriSertifikasi: { [key: string]: any; }) => new KategoriSertifikasi(kategoriSertifikasi))
-        this.rwSertifikasi.kategoriSertifikasiId = this.kategoriSertifikasiList[0].id;
+        // this.rwSertifikasi.kategoriSertifikasiId = this.kategoriSertifikasiList[0].id;
+        this.kategoriLoading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
-        this.alertService.showToast("Error", "gagal menerima data");
+        this.alertService.showToast("Error", "Gagal mendapatkan data kategori sertifikasi!");
       }
     })
   }
 
   setKategori(kategoriSertifikasiValue: number, kategoriSertifikasiId: string) {
-    // this.kategoriSertifikasiList.forEach(kategoriSertifikasi => {
-    //   if (kategoriSertifikasi.id == this.rwSertifikasi.kategoriSertifikasiId) {
-    //     this.kategori = kategoriSertifikasi.value;
-    //   }
-    // });
-
-    this.kategori = kategoriSertifikasiValue;
+    this.kategoriChangeLoading$.next(true);
+    this.kategori$.next(kategoriSertifikasiValue);
     this.rwSertifikasi.kategoriSertifikasiId = kategoriSertifikasiId;
 
     if (kategoriSertifikasiValue === 1) {
       this.rwSertifikasiForm = new FormGroup({
         noSk: new FormControl('', [Validators.required]),
         tglSk: new FormControl('', [Validators.required]),
+        fileSkPengangkatan: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
       })
+      this.fileLoadHandler();
+      this.rwSertifikasiForm.patchValue({
+        noSk: this.rwSertifikasi.noSk,
+        tglSk: this.rwSertifikasi.tglSk,
+      })
+      this.kategoriChangeLoading$.next(false);
+      // console.log(this.rwSertifikasiForm.value);
     }
     else if (kategoriSertifikasiValue === 2) {
       this.rwSertifikasiForm = new FormGroup({
@@ -103,21 +123,36 @@ export class RwSertifikasiPendingComponent {
         dateEnd: new FormControl('', [Validators.required]),
         wilayahKerja: new FormControl('', [Validators.required]),
         uuKawalan: new FormControl('', [Validators.required]),
+        fileSkPengangkatan: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
+        fileKtpPpns: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
       })
+      this.fileLoadHandler();
+      this.rwSertifikasiForm.patchValue({
+        noSk: this.rwSertifikasi.noSk,
+        tglSk: this.rwSertifikasi.tglSk,
+        dateStart: this.rwSertifikasi.dateStart,
+        dateEnd: this.rwSertifikasi.dateEnd,
+        wilayahKerja: this.rwSertifikasi.wilayahKerja,
+        uuKawalan: this.rwSertifikasi.uuKawalan,
+      })
+      this.kategoriChangeLoading$.next(false);
+      // console.log(this.rwSertifikasiForm.value);
     }
   }
 
   getPendingRWSertifikasi(id: string) {
+    this.rwSertifikasiLoading$.next(true);
     this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
       next: (response) => {
         const pendingTask = new PendingTask(response);
         this.rwSertifikasi = new RWSertifikasi(pendingTask.objectTask.object);
-        this.kategori = this.rwSertifikasi.kategoriSertifikasiValue;
+        this.kategori$.next(this.rwSertifikasi.kategoriSertifikasiValue);
 
-        if (this.kategori === 1) {
+        if (this.kategori$.value === 1) {
           this.rwSertifikasiForm = new FormGroup({
             noSk: new FormControl('', [Validators.required]),
             tglSk: new FormControl('', [Validators.required]),
+            fileSkPengangkatan: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
           })
 
           this.rwSertifikasiForm.patchValue({
@@ -125,7 +160,7 @@ export class RwSertifikasiPendingComponent {
             tglSk: this.rwSertifikasi.tglSk,
           })
         }
-        else if (this.kategori === 2) {
+        else if (this.kategori$.value === 2) {
           this.rwSertifikasiForm = new FormGroup({
             noSk: new FormControl('', [Validators.required]),
             tglSk: new FormControl('', [Validators.required]),
@@ -133,6 +168,8 @@ export class RwSertifikasiPendingComponent {
             dateEnd: new FormControl('', [Validators.required]),
             wilayahKerja: new FormControl('', [Validators.required]),
             uuKawalan: new FormControl('', [Validators.required]),
+            fileSkPengangkatan: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
+            fileKtpPpns: new FormControl('', [Validators.required, fileValidator(['application/pdf'], 2)]),
           })
 
           this.rwSertifikasiForm.patchValue({
@@ -144,8 +181,9 @@ export class RwSertifikasiPendingComponent {
             uuKawalan: this.rwSertifikasi.uuKawalan,
           })
         }
-
-        this.isDetailOpen = true;
+        // this.isDetailOpen = true;
+        this.fileLoadHandler();
+        this.rwSertifikasiLoading$.next(false);
       },
       error: (error) => {
         console.log("error", error);
@@ -162,15 +200,18 @@ export class RwSertifikasiPendingComponent {
   }
 
   submit() {
-    if(this.rwSertifikasiForm.valid) {
+    if (this.rwSertifikasiForm.valid) {
       this.rwSertifikasi.noSk = this.rwSertifikasiForm.value.noSk;
       this.rwSertifikasi.tglSk = this.rwSertifikasiForm.value.tglSk;
       this.rwSertifikasi.dateStart = this.rwSertifikasiForm.value.dateStart;
       this.rwSertifikasi.dateEnd = this.rwSertifikasiForm.value.dateEnd;
       this.rwSertifikasi.wilayahKerja = this.rwSertifikasiForm.value.wilayahKerja;
       this.rwSertifikasi.uuKawalan = this.rwSertifikasiForm.value.uuKawalan;
+      this.rwSertifikasi.fileKtpPpns = this.rwSertifikasiForm.value.fileKtpPpns;
+      this.rwSertifikasi.fileSkPengangkatan = this.rwSertifikasiForm.value.fileSkPengangkatan;
 
-      if (this.kategori != 2) {
+
+      if (this.kategori$.value === 1) {
         this.rwSertifikasi.dateEnd = undefined;
         this.rwSertifikasi.dateStart = undefined;
         this.rwSertifikasi.wilayahKerja = undefined;
@@ -178,24 +219,35 @@ export class RwSertifikasiPendingComponent {
         this.rwSertifikasi.ktpPpns = undefined;
         this.rwSertifikasi.ktpPpnsUrl = undefined;
         this.rwSertifikasi.fileKtpPpns = undefined;
+        this.rwSertifikasi.kategoriSertifikasiId = this.kategoriSertifikasiList[0].id;
+        this.rwSertifikasi.kategoriSertifikasiValue = 1;
+        this.rwSertifikasi.kategoriSertifikasiName = this.kategoriSertifikasiList[0].name;
       }
-      
+      if (this.kategori$.value === 2) {
+        this.rwSertifikasi.kategoriSertifikasiId = this.kategoriSertifikasiList[1].id;
+        this.rwSertifikasi.kategoriSertifikasiValue = 2;
+        this.rwSertifikasi.kategoriSertifikasiName = this.kategoriSertifikasiList[1].name;
+      }
+
       this.confirmationService.open(false).subscribe({
         next: (result) => {
           if (!result.confirmed) return;
-  
+          this.submitLoading$.next(true);
+
           const task = new Task();
           task.id = this.pendingTask.id;
           task.taskAction = "approve";
           task.object = this.rwSertifikasi;
-  
+
           this.apiService.postData(`/api/v1/rw_sertifikasi/task/submit`, task).subscribe({
             next: () => {
               this.alertService.showToast('Success', "Berhasil mengubah riwayat sertifikasi.");
+              this.submitLoading$.next(false);
               this.back();
             },
             error: (error) => {
               console.log("error", error);
+              this.submitLoading$.next(false);
               this.alertService.showToast("Error", "gagal mengirim data");
             }
           })
