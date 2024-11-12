@@ -33,7 +33,7 @@ export class MatrixThreeTableComponent {
 
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "pertanyaanName", headerName:'Pertanyaan', filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] }, minWidth: 500 },
+    { field: "pertanyaanName", headerName:'Pertanyaan', filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] }, initialWidth: 600 },
     { field: "nilaiWaktu", filter: true, floatingFilter: true },
     { field: "nilaiKesulitan", filter: true, floatingFilter: true },
     { field: "nilaiKualitas", filter: true, floatingFilter: true },

@@ -31,7 +31,7 @@ export class MatrixOneTableComponent {
 
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "pertanyaanName", headerName: 'Pertanyaan', filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] }, minWidth: 400 },
+    { field: "pertanyaanName", headerName: 'Pertanyaan', filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] }, initialWidth: 600 },
     { field: "nilaiYbs", filter: true, floatingFilter: true},
     { field: "nilaiAtasan", filter: true, floatingFilter: true },
     { field: "nilaiRekan", filter: true, floatingFilter: true },

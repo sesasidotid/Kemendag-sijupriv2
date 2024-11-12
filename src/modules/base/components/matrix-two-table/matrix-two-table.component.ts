@@ -35,7 +35,7 @@ export class MatrixTwoTableComponent {
 
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "pertanyaanName", headerName:'Pertanyaan', filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] }, minWidth: 500 },
+    { field: "pertanyaanName", headerName:'Pertanyaan', filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] }, initialWidth: 600 },
     { field: "nilaiPenugasan", filter: true, floatingFilter: true },
     { field: "nilaiMateri", filter: true, floatingFilter: true },
     { field: "nilaiInformasi", filter: true, floatingFilter: true },
