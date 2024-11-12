@@ -1,0 +1,15 @@
+.detail-jf {
+    width: 70%;
+
+    @media screen and (max-width: 1200px) {
+        width: 100%;
+    }
+}
+
+.detail-atasan {
+    width: 30%;
+
+    @media screen and (max-width: 1200px) {
+        width: 100%;
+    }
+}

@@ -57,7 +57,7 @@ export class AkpDetailComponent {
   }
 
   backToList() {
-    this.router.navigate(['/akp/akp-list/' + this.AKPDetail.nip]);
+    this.router.navigate(['/akp/akp-list']);
   }
 
   tabChange(tab: number) {

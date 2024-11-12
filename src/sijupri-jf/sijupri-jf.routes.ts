@@ -164,6 +164,15 @@ export const routes: Routes = [
                 "AKP": {
                     "Penilaian AKP": {
                         components: () => import('../sijupri-jf/akp/akp-task/akp-task.component').then(m => m.AkpTaskComponent)
+                    },
+                    "Riwayat AKP": {
+                        components: () => import('../sijupri-jf/akp/akp-list/akp-list.component').then(m => m.AkpListComponent),
+                        routes: [
+                            {
+                                path: 'detail/:id',
+                                loadComponent: () => import('../sijupri-jf/akp/akp-detail/akp-detail.component').then(m => m.AkpDetailComponent),
+                            }
+                        ]
                     }
 
                 }
