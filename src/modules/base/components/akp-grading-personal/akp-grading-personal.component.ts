@@ -68,6 +68,7 @@ export class AKPGradingPersonalComponent {
     AKPGrading = new AKPByPersonal();
 
     AKPLoading$ = new BehaviorSubject<boolean>(true);
+    submitLoading$ = new BehaviorSubject<boolean>(false);
 
     optionsM1: Option[] = [
         { id: 1, label: 'Tidak Mampu' },
@@ -216,16 +217,19 @@ export class AKPGradingPersonalComponent {
     }
 
     onSubmit() {
+      this.AKPLoading$.next(true);
         this.akpTaskService.saveAKPReviewBySelf(this.payloadFormatter(this.form.value)).subscribe({
             next: () => {
                 this.alertService.showToast('Success', 'Berhasil menyimpan data');
+                this.AKPLoading$.next(false);
                 setTimeout(() => {
                     this.router.navigate(['/akp/akp-task']).then(() => { window.location.reload() });
-                }, 1500);
+                }, 1000);
             },
             error: (error) => {
                 console.error('error', error);
                 this.alertService.showToast('Error', error.error.message);
+                this.AKPLoading$.next(false);
             }
         });
     }
