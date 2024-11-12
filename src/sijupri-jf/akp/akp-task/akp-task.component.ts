@@ -99,13 +99,13 @@ export class AkpTaskComponent {
   saveAKPTask() {
     this.akpTaskService.saveTask(LoginContext.getUserId()).subscribe({
       next: () => {
-        this.alertService.showToast('Success', 'Berhasil mengajukan data');
+        this.alertService.showToast('Success', 'Berhasil mengajukan AKP');
         setTimeout(() => {
           this.router.navigate(['/akp/akp-task']).then(() => { window.location.reload() });
-        }, 2000);
+        }, 1000);
       },
       error: (error) => {
-        
+        this.alertService.showToast('Error', 'Gagal mengajukan AKP');
       }
     })
   }
