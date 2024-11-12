@@ -1,0 +1,84 @@
+<button class="btn btn-sm btn-outline-secondary mb-3" (click)="backToList()"> <i class="mdi mdi-chevron-left"></i>
+    Kembali</button>
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card card-profile shadow-sm">
+            <div *ngIf="jfLoading$ | async; else hadItem" class="d-flex justify-content-center my-5">
+                <div class="spinner-border text-white" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            
+            <ng-template #hadItem>
+                <div class="card-body p-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="profile-user">
+                                <img src="assets/avatar.jpg"
+                                    class="rounded-circle avatar-md img-thumbnail user-profile-image"
+                                    alt="user-profile-image">
+                            </div>
+                            <span class="badge rounded-pill text-bg-success">Aktif</span>
+                        </div>
+                        <div class="mt-3">
+                            <h4 class="text-white fs-18">{{jf.name}}</h4>
+                            <h6 class="text-muted fs-14">NIP : {{jf.nip}}</h6>
+                        </div>
+                        <hr class="text-white" />
+                        <div class="row text-white">
+                            <!-- First Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="firstnameInput" class="form-label">
+                                    NIK
+                                </label>
+                                <p class="text-muted">{{jf.nik ? jf.nik : '-'}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="firstnameInput" class="form-label">
+                                    Jenis Kelamin
+                                </label>
+                                <p class="text-muted">{{jf.jenisKelaminName ? jf.jenisKelaminName : '-'}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="firstnameInput" class="form-label">
+                                    Tempat Lahir
+                                </label>
+                                <p class="text-muted">{{jf.tempatLahir ? jf.tempatLahir : '-'}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="firstnameInput" class="form-label">
+                                    Tanggal Lahir
+                                </label>
+                                <p class="text-muted">{{jf.tanggalLahir ? jf.tanggalLahir : '-'}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="firstnameInput" class="form-label">
+                                    Email
+                                </label>
+                                <p class="text-muted">{{jf.email ? jf.email : '-'}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="firstnameInput" class="form-label">
+                                    No. HP
+                                </label>
+                                <p class="text-muted">{{jf.phone ? jf.phone : '-'}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="firstnameInput" class="form-label">
+                                    KTP
+                                </label>
+                                <p class="text-muted">{{jf.ktp ? jf.ktp : '-'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+
+    </div>
+    <div class="col-xl-8">
+        <div class="card p-3">
+            <app-pagable [pagable]="pagable"></app-pagable>
+        </div>
+    </div>
+</div>

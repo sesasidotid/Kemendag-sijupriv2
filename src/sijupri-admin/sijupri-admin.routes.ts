@@ -67,7 +67,20 @@ export const routes: Routes = [
                             path: ':id',
                             loadComponent: () => import('../sijupri-admin/akp/akp-task-detail/akp-task-detail.component').then(m => m.AkpTaskDetailComponent),
                         }
-                ]
+                    ]
+                },
+                "Pemetaan AKP": {
+                    components: () => import('../sijupri-admin/akp/akp-list/akp-list.component').then(m => m.AkpListComponent),
+                    routes: [
+                        {
+                            path: ':id',
+                            loadComponent: () => import('../sijupri-admin/akp/jf-akp-list/jf-akp-list.component').then(m => m.JfAkpListComponent),
+                        },
+                        {
+                            path: 'detail/:id',
+                            loadComponent: () => import('../sijupri-admin/akp/akp-detail/akp-detail.component').then(m => m.AkpDetailComponent),
+                        }
+                    ]
                 }
             },
             "UKom": {

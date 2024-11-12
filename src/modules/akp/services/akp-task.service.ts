@@ -7,6 +7,7 @@ import { AKPByReviewer } from '../models/akp-by-reviewer.model';
 import { AKPByPersonal } from '../models/akp-by-personal.model';
 import { VerifAKPTask } from '../models/verif-akp-task.model';
 import { AKPTaskDetail } from '../models/akp-task-detail.modal';
+import { AKPDetail } from '../models/akp-detail.model';
 
 @Injectable({
   providedIn: 'root'
@@ -110,6 +111,15 @@ export class AkpTaskService {
 
   getAKPTaskDetailById(id: string): Observable<any> {
     return this.apiService.getData(`${this.BASE_PATH_AKP}/task/${id}`).pipe(
+      catchError((error) => {
+        console.error('error', error);
+        this.alertService.showToast('Error', error.error.message);
+        throw error;
+      }));
+  }
+
+  getAKPDetailById(id: string): Observable<AKPDetail> {
+    return this.apiService.getData(`${this.BASE_PATH_AKP}/${id}`).pipe(
       catchError((error) => {
         console.error('error', error);
         this.alertService.showToast('Error', error.error.message);

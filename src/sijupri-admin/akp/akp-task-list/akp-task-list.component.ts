@@ -16,7 +16,7 @@ import { VerifAKPTask } from '../../../modules/akp/models/verif-akp-task.model';
 @Component({
   selector: 'app-akp-task-list',
   standalone: true,
-  imports: [PagableComponent, RouterLink, ModalComponent, CommonModule, ReactiveFormsModule],
+  imports: [PagableComponent, ModalComponent, CommonModule, ReactiveFormsModule],
   templateUrl: './akp-task-list.component.html',
   styleUrl: './akp-task-list.component.scss'
 })
@@ -73,9 +73,16 @@ export class AKPTaskComponent {
           namaAtasan: this.form.get('nama_atasan').value,
         }
 
-        this.akpTaskService.verifAKPTask(this.payload).subscribe(() => {
-          this.alertService.showToast('Success', 'Berhasil menerima pengajuan AKP.');
-          this.toggleModal();
+        this.akpTaskService.verifAKPTask(this.payload).subscribe({
+          next: () => {
+            this.alertService.showToast('Success', 'Berhasil menerima pengajuan AKP.');
+            this.toggleModal();
+            setTimeout(() => {window.location.reload();}, 1000);
+          },
+          error: (error) => {
+            this.alertService.showToast('Error', 'Gagal menerima pengajuan AKP.');
+            this.toggleModal();
+          }          
         });
       }
     } else if (this.action$.value === 'reject') {
@@ -84,9 +91,16 @@ export class AKPTaskComponent {
         this.payload.taskAction = 'reject';
         this.payload.remark = this.form.get('remark').value;
 
-        this.akpTaskService.verifAKPTask(this.payload).subscribe(() => {
-          this.alertService.showToast('Success', 'Berhasil menolak pengajuan AKP.');
-          this.toggleModal();
+        this.akpTaskService.verifAKPTask(this.payload).subscribe({
+          next: () => {
+            this.alertService.showToast('Success', 'Berhasil menolak pengajuan AKP.');
+            this.toggleModal();
+            setTimeout(() => {window.location.reload();}, 1000);
+          },
+          error: (error) => {
+            this.alertService.showToast('Error', 'Gagal menolak pengajuan AKP.');
+            this.toggleModal();
+          }          
         });
       }
     }

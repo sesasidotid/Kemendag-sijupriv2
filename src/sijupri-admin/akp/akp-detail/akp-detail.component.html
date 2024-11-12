@@ -7,15 +7,6 @@
 <ng-template #akpHadItem>
     <button class="btn btn-sm btn-outline-secondary mb-3" (click)="backToList()"> <i class="mdi mdi-chevron-left"></i>
         Kembali</button>
-    <div *ngIf="AKPDetail.flowId === 'akp_flow_2'" class="alert alert-primary" role="alert">
-        <i class="mdi mdi-information me-1"></i> Menunggu penilaian dari atasan dan rekan.
-    </div>
-    <div *ngIf="AKPDetail.flowId === 'akp_flow_3'" class="alert alert-primary" role="alert">
-        <i class="mdi mdi-information me-1"></i> Menunggu penilaian personal oleh user JF.
-    </div>
-    <div *ngIf="AKPDetail.flowId === 'akp_flow_4'" class="alert alert-primary" role="alert">
-        <i class="mdi mdi-information me-1"></i> Perlu memberikan dokumen rekomendasi AKP. Kamu bisa mengunggah dokumen rekomendasi pada menu <strong>Rekomendasi</strong> dibawah.
-    </div>
     <div class="p-0 d-flex flex-column flex-xl-row gap-3">
         <div class="card flex-grow-1 m-0 detail-jf">
             <div class="card-header">
@@ -94,9 +85,6 @@
                     </div>
                 </div>
             </div>
-            <div class="card-footer" *ngIf="AKPDetail.flowId === 'akp_flow_2'">
-                <button class="btn btn-primary float-end"><i class="mdi mdi-email me-2"></i> Kirim Ulang Email</button>
-            </div>
         </div>
     </div>
 
@@ -121,7 +109,7 @@
                         Matrix 3
                     </a>
                 </li>
-                <li class="nav-item cursor-pointer" (click)="tabChange(4)" *ngIf="AKPDetail.flowId === 'akp_flow_4'">
+                <li class="nav-item cursor-pointer" (click)="tabChange(4)">
                     <a class="nav-link" data-bs-toggle="tab" role="tab">
                         <i class="mdi mdi-book me-1"></i>
                         Rekomendasi
@@ -142,29 +130,7 @@
     </ng-container>
     <ng-container *ngIf="(currentTab$ | async) === 4">
         <div class="card p-4">
-            <form [formGroup]="form" (ngSubmit)="rekomendasiSubmit()">
                 <app-file-handler [inputs]="inputs"></app-file-handler>
-                <div class="feedback"
-                    *ngIf="form.get('rekomendasiFile').invalid">
-                    <small *ngIf="form.get('rekomendasiFile').errors?.['required']">Rekomendasi file perlu
-                        diunggah.</small>
-                    <small *ngIf="form.get('rekomendasiFile')?.hasError('invalidFileType')">File dokumentasi harus
-                        format .pdf</small>
-                    <div *ngIf="form.get('rekomendasiFile')?.hasError('fileTooLarge')">File rekomendasi lebih dari 2MB.
-                    </div>
-                </div>
-                <ng-container *ngIf="(rekomendasiSubmitLoading$ | async) else noLoading">
-                    <button class="float-end btn btn-primary" disabled>
-                        <div class="spinner-border" style="width: 19px; height: 19px;" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </button>
-                </ng-container>
-                <ng-template #noLoading>
-                    <button type="submit" class="float-end btn btn-primary"
-                        [disabled]="form.invalid || (rekomendasiSubmitLoading$ | async)">Kirim Rekomendasi</button>
-                </ng-template>
-            </form>
         </div>
     </ng-container>
 </ng-template>
