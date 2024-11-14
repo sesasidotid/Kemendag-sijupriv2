@@ -80,13 +80,21 @@
         <div *ngFor="let category of AKPGrading.kategoriInstrumentList; let categoryIndex = index">
             <h4 class="mb-3">{{ category.name }}</h4>
             <div *ngFor="let question of category.pertanyaanList; let questionIndex = index" class="mt-2">
-                <label>{{ question.name }}</label>
-                <div>
-                    <div *ngFor="let option of options">
-                        <input class="me-2" type="radio" [formControlName]="'question_'+category.id+question.id " [value]="option.id"
-                            [id]="option.label + '-' + question.id" sele/>
-                        <label [for]="option.label + '-' + question.id">{{ option.label }}</label>
-                    </div>
+                <label class="">{{ question.name }}</label>
+                <div class="">
+                    <div *ngFor="let option of options" class="option-wrapper me-2">
+                        <input
+                          type="radio"
+                          [formControlName]="'question_' + category.id + question.id"
+                          [value]="option.id"
+                          [id]="option.label + '-' + question.id"
+                          class="option-input"
+                        />
+                        <label [for]="option.label + '-' + question.id" class="option-label">
+                          {{ option.label }}
+                        </label>
+                      </div>
+                      
                 </div>
             </div>
             <hr class="text-muted"/>

@@ -15,36 +15,36 @@
             </div>
             <label class="mb-1 mt-2">{{ question.pertanyaanName }}</label>
             <div>
-                <div *ngFor="let option of optionsM1">
+                <div *ngFor="let option of optionsM1" class="option-wrapper me-2">
                     <!-- Use a combination of question id, option id, and index for unique ids -->
                     <input type="radio" [formControlName]="question.pertanyaanId+'_nilaiYbs'" [value]="option.id"
-                        [id]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i" class="me-2" />
-                    <label [for]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i">{{ option.label }}</label>
+                        [id]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i" class="option-input" />
+                    <label class="option-label" [for]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i">{{ option.label }}</label>
                 </div>
             </div>
             <div *ngIf="(this.form.get(question.pertanyaanId+'_nilaiYbs')?.value + question.nilaiAtasan + question.nilaiRekan) < 7" class="card p-3 m-0">
                 <div class="alert alert-danger">
                     {{'Kamu dinilai '}} <strong>{{'Belum '+question.pertanyaanName}}</strong> {{' Menurut anda, apakah penyebab ketidakmampuan tersebut.'}}
                 </div>
-                <div *ngFor="let M2Question of matrix2_3Questions.M2; let i = index">
+                <div *ngFor="let M2Question of matrix2_3Questions.M2; let i = index" class="option-wrapper me-2">
                     <label class="mb-1 mt-2">{{ M2Question.question }}</label>
                     <div>
-                        <div *ngFor="let option of M2Question.options">
+                        <div *ngFor="let option of M2Question.options" class="option-wrapper me-2">
                             <!-- Generate unique ids for M2Question inputs -->
                             <input type="radio" [formControlName]="question.pertanyaanId+'_'+M2Question.formControlName" [value]="option.id"
-                                [id]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i" class="me-2" />
-                            <label [for]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i">{{ option.label }}</label>
+                                [id]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i" class="option-input" />
+                            <label [for]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i" class="option-label">{{ option.label }}</label>
                         </div>
                     </div>
                 </div>
                 <div *ngFor="let M3Question of matrix2_3Questions.M3; let i = index">
                     <label class="mb-1 mt-2">{{ M3Question.question }}</label>
                     <div>
-                        <div *ngFor="let option of M3Question.options">
+                        <div *ngFor="let option of M3Question.options" class="option-wrapper me-2">
                             <!-- Generate unique ids for M3Question inputs -->
                             <input type="radio" [formControlName]="question.pertanyaanId+'_'+M3Question.formControlName" [value]="option.id"
-                                [id]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i" class="me-2" />
-                            <label [for]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i">{{ option.label }}</label>
+                                [id]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i" class="option-input" />
+                            <label [for]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i" class="option-label">{{ option.label }}</label>
                         </div>
                     </div>
                 </div>
