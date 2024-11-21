@@ -1,0 +1,70 @@
+<div class="row">
+    <form [formGroup]="addAkpReportForm" (submit)="onSubmit()">
+        <div class="row mb-3">
+            <label for="inputUnitKerjaId" class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
+            <div class="col-sm-10">
+                <select id="inputUnitKerjaId" class="form-select" (change)="onUnitKerjaChange($event)"
+                    formControlName="unitKerjaId" name="unitKerjaId">
+                    <option [value]='""'>Pilih</option>
+                    <option *ngFor="let unitKerja of unitKerjaList" [value]='unitKerja.id'>{{unitKerja.name}}</option>
+                </select>
+                <div class="feedback"
+                    *ngIf="addAkpReportForm.get('unitKerjaId').invalid && addAkpReportForm.get('unitKerjaId').touched">
+                    <small *ngIf="addAkpReportForm.get('unitKerjaId').errors?.['required']">
+                        Unit Kerja perlu diisi.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Tanggal</label>
+            <div class="col-sm-3">
+                <input type="date" name="dateFrom" class="form-control" id="inputDateFrom" formControlName="dateFrom">
+                <div class="feedback"
+                    *ngIf="addAkpReportForm.get('dateFrom').invalid && addAkpReportForm.get('dateFrom').touched">
+                    <small *ngIf="addAkpReportForm.get('dateFrom').errors?.['required']">
+                        Tanggal mulai perlu diisi.
+                    </small>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <input type="date" name="dateTo" class="form-control" id="inputDateTo" formControlName="dateTo">
+                <div class="feedback"
+                    *ngIf="addAkpReportForm.get('dateTo').invalid && addAkpReportForm.get('dateTo').touched">
+                    <small *ngIf="addAkpReportForm.get('dateTo').errors?.['required']">
+                        Tanggal tujuan perlu diisi.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="inputfileType" class="col-sm-2 col-form-label fw-bold">Tipe</label>
+            <div class="col-sm-10">
+                <select id="inputfileType" class="form-select" formControlName="fileType" name="fileType">
+                    <option [value]='""'>Pilih</option>
+                    <option [value]='"xlsx"'>Excel 2007</option>
+                    <option [value]='"xls"'>Excel</option>
+                    <option [value]='"csv"'>CSV</option>
+                    <option [value]='"pdf"'>PDF</option>
+                </select>
+                <div class="feedback"
+                    *ngIf="addAkpReportForm.get('fileType').invalid && addAkpReportForm.get('fileType').touched">
+                    <small *ngIf="addAkpReportForm.get('fileType').errors?.['required']">
+                        File type perlu diisi.
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-12">
+                <button type="submit" class="btn btn-sm btn-success float-end">Generate</button>
+            </div>
+        </div>
+    </form>
+</div>
+<hr>
+<div class="row">
+    <app-pagable [pagable]="pagable"></app-pagable>
+</div>

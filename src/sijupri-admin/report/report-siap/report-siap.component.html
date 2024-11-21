@@ -1,0 +1,82 @@
+<div class="row">
+    <form [formGroup]="addSiapReportForm" (submit)="onSubmit()">
+        <div class="row mb-3">
+            <label for="inputUnitKerjaId" class="col-sm-2 col-form-label fw-bold">Unit Kerja <b class="text-info">(optional)</b></label>
+            <div class="col-sm-10">
+                <select id="inputUnitKerjaId" class="form-select" (change)="onUnitKerjaChange($event)"
+                    formControlName="unitKerjaId" name="unitKerjaId">
+                    <option [value]='""'>Pilih</option>
+                    <option *ngFor="let unitKerja of unitKerjaList" [value]='unitKerja.id'>{{unitKerja.name}}</option>
+                </select>
+                <div class="feedback"
+                    *ngIf="addSiapReportForm.get('unitKerjaId').invalid && addSiapReportForm.get('unitKerjaId').touched">
+                    <small *ngIf="addSiapReportForm.get('unitKerjaId').errors?.['required']">
+                        Unit Kerja perlu diisi.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <label for="inputProvinsiId" class="col-sm-2 col-form-label fw-bold">Provinsi <b class="text-info">(optional)</b></label>
+            <div class="col-sm-10">
+                <select id="inputProvinsiId" class="form-select" (change)="onProvinsiChange($event)"
+                    formControlName="provinsiId" name="provinsiId">
+                    <option [value]='""'>Pilih</option>
+                    <option *ngFor="let provinsi of provinsiList" [value]='provinsi.id'>{{provinsi.name}}</option>
+                </select>
+                <div class="feedback"
+                    *ngIf="addSiapReportForm.get('provinsiId').invalid && addSiapReportForm.get('provinsiId').touched">
+                    <small *ngIf="addSiapReportForm.get('provinsiId').errors?.['required']">
+                        Provinsi perlu diisi.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <label for="inputKabKotaId" class="col-sm-2 col-form-label fw-bold">Kabupaten/Kota <b class="text-info">(optional)</b></label>
+            <div class="col-sm-10">
+                <select id="inputKabKotaId" class="form-select" (change)="onKabKotaChange($event)"
+                    formControlName="kabKotaId" name="kabKotaId">
+                    <option [value]='""'>Pilih</option>
+                    <option *ngFor="let kabKota of kabKotaList" [value]='kabKota.id'>{{kabKota.name}}</option>
+                </select>
+                <div class="feedback"
+                    *ngIf="addSiapReportForm.get('kabKotaId').invalid && addSiapReportForm.get('kabKotaId').touched">
+                    <small *ngIf="addSiapReportForm.get('kabKotaId').errors?.['required']">
+                        Kabupaten/Kota perlu diisi.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="inputfileType" class="col-sm-2 col-form-label fw-bold">Tipe</label>
+            <div class="col-sm-10">
+                <select id="inputfileType" class="form-select" formControlName="fileType" name="fileType">
+                    <option [value]='""'>Pilih</option>
+                    <option [value]='"xlsx"'>Excel 2007</option>
+                    <option [value]='"xls"'>Excel</option>
+                    <option [value]='"csv"'>CSV</option>
+                    <option [value]='"pdf"'>PDF</option>
+                </select>
+                <div class="feedback"
+                    *ngIf="addSiapReportForm.get('fileType').invalid && addSiapReportForm.get('fileType').touched">
+                    <small *ngIf="addSiapReportForm.get('fileType').errors?.['required']">
+                        File type perlu diisi.
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-12">
+                <button type="submit" class="btn btn-sm btn-success float-end">Generate</button>
+            </div>
+        </div>
+    </form>
+</div>
+<hr>
+<div class="row">
+    <app-pagable [pagable]="pagable"></app-pagable>
+</div>

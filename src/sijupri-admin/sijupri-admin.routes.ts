@@ -174,6 +174,20 @@ export const routes: Routes = [
                     ]
                 },
             },
+            "Report": {
+                "Report SIAP": {
+                    components: () => import('../sijupri-admin/report/report-siap/report-siap.component').then(m => m.ReportSiapComponent)
+                },
+                "Report AKP": {
+                    components: () => import('../sijupri-admin/report/report-akp/report-akp.component').then(m => m.ReportAkpComponent)
+                },
+                "Report Formasi": {
+                    components: () => import('../sijupri-admin/report/report-formasi/report-formasi.component').then(m => m.ReportFormasiComponent)
+                },
+                "Report UKom": {
+                    components: () => import('../sijupri-admin/report/report-ukom/report-ukom.component').then(m => m.ReportUkomComponent)
+                },
+            },
         }) ?? [],
     }
 ];

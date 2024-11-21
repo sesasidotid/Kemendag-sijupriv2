@@ -73,7 +73,7 @@ export class UkomGradeImportComponent {
   }
 
   downloadTemplate(filename: string) {
-    this.apiService.downloadData(`/storage_system/template/${filename}.xlsx/download`, `${filename}.xlsx`).subscribe({
+    this.apiService.getDownload(`/storage_system/template/${filename}.xlsx/download`, `${filename}.xlsx`).subscribe({
       error: (error) => this.handlerService.handleException(error)
     });
   }
