@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service';
@@ -26,6 +26,8 @@ export class ReportUkomComponent {
 
   reportId: string = "ukomReport";
 
+  @ViewChild(PagableComponent) pagableComponent!: PagableComponent;
+
   constructor(
     private confirmationService: ConfirmationService,
     private handlerService: HandlerService,
@@ -43,6 +45,20 @@ export class ReportUkomComponent {
       }, "success").withIcon("download").addInactiveCondition((report: any) => {
         return report.status == "FAILED";
       }).build())
+      .addActionColumn(new ActionColumnBuilder().setAction((report: any) => {
+        this.confirmationService.open(false).subscribe({
+          next: (result) => {
+            if (!result.confirmed) return;
+            this.apiService.deleteData(`/api/v1/report/${report.id}`).subscribe({
+              next: () => {
+                this.handlerService.handleAlert("Success", "report berhasil dihapus");
+                this.pagableComponent.fetchData();
+              },
+              error: (error) => this.handlerService.handleException(error)
+            })
+          }
+        })
+      }, "danger").withIcon("danger").build())
       .addFilter(new PageFilterBuilder("like").setProperty("fileName").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("fileType").withField("Tipe", "select").setOptionList([
         { label: "Excel", value: "xlsx" },

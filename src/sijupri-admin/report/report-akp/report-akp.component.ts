@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component';
@@ -30,6 +30,8 @@ export class ReportAkpComponent {
 
   reportId: string = "akpReport";
 
+  @ViewChild(PagableComponent) pagableComponent!: PagableComponent;
+
   constructor(
     private confirmationService: ConfirmationService,
     private handlerService: HandlerService,
@@ -47,6 +49,20 @@ export class ReportAkpComponent {
       }, "success").withIcon("download").addInactiveCondition((report: any) => {
         return report.status == "FAILED";
       }).build())
+      .addActionColumn(new ActionColumnBuilder().setAction((report: any) => {
+        this.confirmationService.open(false).subscribe({
+          next: (result) => {
+            if (!result.confirmed) return;
+            this.apiService.deleteData(`/api/v1/report/${report.id}`).subscribe({
+              next: () => {
+                this.handlerService.handleAlert("Success", "report berhasil dihapus");
+                this.pagableComponent.fetchData();
+              },
+              error: (error) => this.handlerService.handleException(error)
+            })
+          }
+        })
+      }, "danger").withIcon("danger").build())
       .addFilter(new PageFilterBuilder("like").setProperty("fileName").withField("Nama", "text").build())
       .addFilter(new PageFilterBuilder("like").setProperty("fileType").withField("Tipe", "select").setOptionList([
         { label: "Excel", value: "xlsx" },
@@ -105,7 +121,8 @@ export class ReportAkpComponent {
           this.apiService.postData('/api/v1/report_generate', reportGenerate).subscribe({
             next: () => {
               this.handlerService.handleAlert("Success", "Report Generating")
-              window.location.reload();
+              this.pagableComponent.fetchData();
+              this.ngOnInit();
             }
           })
         }
