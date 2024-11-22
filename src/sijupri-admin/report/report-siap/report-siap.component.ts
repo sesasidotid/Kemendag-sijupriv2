@@ -186,6 +186,7 @@ export class ReportSiapComponent {
   }
 
   onSubmit() {
+    this.addSiapReportForm.markAllAsTouched();
     if (this.addSiapReportForm.valid) {
       this.confirmationService.open(false).subscribe({
         next: (result) => {

@@ -103,6 +103,7 @@ export class ReportAkpComponent {
   }
 
   onSubmit() {
+    this.addAkpReportForm.markAllAsTouched();
     if (this.addAkpReportForm.valid) {
       this.confirmationService.open(false).subscribe({
         next: (result) => {
