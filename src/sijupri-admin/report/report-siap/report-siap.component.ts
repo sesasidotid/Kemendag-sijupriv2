@@ -11,6 +11,7 @@ import { ApiService } from '../../../modules/base/services/api.service';
 import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
 import { ReportGenerate } from '../../../modules/report/models/report-generate.model';
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component';
+import { Instansi } from '../../../modules/maintenance/models/instansi.model';
 
 @Component({
   selector: 'app-report-siap',
@@ -28,6 +29,7 @@ export class ReportSiapComponent {
 
   addSiapReportForm!: FormGroup;
 
+  instansiList: Instansi[];
   unitKerjaList: UnitKerja[];
   provinsiList: Provinsi[];
   kabKotaList: KabKota[];
@@ -62,6 +64,15 @@ export class ReportSiapComponent {
   }
 
   ngOnInit() {
+    this.apiService.getData('/api/v1/instansi').subscribe({
+      next: ((response: any) => {
+        this.instansiList = response.map((instansi: { [key: string]: any; }) => new Instansi(instansi));
+      }),
+      error: ((error) => {
+        this.handlerService.handleException(error);
+      })
+    });
+
     this.apiService.getData('/api/v1/unit_kerja').subscribe({
       next: ((response: any) => {
         this.unitKerjaList = response.map((unitKerja: { [key: string]: any; }) => new UnitKerja(unitKerja));
@@ -90,14 +101,30 @@ export class ReportSiapComponent {
     });
 
     this.addSiapReportForm = new FormGroup({
+      instansiId: new FormControl(''),
+      instansiName: new FormControl(''),
       unitKerjaId: new FormControl(''),
       unitKerjaName: new FormControl(''),
       provinsiId: new FormControl(''),
       provinsiName: new FormControl(''),
       kabKotaId: new FormControl(''),
       kabKotaName: new FormControl(''),
-      fileType: new FormControl(''),
+      fileType: new FormControl('', [Validators.required]),
     })
+  }
+
+  onInstansiChange(event: Event) {
+    const instansiId = (event.target as HTMLSelectElement).value;
+    for (const instansi of this.instansiList) {
+      if (instansi.id == instansiId) {
+        this.addSiapReportForm.get("instansiId").setValue(instansi.id)
+        this.addSiapReportForm.get("instansiName").setValue(instansi.name)
+        break;
+      } else {
+        this.addSiapReportForm.get("instansiId").setValue('')
+        this.addSiapReportForm.get("instansiName").setValue('')
+      }
+    }
   }
 
   onUnitKerjaChange(event: Event) {
@@ -108,8 +135,8 @@ export class ReportSiapComponent {
         this.addSiapReportForm.get("unitKerjaName").setValue(unitKerja.name)
         break;
       } else {
-        this.addSiapReportForm.get("unitKerjaId").setValue(null)
-        this.addSiapReportForm.get("unitKerjaName").setValue(null)
+        this.addSiapReportForm.get("unitKerjaId").setValue('')
+        this.addSiapReportForm.get("unitKerjaName").setValue('')
       }
     }
   }
@@ -122,8 +149,8 @@ export class ReportSiapComponent {
         this.addSiapReportForm.get("provinsiName").setValue(provinsi.name)
         break;
       } else {
-        this.addSiapReportForm.get("provinsiId").setValue(null)
-        this.addSiapReportForm.get("provinsiName").setValue(null)
+        this.addSiapReportForm.get("provinsiId").setValue('')
+        this.addSiapReportForm.get("provinsiName").setValue('')
       }
     }
   }
@@ -136,8 +163,8 @@ export class ReportSiapComponent {
         this.addSiapReportForm.get("kabKotaName").setValue(kabKota.name)
         break;
       } else {
-        this.addSiapReportForm.get("kabKotaId").setValue(null)
-        this.addSiapReportForm.get("kabKotaName").setValue(null)
+        this.addSiapReportForm.get("kabKotaId").setValue('')
+        this.addSiapReportForm.get("kabKotaName").setValue('')
       }
     }
   }
@@ -152,15 +179,19 @@ export class ReportSiapComponent {
           reportGenerate.reportId = this.reportId;
           reportGenerate.fileType = this.addSiapReportForm.value.fileType;
           reportGenerate.parameter = {}
-          if (this.addSiapReportForm.value.unitKerjaId) {
+          if (this.addSiapReportForm.value.instansiId != '') {
+            reportGenerate.parameter.instansiId = this.addSiapReportForm.value.instansiId;
+            reportGenerate.parameter.instansiName = this.addSiapReportForm.value.instansiName;
+          }
+          if (this.addSiapReportForm.value.unitKerjaId != '') {
             reportGenerate.parameter.unitKerjaId = this.addSiapReportForm.value.unitKerjaId;
             reportGenerate.parameter.unitKerjaName = this.addSiapReportForm.value.unitKerjaName;
           }
-          if (this.addSiapReportForm.value.provinsiId) {
+          if (this.addSiapReportForm.value.provinsiId != '') {
             reportGenerate.parameter.provinsiId = this.addSiapReportForm.value.provinsiId;
             reportGenerate.parameter.provinsiName = this.addSiapReportForm.value.provinsiName;
           }
-          if (this.addSiapReportForm.value.kabKotaId) {
+          if (this.addSiapReportForm.value.kabKotaId != '') {
             reportGenerate.parameter.kabKotaId = this.addSiapReportForm.value.kabKotaId;
             reportGenerate.parameter.kabKotaName = this.addSiapReportForm.value.kabKotaName;
           }

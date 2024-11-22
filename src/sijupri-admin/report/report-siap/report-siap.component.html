@@ -1,6 +1,23 @@
 <div class="row">
     <form [formGroup]="addSiapReportForm" (submit)="onSubmit()">
         <div class="row mb-3">
+            <label for="inputInstansiId" class="col-sm-2 col-form-label fw-bold">Instansi <b class="text-info">(optional)</b></label>
+            <div class="col-sm-10">
+                <select id="inputInstansiId" class="form-select" (change)="onInstansiChange($event)"
+                    formControlName="instansiId" name="instansiId">
+                    <option [value]='""'>Pilih</option>
+                    <option *ngFor="let instansi of instansiList" [value]='instansi.id'>{{instansi.name}}</option>
+                </select>
+                <div class="feedback"
+                    *ngIf="addSiapReportForm.get('instansiId').invalid && addSiapReportForm.get('instansiId').touched">
+                    <small *ngIf="addSiapReportForm.get('instansiId').errors?.['required']">
+                        Unit Kerja perlu diisi.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
             <label for="inputUnitKerjaId" class="col-sm-2 col-form-label fw-bold">Unit Kerja <b class="text-info">(optional)</b></label>
             <div class="col-sm-10">
                 <select id="inputUnitKerjaId" class="form-select" (change)="onUnitKerjaChange($event)"
@@ -59,7 +76,6 @@
                     <option [value]='"xlsx"'>Excel 2007</option>
                     <option [value]='"xls"'>Excel</option>
                     <option [value]='"csv"'>CSV</option>
-                    <option [value]='"pdf"'>PDF</option>
                 </select>
                 <div class="feedback"
                     *ngIf="addSiapReportForm.get('fileType').invalid && addSiapReportForm.get('fileType').touched">
