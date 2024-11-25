@@ -20,13 +20,34 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}${path}`, data, { headers });
   }
 
-  public downloadData(path: string, expectedFileName: string = "downloaded", customHeader: any = null): Observable<void> {
+  public getDownload(path: string, expectedFileName: string = "downloaded", customHeader: any = null): Observable<void> {
     const headers = this.createHeader(customHeader || {
       'Authorization': `Bearer ${LoginContext.getAccessToken()}`,
       'Accept': 'application/octet-stream'
     });
 
     return this.http.get(`${this.baseUrl}${path}`, {
+      headers,
+      responseType: 'blob'
+    }).pipe(
+      map((blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = expectedFileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+    );
+  }
+
+  public postDownload(path: string, data: any, expectedFileName: string = "downloaded", customHeader: any = null): Observable<void> {
+    const headers = this.createHeader(customHeader || {
+      'Authorization': `Bearer ${LoginContext.getAccessToken()}`,
+      'Accept': 'application/octet-stream'
+    });
+
+    return this.http.post(`${this.baseUrl}${path}`, data, {
       headers,
       responseType: 'blob'
     }).pipe(

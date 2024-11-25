@@ -8,7 +8,7 @@ import { Pagable } from '../../commons/pagable/pagable';
 @Component({
   selector: 'app-pagable',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './pagable.component.html',
   styleUrls: ['./pagable.component.scss'],
 })
@@ -28,6 +28,7 @@ export class PagableComponent implements OnChanges {
       this.pagable.primaryColumnList.forEach(column => {
         this.sortOrder[column.property] = '';
       });
+      this.limit = this.pagable.limit;
       this.fetchData();
     }
   }

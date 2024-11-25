@@ -7,6 +7,7 @@ export class PagableBuilder {
     private primaryColumnList: PageColumn[] = [];
     private actionColumnList: PageColumn[] = [];
     private filterList: PageFilter[] = [];
+    private limit: number = 10;
 
     constructor(endpoint: string) {
         this.endpoint = endpoint
@@ -27,8 +28,13 @@ export class PagableBuilder {
         return this;
     }
 
+    setLimit(limit: number) {
+        this.limit = limit
+        return this;
+    }
+
     build(): Pagable {
-        return new Pagable(this.endpoint, this.primaryColumnList, this.actionColumnList, this.filterList);
+        return new Pagable(this.endpoint, this.primaryColumnList, this.actionColumnList, this.filterList, this.limit);
     }
 }
 
@@ -146,6 +152,7 @@ export class ActionColumnBuilder {
         update: "ri-pencil-line",
         detail: "ri-eye-line",
         danger: "ri-delete-bin-line",
+        download: "ri-download-line",
     }
 
     setAction(process: Function, color: "primary" | "success" | "info" | "danger"): ActionColumnBuilder {
@@ -154,7 +161,7 @@ export class ActionColumnBuilder {
         return this;
     }
 
-    withIcon(icon: "create" | "detail" | "danger" | "update"): ActionColumnBuilder {
+    withIcon(icon: "create" | "detail" | "danger" | "update" | "download"): ActionColumnBuilder {
         this.icon = this.icons[icon];
         return this;
     }
