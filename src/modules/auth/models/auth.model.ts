@@ -9,6 +9,8 @@ export class Auth extends Serializable {
     applicationCode?: string = undefined;
     channel_code?: string = undefined;
 
+    deviceId: string = undefined;
+
     constructor(object?: { [key: string]: any }) {
         super();
         if (object) this.fromObject(object);
