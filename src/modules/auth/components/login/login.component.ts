@@ -10,7 +10,6 @@ import { LoginContext } from '../../../base/commons/login-context';
 import { Router } from '@angular/router';
 import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular';
 import { BehaviorSubject } from 'rxjs';
-import { AlertService } from '../../../base/services/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -27,17 +26,21 @@ export class LoginComponent {
   isPasswordVisible: boolean = false;
 
   isLoginLoading$ = new BehaviorSubject<boolean>(false);
-  loginMessage$ = new BehaviorSubject<{status: string, message: string}>({status: '', message: ''});
+  loginMessage$ = new BehaviorSubject<{ status: string, message: string }>({ status: '', message: '' });
 
   readonly Eye = Eye;
   readonly EyeOff = EyeOff;
 
-  constructor(private applicationServce: ApplicationService, private authService: AuthService, private router: Router, private alertService: AlertService) {
+  constructor(
+    private applicationServce: ApplicationService,
+    private authService: AuthService,
+    private router: Router,
+  ) {
     if (LoginContext.isLogin()) {
       this.router.navigate(['/'])
     }
   }
-  
+
   ngOnInit() {
     this.getApplicationList();
     this.loginForm = new FormGroup({
@@ -70,7 +73,7 @@ export class LoginComponent {
         next: (authResponse: AuthResponse) => {
           this.authResponse = authResponse;
           LoginContext.storeContextLocalStorage(this.authResponse);
-          this.loginMessage$.next({status: 'success', message: 'Login berhasil, tunggu sebentar...'});
+          this.loginMessage$.next({ status: 'success', message: 'Login berhasil, tunggu sebentar...' });
         },
         complete: () => {
           this.isLoginLoading$.next(false);
@@ -83,7 +86,7 @@ export class LoginComponent {
         error: (error) => {
           this.isLoginLoading$.next(false);
           console.log("error", error);
-          this.loginMessage$.next({status: 'error', message: 'Login gagal, tolong coba lagi.'});
+          this.loginMessage$.next({ status: 'error', message: 'Login gagal, tolong coba lagi.' });
         }
       });
     }

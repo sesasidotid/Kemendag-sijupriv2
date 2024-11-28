@@ -4,6 +4,7 @@ import { Auth } from '../models/auth.model';
 import { catchError, map, Observable } from 'rxjs';
 import { AuthResponse } from '../models/auth-response.model';
 import { AlertService } from '../../base/services/alert.service';
+import { DeviceService } from '../../security/services/device.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class AuthService {
 
   constructor(
     private apiService: ApiService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private deviceService: DeviceService
   ) { }
 
   login(auth: Auth): Observable<AuthResponse> {
@@ -21,8 +23,9 @@ export class AuthService {
     // auth.clientSecret = `${auth.applicationCode}P@ssw0rd`;
     auth.grantType = "password";
     auth.channel_code = "WEB";
+    auth.deviceId = this.deviceService.getDeviceId();
 
-    return this.apiService.auth(this.BASE_PATH, auth, {'Authorization': 'Basic c2lqdXByaS13ZWI6c2lqdXByaS13ZWJQQHNzdzByZA=='}).pipe(
+    return this.apiService.auth(this.BASE_PATH, auth, { 'Authorization': 'Basic c2lqdXByaS13ZWI6c2lqdXByaS13ZWJQQHNzdzByZA==' }).pipe(
       map((response: any) => new AuthResponse(response)),
       catchError((error) => {
         console.error('Error login', error);

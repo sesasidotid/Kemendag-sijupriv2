@@ -29,6 +29,7 @@
               "src/favicon.ico",
               "src/assets",
               "src/assets/icons",
+              "src/firebase-messaging-sw.js",
               {
                 "glob": "**/*",
                 "input": "src/assets/tinymce/skins",
@@ -68,9 +69,7 @@
               "src/assets/Velzon/build/libs/feather-icons/feather.min.js",
               "src/assets/Velzon/build/js/pages/plugins/lord-icon-2.1.0.js",
               "src/assets/Velzon/build/js/plugins.js",
-              "src/assets/Velzon/build/js/app.js",
-              "src/assets/tinymce/tinymce.js",
-              "src/assets/tinymce/tinymce.min.js"
+              "src/assets/Velzon/build/js/app.js"
             ]
           },
           "configurations": {
