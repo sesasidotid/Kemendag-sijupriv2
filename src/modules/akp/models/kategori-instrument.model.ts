@@ -7,6 +7,8 @@ export class KategoriInstrument extends Serializable {
     instrumentName: string = undefined
     name: string = undefined;
     jabatanJenjangId: string = undefined;
+    pelatihanTeknisId: string = undefined;
+    pelatihanTeknisName: string = undefined;
 
     pertanyaanList: Pertanyaan[] = [];
 

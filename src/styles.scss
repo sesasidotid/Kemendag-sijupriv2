@@ -4,3 +4,12 @@
     overflow-x: auto;
     white-space: nowrap;
 }
+
+.feedback {
+    color: red;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
