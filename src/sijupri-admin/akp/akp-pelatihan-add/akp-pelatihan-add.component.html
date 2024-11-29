@@ -1,0 +1,61 @@
+<form [formGroup]="pelatihanTeknisForm" (ngSubmit)="submit()">
+    <div class="row mb-3">
+        <label for="code" class="col-sm-2 col-form-label fw-bold">Kode Pelatihan <span
+                class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <input type="text" id="code" class="form-control" name="code"
+                formControlName="code" placeholder="Masukan Kode Pelatihan">
+            <div class="feedback"
+                *ngIf="pelatihanTeknisForm.get('code').invalid && pelatihanTeknisForm.get('code').touched">
+                <small *ngIf="pelatihanTeknisForm.get('code').errors?.['required']">Kode pelatihan perlu
+                    diisi.</small>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold">Nama Pelatihan <span
+                class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <input type="text" id="name" class="form-control" name="name"
+                formControlName="name" placeholder="Masukan Nama Pelatihan">
+            <div class="feedback"
+                *ngIf="pelatihanTeknisForm.get('name').invalid && pelatihanTeknisForm.get('name').touched">
+                <small *ngIf="pelatihanTeknisForm.get('name').errors?.['required']">Nama pelatihan perlu
+                    diisi.</small>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold">
+            Jabatan <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+            <select class="form-select" name="jabatanCode" id="jabatanCode" formControlName="jabatanCode">
+                <option selected value="" style=" display: none;">Pilih Jabatan</option>
+                <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
+                    {{jabatan.name}}
+                </option>
+            </select>
+            <div class="feedback"
+                *ngIf="pelatihanTeknisForm.get('jabatanCode').invalid && pelatihanTeknisForm.get('jabatanCode').touched">
+                <small *ngIf="pelatihanTeknisForm.get('jabatanCode').errors?.['required']">Jabatan perlu
+                    dipilih.</small>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-12">
+            <ng-container *ngIf="(submitLoading$ | async) else noLoading">
+                <button class="btn btn-primary" disabled>
+                    <div class="spinner-border" style="width: 19px; height: 19px;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </button>
+            </ng-container>
+            <ng-template #noLoading>
+                <button type="submit" class="btn btn-primary float-end"
+                    [disabled]="pelatihanTeknisForm.invalid || (submitLoading$ | async)">Simpan</button>
+            </ng-template>
+        </div>
+    </div>
+</form>

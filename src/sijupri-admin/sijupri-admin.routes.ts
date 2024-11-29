@@ -50,10 +50,10 @@ export const routes: Routes = [
                 "KKN": {
                     components: () => import('../sijupri-admin/akp/kkn/kkn.component').then(m => m.KknComponent),
                     routes: [
-                        {
-                            path: 'add',
-                            loadComponent: () => import('../sijupri-admin/akp/kkn-add/kkn-add.component').then(m => m.KknAddComponent),
-                        },
+                        // {
+                        //     path: 'add',
+                        //     loadComponent: () => import('../sijupri-admin/akp/kkn-add/kkn-add.component').then(m => m.KknAddComponent),
+                        // },
                         {
                             path: ':id',
                             loadComponent: () => import('../sijupri-admin/akp/kkn-detail/kkn-detail.component').then(m => m.KknDetailComponent),
@@ -81,7 +81,20 @@ export const routes: Routes = [
                             loadComponent: () => import('../sijupri-admin/akp/akp-detail/akp-detail.component').then(m => m.AkpDetailComponent),
                         }
                     ]
-                }
+                },
+                "Pelatihan Teknis": {
+                    components: () => import('../sijupri-admin/akp/akp-pelatihan-list/akp-pelatihan-list.component').then(m => m.AkpPelatihanListComponent),
+                    routes: [
+                        // {
+                        //     path: 'add',
+                        //     loadComponent: () => import('../sijupri-admin/akp/akp-pelatihan-add/akp-pelatihan-add.component').then(m => m.AkpPelatihanAddComponent),
+                        // },
+                        {
+                            path: ':id',
+                            loadComponent: () => import('../sijupri-admin/akp/akp-pelatihan-detail/akp-pelatihan-detail.component').then(m => m.AkpPelatihanDetailComponent),
+                        }
+                    ]
+                },
             },
             "UKom": {
                 "Data Dukung UKom": {

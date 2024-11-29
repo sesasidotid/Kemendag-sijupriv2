@@ -1,0 +1,43 @@
+<ng-container *ngIf="(tab$ | async) === 0">
+    <app-pagable [pagable]="pagable"></app-pagable>
+</ng-container>
+
+<ng-container *ngIf="(tab$ | async) === 1">
+    <app-akp-pelatihan-add [tab]="tab$" (changeTabActive)="handleTabChange(0)"></app-akp-pelatihan-add>
+</ng-container>
+
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Ubah Data Pelatihan Teknis'" (toggle)="toggleModal()"
+    [enableFooter]="false">
+    <form [formGroup]="form">
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    <label for="nama_atasan" class="form-label">
+                        Kode Pelatihan <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="code" placeholder="Masukkan Kode Pelatihan Teknis"
+                        name="name" formControlName="code">
+                    <div class="feedback" *ngIf="form.get('code').invalid && form.get('code').touched">
+                        <small *ngIf="form.get('code').errors?.['required']">Kode pelatihan perlu
+                            diisi.</small>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="email_atasan" class="form-label">
+                        Nama Pelatihan <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="name" placeholder="Masukkan Nama Pelatihan Teknis"
+                        name="name" formControlName="name">
+                    <div class="feedback" *ngIf="form.get('name').invalid && form.get('name').touched">
+                        <small *ngIf="form.get('name').errors?.['required']">Nama pelatihan perlu
+                            diisi.</small>
+                    </div>
+                </div>
+                <div class="float-end">
+                    <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">Batal</button>
+                    <button class="btn btn-primary" (click)="updateSumbit()" [disabled]="form.invalid">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</app-modal>
