@@ -84,16 +84,6 @@ export const routes: Routes = [
                 },
                 "Pelatihan Teknis": {
                     components: () => import('../sijupri-admin/akp/akp-pelatihan-list/akp-pelatihan-list.component').then(m => m.AkpPelatihanListComponent),
-                    routes: [
-                        // {
-                        //     path: 'add',
-                        //     loadComponent: () => import('../sijupri-admin/akp/akp-pelatihan-add/akp-pelatihan-add.component').then(m => m.AkpPelatihanAddComponent),
-                        // },
-                        {
-                            path: ':id',
-                            loadComponent: () => import('../sijupri-admin/akp/akp-pelatihan-detail/akp-pelatihan-detail.component').then(m => m.AkpPelatihanDetailComponent),
-                        }
-                    ]
                 },
             },
             "UKom": {
