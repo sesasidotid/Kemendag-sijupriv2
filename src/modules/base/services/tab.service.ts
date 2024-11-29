@@ -28,5 +28,17 @@ export class TabService {
   getTabsLength(): number {
     return this.tabsSubject.getValue().length;
   }
+
+  changeTabActive(tab: number) {
+    const currentTabs = this.tabsSubject.value;
+    const updatedTabs = currentTabs.map((item, index) => {
+      if (index === tab) {
+        return { ...item, isActive: true };
+      }
+      return { ...item, isActive: false };
+    });
+
+    this.tabsSubject.next(updatedTabs);
+  }
 }
 
