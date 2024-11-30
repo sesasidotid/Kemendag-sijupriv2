@@ -1,7 +1,9 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginContext } from '../../../modules/base/commons/login-context';
+import { ApiService } from '../../../modules/base/services/api.service';
+import { NotificationMessage } from '../../../modules/notification/models/notification-message.model';
 
 @Component({
   selector: 'app-top-bar',
@@ -14,14 +16,65 @@ export class TopBarComponent {
   id: string;
   name: string;
   role: string[];
+  isOpen: boolean = false;
+
+  selectedTab: string = '';
+  isExpanded: boolean = false;
+
+  notificationMessagePersonalList: NotificationMessage[] = [];
+  notificationMessageGroupList: NotificationMessage[] = [];
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    private router: Router
+    private router: Router,
+    private apiService: ApiService,
+    private el: ElementRef
   ) {
     this.id = LoginContext.getUserId();
     this.name = LoginContext.getName();
     this.role = LoginContext.getRoleCodes();
+  }
+
+  ngAfterViewInit() {
+    const tabElement = this.el.nativeElement.querySelector('#notificationItemsTab');
+    const dropdownButton = this.el.nativeElement.querySelector('#page-header-notifications-dropdown');
+
+    dropdownButton.addEventListener('shown.bs.dropdown', () => {
+      this.getNotificationPersonal()
+    });
+
+    tabElement.addEventListener('shown.bs.tab', (event: any) => {
+      this.selectedTab = event.target.getAttribute('href'); // Get href of the activated tab
+      if (this.selectedTab == "#all-noti-tab") {
+        this.getNotificationPersonal()
+      } else if (this.selectedTab == "#messages-tab") {
+        this.getNotificationGroup();
+      }
+    });
+  }
+
+  getNotificationPersonal() {
+    this.apiService.getData(`/api/v1/notification_message/personal`).subscribe({
+      next: (response: any) => {
+        this.notificationMessagePersonalList = response.map((notificationMessage: { [key: string]: any; }) => {
+          const notificationMessagePersonal = new NotificationMessage(notificationMessage)
+          notificationMessagePersonal.age = this.calculateAge(notificationMessagePersonal.dateCreated)
+          return notificationMessagePersonal;
+        })
+      }
+    });
+  }
+
+  getNotificationGroup() {
+    this.apiService.getData(`/api/v1/notification_message/group`).subscribe({
+      next: (response: any) => {
+        this.notificationMessageGroupList = response.map((notificationMessage: { [key: string]: any; }) => {
+          const notificationMessageGroup = new NotificationMessage(notificationMessage)
+          notificationMessageGroup.age = this.calculateAge(notificationMessageGroup.dateCreated)
+          return notificationMessageGroup;
+        })
+      }
+    });
   }
 
   toggelSidebar() {
@@ -80,5 +133,32 @@ export class TopBarComponent {
   logOut() {
     LoginContext.release();
     this.router.navigate(['/login'])
+  }
+
+  private calculateAge(dateCreated: string): string {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - new Date(dateCreated).getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    } else if (diffInSeconds < 2629746) {
+      const weeks = Math.floor(diffInSeconds / 604800);
+      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    } else if (diffInSeconds < 31556952) {
+      const months = Math.floor(diffInSeconds / 2629746);
+      return `${months} month${months > 1 ? 's' : ''} ago`;
+    } else {
+      const years = Math.floor(diffInSeconds / 31556952);
+      return `${years} year${years > 1 ? 's' : ''} ago`;
+    }
   }
 }

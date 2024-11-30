@@ -119,7 +119,7 @@ export class ReportAkpComponent {
             dateTo: this.addAkpReportForm.value.dateTo,
           }
 
-          this.apiService.postData('/api/v1/report_generate', reportGenerate).subscribe({
+          this.apiService.postData('/api/v1/report_generate/async', reportGenerate).subscribe({
             next: () => {
               this.handlerService.handleAlert("Success", "Report Generating")
               this.pagableComponent.fetchData();
