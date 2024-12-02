@@ -26,14 +26,18 @@ export class FcmService {
   }
 
   private backgroundHandler() {
-    navigator.serviceWorker
-      .register('/firebase-messaging-sw.js', { type: 'module' })
-      .then((serviceWorkerRegistration) => {
-        console.log('Service Worker registered:', serviceWorkerRegistration);
-      })
-      .catch((error) => {
-        console.error('Service Worker registration failed:', error);
-      });
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/firebase-messaging-sw.js', { type: 'module' })
+        .then((serviceWorkerRegistration) => {
+          console.log('Service Worker registered:', serviceWorkerRegistration);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    } else {
+      console.warn('Service Worker is not supported in this browser.');
+    }
   }
 
   private requestPermission() {

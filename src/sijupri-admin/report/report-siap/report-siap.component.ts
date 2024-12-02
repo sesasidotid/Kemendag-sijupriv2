@@ -213,7 +213,7 @@ export class ReportSiapComponent {
             reportGenerate.parameter.kabKotaName = this.addSiapReportForm.value.kabKotaName;
           }
 
-          this.apiService.postData('/api/v1/report_generate', reportGenerate).subscribe({
+          this.apiService.postData('/api/v1/report_generate/async', reportGenerate).subscribe({
             next: () => {
               this.handlerService.handleAlert("Success", "Report Generating")
               this.pagableComponent.fetchData();
