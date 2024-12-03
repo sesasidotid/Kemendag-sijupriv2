@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="row mb-3" *ngIf="addSiapReportForm.get('exportType').value === 'instansi'">
-                <label for="inputInstansiId" class="col-sm-2 col-form-label fw-bold">Instansi <b class="text-info">(optional)</b></label>
+                <label for="inputInstansiId" class="col-sm-2 col-form-label fw-bold">Instansi</label>
                 <div class="col-sm-10">
                     <select id="inputInstansiId" class="form-select"
                         formControlName="instansiId" name="instansiId" (change)="patchFormValue($event, 'instansi')">
@@ -44,7 +44,7 @@
             </div>
             
             <div class="row mb-3" *ngIf="addSiapReportForm.get('exportType').value === 'unitKerja'">
-                <label for="inputUnitKerjaId" class="col-sm-2 col-form-label fw-bold">Unit Kerja <b class="text-info">(optional)</b></label>
+                <label for="inputUnitKerjaId" class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
                 <div class="col-sm-10">
                     <select id="inputUnitKerjaId" class="form-select"
                         formControlName="unitKerjaId" name="unitKerjaId" (change)="patchFormValue($event, 'unitKerja')">
@@ -61,7 +61,7 @@
             </div>
             
             <div class="row mb-3" *ngIf="addSiapReportForm.get('exportType').value === 'provinsi'">
-                <label for="inputProvinsiId" class="col-sm-2 col-form-label fw-bold">Provinsi <b class="text-info">(optional)</b></label>
+                <label for="inputProvinsiId" class="col-sm-2 col-form-label fw-bold">Provinsi</label>
                 <div class="col-sm-10">
                     <select id="inputProvinsiId" class="form-select"
                         formControlName="provinsiId" name="provinsiId" (change)="patchFormValue($event, 'provinsi')">
@@ -78,7 +78,7 @@
             </div>
             
             <div class="row mb-3" *ngIf="addSiapReportForm.get('exportType').value === 'kabKota'">
-                <label for="inputKabKotaId" class="col-sm-2 col-form-label fw-bold">Kabupaten/Kota <b class="text-info">(optional)</b></label>
+                <label for="inputKabKotaId" class="col-sm-2 col-form-label fw-bold">Kabupaten/Kota</label>
                 <div class="col-sm-10">
                     <select id="inputKabKotaId" class="form-select"
                         formControlName="kabKotaId" name="kabKotaId" (change)="patchFormValue($event, 'kabKota')">
