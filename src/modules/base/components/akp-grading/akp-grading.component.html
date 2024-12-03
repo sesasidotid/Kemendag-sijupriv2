@@ -3,7 +3,7 @@
     <h1 class="p-0">Form Penilaian AKP Oleh {{whoIs === 'atasan' ? 'Atasan Kerja' : 'Rekan Kerja'}}</h1>
     <p class="mt-1 mb-0 text-muted p-0">Evaluasi Kinerja Pegawai untuk Peningkatan Produktivitas dan Pengembangan
         Kompetensi</p>
-        <div *ngIf="AKPLoading$ | async" class="d-flex justify-content-center mt-5 my-4 ">
+        <div *ngIf="(AKPLoading$ | async)" class="d-flex justify-content-center mt-5 my-4 ">
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
@@ -77,7 +77,7 @@
 </div>
 <div class="card parent"  *ngIf="!(AKPLoading$ | async) && (isIDValid$ | async) && (AKPStatus$ | async) !== 'FINISHED'">
     <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!(AKPLoading$ | async)">
-        <div *ngFor="let category of AKPGrading.kategoriInstrumentList; let categoryIndex = index">
+        <div *ngIf="AKPGrading.kategoriInstrumentList[categoryPage$.value] as category">
             <h4 class="mb-3">{{ category.name }}</h4>
             <div *ngFor="let question of category.pertanyaanList; let questionIndex = index" class="mt-2">
                 <label class="">{{ question.name }}</label>
@@ -99,11 +99,15 @@
             </div>
             <hr class="text-muted"/>
         </div>
-        <div class="alert alert-warning">
-            Periksa dan pastikan semua jawaban diatas sudah benar, jika sudah benar silahkan tekan tombol
-            Kirim Penilaian.
+        <div *ngIf="categoryPage$.value === categoryLength$.value - 1" class="alert alert-warning">
+            Periksa dan pastikan semua jawaban diatas sudah terisi dan benar, jika sudah sesuai kamu bisa menekan tombol <strong>Kirim Penilaian</strong> dibawah ini.
         </div>
-        <button class="btn btn-primary float-end" type="submit">Kirim Penilaian</button>
+        <div class="float-end">
+            <span class="me-3">Halaman {{categoryPage$.value + 1}} dari {{categoryLength$.value}}</span>
+            <button class="btn me-2 btn-secondary" type="button" (click)="handleCategoryPage('prev')" [disabled]="categoryPage$.value === 0"><i class="mdi mdi-chevron-left"></i></button>
+            <button class="btn me-2 btn-secondary" type="button" (click)="handleCategoryPage('next')" [disabled]="categoryPage$.value === categoryLength$.value - 1"><i class="mdi mdi-chevron-right"></i></button>
+            <button *ngIf="categoryPage$.value === categoryLength$.value - 1" class="btn btn-primary float-end" type="submit">Kirim Penilaian</button>
+        </div>
     </form>
 </div>
 <div class="row mb-4">

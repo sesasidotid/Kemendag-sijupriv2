@@ -33,6 +33,9 @@ export class AKPGradingComponent {
     isIDValid$ = new BehaviorSubject<boolean>(true);
     AKPStatus$ = new BehaviorSubject<string>('');
 
+    categoryPage$ = new BehaviorSubject<number>(0);
+    categoryLength$ = new BehaviorSubject<number | null>(null);
+
     options: Option[] = [
         { id: 1, label: 'Tidak Mampu' },
         { id: 2, label: 'Cukup Mampu' },
@@ -141,20 +144,33 @@ export class AKPGradingComponent {
         }
     }
 
+    handleCategoryPage(cond: string): void {
+        if (cond === 'next' && this.categoryPage$.value < this.categoryLength$.value - 1) {
+            this.categoryPage$.next(this.categoryPage$.value + 1);
+        }
+        if (cond === 'prev' && this.categoryPage$.value > 0) {
+            this.categoryPage$.next(this.categoryPage$.value - 1);
+        }
+    }
+
     getAKPGrading() {
         this.AKPLoading$.next(true);
         this.akpTaskService.getAKPByReviewer(this.AKPId, this.whoIs).subscribe({
             next: (response) => {
                 this.AKPGrading = response;
+
+                // If the grading is completed
                 if (this.AKPGrading.status) {
                     this.AKPStatus$.next(this.AKPGrading.status);
                 }
+
+                this.categoryLength$.next(this.AKPGrading.kategoriInstrumentList?.length);
+
                 this.AKPLoading$.next(false);
+
                 this.isIDValid$.next(true);
-                console.log('AKPGrading', this.AKPGrading);
             },
             error: (error) => {
-                console.error('Error fetching data', error);
                 this.AKPLoading$.next(false);
                 this.isIDValid$.next(false);
             }

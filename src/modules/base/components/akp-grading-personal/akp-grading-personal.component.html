@@ -6,57 +6,97 @@
 <ng-template #hadItem>
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-3">
         <div *ngFor="let question of AKPGrading.dataPertanyaanList; let i = index">
-            <!-- Only display the heading if it's the first question or the kategoriInstrumentName has changed -->
-            <div *ngIf="i === 0 || question.kategoriInstrumentName !== AKPGrading.dataPertanyaanList[i - 1].kategoriInstrumentName">
-                <hr *ngIf="i !== 0" class="text-muted"/>
-                <h4>
-                    {{ question.kategoriInstrumentName }}
-                </h4>
-            </div>
-            <label class="mb-1 mt-2">{{ question.pertanyaanName }}</label>
-            <div>
-                <div *ngFor="let option of optionsM1" class="option-wrapper me-2">
-                    <!-- Use a combination of question id, option id, and index for unique ids -->
-                    <input type="radio" [formControlName]="question.pertanyaanId+'_nilaiYbs'" [value]="option.id"
-                        [id]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i" class="option-input" />
-                    <label class="option-label" [for]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i">{{ option.label }}</label>
-                </div>
-            </div>
-            <div *ngIf="(this.form.get(question.pertanyaanId+'_nilaiYbs')?.value + question.nilaiAtasan + question.nilaiRekan) < 7" class="card p-3 m-0">
-                <div class="alert alert-danger">
-                    {{'Kamu dinilai '}} <strong>{{'Belum '+question.pertanyaanName}}</strong> {{' Menurut anda, apakah penyebab ketidakmampuan tersebut.'}}
-                </div>
-                <div *ngFor="let M2Question of matrix2_3Questions.M2; let i = index" class="option-wrapper me-2">
-                    <label class="mb-1 mt-2">{{ M2Question.question }}</label>
-                    <div>
-                        <div *ngFor="let option of M2Question.options" class="option-wrapper me-2">
-                            <!-- Generate unique ids for M2Question inputs -->
-                            <input type="radio" [formControlName]="question.pertanyaanId+'_'+M2Question.formControlName" [value]="option.id"
-                                [id]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i" class="option-input" />
-                            <label [for]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i" class="option-label">{{ option.label }}</label>
-                        </div>
+            <div *ngIf="question.pertanyaanId === currentQuestion.pertanyaanId">
+                <h4>{{ question.kategoriInstrumentName }}</h4>
+                <label class="mb-1 mt-2">{{ question.pertanyaanName }}</label>
+                <div [formGroupName]="question.pertanyaanId">
+                    <div *ngFor="let option of optionsM1" class="option-wrapper me-2">
+                        <!-- Unique ID generation -->
+                        <input
+                            type="radio"
+                            [formControlName]="question.pertanyaanId + '_nilaiYbs'"
+                            [value]="option.id"
+                            [id]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i"
+                            class="option-input" />
+                        <label
+                            class="option-label"
+                            [for]="'option-' + question.pertanyaanId + '-' + option.id + '-' + i">
+                            {{ option.label }}
+                        </label>
                     </div>
                 </div>
-                <div *ngFor="let M3Question of matrix2_3Questions.M3; let i = index">
-                    <label class="mb-1 mt-2">{{ M3Question.question }}</label>
-                    <div>
-                        <div *ngFor="let option of M3Question.options" class="option-wrapper me-2">
-                            <!-- Generate unique ids for M3Question inputs -->
-                            <input type="radio" [formControlName]="question.pertanyaanId+'_'+M3Question.formControlName" [value]="option.id"
-                                [id]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i" class="option-input" />
-                            <label [for]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i" class="option-label">{{ option.label }}</label>
+            
+                <!-- Conditional rendering for additional questions -->
+                <div
+                    *ngIf="(form.get(question.pertanyaanId.toString())?.get(question.pertanyaanId + '_nilaiYbs')?.value + question.nilaiAtasan + question.nilaiRekan) < 7"
+                    class="card p-3 m-0">
+                    <div class="alert alert-danger">
+                        {{ 'Kamu dinilai ' }}
+                        <strong>{{ 'Belum ' + question.pertanyaanName }}</strong>
+                        {{ ' Menurut anda, apakah penyebab ketidakmampuan tersebut.' }}
+                    </div>
+            
+                    <!-- Matrix M2 Questions -->
+                    <div *ngFor="let M2Question of matrix2_3Questions.M2; let i = index" class="option-wrapper me-2">
+                        <label class="mb-1 mt-2">{{ M2Question.question }}</label>
+                        <div [formGroupName]="question.pertanyaanId">
+                            <div>
+                                <div *ngFor="let option of M2Question.options" class="option-wrapper me-2">
+                                    <input
+                                        type="radio"
+                                        [formControlName]="question.pertanyaanId + '_' + M2Question.formControlName"
+                                        [value]="option.id"
+                                        [id]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i"
+                                        class="option-input" />
+                                    <label
+                                        class="option-label"
+                                        [for]="'option-' + question.pertanyaanId + '-' + M2Question.formControlName + '-' + option.id + '-' + i">
+                                        {{ option.label }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feedback">
+                        <small *ngIf="form.get(question.pertanyaanId.toString())?.hasError('atLeastOneZero')">
+                            Salah satu jawaban dari penugasan, materi dan informasi harus bernilai <strong>Tidak Mampu</strong>.
+                        </small>
+                    </div>
+            
+                    <!-- Matrix M3 Questions -->
+                    <div *ngFor="let M3Question of matrix2_3Questions.M3; let i = index">
+                        <label class="mb-1 mt-2">{{ M3Question.question }}</label>
+                        <div [formGroupName]="question.pertanyaanId">
+                            <div>
+                                <div *ngFor="let option of M3Question.options" class="option-wrapper me-2">
+                                    <input
+                                        type="radio"
+                                        [formControlName]="question.pertanyaanId + '_' + M3Question.formControlName"
+                                        [value]="option.id"
+                                        [id]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i"
+                                        class="option-input" />
+                                    <label
+                                        class="option-label"
+                                        [for]="'option-' + question.pertanyaanId + '-' + M3Question.formControlName + '-' + option.id + '-' + i">
+                                        {{ option.label }}
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <hr class="text-muted"/>
-        <div class="alert alert-warning">
+        <div class="alert alert-warning" *ngIf="categoryPage$.value === categoryLength$.value - 1">
             Periksa dan pastikan semua jawaban diatas sudah benar, jika sudah benar silahkan tekan tombol
             Kirim Penilaian.
         </div>
         <div class="float-end mb-3">
-            <button *ngIf="backButonAction" type="submit" class="btn btn-soft-secondary me-2" (click)="backButonAction()">Kembali</button>
+            <span class="me-3">Halaman {{categoryPage$.value + 1}} dari {{categoryLength$.value}}</span>
+            <button class="btn me-2 btn-secondary" type="button" (click)="handleCategoryPage('prev')" [disabled]="categoryPage$.value === 0"><i class="mdi mdi-chevron-left"></i></button>
+            <button class="btn me-2 btn-secondary" type="button" (click)="handleCategoryPage('next')" [disabled]="categoryPage$.value === categoryLength$.value - 1"><i class="mdi mdi-chevron-right"></i></button>
+            <button *ngIf="backButonAction" type="submit" class="btn btn-outline-danger me-2" (click)="backButonAction()">Tutup Penilaian</button>
             <ng-container *ngIf="(submitLoading$ | async) else noLoading">
                 <button class="btn btn-primary" disabled>
                     <div class="spinner-border" style="width: 19px; height: 19px;" role="status">
@@ -66,7 +106,7 @@
             </ng-container>
             <ng-template #noLoading>
                 <button type="submit" class="btn btn-primary"
-                    [disabled]="form.invalid || (submitLoading$ | async)">Kirim Penilaian</button>
+                    [disabled]="form.invalid || (submitLoading$ | async)" *ngIf="categoryPage$.value === categoryLength$.value - 1">Kirim Penilaian</button>
             </ng-template>
         </div>
     </form>
