@@ -222,6 +222,14 @@ export class ReportSiapComponent {
           if (this.addSiapReportForm.value.exportType == 'kabKota') {
             reportGenerate.parameter = { kabKotaId: this.addSiapReportForm.value.kabKotaId, kabKotaName: this.addSiapReportForm.value.kabKotaName }
           }
+          // console.log(reportGenerate);
+          this.apiService.postData('/api/v1/report_generate/async', reportGenerate).subscribe({
+            next: () => {
+              this.handlerService.handleAlert("Success", "Generating Report...")
+              this.pagableComponent.fetchData();
+              this.ngOnInit();
+            }
+          })
         }
       })
     }
