@@ -5,7 +5,7 @@ export class NotificationMessage extends Serializable {
     title: string = undefined;
     body: string = undefined;
     data: any = undefined;
-    read: boolean = undefined;
+    read: boolean | number = undefined;
     dateCreated: string = undefined;
     age: string = undefined;
 

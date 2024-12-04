@@ -10,3 +10,32 @@
     color: #272a3a;
     font-weight: bold;
 }
+
+.card-bg {
+    background-color: #13182B;
+     /* SVG pattern overlay */
+     background-image: 
+     url('/assets/sun.svg');
+
+     /* Cover styling */
+     background-size: contain;
+     background-repeat: repeat;
+     background-blend-mode: overlay;
+}
+
+.w-xl {
+    width: 500px;
+}
+
+.trash-button {
+    background-color: #ffffff;
+    color: rgb(219, 45, 45);
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 5px 10px;
+    
+    &:hover {
+        background-color: rgb(234, 234, 234);
+    }
+}

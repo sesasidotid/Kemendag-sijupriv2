@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import { LoginContext } from '../../../modules/base/commons/login-context';
 import { ApiService } from '../../../modules/base/services/api.service';
 import { NotificationMessage } from '../../../modules/notification/models/notification-message.model';
+import { BehaviorSubject } from 'rxjs';
+import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-top-bar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EmptyStateComponent],
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.scss'
 })
@@ -20,6 +22,8 @@ export class TopBarComponent {
 
   selectedTab: string = '';
   isExpanded: boolean = false;
+
+  notificationsDeleteId$ = new BehaviorSubject<string[]>([]);
 
   notificationMessagePersonalList: NotificationMessage[] = [];
   notificationMessageGroupList: NotificationMessage[] = [];
@@ -33,6 +37,7 @@ export class TopBarComponent {
     this.id = LoginContext.getUserId();
     this.name = LoginContext.getName();
     this.role = LoginContext.getRoleCodes();
+    this.getNotificationPersonal()
   }
 
   ngAfterViewInit() {
@@ -159,6 +164,45 @@ export class TopBarComponent {
     } else {
       const years = Math.floor(diffInSeconds / 31556952);
       return `${years} year${years > 1 ? 's' : ''} ago`;
+    }
+  }
+
+  checkNotificationsDeleteId(notificationId: string) {
+    return this.notificationsDeleteId$.value.includes(notificationId);
+  }
+
+  handleCheckClicked(notificationId: string) {
+    if (!this.checkNotificationsDeleteId(notificationId)) {
+      this.notificationsDeleteId$.next([...this.notificationsDeleteId$.value, notificationId]);
+    } else {
+      this.notificationsDeleteId$.next(this.notificationsDeleteId$.value.filter(id => id !== notificationId));
+    }
+    console.log(this.notificationsDeleteId$.value.length);
+  }
+  
+  handleCheckAllClicked() {
+    if (this.notificationsDeleteId$.value.length === this.notificationMessagePersonalList.length) {
+      this.notificationsDeleteId$.next([]);
+    } else {
+      this.notificationsDeleteId$.next(this.notificationMessagePersonalList.map(notification => notification.id));
+    }
+  }
+
+  handleDeleteClicked() {
+    if (this.notificationsDeleteId$.value.length === 1) {
+      this.apiService.deleteData(`/api/v1/notification_message/${this.notificationsDeleteId$.value[0]}`).subscribe({
+        next: (response: any) => {
+          this.notificationsDeleteId$.next([]);
+          this.getNotificationPersonal();
+        }
+      });
+    } else {
+      this.apiService.postData('/api/v1/notification_message/delete', { idList: this.notificationsDeleteId$.value }).subscribe({
+        next: (response: any) => {
+          this.notificationsDeleteId$.next([]);
+          this.getNotificationPersonal();
+        }
+      });
     }
   }
 }
