@@ -9,18 +9,19 @@ import { MatrixTwoTableComponent } from '../../../modules/base/components/matrix
 import { MatrixThreeTableComponent } from '../../../modules/base/components/matrix-three-table/matrix-three-table.component';
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component';
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler';
+import { RekapTableComponent } from '../../../modules/base/components/rekap-table/rekap-table.component';
 
 @Component({
   selector: 'app-akp-detail',
   standalone: true,
-  imports: [CommonModule, FileHandlerComponent, MatrixOneTableComponent, MatrixTwoTableComponent, MatrixThreeTableComponent],
+  imports: [CommonModule, FileHandlerComponent, MatrixOneTableComponent, MatrixTwoTableComponent, MatrixThreeTableComponent, RekapTableComponent],
   templateUrl: './akp-detail.component.html',
   styleUrl: './akp-detail.component.scss'
 })
 export class AkpDetailComponent {
   akpId: string;
   inputs: FIleHandler;
-
+  
   AKPDetail = new AKPDetail();
   currentTab$ = new BehaviorSubject<number>(1);
 

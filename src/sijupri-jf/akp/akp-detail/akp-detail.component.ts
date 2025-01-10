@@ -4,16 +4,13 @@ import { AkpTaskService } from '../../../modules/akp/services/akp-task.service';
 import { AKPDetail } from '../../../modules/akp/models/akp-detail.model';
 import { BehaviorSubject } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { MatrixOneTableComponent } from '../../../modules/base/components/matrix-one-table/matrix-one-table.component';
-import { MatrixTwoTableComponent } from '../../../modules/base/components/matrix-two-table/matrix-two-table.component';
-import { MatrixThreeTableComponent } from '../../../modules/base/components/matrix-three-table/matrix-three-table.component';
-import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component';
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler';
+import { RekapTableComponent } from "../../../modules/base/components/rekap-table/rekap-table.component";
 
 @Component({
   selector: 'app-akp-detail',
   standalone: true,
-  imports: [CommonModule, FileHandlerComponent, MatrixOneTableComponent, MatrixTwoTableComponent, MatrixThreeTableComponent],
+  imports: [CommonModule, RekapTableComponent],
   templateUrl: './akp-detail.component.html',
   styleUrl: './akp-detail.component.scss'
 })

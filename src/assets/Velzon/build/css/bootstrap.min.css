@@ -9654,7 +9654,7 @@ fieldset:disabled .btn {
 
 .bg-primary {
     --vz-bg-opacity: 1;
-    background-color: rgba(var(--vz-primary-rgb), var(--vz-bg-opacity)) !important
+    background-color: var(--vz-primary) !important
 }
 
 .bg-secondary {

@@ -1,0 +1,43 @@
+<div *ngIf="data" class="ag-theme-alpine">
+    <ag-grid-angular
+    style="height: 500px;"
+    [rowData]="data"
+    [columnDefs]="colDefs" 
+    [pagination]="pagination"
+    [paginationPageSize]="paginationPageSize"
+    [paginationPageSizeSelector]="paginationPageSizeSelector"
+    />
+    
+    <app-modal *ngIf="isModalOpen$ | async" [title]="'Aksi Pelatihan'" (toggle)="toggleModal()" [enableFooter]="false">
+        {{selectedRekapData}}
+        <!-- <form> -->
+            <!-- <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="firstnameInput" class="form-label">
+                            Kompetensi
+                        </label>
+                        <p class="border-bottom pb-2">{{selectedRekapData.kompetensi}}</p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="firstnameInput" class="form-label">
+                            DKK
+                        </label>
+                        <p class="border-bottom pb-2">{{selectedRekapData.dkk}}</p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="firstnameInput" class="form-label">
+                            Prioritas
+                        </label>
+                        <p class="border-bottom pb-2">{{selectedRekapData.prioritas}}</p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="firstnameInput" class="form-label">
+                            Jenis Pengembangan Kompetensi
+                        </label>
+                        <p class="border-bottom pb-2">{{selectedRekapData.jenisPelatihan}}</p>
+                    </div>
+                    
+            </div> -->
+        <!-- </form> -->
+    </app-modal>
+</div>

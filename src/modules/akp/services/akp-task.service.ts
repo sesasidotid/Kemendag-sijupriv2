@@ -39,7 +39,7 @@ export class AkpTaskService {
     return this.apiService.postData(`${this.BASE_PATH_TASK}`, {nip: id}).pipe(
       catchError((error) => {
         console.error('error', error);
-        this.alertService.showToast('Error', error.message);
+        // this.alertService.showToast('Error', error.message);
         throw error;
       })
     );
@@ -51,7 +51,7 @@ export class AkpTaskService {
         return new AKPByReviewer(response);
       }),
       catchError((error) => {
-        this.alertService.showToast('Error', error.message);
+        // this.alertService.showToast('Error', error.message);
         throw error;
       })
     );
@@ -63,7 +63,7 @@ export class AkpTaskService {
         return new AKPByPersonal(response);
       }),
       catchError((error) => {
-        this.alertService.showToast('Error', error.message);
+        // this.alertService.showToast('Error', error.message);
         throw error;
       })
     );
@@ -73,7 +73,7 @@ export class AkpTaskService {
     return this.apiService.postData(`${this.BASE_PATH_AKP}/matrix/personal`, review).pipe(
       catchError((error) => {
         console.error('error', error);
-        this.alertService.showToast('Error', error.error.message);
+        // this.alertService.showToast('Error', error.error.message);
         throw error;
       })
     );
@@ -83,7 +83,7 @@ export class AkpTaskService {
     return this.apiService.postData(`${this.BASE_PATH_AKP}/matrix/atasan`, review).pipe(
       catchError((error) => {
         console.error('error', error);
-        this.alertService.showToast('Error', error.error.message);
+        // this.alertService.showToast('Error', error.error.message);
         throw error;
       })
     );
@@ -93,7 +93,7 @@ export class AkpTaskService {
     return this.apiService.postData(`${this.BASE_PATH_AKP}/matrix/rekan`, review).pipe(
       catchError((error) => {
         console.error('error', error);
-        this.alertService.showToast('Error', error.error.message);
+        // this.alertService.showToast('Error', error.error.message);
         throw error;
       })
     );
@@ -103,7 +103,7 @@ export class AkpTaskService {
     return this.apiService.postData(`${this.BASE_PATH_TASK}/submit`, payload).pipe(
       catchError((error) => {
         console.error('error', error);
-        this.alertService.showToast('Error', error.error.message);
+        // this.alertService.showToast('Error', error.error.message);
         throw error;
       })
     );
@@ -113,7 +113,7 @@ export class AkpTaskService {
     return this.apiService.getData(`${this.BASE_PATH_AKP}/task/${id}`).pipe(
       catchError((error) => {
         console.error('error', error);
-        this.alertService.showToast('Error', error.error.message);
+        // this.alertService.showToast('Error', error.error.message);
         throw error;
       }));
   }
@@ -122,7 +122,7 @@ export class AkpTaskService {
     return this.apiService.getData(`${this.BASE_PATH_AKP}/${id}`).pipe(
       catchError((error) => {
         console.error('error', error);
-        this.alertService.showToast('Error', error.error.message);
+        // this.alertService.showToast('Error', error.error.message);
         throw error;
       }));
   }

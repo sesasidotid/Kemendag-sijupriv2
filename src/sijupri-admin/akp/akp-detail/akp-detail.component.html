@@ -111,8 +111,8 @@
                 </li>
                 <li class="nav-item cursor-pointer" (click)="tabChange(4)">
                     <a class="nav-link" data-bs-toggle="tab" role="tab">
-                        <i class="mdi mdi-book me-1"></i>
-                        Rekomendasi
+                        <i class="mdi mdi-clipboard-list me-1"></i>
+                        Rekap
                     </a>
                 </li>
             </ul>
@@ -128,9 +128,7 @@
     <ng-container *ngIf="(currentTab$ |async) === 3">
         <app-matrix-three-table [data]="AKPDetail.matrix3DtoList"></app-matrix-three-table>
     </ng-container>
-    <ng-container *ngIf="(currentTab$ | async) === 4">
-        <div class="card p-4">
-                <app-file-handler [inputs]="inputs"></app-file-handler>
-        </div>
+    <ng-container *ngIf="(currentTab$ |async) === 4">
+        <app-rekap-table [data]="AKPDetail.akpRekapDtoList"></app-rekap-table>
     </ng-container>
 </ng-template>

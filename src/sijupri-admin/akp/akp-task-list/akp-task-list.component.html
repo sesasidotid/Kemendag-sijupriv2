@@ -1,4 +1,4 @@
-<app-pagable [pagable]="pagable"></app-pagable>
+<app-pagable [pagable]="pagable$ | async"></app-pagable>
 
 <app-modal *ngIf="isModalOpen$ | async" [title]="'Verifikasi Pengajuan AKP'" (toggle)="toggleModal()" [enableFooter]="false">
     <form [formGroup]="form">

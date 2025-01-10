@@ -177,7 +177,7 @@ export class TopBarComponent {
     } else {
       this.notificationsDeleteId$.next(this.notificationsDeleteId$.value.filter(id => id !== notificationId));
     }
-    console.log(this.notificationsDeleteId$.value.length);
+    // console.log(this.notificationsDeleteId$.value.length);
   }
   
   handleCheckAllClicked() {

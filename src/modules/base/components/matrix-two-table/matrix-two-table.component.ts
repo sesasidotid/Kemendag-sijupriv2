@@ -43,8 +43,8 @@ export class MatrixTwoTableComponent {
     { field: "nilaiMetode", filter: true, floatingFilter: true },
     // { field: "alasanMateri", filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] } },
     // { field: "alasanInformasi", filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] } },
-    { field: "penyebabDiskrepansiUtama", filter: true, floatingFilter: true, minWidth: 300 },
-    { field: "jenisPengembanganKompetensi", filter: true, floatingFilter: true, minWidth: 300 },
+    // { field: "penyebabDiskrepansiUtama", filter: true, floatingFilter: true, minWidth: 300 },
+    // { field: "jenisPengembanganKompetensi", filter: true, floatingFilter: true, minWidth: 300 },
   ];
 
   ngOnInit() {

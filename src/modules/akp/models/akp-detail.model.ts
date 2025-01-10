@@ -29,6 +29,7 @@ export class AKPDetail extends Serializable {
     matrix1DtoList: any[];
     matrix2DtoList: any[];
     matrix3DtoList: any[];
+    akpRekapDtoList: any[];
     isAtasanGraded: boolean;
     isRekanGraded: boolean;
 

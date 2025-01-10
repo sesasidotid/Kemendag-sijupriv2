@@ -36,7 +36,7 @@ export class MatrixOneTableComponent {
     { field: "nilaiAtasan", filter: true, floatingFilter: true },
     { field: "nilaiRekan", filter: true, floatingFilter: true },
     { field: "score", filter: true, floatingFilter: true },
-    { field: "keterangan", filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] } }
+    // { field: "keterangan", filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] } }
   ];
 
   ngOnInit() {

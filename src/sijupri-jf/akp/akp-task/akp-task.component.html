@@ -195,12 +195,6 @@
                         <div class="step-counter"><i class="mdi mdi-account"></i></div>
                         <div class="step-name">Penilaian Personal</div>
                     </div>
-                    <div class="stepper-item"
-                        [ngClass]="{'active': (currentAKPStep$ | async) === 4, 'completed': (currentAKPStep$ | async) > 4}"
-                        (click)="handleStepClick(4)">
-                        <div class="step-counter"><i class="mdi mdi-bookmark-box"></i></div>
-                        <div class="step-name">Rekomendasi AKP</div>
-                    </div>
                 </div>
                 <div *ngIf="isPersonalReview$ | async" class="card">
                     <app-akp-grading-personal [AKPId]="AKPTask.akpId" [backButonAction]="togglePersonalReview.bind(this)"></app-akp-grading-personal>
@@ -218,7 +212,6 @@
                                                 <i *ngIf="history.flowId === 'akp_flow_1'" class="mdi mdi-clipboard-multiple-outline mdi-24px text-muted"></i>
                                                 <i *ngIf="history.flowId === 'akp_flow_2'" class="mdi mdi-account-multiple mdi-24px text-muted"></i>
                                                 <i *ngIf="history.flowId === 'akp_flow_3'" class="mdi mdi-account mdi-24px text-muted"></i>
-                                                <i *ngIf="history.flowId === 'akp_flow_4'" class="mdi mdi-bookmark-box mdi-24px text-muted"></i>
 
                                             </div>
                                             <div class="">
@@ -232,16 +225,14 @@
                                                     <h5 class="">{{history.flowName}} <span class="badge rounded-pill text-bg-danger ms-2">Ditolak</span></h5>
                                                 </ng-container>
                                                 <ng-container *ngIf="history.taskStatus === 'COMPLETED'">
-                                                    <p *ngIf="history.flowId === 'akp_flow_1'" class="text-muted" >Diverifikasi Pada : {{convertDate(history.lastUpdated)}}</p>
-                                                    <p *ngIf="history.flowId === 'akp_flow_2'" class="text-muted" >Dinilai Pada : {{convertDate(history.lastUpdated)}}</p>
-                                                    <p *ngIf="history.flowId === 'akp_flow_3'" class="text-muted" >Dinilai Pada : {{convertDate(history.lastUpdated)}}</p>
-                                                    <p *ngIf="history.flowId === 'akp_flow_4'" class="text-muted" >Direkomendasikan Pada : {{convertDate(history.lastUpdated)}}</p>
+                                                    <p *ngIf="history.flowId === 'akp_flow_1'" class="text-muted mb-0" >Diverifikasi Pada : {{convertDate(history.lastUpdated)}}</p>
+                                                    <p *ngIf="history.flowId === 'akp_flow_2'" class="text-muted mb-0" >Dinilai Pada : {{convertDate(history.lastUpdated)}}</p>
+                                                    <p *ngIf="history.flowId === 'akp_flow_3'" class="text-muted mb-0" >Dinilai Pada : {{convertDate(history.lastUpdated)}}</p>
                                                 </ng-container>
                                                 <ng-container *ngIf="history.taskStatus !== 'COMPLETED'">
-                                                    <p *ngIf="history.flowId === 'akp_flow_1'" class="text-muted" >Diverifikasi Pada : -</p>
-                                                    <p *ngIf="history.flowId === 'akp_flow_2'" class="text-muted" >Dinilai Pada : -</p>
-                                                    <p *ngIf="history.flowId === 'akp_flow_3'" class="text-muted" >Dinilai Pada : -</p>
-                                                    <p *ngIf="history.flowId === 'akp_flow_4'" class="text-muted" >Direkomendasikan Pada : -</p>
+                                                    <p *ngIf="history.flowId === 'akp_flow_1'" class="text-muted mb-0" >Diverifikasi Pada : -</p>
+                                                    <p *ngIf="history.flowId === 'akp_flow_2'" class="text-muted mb-0" >Dinilai Pada : -</p>
+                                                    <p *ngIf="history.flowId === 'akp_flow_3'" class="text-muted mb-0" >Dinilai Pada : -</p>
                                                 </ng-container>
                                             </div>
                                         </div>

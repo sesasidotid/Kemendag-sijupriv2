@@ -30,6 +30,7 @@ export class AKPTaskComponent {
   isModalOpen$ = new BehaviorSubject<boolean>(false);
   taskId$ = new BehaviorSubject<string>('');
   action$ = new BehaviorSubject<"approve" | "reject">('approve');
+  pagable$ = new BehaviorSubject<Pagable | null>(null);
 
   constructor(
     private tabService: TabService,
@@ -37,26 +38,64 @@ export class AKPTaskComponent {
     private alertService: AlertService,
     private router: Router,
   ) {
-    this.pagable = new PagableBuilder("/api/v1/akp/task/search")
-      .addPrimaryColumn(new PrimaryColumnBuilder("NIP", 'objectId').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("Nama AKP", 'objectName').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("Proses", 'flowName').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'taskStatus').build())
-      .addActionColumn(new ActionColumnBuilder().setAction((task: any) => {
-        this.router.navigate([`/akp/akp-task-list/${task.id}`])
-      }, "info").addInactiveCondition((task: any) => task.flowId === 'akp_flow_1').withIcon("detail").build())
-      .addActionColumn(new ActionColumnBuilder().setAction((task: any) => {
-        this.taskId$.next(task.id);
-        this.toggleModal();
-      }, "primary").addInactiveCondition((task: any) => task.flowId !== 'akp_flow_1').withIcon("update").build())
-      .addFilter(new PageFilterBuilder("like").setProperty("objectId").withField("NIP", "text").build())
-      .build();
+    this.pagable$.next(
+      new PagableBuilder("/api/v1/akp/task/search")
+        .addPrimaryColumn(new PrimaryColumnBuilder("NIP", 'objectGroup').build())
+        .addPrimaryColumn(new PrimaryColumnBuilder("Nama AKP", 'objectName').build())
+        .addPrimaryColumn(new PrimaryColumnBuilder("Proses", 'flowName').build())
+        .addPrimaryColumn(new PrimaryColumnBuilder("Status", 'taskStatus').build())
+        .addActionColumn(new ActionColumnBuilder().setAction((task: any) => {
+          this.router.navigate([`/akp/akp-task-list/${task.id}`])
+        }, "info").addInactiveCondition((task: any) => task.flowId === 'akp_flow_1').withIcon("detail").build())
+        .addActionColumn(new ActionColumnBuilder().setAction((task: any) => {
+          this.taskId$.next(task.id);
+          this.toggleModal();
+        }, "primary").addInactiveCondition((task: any) => task.flowId !== 'akp_flow_1').withIcon("update").build())
+        .addFilter(new PageFilterBuilder("equal").setProperty("flowId").withDefaultValue("akp_flow_1").build())
+        .addFilter(new PageFilterBuilder("like").setProperty("objectGroup").withField("NIP", "text").build())
+        .build()
+    )
 
     this.form = new FormGroup({
       nama_atasan: new FormControl('', [Validators.required]),
       email_atasan: new FormControl('', [Validators.required, Validators.email]),
       remark: new FormControl('', [Validators.required]),
     });
+  }
+
+  ngOnInit() {
+    if (this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs();
+    }
+
+    this.tabService.addTab({
+      label: 'Verifikasi Pengajuan',
+      icon: 'mdi-list-box',
+      isActive: true,
+      onClick: () => this.handlePagableTabChange("akp_flow_1", 0),
+    }).addTab({
+      label: 'Penilaian Atasan/Rekan',
+      icon: 'mdi-account-supervisor',
+      onClick: () => this.handlePagableTabChange("akp_flow_2", 1),
+    }).addTab({
+      label: 'Penilaian Personal',
+      icon: 'mdi-account',
+      onClick: () => this.handlePagableTabChange("akp_flow_3", 2),
+    });
+  }
+
+  handlePagableTabChange(tab: string, tabIndex: number) {
+    const currentPagable = this.pagable$.value;
+
+    const updatedPagable = {
+      ...currentPagable,
+      filterLIst: currentPagable.filterLIst.map((item, index) =>
+        item.key === 'eq_flowId' ? { ...item, value: tab } : item
+      ),
+    };
+
+    this.tabService.changeTabActive(tabIndex);
+    this.pagable$.next(updatedPagable);
   }
 
   toggleModal() {
@@ -77,12 +116,12 @@ export class AKPTaskComponent {
           next: () => {
             this.alertService.showToast('Success', 'Berhasil menerima pengajuan AKP.');
             this.toggleModal();
-            setTimeout(() => {window.location.reload();}, 1000);
+            setTimeout(() => { window.location.reload(); }, 1000);
           },
           error: (error) => {
             this.alertService.showToast('Error', 'Gagal menerima pengajuan AKP.');
             this.toggleModal();
-          }          
+          }
         });
       }
     } else if (this.action$.value === 'reject') {
@@ -95,12 +134,12 @@ export class AKPTaskComponent {
           next: () => {
             this.alertService.showToast('Success', 'Berhasil menolak pengajuan AKP.');
             this.toggleModal();
-            setTimeout(() => {window.location.reload();}, 1000);
+            setTimeout(() => { window.location.reload(); }, 1000);
           },
           error: (error) => {
             this.alertService.showToast('Error', 'Gagal menolak pengajuan AKP.');
             this.toggleModal();
-          }          
+          }
         });
       }
     }

@@ -38,9 +38,9 @@ export class MatrixThreeTableComponent {
     { field: "nilaiKesulitan", filter: true, floatingFilter: true },
     { field: "nilaiKualitas", filter: true, floatingFilter: true },
     { field: "nilaiPengaruh", filter: true, floatingFilter: true },
-    { field: "nilaiMetode", filter: true, floatingFilter: true },
-    { field: "kategori", filter: true, floatingFilter: true, minWidth: 300 },
-    { field: "rankPrioritas", filter: true, floatingFilter: true,},
+    // { field: "nilaiMetode", filter: true, floatingFilter: true },
+    // { field: "kategori", filter: true, floatingFilter: true, minWidth: 300 },
+    // { field: "rankPrioritas", filter: true, floatingFilter: true,},
   ];
 
   ngOnInit() {
