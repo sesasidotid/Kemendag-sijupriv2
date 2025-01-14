@@ -1,19 +1,36 @@
 <form (submit)="submit()">
-    <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Tanggal Pendaftaran Dibuka</label>
-        <div class="col-sm-10">
-            <input type="date" class="form-control" [(ngModel)]="ukom.startDate" name="start_date">
-        </div>
+  <div class="row mb-3">
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Tanggal Pendaftaran Dibuka</label
+    >
+    <div class="col-sm-10">
+      <input
+        type="date"
+        class="form-control"
+        [(ngModel)]="ukom.startDate"
+        name="start_date"
+      />
     </div>
-    <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Tanggal Pendaftaran Ditutup</label>
-        <div class="col-sm-10">
-            <input type="date" class="form-control" [(ngModel)]="ukom.endDate" name="end_date">
-        </div>
+  </div>
+  <div class="row mb-3">
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Tanggal Pendaftaran Ditutup</label
+    >
+    <div class="col-sm-10">
+      <input
+        type="date"
+        class="form-control"
+        [(ngModel)]="ukom.endDate"
+        name="end_date"
+      />
     </div>
-    <div class="row">
-        <div class="col text-center">
-            <button type="submit" class="btn btn-sm btn-success float-end">Simpan</button>
-        </div>
+  </div>
+
+  <div class="row">
+    <div class="col text-center">
+      <button type="submit" class="btn btn-sm btn-success float-end">
+        Simpan
+      </button>
     </div>
+  </div>
 </form>

@@ -1,39 +1,65 @@
 <!-- ========== App Menu ========== -->
 <div class="app-menu navbar-menu">
-    <div [id]="isScrollV ? 'scrollbarV' : 'scrollbarH'">
-        <div class="container-fluid">
-            <div id="two-column-menu">
-            </div>
-            <ul class="navbar-nav" id="navbar-nav">
-                <li class="menu-title" *ngIf="isScrollV"><img src="assets/logo/kemendag-logo-dark.png" width="120"><i-lucide [img]="X" [size]="24" (click)="closeMobileSidebar()" class="x-button"></i-lucide></li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link" [ngClass]="{'px-3': !isScrollV}" routerLink="">
-                        <i-lucide [img]="getIcon('home')" [size]="16"></i-lucide> <span class="fw-bold">Home</span>
-                    </a>
-                </li>
-                <li *ngFor="let menu of menuTree" class="nav-item">
-                    <a class="nav-link menu-link" [ngClass]="{'px-3': !isScrollV}" href="#sidebar{{menu.code}}" data-bs-toggle="collapse" role="button"
-                        [attr.aria-expanded]="isActive(menu) ? 'true' : 'false'"
-                        [attr.aria-controls]="'sidebar'+menu.code">
-                        <i-lucide [img]="getIcon(menu.code)" [size]="16"></i-lucide>
-                        <span class="fw-bold">{{menu.name}}</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebar{{menu.code}}" [class.show]="isActive(menu)">
-                        <ul class="nav nav-sm flex-column">
-                            <li *ngFor="let child of menu.child" class="nav-item">
-                                <a routerLink="{{menu.path}}/{{child.path}}" class="nav-link fw-bold"
-                                    routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                                    {{child.name}}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li> <!-- end Dashboard Menu -->
+  <div [id]="isScrollV ? 'scrollbarV' : 'scrollbarH'">
+    <div class="container-fluid">
+      <div id="two-column-menu"></div>
+      <ul class="navbar-nav" id="navbar-nav">
+        <li class="menu-title" *ngIf="isScrollV">
+          <img src="assets/logo/kemendag-logo-dark.png" width="120" /><i-lucide
+            [img]="X"
+            [size]="24"
+            (click)="closeMobileSidebar()"
+            class="x-button"
+          ></i-lucide>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link menu-link"
+            [ngClass]="{ 'px-3': !isScrollV }"
+            routerLink=""
+          >
+            <i-lucide [img]="getIcon('home')" [size]="16"></i-lucide>
+            <span class="fw-bold">Home</span>
+          </a>
+        </li>
+        <li *ngFor="let menu of menuTree" class="nav-item">
+          <a
+            class="nav-link menu-link"
+            [ngClass]="{ 'px-3': !isScrollV }"
+            href="#sidebar{{ menu.code }}"
+            data-bs-toggle="collapse"
+            role="button"
+            [attr.aria-expanded]="isActive(menu) ? 'true' : 'false'"
+            [attr.aria-controls]="'sidebar' + menu.code"
+          >
+            <i-lucide [img]="getIcon(menu.code)" [size]="16"></i-lucide>
+            <span class="fw-bold">{{ menu.name }}</span>
+          </a>
+          <div
+            class="collapse menu-dropdown"
+            id="sidebar{{ menu.code }}"
+            [class.show]="isActive(menu)"
+          >
+            <ul class="nav nav-sm flex-column">
+              <li *ngFor="let child of menu.child" class="nav-item">
+                <a
+                  routerLink="{{ menu.path }}/{{ child.path }}"
+                  class="nav-link fw-bold"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                >
+                  {{ child.name }}
+                </a>
+              </li>
             </ul>
-        </div>
-        <!-- Sidebar -->
+          </div>
+        </li>
+        <!-- end Dashboard Menu -->
+      </ul>
     </div>
-    <div class="sidebar-background"></div>
+    <!-- Sidebar -->
+  </div>
+  <div class="sidebar-background"></div>
 </div>
 <!-- Left Sidebar End -->
 <!-- Vertical Overlay-->
