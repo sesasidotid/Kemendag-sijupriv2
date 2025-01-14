@@ -29,6 +29,7 @@ export class UkomListComponent {
   editorContent: string = ''
   init: any
   pagable: Pagable
+  data: any[] = []
 
   constructor (
     private apiService: ApiService,
@@ -37,37 +38,55 @@ export class UkomListComponent {
     private tabService: TabService,
     private router: Router
   ) {
+    // this.pagable = new PagableBuilder('/api/v1/ukom/search')
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder(
+    //       'Tanggal Dibuka',
+    //       'periodePendaftaran|startDate'
+    //     ).build()
+    //   )
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder(
+    //       'Tanggal Ditutup',
+    //       'periodePendaftaran|endDate'
+    //     ).build()
+    //   )
+    //   .addActionColumn(
+    //     new ActionColumnBuilder()
+    //       .setAction((periodePendafatan: any) => {
+    //         this.router.navigate([`/ukom/ukom-periode/${periodePendafatan.id}`])
+    //       }, 'info')
+    //       .withIcon('detail')
+    //       .build()
+    //   )
+    //   .addFilter(
+    //     new PageFilterBuilder('equal')
+    //       .setProperty('periodePendaftaran|startDate')
+    //       .withField('Tanggal Dibuka', 'text')
+    //       .build()
+    //   )
+    //   .addFilter(
+    //     new PageFilterBuilder('equal')
+    //       .setProperty('periodePendaftaran|endDate')
+    //       .withField('Tanggal Ditutup', 'text')
+    //       .build()
+    //   )
+
+    //   .build()
     this.pagable = new PagableBuilder('/api/v1/ukom/search')
+      .addPrimaryColumn(new PrimaryColumnBuilder('Periode', 'periode').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'email').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'nama').build())
       .addPrimaryColumn(
-        new PrimaryColumnBuilder(
-          'Tanggal Dibuka',
-          'periodePendaftaran|startDate'
-        ).build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder(
-          'Tanggal Ditutup',
-          'periodePendaftaran|endDate'
-        ).build()
+        new PrimaryColumnBuilder('Nilai CAT', 'nilai_cat').build()
       )
       .addActionColumn(
         new ActionColumnBuilder()
-          .setAction((periodePendafatan: any) => {
-            this.router.navigate([`/ukom/ukom-periode/${periodePendafatan.id}`])
+          .setAction((jf: any) => {
+            this.router.navigate([`/ukom/ukom-list/${jf.nip}`])
           }, 'info')
           .withIcon('detail')
-          .build()
-      )
-      .addFilter(
-        new PageFilterBuilder('equal')
-          .setProperty('periodePendaftaran|startDate')
-          .withField('Tanggal Dibuka', 'text')
-          .build()
-      )
-      .addFilter(
-        new PageFilterBuilder('equal')
-          .setProperty('periodePendaftaran|endDate')
-          .withField('Tanggal Ditutup', 'text')
           .build()
       )
       .build()

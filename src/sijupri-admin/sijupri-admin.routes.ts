@@ -185,26 +185,26 @@ export const routes: Routes = [
                 '../sijupri-admin/ukom/ukom-grade-import/ukom-grade-import.component'
               ).then(m => m.UkomGradeImportComponent)
           },
-          Periode: {
-            components: () =>
-              import(
-                '../sijupri-admin/ukom/ukom-periode/ukom-periode.component'
-              ).then(m => m.UkomPeriodeComponent),
-            routes: [
-              {
-                path: 'add',
-                loadComponent: () =>
-                  import(
-                    '../sijupri-admin/ukom/ukom-periode-add/ukom-periode-add.component'
-                  ).then(m => m.UkomPeriodeAddComponent)
-              }
-            ]
-          },
+          //   Periode: {
+          //     components: () =>
+          //       import(
+          //         '../sijupri-admin/ukom/ukom-periode/ukom-periode.component'
+          //       ).then(m => m.UkomPeriodeComponent),
+          //     routes: [
+          //       {
+          //         path: 'add',
+          //         loadComponent: () =>
+          //           import(
+          //             '../sijupri-admin/ukom/ukom-periode-add/ukom-periode-add.component'
+          //           ).then(m => m.UkomPeriodeAddComponent)
+          //       }
+          //     ]
+          //   },
           'Rumus UKom': {
             components: () =>
-              import(
-                '../sijupri-admin/ukom/ukom-rumus/ukom-rumus.component'
-              ).then(m => m.UkomRumusComponent)
+              import('./ukom/ukom-formula/ukom-formula.component').then(
+                m => m.UkomFormulaComponent
+              )
           }
         },
         Maintenance: {

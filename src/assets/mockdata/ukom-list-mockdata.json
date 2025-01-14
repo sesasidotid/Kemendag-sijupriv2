@@ -1,0 +1,37 @@
+[
+  {
+    "Periode": "2023-01",
+    "NIP": "123456789",
+    "Email": "user1@example.com",
+    "Nama": "John Doe",
+    "Nilai CAT": 85
+  },
+  {
+    "Periode": "2023-02",
+    "NIP": "987654321",
+    "Email": "user2@example.com",
+    "Nama": "Jane Smith",
+    "Nilai CAT": 90
+  },
+  {
+    "Periode": "2023-03",
+    "NIP": "123123123",
+    "Email": "user3@example.com",
+    "Nama": "Alice Johnson",
+    "Nilai CAT": 78
+  },
+  {
+    "Periode": "2023-04",
+    "NIP": "321321321",
+    "Email": "user4@example.com",
+    "Nama": "Bob Brown",
+    "Nilai CAT": 82
+  },
+  {
+    "Periode": "2023-05",
+    "NIP": "555666777",
+    "Email": "user5@example.com",
+    "Nama": "Charlie Davis",
+    "Nilai CAT": 88
+  }
+]

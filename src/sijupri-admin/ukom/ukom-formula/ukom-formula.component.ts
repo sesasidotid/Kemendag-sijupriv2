@@ -5,9 +5,9 @@ import { CommonModule } from '@angular/common'
   selector: 'app-ukom-task-detail',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './ukom-rumus.component.html',
-  styleUrl: './ukom-rumus.component.scss'
+  templateUrl: './ukom-formula.component.html',
+  styleUrl: './ukom-formula.component.scss'
 })
-export class UkomRumusComponent {
+export class UkomFormulaComponent {
   constructor () {}
 }

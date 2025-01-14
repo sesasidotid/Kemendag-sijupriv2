@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AkpTaskService } from '../../../modules/akp/services/akp-task.service';
-import { AKPDetail } from '../../../modules/akp/models/akp-detail.model';
-import { BehaviorSubject } from 'rxjs';
-import { CommonModule } from '@angular/common';
-import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler';
-import { RekapTableComponent } from "../../../modules/base/components/rekap-table/rekap-table.component";
+import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { AkpTaskService } from '../../../modules/akp/services/akp-task.service'
+import { AKPDetail } from '../../../modules/akp/models/akp-detail.model'
+import { BehaviorSubject } from 'rxjs'
+import { CommonModule } from '@angular/common'
+import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
+import { RekapTableComponent } from '../../../modules/base/components/rekap-table/rekap-table.component'
 
 @Component({
   selector: 'app-akp-detail',
@@ -15,49 +15,57 @@ import { RekapTableComponent } from "../../../modules/base/components/rekap-tabl
   styleUrl: './akp-detail.component.scss'
 })
 export class AkpDetailComponent {
-  akpId: string;
-  inputs: FIleHandler;
+  akpId: string
+  inputs: FIleHandler
 
-  AKPDetail = new AKPDetail();
-  currentTab$ = new BehaviorSubject<number>(1);
+  AKPDetail = new AKPDetail()
+  currentTab$ = new BehaviorSubject<number>(1)
 
-  AKPDetailLoading$ = new BehaviorSubject<boolean>(false);
+  AKPDetailLoading$ = new BehaviorSubject<boolean>(false)
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private akpTaskService: AkpTaskService) {
+  constructor (
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private akpTaskService: AkpTaskService
+  ) {
     this.activatedRoute.paramMap.subscribe(params => {
-      this.akpId = params.get('id');
-    });
-    this.getAKPDetail();
+      this.akpId = params.get('id')
+    })
+    this.getAKPDetail()
   }
 
-  getAKPDetail() {
-    this.AKPDetailLoading$.next(true);
+  getAKPDetail () {
+    this.AKPDetailLoading$.next(true)
     this.akpTaskService.getAKPDetailById(this.akpId).subscribe({
-      next: (response) => {
-        this.AKPDetail = response;
+      next: response => {
+        this.AKPDetail = response
 
         this.inputs = {
           files: {
-            rekomendasi: { label: "File Rekomendasi AKP", fileName: this.AKPDetail.rekomendasi, source: this.AKPDetail.rekomendasiUrl }
+            rekomendasi: {
+              label: 'File Rekomendasi AKP',
+              fileName: this.AKPDetail.rekomendasi,
+              source: this.AKPDetail.rekomendasiUrl
+            }
           },
           listen: (key: string, source: string, base64Data: string) => {},
           viewOnly: true
-        };
+        }
 
-        this.AKPDetailLoading$.next(false);
+        this.AKPDetailLoading$.next(false)
       },
-      error: (error) => {
-        this.AKPDetailLoading$.next(false);
-        console.error('Error fetching data', error);
+      error: error => {
+        this.AKPDetailLoading$.next(false)
+        console.error('Error fetching data', error)
       }
-    });
+    })
   }
 
-  backToList() {
-    this.router.navigate(['/akp/akp-list']);
+  backToList () {
+    this.router.navigate(['/akp/akp-list'])
   }
 
-  tabChange(tab: number) {
-    this.currentTab$.next(tab);
+  tabChange (tab: number) {
+    this.currentTab$.next(tab)
   }
 }
