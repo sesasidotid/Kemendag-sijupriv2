@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
-import { ApiService } from '../../../modules/base/services/api.service'
-import { AlertService } from '../../../modules/base/services/alert.service'
-import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
+import { ApiService } from '../../../../modules/base/services/api.service'
+import { AlertService } from '../../../../modules/base/services/alert.service'
+import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { Router } from '@angular/router'
-import { Pagable } from '../../../modules/base/commons/pagable/pagable'
-import { Ukom } from '../../../modules/ukom/models/ukom.model'
+import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+import { Ukom } from '../../../../modules/ukom/models/ukom.model'
 import { FormsModule } from '@angular/forms'
-import { HandlerService } from '../../../modules/base/services/handler.service'
-import { TabService } from '../../../modules/base/services/tab.service'
-import { LoginContext } from '../../../modules/base/commons/login-context'
+import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { TabService } from '../../../../modules/base/services/tab.service'
+import { LoginContext } from '../../../../modules/base/commons/login-context'
 
 @Component({
   selector: 'app-ukom-add',

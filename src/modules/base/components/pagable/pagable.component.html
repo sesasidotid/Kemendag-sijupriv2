@@ -1,101 +1,154 @@
 <div class="row mb-3" *ngIf="pagable.filterLIst">
-    <form (submit)="fetchData()">
-        <div class="filter-container">
-                <ng-container *ngFor="let fillter of pagable.filterLIst">
-                    <ng-container *ngIf="fillter.fieldType" >
-                        <div>
-                            <div class="mb-0 cursor-pointer" *ngIf="fillter.fieldType == 'select'">
-                                <label class="col-form-label p-1"><b>{{fillter.label}}</b></label>
-                                <select class="form-select p-1 cursor-pointer" [(ngModel)]="fillter.value" name="{{fillter.label}}">
-                                    <option [value]='""'>pilih</option>
-                                    <ng-container *ngFor="let data of fillter.optionList">
-                                        <option [value]='data.value'>{{data.label}}</option>
-                                    </ng-container>
-                                </select>
-                            </div>
-                            <div class="mb-0" *ngIf="fillter.fieldType == 'text'">
-                                <label class="col-form-label p-1"><b>{{fillter.label}}</b></label>
-                                <input class="form-control p-1" [(ngModel)]="fillter.value" name="{{fillter.label}}" />
-                            </div>
-                        </div>
-                    </ng-container>
+  <form (submit)="fetchData()">
+    <div class="filter-container">
+      <ng-container *ngFor="let fillter of pagable.filterLIst">
+        <ng-container *ngIf="fillter.fieldType">
+          <div>
+            <div
+              class="mb-0 cursor-pointer"
+              *ngIf="fillter.fieldType == 'select'"
+            >
+              <label class="col-form-label p-1"
+                ><b>{{ fillter.label }}</b></label
+              >
+              <select
+                class="form-select p-1 cursor-pointer"
+                [(ngModel)]="fillter.value"
+                name="{{ fillter.label }}"
+              >
+                <option [value]="''">pilih</option>
+                <ng-container *ngFor="let data of fillter.optionList">
+                  <option [value]="data.value">{{ data.label }}</option>
                 </ng-container>
-                <button *ngIf="isSearchExist()" type="submit" class="btn btn-sm btn-outline-primary"
-                    style="bottom: 0;">Terapkan</button>
-        </div>
-    </form>
+              </select>
+            </div>
+            <div class="mb-0" *ngIf="fillter.fieldType == 'text'">
+              <label class="col-form-label p-1"
+                ><b>{{ fillter.label }}</b></label
+              >
+              <input
+                class="form-control p-1"
+                [(ngModel)]="fillter.value"
+                name="{{ fillter.label }}"
+              />
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+      <button
+        *ngIf="isSearchExist()"
+        type="submit"
+        class="btn btn-sm btn-outline-primary"
+        style="bottom: 0"
+      >
+        Terapkan
+      </button>
+    </div>
+  </form>
 </div>
 <div class="scroll-container">
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>#No</th>
-                <ng-container *ngFor="let column of pagable.primaryColumnList">
-                    <th *ngIf="column.property" (click)="toggleSort(column.property)">
-                        {{ column.label }}
-                        <span class="float-end text-primary" [ngClass]="{
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>#No</th>
+        <ng-container *ngFor="let column of pagable.primaryColumnList">
+          <th *ngIf="column.property" (click)="toggleSort(column.property)">
+            {{ column.label }}
+            <span
+              class="float-end text-primary"
+              [ngClass]="{
                             'ri-filter-3-line': getSortIcon(column.property) == '',
                             'ri-arrow-up-line': getSortIcon(column.property) == 'asc',
                             'ri-arrow-down-line': getSortIcon(column.property) == 'desc',
-                        }"></span>
-                    </th>
-                </ng-container>
-                <th *ngIf="pagable.actionColumnList && pagable.actionColumnList.length > 0">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngIf="onLoad">
-                <td colspan="100%" class="m-1 p-4" >
-                    <div class="d-flex justify-content-center">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <ng-container *ngIf="!onLoad">
-                <tr *ngIf="paginator.data.length == 0">
-                    <td colspan="100%" class="m-1 p-4" >
-                        <div class="d-flex justify-content-center align-items-center">
-                            <span class="ms-2">Data tidak ditemukan</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr *ngFor="let row of paginator.data; index as i" class="table-row">
-                    <td class="fw-bold m-1 p-1">{{(i+1) + ((page * 10) - 10)}}</td>
-                    <ng-container *ngFor="let column of pagable.primaryColumnList">
-                        <td *ngIf="column.property" class="m-1 p-1">{{ getPropertyValue(row, column.property) }}</td>
-                        <td *ngIf="!column.property" class="m-1 p-1">{{ column.dynamic(row) }}</td>
-                    </ng-container>
-                    <td *ngIf="pagable.actionColumnList && pagable.actionColumnList.length > 0" class="m-1 p-1">
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <a *ngFor="let action of pagable.actionColumnList" (click)="action.process(row)"
-                                class="text-light btn btn-sm btn-{{(action.inactive && action.inactive(row)) ? 'grey disabled' : action.color}} {{action.icon}}"></a>
-                        </div>
-                    </td>
-                </tr>
-            </ng-container>
-        </tbody>
-    </table>
+                        }"
+            ></span>
+          </th>
+        </ng-container>
+        <th
+          *ngIf="
+            pagable.actionColumnList && pagable.actionColumnList.length > 0
+          "
+        >
+          Action
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngIf="onLoad">
+        <td colspan="100%" class="m-1 p-4">
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <ng-container *ngIf="!onLoad">
+        <tr *ngIf="paginator.data.length == 0">
+          <td colspan="100%" class="m-1 p-4">
+            <div class="d-flex justify-content-center align-items-center">
+              <span class="ms-2">Data tidak ditemukan</span>
+            </div>
+          </td>
+        </tr>
+        <tr *ngFor="let row of paginator.data; index as i" class="table-row">
+          <td class="fw-bold m-1 p-1">{{ i + 1 + (page * 10 - 10) }}</td>
+          <ng-container *ngFor="let column of pagable.primaryColumnList">
+            <td *ngIf="column.property" class="m-1 p-1">
+              {{ getPropertyValue(row, column.property) }}
+            </td>
+            <td *ngIf="!column.property" class="m-1 p-1">
+              {{ column.dynamic(row) }}
+            </td>
+          </ng-container>
+          <td
+            *ngIf="
+              pagable.actionColumnList && pagable.actionColumnList.length > 0
+            "
+            class="m-1 p-1"
+          >
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <a
+                *ngFor="let action of pagable.actionColumnList"
+                (click)="action.process(row)"
+                class="text-light btn btn-sm btn-{{
+                  action.inactive && action.inactive(row)
+                    ? 'grey disabled'
+                    : action.color
+                }} {{ action.icon }}"
+              ></a>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
 </div>
 <nav *ngIf="paginator" aria-label="Page navigation example">
-    <ul class="pagination justify-content-end">
-        <li class="page-item cursor-pointer" [ngClass]="{'disabled': page == 1}">
-            <a class="page-link py-1 px-2" (click)="prev()">Previous</a>
-        </li>
+  <ul class="pagination justify-content-end">
+    <li class="page-item cursor-pointer" [ngClass]="{ disabled: page == 1 }">
+      <a class="page-link py-1 px-2" (click)="prev()">Previous</a>
+    </li>
 
-        <ng-container *ngFor="let item of getPages(); let i = index">
-            <li *ngIf="item !== '...'" class="page-item cursor-pointer">
-                <a class="page-link py-1 px-2" [ngClass]="{'active': page == item}" (click)="select(item)">{{ item
-                    }}</a>
-            </li>
-            <li *ngIf="item === '...'" class="page-item disabled">
-                <a class="page-link py-1 px-2">{{ item }}</a>
-            </li>
-        </ng-container>
+    <ng-container *ngFor="let item of getPages(); let i = index">
+      <li *ngIf="item !== '...'" class="page-item cursor-pointer">
+        <a
+          class="page-link py-1 px-2"
+          [ngClass]="{ active: page == item }"
+          (click)="select(item)"
+          >{{ item }}</a
+        >
+      </li>
+      <li *ngIf="item === '...'" class="page-item disabled">
+        <a class="page-link py-1 px-2">{{ item }}</a>
+      </li>
+    </ng-container>
 
-        <li class="page-item cursor-pointer"[ngClass]="{'disabled': page == paginator.lastPage}">
-            <a class="page-link py-1 px-2" (click)="next()">Next</a>
-        </li>
-    </ul>
+    <li
+      class="page-item cursor-pointer"
+      [ngClass]="{ disabled: page == paginator.lastPage }"
+    >
+      <a class="page-link py-1 px-2" (click)="next()">Next</a>
+    </li>
+  </ul>
 </nav>

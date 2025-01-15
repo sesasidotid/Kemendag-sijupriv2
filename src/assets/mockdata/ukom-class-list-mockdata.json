@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "tempat": "Aula",
+    "tanggal": "2021-08-01",
+    "jam": "08.00 - 09.00",
+    "pengawas kelas": "Budi"
+  },
+  {
+    "id": 2,
+    "tempat": "Aula",
+    "tanggal": "2021-08-01",
+    "jam": "09.00 - 10.00",
+    "pengawas kelas": "Budi"
+  },
+  {
+    "id": 3,
+    "tempat": "Aula",
+    "tanggal": "2021-08-01",
+    "jam": "10.00 - 11.00",
+    "pengawas kelas": "Budi"
+  },
+  {
+    "id": 4,
+    "tempat": "Aula",
+    "tanggal": "2021-08-01",
+    "jam": "11.00 - 12.00",
+    "pengawas kelas": "Budi"
+  }
+]
