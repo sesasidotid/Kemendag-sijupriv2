@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 
 @Component({
   selector: 'app-ukom-list',
@@ -7,6 +7,4 @@ import { Component } from '@angular/core';
   templateUrl: './ukom-list.component.html',
   styleUrl: './ukom-list.component.scss'
 })
-export class UkomListComponent {
-
-}
+export class UkomListComponent {}

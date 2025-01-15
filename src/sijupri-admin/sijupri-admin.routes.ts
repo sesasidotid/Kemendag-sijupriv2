@@ -136,30 +136,30 @@ export const routes: Routes = [
           }
         },
         UKom: {
-          'Data Dukung UKom': {
-            components: () =>
-              import(
-                '../sijupri-admin/ukom/ukom-document-list/ukom-document-list.component'
-              ).then(m => m.UkomDocumentListComponent)
-          },
+          //   'Data Dukung UKom': {
+          //     components: () =>
+          //       import(
+          //         '../sijupri-admin/ukom/ukom-document-list/ukom-document-list.component'
+          //       ).then(m => m.UkomDocumentListComponent)
+          //   },
           'Pemetaan Ukom': {
             components: () =>
-              import(
-                '../sijupri-admin/ukom/ukom-list/ukom-list.component'
-              ).then(m => m.UkomListComponent),
+              import('./ukom/ukom-pemetaan/ukom-list/ukom-list.component').then(
+                m => m.UkomListComponent
+              ),
             routes: [
-              {
-                path: 'add',
-                loadComponent: () =>
-                  import(
-                    '../sijupri-admin/ukom/ukom-add/ukom-add.component'
-                  ).then(m => m.UkomAddComponent)
-              },
+              //   {
+              //     path: 'add',
+              //     loadComponent: () =>
+              //       import(
+              //         '../sijupri-admin/ukom/ukom-add/ukom-add.component'
+              //       ).then(m => m.UkomAddComponent)
+              //   },
               {
                 path: ':id',
                 loadComponent: () =>
                   import(
-                    '../sijupri-admin/ukom/ukom-detail/ukom-detail.component'
+                    './ukom/ukom-pemetaan/ukom-detail/ukom-detail.component'
                   ).then(m => m.UkomDetailComponent)
               }
             ]
@@ -167,14 +167,14 @@ export const routes: Routes = [
           'Pengajuan Ukom': {
             components: () =>
               import(
-                '../sijupri-admin/ukom/ukom-task-list/ukom-task-list.component'
+                './ukom/ukom-pengajuan/ukom-task-list/ukom-task-list.component'
               ).then(m => m.UkomTaskListComponent),
             routes: [
               {
                 path: ':id',
                 loadComponent: () =>
                   import(
-                    '../sijupri-admin/ukom/ukom-task-detail/ukom-task-detail.component'
+                    './ukom/ukom-pengajuan/ukom-task-detail/ukom-task-detail.component'
                   ).then(m => m.UkomTaskDetailComponent)
               }
             ]
@@ -205,6 +205,29 @@ export const routes: Routes = [
               import('./ukom/ukom-formula/ukom-formula.component').then(
                 m => m.UkomFormulaComponent
               )
+          },
+          //just placeholder waiting till class api ready
+          Periode: {
+            components: () =>
+              import(
+                '../sijupri-admin/ukom/ukom-class/ukom-class-list/ukom-class-list.component'
+              ).then(m => m.UkomClassListComponent),
+            routes: [
+              {
+                path: 'add',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/ukom/ukom-class/ukom-class-add/ukom-class-add.component'
+                  ).then(m => m.UkomClassAddComponent)
+              },
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-class/ukom-class-detail/ukom-class-detail.component'
+                  ).then(m => m.UkomClassDetailComponent)
+              }
+            ]
           }
         },
         Maintenance: {

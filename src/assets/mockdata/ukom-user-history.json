@@ -9,12 +9,30 @@
     "Status": "Lolos"
   },
   {
+    "id": 11,
+    "Periode": "2023-06",
+    "NIP": "123456789",
+    "Email": "user1@example.com",
+    "Nama": "John Doe",
+    "Nilai CAT": 78,
+    "Status": "Pending"
+  },
+  {
     "id": 2,
     "Periode": "2023-02",
     "NIP": "987654321",
     "Email": "user2@example.com",
     "Nama": "Jane Smith",
     "Nilai CAT": 90,
+    "Status": "Lolos"
+  },
+  {
+    "id": 12,
+    "Periode": "2023-07",
+    "NIP": "987654321",
+    "Email": "user2@example.com",
+    "Nama": "Jane Smith",
+    "Nilai CAT": 87,
     "Status": "Lolos"
   },
   {
@@ -27,6 +45,15 @@
     "Status": "Pending"
   },
   {
+    "id": 13,
+    "Periode": "2023-08",
+    "NIP": "123123123",
+    "Email": "user3@example.com",
+    "Nama": "Alice Johnson",
+    "Nilai CAT": 82,
+    "Status": "Lolos"
+  },
+  {
     "id": 4,
     "Periode": "2023-04",
     "NIP": "321321321",
@@ -36,12 +63,30 @@
     "Status": "Pending"
   },
   {
+    "id": 14,
+    "Periode": "2023-09",
+    "NIP": "321321321",
+    "Email": "user4@example.com",
+    "Nama": "Bob Brown",
+    "Nilai CAT": 88,
+    "Status": "Lolos"
+  },
+  {
     "id": 5,
     "Periode": "2023-05",
     "NIP": "555666777",
     "Email": "user5@example.com",
     "Nama": "Charlie Davis",
     "Nilai CAT": 88,
+    "Status": "Lolos"
+  },
+  {
+    "id": 15,
+    "Periode": "2023-10",
+    "NIP": "555666777",
+    "Email": "user5@example.com",
+    "Nama": "Charlie Davis",
+    "Nilai CAT": 90,
     "Status": "Lolos"
   },
   {
@@ -54,12 +99,30 @@
     "Status": "Pending"
   },
   {
+    "id": 16,
+    "Periode": "2023-11",
+    "NIP": "666777888",
+    "Email": "user6@example.com",
+    "Nama": "David Evans",
+    "Nilai CAT": 83,
+    "Status": "Lolos"
+  },
+  {
     "id": 7,
     "Periode": "2023-07",
     "NIP": "777888999",
     "Email": "user7@example.com",
     "Nama": "Eva Miller",
     "Nilai CAT": 92,
+    "Status": "Lolos"
+  },
+  {
+    "id": 17,
+    "Periode": "2023-12",
+    "NIP": "777888999",
+    "Email": "user7@example.com",
+    "Nama": "Eva Miller",
+    "Nilai CAT": 89,
     "Status": "Lolos"
   },
   {
@@ -72,12 +135,30 @@
     "Status": "Pending"
   },
   {
+    "id": 18,
+    "Periode": "2023-11",
+    "NIP": "888999000",
+    "Email": "user8@example.com",
+    "Nama": "Frank Wilson",
+    "Nilai CAT": 82,
+    "Status": "Lolos"
+  },
+  {
     "id": 9,
     "Periode": "2023-09",
     "NIP": "999000111",
     "Email": "user9@example.com",
     "Nama": "Grace Lee",
     "Nilai CAT": 84,
+    "Status": "Lolos"
+  },
+  {
+    "id": 19,
+    "Periode": "2023-12",
+    "NIP": "999000111",
+    "Email": "user9@example.com",
+    "Nama": "Grace Lee",
+    "Nilai CAT": 86,
     "Status": "Lolos"
   },
   {
@@ -88,5 +169,14 @@
     "Nama": "Henry Clark",
     "Nilai CAT": 79,
     "Status": "Pending"
+  },
+  {
+    "id": 20,
+    "Periode": "2023-12",
+    "NIP": "101112131",
+    "Email": "user10@example.com",
+    "Nama": "Henry Clark",
+    "Nilai CAT": 85,
+    "Status": "Lolos"
   }
 ]
