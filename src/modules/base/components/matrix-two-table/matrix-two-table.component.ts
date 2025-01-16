@@ -1,22 +1,22 @@
-import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef } from 'ag-grid-community'; // Column Definition Type Interface
+import { CommonModule } from '@angular/common'
+import { Component, Input } from '@angular/core'
+import { AgGridAngular } from 'ag-grid-angular'
+import { ColDef } from 'ag-grid-community' // Column Definition Type Interface
 
 interface MatrixData {
-  id: number;
-  nilaiPenugasan: number;
-  nilaiMateri: number;
-  nilaiInformasi: number;
-  nilaiStandar: number;
-  nilaiMetode: number;
-  alasanMateri: string;
-  alasanInformasi: string;
-  penyebabDiskrepansiUtama: string;
-  jenisPengembanganKompetensi: string;
-  pertanyaanId: number;
-  pertanyaanName: string;
-  matrixId: number;
+  id: number
+  nilaiPenugasan: number
+  nilaiMateri: number
+  nilaiInformasi: number
+  nilaiStandar: number
+  nilaiMetode: number
+  alasanMateri: string
+  alasanInformasi: string
+  penyebabDiskrepansiUtama: string
+  jenisPengembanganKompetensi: string
+  pertanyaanId: number
+  pertanyaanName: string
+  matrixId: number
 }
 
 @Component({
@@ -27,27 +27,59 @@ interface MatrixData {
   styleUrl: './matrix-two-table.component.scss'
 })
 export class MatrixTwoTableComponent {
-  @Input() data: MatrixData[] = [];
+  @Input() data: MatrixData[] = []
 
-  pagination = true;
-  paginationPageSize = 10;
-  paginationPageSizeSelector = [10, 20, 30, 100];
+  pagination = true
+  paginationPageSize = 10
+  paginationPageSizeSelector = [10, 20, 30, 100]
 
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-    { field: "pertanyaanName", headerName:'Pertanyaan', filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] }, initialWidth: 600 },
-    { field: "nilaiPenugasan", filter: true, floatingFilter: true },
-    { field: "nilaiMateri", filter: true, floatingFilter: true },
-    { field: "nilaiInformasi", filter: true, floatingFilter: true },
-    { field: "nilaiStandar", filter: true, floatingFilter: true },
-    { field: "nilaiMetode", filter: true, floatingFilter: true },
+    {
+      field: 'pertanyaanName',
+      headerName: 'Pertanyaan',
+      filter: true,
+      floatingFilter: true,
+      filterParams: { filterOptions: ['contains'] },
+      initialWidth: 600
+    },
+    {
+      field: 'nilaiPenugasan',
+      filter: true,
+      floatingFilter: true,
+      cellStyle: { textAlign: 'center' }
+    },
+    {
+      field: 'nilaiMateri',
+      filter: true,
+      floatingFilter: true,
+      cellStyle: { textAlign: 'center' }
+    },
+    {
+      field: 'nilaiInformasi',
+      filter: true,
+      floatingFilter: true,
+      cellStyle: { textAlign: 'center' }
+    },
+    {
+      field: 'nilaiStandar',
+      filter: true,
+      floatingFilter: true,
+      cellStyle: { textAlign: 'center' }
+    },
+    {
+      field: 'nilaiMetode',
+      filter: true,
+      floatingFilter: true,
+      cellStyle: { textAlign: 'center' }
+    }
     // { field: "alasanMateri", filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] } },
     // { field: "alasanInformasi", filter: true, floatingFilter: true, filterParams: { filterOptions: ["contains"] } },
     // { field: "penyebabDiskrepansiUtama", filter: true, floatingFilter: true, minWidth: 300 },
     // { field: "jenisPengembanganKompetensi", filter: true, floatingFilter: true, minWidth: 300 },
-  ];
+  ]
 
-  ngOnInit() {
-    console.log(this.data);
+  ngOnInit () {
+    console.log(this.data)
   }
 }
