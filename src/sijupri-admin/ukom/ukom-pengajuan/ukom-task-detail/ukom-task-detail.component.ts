@@ -21,6 +21,7 @@ export class UkomTaskDetailComponent {
   pendingTask: PendingTask
   isApproveEnable: boolean = true
   id: string
+  body: any
 
   constructor (
     private apiService: ApiService,
@@ -53,9 +54,9 @@ export class UkomTaskDetailComponent {
   }
 
   onFIleSwitch (index: number, status: 'APPROVE' | 'REJECT') {
-    this.pesertaUkom.dokumenPesertaUkom[index].status = status
+    this.pesertaUkom.dokumenUkomList[index].status = status
 
-    for (const formasiDokumen of this.pesertaUkom.dokumenPesertaUkom) {
+    for (const formasiDokumen of this.pesertaUkom.dokumenUkomList) {
       if (formasiDokumen.status == 'REJECT') {
         this.isApproveEnable = false
         break
@@ -75,8 +76,16 @@ export class UkomTaskDetailComponent {
         task.taskAction = isReject ? 'reject' : 'approve'
         task.object = this.pesertaUkom
 
+        this.body = {
+          id: this.pendingTask.id,
+          taskAction: 'approve',
+          dokumen_ukom_list: this.pesertaUkom.dokumenUkomList
+        }
+
+        console.log(this.body)
+
         this.apiService
-          .postData(`/api/v1/peserta_ukom/task/submit`, task)
+          .postData(`/api/v1/participant_ukom/task/submit`, this.body)
           .subscribe({
             next: () =>
               this.handlerService.handleNavigate('/ukom/ukom-task-list'),

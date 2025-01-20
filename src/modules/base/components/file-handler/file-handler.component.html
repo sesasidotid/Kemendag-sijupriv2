@@ -1,36 +1,56 @@
 <!-- file-handler.component.html -->
 <div class="file-parent">
-    <ng-container *ngFor="let obj of inputs.files| keyvalue">
-        <div class="mb-3 d-flex flex-column gap-2" *ngIf="obj.value.visible == null|| obj.value.visible == undefined || obj.value.visible()">
-            <!-- <h6 class="">{{ obj.value.label }}</h6> -->
-            <label class="form-label">
-                {{ obj.value.label }} <span *ngIf="obj.value.required" class="text-danger">*</span>
-            </label>
-            <div class="spinner-border" role="status" *ngIf="(hadItemsLoading$ | async) else loadCompleted">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <ng-template #loadCompleted>
-                <div class="d-flex flex-column flex-md-row gap-3">
-                    <div class="d-flex align-items-center">
-                        <!-- Preview section -->
-                        <!-- <div class="file-preview" *ngIf="obj.value.source">
+  <ng-container *ngFor="let obj of inputs.files | keyvalue">
+    <div
+      class="mb-3 d-flex flex-column gap-2"
+      *ngIf="
+        obj.value.visible == null ||
+        obj.value.visible == undefined ||
+        obj.value.visible()
+      "
+    >
+      <!-- <h6 class="">{{ obj.value.label }}</h6> -->
+      <label class="form-label">
+        {{ obj.value.label }}
+        <span *ngIf="obj.value.required" class="text-danger">*</span>
+      </label>
+      <div
+        class="spinner-border"
+        role="status"
+        *ngIf="hadItemsLoading$ | async; else loadCompleted"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <ng-template #loadCompleted>
+        <div class="d-flex flex-column flex-md-row gap-3">
+          <div class="d-flex align-items-center">
+            <!-- Preview section -->
+            <!-- <div class="file-preview" *ngIf="obj.value.source">
                             <img [src]="isImage(obj.value.source) ? obj.value.source : defaultImage" class="w-fit"
                                 alt="{{ obj.value.label }}">
                         </div> -->
-                        <!-- Upload Button (only show if previewOnly is false) -->
-                        <div *ngIf="!inputs.viewOnly">
-                            <input type="file" (change)="handleFileUpload($event, obj.key)" class="form-control">
-                        </div>
-                        <!-- Display file name if selected or pre-existing -->
-                        <div *ngIf="fileNames[obj.key]" class="file-name">
-                            {{ fileNames[obj.key] }}
-                        </div>
-                    </div>
-                    <!-- Preview Button -->
-                    <a class="btn btn-soft-success w-fit" *ngIf="obj.value.source"
-                    (click)="previewFile(obj.value.label, obj.value.source)">Preview</a>
-                </div>
-            </ng-template>
+            <!-- Upload Button (only show if previewOnly is false) -->
+            <div *ngIf="!inputs.viewOnly">
+              <input
+                type="file"
+                (change)="handleFileUpload($event, obj.key)"
+                class="form-control"
+              />
+            </div>
+            <!-- Display file name if selected or pre-existing -->
+            <div *ngIf="fileNames[obj.key]" class="file-name">
+              {{ fileNames[obj.key] }}
+            </div>
+          </div>
+          <!-- Preview Button -->
+          <a
+            class="btn btn-soft-success w-fit"
+            *ngIf="obj.value.source"
+            (click)="previewFile(obj.value.label, obj.value.source)"
+            >Preview</a
+          >
         </div>
-    </ng-container>
+      </ng-template>
+    </div>
+  </ng-container>
 </div>

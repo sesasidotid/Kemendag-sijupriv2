@@ -2,107 +2,169 @@
   <form [formGroup]="kelasForm" (ngSubmit)="submit()">
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Tempat <span class="text-danger">*</span></label
+        >Nama <span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
           type="text"
-          id="tempat"
+          id="name"
           class="form-control"
-          name="tempat"
-          formControlName="tempat"
-          placeholder="Masukan Tempat UKom diadakan"
+          name="name"
+          formControlName="name"
+          placeholder="Masukan nama tempat UKom"
         />
         <div
           class="feedback"
-          *ngIf="
-            kelasForm.get('tempat').invalid && kelasForm.get('tempat').touched
-          "
+          *ngIf="kelasForm.get('name').invalid && kelasForm.get('name').touched"
         >
-          <small *ngIf="kelasForm.get('tempat').errors?.['required']"
-            >Tempat Ukom perlu diisi.</small
+          <small *ngIf="kelasForm.get('name').errors?.['required']"
+            >Nama tempat ukom perlu diisi.</small
           >
         </div>
       </div>
     </div>
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Tanggal <span class="text-danger">*</span></label
-      >
-      <div class="col-sm-10">
-        <input
-          type="date"
-          id="tanggal"
-          class="form-control"
-          name="tanggal"
-          formControlName="tanggal"
-        />
-        <div
-          class="feedback"
-          *ngIf="
-            kelasForm.get('tanggal').invalid && kelasForm.get('tanggal').touched
-          "
-        >
-          <small *ngIf="kelasForm.get('tanggal').errors?.['required']"
-            >Tanggal Ukom perlu diisi.</small
-          >
-        </div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Jam <span class="text-danger">*</span></label
-      >
-      <div class="col-sm-10">
-        <input
-          type="time"
-          id="jam"
-          class="form-control"
-          name="jam"
-          formControlName="jam"
-        />
-        <div
-          class="feedback"
-          *ngIf="kelasForm.get('jam').invalid && kelasForm.get('jam').touched"
-        >
-          <small *ngIf="kelasForm.get('jam').errors?.['required']"
-            >Jam Ukom perlu diisi.</small
-          >
-        </div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Pengawas Kelas <span class="text-danger">*</span></label
+        >Jabatan <span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <select
-          id="pengawas kelas"
+          id="jabatan"
           class="form-select"
-          name="pengawas kelas"
-          formControlName="pengawas kelas"
+          name="jabatan"
+          formControlName="jabatan"
         >
-          <option value="" selected disabled>Pilih Pengawas Kelas</option>
+          <!-- <option [value]="">Pilih</option> -->
           <option
-            *ngFor="let pengawasKelas of pengawasKelasList"
-            [value]="pengawasKelas.id"
+            *ngFor="let jabatan of jabatanList$ | async"
+            [value]="jabatan.code"
           >
-            {{ pengawasKelas.nama }}
+            {{ jabatan.name }}
           </option>
         </select>
         <div
           class="feedback"
           *ngIf="
-            kelasForm.get('pengawas kelas').invalid &&
-            kelasForm.get('pengawas kelas').touched
+            kelasForm.get('jabatan').invalid && kelasForm.get('jabatan').touched
           "
         >
-          <small *ngIf="kelasForm.get('pengawas kelas').errors?.['required']"
-            >Pengawas Kelas Ukom perlu diisi.</small
+          <small *ngIf="kelasForm.get('jabatan').errors?.['required']"
+            >Jabatan perlu diisi.</small
           >
         </div>
       </div>
     </div>
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold"
+        >Jenjang <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <select
+          id="jenjang"
+          class="form-select"
+          name="jenjang"
+          formControlName="jenjang"
+        >
+          <option
+            *ngFor="let jenjang of jenjangList$ | async"
+            [value]="jenjang.code"
+          >
+            {{ jenjang.name }}
+          </option>
+        </select>
+
+        <div
+          class="feedback"
+          *ngIf="
+            kelasForm.get('jenjang').invalid && kelasForm.get('jenjang').touched
+          "
+        >
+          <small *ngIf="kelasForm.get('jenjang').errors?.['required']"
+            >Jenjang perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold"
+        >Kuota Peserta <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="text"
+          id="participant_quota"
+          class="form-control"
+          name="participant_quota"
+          formControlName="participant_quota"
+          placeholder="Masukan kuota peserta"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            kelasForm.get('participant_quota').invalid &&
+            kelasForm.get('participant_quota').touched
+          "
+        >
+          <small *ngIf="kelasForm.get('participant_quota').errors?.['required']"
+            >Kuota peserta perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="exam_start_at" class="col-sm-2 col-form-label fw-bold"
+        >Waktu Mulai <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="time"
+          id="exam_start_at"
+          class="form-control"
+          name="exam_start_at"
+          formControlName="exam_start_at"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            kelasForm.get('exam_start_at').invalid &&
+            kelasForm.get('exam_start_at').touched
+          "
+        >
+          <small *ngIf="kelasForm.get('exam_start_at').errors?.['required']"
+            >Waktu mulai perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="exam_end_at" class="col-sm-2 col-form-label fw-bold"
+        >Waktu Mulai <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="time"
+          id="exam_end_at"
+          class="form-control"
+          name="exam_end_at"
+          formControlName="exam_end_at"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            kelasForm.get('exam_end_at').invalid &&
+            kelasForm.get('exam_end_at').touched
+          "
+        >
+          <small *ngIf="kelasForm.get('exam_end_at').errors?.['required']"
+            >Waktu selesai perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
     <div class="row text-center">
       <div class="col-12">
         <ng-container *ngIf="submitLoading$ | async; else noLoading">

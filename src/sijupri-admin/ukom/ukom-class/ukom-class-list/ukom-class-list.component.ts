@@ -32,15 +32,21 @@ export class UkomClassListComponent {
     private router: Router,
     private handlerService: HandlerService
   ) {
-    // this.pagable = new PagableBuilder('/api/v1/ukom')
-    this.pagable = new PagableBuilder(
-      'http://localhost:4200/assets/mockdata/ukom-class-list-mockdata.json'
-    )
-      .addPrimaryColumn(new PrimaryColumnBuilder('Tempat', 'tempat').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Tanggal', 'tanggal').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Jam', 'jam').build())
+    this.pagable = new PagableBuilder('/api/v1/room_ukom/search')
+
+      .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Pengawas Kelas', 'pengawas kelas').build()
+        new PrimaryColumnBuilder('Kuota Peserta', 'participantQuota').build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Mulai', 'examStartAt').build()
+      )
+      .addPrimaryColumn(new PrimaryColumnBuilder('Jam', 'examEndAt').build())
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('jabatanCode', 'jenjangCode').build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('jenjangCode', 'jenjangCode').build()
       )
       .addActionColumn(
         new ActionColumnBuilder()
