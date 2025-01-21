@@ -161,6 +161,13 @@ export const routes: Routes = [
                   import(
                     './ukom/ukom-pemetaan/ukom-detail/ukom-detail.component'
                   ).then(m => m.UkomDetailComponent)
+              },
+              {
+                path: 'detail/:id',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-pemetaan/ukom-task-detail/ukom-task-detail.component'
+                  ).then(m => m.UkomTaskDetailComponent)
               }
             ]
           },

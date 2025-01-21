@@ -1,0 +1,72 @@
+<div
+  *ngIf="ukomDetailLoading$ | async; else ukomHadItem"
+  class="d-flex justify-content-center my-5"
+>
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<ng-template #ukomHadItem>
+  <div class="p-0 d-flex flex-column flex-xl-row gap-3">
+    <div class="card flex-grow-1 m-0 detail-jf">
+      <div class="card-header">
+        <h5 class="m-0">
+          <i class="mdi mdi-account me-2"></i> Informasi Ukom User JF
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Nama Lengkap </label>
+            <p>{{ ukomDetail.name }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> NIP </label>
+            <p>{{ ukomDetail.nip }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Tempat, Tanggal Lahir </label>
+            <p>{{ ukomDetail.tempatLahir + ', ' + ukomDetail.tanggalLahir }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Unit Kerja </label>
+            <p>{{ ukomDetail.unitKerjaName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Instansi </label>
+            <p>{{ ukomDetail.instansiName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Pangkat </label>
+            <p>{{ ukomDetail.pangkatName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jabatan </label>
+            <p>{{ ukomDetail.jabatanName }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="card flex-grow-1 m-0 detail-atasan">
+      <div class="card-header">
+        <h5 class="m-0">
+          <i class="mdi mdi-account-multiple me-2"></i> Informasi Atasan
+          (Penilai)
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-2">
+            <label class="form-label"> Nama Lengkap Atasan </label>
+            <p>{{ ukomDetail.namaAtasan }}</p>
+          </div>
+          <div class="col-12 mb-2">
+            <label class="form-label"> Email Atasan </label>
+            <p>{{ ukomDetail.emailAtasan }}</p>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  </div>
+</ng-template>

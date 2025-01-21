@@ -20,30 +20,18 @@ export class UkomListComponent {
   pagable: Pagable
   id: string = LoginContext.getUserId()
 
-  constructor () {
-    this.pagable = new PagableBuilder(
-      `/api/v1/participant_ukom/task/nip/${this.id}`
-    )
+  constructor (private router: Router) {
+    this.pagable = new PagableBuilder(`/api/v1/participant_ukom/all/${this.id}`)
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Diajukan Pada', 'flowId').build()
+        new PrimaryColumnBuilder('Jenis Ukom', 'jenisUkom').build()
       )
-      //   .addPrimaryColumn(
-      //     new PrimaryColumnBuilder('Selesai Pada', 'lastUpdated').build()
-      //   )
-      //   .addPrimaryColumn(
-      //     new PrimaryColumnBuilder('Status', 'taskStatus').build()
-      //   )
-      //   .addFilter(
-      //     new PageFilterBuilder('equal')
-      //       .setProperty('objectGroup')
-      //       .withDefaultValue(LoginContext.getUserId())
-      //       .build()
-      //   )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Tanggal', 'lastUpdated').build()
+      )
       .addActionColumn(
-        new ActionColumnBuilder()
+        new ActionColumnBuilder()   
           .setAction((ukom: any) => {
-            // this.router.navigate([`/akp/akp-list/detail/${akp.id}`])
-            alert('Detail')
+            this.router.navigate([`/ukom/ukom-list/detail/${ukom.id}`])
           }, 'info')
           .withIcon('detail')
           .build()
@@ -55,7 +43,6 @@ export class UkomListComponent {
           .withField('Status', 'text')
           .build()
       )
-
       .build()
   }
 }

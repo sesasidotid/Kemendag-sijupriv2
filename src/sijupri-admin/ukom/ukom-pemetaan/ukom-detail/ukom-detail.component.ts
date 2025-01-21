@@ -7,6 +7,11 @@ import {
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { LoginContext } from '../../../../modules/base/commons/login-context'
+import { ActivatedRoute, Router } from '@angular/router'
+import { JfService } from '../../../../modules/siap/services/jf.service'
+import { JF } from '../../../../modules/siap/models/jf.model'
+import { BehaviorSubject } from 'rxjs'
 
 @Component({
   selector: 'app-ukom-detail',
@@ -17,14 +22,46 @@ import { PagableComponent } from '../../../../modules/base/components/pagable/pa
 })
 export class UkomDetailComponent {
   pagable: Pagable
+  jf: JF = new JF()
+  jfLoading$ = new BehaviorSubject<boolean>(false)
 
-  constructor () {
-    this.pagable = new PagableBuilder(
-      'http://localhost:4200/assets/mockdata/ukom-user-history.json'
-    )
-      .addPrimaryColumn(new PrimaryColumnBuilder('Periode', 'Periode').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Status', 'Status').build())
-      .addActionColumn(new ActionColumnBuilder().withIcon('detail').build())
+  id: string
+  constructor (
+    private activatedRoute: ActivatedRoute,
+    private jfService: JfService,
+    private router: Router
+  ) {
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.id = params.get('id')
+    })
+
+    this.pagable = new PagableBuilder(`/api/v1/participant_ukom/all/${this.id}`)
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Jenis Ukom', 'jenisUkom').build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Tanggal', 'lastUpdated').build()
+      )
+      .addActionColumn(
+        new ActionColumnBuilder()
+          .setAction((ukom: any) => {
+            this.router.navigate([`/ukom/ukom-list/detail/${ukom.id}`])
+          }, 'info')
+          .withIcon('detail')
+          .build()
+      )
       .build()
+
+    this.getJF()
+  }
+
+  getJF () {
+    this.jfLoading$.next(true)
+    this.jfService.findByNip(this.id).subscribe({
+      next: (jf: JF) => {
+        this.jf = jf
+        this.jfLoading$.next(false)
+      }
+    })
   }
 }

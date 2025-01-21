@@ -102,7 +102,8 @@ export class PagableComponent implements OnChanges {
 
     fetchObservable.subscribe({
       next: (response: any) => {
-        this.paginator = isLocalEndpoint ? { data: response } : response // Wrap response in data only for local endpoint
+        // Wrap response in data only if it isn't already wrapped
+        this.paginator = response?.data ? response : { data: response }
         this.onLoad = false
         console.log(this.paginator)
       },
@@ -110,6 +111,16 @@ export class PagableComponent implements OnChanges {
         console.error('Error fetching data', e)
       }
     })
+    // fetchObservable.subscribe({
+    //   next: (response: any) => {
+    //     this.paginator = isLocalEndpoint ? { data: response } : response // Wrap response in data only for local endpoint
+    //     this.onLoad = false
+    //     console.log(this.paginator)
+    //   },
+    //   error: e => {
+    //     console.error('Error fetching data', e)
+    //   }
+    // })
 
     // this.apiService.getData(`${this.pagable.endpoint}${query}`).subscribe({
     //   next: (response: any) => {

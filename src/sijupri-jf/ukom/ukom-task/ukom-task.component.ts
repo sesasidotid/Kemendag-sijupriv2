@@ -18,7 +18,8 @@ import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.mo
 import { ConverterService } from '../../../modules/base/services/converter.service'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 import { RekapButtonComponent } from '../../../modules/base/components/rekap-table/rekap-button.component'
-
+import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
+import { UkomRevisionComponent } from '../ukom-revision/ukom-revision.component'
 @Component({
   selector: 'app-ukom-task',
   standalone: true,
@@ -27,7 +28,9 @@ import { RekapButtonComponent } from '../../../modules/base/components/rekap-tab
     UkomTaskFormComponent,
     FileHandlerComponent,
     EmptyStateComponent,
-    RekapButtonComponent
+    RekapButtonComponent,
+    ModalComponent,
+    UkomRevisionComponent
   ],
   templateUrl: './ukom-task.component.html',
   styleUrl: './ukom-task.component.scss'
@@ -47,6 +50,7 @@ export class UkomTaskComponent {
   currentUkomStep$ = new BehaviorSubject<number>(1)
   groupedUkomPendingTaskHistory: { [key: string]: any[] } = {}
   wannaRequest: boolean = false
+  isModalOpen$ = new BehaviorSubject<boolean>(false)
 
   constructor (
     private apiService: ApiService,
@@ -126,20 +130,20 @@ export class UkomTaskComponent {
 
         this.ukomDataLoading$.next(false)
 
-        //   this.detectedDokumen = {}
-        //   const dokumenPersyaratanListTemp: any = []
-        //   let count = 1
-        //   this.pesertaUkom.pendingTaskHistory.forEach(dokumenPersyaratan => {
-        //     if (dokumenPersyaratan.status == 'REJECT') {
-        //       this.inputs.files['dokumenPersyaratan_' + count] = {
-        //         label: dokumenPersyaratan.dokumenName,
-        //         source: dokumenPersyaratan.dokumenUrl
-        //       }
-        //       count = count + 1
-        //     } else {
-        //       dokumenPersyaratanListTemp.push(dokumenPersyaratan)
+        // this.detectedDokumen = {}
+        // const dokumenPersyaratanListTemp: any = []
+        // let count = 1
+        // this.pesertaUkom.pendingTaskHistory.forEach(dokumenPersyaratan => {
+        //   if (dokumenPersyaratan.status == 'REJECT') {
+        //     this.inputs.files['dokumenPersyaratan_' + count] = {
+        //       label: dokumenPersyaratan.dokumenName,
+        //       source: dokumenPersyaratan.dokumenUrl
         //     }
-        //   })
+        //     count = count + 1
+        //   } else {
+        //     dokumenPersyaratanListTemp.push(dokumenPersyaratan)
+        //   }
+        // })
 
         //   this.pesertaUkom.pendingTaskHistory = dokumenPersyaratanListTemp
       },
@@ -213,6 +217,9 @@ export class UkomTaskComponent {
     return this.converterService.dateToHumanReadable(date)
   }
 
+  toggleModal () {
+    this.isModalOpen$.next(!this.isModalOpen$.value)
+  }
   submit () {
     // for (const key in this.detectedDokumen) {
     //   this.pesertaUkom.pendingTaskHistory.push({

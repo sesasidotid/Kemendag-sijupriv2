@@ -74,13 +74,44 @@ export class UkomTaskDetailComponent {
         task.id = this.pendingTask.id
         task.remark = result.comment || null
         task.taskAction = isReject ? 'reject' : 'approve'
-        task.object = this.pesertaUkom
 
         this.body = {
           id: this.pendingTask.id,
-          taskAction: 'approve',
-          dokumen_ukom_list: this.pesertaUkom.dokumenUkomList
+          taskAction: task.taskAction
         }
+
+        if (isReject) {
+          const rejectedDokumenUkomList =
+            this.pesertaUkom.dokumenUkomList.filter(
+              dokumen => dokumen.status === 'REJECT'
+            )
+
+          if (rejectedDokumenUkomList.length > 0) {
+            this.body.object = {
+              dokumenUkomList: rejectedDokumenUkomList
+            }
+          }
+        }
+
+        console.log(this.pesertaUkom)
+        // if (
+        //   this.pendingTask.flowId !== 'ukom_flow_1' ||
+        //   task.taskAction === 'reject'
+        // ) {
+        //   this.body.object = {
+        //     dokumenUkomList: this.pesertaUkom.dokumenUkomList
+        //   }
+        // }
+        // task.object = this.pesertaUkom
+
+        // this.body = {
+        //   id: this.pendingTask.id,
+        //   taskAction: task.taskAction,
+        //   object: {
+        //     dokumenUkomList: this.pesertaUkom.dokumenUkomList
+        //   }
+        //   //   dokumen_ukom_list: this.pesertaUkom.dokumenUkomList
+        // }
 
         console.log(this.body)
 

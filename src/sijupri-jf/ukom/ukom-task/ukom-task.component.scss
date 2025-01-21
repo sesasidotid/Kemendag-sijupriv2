@@ -13,6 +13,14 @@
   line-height: 100% !important;
 }
 
+// :host a {
+//   cursor: pointer;
+// }
+
+.link-with-pointer {
+  cursor: pointer;
+}
+
 // .hori-timeline .events {
 //     border-top: 3px solid #e9ecef;
 // }

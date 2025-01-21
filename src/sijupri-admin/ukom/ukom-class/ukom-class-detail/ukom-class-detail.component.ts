@@ -11,7 +11,10 @@ import {
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-
+import { ActivatedRoute } from '@angular/router'
+import { RoomUkomDetail } from '../../../../modules/ukom/models/room-ukom-detail'
+import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
+import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 @Component({
   selector: 'app-ukom-class-detail',
   standalone: true,
@@ -20,9 +23,14 @@ import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
   styleUrl: './ukom-class-detail.component.scss'
 })
 export class UkomClassDetailComponent {
+  id: string
   //change when api is ready
-  detailKelas: any = {}
+  detailKelas: RoomUkomDetail = new RoomUkomDetail()
+  jabatanList: Jabatan[] = []
+  jenjangList: Jenjang[] = []
   listPeserta: any[] = []
+
+  jabatanName: string
 
   detailKelasLoading$ = new BehaviorSubject<boolean>(false)
 
@@ -31,36 +39,64 @@ export class UkomClassDetailComponent {
 
   constructor (
     private apiService: ApiService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private activatedRoute: ActivatedRoute
   ) {
-    this.pagable = new PagableBuilder(
-      'http://localhost:4200/assets/mockdata/ukom-list-mockdata.json'
-    )
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.id = params.get('id')
+    })
 
-      .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'NIP').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'Email').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'Nama').build())
-      .build()
+    // this.pagable = new PagableBuilder(`/api/v1/room_ukom/${this.id}`)
+    //   .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'NIP').build())
+    //   .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'Email').build())
+    //   .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'Nama').build())
+    //   .build()
+    this.getJenjang()
+    this.getJabatan()
   }
 
   ngOnInit () {
     this.getDetailKelas()
   }
 
+  getJenjang () {
+    this.apiService.getData(`/api/v1/jenjang`).subscribe({
+      next: res => {
+        this.jenjangList = res
+      },
+      error: err => {
+        this.alertService.showToast('Error', err.error.message)
+      }
+    })
+  }
+
+  getJabatan () {
+    this.apiService.getData(`/api/v1/jabatan`).subscribe({
+      next: res => {
+        this.jabatanList = res
+      },
+      error: err => {
+        this.alertService.showToast('Error', err.error.message)
+      }
+    })
+  }
+
+  getjabatanName (): string {
+    const jabatan = this.jabatanList.find(
+      j => j.code === this.detailKelas.jabatanCode
+    )
+    return jabatan ? jabatan.name : 'N/A'
+  }
+
   getDetailKelas () {
-    fetch('http://localhost:4200/assets/mockdata/ukom-class-list-mockdata.json')
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.length > 0) {
-          this.detailKelas = data[0]
-          console.log('detailKelas:', this.detailKelas)
-        } else {
-          this.alertService.showToast('Warning', 'No data found!')
-        }
-      })
-      .catch(error => {
-        console.log('Error fetching data:', error)
-        this.alertService.showToast('Error', 'Failed to fetch data!')
-      })
+    this.apiService.getData(`/api/v1/room_ukom/${this.id}`).subscribe({
+      next: res => {
+        this.detailKelas = res
+        // this.listPeserta = res['peserta']
+      },
+      error: err => {
+        this.alertService.showToast('Error', err.error.message)
+      }
+    })
   }
 }

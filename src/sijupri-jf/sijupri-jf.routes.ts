@@ -253,6 +253,13 @@ export const routes: Routes = [
                   import(
                     '../sijupri-jf/ukom/ukom-task-form/ukom-task-form.component'
                   ).then(m => m.UkomTaskFormComponent)
+              },
+              {
+                path: 'revisi',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-jf/ukom/ukom-revision/ukom-revision.component'
+                  ).then(m => m.UkomRevisionComponent)
               }
             ]
           },
@@ -260,7 +267,16 @@ export const routes: Routes = [
             components: () =>
               import('../sijupri-jf/ukom/ukom-list/ukom-list.component').then(
                 m => m.UkomListComponent
-              )
+              ),
+            routes: [
+              {
+                path: 'detail/:id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-jf/ukom/ukom-task-detail/ukom-task-detail.component'
+                  ).then(m => m.UkomTaskDetailComponent)
+              }
+            ]
           }
         },
         AKP: {
