@@ -1,0 +1,140 @@
+<section>
+  <form [formGroup]="examScheduleForm" (ngSubmit)="submit()">
+    <div class="row mb-3">
+      <label for="id" class="col-sm-2 col-form-label fw-bold"
+        >Ruangan <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <select id="id" class="form-select" name="id" formControlName="id">
+          <option *ngFor="let room of roomList$ | async" [value]="room.id">
+            {{ room.name }}
+          </option>
+          <!-- <option value="1">Aula</option>
+          <option value="2">Lab Komputer</option> -->
+        </select>
+        <div
+          class="feedback"
+          *ngIf="
+            examScheduleForm.get('id').invalid &&
+            examScheduleForm.get('id').touched
+          "
+        >
+          <small *ngIf="examScheduleForm.get('ruangan').errors?.['required']"
+            >Ruangan perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="exam_start_at" class="col-sm-2 col-form-label fw-bold"
+        >Waktu Mulai <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="datetime-local"
+          id="start_time"
+          class="form-control"
+          name="start_time"
+          formControlName="start_time"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            examScheduleForm.get('start_time').invalid &&
+            examScheduleForm.get('start_time').touched
+          "
+        >
+          <small *ngIf="examScheduleForm.get('start_time').errors?.['required']"
+            >Waktu mulai perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="end_time" class="col-sm-2 col-form-label fw-bold"
+        >Waktu Selesai <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="datetime-local"
+          id="end_time"
+          class="form-control"
+          name="end_time"
+          formControlName="end_time"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            examScheduleForm.get('end_time').invalid &&
+            examScheduleForm.get('end_time').touched
+          "
+        >
+          <small *ngIf="examScheduleForm.get('end_time').errors?.['required']"
+            >Waktu selesai perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="exam_type_code" class="col-sm-2 col-form-label fw-bold"
+        >Jenis Ujian <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <select
+          id="exam_type_code"
+          class="form-select"
+          name="exam_type_code"
+          formControlName="exam_type_code"
+        >
+          <option
+            *ngFor="let jenisUkom of jenisUkomList$ | async"
+            [value]="jenisUkom.code"
+          >
+            {{ jenisUkom.name }}
+          </option>
+        </select>
+        <div
+          class="feedback"
+          *ngIf="
+            examScheduleForm.get('exam_type_code').invalid &&
+            examScheduleForm.get('exam_type_code').touched
+          "
+        >
+          <small
+            *ngIf="examScheduleForm.get('exam_type_code').errors?.['required']"
+            >Ujian perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row text-center">
+      <div class="col-12">
+        <ng-container *ngIf="submitLoading$ | async; else noLoading">
+          <button class="btn btn-primary float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-primary float-end"
+            [disabled]="examScheduleForm.invalid || (submitLoading$ | async)"
+          >
+            Simpan
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </form>
+</section>

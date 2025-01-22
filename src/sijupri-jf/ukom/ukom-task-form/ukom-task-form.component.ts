@@ -160,18 +160,6 @@ export class UkomTaskFormComponent {
         if (!result.confirmed) return
 
         this.pesertaUkom.nip = this.jf.nip
-        // this.pesertaUkom.nik = this.jf.nik
-        // this.pesertaUkom.name = this.jf.name
-        // this.pesertaUkom.email = this.jf.email
-        // this.pesertaUkom.phone = this.jf.phone
-        // this.pesertaUkom.tempatLahir = this.jf.tempatLahir
-        // this.pesertaUkom.tanggalLahir = this.jf.tanggalLahir
-        // this.pesertaUkom.jenisKelaminCode = this.jf.jenisKelaminCode
-
-        // this.pesertaUkom.jabatanCode = this.jf.jabatanCode
-        // this.pesertaUkom.jenjangCode = this.jf.jenjangCode
-        // this.pesertaUkom.pangkatCode = this.jf.pangkatCode
-
         if (this.pesertaUkom.jenis_ukom == 'PERPINDAHAN_JABATAN') {
           this.pesertaUkom.nextJabatanCode = this.pesertaUkom.nextJabatanCode
           this.pesertaUkom.nextJenjangCode = this.jf.jenjangCode
@@ -179,6 +167,7 @@ export class UkomTaskFormComponent {
 
         if (this.pesertaUkom.jenis_ukom == 'KENAIKAN_JENJANG') {
           this.pesertaUkom.nextJenjangCode = this.pesertaUkom.nextJenjangCode
+          this.pesertaUkom.nextJabatanCode = this.jf.jabatanCode
         }
         this.pesertaUkom.nextPangkatCode = this.jf.pangkatCode
         this.pesertaUkom.password = 'password'
@@ -193,7 +182,7 @@ export class UkomTaskFormComponent {
       },
       error: error => {
         console.log('error', error)
-        // this.alertService.showToast('Error', 'Gagal menghapus pelatihan!')
+        this.handlerService.handleAlert('Error', error.error.message)
       }
     })
   }

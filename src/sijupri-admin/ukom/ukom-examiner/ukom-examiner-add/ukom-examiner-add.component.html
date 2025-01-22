@@ -1,0 +1,135 @@
+<section>
+  <form [formGroup]="examinerForm" (ngSubmit)="submit()">
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold"
+        >Nama <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          name="name"
+          formControlName="name"
+          placeholder="Masukan nama tempat UKom"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            examinerForm.get('name').invalid && examinerForm.get('name').touched
+          "
+        >
+          <small *ngIf="examinerForm.get('name').errors?.['required']"
+            >Nama examiner perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold"
+        >NIP <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="text"
+          id="nip"
+          class="form-control"
+          name="nip"
+          formControlName="nip"
+          placeholder="Masukan NIP"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            examinerForm.get('nip').invalid && examinerForm.get('nip').touched
+          "
+        >
+          <small *ngIf="examinerForm.get('nip').errors?.['required']"
+            >NIP perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold"
+        >Jenis Kelamin <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <select
+          id="jenis_kelamin_code"
+          class="form-select"
+          name="jenis_kelamin_code"
+          formControlName="jenis_kelamin_code"
+        >
+          <option [value]="'F'">Female</option>
+          <option [value]="'M'">Male</option>
+        </select>
+
+        <div
+          class="feedback"
+          *ngIf="
+            examinerForm.get('jenis_kelamin_code').invalid &&
+            examinerForm.get('jenis_kelamin_code').touched
+          "
+        >
+          <small
+            *ngIf="examinerForm.get('jenis_kelamin_code').errors?.['required']"
+            >Jenis kelamin perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold"
+        >Password <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          name="password"
+          formControlName="password"
+          placeholder="Masukan password"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            examinerForm.get('password').invalid &&
+            examinerForm.get('password').touched
+          "
+        >
+          <small *ngIf="examinerForm.get('password').errors?.['required']"
+            >Kuota peserta perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row text-center">
+      <div class="col-12">
+        <ng-container *ngIf="submitLoading$ | async; else noLoading">
+          <button class="btn btn-primary float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-primary float-end"
+            [disabled]="examinerForm.invalid || (submitLoading$ | async)"
+          >
+            Simpan
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </form>
+</section>

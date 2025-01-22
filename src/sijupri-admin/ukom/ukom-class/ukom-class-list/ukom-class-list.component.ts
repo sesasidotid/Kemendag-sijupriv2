@@ -13,11 +13,16 @@ import { Router, RouterLink } from '@angular/router'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { BehaviorSubject } from 'rxjs'
 import { UkomClassAddComponent } from '../ukom-class-add/ukom-class-add.component'
-
+import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
 @Component({
   selector: 'app-ukom-class-list',
   standalone: true,
-  imports: [PagableComponent, CommonModule, UkomClassAddComponent],
+  imports: [
+    PagableComponent,
+    CommonModule,
+    UkomClassAddComponent,
+    UkomExamScheduleAddComponent
+  ],
   templateUrl: './ukom-class-list.component.html',
   styleUrl: './ukom-class-list.component.scss'
 })
@@ -51,7 +56,7 @@ export class UkomClassListComponent {
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((ukom: any) => {
-            this.router.navigate([`/ukom/ukom-periode/${ukom.id}`])
+            this.router.navigate([`ukom/ukom-room-list/${ukom.id}`])
           }, 'info')
           .withIcon('detail')
           .build()
@@ -76,6 +81,11 @@ export class UkomClassListComponent {
         icon: 'mdi-plus-circle',
         onClick: () => this.handleTabChange(1)
       })
+    this.tabService.addTab({
+      label: 'Tambah Jadwal Ukom',
+      icon: 'mdi-list-box',
+      onClick: () => this.handleTabChange(2)
+    })
   }
 
   handleTabChange (tab?: number) {

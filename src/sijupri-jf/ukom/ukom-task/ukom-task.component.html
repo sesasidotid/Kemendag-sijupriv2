@@ -132,41 +132,6 @@
       <app-ukom-task-form [ukom]="ukom" [jf]="jf"></app-ukom-task-form>
     </ng-container>
 
-    <!-- <div class="col-lg-12"> -->
-    <!-- <div *ngIf="!pendingTask" class="card">
-        <div class="card-header align-items-center d-flex">
-          <h4 class="card-title mb-0 flex-grow-1">Pendaftaran Ukom</h4>
-          <div class="flex-shrink-0"></div>
-        </div>
-       
-      </div> -->
-
-    <!-- <div class="row">
-      <div class="col-sm-6 mb-3 mb-sm-0">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Pendaftaran Ukom</h5>
-            <p class="card-text">Kenaikan Jenjang</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-sm-6">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Pendaftaran Ukom</h5>
-            <p class="card-text">Perpindahan Jabatan</p>
-            <a (click)="isFormOpen = true" class="btn btn-primary">Lanjut</a>
-            <a (click)="isFormOpen = false" class="btn btn-primary">tutup</a>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- <div
-      *ngIf="pendingTask && pendingTask.flowId == 'ukom_flow_1'"
-      class="card"
-    > -->
     <ng-template #hadData>
       <div class="card card-profile shadow-sm">
         <div class="card-body p-3 p-md-4">
@@ -250,7 +215,7 @@
           <div
             class="stepper-item"
             [ngClass]="{
-              'active ': (currentUkomStep$ | async) === 2,
+              active: (currentUkomStep$ | async) === 2,
               completed: (currentUkomStep$ | async) > 2
             }"
             (click)="handleStepClick(2)"
@@ -276,11 +241,20 @@
           <div class="d-flex flex-column mt-2 gap-3" *ngIf="task.key">
             <ng-container *ngFor="let history of task.value">
               <a
-                (click)="toggleModal()"
+                (click)="
+                  history.taskStatus === 'PENDING' &&
+                  history.flowId === 'ukom_flow_2'
+                    ? toggleModal()
+                    : null
+                "
                 [ngClass]="{
                   'link-with-pointer':
                     history.taskStatus === 'PENDING' &&
+                    history.flowId === 'ukom_flow_2',
+                  'disabled-link': !(
+                    history.taskStatus === 'PENDING' &&
                     history.flowId === 'ukom_flow_2'
+                  )
                 }"
               >
                 <div
@@ -313,9 +287,9 @@
                                 : ''
                             }}
                             {{
-                              history.flowId === 'akp_flow_2'
-                                ? 'Menunggu Ukom'
-                                : ''
+                              history.flowId === 'ukom_flow_2'
+                                ? 'Sudah Diverifikasi'
+                                : 'test'
                             }}
                           </span>
                         </h5>
@@ -383,132 +357,6 @@
           </div>
         </div>
       </ng-container>
-      <!-- </div> -->
-
-      <!-- <div
-      *ngIf="pendingTask && pendingTask.flowId == 'ukom_flow_3'"
-      class="card"
-    >
-      <div class="card-header align-items-center d-flex">
-        <h4 class="card-title mb-0 flex-grow-1">Pendaftaran Ukom</h4>
-        <div class="flex-shrink-0"></div>
-      </div>
-      <div class="card-body">
-        <div
-          *ngIf="pendingTask.remark"
-          class="alert alert-warning"
-          role="alert"
-        >
-          {{ pendingTask.remark }}
-        </div>
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="mb-3">
-              <label for="firstnameInput" class="form-label">
-                First Name
-              </label>
-              <p class="border-bottom">{{ pesertaUkom.name }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="lastnameInput" class="form-label"> No. HP </label>
-              <p class="border-bottom">{{ pesertaUkom.phone }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> Email </label>
-              <p class="border-bottom">{{ pesertaUkom.email }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> Tempat Lahir </label>
-              <p class="border-bottom">{{ pesertaUkom.tempatLahir }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> Tanggal Lahir </label>
-              <p class="border-bottom">{{ pesertaUkom.tanggalLahir }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> Jenis Kelamin </label>
-              <p class="border-bottom">{{ pesertaUkom.jenisKelaminName }}</p>
-            </div>
-          </div>
-          <div class="col-lg-12">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> NIK </label>
-              <p class="border-bottom">{{ pesertaUkom.nik }}</p>
-            </div>
-          </div>
-          <hr />
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> Jabatan </label>
-              <p class="border-bottom">{{ pesertaUkom.jabatanName }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label">
-                Jabatan Yang Dituju
-              </label>
-              <p class="border-bottom">{{ pesertaUkom.nextJabatanName }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> Jenjang </label>
-              <p class="border-bottom">{{ pesertaUkom.jenjangName }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label">
-                Jenjang Yang Dituju
-              </label>
-              <p class="border-bottom">{{ pesertaUkom.nextJenjangName }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> Pangkat </label>
-              <p class="border-bottom">{{ pesertaUkom.pangkatName }}</p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label">
-                Pangkat Yang Dituju
-              </label>
-              <p class="border-bottom">{{ pesertaUkom.nextPangkatName }}</p>
-            </div>
-          </div>
-          <div class="col-lg-12">
-            <div class="mb-3">
-              <label for="emailInput" class="form-label"> File : </label>
-            </div>
-            <div class="row">
-              <app-file-handler [inputs]="inputs"></app-file-handler>
-            </div>
-          </div>
-          <div class="col-lg-12">
-            <div class="hstack gap-2 justify-content-end">
-              <a class="btn btn-sm btn-soft-success me-1" (click)="submit()"
-                >Simpan</a
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
-      <!-- </div> -->
-      <!-- </div> -->
     </ng-template>
   </div>
 </ng-template>

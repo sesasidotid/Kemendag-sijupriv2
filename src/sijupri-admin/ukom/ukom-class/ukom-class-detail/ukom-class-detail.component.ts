@@ -15,6 +15,9 @@ import { ActivatedRoute } from '@angular/router'
 import { RoomUkomDetail } from '../../../../modules/ukom/models/room-ukom-detail'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { Router } from '@angular/router'
 @Component({
   selector: 'app-ukom-class-detail',
   standalone: true,
@@ -26,13 +29,13 @@ export class UkomClassDetailComponent {
   id: string
   //change when api is ready
   detailKelas: RoomUkomDetail = new RoomUkomDetail()
-  jabatanList: Jabatan[] = []
-  jenjangList: Jenjang[] = []
-  listPeserta: any[] = []
-
-  jabatanName: string
+  jabatanList$: Observable<Jabatan[]>
+  jenjangList$: Observable<Jenjang[]>
+  listPeserta$: Observable<any[]>
 
   detailKelasLoading$ = new BehaviorSubject<boolean>(false)
+  filteredJabatan$: Observable<Jabatan | undefined>
+  filteredJenjang$: Observable<Jenjang | undefined>
 
   pagable: Pagable
   data: any[] = []
@@ -40,59 +43,82 @@ export class UkomClassDetailComponent {
   constructor (
     private apiService: ApiService,
     private alertService: AlertService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.id = params.get('id')
     })
 
-    // this.pagable = new PagableBuilder(`/api/v1/room_ukom/${this.id}`)
-    //   .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'NIP').build())
-    //   .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'Email').build())
-    //   .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'Nama').build())
-    //   .build()
     this.getJenjang()
     this.getJabatan()
+
+    this.pagable = new PagableBuilder(`/api/v1/exam_schedule/room/${this.id}`)
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Waktu Mulai', 'startTime').build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Waktu selesai', 'endTime').build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build()
+      )
+      .addActionColumn(
+        new ActionColumnBuilder()
+          .setAction((item: any) => {
+            this.router.navigate([`/ukom/ukom-room-list/detail/${item.id}`])
+          }, 'info')
+          .withIcon('detail')
+          .build()
+      )
+      .build()
   }
 
   ngOnInit () {
     this.getDetailKelas()
+    this.getJenjang()
+    this.getJabatan()
   }
 
   getJenjang () {
-    this.apiService.getData(`/api/v1/jenjang`).subscribe({
-      next: res => {
-        this.jenjangList = res
-      },
-      error: err => {
-        this.alertService.showToast('Error', err.error.message)
-      }
-    })
+    this.jenjangList$ = this.apiService
+      .getData(`/api/v1/jenjang`)
+      .pipe(
+        map(response =>
+          response.map(
+            (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+          )
+        )
+      )
   }
 
   getJabatan () {
-    this.apiService.getData(`/api/v1/jabatan`).subscribe({
-      next: res => {
-        this.jabatanList = res
-      },
-      error: err => {
-        this.alertService.showToast('Error', err.error.message)
-      }
-    })
-  }
-
-  getjabatanName (): string {
-    const jabatan = this.jabatanList.find(
-      j => j.code === this.detailKelas.jabatanCode
-    )
-    return jabatan ? jabatan.name : 'N/A'
+    this.jabatanList$ = this.apiService
+      .getData(`/api/v1/jabatan`)
+      .pipe(
+        map(response =>
+          response.map(
+            (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+          )
+        )
+      )
   }
 
   getDetailKelas () {
     this.apiService.getData(`/api/v1/room_ukom/${this.id}`).subscribe({
       next: res => {
         this.detailKelas = res
-        // this.listPeserta = res['peserta']
+        this.filteredJabatan$ = this.jabatanList$.pipe(
+          map(jabatanList =>
+            jabatanList.find(j => j.code === this.detailKelas.jabatanCode)
+          )
+        )
+
+        this.filteredJenjang$ = this.jenjangList$.pipe(
+          map(jenjangList =>
+            jenjangList.find(j => j.code === this.detailKelas.jenjangCode)
+          )
+        )
       },
       error: err => {
         this.alertService.showToast('Error', err.error.message)

@@ -136,12 +136,12 @@ export const routes: Routes = [
           }
         },
         UKom: {
-          //   'Data Dukung UKom': {
-          //     components: () =>
-          //       import(
-          //         '../sijupri-admin/ukom/ukom-document-list/ukom-document-list.component'
-          //       ).then(m => m.UkomDocumentListComponent)
-          //   },
+          'Data Dukung UKom': {
+            components: () =>
+              import(
+                './ukom/ukom-document/ukom-document-list/ukom-document-list.component'
+              ).then(m => m.UkomDocumentListComponent)
+          },
           'Pemetaan Ukom': {
             components: () =>
               import('./ukom/ukom-pemetaan/ukom-list/ukom-list.component').then(
@@ -211,10 +211,25 @@ export const routes: Routes = [
             components: () =>
               import('./ukom/ukom-formula/ukom-formula.component').then(
                 m => m.UkomFormulaComponent
-              )
+              ),
+            routes: [
+              {
+                path: 'examiner',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
+                  ).then(m => m.UkomExaminerListComponent)
+              },
+              {
+                path: 'schedule',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-exam-schedule/ukom-exam-schedule-list/ukom-exam-schedule-list.component'
+                  ).then(m => m.UkomExamScheduleListComponent)
+              }
+            ]
           },
-          //just placeholder waiting till class api ready
-          Periode: {
+          Kelas: {
             components: () =>
               import(
                 '../sijupri-admin/ukom/ukom-class/ukom-class-list/ukom-class-list.component'
@@ -233,8 +248,21 @@ export const routes: Routes = [
                   import(
                     './ukom/ukom-class/ukom-class-detail/ukom-class-detail.component'
                   ).then(m => m.UkomClassDetailComponent)
+              },
+              {
+                path: 'detail/:id',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-exam-schedule/ukom-exam-detail/ukom-exam-detail.component'
+                  ).then(m => m.UkomExamDetailComponent)
               }
             ]
+          },
+          'Penguji Ukom': {
+            components: () =>
+              import(
+                './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
+              ).then(m => m.UkomExaminerListComponent)
           }
         },
         Maintenance: {

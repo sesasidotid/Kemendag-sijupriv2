@@ -30,13 +30,40 @@
         Jabatan
       </label>
       <div class="col-sm-10 pt-2">
-        <!-- <p>: {{ jabatanName }}</p> -->
+        <p>
+          :
+          {{ (filteredJabatan$ | async)?.name || 'Not Found' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold">
+        Jenjang
+      </label>
+      <div class="col-sm-10 pt-2">
+        <p>
+          :
+          {{ (filteredJenjang$ | async)?.name || 'Not Found' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold">
+        Kuota Peserta
+      </label>
+      <div class="col-sm-10 pt-2">
+        <p>
+          :
+          {{ detailKelas.participantQuota }}
+        </p>
       </div>
     </div>
   </div>
 
   <section class="mt-5">
-    <h5 class="fw-bold">List Peserta</h5>
+    <h5 class="fw-bold">List Jadwal Ukom</h5>
     <app-pagable [pagable]="pagable"></app-pagable>
   </section>
 </ng-template>

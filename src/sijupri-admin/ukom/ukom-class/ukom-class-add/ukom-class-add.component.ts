@@ -70,6 +70,10 @@ export class UkomClassAddComponent {
         )
       )
 
+    this.jabatanList$.subscribe(jabatanList => {
+      console.log(jabatanList)
+    })
+
     this.jenjangList$ = this.apiService
       .getData(`/api/v1/jenjang`)
       .pipe(
@@ -85,23 +89,31 @@ export class UkomClassAddComponent {
     this.confirmationService.open(false).subscribe({
       next: result => {
         if (!result.confirmed) return
-        this.submitLoading$.next(true),
-          (this.kelasData.name = this.kelasForm.get('name')?.value),
-          (this.kelasData.jabatan_code = this.kelasForm.get('jabatan')?.value),
-          (this.kelasData.jenjang_code = this.kelasForm.get('jenjang')?.value),
-          (this.kelasData.participant_quota =
-            this.kelasForm.get('participant_quota')?.value),
-          (this.kelasData.exam_start_at =
-            this.kelasForm.get('exam_start_at')?.value)
+
+        this.submitLoading$.next(true)
+
+        this.kelasData.name = this.kelasForm.get('name')?.value
+        this.kelasData.jabatan_code = this.kelasForm.get('jabatan')?.value
+        this.kelasData.jenjang_code = this.kelasForm.get('jenjang')?.value
+        this.kelasData.participant_quota =
+          this.kelasForm.get('participant_quota')?.value
+        this.kelasData.exam_start_at =
+          this.kelasForm.get('exam_start_at')?.value
         this.kelasData.exam_end_at = this.kelasForm.get('exam_end_at')?.value
 
         this.apiService
           .postData(`/api/v1/room_ukom`, this.kelasData)
           .subscribe({
-            next: () => this.router.navigate(['/ukom/ukom-periode']),
+            next: (response: any) => {
+              this.router.navigate(['/ukom/ukom-room-list'])
+            },
             error: error => {
               this.submitLoading$.next(false)
               this.handlerService.handleException(error)
+            },
+            complete: () => {
+              this.submitLoading$.next(false)
+              this.router.navigate(['/ukom/ukom-room-list'])
             }
           })
       }

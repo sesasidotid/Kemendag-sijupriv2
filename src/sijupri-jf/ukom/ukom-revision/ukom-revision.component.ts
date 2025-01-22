@@ -83,6 +83,12 @@ export class UkomRevisionComponent {
     })
   }
 
+  isAnyFileMissing (): boolean {
+    return Object.keys(this.inputs.files).some(key => {
+      return !this.detectedDokumen[key]
+    })
+  }
+
   onSave () {
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []

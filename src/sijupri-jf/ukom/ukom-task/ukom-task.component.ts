@@ -178,10 +178,9 @@ export class UkomTaskComponent {
   }
 
   handleStepClick (clickedStep: number) {
-    console.log('clickedStep', clickedStep)
     this.currentUkomStep$.subscribe(step => {
       if (clickedStep <= step) {
-        this.currentUkomStep$.next(clickedStep)
+        this.ukomStep$.next(clickedStep)
       }
     })
   }
