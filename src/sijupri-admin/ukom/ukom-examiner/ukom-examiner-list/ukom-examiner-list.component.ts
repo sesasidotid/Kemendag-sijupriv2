@@ -1,3 +1,4 @@
+import { JenisKelamin } from './../../../../modules/maintenance/models/jenis-kelamin.model'
 import { Component } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
@@ -30,6 +31,9 @@ export class UkomExaminerListComponent {
         new PrimaryColumnBuilder('Nama', 'name', ['user']).build()
       )
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Jenis Kelalamin', 'jenisKelaminCode').build()
+      )
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Status', 'status', ['user']).build()
       )

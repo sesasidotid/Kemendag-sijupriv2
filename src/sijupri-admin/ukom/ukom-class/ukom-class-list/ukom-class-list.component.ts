@@ -14,6 +14,12 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
 import { BehaviorSubject } from 'rxjs'
 import { UkomClassAddComponent } from '../ukom-class-add/ukom-class-add.component'
 import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
+import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
+import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
+import { ApiService } from '../../../../modules/base/services/api.service'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+
 @Component({
   selector: 'app-ukom-class-list',
   standalone: true,
@@ -28,6 +34,11 @@ import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam
 })
 export class UkomClassListComponent {
   tab$ = new BehaviorSubject<number | null>(0)
+  jabatanList$: Observable<Jabatan[]>
+  jenjangList$: Observable<Jenjang[]>
+
+  jenjangMap: Record<string, string> = {}
+  jabatanMap: Record<string, string> = {}
 
   pagable: Pagable
   data: any[] = []
@@ -35,7 +46,8 @@ export class UkomClassListComponent {
   constructor (
     private tabService: TabService,
     private router: Router,
-    private handlerService: HandlerService
+    private handlerService: HandlerService,
+    private apiService: ApiService
   ) {
     this.pagable = new PagableBuilder('/api/v1/room_ukom/search')
 
@@ -48,10 +60,20 @@ export class UkomClassListComponent {
       )
       .addPrimaryColumn(new PrimaryColumnBuilder('Jam', 'examEndAt').build())
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('jabatanCode', 'jenjangCode').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue(
+            'Jabatan',
+            (data: any) => this.jabatanMap[data.jabatanCode]
+          )
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('jenjangCode', 'jenjangCode').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue(
+            'Jenjang',
+            (data: any) => this.jenjangMap[data.jenjangCode] || ''
+          )
+          .build()
       )
       .addActionColumn(
         new ActionColumnBuilder()
@@ -69,6 +91,9 @@ export class UkomClassListComponent {
       this.tabService.clearTabs()
     }
 
+    this.getJenjang()
+    this.getJabatan()
+
     this.tabService
       .addTab({
         label: 'Daftar Kelas',
@@ -85,6 +110,44 @@ export class UkomClassListComponent {
       label: 'Tambah Jadwal Ukom',
       icon: 'mdi-list-box',
       onClick: () => this.handleTabChange(2)
+    })
+  }
+
+  getJenjang () {
+    this.apiService.getData(`/api/v1/jenjang`).subscribe({
+      next: (response: any) => {
+        const jenjangs = response.map(
+          (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+        )
+
+        jenjangs.forEach((jenjang: any) => {
+          this.jenjangMap[jenjang.code] = jenjang.name
+        })
+
+        this.jenjangList$ = new BehaviorSubject(jenjangs).asObservable()
+      },
+      error: err => {
+        console.error('Error fetching jenjang data:', err)
+      }
+    })
+  }
+
+  getJabatan () {
+    this.apiService.getData(`/api/v1/jabatan`).subscribe({
+      next: (response: any) => {
+        const jabatans = response.map(
+          (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+        )
+
+        jabatans.forEach((jabatan: any) => {
+          this.jabatanMap[jabatan.code] = jabatan.name
+        })
+
+        this.jabatanList$ = new BehaviorSubject(jabatans).asObservable()
+      },
+      error: err => {
+        console.error('Error fetching jabatan data:', err)
+      }
     })
   }
 

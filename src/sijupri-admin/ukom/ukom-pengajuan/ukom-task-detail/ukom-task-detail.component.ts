@@ -44,6 +44,7 @@ export class UkomTaskDetailComponent {
       next: response => {
         this.pendingTask = new PendingTask(response)
         this.pesertaUkom = new PesertaUkom(this.pendingTask.objectTask.object)
+        console.log(this.pendingTask)
       },
       error: error => this.handlerService.handleException(error)
     })
@@ -92,28 +93,6 @@ export class UkomTaskDetailComponent {
             }
           }
         }
-
-        console.log(this.pesertaUkom)
-        // if (
-        //   this.pendingTask.flowId !== 'ukom_flow_1' ||
-        //   task.taskAction === 'reject'
-        // ) {
-        //   this.body.object = {
-        //     dokumenUkomList: this.pesertaUkom.dokumenUkomList
-        //   }
-        // }
-        // task.object = this.pesertaUkom
-
-        // this.body = {
-        //   id: this.pendingTask.id,
-        //   taskAction: task.taskAction,
-        //   object: {
-        //     dokumenUkomList: this.pesertaUkom.dokumenUkomList
-        //   }
-        //   //   dokumen_ukom_list: this.pesertaUkom.dokumenUkomList
-        // }
-
-        console.log(this.body)
 
         this.apiService
           .postData(`/api/v1/participant_ukom/task/submit`, this.body)

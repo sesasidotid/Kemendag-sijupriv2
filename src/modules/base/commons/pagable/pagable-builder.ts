@@ -39,7 +39,7 @@ export class PagableBuilder {
       this.primaryColumnList,
       this.actionColumnList,
       this.filterList,
-      this.limit,
+      this.limit
     )
   }
 }

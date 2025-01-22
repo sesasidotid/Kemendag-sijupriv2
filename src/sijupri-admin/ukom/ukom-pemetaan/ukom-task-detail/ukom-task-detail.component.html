@@ -26,6 +26,10 @@
             <p>{{ ukomDetail.nip }}</p>
           </div>
           <div class="col-md-6 mb-2">
+            <label class="form-label"> Email </label>
+            <p>{{ ukomDetail.email }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
             <label class="form-label"> Tempat, Tanggal Lahir </label>
             <p>{{ ukomDetail.tempatLahir + ', ' + ukomDetail.tanggalLahir }}</p>
           </div>
@@ -37,14 +41,35 @@
             <label class="form-label"> Instansi </label>
             <p>{{ ukomDetail.instansiName }}</p>
           </div>
+
           <div class="col-md-6 mb-2">
-            <label class="form-label"> Pangkat </label>
-            <p>{{ ukomDetail.pangkatName }}</p>
-          </div>
-          <div class="col-md-6 mb-2">
-            <label class="form-label"> Jabatan </label>
+            <label class="form-label"> Jabatan Awal </label>
             <p>{{ ukomDetail.jabatanName }}</p>
           </div>
+
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jenjang Awal </label>
+            <p>{{ ukomDetail.jenjangName }}</p>
+          </div>
+          <!-- <div class="col-md-6 mb-2">
+            <label class="form-label"> Pangkat Awal </label>
+            <p>{{ ukomDetail.pangkatName }}</p>
+          </div> -->
+
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jabatan Akhir </label>
+            <p>{{ ukomDetail.nextJabatanName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jenjang Akhir </label>
+            <p>{{ ukomDetail.nextJenjangName }}</p>
+          </div>
+          <!-- <div class="col-md-6 mb-2">
+            <label class="form-label"> Pangkat Akhir </label>
+            <p>
+              {{ ukomDetail.nextPangkatName }}
+            </p>
+          </div> -->
         </div>
       </div>
     </div>
