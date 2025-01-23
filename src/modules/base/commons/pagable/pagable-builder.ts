@@ -142,6 +142,7 @@ export class PrimaryColumnBuilder {
   withDynamicValue (label: string, dynamic: Function): PrimaryColumnBuilder {
     this.label = label
     this.dynamic = dynamic
+
     return this
   }
 

@@ -1,3 +1,4 @@
+import { ConfirmationService } from './../../../../modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
@@ -40,50 +41,96 @@ export class UkomClassListComponent {
   jenjangMap: Record<string, string> = {}
   jabatanMap: Record<string, string> = {}
 
-  pagable: Pagable
+  //   pagable$: Observable<Pagable>
+  pagable$ = new BehaviorSubject<Pagable | null>(null)
   data: any[] = []
+  refreshToggle: boolean = false
 
   constructor (
     private tabService: TabService,
     private router: Router,
     private handlerService: HandlerService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private confirmationService: ConfirmationService
   ) {
-    this.pagable = new PagableBuilder('/api/v1/room_ukom/search')
+    this.pagable$.next(
+      new PagableBuilder('/api/v1/room_ukom/search')
 
-      .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Kuota Peserta', 'participantQuota').build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Mulai', 'examStartAt').build()
-      )
-      .addPrimaryColumn(new PrimaryColumnBuilder('Jam', 'examEndAt').build())
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue(
-            'Jabatan',
-            (data: any) => this.jabatanMap[data.jabatanCode]
-          )
-          .build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue(
-            'Jenjang',
-            (data: any) => this.jenjangMap[data.jenjangCode] || ''
-          )
-          .build()
-      )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((ukom: any) => {
-            this.router.navigate([`ukom/ukom-room-list/${ukom.id}`])
-          }, 'info')
-          .withIcon('detail')
-          .build()
-      )
-      .build()
+        .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder('Kuota Peserta', 'participantQuota').build()
+        )
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder('Mulai', 'examStartAt').build()
+        )
+        .addPrimaryColumn(new PrimaryColumnBuilder('Jam', 'examEndAt').build())
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder()
+            .withDynamicValue(
+              'Jabatan',
+              (data: any) => this.jabatanMap[data.jabatanCode]
+            )
+            .build()
+        )
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder()
+            .withDynamicValue(
+              'Jenjang',
+              (data: any) => this.jenjangMap[data.jenjangCode] || ''
+            )
+            .build()
+        )
+        .addActionColumn(
+          new ActionColumnBuilder()
+            .setAction((ukom: any) => {
+              this.router.navigate([`ukom/ukom-room-list/${ukom.id}`])
+            }, 'info')
+            .withIcon('detail')
+            .build()
+        )
+        .addActionColumn(
+          new ActionColumnBuilder()
+            .setAction(
+              (ukom: any) =>
+                this.confirmationService.open(false).subscribe({
+                  next: (result: any) => {
+                    if (result) {
+                      if (!result.confirmed) return
+
+                      this.apiService
+                        .deleteData(`/api/v1/room_ukom/${ukom.id}`)
+                        .subscribe({
+                          next: (response: any) => {
+                            this.handlerService.handleAlert(
+                              'Success',
+                              'Data berhasil dihapus'
+                            )
+
+                            this.refreshPagableData()
+                          },
+                          error: (err: any) => {
+                            this.handlerService.handleAlert('Error', err.error)
+                          }
+                        })
+                    }
+                  }
+                }),
+              'danger'
+            )
+            .withIcon('danger')
+            .build()
+        )
+        .build()
+    )
+  }
+  refreshPagableData () {
+    const currentPagable = this.pagable$.value
+
+    const updatedPagable = {
+      ...currentPagable,
+      limit: 10
+    }
+    this.pagable$.next(updatedPagable)
   }
 
   ngOnInit () {
@@ -151,8 +198,13 @@ export class UkomClassListComponent {
     })
   }
 
+  handleRefreshToggle () {
+    this.refreshToggle = !this.refreshToggle
+  }
+
   handleTabChange (tab?: number) {
     console.log('tab', tab)
+
     this.tab$.next(tab)
     this.tabService.changeTabActive(tab)
   }

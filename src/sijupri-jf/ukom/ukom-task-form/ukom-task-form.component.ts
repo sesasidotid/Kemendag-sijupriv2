@@ -39,11 +39,13 @@ export class UkomTaskFormComponent {
       key: string,
       source: string,
       base64Data: string,
-      label: string
+      label: string,
+      id: string
     ) => {
       this.detectedDokumen[key] = {
         base64: base64Data,
-        label: label
+        label: label,
+        id: id
       }
     }
   }
@@ -86,7 +88,8 @@ export class UkomTaskFormComponent {
           this.dokumenPersyaratanList.forEach((dokumen, index) => {
             const key = `dokumenPersyaratan_${index + 1}`
             this.inputs.files[key] = {
-              label: dokumen.dokumenPersyaratanName
+              label: dokumen.dokumenPersyaratanName,
+              id: dokumen.dokumenPersyaratanId
             }
           })
         },
@@ -147,10 +150,16 @@ export class UkomTaskFormComponent {
         const detected = this.detectedDokumen[key]
         this.pesertaUkom.dokumenUkomList.push({
           dokumenFile: detected.base64,
-          dokumenPersyaratanName: this.jf.nip + '_' + 'dokumenPersyaratanUkom',
-          dokumenPersyaratanId: this.dokumenPersyaratanList.find(
-            dokumen => dokumen.dokumenPersyaratanName == detected.label
-          ).dokumenPersyaratanId
+          //   dokumenPersyaratanName: this.jf.nip + '_' + 'dokumenPersyaratanUkom'
+          dokumenPersyaratanName:
+            this.dokumenPersyaratanList.find(
+              dokumen => dokumen.dokumenPersyaratanName == detected.label
+            ).dokumenPersyaratanName +
+            '_' +
+            this.jf.nip +
+            '_' +
+            Date.now(),
+          dokumenPersyaratanId: detected.id
         })
       }
     }
@@ -172,7 +181,7 @@ export class UkomTaskFormComponent {
         this.pesertaUkom.nextPangkatCode = this.jf.pangkatCode
         this.pesertaUkom.password = 'password'
 
-        // console.log('pesertaUkom', this.pesertaUkom)
+        console.log('pesertaUkom', this.pesertaUkom)
         this.apiService
           .postData(`/api/v1/participant_ukom/task/jf`, this.pesertaUkom)
           .subscribe({

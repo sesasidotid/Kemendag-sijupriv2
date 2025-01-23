@@ -1,0 +1,184 @@
+<div class="row card px-4 parent">
+  <div class="gradient-line"></div>
+  <h1 class="p-0">Pendafataran UKOM</h1>
+  <p class="mt-1 mb-0 text-muted p-0">
+    Silahkan isi form di bawah ini untuk mendaftar UKOM
+  </p>
+</div>
+
+<div class="card parent">
+  <form [formGroup]="nonJFForm" (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label for="jenis_ukom" class="form-label">Jenis UKOM</label>
+      <select
+        class="form-select"
+        id="jenis_ukom"
+        required
+        (change)="onJenisUkomSwitch($event)"
+      >
+        <option selected value="" style="display: none">
+          Pilih Jenis UKOM
+        </option>
+        <option value="PERPINDAHAN_JABATAN">Perpindahan Jabatan</option>
+        <option value="PROMOSI">Promosi</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="nip" class="form-label">NIP</label>
+      <input type="text" class="form-control" id="nip" required />
+    </div>
+    <div class="mb-3">
+      <label for="nik" class="form-label">NIK</label>
+      <input type="text" class="form-control" id="nik" required />
+    </div>
+    <div class="mb-3">
+      <label for="name" class="form-label">Nama</label>
+      <input type="text" class="form-control" id="name" required />
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" required />
+    </div>
+    <div class="mb-3">
+      <label for="phone" class="form-label">Telepon</label>
+      <input type="text" class="form-control" id="phone" required />
+    </div>
+    <div class="mb-3">
+      <label for="tempatLahir" class="form-label">Tempat Lahir</label>
+      <input type="text" class="form-control" id="tempatLahir" required />
+    </div>
+    <div class="mb-3">
+      <label for="tanggalLahir" class="form-label">Tanggal Lahir</label>
+      <input type="date" class="form-control" id="tanggalLahir" required />
+    </div>
+    <div class="mb-3">
+      <label for="jenisKelaminCode" class="form-label">Jenis Kelamin</label>
+      <div class="option-wrapper">
+        <input
+          type="radio"
+          name="jenisKelamin"
+          id="jenisKelaminM"
+          value="M"
+          class="option-input"
+          required
+          [defaultChecked]="true"
+        />
+        <label for="jenisKelaminM" class="option-label">Laki-Laki</label>
+        <input
+          type="radio"
+          name="jenisKelamin"
+          id="jenisKelaminF"
+          value="F"
+          class="option-input"
+          required
+        />
+        <label for="jenisKelaminF" class="option-label">Perempuan</label>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="jabatanCode" class="form-label">Jabatan</label>
+      <select
+        class="form-select"
+        name="jabatanCode"
+        id="jabatanCode"
+        formControlName="jabatanCode"
+      >
+        <option selected value="" style="display: none">Pilih Jabatan</option>
+        <option
+          *ngFor="let jabatan of jabatanList$ | async"
+          [value]="jabatan.code"
+        >
+          {{ jabatan.name }}
+        </option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="jenjangCode" class="form-label">Jenjang</label>
+      <select
+        class="form-select"
+        name="jenjangCode"
+        id="jenjangCode"
+        formControlName="jenjangCode"
+        (change)="onJenjangSwitch($event)"
+      >
+        <option selected value="" style="display: none">Pilih Jenjang</option>
+        <option
+          *ngFor="let jenjang of jenjangList$ | async"
+          [value]="jenjang.code"
+        >
+          {{ jenjang.name }}
+        </option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="pangkatCode" class="form-label">Pangkat</label>
+      <select
+        class="form-select"
+        name="pangkatCode"
+        id="pangkatCode"
+        formControlName="pangkatCode"
+      >
+        <option selected value="" style="display: none">Pilih Pangkat</option>
+        <option
+          *ngFor="let pangkat of pangkatList$ | async"
+          [value]="pangkat.code"
+        >
+          {{ pangkat.name }}
+        </option>
+      </select>
+    </div>
+    <div
+      class="mb-3"
+      *ngIf="this.pesertaUkom.jenis_ukom === 'PERPINDAHAN_JABATAN'"
+    >
+      <label for="nextJabatanCode" class="form-label"
+        >Jabatan Yang Dituju</label
+      >
+      <select
+        class="form-select"
+        name="nextJabatanCode"
+        id="nextJabatanCode"
+        formControlName="nextJabatanCode"
+      >
+        <option selected value="" style="display: none">
+          Pilih Jabatan Yang Dituju
+        </option>
+        <option
+          *ngFor="let jabatan of jabatanList$ | async"
+          [value]="jabatan.code"
+        >
+          {{ jabatan.name }}
+        </option>
+      </select>
+    </div>
+    <div class="mb-3" *ngIf="this.pesertaUkom.jenis_ukom === 'PROMOSI'">
+      <label for="nextJenjangCode" class="form-label"
+        >Jenjang Yang Dituju</label
+      >
+      <select
+        class="form-select"
+        name="nextJenjangCode"
+        id="nextJenjangCode"
+        formControlName="nextJenjangCode"
+        [disabled]="!nextJenjang"
+      >
+        <option selected value="" style="display: none">
+          Pilih Jenjang Anda Terlebih Dahulu
+        </option>
+        <option *ngIf="nextJenjang" [value]="nextJenjang.code">
+          {{ nextJenjang.name }}
+        </option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Daftar</button>
+  </form>
+</div>
+
+<div class="row mb-4">
+  <small class="text-muted text-center"
+    >Copyright &copy; Kementerian Perdagangan Republik Indonesia</small
+  >
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>

@@ -45,7 +45,7 @@ export class RekapTableComponent {
 
   dokumentImport: {
     id?: string
-    dokumen_verifikasi?: string
+    fileDokumenVerifikasi?: string
   } = {}
   role = LoginContext.getRoleCodes()
 
@@ -138,12 +138,13 @@ export class RekapTableComponent {
       label: string
     ) => {
       this.dokumentImport.id = this.selectedRekapId$.value.toString()
-      this.dokumentImport.dokumen_verifikasi = base64Data
+      this.dokumentImport.fileDokumenVerifikasi = base64Data
     }
   }
 
-  sourceFile: string =
-    'https://drive.google.com/file/d/1Nj7PXf3U_T4BXoAn1RTRqCoQ4LMMikjI/preview'
+  //   sourceFile: string =
+  //     'https://drive.google.com/file/d/1Nj7PXf3U_T4BXoAn1RTRqCoQ4LMMikjI/preview'
+  sourceFile: string
 
   constructor (
     private confirmationService: ConfirmationService,
@@ -287,6 +288,7 @@ export class RekapTableComponent {
       next: result => {
         if (!result.confirmed) return
 
+        console.log('dokumenImport', this.dokumentImport)
         this.apiService
           .postData(
             '/api/v1/akp_pelatihan_teknis/upload/dokumen_verifikasi',

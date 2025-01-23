@@ -1,0 +1,57 @@
+.parent {
+  @media screen and (max-width: 768px) {
+    margin-left: 16px !important;
+    margin-right: 16px !important;
+    padding: 16px !important;
+  }
+
+  @media screen and (min-width: 768px) {
+    margin-left: 32px !important;
+    margin-right: 32px !important;
+    padding: 16px !important;
+  }
+
+  @media screen and (min-width: 1200px) {
+    margin-left: 200px !important;
+    margin-right: 200px !important;
+    padding: 32px !important;
+  }
+
+  margin-left: 160px !important;
+  margin-right: 160px !important;
+  margin-top: 24px;
+}
+
+.gradient-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px; /* Adjust the height of the gradient line as needed */
+  background: linear-gradient(45deg, #2967be, #49ab49) !important;
+}
+
+.option-wrapper {
+  //   display: inline-block;
+}
+
+.option-input {
+  display: none; /* Hide the default radio input */
+}
+
+.option-label {
+  padding: 0.5rem 1rem;
+  // border: 1px solid #007bff;
+  border-radius: 0.25rem;
+  background-color: #e9e9e9;
+  color: #474747;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  font-size: 13px !important;
+}
+
+/* Style for selected state */
+.option-input:checked + .option-label {
+  background: linear-gradient(45deg, #2967be, #49ab49) !important;
+  color: #fff;
+}

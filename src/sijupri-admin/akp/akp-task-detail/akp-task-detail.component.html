@@ -1,170 +1,202 @@
-<div *ngIf="AKPDetailLoading$ | async; else akpHadItem" class="d-flex justify-content-center my-5">
-    <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
+<div
+  *ngIf="AKPDetailLoading$ | async; else akpHadItem"
+  class="d-flex justify-content-center my-5"
+>
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
 </div>
 
 <ng-template #akpHadItem>
-    <button class="btn btn-sm btn-outline-secondary mb-3" (click)="backToList()"> <i class="mdi mdi-chevron-left"></i>
-        Kembali</button>
-    <div *ngIf="AKPDetail.flowId === 'akp_flow_2'" class="alert alert-primary" role="alert">
-        <i class="mdi mdi-information me-1"></i> Menunggu penilaian dari atasan dan rekan.
-    </div>
-    <div *ngIf="AKPDetail.flowId === 'akp_flow_3'" class="alert alert-primary" role="alert">
-        <i class="mdi mdi-information me-1"></i> Menunggu penilaian personal oleh user JF.
-    </div>
-    <div *ngIf="AKPDetail.flowId === 'akp_flow_4'" class="alert alert-primary" role="alert">
-        <i class="mdi mdi-information me-1"></i> Perlu memberikan dokumen rekomendasi AKP. Kamu bisa mengunggah dokumen rekomendasi pada menu <strong>Rekomendasi</strong> dibawah.
-    </div>
-    <div class="p-0 d-flex flex-column flex-xl-row gap-3">
-        <div class="card flex-grow-1 m-0 detail-jf">
-            <div class="card-header">
-                <h5 class="m-0"><i class="mdi mdi-account me-2"></i> Informasi User JF</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">
-                            Nama Lengkap
-                        </label>
-                        <p>{{AKPDetail.name}}</p>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">
-                            NIP
-                        </label>
-                        <p>{{AKPDetail.nip}}</p>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">
-                            Tempat, Tanggal Lahir
-                        </label>
-                        <p>{{AKPDetail.tempatLahir + ', ' + AKPDetail.tanggalLahir}}</p>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">
-                            Jenis Kelamin
-                        </label>
-                        <p>{{AKPDetail.jenisKelaminName}}</p>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">
-                            Unit Kerja
-                        </label>
-                        <p>{{AKPDetail.unitKerjaName}}</p>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">
-                            Instansi
-                        </label>
-                        <p>{{AKPDetail.instansiName}}</p>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">
-                            Pangkat
-                        </label>
-                        <p>{{AKPDetail.pangkatName}}</p>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">
-                            Jabatan
-                        </label>
-                        <p>{{AKPDetail.jabatanName}}</p>
-                    </div>
-                </div>
-            </div>
+  <button class="btn btn-sm btn-outline-secondary mb-3" (click)="backToList()">
+    <i class="mdi mdi-chevron-left"></i> Kembali
+  </button>
+  <div
+    *ngIf="AKPDetail.flowId === 'akp_flow_2'"
+    class="alert alert-primary"
+    role="alert"
+  >
+    <i class="mdi mdi-information me-1"></i> Menunggu penilaian dari atasan dan
+    rekan.
+  </div>
+  <div
+    *ngIf="AKPDetail.flowId === 'akp_flow_3'"
+    class="alert alert-primary"
+    role="alert"
+  >
+    <i class="mdi mdi-information me-1"></i> Menunggu penilaian personal oleh
+    user JF.
+  </div>
+  <div
+    *ngIf="AKPDetail.flowId === 'akp_flow_4'"
+    class="alert alert-primary"
+    role="alert"
+  >
+    <i class="mdi mdi-information me-1"></i> Perlu memberikan dokumen
+    rekomendasi AKP. Kamu bisa mengunggah dokumen rekomendasi pada menu
+    <strong>Rekomendasi</strong> dibawah.
+  </div>
+  <div class="p-0 d-flex flex-column flex-xl-row gap-3">
+    <div class="card flex-grow-1 m-0 detail-jf">
+      <div class="card-header">
+        <h5 class="m-0">
+          <i class="mdi mdi-account me-2"></i> Informasi User JF
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Nama Lengkap </label>
+            <p>{{ AKPDetail.name }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> NIP </label>
+            <p>{{ AKPDetail.nip }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Tempat, Tanggal Lahir </label>
+            <p>{{ AKPDetail.tempatLahir + ', ' + AKPDetail.tanggalLahir }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jenis Kelamin </label>
+            <p>{{ AKPDetail.jenisKelaminName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Unit Kerja </label>
+            <p>{{ AKPDetail.unitKerjaName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Instansi </label>
+            <p>{{ AKPDetail.instansiName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Pangkat </label>
+            <p>{{ AKPDetail.pangkatName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jabatan </label>
+            <p>{{ AKPDetail.jabatanName }}</p>
+          </div>
         </div>
-        <div class="card flex-grow-1 m-0 detail-atasan">
-            <div class="card-header">
-                <h5 class="m-0"><i class="mdi mdi-account-multiple me-2"></i> Informasi Atasan (Penilai)</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 mb-2">
-                        <label class="form-label">
-                            Nama Lengkap Atasan
-                        </label>
-                        <p>{{AKPDetail.namaAtasan}}</p>
-                    </div>
-                    <div class="col-12 mb-2">
-                        <label class="form-label">
-                            Email Atasan
-                        </label>
-                        <p>{{AKPDetail.emailAtasan}}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer" *ngIf="AKPDetail.flowId === 'akp_flow_2'">
-                <button class="btn btn-primary float-end"><i class="mdi mdi-email me-2"></i> Kirim Ulang Email</button>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="card flex-grow-1 m-0 detail-atasan">
+      <div class="card-header">
+        <h5 class="m-0">
+          <i class="mdi mdi-account-multiple me-2"></i> Informasi Atasan
+          (Penilai)
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-2">
+            <label class="form-label"> Nama Lengkap Atasan </label>
+            <p>{{ AKPDetail.namaAtasan }}</p>
+          </div>
+          <div class="col-12 mb-2">
+            <label class="form-label"> Email Atasan </label>
+            <p>{{ AKPDetail.emailAtasan }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer" *ngIf="AKPDetail.flowId === 'akp_flow_2'">
+        <button class="btn btn-primary float-end">
+          <i class="mdi mdi-email me-2"></i> Kirim Ulang Email
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <div class="card mt-3">
-        <div class="card-header" style="border-bottom: none;">
-            <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
-                <li class="nav-item cursor-pointer" (click)="tabChange(1)">
-                    <a class="nav-link active" data-bs-toggle="tab" role="tab">
-                        <i class="mdi mdi-numeric-1-box me-1"></i>
-                        Matrix 1
-                    </a>
-                </li>
-                <li class="nav-item cursor-pointer" (click)="tabChange(2)">
-                    <a class="nav-link" data-bs-toggle="tab" role="tab">
-                        <i class="mdi mdi-numeric-2-box me-1"></i>
-                        Matrix 2
-                    </a>
-                </li>
-                <li class="nav-item cursor-pointer" (click)="tabChange(3)">
-                    <a class="nav-link" data-bs-toggle="tab" role="tab">
-                        <i class="mdi mdi-numeric-3-box me-1"></i>
-                        Matrix 3
-                    </a>
-                </li>
-                <li class="nav-item cursor-pointer" (click)="tabChange(4)" *ngIf="AKPDetail.flowId === 'akp_flow_4'">
-                    <a class="nav-link" data-bs-toggle="tab" role="tab">
-                        <i class="mdi mdi-book me-1"></i>
-                        Rekomendasi
-                    </a>
-                </li>
-            </ul>
-        </div>
+  <div class="card mt-3">
+    <div class="card-header" style="border-bottom: none">
+      <ul
+        class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0"
+        role="tablist"
+      >
+        <li class="nav-item cursor-pointer" (click)="tabChange(1)">
+          <a class="nav-link active" data-bs-toggle="tab" role="tab">
+            <i class="mdi mdi-numeric-1-box me-1"></i>
+            Matrix 1
+          </a>
+        </li>
+        <li class="nav-item cursor-pointer" (click)="tabChange(2)">
+          <a class="nav-link" data-bs-toggle="tab" role="tab">
+            <i class="mdi mdi-numeric-2-box me-1"></i>
+            Matrix 2
+          </a>
+        </li>
+        <li class="nav-item cursor-pointer" (click)="tabChange(3)">
+          <a class="nav-link" data-bs-toggle="tab" role="tab">
+            <i class="mdi mdi-numeric-3-box me-1"></i>
+            Matrix 3
+          </a>
+        </li>
+        <li
+          class="nav-item cursor-pointer"
+          (click)="tabChange(4)"
+          *ngIf="AKPDetail.flowId === 'akp_flow_4'"
+        >
+          <a class="nav-link" data-bs-toggle="tab" role="tab">
+            <i class="mdi mdi-book me-1"></i>
+            Rekomendasi
+          </a>
+        </li>
+      </ul>
     </div>
+  </div>
 
-    <ng-container *ngIf="(currentTab$ |async) === 1">
-        <app-matrix-one-table [data]="AKPDetail.matrix1DtoList"></app-matrix-one-table>
-    </ng-container>
-    <ng-container *ngIf="(currentTab$ |async) === 2">
-        <app-matrix-two-table [data]="AKPDetail.matrix2DtoList"></app-matrix-two-table>
-    </ng-container>
-    <ng-container *ngIf="(currentTab$ |async) === 3">
-        <app-matrix-three-table [data]="AKPDetail.matrix3DtoList"></app-matrix-three-table>
-    </ng-container>
-    <ng-container *ngIf="(currentTab$ | async) === 4">
-        <div class="card p-4">
-            <form [formGroup]="form" (ngSubmit)="rekomendasiSubmit()">
-                <app-file-handler [inputs]="inputs"></app-file-handler>
-                <div class="feedback"
-                    *ngIf="form.get('rekomendasiFile').invalid">
-                    <small *ngIf="form.get('rekomendasiFile').errors?.['required']">Rekomendasi file perlu
-                        diunggah.</small>
-                    <small *ngIf="form.get('rekomendasiFile')?.hasError('invalidFileType')">File dokumentasi harus
-                        format .pdf</small>
-                    <div *ngIf="form.get('rekomendasiFile')?.hasError('fileTooLarge')">File rekomendasi lebih dari 2MB.
-                    </div>
-                </div>
-                <ng-container *ngIf="(rekomendasiSubmitLoading$ | async) else noLoading">
-                    <button class="float-end btn btn-primary" disabled>
-                        <div class="spinner-border" style="width: 19px; height: 19px;" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </button>
-                </ng-container>
-                <ng-template #noLoading>
-                    <button type="submit" class="float-end btn btn-primary"
-                        [disabled]="form.invalid || (rekomendasiSubmitLoading$ | async)">Kirim Rekomendasi</button>
-                </ng-template>
-            </form>
+  <ng-container *ngIf="(currentTab$ | async) === 1">
+    <app-matrix-one-table
+      [data]="AKPDetail.matrix1DtoList"
+    ></app-matrix-one-table>
+  </ng-container>
+  <ng-container *ngIf="(currentTab$ | async) === 2">
+    <app-matrix-two-table
+      [data]="AKPDetail.matrix2DtoList"
+    ></app-matrix-two-table>
+  </ng-container>
+  <ng-container *ngIf="(currentTab$ | async) === 3">
+    <app-matrix-three-table
+      [data]="AKPDetail.matrix3DtoList"
+    ></app-matrix-three-table>
+  </ng-container>
+  <ng-container *ngIf="(currentTab$ | async) === 4">
+    <div class="card p-4">
+      <form [formGroup]="form" (ngSubmit)="rekomendasiSubmit()">
+        <app-file-handler [inputs]="inputs"></app-file-handler>
+        <div class="feedback" *ngIf="form.get('rekomendasiFile').invalid">
+          <small *ngIf="form.get('rekomendasiFile').errors?.['required']"
+            >Rekomendasi file perlu diunggah.</small
+          >
+          <small
+            *ngIf="form.get('rekomendasiFile')?.hasError('invalidFileType')"
+            >File dokumentasi harus format .pdf</small
+          >
+          <div *ngIf="form.get('rekomendasiFile')?.hasError('fileTooLarge')">
+            File rekomendasi lebih dari 2MB.
+          </div>
         </div>
-    </ng-container>
+        <ng-container *ngIf="rekomendasiSubmitLoading$ | async; else noLoading">
+          <button class="float-end btn btn-primary" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="float-end btn btn-primary"
+            [disabled]="form.invalid || (rekomendasiSubmitLoading$ | async)"
+          >
+            Kirim Rekomendasi
+          </button>
+        </ng-template>
+      </form>
+    </div>
+  </ng-container>
 </ng-template>

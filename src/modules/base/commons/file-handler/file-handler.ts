@@ -10,4 +10,5 @@ export class EygileFile {
   source?: string
   visible?: Function
   required?: boolean
+  id?: string
 }

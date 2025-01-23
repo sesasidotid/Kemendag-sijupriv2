@@ -106,6 +106,7 @@ export class UkomClassAddComponent {
           .subscribe({
             next: (response: any) => {
               this.router.navigate(['/ukom/ukom-room-list'])
+              this.changeTabActive.emit(0)
             },
             error: error => {
               this.submitLoading$.next(false)

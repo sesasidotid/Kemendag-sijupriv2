@@ -1,8 +1,59 @@
-<div class="card-header align-items-center d-flex">
-  <h4 class="card-title mb-0 flex-grow-1">Daftar Riwayat Ukom</h4>
-  <div class="flex-shrink-0"></div>
-</div>
-<div class="card-body">
-  <app-pagable [pagable]="pagable"></app-pagable>
-</div>
-    
+<section>
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">Jadwal UKom Mendatang</h4>
+    <div class="flex-shrink-0"></div>
+  </div>
+  <div class="card-body">
+    <div *ngIf="true">
+      <app-empty-state
+        [title]="'Anda belum ada jadwal UKom'"
+        [description]="
+          'Anda bisa mendaftar di menu Pendaftaran UKom atau pengajuan kamu masih dalam proses verifikasi'
+        "
+      ></app-empty-state>
+    </div>
+    <div *ngIf="false">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Jenis UKom</th>
+              <th>Kelas</th>
+              <th>Tanggal</th>
+              <th>Waktu</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Wawancara</td>
+              <td>Ruangan 1</td>
+              <td>12-12-2021</td>
+              <td>08:00 - 10:00</td>
+              <td>Belum Selesai</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>CAT</td>
+              <td>Ruangan 1</td>
+              <td>12-12-2021</td>
+              <td>10:00 - 12:00</td>
+              <td>Belum Selesai</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">Daftar Riwayat Ukom</h4>
+    <div class="flex-shrink-0"></div>
+  </div>
+  <div class="card-body">
+    <app-pagable [pagable]="pagable"></app-pagable>
+  </div>
+</section>

@@ -1,3 +1,4 @@
+import { JenisUkom } from './../../../modules/ukom/models/jenis-ukom'
 import { Component } from '@angular/core'
 import {
   ActionColumnBuilder,
@@ -9,10 +10,12 @@ import { Router } from '@angular/router'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
 import { LoginContext } from '../../../modules/base/commons/login-context'
+import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
+import { CommonModule } from '@angular/common'
 @Component({
   selector: 'app-ukom-list',
   standalone: true,
-  imports: [PagableComponent],
+  imports: [PagableComponent, EmptyStateComponent, CommonModule],
   templateUrl: './ukom-list.component.html',
   styleUrl: './ukom-list.component.scss'
 })
@@ -21,7 +24,9 @@ export class UkomListComponent {
   id: string = LoginContext.getUserId()
 
   constructor (private router: Router) {
-    this.pagable = new PagableBuilder(`/api/v1/participant_ukom/all/${this.id}`)
+    this.pagable = new PagableBuilder(
+      `/api/v1/participant_ukom/search/${this.id}`
+    )
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
           .withDynamicValue('Jenis Ukom', (data: any) =>
@@ -45,6 +50,12 @@ export class UkomListComponent {
           .build()
       )
 
+      .addFilter(
+        new PageFilterBuilder('equal')
+          .setProperty('nip')
+          .withDefaultValue(LoginContext.getUserId())
+          .build()
+      )
       .addFilter(
         new PageFilterBuilder('like')
           .setProperty('taskStatus')

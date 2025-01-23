@@ -29,7 +29,6 @@ import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam
 })
 export class UkomClassDetailComponent {
   id: string
-  //change when api is ready
   detailKelas: RoomUkomDetail = new RoomUkomDetail()
   jabatanList$: Observable<Jabatan[]>
   jenjangList$: Observable<Jenjang[]>
@@ -79,7 +78,9 @@ export class UkomClassDetailComponent {
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((data: any) => {
-            this.router.navigate([`/${data.id}`])
+            this.router.navigate([
+              `/ukom/ukom-room-list/detail-participant/${data.id}`
+            ])
           }, 'info')
           .withIcon('detail')
           .build()

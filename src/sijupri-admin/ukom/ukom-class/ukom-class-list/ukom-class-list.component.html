@@ -1,7 +1,11 @@
 <!-- <app-pagable [pagable]="pagable"></app-pagable> -->
 
 <ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable"></app-pagable>
+  <!-- <app-pagable [pagable]="pagable"></app-pagable> -->
+  <app-pagable
+    [pagable]="pagable$ | async"
+    [refresh]="refreshToggle"
+  ></app-pagable>
 </ng-container>
 <ng-container *ngIf="(tab$ | async) === 1">
   <app-ukom-class-add

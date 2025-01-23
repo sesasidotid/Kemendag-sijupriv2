@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http'
 })
 export class PagableComponent implements OnChanges {
   @Input() pagable!: Pagable
+  @Input() refresh!: boolean
 
   page: number = 1
   limit: number = 10
@@ -29,6 +30,10 @@ export class PagableComponent implements OnChanges {
         this.sortOrder[column.property] = ''
       })
       this.limit = this.pagable.limit
+      this.fetchData()
+    }
+
+    if (changes['refresh'] && !changes['refresh'].isFirstChange()) {
       this.fetchData()
     }
   }
@@ -165,6 +170,13 @@ export class PagableComponent implements OnChanges {
   }
 
   toggleSort (columnProperty: string): void {
+    const column = this.pagable.primaryColumnList.find(
+      col => col.property === columnProperty
+    )
+    if (column && column.dynamic) {
+      return
+    }
+
     switch (this.sortOrder[columnProperty]) {
       case '':
         this.sortOrder[columnProperty] = 'asc'
@@ -176,6 +188,7 @@ export class PagableComponent implements OnChanges {
         this.sortOrder[columnProperty] = ''
         break
     }
+
     this.fetchData()
   }
 

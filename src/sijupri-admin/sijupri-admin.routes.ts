@@ -235,13 +235,13 @@ export const routes: Routes = [
                 '../sijupri-admin/ukom/ukom-class/ukom-class-list/ukom-class-list.component'
               ).then(m => m.UkomClassListComponent),
             routes: [
-              {
-                path: 'add',
-                loadComponent: () =>
-                  import(
-                    '../sijupri-admin/ukom/ukom-class/ukom-class-add/ukom-class-add.component'
-                  ).then(m => m.UkomClassAddComponent)
-              },
+              //   {
+              //     path: 'add',
+              //     loadComponent: () =>
+              //       import(
+              //         '../sijupri-admin/ukom/ukom-class/ukom-class-add/ukom-class-add.component'
+              //       ).then(m => m.UkomClassAddComponent)
+              //   },
               {
                 path: ':id',
                 loadComponent: () =>
@@ -250,12 +250,19 @@ export const routes: Routes = [
                   ).then(m => m.UkomClassDetailComponent)
               },
               {
-                path: 'detail/:id',
+                path: 'detail-participant/:id',
                 loadComponent: () =>
                   import(
-                    './ukom/ukom-exam-schedule/ukom-exam-detail/ukom-exam-detail.component'
-                  ).then(m => m.UkomExamDetailComponent)
+                    './ukom/ukom-class/ukom-class-participant-detail/ukom-class-participant-detail.component'
+                  ).then(m => m.UkomClassParticipantDetailComponent)
               }
+              //   {
+              //     path: 'detail/:id',
+              //     loadComponent: () =>
+              //       import(
+              //         './ukom/ukom-exam-schedule/ukom-exam-detail/ukom-exam-detail.component'
+              //       ).then(m => m.UkomExamDetailComponent)
+              //   }
             ]
           },
           'Penguji Ukom': {
