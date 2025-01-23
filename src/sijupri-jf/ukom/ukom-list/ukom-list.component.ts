@@ -23,13 +23,21 @@ export class UkomListComponent {
   constructor (private router: Router) {
     this.pagable = new PagableBuilder(`/api/v1/participant_ukom/all/${this.id}`)
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Jenis Ukom', 'jenisUkom').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Jenis Ukom', (data: any) =>
+            data.jenisUkom === 'KENAIKAN_JENJANG'
+              ? 'Kenaikan Jenjang'
+              : data.jenisUkom === 'PERPINDAHAN_JABATAN'
+              ? 'Perpindahan Jabatan'
+              : data.jenisUkom
+          )
+          .build()
       )
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Tanggal', 'lastUpdated').build()
       )
       .addActionColumn(
-        new ActionColumnBuilder()   
+        new ActionColumnBuilder()
           .setAction((ukom: any) => {
             this.router.navigate([`/ukom/ukom-list/detail/${ukom.id}`])
           }, 'info')

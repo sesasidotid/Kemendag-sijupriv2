@@ -1,32 +1,6 @@
 <section>
   <form [formGroup]="examScheduleForm" (ngSubmit)="submit()">
     <div class="row mb-3">
-      <label for="id" class="col-sm-2 col-form-label fw-bold"
-        >Ruangan <span class="text-danger">*</span></label
-      >
-      <div class="col-sm-10">
-        <select id="id" class="form-select" name="id" formControlName="id">
-          <option *ngFor="let room of roomList$ | async" [value]="room.id">
-            {{ room.name }}
-          </option>
-          <!-- <option value="1">Aula</option>
-          <option value="2">Lab Komputer</option> -->
-        </select>
-        <div
-          class="feedback"
-          *ngIf="
-            examScheduleForm.get('id').invalid &&
-            examScheduleForm.get('id').touched
-          "
-        >
-          <small *ngIf="examScheduleForm.get('ruangan').errors?.['required']"
-            >Ruangan perlu diisi.</small
-          >
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-3">
       <label for="exam_start_at" class="col-sm-2 col-form-label fw-bold"
         >Waktu Mulai <span class="text-danger">*</span></label
       >
@@ -137,4 +111,6 @@
       </div>
     </div>
   </form>
+
+  <app-pagable [pagable]="pagable"></app-pagable>
 </section>

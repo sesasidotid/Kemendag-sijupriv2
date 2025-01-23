@@ -1,1 +1,87 @@
-<p>ukom-task-detail works!</p>
+<div
+  *ngIf="ukomDetailLoading$ | async; else ukomHadItem"
+  class="d-flex justify-content-center my-5"
+>
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<ng-template #ukomHadItem>
+  <div class="p-0 d-flex flex-column flex-xl-row gap-3">
+    <div class="card flex-grow-1 m-0 detail-jf">
+      <div class="card-header">
+        <h5 class="m-0">
+          <i class="mdi mdi-account me-2"></i> Detail riwayat UKom
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Nama Lengkap </label>
+            <p>{{ ukomDetail.name }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> NIP </label>
+            <p>{{ ukomDetail.nip }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Email </label>
+            <p>{{ ukomDetail.email }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Tempat, Tanggal Lahir </label>
+            <p>{{ ukomDetail.tempatLahir + ', ' + ukomDetail.tanggalLahir }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jenis Kelamin </label>
+            <p>{{ ukomDetail.jenisKelaminName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jenis Ukom </label>
+            <p>
+              {{
+                ukomDetail.jenisUkom === 'KENAIKAN_JENJANG'
+                  ? 'Kenaikan Jenjang'
+                  : ukomDetail.jenisUkom === 'PERPINDAHAN_JABATAN'
+                  ? 'Perpindahan Jabatan'
+                  : ukomDetail.jenisUkom
+              }}
+            </p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Unit Kerja </label>
+            <p>{{ ukomDetail.unitKerjaName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Instansi </label>
+            <p>{{ ukomDetail.instansiName }}</p>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jabatan Awal </label>
+            <p>{{ ukomDetail.jabatanName }}</p>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jenjang Awal </label>
+            <p>{{ ukomDetail.jenjangName }}</p>
+          </div>
+          <!-- <div class="col-md-6 mb-2">
+            <label class="form-label"> Pangkat Awal </label>
+            <p>{{ ukomDetail.pangkatName }}</p>
+          </div> -->
+
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jabatan Akhir </label>
+            <p>{{ ukomDetail.nextJabatanName }}</p>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label"> Jenjang Akhir </label>
+            <p>{{ ukomDetail.nextJenjangName }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

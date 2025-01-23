@@ -30,7 +30,15 @@ export class UkomDocumentListComponent {
         new PrimaryColumnBuilder('Nama', 'dokumenPersyaratanName').build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Jenis Ukom', 'jenisUkom').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Jenis Ukom', (data: any) =>
+            data.jenisUkom === 'KENAIKAN_JENJANG'
+              ? 'Kenaikan Jenjang'
+              : data.jenisUkom === 'PERPINDAHAN_JABATAN'
+              ? 'Perpindahan Jabatan'
+              : data.jenisUkom
+          )
+          .build()
       )
       .addActionColumn(
         new ActionColumnBuilder()

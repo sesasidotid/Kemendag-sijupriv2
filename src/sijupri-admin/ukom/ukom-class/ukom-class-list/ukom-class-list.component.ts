@@ -106,11 +106,11 @@ export class UkomClassListComponent {
         icon: 'mdi-plus-circle',
         onClick: () => this.handleTabChange(1)
       })
-    this.tabService.addTab({
-      label: 'Tambah Jadwal Ukom',
-      icon: 'mdi-list-box',
-      onClick: () => this.handleTabChange(2)
-    })
+    // this.tabService.addTab({
+    //   label: 'Tambah Jadwal Ukom',
+    //   icon: 'mdi-list-box',
+    //   onClick: () => this.handleTabChange(2)
+    // })
   }
 
   getJenjang () {

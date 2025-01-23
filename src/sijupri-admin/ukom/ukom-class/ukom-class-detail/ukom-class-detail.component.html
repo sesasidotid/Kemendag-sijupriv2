@@ -1,69 +1,78 @@
-<div
-  *ngIf="detailKelasLoading$ | async; else kelasHadItem"
-  class="d-flex justify-content-center my-5"
->
-  <div class="spinner-border" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-</div>
-
-<ng-template #kelasHadItem>
-  <div>
-    <div class="row mb-3">
-      <label for="" class="col-sm-2 col-form-label fw-bold">Tempat</label>
-      <div class="col-sm-10 pt-2">
-        <p>: {{ detailKelas.name }}</p>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label fw-bold">
-        Tanggal
-      </label>
-      <div class="col-sm-10 pt-2">
-        <p>: {{ detailKelas.examStartAt }} - {{ detailKelas.examEndAt }}</p>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label fw-bold">
-        Jabatan
-      </label>
-      <div class="col-sm-10 pt-2">
-        <p>
-          :
-          {{ (filteredJabatan$ | async)?.name || 'Not Found' }}
-        </p>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label fw-bold">
-        Jenjang
-      </label>
-      <div class="col-sm-10 pt-2">
-        <p>
-          :
-          {{ (filteredJenjang$ | async)?.name || 'Not Found' }}
-        </p>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label fw-bold">
-        Kuota Peserta
-      </label>
-      <div class="col-sm-10 pt-2">
-        <p>
-          :
-          {{ detailKelas.participantQuota }}
-        </p>
-      </div>
+<ng-container *ngIf="(tab$ | async) === 0">
+  <div
+    *ngIf="detailKelasLoading$ | async; else kelasHadItem"
+    class="d-flex justify-content-center my-5"
+  >
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
   </div>
 
-  <section class="mt-5">
-    <h5 class="fw-bold">List Jadwal Ukom</h5>
-    <app-pagable [pagable]="pagable"></app-pagable>
-  </section>
-</ng-template>
+  <ng-template #kelasHadItem>
+    <div>
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Tempat</label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ detailKelas.name }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold">
+          Tanggal
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ detailKelas.examStartAt }} - {{ detailKelas.examEndAt }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold">
+          Jabatan
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>
+            :
+            {{ (filteredJabatan$ | async)?.name || 'Not Found' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold">
+          Jenjang
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>
+            :
+            {{ (filteredJenjang$ | async)?.name || 'Not Found' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold">
+          Kuota Peserta
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>
+            :
+            {{ detailKelas.participantQuota }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-5">
+      <h5 class="fw-bold">List Peserta</h5>
+
+      <app-pagable [pagable]="pagable"></app-pagable>
+    </section>
+  </ng-template>
+</ng-container>
+
+<ng-container *ngIf="(tab$ | async) === 1">
+  <app-ukom-exam-schedule-add
+    (changeTabActive)="handleTabChange(0)"
+  ></app-ukom-exam-schedule-add>
+</ng-container>

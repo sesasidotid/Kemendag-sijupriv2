@@ -1,3 +1,4 @@
+import { JenisUkom } from './../../../../modules/ukom/models/jenis-ukom'
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -32,18 +33,30 @@ export class UkomListComponent {
   init: any
   pagable: Pagable
 
+  jenisUkomMap: Record<string, string> = {}
+
   constructor (
     private apiService: ApiService,
     private allertService: AlertService,
     private confirmationService: ConfirmationService,
     private router: Router
   ) {
-    // this.pagable = new PagableBuilder('/api/v1/ukom/search')
     this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
       .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
+      //   .addPrimaryColumn(
+      //     new PrimaryColumnBuilder('Jenis Ukom', 'jenisUkom').build()
+      //   )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Jenis Ukom', 'jenisUkom').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Jenis Ukom', (data: any) =>
+            data.jenisUkom === 'KENAIKAN_JENJANG'
+              ? 'Kenaikan Jenjang'
+              : data.jenisUkom === 'PERPINDAHAN_JABATAN'
+              ? 'Perpindahan Jabatan'
+              : data.jenisUkom
+          )
+          .build()
       )
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Tanggal', 'lastUpdated').build()

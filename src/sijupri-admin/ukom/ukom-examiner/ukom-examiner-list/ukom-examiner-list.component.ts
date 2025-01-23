@@ -32,7 +32,15 @@ export class UkomExaminerListComponent {
       )
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Jenis Kelalamin', 'jenisKelaminCode').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Jenis Kelamin', (data: any) =>
+            data.jenisKelaminCode === 'M'
+              ? 'Pria'
+              : data.jenisKelaminCode === 'F'
+              ? 'Wanita'
+              : data.jenisKelaminCode
+          )
+          .build()
       )
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Status', 'status', ['user']).build()

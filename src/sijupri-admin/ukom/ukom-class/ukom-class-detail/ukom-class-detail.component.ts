@@ -18,10 +18,12 @@ import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Router } from '@angular/router'
+import { TabService } from '../../../../modules/base/services/tab.service'
+import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
 @Component({
   selector: 'app-ukom-class-detail',
   standalone: true,
-  imports: [PagableComponent, CommonModule],
+  imports: [PagableComponent, CommonModule, UkomExamScheduleAddComponent],
   templateUrl: './ukom-class-detail.component.html',
   styleUrl: './ukom-class-detail.component.scss'
 })
@@ -37,14 +39,18 @@ export class UkomClassDetailComponent {
   filteredJabatan$: Observable<Jabatan | undefined>
   filteredJenjang$: Observable<Jenjang | undefined>
 
+  pagableJenisUkom: Pagable
   pagable: Pagable
+  tab$ = new BehaviorSubject<number | null>(0)
+
   data: any[] = []
 
   constructor (
     private apiService: ApiService,
     private alertService: AlertService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    public tabService: TabService
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.id = params.get('id')
@@ -53,20 +59,27 @@ export class UkomClassDetailComponent {
     this.getJenjang()
     this.getJabatan()
 
-    this.pagable = new PagableBuilder(`/api/v1/exam_schedule/room/${this.id}`)
+    this.pagable = new PagableBuilder(
+      `/api/v1/participant_ukom/room/${this.id}`
+    )
+      .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'email').build())
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Waktu Mulai', 'startTime').build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Waktu selesai', 'endTime').build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Jenis Ukom', (data: any) =>
+            data.jenisUkom === 'KENAIKAN_JENJANG'
+              ? 'Kenaikan Jenjang'
+              : data.jenisUkom === 'PERPINDAHAN_JABATAN'
+              ? 'Perpindahan Jabatan'
+              : data.jenisUkom
+          )
+          .build()
       )
       .addActionColumn(
         new ActionColumnBuilder()
-          .setAction((item: any) => {
-            this.router.navigate([`/ukom/ukom-room-list/detail/${item.id}`])
+          .setAction((data: any) => {
+            this.router.navigate([`/${data.id}`])
           }, 'info')
           .withIcon('detail')
           .build()
@@ -78,8 +91,30 @@ export class UkomClassDetailComponent {
     this.getDetailKelas()
     this.getJenjang()
     this.getJabatan()
+
+    if (this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs()
+    }
+
+    this.tabService
+      .addTab({
+        label: 'Detail Kelas',
+        icon: 'mdi-list-box',
+        isActive: true,
+        onClick: () => this.handleTabChange(0)
+      })
+      .addTab({
+        label: 'Tambah Jadwal UKom',
+        icon: 'mdi-plus-circle',
+        onClick: () => this.handleTabChange(1)
+      })
   }
 
+  handleTabChange (tab?: number) {
+    console.log('tab', tab)
+    this.tab$.next(tab)
+    this.tabService.changeTabActive(tab)
+  }
   getJenjang () {
     this.jenjangList$ = this.apiService
       .getData(`/api/v1/jenjang`)
