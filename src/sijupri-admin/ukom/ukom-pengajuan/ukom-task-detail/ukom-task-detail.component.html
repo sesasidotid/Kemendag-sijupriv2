@@ -120,36 +120,57 @@
               >
             </div>
             <div class="col">
-              <div class="ms-2">
-                <input
-                  type="radio"
-                  class="btn-check"
-                  name="options-outlined_{{ i }}"
-                  (click)="onFIleSwitch(i, 'APPROVE')"
-                  id="btn-approve-toggle_{{ i }}"
-                  autocomplete="off"
-                  checked
-                />
-                <label
-                  class="btn btn-sm btn-soft-success"
-                  for="btn-approve-toggle_{{ i }}"
-                  >Terima</label
+              <div
+                class=""
+                *ngIf="
+                  !isDocumentApproved(dokumenPeserta.dokumenPersyaratanId) ||
+                    dokumenPeserta.dokumenStatus === 'REJECT';
+                  else Approved
+                "
+              >
+                <div
+                  *ngIf="pendingTask.flowId !== 'ukom_flow_2'; else Disapproved"
                 >
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="options-outlined_{{ i }}"
+                    (click)="onFIleSwitch(i, 'APPROVE')"
+                    id="btn-approve-toggle_{{ i }}"
+                    autocomplete="off"
+                    checked
+                  />
+                  <label
+                    class="btn btn-sm btn-soft-success"
+                    for="btn-approve-toggle_{{ i }}"
+                    >Terima</label
+                  >
 
-                <input
-                  type="radio"
-                  class="btn-check"
-                  name="options-outlined_{{ i }}"
-                  (click)="onFIleSwitch(i, 'REJECT')"
-                  id="btn-reject-toggle_{{ i }}"
-                  autocomplete="off"
-                />
-                <label
-                  class="btn btn-sm btn-soft-danger"
-                  for="btn-reject-toggle_{{ i }}"
-                  >Tolak</label
-                >
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="options-outlined_{{ i }}"
+                    (click)="onFIleSwitch(i, 'REJECT')"
+                    id="btn-reject-toggle_{{ i }}"
+                    autocomplete="off"
+                  />
+                  <label
+                    class="btn btn-sm btn-soft-danger"
+                    for="btn-reject-toggle_{{ i }}"
+                    >Tolak</label
+                  >
+                </div>
               </div>
+              <ng-template #Approved>
+                <label class="btn btn-sm btn-success" aria-disabled="true"
+                  >Disetujui</label
+                >
+              </ng-template>
+              <ng-template #Disapproved>
+                <label class="btn btn-sm btn-danger" aria-disabled="true"
+                  >Menunggu Perbaikan</label
+                >
+              </ng-template>
             </div>
           </div>
         </div>

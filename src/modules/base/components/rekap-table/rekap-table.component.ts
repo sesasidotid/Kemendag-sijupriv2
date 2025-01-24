@@ -31,6 +31,7 @@ interface RekapData {
   pertanyaanName: string
   rankPrioritas: string
   verified: boolean
+  dokumenVerifikasiUrl: string
 }
 
 @Component({
@@ -242,15 +243,24 @@ export class RekapTableComponent {
   }
 
   toggleModalPreview (data?: RekapData) {
-    if (data) {
-      this.selectedRekapId$.next(Number(data.id))
-      this.selectedRekapData = data
-      console.log(this.selectedRekapData)
-    }
-    this.isModalPreviewOpen$.next(!this.isModalPreviewOpen$.value)
+    // if (data) {
+    //   this.selectedRekapId$.next(Number(data.id))
+    //   this.selectedRekapData = data
+    //   console.log(this.selectedRekapData)
+    // }
+    // this.isModalPreviewOpen$.next(!this.isModalPreviewOpen$.value)
 
-    this.sourceFile = this.sourceFile
+    // this.sourceFile = this.sourceFile
+    console.log('data', data)
+    this.filePreviewService.open(
+      data.dokumenVerifikasi,
+      data.dokumenVerifikasiUrl
+    )
   }
+
+  //   toggleModalPreview (fileName: string, source: string) {
+  //     this.filePreviewService.open(fileName, source)
+  //   }
 
   verifyDocument (data?: RekapData) {
     if (!data) {

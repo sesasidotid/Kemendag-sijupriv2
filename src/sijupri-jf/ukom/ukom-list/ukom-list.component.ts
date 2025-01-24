@@ -12,6 +12,12 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 import { CommonModule } from '@angular/common'
+import { ApiService } from '../../../modules/base/services/api.service'
+import { Observable } from 'rxjs'
+import { UkomExamScheduleJF } from '../../../modules/ukom/models/ukom-exam-schedule-jf'
+import { HandlerService } from '../../../modules/base/services/handler.service'
+import { map } from 'rxjs/operators'
+import { RoomUkom } from '../../../modules/ukom/models/room-ukom.model'
 @Component({
   selector: 'app-ukom-list',
   standalone: true,
@@ -21,9 +27,16 @@ import { CommonModule } from '@angular/common'
 })
 export class UkomListComponent {
   pagable: Pagable
+  schedulePagable$: Observable<Pagable>
   id: string = LoginContext.getUserId()
+  ukomSchedule$: Observable<UkomExamScheduleJF>
+  //   ukomSchedule$: UkomExamScheduleJF
 
-  constructor (private router: Router) {
+  constructor (
+    private router: Router,
+    private apiService: ApiService,
+    private handlerService: HandlerService
+  ) {
     this.pagable = new PagableBuilder(
       `/api/v1/participant_ukom/search/${this.id}`
     )
@@ -49,7 +62,6 @@ export class UkomListComponent {
           .withIcon('detail')
           .build()
       )
-
       .addFilter(
         new PageFilterBuilder('equal')
           .setProperty('nip')
@@ -63,5 +75,25 @@ export class UkomListComponent {
           .build()
       )
       .build()
+  }
+
+  ngOnInit () {
+    this.getUkomSchedule()
+    this.ukomSchedule$.subscribe(jabatanList => {
+      console.log('test', jabatanList)
+    })
+  }
+
+  getUkomSchedule () {
+    this.ukomSchedule$ = this.apiService
+      .getData(`/api/v1/participant_ukom/nip/${this.id}`)
+      .pipe(
+        map(
+          response =>
+            (response.roomUkomDto = new UkomExamScheduleJF(
+              response.roomUkomDto
+            ))
+        )
+      )
   }
 }

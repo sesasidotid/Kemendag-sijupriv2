@@ -8,7 +8,7 @@ import { ActivatedRoute } from '@angular/router'
 import { Task } from '../../../../modules/workflow/models/task.model'
 import { CommonModule } from '@angular/common'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
-
+import { PrevPendingTask } from '../../../../modules/workflow/models/prev-pending-task'
 @Component({
   selector: 'app-ukom-task-detail',
   standalone: true,
@@ -22,6 +22,8 @@ export class UkomTaskDetailComponent {
   isApproveEnable: boolean = true
   id: string
   body: any
+  prevPendingTask: PrevPendingTask
+  prevApprovedTask: any[] = []
 
   constructor (
     private apiService: ApiService,
@@ -44,14 +46,33 @@ export class UkomTaskDetailComponent {
       next: response => {
         this.pendingTask = new PendingTask(response)
         this.pesertaUkom = new PesertaUkom(this.pendingTask.objectTask.object)
-        console.log(this.pendingTask)
+        this.prevPendingTask = new PrevPendingTask(
+          this.pendingTask.objectTask.prevObject
+        )
+        console.log('peserta', this.pesertaUkom)
+        console.log('prevpending', this.prevPendingTask)
+        console.log('pending', this.pendingTask)
+        this.findApproveDokumen(this.prevPendingTask.dokumenUkomList)
       },
       error: error => this.handlerService.handleException(error)
     })
   }
 
+  findApproveDokumen (dokumenUkomList: any[]) {
+    this.prevApprovedTask = dokumenUkomList.filter(
+      dokumen => dokumen.dokumenStatus === 'APPROVE'
+    )
+    console.log('prevApprovedTask', this.prevApprovedTask)
+  }
   preview (fileName: string, source: string) {
     this.filePreviewService.open(fileName, source)
+  }
+
+  isDocumentApproved (dokumenPersyaratanId: string): boolean {
+    return this.prevApprovedTask.some(
+      approvedDokumen =>
+        approvedDokumen.dokumenPersyaratanId === dokumenPersyaratanId
+    )
   }
 
   onFIleSwitch (index: number, status: 'APPROVE' | 'REJECT') {

@@ -85,7 +85,11 @@ export class ApiService {
       )
   }
 
-  public getData (path: string, customHeader: any = null): Observable<any> {
+  public getData (
+    path: string,
+    customHeader: any = null,
+    responseType?: string
+  ): Observable<any> {
     const headers = this.createHeader(
       customHeader || {
         Authorization: `Bearer ${LoginContext.getAccessToken()}`
@@ -138,5 +142,16 @@ export class ApiService {
 
   private createHeader (headerObject: any): HttpHeaders {
     return new HttpHeaders(headerObject)
+  }
+
+  public getPhotoProfile (userId: string): Observable<Blob> {
+    const headers = this.createHeader({
+      Authorization: `Bearer ${LoginContext.getAccessToken()}`
+    })
+
+    return this.http.get(`${this.baseUrl}/api/v1/profile_img/${userId}`, {
+      headers,
+      responseType: 'blob'
+    })
   }
 }

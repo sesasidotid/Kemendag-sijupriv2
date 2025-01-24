@@ -1,0 +1,51 @@
+.question-container {
+  padding: 16px;
+  border-radius: 6px;
+  background-color: #f1f3ff;
+}
+
+.card {
+  background-color: white;
+  border-radius: 6px;
+  padding-right: 12px;
+  padding-left: 12px;
+  padding-top: 13px;
+  padding-bottom: 20px;
+}
+
+.card-add {
+  background-color: white;
+  border-radius: 6px;
+  padding-right: 20px;
+  padding-left: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.add-button {
+  padding: 24px;
+  padding-bottom: 12px !important;
+  width: 100%;
+  border: 2px dashed #dbddea;
+  border-radius: 4px;
+  cursor: pointer;
+
+  p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #b8bbc9;
+  }
+}
+
+.add-button:hover {
+  background-color: #f1f3ff;
+}
+
+.feedback {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

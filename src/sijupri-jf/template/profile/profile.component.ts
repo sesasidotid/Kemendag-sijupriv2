@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { LoginContext } from '../../../modules/base/commons/login-context';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ProfileCardComponent } from '../../../modules/base/components/profile-card/profile-card.component';
+import { Component } from '@angular/core'
+import { LoginContext } from '../../../modules/base/commons/login-context'
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
+import { ProfileCardComponent } from '../../../modules/base/components/profile-card/profile-card.component'
 
 @Component({
   selector: 'app-profile',
@@ -10,5 +10,4 @@ import { ProfileCardComponent } from '../../../modules/base/components/profile-c
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
-export class ProfileComponent {
-}
+export class ProfileComponent {}

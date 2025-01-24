@@ -1,12 +1,14 @@
 import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Output } from '@angular/core'
-import { LucideAngularModule } from 'lucide-angular'
+import { LucideAngularModule, FilePlus } from 'lucide-angular'
 import {
+  FormBuilder,
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
-  Validators
+  Validators,
+  FormArray
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
@@ -26,6 +28,8 @@ import {
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { ExamScheduleUkomList } from '../../../../modules/ukom/models/exam-scheduleDtoList'
+
 @Component({
   selector: 'app-ukom-exam-schedule-add',
   standalone: true,
@@ -48,24 +52,23 @@ export class UkomExamScheduleAddComponent {
   submitLoading$ = new BehaviorSubject<boolean>(false)
 
   examScheduleData: ExamScheduleUkom = new ExamScheduleUkom()
-  roomList$: Observable<RoomUkomDetail[]>
   jenisUkomList$: Observable<JenisUkom[]>
 
   id: string
   pagable: Pagable
+  readonly filePlus = FilePlus
+  refreshToggle: boolean = false
 
   constructor (
     private confirmationService: ConfirmationService,
     private router: Router,
     private apiService: ApiService,
     private handlerService: HandlerService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private fb: FormBuilder
   ) {
-    this.examScheduleForm = new FormGroup({
-      //   id: new FormControl('', Validators.required),
-      start_time: new FormControl('', Validators.required),
-      end_time: new FormControl('', Validators.required),
-      exam_type_code: new FormControl('', Validators.required)
+    this.examScheduleForm = this.fb.group({
+      schedules: this.fb.array([], [Validators.required]) // Ensures at least one schedule exists
     })
 
     this.activatedRoute.paramMap.subscribe(params => {
@@ -86,20 +89,6 @@ export class UkomExamScheduleAddComponent {
   }
 
   ngOnInit () {
-    this.roomList$ = this.apiService
-      .getData(`/api/v1/room_ukom/search?limit=1000`)
-      .pipe(
-        map(response =>
-          response.data.map(
-            (room: { [key: string]: any }) => new RoomUkomDetail(room)
-          )
-        )
-      )
-
-    this.roomList$.subscribe(roomList => {
-      console.log(roomList)
-    })
-
     this.jenisUkomList$ = this.apiService
       .getData(`/api/v1/exam_type`)
       .pipe(
@@ -113,8 +102,44 @@ export class UkomExamScheduleAddComponent {
     this.jenisUkomList$.subscribe(roomList => {
       console.log(roomList)
     })
+
+    this.addSchedule()
   }
 
+  get schedules () {
+    return this.examScheduleForm.get('schedules') as FormArray
+  }
+
+  addSchedule (): void {
+    const scheduleGroup = this.fb.group({
+      start_time: ['', Validators.required],
+      end_time: ['', Validators.required],
+      exam_type_code: ['', Validators.required]
+    })
+    this.schedules.push(scheduleGroup)
+  }
+
+  removeSchedule (index: number): void {
+    this.schedules.removeAt(index)
+  }
+
+  getAvailableExamTypes (selectedCode: string): Observable<JenisUkom[]> {
+    return this.jenisUkomList$.pipe(
+      map(jenisUkomList => {
+        const selectedCodes = this.schedules.value.map(
+          (schedule: any) => schedule.exam_type_code
+        )
+        return jenisUkomList.filter(
+          jenisUkom =>
+            !selectedCodes.includes(jenisUkom.code) ||
+            jenisUkom.code === selectedCode
+        )
+      })
+    )
+  }
+  handleRefreshToggle () {
+    this.refreshToggle = !this.refreshToggle
+  }
   submit (): void {
     this.confirmationService.open(false).subscribe({
       next: result => {
@@ -123,14 +148,36 @@ export class UkomExamScheduleAddComponent {
         this.submitLoading$.next(true)
 
         this.examScheduleData.id = this.id
-        this.examScheduleData.examScheduleDtoList = [
-          {
-            start_time: this.examScheduleForm.get('start_time')?.value,
-            end_time: this.examScheduleForm.get('end_time')?.value,
-            exam_type_code: this.examScheduleForm.get('exam_type_code')?.value
-          }
-        ]
-        console.log(this.examScheduleData)
+
+        const schedules = this.schedules.value.map((schedule: any) => ({
+          start_time: schedule.start_time,
+          end_time: schedule.end_time,
+          exam_type_code: schedule.exam_type_code
+        }))
+
+        const payload = {
+          id: this.id,
+          examScheduleDtoList: schedules
+        }
+
+        const examTypeCodes = this.schedules.value.map(
+          (schedule: any) => schedule.exam_type_code
+        )
+        const hasDuplicate = examTypeCodes.some(
+          (value: any, index: any) => examTypeCodes.indexOf(value) !== index
+        )
+
+        if (hasDuplicate) {
+          this.handlerService.handleAlert(
+            'Error',
+            'Jenis UKOM tidak boleh sama'
+          )
+          this.submitLoading$.next(false)
+          return
+        }
+
+        console.log(payload)
+        this.examScheduleData.examScheduleDtoList = this.schedules.value
 
         this.apiService
           .postData(`/api/v1/exam_schedule`, this.examScheduleData)
@@ -140,7 +187,7 @@ export class UkomExamScheduleAddComponent {
                 'Success',
                 'Data berhasil disimpan'
               )
-              this.router.navigate([`/ukom/ukom-room-list/${this.id}`])
+              this.handleRefreshToggle()
             },
             error: error => {
               this.handlerService.handleAlert('Error', error.error.message)

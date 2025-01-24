@@ -4,15 +4,7 @@
     <div class="flex-shrink-0"></div>
   </div>
   <div class="card-body">
-    <div *ngIf="true">
-      <app-empty-state
-        [title]="'Anda belum ada jadwal UKom'"
-        [description]="
-          'Anda bisa mendaftar di menu Pendaftaran UKom atau pengajuan kamu masih dalam proses verifikasi'
-        "
-      ></app-empty-state>
-    </div>
-    <div *ngIf="false">
+    <div *ngIf="(ukomSchedule$ | async).id; else emptyState">
       <div class="table-responsive">
         <table class="table table-striped">
           <thead>
@@ -26,28 +18,34 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>Wawancara</td>
-              <td>Ruangan 1</td>
-              <td>12-12-2021</td>
-              <td>08:00 - 10:00</td>
-              <td>Belum Selesai</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>CAT</td>
-              <td>Ruangan 1</td>
-              <td>12-12-2021</td>
-              <td>10:00 - 12:00</td>
-              <td>Belum Selesai</td>
+            <tr
+              *ngFor="
+                let schedule of (ukomSchedule$ | async).examScheduleDtoList
+              "
+            >
+              <td></td>
+              <td>{{ schedule.examTypeCode }}</td>
+              <td>{{ schedule.examTypeCode }}</td>
+              <td>{{ schedule.examTypeCode }}</td>
+              <td>{{ schedule.examTypeCode }}</td>
+              <td>{{ schedule.examTypeCode }}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+    <ng-template #emptyState>
+      <app-empty-state
+        [title]="'Anda belum ada jadwal UKom'"
+        [description]="
+          'Anda bisa mendaftar di menu Pendaftaran UKom atau pengajuan kamu masih dalam proses verifikasi'
+        "
+      >
+      </app-empty-state>
+    </ng-template>
   </div>
 </section>
+
 <section>
   <div class="card-header align-items-center d-flex">
     <h4 class="card-title mb-0 flex-grow-1">Daftar Riwayat Ukom</h4>

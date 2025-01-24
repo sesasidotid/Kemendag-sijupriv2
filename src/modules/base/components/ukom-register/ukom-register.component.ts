@@ -23,7 +23,12 @@ import { map } from 'rxjs/operators'
 @Component({
   selector: 'app-ukom-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FileHandlerComponent
+  ],
   templateUrl: './ukom-register.component.html',
   styleUrl: './ukom-register.component.scss'
 })
@@ -49,11 +54,13 @@ export class UkomRegisterComponent {
       key: string,
       source: string,
       base64Data: string,
-      label: string
+      label: string,
+      id: string
     ) => {
       this.detectedDokumen[key] = {
         base64: base64Data,
-        label: label
+        label: label,
+        id: id
       }
     }
   }
@@ -72,12 +79,13 @@ export class UkomRegisterComponent {
       phone: new FormControl('', Validators.required),
       tempatLahir: new FormControl('', Validators.required),
       tanggalLahir: new FormControl('', Validators.required),
-      jenisKelaminCode: new FormControl('', Validators.required),
+      jenisKelaminCode: new FormControl('M', Validators.required),
       jabatanCode: new FormControl('', Validators.required),
       jenjangCode: new FormControl('', Validators.required),
       pangkatCode: new FormControl('', Validators.required),
       nextJabatanCode: new FormControl('', Validators.required),
-      nextJenjangCode: new FormControl('', Validators.required)
+      nextJenjangCode: new FormControl('', Validators.required),
+      password: new FormControl('', Validators.required)
     })
   }
 
@@ -102,13 +110,16 @@ export class UkomRegisterComponent {
             })
           })
 
+          console.log('Dokumen Persyaratan:', this.dokumenPersyaratanList)
+
           this.detectedDokumen = {}
           this.inputs.files = {}
 
           this.dokumenPersyaratanList.forEach((dokumen, index) => {
             const key = `dokumenPersyaratan_${index + 1}`
             this.inputs.files[key] = {
-              label: dokumen.dokumenPersyaratanName
+              label: dokumen.dokumenPersyaratanName,
+              id: dokumen.dokumenPersyaratanId
             }
           })
         },
@@ -170,7 +181,11 @@ export class UkomRegisterComponent {
     console.log('Jenis Ukom changed to:', jenis_ukom)
 
     // this.pesertaUkom = new PesertaUkom()
-    // this.nonJFForm.reset()
+    this.nonJFForm.get('nextJabatanCode')?.setValue('')
+    this.nonJFForm.get('nextJenjangCode')?.setValue('')
+    this.nonJFForm.get('jabatanCode')?.setValue('')
+    this.nonJFForm.get('jenjangCode')?.setValue('')
+    this.nonJFForm.get('pangkatCode')?.setValue('')
 
     if (jenis_ukom) {
       this.nonJFForm.patchValue({ jenis_ukom })
@@ -183,6 +198,7 @@ export class UkomRegisterComponent {
 
       if (jenis_ukom == 'PROMOSI') {
         // this.getNextJenjang()
+        this.nonJFForm.get('jenjangCode')?.setValue('JJ1')
         this.getDokumenPersyaratan(jenis_ukom)
       }
     }
@@ -198,12 +214,9 @@ export class UkomRegisterComponent {
   }
 
   submit () {
-    console.log('Submitting data:')
-
     const jenis_ukom = this.nonJFForm.get('jenis_ukom')?.value
-    console.log(jenis_ukom)
-
     this.pesertaUkom.jenis_ukom = jenis_ukom
+    this.pesertaUkom.password = this.nonJFForm.get('password')?.value
     this.pesertaUkom.nip = this.nonJFForm.get('nip')?.value
     this.pesertaUkom.nik = this.nonJFForm.get('nik')?.value
     this.pesertaUkom.name = this.nonJFForm.get('name')?.value
@@ -216,48 +229,50 @@ export class UkomRegisterComponent {
     this.pesertaUkom.jabatanCode = this.nonJFForm.get('jabatanCode')?.value
     this.pesertaUkom.jenjangCode = this.nonJFForm.get('jenjangCode')?.value
     this.pesertaUkom.pangkatCode = this.nonJFForm.get('pangkatCode')?.value
-    this.pesertaUkom.nextPangkatName = this.nonJFForm.get('pangkatCode')?.value
-
+    this.pesertaUkom.nextPangkatCode = this.nonJFForm.get('pangkatCode')?.value
     if (jenis_ukom === 'PERPINDAHAN_JABATAN') {
       this.pesertaUkom.nextJabatanCode =
         this.nonJFForm.get('nextJabatanCode')?.value
+      this.pesertaUkom.nextJenjangCode =
+        this.nonJFForm.get('jenjangCode')?.value
     }
-
     if (jenis_ukom === 'PROMOSI') {
       this.pesertaUkom.nextJenjangCode =
         this.nonJFForm.get('nextJenjangCode')?.value
       this.pesertaUkom.nextJabatanCode =
         this.nonJFForm.get('jabatanCode')?.value
     }
-
-    console.log('Submitting data:', this.pesertaUkom)
+    if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
+      this.pesertaUkom.dokumenUkomList = []
+    }
+    for (const key in this.detectedDokumen) {
+      if (this.detectedDokumen.hasOwnProperty(key)) {
+        const detected = this.detectedDokumen[key]
+        this.pesertaUkom.dokumenUkomList.push({
+          dokumenFile: detected.base64,
+          dokumenPersyaratanName:
+            this.dokumenPersyaratanList.find(
+              dokumen => dokumen.dokumenPersyaratanName == detected.label
+            ).dokumenPersyaratanName +
+            '_' +
+            this.pesertaUkom.nip +
+            '_' +
+            Date.now(),
+          dokumenPersyaratanId: detected.id
+        })
+      }
+      console.log('pesertaUkom', this.pesertaUkom.dokumenUkomList)
+    }
+    console.log('pesertaUkom', this.pesertaUkom)
     // this.confirmationService.open(false).subscribe({
     //   next: result => {
     //     if (!result.confirmed) return
-
-    //     // const jenis_ukom = this.nonJFForm.get('jenis_ukom')?.value
-
-    //     // this.pesertaUkom.jabatanCode = this.nonJFForm.get('jabatanCode')?.value
-    //     // this.pesertaUkom.jenjangCode = this.nonJFForm.get('jenjangCode')?.value
-    //     // this.pesertaUkom.pangkatCode = this.nonJFForm.get('pangkatCode')?.value
-    //     // this.pesertaUkom.nextJabatanCode =
-    //     //   this.nonJFForm.get('jabatanCode')?.value
-    //     // this.pesertaUkom.nextJenjangCode =
-    //     //   this.nonJFForm.get('jenjangCode')?.value
-    //     // this.pesertaUkom.nextPangkatCode =
-    //     //   this.nonJFForm.get('pangkatCode')?.value
-
-    //     // if (jenis_ukom === 'PERPINDAHAN_JABATAN') {
-    //     //   this.pesertaUkom.nextJabatanCode =
-    //     //     this.nonJFForm.get('nextJabatanCode')?.value
-    //     // }
-
-    //     // if (jenis_ukom === 'PROMOSI') {
-    //     //   this.pesertaUkom.nextJenjangCode =
-    //     //     this.nonJFForm.get('nextJenjangCode')?.value
-    //     // }
-
-    //     console.log('Submitting data:', this.pesertaUkom)
+    this.apiService
+      .postData(`/api/v1/participant_ukom/task/`, this.pesertaUkom)
+      .subscribe({
+        next: () => window.location.reload(),
+        error: error => this.handlerService.handleException(error)
+      })
     //   },
     //   error: error => {
     //     console.log('error', error)
