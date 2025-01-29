@@ -1,4 +1,4 @@
-import { ConfirmationService } from './../../../../modules/base/services/confirmation.service'
+import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {

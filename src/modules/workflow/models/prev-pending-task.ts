@@ -1,4 +1,4 @@
-import { Serializable } from '../../../modules/base/commons/serializable'
+import { Serializable } from '../../base/commons/serializable'
 import { ObjectTask } from './object-task.model'
 
 export class PrevPendingTask extends Serializable {

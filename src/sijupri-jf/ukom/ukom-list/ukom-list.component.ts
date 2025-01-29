@@ -1,4 +1,4 @@
-import { JenisUkom } from './../../../modules/ukom/models/jenis-ukom'
+import { JenisUkom } from '../../../modules/ukom/models/jenis-ukom'
 import { Component } from '@angular/core'
 import {
   ActionColumnBuilder,
@@ -30,6 +30,8 @@ export class UkomListComponent {
   schedulePagable$: Observable<Pagable>
   id: string = LoginContext.getUserId()
   ukomSchedule$: Observable<UkomExamScheduleJF>
+
+  jadwalPagable: Pagable
   //   ukomSchedule$: UkomExamScheduleJF
 
   constructor (
@@ -72,6 +74,28 @@ export class UkomListComponent {
         new PageFilterBuilder('like')
           .setProperty('taskStatus')
           .withField('Status', 'text')
+          .build()
+      )
+      .build()
+
+    this.jadwalPagable = new PagableBuilder(
+      `/api/v1/participant_ukom/nip/${this.id}`
+    )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Jenis Ujian', 'examTypeCode').build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Waktu Mulai', 'startTime').build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Waktu Selesai', 'endTime').build()
+      )
+      .addActionColumn(
+        new ActionColumnBuilder()
+          .setAction((ukom: any) => {
+            // this.router.navigate([`/ukom/ukom-list/detail/${ukom.id}`])
+          }, 'info')
+          .withIcon('detail')
           .build()
       )
       .build()

@@ -1,5 +1,5 @@
 import { ActivatedRoute } from '@angular/router'
-import { ApiService } from './../../../modules/base/services/api.service'
+import { ApiService } from '../../../modules/base/services/api.service'
 import { Component } from '@angular/core'
 import { Jenjang } from '../../../modules/maintenance/models/jenjang.modle'
 import { Pangkat } from '../../../modules/maintenance/models/pangkat.model'

@@ -1,4 +1,4 @@
-import { LoginContext } from './../../../modules/base/commons/login-context'
+import { LoginContext } from '../../../modules/base/commons/login-context'
 import { CommonModule, DOCUMENT } from '@angular/common'
 import { Component, ElementRef, Inject } from '@angular/core'
 import { Router } from '@angular/router'

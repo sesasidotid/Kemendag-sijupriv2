@@ -192,21 +192,12 @@ export const routes: Routes = [
                 '../sijupri-admin/ukom/ukom-grade-import/ukom-grade-import.component'
               ).then(m => m.UkomGradeImportComponent)
           },
-          //   Periode: {
-          //     components: () =>
-          //       import(
-          //         '../sijupri-admin/ukom/ukom-periode/ukom-periode.component'
-          //       ).then(m => m.UkomPeriodeComponent),
-          //     routes: [
-          //       {
-          //         path: 'add',
-          //         loadComponent: () =>
-          //           import(
-          //             '../sijupri-admin/ukom/ukom-periode-add/ukom-periode-add.component'
-          //           ).then(m => m.UkomPeriodeAddComponent)
-          //       }
-          //     ]
-          //   },
+          Periode: {
+            components: () =>
+              import(
+                './ukom/ukom-question/ukom-question-list/ukom-question-list.component'
+              ).then(m => m.UkomQuestionListComponent)
+          },
           'Rumus UKom': {
             components: () =>
               import('./ukom/ukom-formula/ukom-formula.component').then(
@@ -255,7 +246,15 @@ export const routes: Routes = [
                   import(
                     './ukom/ukom-class/ukom-class-participant-detail/ukom-class-participant-detail.component'
                   ).then(m => m.UkomClassParticipantDetailComponent)
+              },
+              {
+                path: ':roomid/competence/:id',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-exam-schedule/ukom-exam-choose-comp-questions/ukom-exam-choose-comp-questions.component'
+                  ).then(m => m.UkomExamChooseCompQuestionsComponent)
               }
+
               //   {
               //     path: 'detail/:id',
               //     loadComponent: () =>
@@ -270,6 +269,12 @@ export const routes: Routes = [
               import(
                 './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
               ).then(m => m.UkomExaminerListComponent)
+          },
+          'Peserta Ukom': {
+            components: () =>
+              import(
+                '../sijupri-admin/ukom/ukom-kompetensi/ukom-kompetensi-list/ukom-kompetensi-list.component'
+              ).then(m => m.UkomKompetensiListComponent)
           }
         },
         Maintenance: {

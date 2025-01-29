@@ -1,6 +1,7 @@
 import { Serializable } from '../../base/commons/serializable'
 
 export class PesertaUkom extends Serializable {
+  id: string = undefined
   jenis_ukom: string = undefined
   nip: string = undefined
   nik: string = undefined
@@ -27,6 +28,9 @@ export class PesertaUkom extends Serializable {
   pangkatName: string = undefined
   nextPangkatCode: string = undefined
   nextPangkatName: string = undefined
+
+  instansi_id: string = undefined
+  unit_kerja_id: string = undefined
 
   dokumenUkomList: any[] = undefined
   pendingTaskHistory: any[] = undefined

@@ -1,4 +1,4 @@
-import { JenisKelamin } from './../../../../modules/maintenance/models/jenis-kelamin.model'
+import { JenisKelamin } from '../../../../modules/maintenance/models/jenis-kelamin.model'
 import { Component } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {

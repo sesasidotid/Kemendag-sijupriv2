@@ -55,3 +55,16 @@
   background: linear-gradient(45deg, #2967be, #49ab49) !important;
   color: #fff;
 }
+
+/* The div container */
+.qrcodeImage {
+  display: flex;
+  flex: 1;
+}
+
+/* Add custom styles here */
+.center {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}

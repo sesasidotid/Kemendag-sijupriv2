@@ -18,6 +18,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'login-cat',
+    loadComponent: () =>
+      import('../modules/auth/components/login-cat/login-cat.component').then(
+        m => m.LoginCatComponent
+      )
+  },
+  {
     path: 'not-found',
     loadComponent: () =>
       import('./template/not-found/not-found.component').then(
@@ -30,6 +37,13 @@ export const routes: Routes = [
       import(
         '../modules/base/components/ukom-register/ukom-register.component'
       ).then(m => m.UkomRegisterComponent)
+  },
+  {
+    path: 'ukom/external/status',
+    loadComponent: () =>
+      import(
+        '../modules/base/components/status-pendaftaran-ukom/status-pendaftaran-ukom.component'
+      ).then(m => m.StatusPendaftaranUkomComponent)
   },
   {
     path: 'akp-grading/:whoIs/:id',
@@ -78,6 +92,14 @@ function getMenus (): any {
         path: '',
         loadChildren: () =>
           import('../sijupri-jf/sijupri-jf.module').then(m => m.SijupriJfModule)
+      }
+    case 'siukom-participant':
+      return {
+        path: '',
+        loadChildren: () =>
+          import('../sijupri-cat/sijupri-cat.module').then(
+            m => m.SijupriCAtModule
+          )
       }
     default:
       return {

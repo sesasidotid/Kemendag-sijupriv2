@@ -1,4 +1,4 @@
-import { UkomTaskService } from './../../../modules/ukom/services/ukom-task.service'
+import { UkomTaskService } from '../../../modules/ukom/services/ukom-task.service'
 import { Component } from '@angular/core'
 import { JF } from '../../../modules/siap/models/jf.model'
 import { ApiService } from '../../../modules/base/services/api.service'

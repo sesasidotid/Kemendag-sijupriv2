@@ -1,4 +1,4 @@
-import { DokumenUkomList } from './../../../modules/ukom/models/ukom-task-detail.modal'
+import { DokumenUkomList } from '../../../modules/ukom/models/ukom-task-detail.modal'
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { JF } from '../../../modules/siap/models/jf.model'

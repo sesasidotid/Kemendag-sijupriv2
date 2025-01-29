@@ -58,6 +58,7 @@ export class UkomExamScheduleAddComponent {
   pagable: Pagable
   readonly filePlus = FilePlus
   refreshToggle: boolean = false
+  ukom_type: string = undefined
 
   constructor (
     private confirmationService: ConfirmationService,
@@ -84,6 +85,17 @@ export class UkomExamScheduleAddComponent {
       )
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build()
+      )
+      .addActionColumn(
+        new ActionColumnBuilder()
+          .setAction((item: any) => {
+            this.router.navigate(
+              [`ukom/ukom-room-list/${this.id}/competence/${item.id}`],
+              { queryParams: { type_ukom: item.examTypeCode } }
+            )
+          }, 'info')
+          .withIcon('detail')
+          .build()
       )
       .build()
   }

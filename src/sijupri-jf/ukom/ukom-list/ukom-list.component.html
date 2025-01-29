@@ -5,34 +5,7 @@
   </div>
   <div class="card-body">
     <div *ngIf="(ukomSchedule$ | async).id; else emptyState">
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Jenis UKom</th>
-              <th>Kelas</th>
-              <th>Tanggal</th>
-              <th>Waktu</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              *ngFor="
-                let schedule of (ukomSchedule$ | async).examScheduleDtoList
-              "
-            >
-              <td></td>
-              <td>{{ schedule.examTypeCode }}</td>
-              <td>{{ schedule.examTypeCode }}</td>
-              <td>{{ schedule.examTypeCode }}</td>
-              <td>{{ schedule.examTypeCode }}</td>
-              <td>{{ schedule.examTypeCode }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <app-pagable [pagable]="jadwalPagable"></app-pagable>
     </div>
     <ng-template #emptyState>
       <app-empty-state

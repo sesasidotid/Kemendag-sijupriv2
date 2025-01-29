@@ -1,4 +1,4 @@
-import { PesertaUkom } from './../../../ukom/models/peserta-ukom.model'
+import { PesertaUkom } from '../../../ukom/models/peserta-ukom.model'
 import { Component } from '@angular/core'
 import { Jabatan } from '../../../maintenance/models/jabatan.model'
 import { Jenjang } from '../../../maintenance/models/jenjang.modle'
@@ -11,15 +11,25 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms'
-import { Observable } from 'rxjs'
-import { DokumenUkomPersyaratan } from '../../../../modules/maintenance/models/dokumen-persyaratan-ukom'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { Observable, of, Subject } from 'rxjs'
+import { DokumenUkomPersyaratan } from '../../../maintenance/models/dokumen-persyaratan-ukom'
+import { FIleHandler } from '../../commons/file-handler/file-handler'
+import { ApiService } from '../../services/api.service'
+import { HandlerService } from '../../services/handler.service'
+import { ConfirmationService } from '../../services/confirmation.service'
 import { CommonModule } from '@angular/common'
-import { map } from 'rxjs/operators'
-
+import { map, filter } from 'rxjs/operators'
+import { Instansi } from '../../../maintenance/models/instansi.model'
+import { UnitKerja } from '../../../maintenance/models/unit-kerja.model'
+import {
+  NgLabelTemplateDirective,
+  NgOptionTemplateDirective,
+  NgSelectComponent
+} from '@ng-select/ng-select'
+import { ModalComponent } from '../modal/modal.component'
+import { QRCodeModule } from 'angularx-qrcode'
+import { SafeUrl } from '@angular/platform-browser'
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
 @Component({
   selector: 'app-ukom-register',
   standalone: true,
@@ -27,27 +37,39 @@ import { map } from 'rxjs/operators'
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    FileHandlerComponent
+    FileHandlerComponent,
+    NgLabelTemplateDirective,
+    NgOptionTemplateDirective,
+    NgSelectComponent,
+    ModalComponent,
+    QRCodeModule,
+    ConfirmationDialogComponent
   ],
   templateUrl: './ukom-register.component.html',
   styleUrl: './ukom-register.component.scss'
 })
 export class UkomRegisterComponent {
-  customHeader = {
-    Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJzaWp1cHJpLXdlYiIsImp0aSI6ImY4YjFhMjE5YWYzZjczYmNmODhiZTY1MjIyZWFlNzE2ZDU5NjgzYzZjN2UzZmU1OGQ3Zjk0Yjc0OGFhYTlkMWE1ZGQyMzU4ODkzODJkYTQxIiwiaWF0IjoxNzM3NjAwMTk3LjcwMTQ2OSwibmJmIjoxNzM3NjAwMTk3LjcwMTQ3NSwiZXhwIjoxNzQwNjAwMTk3LjYyOTg1OSwic3ViIjoiNDQ0NDQ0NDQ0NDQ0NDQ0NDQxIiwic2NvcGVzIjpbXSwiZGV0YWlscyI6eyJpZCI6IjQ0NDQ0NDQ0NDQ0NDQ0NDQ0MSIsIm5hbWUiOiJUZXN0IEpGIDEiLCJyb2xlX2NvZGVzIjpbIlVTRVJfRVhURVJOQUwiXSwibWVudV9jb2RlcyI6WyJNTlVfQUtQSkUwMDEiLCJNTlVfQUtQSkUwMDIiLCJNTlVfQUtQSkUwMDMiLCJNTlVfVUtNSkUwMDEiLCJNTlVfVUtNSkUwMDIiLCJNTlVfVUtNSkUwMDMiLCJNTlVfRk9SSkUwMDEiLCJNTlVfRk9SSkUwMDIiXSwiYXBwbGljYXRpb25fY29kZSI6InNpanVwcmktZXh0ZXJuYWwiLCJpbnN0YW5zaV9pZCI6IjJiYTU5YTc4LTBlMTQtNGUwMy1hOTk4LTNiY2Q0ZWU4OGEzMSIsInVuaXRfa2VyamFfaWQiOiI3MDUwOTg0Yy1mYjZiLTQxMjgtOWExYS1iNTEzNjY0Nzk0NDIiLCJ1cmxzIjpbIi9hcGkvdjEvKip8Q1VEIl19fQ.aLDxwTxdUl2hcGYtCGNehzI3qbEWd9Bz8NE7n18BMzXtsk25ZFzBEGj0JUZ4hY4_xCvDuS_yglQQ0pjIk-jXGPXmbQT6yYG737wAJtVDhomMcFAXg2NkAlUjwlE8X0i8UhD-G-L7jIKq_0dlB0QImaqlGaPPo4kx21gkDIrj8dkNu5jj7GCrO7g4nCbtKz9axg9gttQrMBaRcF82OzeqN9H34XLgh4Uro1FvkSLCAOzzaPcu06gWkMLraW0fl0XeiT6QTirH2CrJJcF-a8oetors3hExf9qudhG-s13mWa0kI1XxkFPYjNcfOJopNTlg5qQscXNC0_5eVRkoxXxNDPE20zgUuv9vJLiiy1aAryR2abVkbqBzCHAYVBDKFPV2-GSXIfK0jdY42DIK1B3_U_mdgZqt4qM5skp5gzOcZn9eBfhR2UGsv0LPidhb8PEnEQs6TG5bVIZ7WsrscpUAvAdI-zNqVCaB2FrhOfL3RYhIONmRtSiU5Rifd6CsgRL6lnvgV45jBmJN7boQ6sPxaw-VCbGwQWhUp8MK2GNmW0MaqmPcajT0I-h7BYUxUqrKAlsWECtvJdzHcJsnjJug9aMa75R66MOwV0fbe07Gci50fENaS_D0e72tw0o0x8oKMQV1rbnCiEojQQau33WKPFCcVNzTW9al6DcGJE0_RC0`
-  }
   nonJFForm: FormGroup
 
   jabatanList$: Observable<Jabatan[]>
   jenjangList$: Observable<Jenjang[]>
   pangkatList$: Observable<Pangkat[]>
 
+  instansiSearch = new Subject<string>()
+  instansiList$: Observable<Instansi[]>
+  unitKerjaList$: Observable<UnitKerja[]>
+
   nextJenjang: Jenjang
   detectedDokumen: any = {}
   pesertaUkom: PesertaUkom = new PesertaUkom()
-
+  filteredInstansiList: any[] = []
   dokumenPersyaratanList: DokumenUkomPersyaratan[] = []
 
+  registerComplete: boolean = false
+
+  myAngularxQrCode: string = ''
+  stringCode: string = ''
+  qrCodeDownloadLink: SafeUrl = ''
   inputs: FIleHandler = {
     files: {},
     listen: (
@@ -85,22 +107,50 @@ export class UkomRegisterComponent {
       pangkatCode: new FormControl('', Validators.required),
       nextJabatanCode: new FormControl('', Validators.required),
       nextJenjangCode: new FormControl('', Validators.required),
-      password: new FormControl('', Validators.required)
+      instansi_id: new FormControl('', Validators.required),
+      unit_kerja_id: new FormControl('', Validators.required),
+      password: new FormControl('', Validators.required),
+      instansi_name: new FormControl('', Validators.required)
     })
   }
 
   ngOnInit () {
     this.getListJabatan()
-    this.getListJenjang()
-    this.getListPanngkat()
+    // this.getListJenjang()
+    // this.getListPanngkat()
+    this.getListInstansi()
+
+    this.instansiList$.subscribe(instansiList => {
+      this.filteredInstansiList = instansiList
+    })
+  }
+
+  filterInstansi (event: Event) {
+    const searchTerm = (event.target as HTMLInputElement).value // Get the input value
+    console.log('Search Term:', searchTerm)
+
+    // Subscribe to the instansiList$ observable to get the full list of instansi
+    this.instansiList$.subscribe(instansiList => {
+      if (searchTerm) {
+        // Filter the list based on the search term
+        this.filteredInstansiList = instansiList.filter(instansi =>
+          instansi.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      } else {
+        // If the search term is empty, reset the filtered list to the original list
+        this.filteredInstansiList = instansiList
+      }
+      console.log('Filtered Instansi:', this.filteredInstansiList)
+    })
+  }
+
+  onInstansiNameChange (name: string) {
+    this.instansiSearch.next(name)
   }
 
   getDokumenPersyaratan (jenis_ukom: string) {
     this.apiService
-      .getData(
-        `/api/v1/document_ukom/jenis_ukom/${jenis_ukom}`,
-        this.customHeader
-      )
+      .getData(`/api/v1/document_ukom/jenis_ukom/${jenis_ukom}`)
       .subscribe({
         next: response => {
           this.dokumenPersyaratanList = response.map((dokumen: any) => {
@@ -129,7 +179,7 @@ export class UkomRegisterComponent {
 
   getListJabatan () {
     this.jabatanList$ = this.apiService
-      .getData(`/api/v1/jabatan`, this.customHeader)
+      .getData(`/api/v1/jabatan`)
       .pipe(
         map(response =>
           response.map(
@@ -139,9 +189,17 @@ export class UkomRegisterComponent {
       )
   }
 
-  getListJenjang () {
+  onJabatanSwitch (event: Event) {
+    const jabatanCode = (event.target as HTMLSelectElement).value
+
+    if (jabatanCode) {
+      this.pesertaUkom.jabatanCode = jabatanCode
+      this.getListJenjang(jabatanCode)
+    }
+  }
+  getListJenjang (jabatanCode: string) {
     this.jenjangList$ = this.apiService
-      .getData(`/api/v1/jenjang`, this.customHeader)
+      .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
       .pipe(
         map(response =>
           response.map(
@@ -151,9 +209,9 @@ export class UkomRegisterComponent {
       )
   }
 
-  getListPanngkat () {
+  getListPanngkat (jenjangCode: string) {
     this.pangkatList$ = this.apiService
-      .getData(`/api/v1/pangkat`, this.customHeader)
+      .getData(`/api/v1/pangkat/jenjang/${jenjangCode}`)
       .pipe(
         map(response =>
           response.map(
@@ -163,10 +221,37 @@ export class UkomRegisterComponent {
       )
   }
 
+  getListInstansi (instasi_name: string = '') {
+    this.instansiList$ = this.apiService
+      //   .getData(
+      //     `/api/v1/instansi/search?eq_name=Badan Kepegawaian dan Pengembangan Sumber Daya Manusia Kabupaten  Kaur`
+      //   )
+      .getData(`/api/v1/instansi`)
+      .pipe(
+        map(response =>
+          response.map(
+            (instansi: { [key: string]: any }) => new Instansi(instansi)
+          )
+        )
+      )
+  }
+
+  getListUnitKerja (instansiId: string) {
+    this.unitKerjaList$ = this.apiService
+      .getData(`/api/v1/unit_kerja/instansi/${instansiId}`)
+      .pipe(
+        map(response =>
+          response.map(
+            (unitKerja: { [key: string]: any }) => new UnitKerja(unitKerja)
+          )
+        )
+      )
+  }
+
   getNextJenjang (jenjang_code: string) {
     if (jenjang_code) {
       this.apiService
-        .getData(`/api/v1/jenjang/next/${jenjang_code}`, this.customHeader)
+        .getData(`/api/v1/jenjang/next/${jenjang_code}`)
         .subscribe({
           next: (response: any) => {
             this.nextJenjang = new Jenjang(response)
@@ -209,11 +294,36 @@ export class UkomRegisterComponent {
 
     if (jenjangCode) {
       this.pesertaUkom.jenjangCode = jenjangCode
+      this.getListPanngkat(jenjangCode)
     }
-    this.getNextJenjang(jenjangCode)
+    // this.getNextJenjang(jenjangCode)
+  }
+
+  onInstansiSwitch (event: Event) {
+    const instansiId = (event.target as HTMLSelectElement).value
+    console.log('instansiId', instansiId)
+
+    if (instansiId) {
+      this.pesertaUkom.instansi_id = instansiId
+      this.getListUnitKerja(instansiId)
+    }
+  }
+
+  onUnitKerjaSwitch (event: Event) {
+    const unitKerjaId = (event.target as HTMLSelectElement).value
+
+    if (unitKerjaId) {
+      this.pesertaUkom.unit_kerja_id = unitKerjaId
+    }
+  }
+
+  onChangeURL (url: SafeUrl) {
+    this.qrCodeDownloadLink = url
   }
 
   submit () {
+    console.log(this.nonJFForm.get('instansi_id')?.value)
+
     const jenis_ukom = this.nonJFForm.get('jenis_ukom')?.value
     this.pesertaUkom.jenis_ukom = jenis_ukom
     this.pesertaUkom.password = this.nonJFForm.get('password')?.value
@@ -230,6 +340,8 @@ export class UkomRegisterComponent {
     this.pesertaUkom.jenjangCode = this.nonJFForm.get('jenjangCode')?.value
     this.pesertaUkom.pangkatCode = this.nonJFForm.get('pangkatCode')?.value
     this.pesertaUkom.nextPangkatCode = this.nonJFForm.get('pangkatCode')?.value
+    // this.pesertaUkom.instansi_id = this.nonJFForm.get('instansi_id')?.value
+    // this.pesertaUkom.unit_kerja_id = this.nonJFForm.get('unit_kerja_id')?.value
     if (jenis_ukom === 'PERPINDAHAN_JABATAN') {
       this.pesertaUkom.nextJabatanCode =
         this.nonJFForm.get('nextJabatanCode')?.value
@@ -238,13 +350,15 @@ export class UkomRegisterComponent {
     }
     if (jenis_ukom === 'PROMOSI') {
       this.pesertaUkom.nextJenjangCode =
-        this.nonJFForm.get('nextJenjangCode')?.value
+        this.nonJFForm.get('jenjangCode')?.value
       this.pesertaUkom.nextJabatanCode =
         this.nonJFForm.get('jabatanCode')?.value
     }
+
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
     }
+
     for (const key in this.detectedDokumen) {
       if (this.detectedDokumen.hasOwnProperty(key)) {
         const detected = this.detectedDokumen[key]
@@ -264,20 +378,30 @@ export class UkomRegisterComponent {
       console.log('pesertaUkom', this.pesertaUkom.dokumenUkomList)
     }
     console.log('pesertaUkom', this.pesertaUkom)
-    // this.confirmationService.open(false).subscribe({
-    //   next: result => {
-    //     if (!result.confirmed) return
-    this.apiService
-      .postData(`/api/v1/participant_ukom/task/`, this.pesertaUkom)
-      .subscribe({
-        next: () => window.location.reload(),
-        error: error => this.handlerService.handleException(error)
-      })
-    //   },
-    //   error: error => {
-    //     console.log('error', error)
-    //     this.handlerService.handleAlert('Error', error.error.message)
-    //   }
-    // })
+
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) return
+
+        this.apiService
+          .postData('/api/v1/participant_ukom/task', this.pesertaUkom)
+          .subscribe({
+            next: response => {
+              this.registerComplete = true
+              this.myAngularxQrCode = `${window.location.origin}/ukom/external/status?key=${response.key}`
+              this.stringCode = response.key
+              this.handlerService.handleAlert(
+                'Success',
+                'Data berhasil disimpan'
+              )
+            },
+            error: error => this.handlerService.handleException(error)
+          })
+      },
+      error: error => {
+        console.log('error', error)
+        this.handlerService.handleAlert('Error', error.error.message)
+      }
+    })
   }
 }

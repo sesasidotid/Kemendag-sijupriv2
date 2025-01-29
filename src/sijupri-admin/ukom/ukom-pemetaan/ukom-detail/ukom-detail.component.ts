@@ -12,11 +12,11 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { JfService } from '../../../../modules/siap/services/jf.service'
 import { JF } from '../../../../modules/siap/models/jf.model'
 import { BehaviorSubject } from 'rxjs'
-
+import { CommonModule } from '@angular/common'
 @Component({
   selector: 'app-ukom-detail',
   standalone: true,
-  imports: [PagableComponent],
+  imports: [PagableComponent, CommonModule],
   templateUrl: './ukom-detail.component.html',
   styleUrl: './ukom-detail.component.scss'
 })

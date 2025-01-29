@@ -97,7 +97,8 @@ export class LandingPageComponent {
     if (this.ukomForm.valid) {
       console.log(this.ukomForm.value)
 
-      this.router.navigate(['/page/ukom/' + this.ukomForm.value.ukomCode])
+      //   this.router.navigate(['/page/ukom/' + this.ukomForm.value.ukomCode])
+      this.router.navigate(['/ukom/external/status'])
 
       // this.authService.login(this.auth).subscribe({
       //   next: (authResponse: AuthResponse) => {

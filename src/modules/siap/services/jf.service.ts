@@ -33,13 +33,17 @@ export class JfService {
   }
 
   findByNip (id: string): Observable<JF> {
+    if (id.startsWith('PU-')) {
+      id.replace('PU-', '')
+    }
+
     return this.apiService.getData(`${this.BASE_PATH}/${id}`).pipe(
       map((response: any) => {
         return new JF(response)
       }),
       catchError(error => {
         console.error('Error fetching data', error)
-        this.alertService.showToast('Error', error.message)
+        this.alertService.showToast('Error', 'Gagal mengambil data')
         throw error
       })
     )
@@ -64,7 +68,7 @@ export class JfService {
     return this.apiService.postData(this.BASE_PATH, user).pipe(
       catchError(error => {
         console.error('Error fetching data', error)
-        this.alertService.showToast('Error', error.message)
+        this.alertService.showToast('Error', 'Error saving data')
         throw error
       })
     )

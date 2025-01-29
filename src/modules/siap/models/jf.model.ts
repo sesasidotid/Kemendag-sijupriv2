@@ -1,4 +1,4 @@
-import { Serializable } from '../../../modules/base/commons/serializable'
+import { Serializable } from '../../base/commons/serializable'
 
 export class JF extends Serializable {
   nip: string = undefined
@@ -7,15 +7,15 @@ export class JF extends Serializable {
   email: string = undefined
   tempatLahir: string = undefined
   tanggalLahir: Date = undefined
-  ktp: string = undefined
-  ktpUrl: string = undefined
+  ktp?: string = undefined
+  ktpUrl?: string = undefined
   jenisKelaminCode: string = undefined
   jenisKelaminName: string = undefined
   unitKerjaId: string = undefined
-  password: string = undefined
+  password?: string = undefined
 
   phone: string = undefined
-  fileKtp: string = undefined
+  fileKtp?: string = undefined
 
   pangkatCode: string = undefined
   pangkatName: string = undefined

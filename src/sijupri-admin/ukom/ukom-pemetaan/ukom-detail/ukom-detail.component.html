@@ -11,7 +11,12 @@
                 alt="user-profile-image"
               />
             </div>
-            <span class="badge rounded-pill text-bg-success">Aktif</span>
+            <span class="badge rounded-pill text-bg-success" *ngIf="jf.nip"
+              >Aktif</span
+            >
+            <span class="badge rounded-pill text-bg-danger" *ngIf="!jf.nip"
+              >JF tidak terdaftar</span
+            >
           </div>
           <div class="mt-3">
             <h4 class="text-white fs-18">{{ jf.name }}</h4>

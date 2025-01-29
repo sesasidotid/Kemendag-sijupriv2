@@ -1,7 +1,6 @@
-import { DokumenPersyaratan } from './../../../modules/maintenance/models/dokumen-persyaratan.model'
+import { DokumenPersyaratan } from '../../../modules/maintenance/models/dokumen-persyaratan.model'
 import { CommonModule } from '@angular/common'
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
-import { FormsModule } from '@angular/forms'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { Jabatan } from '../../../modules/maintenance/models/jabatan.model'
@@ -14,11 +13,22 @@ import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { JF } from '../../../modules/siap/models/jf.model'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { DokumenUkomPersyaratan } from '../../../modules/maintenance/models/dokumen-persyaratan-ukom'
-
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms'
 @Component({
   selector: 'app-ukom-task-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FileHandlerComponent,
+    ReactiveFormsModule
+  ],
   templateUrl: './ukom-task-form.component.html',
   styleUrl: './ukom-task-form.component.scss'
 })
@@ -30,6 +40,7 @@ export class UkomTaskFormComponent {
   jabatanList: Jabatan[] = []
   nextJenjang: Jenjang
   detectedDokumen: any = {}
+  passwordForm: FormGroup
 
   dokumenPersyaratanList: DokumenUkomPersyaratan[] = []
 
@@ -54,7 +65,11 @@ export class UkomTaskFormComponent {
     private apiService: ApiService,
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) {
+    this.passwordForm = new FormGroup({
+      password: new FormControl('', Validators.required)
+    })
+  }
 
   ngOnChanges (changes: SimpleChanges) {
     if (changes['ukom']) {
@@ -141,6 +156,14 @@ export class UkomTaskFormComponent {
     }
   }
 
+  onNextJabatanSwitch (event: Event) {
+    const nextJabatanCode = (event.target as HTMLSelectElement).value
+
+    if (nextJabatanCode) {
+      this.pesertaUkom.nextJabatanCode = nextJabatanCode
+    }
+  }
+
   submit () {
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
@@ -179,9 +202,10 @@ export class UkomTaskFormComponent {
           this.pesertaUkom.nextJabatanCode = this.jf.jabatanCode
         }
         this.pesertaUkom.nextPangkatCode = this.jf.pangkatCode
-        this.pesertaUkom.password = 'password'
+        this.pesertaUkom.password = this.passwordForm.get('password')?.value
 
         console.log('pesertaUkom', this.pesertaUkom)
+
         this.apiService
           .postData(`/api/v1/participant_ukom/task/jf`, this.pesertaUkom)
           .subscribe({

@@ -1,0 +1,44 @@
+<section>
+  <!-- Room Information -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h3 class="card-title">{{ roomUkom.name }}</h3>
+      <p class="mb-0"><strong>Jabatan:</strong> {{ roomUkom.jabatanName }}</p>
+      <p><strong>Jenjang:</strong> {{ roomUkom.jenjangName }}</p>
+    </div>
+  </div>
+
+  <!-- Exam Schedule -->
+  <div class="card">
+    <div class="card-header">
+      <h4>Jadwal Ujian</h4>
+    </div>
+    <div class="card-body">
+      <div class="list-group">
+        <!-- Exam Item -->
+        <div
+          class="list-group-item d-flex justify-content-between align-items-center mb-3"
+          *ngFor="let exam of roomUkom.examScheduleDtoList"
+        >
+          <div>
+            <h5>{{ exam.examTypeCode }}</h5>
+            <p>
+              <strong>Waktu mulai:</strong>
+              {{ exam.startTime | date: 'MMMM d, y, h:mm a' }}<br />
+              <strong>Waktu selesai:</strong>
+              {{ exam.endTime | date: 'MMMM d, y, h:mm a' }}
+            </p>
+          </div>
+          <button
+            *ngIf="exam.examTypeCode === 'CAT'"
+            class="btn btn-primary btn-lg"
+            (click)="startExam(exam.roomUkomId)"
+            [disabled]="!canStartExam(exam.startTime)"
+          >
+            Mulai
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

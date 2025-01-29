@@ -1,4 +1,4 @@
-import { Serializable } from '../../../modules/base/commons/serializable'
+import { Serializable } from '../../base/commons/serializable'
 
 export class ObjectTask extends Serializable {
   id: string = undefined

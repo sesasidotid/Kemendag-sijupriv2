@@ -123,7 +123,7 @@
           </div>
         </div>
       </div>
-      <a routerLink="/login" class="btn btn-secondary grad-button"
+      <a href="/ukom/external" class="btn btn-secondary grad-button"
         >Daftar Sekarang</a
       >
     </div>
@@ -164,9 +164,9 @@
             <small *ngIf="ukomForm.get('ukomCode').errors?.['minlength']"
               >Kode UKom minimal 5 karakter.</small
             >
-            <small *ngIf="ukomForm.get('ukomCode').errors?.['pattern']"
+            <!-- <small *ngIf="ukomForm.get('ukomCode').errors?.['pattern']"
               >Kode UKom harus angka.</small
-            >
+            > -->
           </div>
           <button
             routerLink="/login"

@@ -1,25 +1,58 @@
-<div *ngIf="isVisible" class="modal fade show d-block" tabindex="-1" role="dialog" 
-     [style.display]="isVisible ? 'block' : 'none'" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content border-0 shadow-sm">
-            <div class="modal-header bg-light pb-3">
-                <h5 class="modal-title" id="confirmationModalLabel">Apakah anda yakin?</h5>
-                <button type="button" class="btn-close" aria-label="Close" (click)="close(false)"></button>
-            </div>
-            <div class="modal-body">
-                <p class="mb-3">Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.</p>
-                
-                <!-- Conditional Comment Section -->
-                <div *ngIf="isCommentEnabled" class="mb-3">
-                    <label for="commentTextarea" class="form-label fw-semibold">Catatan</label>
-                    <textarea class="form-control" id="commentTextarea" rows="3" [(ngModel)]="comment" name="comment" placeholder="Tuliskan catatan atau revisi"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer d-flex justify-content-end gap-1 border-top-0">
-                <button type="button" class="btn btn-outline-danger" (click)="close(false)">Batal</button>
-                <button type="button" class="btn btn-primary" (click)="close(true)">Yakin</button>
-            </div>
+<div
+  *ngIf="isVisible"
+  class="modal fade show d-block"
+  tabindex="-1"
+  role="dialog"
+  [style.display]="isVisible ? 'block' : 'none'"
+  aria-labelledby="confirmationModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content border-0 shadow-sm">
+      <div class="modal-header bg-light pb-3">
+        <h5 class="modal-title" id="confirmationModalLabel">
+          Apakah anda yakin?
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="close(false)"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">
+          Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
+        </p>
+
+        <!-- Conditional Comment Section -->
+        <div *ngIf="isCommentEnabled" class="mb-3">
+          <label for="commentTextarea" class="form-label fw-semibold"
+            >Catatan</label
+          >
+          <textarea
+            class="form-control"
+            id="commentTextarea"
+            rows="3"
+            [(ngModel)]="comment"
+            name="comment"
+            placeholder="Tuliskan catatan atau revisi"
+          ></textarea>
         </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-end gap-1 border-top-0">
+        <button
+          type="button"
+          class="btn btn-outline-danger"
+          (click)="close(false)"
+        >
+          Batal
+        </button>
+        <button type="button" class="btn btn-primary" (click)="close(true)">
+          Yakin
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 <div *ngIf="isVisible" class="modal-backdrop fade show"></div>

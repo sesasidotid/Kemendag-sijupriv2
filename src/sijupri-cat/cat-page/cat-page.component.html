@@ -1,0 +1,130 @@
+<!-- <section class="d-flex vh-70">
+  <div class="row flex-grow-1 w-100 gx-5">
+    Question Section
+    <div class="col-9 d-flex flex-column">
+      <div class="text-center mb-4">
+        <img
+          *ngIf="data.data[0]?.attachmentUrl"
+          [src]="data.data[0]?.attachmentUrl"
+          alt="Question Image"
+          class="img-fluid rounded shadow"
+          style="max-height: 300px; object-fit: cover"
+        />
+      </div>
+
+      <p class="fs-5 mb-4">{{ data.data[0]?.question }}</p>
+
+      <div
+        *ngFor="let choice of data.data[0]?.multipleChoiceDtoList"
+        class="mb-3"
+      >
+        <label class="d-flex align-items-center gap-2">
+          <input
+            type="radio"
+            [value]="choice.choiceId"
+            name="answer"
+            [checked]="selectedAnswer[data.data[0]?.id] === choice.choiceId"
+            (change)="selectAnswer(data.data[0]?.id, choice.choiceId)"
+          />
+          <span>{{ choice.choiceValue }}</span>
+        </label>
+      </div>
+
+      <button
+        (click)="saveAnswer(data.data[0]?.id)"
+        class="btn btn-primary mt-auto"
+      >
+        Simpan
+      </button>
+    </div>
+
+    Navigation Card Section
+    <div class="col-3 d-flex flex-column h-100">
+      <div class="card shadow-sm flex-grow-1">
+        <div class="card-body">
+          <div class="row g-2 justify-content-center">
+            <button
+              *ngFor="let q of [].constructor(totalQuestions); let i = index"
+              (click)="navigateToPage(i + 1)"
+              [class.bg-primary]="currentPage === i + 1"
+              [class.text-white]="currentPage === i + 1"
+              [class.bg-danger]="!savedAnswer[i + 1]"
+              class="btn btn-light col-auto rounded-circle text-center"
+              style="width: 50px; height: 50px"
+            >
+              {{ i + 1 }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<section class="">
+  <div class="card parent">
+    <div class="row flex-grow-1 w-100">
+      <!-- question section -->
+      <div
+        class="col-9 d-flex flex-column"
+        *ngFor="let data of data.data; let i = index"
+      >
+        <div class="text-center mb-4">
+          <img
+            *ngIf="data.attachmentUrl"
+            [src]="data.attachmentUrl"
+            alt="Question Image"
+            class="img-fluid rounded shadow"
+            style="max-height: 300px; object-fit: cover"
+          />
+        </div>
+
+        <p class="fs-5 mb-4">{{ data.question }}</p>
+
+        <div *ngFor="let choice of data.multipleChoiceDtoList" class="mb-3">
+          <label class="d-flex align-items-center gap-2">
+            <input
+              type="radio"
+              [value]="choice.choiceId"
+              name="answer"
+              [checked]="selectedAnswer[data.id] === choice.choiceId"
+              (change)="selectAnswer(data.id, choice.choiceId)"
+            />
+            <span>{{ choice.choiceValue }}</span>
+          </label>
+        </div>
+
+        <button (click)="saveAnswer(data.id)" class="btn btn-primary mt-auto">
+          Simpan
+        </button>
+      </div>
+
+      <!-- navigation card section -->
+      <div class="col-3 d-flex flex-column h-100">
+        <div class="card shadow-sm p-2 flex-grow-1">
+          <div class="row g-2 justify-content-center">
+            <button
+              *ngFor="let q of [].constructor(totalQuestions); let i = index"
+              (click)="navigateToPage(i + 1)"
+              [class.bg-primary]="currentPage === i + 1"
+              [class.text-white]="currentPage === i + 1"
+              class="btn btn-light col-auto rounded-circle text-center"
+              style="width: 50px; height: 50px"
+            >
+              {{ i + 1 }}
+            </button>
+          </div>
+        </div>
+        <button
+          class="btn btn-success mt-2"
+          *ngIf="currentPage === totalQuestions"
+          (click)="submitAnswer()"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-confirmation-dialog></app-confirmation-dialog>

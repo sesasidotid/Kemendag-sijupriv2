@@ -1,4 +1,4 @@
-import { JenisUkom } from './../../../../modules/ukom/models/jenis-ukom'
+import { JenisUkom } from '../../../../modules/ukom/models/jenis-ukom'
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'

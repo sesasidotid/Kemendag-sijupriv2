@@ -1,0 +1,184 @@
+<section>
+  <form [formGroup]="kompetensiForm" (ngSubmit)="submit()">
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold"
+        >Kode <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="text"
+          id="code"
+          class="form-control"
+          code="code"
+          formControlName="code"
+          placeholder="Masukan nama tempat UKom"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            kompetensiForm.get('code').invalid &&
+            kompetensiForm.get('code').touched
+          "
+        >
+          <small *ngIf="kompetensiForm.get('code').errors?.['required']"
+            >Kode kompetensi perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold"
+        >Nama Kompetensi <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          name="name"
+          formControlName="name"
+          placeholder="Masukan nama kompetensi"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            kompetensiForm.get('name').invalid &&
+            kompetensiForm.get('name').touched
+          "
+        >
+          <small *ngIf="kompetensiForm.get('name').errors?.['required']"
+            >Nama kompetensi perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="jabatan_code" class="col-sm-2 col-form-label fw-bold"
+        >Jabatan <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <select
+          id="jabatan_code"
+          class="form-select"
+          name="jabatan_code"
+          formControlName="jabatan_code"
+          (change)="onSwitchJabatan($event)"
+        >
+          <option selected value="" style="display: none">Pilih Jabatan</option>
+          <option
+            *ngFor="let jabatan of jabatanList$ | async"
+            [value]="jabatan.code"
+          >
+            {{ jabatan.name }}
+          </option>
+        </select>
+        <div
+          class="feedback"
+          *ngIf="
+            kompetensiForm.get('jabatan_code').invalid &&
+            kompetensiForm.get('jabatan_code').touched
+          "
+        >
+          <small *ngIf="kompetensiForm.get('jabatan_code').errors?.['required']"
+            >Jabatan perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="jenjang_code" class="col-sm-2 col-form-label fw-bold"
+        >Jenjang <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <select
+          id="jenjang_code"
+          class="form-select"
+          name="jenjang_code"
+          formControlName="jenjang_code"
+          (change)="onSwitchJenjang($event)"
+        >
+          <option
+            *ngFor="let jenjang of jenjangList$ | async"
+            [value]="jenjang.code"
+          >
+            {{ jenjang.name }}
+          </option>
+        </select>
+
+        <div
+          class="feedback"
+          *ngIf="
+            kompetensiForm.get('jenjang_code').invalid &&
+            kompetensiForm.get('jenjang_code').touched
+          "
+        >
+          <small *ngIf="kompetensiForm.get('jenjang_code').errors?.['required']"
+            >Jenjang perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="row mb-3">
+      <label for="bidang_jabatan_code" class="col-sm-2 col-form-label fw-bold"
+        >Pangkat <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <select
+          id="bidang_jabatan_code"
+          class="form-select"
+          name="bidang_jabatan_code"
+          formControlName="bidang_jabatan_code"
+        >
+          <option
+            *ngFor="let pangkat of pangkatList$ | async"
+            [value]="pangkat.code"
+          >
+            {{ pangkat.name }}
+          </option>
+        </select>
+
+        <div
+          class="feedback"
+          *ngIf="
+            kompetensiForm.get('bidang_jabatan_code').invalid &&
+            kompetensiForm.get('bidang_jabatan_code').touched
+          "
+        >
+          <small
+            *ngIf="kompetensiForm.get('bidang_jabatan_code').errors?.['required']"
+            >Jenjang perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div> -->
+
+    <div class="row text-center">
+      <div class="col-12">
+        <ng-container *ngIf="submitLoading$ | async; else noLoading">
+          <button class="btn btn-primary float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-primary float-end"
+            [disabled]="kompetensiForm.invalid || (submitLoading$ | async)"
+          >
+            Simpan
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </form>
+</section>
