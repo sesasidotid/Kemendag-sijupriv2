@@ -48,7 +48,7 @@ export class LandingPageComponent {
     this.ukomForm = new FormGroup({
       ukomCode: new FormControl('', [
         Validators.required,
-        Validators.pattern('^[0-9]+$'),
+        // Validators.pattern('^[0-9]+$'),
         Validators.minLength(5)
       ])
     })
@@ -98,7 +98,9 @@ export class LandingPageComponent {
       console.log(this.ukomForm.value)
 
       //   this.router.navigate(['/page/ukom/' + this.ukomForm.value.ukomCode])
-      this.router.navigate(['/ukom/external/status'])
+      this.router.navigate(['/ukom/external/status'], {
+        queryParams: { key: this.ukomForm.value.ukomCode }
+      })
 
       // this.authService.login(this.auth).subscribe({
       //   next: (authResponse: AuthResponse) => {

@@ -7,10 +7,14 @@ import { Router } from '@angular/router'
 import { HandlerService } from '../../modules/base/services/handler.service'
 import { interval } from 'rxjs'
 import { ConfirmationService } from '../../modules/base/services/confirmation.service'
+import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
+import { ModalComponent } from '../../modules/base/components/modal/modal.component'
+import { BehaviorSubject } from 'rxjs'
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ModalComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -18,8 +22,11 @@ export class DashboardComponent {
   roomUkom: RoomUkom = new RoomUkom()
   now: number = Date.now()
   currentDate = new Date()
+  CATSchore: CATSchore = new CATSchore()
+  participant_id: string = ''
+  isModalOpen$ = new BehaviorSubject<boolean>(false)
 
-  //   canStart: boolean = false
+  t: string = LoginContext.getApplicationCode()
 
   constructor (
     private api: ApiService,
@@ -54,10 +61,9 @@ export class DashboardComponent {
       )
       .subscribe({
         next: (response: any) => {
-          console.log(response)
-
           this.roomUkom = new RoomUkom(response.roomUkomDto)
-          console.log(this.roomUkom)
+          this.participant_id = response.id
+          this.getCATScore()
         },
         error: err => {
           console.error('Error fetching RoomUkom:', err)
@@ -65,18 +71,6 @@ export class DashboardComponent {
       })
   }
 
-  //   checkCAT () {
-  //     this.api
-  //       .getData(`/api/v1/exam/page/CAT/${this.roomUkom.id}?page=1&limit=1`)
-  //       .subscribe({
-  //         next: (response: any) => {
-  //           this.canStart = true
-  //         },
-  //         error: err => {
-  //           this.canStart = false
-  //         }
-  //       })
-  //   }
   startExam (room_ukom_id: string) {
     this.api
       .postData('/api/v1/exam/start', {
@@ -97,5 +91,28 @@ export class DashboardComponent {
           console.error('Error fetching RoomUkom:', err)
         }
       })
+  }
+
+  getCATScore () {
+    const exam_type_code = 'CAT'
+    const room_ukom_id = this.roomUkom.id
+    this.api
+      .getData(`/api/v1/exam_grade/${exam_type_code}/${this.participant_id}`)
+      .subscribe({
+        next: (response: any) => {
+          this.CATSchore = new CATSchore(response)
+        }
+      })
+  }
+
+  toggleModal () {
+    this.isModalOpen$.next(!this.isModalOpen$.value)
+  }
+
+  getCorrectAnswer (question: any): string {
+    const correctChoice = question.multipleChoiceDtoList.find(
+      (choice: any) => choice.correct
+    )
+    return correctChoice ? correctChoice.choiceId : ''
   }
 }

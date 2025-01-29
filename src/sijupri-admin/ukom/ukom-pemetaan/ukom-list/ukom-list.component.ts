@@ -71,13 +71,13 @@ export class UkomListComponent {
       )
       .addFilter(
         new PageFilterBuilder('like')
-          .setProperty('')
+          .setProperty('nip')
           .withField('NIP', 'text')
           .build()
       )
       .addFilter(
         new PageFilterBuilder('like')
-          .setProperty('')
+          .setProperty('name')
           .withField('Nama', 'text')
           .build()
       )

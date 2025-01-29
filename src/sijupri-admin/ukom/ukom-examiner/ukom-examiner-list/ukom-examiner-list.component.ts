@@ -45,6 +45,12 @@ export class UkomExaminerListComponent {
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Status', 'status', ['user']).build()
       )
+      .addFilter(
+        new PageFilterBuilder('like')
+          .setProperty('name', ['user'])
+          .withField('Nama', 'text')
+          .build()
+      )
       .build()
   }
 

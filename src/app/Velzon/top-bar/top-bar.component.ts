@@ -208,8 +208,13 @@ export class TopBarComponent {
   }
 
   logOut () {
+    if (LoginContext.getApplicationCode() === 'siukom-participant') {
+      this.router.navigate(['/login-cat'])
+    } else {
+      this.router.navigate(['/login'])
+    }
+
     LoginContext.release()
-    this.router.navigate(['/login'])
   }
 
   private calculateAge (dateCreated: string): string {

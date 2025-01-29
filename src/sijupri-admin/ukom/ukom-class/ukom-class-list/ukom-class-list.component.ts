@@ -120,6 +120,12 @@ export class UkomClassListComponent {
             .withIcon('danger')
             .build()
         )
+        .addFilter(
+          new PageFilterBuilder('like')
+            .setProperty('name')
+            .withField('Nama', 'text')
+            .build()
+        )
         .build()
     )
   }

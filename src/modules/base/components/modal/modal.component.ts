@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 
 @Component({
   selector: 'app-modal',
@@ -9,16 +9,17 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   imports: [CommonModule]
 })
 export class ModalComponent {
-  @Input() title: string = '';
-  @Input() enableFooter: boolean = true;
-  @Output() toggle = new EventEmitter<void>();
-  @Output() saveEvent = new EventEmitter<void>();
+  @Input() title: string = ''
+  @Input() enableFooter: boolean = true
+  @Output() toggle = new EventEmitter<void>()
+  @Output() saveEvent = new EventEmitter<void>()
+  @Input() size: 'sm' | 'md' | 'lg' = 'sm'
 
-  toggleModal() {
-    this.toggle.emit();
+  toggleModal () {
+    this.toggle.emit()
   }
 
-  save() {
-    this.saveEvent.emit();
+  save () {
+    this.saveEvent.emit()
   }
 }

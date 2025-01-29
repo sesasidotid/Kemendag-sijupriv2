@@ -269,13 +269,13 @@ export const routes: Routes = [
               import(
                 './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
               ).then(m => m.UkomExaminerListComponent)
-          },
-          'Peserta Ukom': {
-            components: () =>
-              import(
-                '../sijupri-admin/ukom/ukom-kompetensi/ukom-kompetensi-list/ukom-kompetensi-list.component'
-              ).then(m => m.UkomKompetensiListComponent)
           }
+          //   'Peserta Ukom': {
+          //     components: () =>
+          //       import(
+          //         '../sijupri-admin/ukom/ukom-kompetensi/ukom-kompetensi-list/ukom-kompetensi-list.component'
+          //       ).then(m => m.UkomKompetensiListComponent)
+          //   }
         },
         Maintenance: {
           Instansi: {
@@ -301,6 +301,12 @@ export const routes: Routes = [
               import(
                 '../sijupri-admin/maintenance/kab-kota-list/kab-kota-list.component'
               ).then(m => m.KabKotaListComponent)
+          },
+          Kompetensi: {
+            components: () =>
+              import(
+                '../sijupri-admin/ukom/ukom-kompetensi/ukom-kompetensi-list/ukom-kompetensi-list.component'
+              ).then(m => m.UkomKompetensiListComponent)
           }
         },
         SIAP: {

@@ -1,3 +1,5 @@
+import { ConfirmationDialogComponent } from './../../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
+import { LoginContext } from './../../../modules/base/commons/login-context'
 import { JenisUkom } from '../../../modules/ukom/models/jenis-ukom'
 import { Component } from '@angular/core'
 import {
@@ -9,7 +11,6 @@ import {
 import { Router } from '@angular/router'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 import { CommonModule } from '@angular/common'
 import { ApiService } from '../../../modules/base/services/api.service'
@@ -18,6 +19,7 @@ import { UkomExamScheduleJF } from '../../../modules/ukom/models/ukom-exam-sched
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { map } from 'rxjs/operators'
 import { RoomUkom } from '../../../modules/ukom/models/room-ukom.model'
+import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 @Component({
   selector: 'app-ukom-list',
   standalone: true,
@@ -37,7 +39,8 @@ export class UkomListComponent {
   constructor (
     private router: Router,
     private apiService: ApiService,
-    private handlerService: HandlerService
+    private handlerService: HandlerService,
+    private confirmationService: ConfirmationService
   ) {
     this.pagable = new PagableBuilder(
       `/api/v1/participant_ukom/search/${this.id}`
@@ -93,7 +96,7 @@ export class UkomListComponent {
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((ukom: any) => {
-            // this.router.navigate([`/ukom/ukom-list/detail/${ukom.id}`])
+            this.navigateToCATPage()
           }, 'info')
           .withIcon('detail')
           .build()
@@ -103,21 +106,44 @@ export class UkomListComponent {
 
   ngOnInit () {
     this.getUkomSchedule()
-    this.ukomSchedule$.subscribe(jabatanList => {
-      console.log('test', jabatanList)
-    })
+    this.ukomSchedule$.subscribe(jabatanList => {})
   }
 
   getUkomSchedule () {
     this.ukomSchedule$ = this.apiService
       .getData(`/api/v1/participant_ukom/nip/${this.id}`)
       .pipe(
-        map(
-          response =>
-            (response.roomUkomDto = new UkomExamScheduleJF(
-              response.roomUkomDto
-            ))
-        )
+        map(response => {
+          const now = new Date()
+          const roomUkom = new UkomExamScheduleJF(response.roomUkomDto)
+          console.log('d1', now)
+
+          roomUkom.examScheduleDtoList = roomUkom.examScheduleDtoList.filter(
+            schedule => {
+              const scheduleEndTime = new Date(
+                schedule.endTime.replace(' ', 'T')
+              )
+              console.log('Exam End Time (d2):', scheduleEndTime)
+              return scheduleEndTime > now
+            }
+          )
+
+          return roomUkom
+        })
       )
+    this.ukomSchedule$.forEach(jabatanList => {
+      console.log('jabatanList', jabatanList)
+    })
+  }
+
+  navigateToCATPage () {
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) return
+        LoginContext.release()
+
+        this.router.navigate(['/login-cat'])
+      }
+    })
   }
 }

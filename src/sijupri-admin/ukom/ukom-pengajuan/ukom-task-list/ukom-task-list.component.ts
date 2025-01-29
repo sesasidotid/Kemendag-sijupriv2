@@ -65,7 +65,7 @@ export class UkomTaskListComponent {
         )
         .addFilter(
           new PageFilterBuilder('like')
-            .setProperty('NIP')
+            .setProperty('objectGroup')
             .withField('NIP', 'text')
             .build()
         )

@@ -4,7 +4,12 @@
     <div class="flex-shrink-0"></div>
   </div>
   <div class="card-body">
-    <div *ngIf="(ukomSchedule$ | async).id; else emptyState">
+    <div
+      *ngIf="
+        (ukomSchedule$ | async).examScheduleDtoList.length > 0;
+        else emptyState
+      "
+    >
       <app-pagable [pagable]="jadwalPagable"></app-pagable>
     </div>
     <ng-template #emptyState>

@@ -12,9 +12,8 @@ import { Observable } from 'rxjs'
 import { map, filter } from 'rxjs/operators'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
-import { FormsModule } from '@angular/forms' // <-- Import FormsModule
+import { FormsModule } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-
 @Component({
   selector: 'app-ukom-exam-choose-comp-questions',
   standalone: true,
@@ -36,6 +35,8 @@ export class UkomExamChooseCompQuestionsComponent {
 
   filterText: string = ''
 
+  listSavedQuestion: UkomQuestion[] = []
+
   payload = {
     id: '',
     exam_type_code: '',
@@ -46,7 +47,8 @@ export class UkomExamChooseCompQuestionsComponent {
     private apiService: ApiService,
     private activatedRoute: ActivatedRoute,
     private handlerService: HandlerService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private router: Router
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.room_ukom_id = params.get('roomid')
@@ -61,11 +63,13 @@ export class UkomExamChooseCompQuestionsComponent {
     })
 
     this.getExamDetail()
+    this.getListPertanyaan()
   }
 
   ngOnInit () {
     this.getUkomTypeFromParams()
     this.getRoomUkomDetail()
+    console.log('q', this.listSavedQuestion)
   }
 
   getRoomUkomDetail () {
@@ -133,8 +137,6 @@ export class UkomExamChooseCompQuestionsComponent {
       })
   }
 
-  onKompetensiChange () {}
-
   getDropDownQuestionList (kompetensi_id: string) {
     const module_id = 'CAT'
     const type = 'MULTI_CHOICE'
@@ -171,18 +173,37 @@ export class UkomExamChooseCompQuestionsComponent {
     }
   }
 
-  // This method will be triggered when a checkbox is selected/unselected
   onQuestionSelect (question: UkomQuestion) {
     if (question.checked) {
       // Add to questCheckedList if checked
       if (!this.questCheckedList.some(q => q.id === question.id)) {
         this.questCheckedList.push(question)
+        this.listQuestion$ = this.listQuestion$.pipe(
+          map(questions => {
+            return questions.map((q: UkomQuestion) => {
+              if (q.id === question.id) {
+                q.checked = true
+              }
+              return q
+            })
+          })
+        )
       }
     } else {
       // Remove from questCheckedList if unchecked
       const index = this.questCheckedList.findIndex(q => q.id === question.id)
       if (index > -1) {
         this.questCheckedList.splice(index, 1)
+        this.listQuestion$ = this.listQuestion$.pipe(
+          map(questions => {
+            return questions.map((q: UkomQuestion) => {
+              if (q.id === question.id) {
+                q.checked = false
+              }
+              return q
+            })
+          })
+        )
       }
     }
 
@@ -202,6 +223,21 @@ export class UkomExamChooseCompQuestionsComponent {
     )
   }
 
+  getListPertanyaan () {
+    const module_id = 'CAT'
+
+    // listSavedQuestion
+    this.apiService
+      .postData(
+        `/api/v1/room_ukom/search/${module_id}/${this.room_ukom_id}?limit=1000`,
+        {}
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.listSavedQuestion = res.data || []
+        }
+      })
+  }
   openModal (kompetensi_id: string) {
     this.getDropDownQuestionList(kompetensi_id)
     this.updateCheckedState()
@@ -226,6 +262,9 @@ export class UkomExamChooseCompQuestionsComponent {
                 'Success',
                 'Questions added successfully'
               )
+              this.router.navigate([
+                `/ukom/ukom-room-list/${this.room_ukom_id}`
+              ])
             },
             error: (err: any) => {
               this.handlerService.handleAlert(

@@ -52,12 +52,12 @@ export class UkomDocumentListComponent {
           .withIcon('danger')
           .build()
       )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('jenisUkom')
-          .withField('Jenis Ukom', 'text')
-          .build()
-      )
+      //   .addFilter(
+      //     new PageFilterBuilder('like')
+      //       .setProperty('jenisUkom')
+      //       .withField('Jenis Ukom', 'text')
+      //       .build()
+      //   )
       .build()
   }
 

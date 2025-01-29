@@ -51,18 +51,10 @@
         </button>
       </div>
     </div>
-
-    <!-- <button class="btn btn-sm btn-secondary" (click)="openModal(kompetensi.id)">
-      Choose Questions
-    </button> -->
   </div>
 </section>
 
 <section>
-  <!-- <div class="mt-5">
-    <p>Jumlah Pertanyaan: {{ questCheckedList.length }}</p>
-    <button (click)="submit()" class="btn btn-sm btn-success">Simpan</button>
-  </div> -->
   <div class="col-lg-12">
     <div class="hstack gap-2 justify-content-end align-items-center">
       <p class="mb-0">Jumlah Pertanyaan: {{ questCheckedList.length }}</p>
@@ -71,10 +63,29 @@
   </div>
 </section>
 
+<section *ngIf="listSavedQuestion.length > 0" class="mt-5">
+  <div class="row question-container mb-3 pb-2">
+    <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
+    <div class="col-sm-12 mt-2">
+      <ng-container *ngFor="let pertanyaan of listSavedQuestion; index as i">
+        <div class="row card">
+          <label for="" class="col-12 col-form-label fw-bold mb-1"
+            >Pertanyaan {{ i + 1 }}</label
+          >
+          <div class="col">
+            <p>{{ pertanyaan.question }}</p>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
 <app-modal
   *ngIf="isModalOpen$ | async"
-  [title]="'Ubah Data Pelatihan Teknis'"
+  [title]="'Pilih pertanyaan'"
   (toggle)="toggleModal()"
+  [size]="'lg'"
   [enableFooter]="false"
 >
   <form>
@@ -89,18 +100,22 @@
       />
     </div>
 
-    <div *ngFor="let question of filteredQuestions$ | async">
-      <label>
+    <div
+      class="checklist-container"
+      *ngFor="let question of filteredQuestions$ | async"
+    >
+      <label class="checklist-item">
         <input
           type="checkbox"
+          class="form-check-input"
           [name]="'question-' + question.id"
           [(ngModel)]="question.checked"
           (change)="onQuestionSelect(question)"
-          class="form-check-input h4"
         />
-        {{ question.question }}
+        <span class="checklist-label">{{ question.question }}</span>
       </label>
     </div>
+
     <div *ngIf="(filteredQuestions$ | async)?.length === 0">
       No questions found.
     </div>

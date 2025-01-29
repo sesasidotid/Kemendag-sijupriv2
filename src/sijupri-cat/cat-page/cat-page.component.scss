@@ -98,3 +98,59 @@
   flex: 1;
   justify-content: center;
 }
+
+.countdown-timer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem; /* Default size for large screens */
+  font-weight: bold;
+  background: #49ab49;
+  color: #fff;
+  padding: 20px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: fit-content;
+  margin: 20px auto;
+  transition: color 0.5s ease, background 0.5s ease;
+}
+
+/* Adjust size for tablets */
+@media (max-width: 768px) {
+  .countdown-timer {
+    font-size: 2.5rem;
+    padding: 15px 30px;
+  }
+}
+
+/* Adjust size for mobile devices */
+@media (max-width: 480px) {
+  .countdown-timer {
+    font-size: 2rem;
+    padding: 12px 24px;
+  }
+}
+
+/* Warning: Less than 5 minutes */
+.countdown-timer.warning {
+  background: #ff9800;
+  color: #fff;
+}
+
+/* Danger: Less than 1 minute */
+.countdown-timer.danger {
+  background: #e53935;
+  color: #fff;
+  animation: pulse 1s infinite alternate;
+}
+
+/* Pulse effect for danger mode */
+@keyframes pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
