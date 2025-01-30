@@ -1,49 +1,40 @@
-<section class="">
-  <div
-    [class.warning]="remainingSeconds < 300"
-    [class.danger]="remainingSeconds < 60"
-    class="countdown-timer"
-  >
-    {{ remainingTime }}
-  </div>
-  <div class="card parent">
-    <div class="row flex-grow-1 w-100">
-      <!-- question section -->
-      <!-- <div
-        class="col-9 d-flex flex-column"
-        *ngFor="let data of data.data; let i = index"
+<div *ngIf="isSubmitted$ | async; else hadItem">
+  <div class="countdown-notification"></div>
+
+  <div class="container">
+    <section
+      class="section min-vh-100 d-flex flex-column align-items-center justify-content-center"
+    >
+      <p class="countdown-message">
+        Anda sudah mengerjakan CAT. Silahkan tunggu hingga waktu CAT selesai
+        untuk melihat skor :
+      </p>
+      <div
+        [class.warning]="remainingSeconds < 300"
+        [class.danger]="remainingSeconds < 60"
+        class="countdown-timer"
       >
-        <div class="text-center mb-4">
-          <img
-            *ngIf="data.attachmentUrl"
-            [src]="data.attachmentUrl"
-            alt="Question Image"
-            class="img-fluid rounded shadow"
-            style="max-height: 300px; object-fit: cover"
-          />
-        </div>
+        {{ remainingTime }}
+      </div>
 
-        <p class="fs-5 mb-4">{{ data.question }}</p>
+      <button
+        class="btn btn-primary btn-lg mt-3"
+        style="transition: transform 0.3s ease"
+        onmouseover="this.style.transform='scale(1.05)';"
+        onmouseout="this.style.transform='scale(1)';"
+        (click)="backToHome()"
+      >
+        Kembali
+      </button>
+    </section>
+  </div>
+</div>
 
-        <div *ngFor="let choice of data.multipleChoiceDtoList" class="mb-3">
-          <label class="d-flex align-items-center gap-2">
-            <input
-              type="radio"
-              [value]="choice.choiceId"
-              name="answer"
-              [checked]="selectedAnswer[data.id] === choice.choiceId"
-              (change)="selectAnswer(data.id, choice.choiceId)"
-            />
-            <span>{{ choice.choiceValue }}</span>
-          </label>
-        </div>
-
-        <button (click)="saveAnswer(data.id)" class="btn btn-primary mt-auto">
-          Simpan
-        </button>
-      </div> -->
-
-      <div class="col-9 d-flex flex-column" *ngIf="data.data.length > 0">
+<ng-template #hadItem>
+  <div class="parent">
+    <div class="row w-100" *ngIf="data.data.length > 0">
+      <!-- question card section -->
+      <div class="col-8 d-flex flex-column card mb-10">
         <div class="text-center mb-4">
           <img
             *ngIf="data.data[currentPage - 1]?.attachmentUrl"
@@ -82,7 +73,7 @@
         <button
           *ngIf="currentPage !== totalQuestions"
           (click)="saveAnswer(data.data[currentPage - 1]?.id)"
-          class="btn btn-primary mt-auto"
+          class="btn btn-primary"
         >
           Simpan
         </button>
@@ -91,45 +82,47 @@
           (click)="
             saveAnswer(data.data[currentPage - 1]?.id); submitAnswer(true)
           "
-          class="btn btn-success mt-auto"
+          class="btn btn-success"
         >
           Simpan dan Selesai
         </button>
       </div>
 
       <!-- navigation card section -->
-      <div class="col-3 d-flex flex-column h-100">
-        <!-- <div class="countdown-timer">
-          <span>{{ remainingTime }}</span>
-        </div> -->
-
+      <div class="col-4 d-flex flex-column">
         <div class="card shadow-sm p-2 flex-grow-1">
-          <div class="row g-2 justify-content-center">
+          <div
+            [class.warning]="remainingSeconds < 300"
+            [class.danger]="remainingSeconds < 60"
+            class="countdown-timer"
+          >
+            {{ remainingTime }}
+          </div>
+
+          <div class="row justify-content-center">
             <button
               *ngFor="let q of [].constructor(totalQuestions); let i = index"
               (click)="navigateToPage(i + 1)"
               [class.bg-primary]="currentPage === i + 1"
               [class.text-white]="currentPage === i + 1"
               [class.bg-success]="savedAnswer[data.data[i]?.id]"
-              class="btn btn-light col-auto rounded-circle text-center"
+              class="btn btn-light col-auto text-center m-1"
               style="width: 50px; height: 50px"
             >
               {{ i + 1 }}
             </button>
           </div>
         </div>
-        <!-- <button
-          class="btn btn-success mt-2"
-          *ngIf="currentPage === totalQuestions - 1"
-          (click)="
-            saveAnswer(data.data[data.data.length - 1].id); submitAnswer(true)
-          "
-        >
-          Submit
-        </button> -->
       </div>
     </div>
   </div>
-</section>
+</ng-template>
+
+<div *ngIf="showWarning" class="warning-message">
+  <p>
+    Mouse harus berada di dalam area ujian. Kembalikan mouse dalam waktu
+    {{ warningCountdown }} detik.
+  </p>
+</div>
 
 <app-confirmation-dialog></app-confirmation-dialog>

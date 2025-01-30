@@ -1,33 +1,3 @@
-// // section {
-// //   background-color: #f9f9f9;
-// // }
-
-// h2,
-// h3 {
-//   color: #333;
-// }
-
-// button {
-//   font-size: 1rem;
-//   font-weight: bold;
-// }
-
-// button.bg-blue-500 {
-//   background-color: #2563eb;
-//   color: white;
-// }
-
-.q-button {
-  background-color: #f9f9f9;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  color: #333;
-  cursor: pointer;
-  //   font-size: 1rem;
-  //   font-weight: 500;
-  //   padding: 0.5rem 1rem;
-}
-
 .parent {
   @media screen and (max-width: 768px) {
     margin-left: 16px !important;
@@ -50,46 +20,7 @@
   margin-left: 160px !important;
   margin-right: 160px !important;
   margin-top: 24px;
-}
-
-.gradient-line {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 5px; /* Adjust the height of the gradient line as needed */
-  background: linear-gradient(45deg, #2967be, #49ab49) !important;
-}
-
-.option-wrapper {
-  //   display: inline-block;
-}
-
-.option-input {
-  display: none; /* Hide the default radio input */
-}
-
-.option-label {
-  padding: 0.5rem 1rem;
-  // border: 1px solid #007bff;
-  border-radius: 0.25rem;
-  background-color: #e9e9e9;
-  color: #474747;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  font-size: 13px !important;
-}
-
-/* Style for selected state */
-.option-input:checked + .option-label {
-  background: linear-gradient(45deg, #2967be, #49ab49) !important;
-  color: #fff;
-}
-
-/* The div container */
-.qrcodeImage {
-  display: flex;
-  flex: 1;
+  margin-bottom: 24px;
 }
 
 /* Add custom styles here */
@@ -103,11 +34,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 3rem; /* Default size for large screens */
+  font-size: 1rem; /* Default size for large screens */
   font-weight: bold;
   background: #49ab49;
   color: #fff;
-  padding: 20px 40px;
+  padding: 10px 20px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
@@ -116,36 +47,31 @@
   transition: color 0.5s ease, background 0.5s ease;
 }
 
-/* Adjust size for tablets */
-@media (max-width: 768px) {
-  .countdown-timer {
-    font-size: 2.5rem;
-    padding: 15px 30px;
-  }
-}
+// @media (max-width: 768px) {
+//   .countdown-timer {
+//     font-size: 2.5rem;
+//     padding: 15px 30px;
+//   }
+// }
 
-/* Adjust size for mobile devices */
-@media (max-width: 480px) {
-  .countdown-timer {
-    font-size: 2rem;
-    padding: 12px 24px;
-  }
-}
+// @media (max-width: 480px) {
+//   .countdown-timer {
+//     font-size: 2rem;
+//     padding: 12px 24px;
+//   }
+// }
 
-/* Warning: Less than 5 minutes */
 .countdown-timer.warning {
   background: #ff9800;
   color: #fff;
 }
 
-/* Danger: Less than 1 minute */
 .countdown-timer.danger {
   background: #e53935;
   color: #fff;
   animation: pulse 1s infinite alternate;
 }
 
-/* Pulse effect for danger mode */
 @keyframes pulse {
   from {
     transform: scale(1);
@@ -153,4 +79,27 @@
   to {
     transform: scale(1.1);
   }
+}
+
+.countdown-notification {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 30px auto;
+  text-align: center;
+}
+
+.warning-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ff9800;
+  color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  text-align: center;
 }

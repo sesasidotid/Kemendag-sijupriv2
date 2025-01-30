@@ -16,11 +16,27 @@ import {
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
-
+import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms'
+import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { HandlerService } from '../../../../modules/base/services/handler.service'
 @Component({
   selector: 'app-ukom-kompetensi-list',
   standalone: true,
-  imports: [PagableComponent, UkomKompetensiAddComponent, CommonModule],
+  imports: [
+    PagableComponent,
+    UkomKompetensiAddComponent,
+    CommonModule,
+    ModalComponent,
+    FormsModule,
+    ReactiveFormsModule
+  ],
   templateUrl: './ukom-kompetensi-list.component.html',
   styleUrl: './ukom-kompetensi-list.component.scss'
 })
@@ -29,13 +45,19 @@ export class UkomKompetensiListComponent {
   pagable: Pagable
   jabatanList: Jabatan[] = []
   jenjangList: Jenjang[] = []
+  refreshToggle: boolean = false
 
+  isModalOpen$ = new BehaviorSubject<boolean>(false)
+
+  editKompetensiForm: FormGroup
   constructor (
     private apiService: ApiService,
     private alertService: AlertService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    public tabService: TabService
+    public tabService: TabService,
+    private confirmationService: ConfirmationService,
+    private handlerService: HandlerService
   ) {
     this.pagable = new PagableBuilder(`/api/v1/kompetensi/search`)
       .addPrimaryColumn(new PrimaryColumnBuilder('Kode', 'code').build())
@@ -60,28 +82,44 @@ export class UkomKompetensiListComponent {
           })
           .build()
       )
-      //   .addPrimaryColumn(
-      //     new PrimaryColumnBuilder()
-      //       .withDynamicValue('Jenis Ukom', (data: any) =>
-      //         data.jenisUkom === 'KENAIKAN_JENJANG'
-      //           ? 'Kenaikan Jenjang'
-      //           : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-      //           ? 'Perpindahan Jabatan'
-      //           : data.jenisUkom
-      //       )
-      //       .build()
-      //   )
+      .addFilter(
+        new PageFilterBuilder('equal')
+          .setProperty('code')
+          .withField('Kode', 'text')
+          .build()
+      )
+      .addFilter(
+        new PageFilterBuilder('like')
+          .setProperty('name')
+          .withField('Nama', 'text')
+          .build()
+      )
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((data: any) => {
             // this.router.navigate([
             //   `/ukom/ukom-room-list/detail-participant/${data.id}`
             // ])
-          }, 'info')
-          .withIcon('detail')
+            this.setDefaultFormValues(data)
+            this.toggleModal()
+          }, 'primary')
+          .withIcon('update')
           .build()
       )
       .build()
+
+    this.editKompetensiForm = new FormGroup({
+      id: new FormControl(''),
+      name: new FormControl('', Validators.required)
+    })
+  }
+
+  setDefaultFormValues (data: any) {
+    console.log('data', data)
+    this.editKompetensiForm.patchValue({
+      id: data.id || '',
+      name: data.name || ''
+    })
   }
 
   ngOnInit () {
@@ -130,5 +168,37 @@ export class UkomKompetensiListComponent {
     console.log('tab', tab)
     this.tab$.next(tab)
     this.tabService.changeTabActive(tab)
+  }
+
+  toggleModal () {
+    this.isModalOpen$.next(!this.isModalOpen$.value)
+  }
+
+  handleRefreshToggle () {
+    this.refreshToggle = !this.refreshToggle
+  }
+  submit () {
+    const payload = {
+      id: this.editKompetensiForm.value.id,
+      name: this.editKompetensiForm.value.name
+    }
+
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) return
+
+        this.apiService.putData('/api/v1/kompetensi', payload).subscribe({
+          next: response => {
+            this.handlerService.handleAlert(
+              'Success',
+              'Berhasil menambahkan data'
+            )
+            this.handleRefreshToggle()
+            this.toggleModal()
+          },
+          error: error => this.handlerService.handleException(error)
+        })
+      }
+    })
   }
 }

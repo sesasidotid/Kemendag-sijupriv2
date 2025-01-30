@@ -14,7 +14,7 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 import { CommonModule } from '@angular/common'
 import { ApiService } from '../../../modules/base/services/api.service'
-import { Observable } from 'rxjs'
+import { BehaviorSubject, Observable } from 'rxjs'
 import { UkomExamScheduleJF } from '../../../modules/ukom/models/ukom-exam-schedule-jf'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { map } from 'rxjs/operators'
@@ -31,7 +31,8 @@ export class UkomListComponent {
   pagable: Pagable
   schedulePagable$: Observable<Pagable>
   id: string = LoginContext.getUserId()
-  ukomSchedule$: Observable<UkomExamScheduleJF>
+  //   ukomSchedule$: Observable<UkomExamScheduleJF>
+  ukomSchedule: UkomExamScheduleJF
 
   jadwalPagable: Pagable
   //   ukomSchedule$: UkomExamScheduleJF
@@ -44,6 +45,7 @@ export class UkomListComponent {
   ) {
     this.pagable = new PagableBuilder(
       `/api/v1/participant_ukom/search/${this.id}`
+      //   `/api/v1/participant_ukom/all/${this.id}`
     )
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
@@ -102,38 +104,47 @@ export class UkomListComponent {
           .build()
       )
       .build()
+
+    this.getUkomSchedule()
   }
 
   ngOnInit () {
-    this.getUkomSchedule()
-    this.ukomSchedule$.subscribe(jabatanList => {})
+    // this.getUkomSchedule()
+    // this.ukomSchedule$.subscribe(jabatanList => {})
   }
 
   getUkomSchedule () {
-    this.ukomSchedule$ = this.apiService
+    // this.ukomSchedule$ = this.apiService
+    //   .getData(`/api/v1/participant_ukom/nip/${this.id}`)
+    //   .pipe(
+    //     map(response => {
+    //       const now = new Date()
+    //       const roomUkom = new UkomExamScheduleJF(response.roomUkomDto)
+    //       console.log('Exam End Time (d1):', roomUkom)
+    //       roomUkom.examScheduleDtoList = roomUkom.examScheduleDtoList.filter(
+    //         schedule => {
+    //           const scheduleEndTime = new Date(
+    //             schedule.endTime.replace(' ', 'T')
+    //           )
+    //           console.log('Exam End Time (d2):', scheduleEndTime)
+    //           return scheduleEndTime > now
+    //         }
+    //       )
+    //       return roomUkom
+    //     })
+    //   )
+    this.apiService
       .getData(`/api/v1/participant_ukom/nip/${this.id}`)
-      .pipe(
-        map(response => {
-          const now = new Date()
-          const roomUkom = new UkomExamScheduleJF(response.roomUkomDto)
-          console.log('d1', now)
-
-          roomUkom.examScheduleDtoList = roomUkom.examScheduleDtoList.filter(
-            schedule => {
-              const scheduleEndTime = new Date(
-                schedule.endTime.replace(' ', 'T')
-              )
-              console.log('Exam End Time (d2):', scheduleEndTime)
-              return scheduleEndTime > now
-            }
-          )
-
-          return roomUkom
-        })
-      )
-    this.ukomSchedule$.forEach(jabatanList => {
-      console.log('jabatanList', jabatanList)
-    })
+      .subscribe({
+        next: res => {
+          console.log('dto', res)
+          if (res.roomUkomDto) {
+            this.ukomSchedule = new UkomExamScheduleJF(res.roomUkomDto)
+          } else {
+            this.ukomSchedule.examScheduleDtoList = []
+          }
+        }
+      })
   }
 
   navigateToCATPage () {

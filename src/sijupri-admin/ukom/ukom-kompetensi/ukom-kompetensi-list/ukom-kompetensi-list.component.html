@@ -1,8 +1,30 @@
 <ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable"></app-pagable>
+  <app-pagable [pagable]="pagable" [refresh]="refreshToggle"></app-pagable>
 </ng-container>
 <ng-container *ngIf="(tab$ | async) === 1">
   <app-ukom-kompetensi-add
     (changeTabActive)="handleTabChange(0)"
   ></app-ukom-kompetensi-add>
 </ng-container>
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Update Kompetensi'"
+  (toggle)="toggleModal()"
+  [enableFooter]="false"
+  [size]="'lg'"
+>
+  <form [formGroup]="editKompetensiForm">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nama</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        required
+        formControlName="name"
+      />
+    </div>
+    <button (click)="submit()" class="btn btn-primary w-100">Update</button>
+  </form></app-modal
+>

@@ -304,7 +304,7 @@
             Pilih Jabatan Yang Dituju
           </option>
           <option
-            *ngFor="let jabatan of jabatanList$ | async"
+            *ngFor="let jabatan of NextjabatanList$ | async"
             [value]="jabatan.code"
           >
             {{ jabatan.name }}

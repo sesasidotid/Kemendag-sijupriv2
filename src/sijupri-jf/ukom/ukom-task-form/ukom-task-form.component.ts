@@ -125,13 +125,22 @@ export class UkomTaskFormComponent {
   }
 
   getListJabatan () {
-    this.apiService.getData(`/api/v1/jabatan`).subscribe({
-      next: response =>
-        (this.jabatanList = response.map(
-          (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
-        )),
-      error: error => this.handlerService.handleException(error)
-    })
+    // this.apiService.getData(`/api/v1/jabatan`).subscribe({
+    //   next: response =>
+    //     (this.jabatanList = response.map(
+    //       (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+    //     )),
+    //   error: error => this.handlerService.handleException(error)
+    // })
+    this.apiService
+      .getData(`/api/v1/jabatan/jenjang/${this.jf.jenjangCode}`)
+      .subscribe({
+        next: response =>
+          (this.jabatanList = response.map(
+            (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+          )),
+        error: error => this.handlerService.handleException(error)
+      })
   }
 
   onJenisUkomSwitch (event: Event) {

@@ -1,7 +1,12 @@
 <div class="modal show d-block" tabindex="-1" aria-modal="true" role="dialog">
   <div
     class="modal-dialog modal-dialog-centered"
-    [ngClass]="'modal-' + size + '-custom'"
+    [ngClass]="{
+      'modal-sm-custom': size === 'sm',
+      'modal-md-custom': size === 'md',
+      'modal-lg-custom': size === 'lg',
+      '': size === ''
+    }"
   >
     <div class="modal-content">
       <div class="modal-header bg-light pb-3">

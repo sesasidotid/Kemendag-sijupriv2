@@ -13,7 +13,7 @@ export class ModalComponent {
   @Input() enableFooter: boolean = true
   @Output() toggle = new EventEmitter<void>()
   @Output() saveEvent = new EventEmitter<void>()
-  @Input() size: 'sm' | 'md' | 'lg' = 'sm'
+  @Input() size: 'sm' | 'md' | 'lg' | '' = ''
 
   toggleModal () {
     this.toggle.emit()

@@ -20,7 +20,15 @@ import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-
+import { UkomClassEditComponent } from '../ukom-class-edit/ukom-class-edit.component'
+import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms'
 @Component({
   selector: 'app-ukom-class-list',
   standalone: true,
@@ -28,7 +36,9 @@ import { map } from 'rxjs/operators'
     PagableComponent,
     CommonModule,
     UkomClassAddComponent,
-    UkomExamScheduleAddComponent
+    ModalComponent,
+    FormsModule,
+    ReactiveFormsModule
   ],
   templateUrl: './ukom-class-list.component.html',
   styleUrl: './ukom-class-list.component.scss'
@@ -37,6 +47,7 @@ export class UkomClassListComponent {
   tab$ = new BehaviorSubject<number | null>(0)
   jabatanList$: Observable<Jabatan[]>
   jenjangList$: Observable<Jenjang[]>
+  fixedJenjangList$: Observable<Jenjang[]>
 
   jenjangMap: Record<string, string> = {}
   jabatanMap: Record<string, string> = {}
@@ -45,6 +56,10 @@ export class UkomClassListComponent {
   pagable$ = new BehaviorSubject<Pagable | null>(null)
   data: any[] = []
   refreshToggle: boolean = false
+
+  isModalOpen$ = new BehaviorSubject<boolean>(false)
+
+  editRoomUkomForm: FormGroup
 
   constructor (
     private tabService: TabService,
@@ -90,6 +105,16 @@ export class UkomClassListComponent {
         )
         .addActionColumn(
           new ActionColumnBuilder()
+            .setAction((data: any) => {
+              this.setDefaultFormValues(data)
+              this.toggleModal()
+              this.getListJenjang(data.jabatanCode)
+            }, 'primary')
+            .withIcon('update')
+            .build()
+        )
+        .addActionColumn(
+          new ActionColumnBuilder()
             .setAction(
               (ukom: any) =>
                 this.confirmationService.open(false).subscribe({
@@ -128,6 +153,16 @@ export class UkomClassListComponent {
         )
         .build()
     )
+
+    this.editRoomUkomForm = new FormGroup({
+      id: new FormControl(''),
+      name: new FormControl('', Validators.required),
+      jabatan_code: new FormControl('', Validators.required),
+      jenjang_code: new FormControl('', Validators.required),
+      participant_quota: new FormControl('', Validators.required),
+      exam_start_at: new FormControl('', Validators.required),
+      exam_end_at: new FormControl('', Validators.required)
+    })
   }
   refreshPagableData () {
     const currentPagable = this.pagable$.value
@@ -159,15 +194,51 @@ export class UkomClassListComponent {
         icon: 'mdi-plus-circle',
         onClick: () => this.handleTabChange(1)
       })
-    // this.tabService.addTab({
-    //   label: 'Tambah Jadwal Ukom',
-    //   icon: 'mdi-list-box',
-    //   onClick: () => this.handleTabChange(2)
-    // })
   }
 
-  getJenjang () {
-    this.apiService.getData(`/api/v1/jenjang`).subscribe({
+  setDefaultFormValues (data: any) {
+    console.log('data', data)
+    this.editRoomUkomForm.patchValue({
+      id: data.id || '',
+      name: data.name || '',
+      jabatan_code: data.jabatanCode || '',
+      jenjang_code: data.jenjangCode || '',
+      participant_quota: data.participantQuota || '',
+      exam_start_at: data.examStartAt || '',
+      exam_end_at: data.examEndAt || ''
+    })
+  }
+
+  onJabatanSwitch (event: Event) {
+    const jabatanCode = (event.target as HTMLSelectElement).value
+
+    if (jabatanCode) {
+      this.getListJenjang(jabatanCode)
+    }
+  }
+
+  getListJenjang (jabatanCode?: string) {
+    this.apiService
+      .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
+      .subscribe({
+        next: (response: any) => {
+          const jenjangs = response.map(
+            (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+          )
+
+          jenjangs.forEach((jenjang: any) => {
+            this.jenjangMap[jenjang.code] = jenjang.name
+          })
+
+          this.fixedJenjangList$ = new BehaviorSubject(jenjangs).asObservable()
+        },
+        error: err => {
+          console.error('Error fetching jenjang data:', err)
+        }
+      })
+  }
+  getJenjang (jabatanCode?: string) {
+    this.apiService.getData(`/api/v1/jenjang/`).subscribe({
       next: (response: any) => {
         const jenjangs = response.map(
           (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
@@ -208,10 +279,45 @@ export class UkomClassListComponent {
     this.refreshToggle = !this.refreshToggle
   }
 
+  toggleModal () {
+    this.isModalOpen$.next(!this.isModalOpen$.value)
+  }
+
   handleTabChange (tab?: number) {
     console.log('tab', tab)
 
     this.tab$.next(tab)
     this.tabService.changeTabActive(tab)
+  }
+
+  submit () {
+    const payload = {
+      id: this.editRoomUkomForm.value.id,
+      name: this.editRoomUkomForm.value.name,
+      jabatan_code: this.editRoomUkomForm.value.jabatan_code,
+      jenjang_code: this.editRoomUkomForm.value.jenjang_code,
+      participant_quota: this.editRoomUkomForm.value.participant_quota,
+      exam_start_at: this.editRoomUkomForm.value.exam_start_at,
+      exam_end_at: this.editRoomUkomForm.value.exam_end_at
+    }
+
+    // console.log('payload', payload)
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) return
+
+        this.apiService.putData('/api/v1/room_ukom', payload).subscribe({
+          next: response => {
+            this.handlerService.handleAlert(
+              'Success',
+              'Berhasil menambahkan data'
+            )
+            this.handleRefreshToggle()
+            this.toggleModal()
+          },
+          error: error => this.handlerService.handleException(error)
+        })
+      }
+    })
   }
 }

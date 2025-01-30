@@ -40,18 +40,18 @@ export class UkomDocumentListComponent {
           )
           .build()
       )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((item: any) => {}, 'info')
-          .withIcon('detail')
-          .build()
-      )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((item: any) => {}, 'danger')
-          .withIcon('danger')
-          .build()
-      )
+      //   .addActionColumn(
+      //     new ActionColumnBuilder()
+      //       .setAction((item: any) => {}, 'info')
+      //       .withIcon('detail')
+      //       .build()
+      //   )
+      //   .addActionColumn(
+      //     new ActionColumnBuilder()
+      //       .setAction((item: any) => {}, 'danger')
+      //       .withIcon('danger')
+      //       .build()
+      //   )
       //   .addFilter(
       //     new PageFilterBuilder('like')
       //       .setProperty('jenisUkom')

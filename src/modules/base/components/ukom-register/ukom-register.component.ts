@@ -59,6 +59,8 @@ export class UkomRegisterComponent {
   instansiList$: Observable<Instansi[]>
   unitKerjaList$: Observable<UnitKerja[]>
 
+  NextjabatanList$: Observable<Jabatan[]>
+
   nextJenjang: Jenjang
   detectedDokumen: any = {}
   pesertaUkom: PesertaUkom = new PesertaUkom()
@@ -189,6 +191,18 @@ export class UkomRegisterComponent {
       )
   }
 
+  getNextListJabatan (jenjangCode: string) {
+    this.NextjabatanList$ = this.apiService
+      .getData(`/api/v1/jabatan/jenjang/${jenjangCode}`)
+      .pipe(
+        map(response =>
+          response.map(
+            (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+          )
+        )
+      )
+  }
+
   onJabatanSwitch (event: Event) {
     const jabatanCode = (event.target as HTMLSelectElement).value
 
@@ -294,6 +308,7 @@ export class UkomRegisterComponent {
 
     if (jenjangCode) {
       this.pesertaUkom.jenjangCode = jenjangCode
+      this.getNextListJabatan(jenjangCode)
       this.getListPanngkat(jenjangCode)
     }
     // this.getNextJenjang(jenjangCode)

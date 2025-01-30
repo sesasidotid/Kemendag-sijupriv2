@@ -9,10 +9,14 @@ import { HandlerService } from '../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../modules/base/services/confirmation.service'
 import { ConfirmationDialogComponent } from '../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
 import { Router } from '@angular/router'
+import { BehaviorSubject } from 'rxjs'
+import { ReactiveFormsModule } from '@angular/forms'
+import { HostListener } from '@angular/core'
+
 @Component({
   selector: 'app-cat-page',
   standalone: true,
-  imports: [CommonModule, ConfirmationDialogComponent],
+  imports: [CommonModule, ConfirmationDialogComponent, ReactiveFormsModule],
   templateUrl: './cat-page.component.html',
   styleUrl: './cat-page.component.scss'
 })
@@ -31,6 +35,11 @@ export class CatPageComponent {
   examEndTime: Date | null = null
   remainingTime: string = ''
   remainingSeconds: number = 0 // Tambahkan variabel baru
+  isSubmitted$ = new BehaviorSubject<boolean>(false)
+  //   isSubmitted$ = false
+  showWarning: boolean = false
+  warningCountdown: number = 30
+  private warningInterval: any
 
   private countdownInterval: any
 
@@ -41,10 +50,96 @@ export class CatPageComponent {
     private router: Router
   ) {
     this.getRoomUkom()
+    this.enterFullScreen()
   }
 
   ngOnInit () {
     // this.getQuestion()
+    this.enterFullScreen()
+    // window.addEventListener('blur', this.onBlur.bind(this))
+    this.isSubmitted$.subscribe(submitted => {
+      if (submitted) {
+        this.showWarning = false
+      }
+    })
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove (event: MouseEvent) {
+    if (this.isSubmitted$.value) return
+
+    const isInsideExamArea = this.isMouseInsideExamArea(event)
+    if (!isInsideExamArea) {
+      this.showWarning = true
+      this.startWarningCountdown()
+    } else {
+      this.showWarning = false
+      this.resetWarningCountdown()
+    }
+  }
+
+  @HostListener('document:visibilitychange', [])
+  handleVisibilityChange () {
+    if (document.hidden) {
+      // You can also submit the exam automatically or log this action
+    }
+  }
+
+  isMouseInsideExamArea (event: MouseEvent): boolean {
+    const examArea = document.querySelector('.parent') as HTMLElement
+    if (!examArea) return false
+
+    const rect = examArea.getBoundingClientRect()
+    return (
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom
+    )
+  }
+
+  startWarningCountdown () {
+    if (this.warningInterval) {
+      clearInterval(this.warningInterval)
+    }
+    this.warningCountdown = 30
+    this.warningInterval = setInterval(() => {
+      this.warningCountdown--
+      if (this.warningCountdown <= 0) {
+        clearInterval(this.warningInterval)
+        this.submitAnswer(false)
+      }
+    }, 1000)
+  }
+
+  resetWarningCountdown () {
+    if (this.warningInterval) {
+      clearInterval(this.warningInterval)
+    }
+    this.warningCountdown = 30
+  }
+
+  onBlur () {
+    alert(
+      'Please do not switch tabs or open other applications during the exam.'
+    )
+    this.enterFullScreen()
+  }
+
+  enterFullScreen () {
+    const elem = document.documentElement
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen()
+    } else if ((elem as any).mozRequestFullScreen) {
+      /* Firefox */
+      ;(elem as any).mozRequestFullScreen()
+    } else if ((elem as any).webkitRequestFullscreen) {
+      /* Chrome, Safari and Opera */
+      ;(elem as any).webkitRequestFullscreen()
+    } else if ((elem as any).msRequestFullscreen) {
+      /* IE/Edge */
+      ;(elem as any).msRequestFullscreen()
+    }
   }
 
   ngOnDestroy () {
@@ -52,7 +147,9 @@ export class CatPageComponent {
       clearInterval(this.countdownInterval)
     }
   }
-
+  backToHome () {
+    this.router.navigate(['/'])
+  }
   startCountdown () {
     if (!this.examEndTime) return
 
@@ -139,6 +236,12 @@ export class CatPageComponent {
         },
         error: err => {
           console.error('Error fetching questions:', err)
+          if (err.error.message === `Exam's already ended`) {
+            this.isSubmitted$.next(true)
+            // this.isSubmitted$ = true
+          } else {
+            this.handler.handleAlert('Error', 'Gagal mengambil pertanyaan')
+          }
         }
       })
   }
@@ -148,6 +251,7 @@ export class CatPageComponent {
       this.currentPage = page
     }
   }
+
   selectAnswer (questionId: string, choiceId: string) {
     this.selectedAnswer[questionId] = choiceId
     console.log('Selected answer:', this.selectedAnswer)

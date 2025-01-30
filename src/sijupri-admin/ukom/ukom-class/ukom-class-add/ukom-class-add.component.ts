@@ -73,9 +73,12 @@ export class UkomClassAddComponent {
     this.jabatanList$.subscribe(jabatanList => {
       console.log(jabatanList)
     })
+  }
 
+  getListJenjang (jabatanCode: string) {
     this.jenjangList$ = this.apiService
-      .getData(`/api/v1/jenjang`)
+      //   .getData(`/api/v1/jenjang`)
+      .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
       .pipe(
         map(response =>
           response.map(
@@ -84,7 +87,13 @@ export class UkomClassAddComponent {
         )
       )
   }
+  onJabatanSwitch (event: Event) {
+    const jabatanCode = (event.target as HTMLSelectElement).value
 
+    if (jabatanCode) {
+      this.getListJenjang(jabatanCode)
+    }
+  }
   submit () {
     this.confirmationService.open(false).subscribe({
       next: result => {

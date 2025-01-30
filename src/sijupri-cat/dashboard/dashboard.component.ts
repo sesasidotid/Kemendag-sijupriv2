@@ -39,12 +39,28 @@ export class DashboardComponent {
     // this.checkCAT()
   }
 
-  ngOnInit () {}
+  ngOnInit () {
+    this.exitFullScreen()
+  }
 
   updateCurrentTime () {
     interval(1000).subscribe(() => {
       this.now = Date.now()
     })
+  }
+  exitFullScreen () {
+    if (document.exitFullscreen) {
+      document.exitFullscreen()
+    } else if ((document as any).mozCancelFullScreen) {
+      /* Firefox */
+      ;(document as any).mozCancelFullScreen()
+    } else if ((document as any).webkitExitFullscreen) {
+      /* Chrome, Safari, and Opera */
+      ;(document as any).webkitExitFullscreen()
+    } else if ((document as any).msExitFullscreen) {
+      /* IE/Edge */
+      ;(document as any).msExitFullscreen()
+    }
   }
 
   canStartExam (examStartTime: string): boolean {

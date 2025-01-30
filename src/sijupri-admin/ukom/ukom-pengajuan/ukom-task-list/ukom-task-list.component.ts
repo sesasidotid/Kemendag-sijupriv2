@@ -63,10 +63,17 @@ export class UkomTaskListComponent {
             .withDefaultValue('ukom_flow_1')
             .build()
         )
+
         .addFilter(
           new PageFilterBuilder('like')
             .setProperty('objectGroup')
             .withField('NIP', 'text')
+            .build()
+        )
+        .addFilter(
+          new PageFilterBuilder('like')
+            .setProperty('objectName')
+            .withField('Nama', 'text')
             .build()
         )
         .build()

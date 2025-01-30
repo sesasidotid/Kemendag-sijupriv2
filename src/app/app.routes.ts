@@ -52,6 +52,13 @@ export const routes: Routes = [
         '../modules/base/components/akp-grading/akp-grading.component'
       ).then(m => m.AKPGradingComponent)
   },
+  {
+    path: 'ukm-clarrify',
+    loadComponent: () =>
+      import(
+        '../modules/base/components/reject-ukom-schedule/reject-ukom-schedule.component'
+      ).then(m => m.RejectUkomScheduleComponent)
+  },
   { path: '**', redirectTo: 'not-found' }
 ]
 

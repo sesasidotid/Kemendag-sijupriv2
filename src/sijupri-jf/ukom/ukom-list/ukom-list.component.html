@@ -4,12 +4,7 @@
     <div class="flex-shrink-0"></div>
   </div>
   <div class="card-body">
-    <div
-      *ngIf="
-        (ukomSchedule$ | async).examScheduleDtoList.length > 0;
-        else emptyState
-      "
-    >
+    <div *ngIf="ukomSchedule?.examScheduleDtoList?.length > 0; else emptyState">
       <app-pagable [pagable]="jadwalPagable"></app-pagable>
     </div>
     <ng-template #emptyState>
@@ -29,6 +24,7 @@
     <h4 class="card-title mb-0 flex-grow-1">Daftar Riwayat Ukom</h4>
     <div class="flex-shrink-0"></div>
   </div>
+
   <div class="card-body">
     <app-pagable [pagable]="pagable"></app-pagable>
   </div>

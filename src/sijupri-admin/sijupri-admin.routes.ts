@@ -133,6 +133,12 @@ export const routes: Routes = [
               import(
                 '../sijupri-admin/akp/akp-pelatihan-list/akp-pelatihan-list.component'
               ).then(m => m.AkpPelatihanListComponent)
+          },
+          'Validasi Pelatihan': {
+            components: () =>
+              import(
+                '../sijupri-admin/akp/akp-verifikasi-pelatihan/akp-verifikasi-pelatihan.component'
+              ).then(m => m.AkpVerifikasiPelatihanComponent)
           }
         },
         UKom: {
@@ -186,13 +192,13 @@ export const routes: Routes = [
               }
             ]
           },
-          'Import Nilai': {
-            components: () =>
-              import(
-                '../sijupri-admin/ukom/ukom-grade-import/ukom-grade-import.component'
-              ).then(m => m.UkomGradeImportComponent)
-          },
-          Periode: {
+          //   'Import Nilai': {
+          //     components: () =>
+          //       import(
+          //         '../sijupri-admin/ukom/ukom-grade-import/ukom-grade-import.component'
+          //       ).then(m => m.UkomGradeImportComponent)
+          //   },
+          Pertanyaan: {
             components: () =>
               import(
                 './ukom/ukom-question/ukom-question-list/ukom-question-list.component'
@@ -200,24 +206,31 @@ export const routes: Routes = [
           },
           'Rumus UKom': {
             components: () =>
-              import('./ukom/ukom-formula/ukom-formula.component').then(
-                m => m.UkomFormulaComponent
-              ),
+              import(
+                './ukom/ukom-formula/ukom-formula-list/ukom-formula-list.component'
+              ).then(m => m.UkomFormulaListComponent),
             routes: [
               {
-                path: 'examiner',
+                path: ':id',
                 loadComponent: () =>
                   import(
-                    './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
-                  ).then(m => m.UkomExaminerListComponent)
-              },
-              {
-                path: 'schedule',
-                loadComponent: () =>
-                  import(
-                    './ukom/ukom-exam-schedule/ukom-exam-schedule-list/ukom-exam-schedule-list.component'
-                  ).then(m => m.UkomExamScheduleListComponent)
+                    './ukom/ukom-formula/ukom-formula-detail/ukom-formula-detail.component'
+                  ).then(m => m.UkomFormulaDetailComponent)
               }
+              //   {
+              //     path: 'examiner',
+              //     loadComponent: () =>
+              //       import(
+              //         './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
+              //       ).then(m => m.UkomExaminerListComponent)
+              //   },
+              //   {
+              //     path: 'schedule',
+              //     loadComponent: () =>
+              //       import(
+              //         './ukom/ukom-exam-schedule/ukom-exam-schedule-list/ukom-exam-schedule-list.component'
+              //       ).then(m => m.UkomExamScheduleListComponent)
+              //   }
             ]
           },
           Kelas: {
