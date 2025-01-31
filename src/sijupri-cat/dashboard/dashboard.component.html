@@ -23,15 +23,22 @@
           <div>
             <h5>{{ exam.examTypeCode }}</h5>
             <p>
-              <strong>Waktu mulai:</strong>
-              {{ exam.startTime | date: 'MMMM d, y, h:mm a' }}<br />
+              <!-- <strong>Waktu mulai:</strong>
+              {{ exam.startTime }}<br />
               <strong>Waktu selesai:</strong>
-              {{ exam.endTime | date: 'MMMM d, y, h:mm a' }}
+              {{ exam.endTime | date: 'MMMM d, y, h:mm a' }} -->
+              <strong>Waktu mulai:</strong>
+              {{ exam.startTime }}<br />
+              <strong>Waktu selesai:</strong>
+              {{ exam.endTime }}
             </p>
           </div>
           <div class="d-flex align-items-center gap-2">
             <button
-              *ngIf="exam.examTypeCode === 'CAT'"
+              *ngIf="
+                exam.examTypeCode === 'CAT' &&
+                (!canStartExam(exam.startTime) || !CATSchore.score)
+              "
               class="btn btn-primary btn-lg"
               (click)="startExam(exam.roomUkomId)"
               [disabled]="!canStartExam(exam.startTime) || CATSchore.score"
@@ -52,16 +59,6 @@
   </div>
 </section>
 
-<!-- <app-modal
-  *ngIf="isModalOpen$ | async"
-  [title]="'Hasil Ujian'"
-  (toggle)="toggleModal()"
-  [size]="'lg'"
-  [enableFooter]="false"
->
-  <h1>Test</h1>
-</app-modal> -->
-
 <app-modal
   *ngIf="isModalOpen$ | async"
   [title]="'Hasil Ujian'"
@@ -76,7 +73,9 @@
     </div> -->
     <div class="total-score-container">
       <!-- <h3 class="total-score-title">Total Skor</h3> -->
-      <div class="total-score-value">{{ CATSchore?.score }}</div>
+      <div class="total-score-value">
+        {{ CATSchore?.score | number: '1.2-2' }}
+      </div>
     </div>
 
     <!-- Competency Scores -->

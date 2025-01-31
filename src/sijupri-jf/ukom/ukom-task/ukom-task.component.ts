@@ -20,6 +20,8 @@ import { EmptyStateComponent } from '../../../modules/base/components/empty-stat
 import { RekapButtonComponent } from '../../../modules/base/components/rekap-table/rekap-button.component'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { UkomRevisionComponent } from '../ukom-revision/ukom-revision.component'
+import { DomSanitizer } from '@angular/platform-browser'
+import { SafeUrl } from '@angular/platform-browser'
 @Component({
   selector: 'app-ukom-task',
   standalone: true,
@@ -51,13 +53,15 @@ export class UkomTaskComponent {
   groupedUkomPendingTaskHistory: { [key: string]: any[] } = {}
   wannaRequest: boolean = false
   isModalOpen$ = new BehaviorSubject<boolean>(false)
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   constructor (
     private apiService: ApiService,
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService,
     private ukomTaskService: UkomTaskService,
-    private converterService: ConverterService
+    private converterService: ConverterService,
+    private sanitizer: DomSanitizer
   ) {}
 
   inputs: FIleHandler = {
@@ -92,6 +96,19 @@ export class UkomTaskComponent {
   //       }
   //     })
   //   }
+
+  fetchPhotoProfile () {
+    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+      next: blob => {
+        const objectUrl = URL.createObjectURL(blob)
+        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+      },
+      error: err => {
+        console.error('Error fetching profile image', err)
+        this.profileImageSrc = 'assets/no-profile.jpg'
+      }
+    })
+  }
 
   getPendingTask () {
     this.ukomDataLoading$.next(true)

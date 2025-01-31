@@ -34,7 +34,7 @@ export class CatPageComponent {
 
   examEndTime: Date | null = null
   remainingTime: string = ''
-  remainingSeconds: number = 0 // Tambahkan variabel baru
+  remainingSeconds: number = 0
   isSubmitted$ = new BehaviorSubject<boolean>(false)
   //   isSubmitted$ = false
   showWarning: boolean = false
@@ -64,19 +64,23 @@ export class CatPageComponent {
     })
   }
 
-  @HostListener('document:mousemove', ['$event'])
-  onMouseMove (event: MouseEvent) {
-    if (this.isSubmitted$.value) return
+  //   @HostListener('document:mousemove', ['$event'])
+  //   onMouseMove (event: MouseEvent) {
+  //     if (this.isSubmitted$.value) return
 
-    const isInsideExamArea = this.isMouseInsideExamArea(event)
-    if (!isInsideExamArea) {
-      this.showWarning = true
-      this.startWarningCountdown()
-    } else {
-      this.showWarning = false
-      this.resetWarningCountdown()
-    }
-  }
+  //     const isInsideExamArea = this.isMouseInsideExamArea(event)
+  //     console.log('isInsideExamArea:', isInsideExamArea)
+  //     if (!isInsideExamArea) {
+  //       this.showWarning = true
+  //       //   this.startWarningCountdown()
+  //       if (!this.warningInterval) {
+  //         this.startWarningCountdown()
+  //       }
+  //     } else {
+  //       this.showWarning = false
+  //       this.resetWarningCountdown()
+  //     }
+  //   }
 
   @HostListener('document:visibilitychange', [])
   handleVisibilityChange () {
@@ -84,6 +88,29 @@ export class CatPageComponent {
       // You can also submit the exam automatically or log this action
     }
   }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove (event: MouseEvent) {
+    if (this.isSubmitted$.value) return
+
+    const inside = this.isMouseInsideExamArea(event)
+
+    if (inside !== this.isInside) {
+      this.isInside = inside
+
+      if (!inside) {
+        console.log('Mouse exited the exam area')
+        this.showWarning = true
+        this.startWarningCountdown()
+      } else {
+        console.log('Mouse entered the exam area')
+        this.showWarning = false
+        this.resetWarningCountdown()
+      }
+    }
+  }
+
+  private isInside = true
 
   isMouseInsideExamArea (event: MouseEvent): boolean {
     const examArea = document.querySelector('.parent') as HTMLElement
@@ -102,6 +129,8 @@ export class CatPageComponent {
     if (this.warningInterval) {
       clearInterval(this.warningInterval)
     }
+    // if (this.warningInterval) return // Don't restart countdown if already running
+
     this.warningCountdown = 30
     this.warningInterval = setInterval(() => {
       this.warningCountdown--
@@ -147,9 +176,11 @@ export class CatPageComponent {
       clearInterval(this.countdownInterval)
     }
   }
+
   backToHome () {
     this.router.navigate(['/'])
   }
+
   startCountdown () {
     if (!this.examEndTime) return
 
@@ -184,6 +215,7 @@ export class CatPageComponent {
   padZero (num: number): string {
     return num < 10 ? `0${num}` : `${num}`
   }
+
   getRoomUkom () {
     this.api
       .getData(
@@ -325,6 +357,7 @@ export class CatPageComponent {
         error: err => {
           console.error('Error submitting answer:', err)
           this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
+          this.router.navigate(['/'])
         }
       })
     }

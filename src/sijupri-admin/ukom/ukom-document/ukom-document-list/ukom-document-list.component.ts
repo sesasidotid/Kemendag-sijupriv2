@@ -36,6 +36,8 @@ export class UkomDocumentListComponent {
               ? 'Kenaikan Jenjang'
               : data.jenisUkom === 'PERPINDAHAN_JABATAN'
               ? 'Perpindahan Jabatan'
+              : data.jenisUkom === 'PROMOSI'
+              ? 'Promosi'
               : data.jenisUkom
           )
           .build()

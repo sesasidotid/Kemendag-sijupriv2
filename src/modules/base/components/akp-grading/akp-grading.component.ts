@@ -14,6 +14,10 @@ import { CommonModule } from '@angular/common'
 import { BehaviorSubject } from 'rxjs'
 import { AlertService } from '../../services/alert.service'
 import { EmptyStateComponent } from '../empty-state/empty-state.component'
+import { ApiService } from '../../services/api.service'
+import { SafeUrl } from '@angular/platform-browser'
+import { DomSanitizer } from '@angular/platform-browser'
+import { LoginContext } from '../../commons/login-context'
 
 interface Option {
   id: number
@@ -42,6 +46,7 @@ export class AKPGradingComponent {
 
   categoryPage$ = new BehaviorSubject<number>(0)
   categoryLength$ = new BehaviorSubject<number | null>(null)
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   options: Option[] = [
     { id: 1, label: 'Tidak Mampu' },
@@ -54,7 +59,9 @@ export class AKPGradingComponent {
     private activatedRoute: ActivatedRoute,
     private akpTaskService: AkpTaskService,
     private fb: FormBuilder,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private apiService: ApiService,
+    private sanitizer: DomSanitizer
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.AKPId = params.get('id')
@@ -80,6 +87,20 @@ export class AKPGradingComponent {
       }
     })
   }
+
+  fetchPhotoProfile () {
+    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+      next: blob => {
+        const objectUrl = URL.createObjectURL(blob)
+        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+      },
+      error: err => {
+        console.error('Error fetching profile image', err)
+        this.profileImageSrc = 'assets/no-profile.jpg'
+      }
+    })
+  }
+
   ngOnDestroy () {
     this.AKPLoading$.unsubscribe()
     this.AKPSumbitLoading$.unsubscribe()

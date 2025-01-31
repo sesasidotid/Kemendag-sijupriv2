@@ -15,7 +15,9 @@ import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
-
+import { DomSanitizer } from '@angular/platform-browser'
+import { SafeUrl } from '@angular/platform-browser'
+import { LoginContext } from '../../../modules/base/commons/login-context'
 @Component({
   selector: 'app-jf-akp-list',
   standalone: true,
@@ -27,6 +29,7 @@ export class JfAkpListComponent {
   pagable$ = new BehaviorSubject<Pagable | null>(null)
   jf: JF = new JF()
   jfNip: string
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   jfLoading$ = new BehaviorSubject<boolean>(false)
 
@@ -36,7 +39,8 @@ export class JfAkpListComponent {
     private jfService: JfService,
     private apiService: ApiService,
     private confirmationService: ConfirmationService,
-    private handlerService: HandlerService
+    private handlerService: HandlerService,
+    private sanitizer: DomSanitizer
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.jfNip = params.get('id')
@@ -128,6 +132,19 @@ export class JfAkpListComponent {
       limit: 10
     }
     this.pagable$.next(updatedPagable)
+  }
+
+  fetchPhotoProfile () {
+    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+      next: blob => {
+        const objectUrl = URL.createObjectURL(blob)
+        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+      },
+      error: err => {
+        console.error('Error fetching profile image', err)
+        this.profileImageSrc = 'assets/no-profile.jpg'
+      }
+    })
   }
 
   getJF () {

@@ -120,16 +120,16 @@ export class UkomFormulaListComponent {
         )
         .addFilter(
           new PageFilterBuilder('like')
-            .setProperty('jabatanName')
+            .setProperty('jabatan|name')
             .withField('Jabatan', 'text')
             .build()
         )
-        .addFilter(
-          new PageFilterBuilder('like')
-            .setProperty('jenjangName')
-            .withField('jenjang', 'text')
-            .build()
-        )
+        // .addFilter(
+        //   new PageFilterBuilder('like')
+        //     .setProperty('Jenjang|name')
+        //     .withField('Jenjang', 'text')
+        //     .build()
+        // )
         .build()
     )
 

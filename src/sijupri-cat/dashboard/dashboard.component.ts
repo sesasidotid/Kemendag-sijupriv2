@@ -48,6 +48,7 @@ export class DashboardComponent {
       this.now = Date.now()
     })
   }
+
   exitFullScreen () {
     if (document.exitFullscreen) {
       document.exitFullscreen()

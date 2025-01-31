@@ -44,9 +44,6 @@ export class UkomListComponent {
     this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
       .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
-      //   .addPrimaryColumn(
-      //     new PrimaryColumnBuilder('Jenis Ukom', 'jenisUkom').build()
-      //   )
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
           .withDynamicValue('Jenis Ukom', (data: any) =>
@@ -58,8 +55,15 @@ export class UkomListComponent {
           )
           .build()
       )
+      //   .addPrimaryColumn(
+      //     new PrimaryColumnBuilder('Tanggal', 'lastUpdated').build()
+      //   )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Tanggal', 'lastUpdated').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Status', (data: any) =>
+            data.ukomBan != null ? 'Banned' : 'Active'
+          )
+          .build()
       )
       .addActionColumn(
         new ActionColumnBuilder()

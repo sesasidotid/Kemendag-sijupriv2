@@ -6,16 +6,21 @@
           <div class="d-flex justify-content-between align-items-start">
             <div class="profile-user">
               <img
-                src="assets/avatar.jpg"
+                [src]="profileImageSrc"
                 class="rounded-circle avatar-md img-thumbnail user-profile-image"
                 alt="user-profile-image"
               />
             </div>
-            <span class="badge rounded-pill text-bg-success" *ngIf="jf.nip"
+            <span
+              class="badge rounded-pill text-bg-success"
+              *ngIf="jf.nip && !isBanned"
               >Aktif</span
             >
             <span class="badge rounded-pill text-bg-danger" *ngIf="!jf.nip"
               >JF tidak terdaftar</span
+            >
+            <span class="badge rounded-pill text-bg-danger" *ngIf="isBanned"
+              >Di banned sampai {{ bannedDue ? bannedDue : 'N/A' }}</span
             >
           </div>
           <div class="mt-3">

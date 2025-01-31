@@ -10,6 +10,8 @@ import { ConverterService } from '../../services/converter.service'
 import { ApiService } from '../../services/api.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { NonjfRevisiUkomComponent } from '../nonjf-revisi-ukom/nonjf-revisi-ukom.component'
+import { DomSanitizer } from '@angular/platform-browser'
+import { SafeUrl } from '@angular/platform-browser'
 @Component({
   selector: 'app-status-pendaftaran-ukom',
   standalone: true,
@@ -30,6 +32,7 @@ export class StatusPendaftaranUkomComponent {
   ukomStep$ = new BehaviorSubject<number>(1)
   currentUkomStep$ = new BehaviorSubject<number>(1)
   isModalOpen$ = new BehaviorSubject<boolean>(false)
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   key: string = undefined
   constructor (
@@ -37,7 +40,8 @@ export class StatusPendaftaranUkomComponent {
     private converterService: ConverterService,
     private apiService: ApiService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit () {
@@ -48,6 +52,19 @@ export class StatusPendaftaranUkomComponent {
       if (key) {
         this.key = key
         this.getPendingTask(key)
+      }
+    })
+  }
+
+  fetchPhotoProfile () {
+    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+      next: blob => {
+        const objectUrl = URL.createObjectURL(blob)
+        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+      },
+      error: err => {
+        console.error('Error fetching profile image', err)
+        this.profileImageSrc = 'assets/no-profile.jpg'
       }
     })
   }

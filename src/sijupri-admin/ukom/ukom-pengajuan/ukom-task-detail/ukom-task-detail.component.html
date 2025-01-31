@@ -162,12 +162,12 @@
                 </div>
               </div>
               <ng-template #Approved>
-                <label class="btn btn-sm btn-success" aria-disabled="true"
+                <label class="btn btn-sm btn-soft-success" aria-disabled="true"
                   >Disetujui</label
                 >
               </ng-template>
               <ng-template #Disapproved>
-                <label class="btn btn-sm btn-danger" aria-disabled="true"
+                <label class="btn btn-sm btn-soft-danger" aria-disabled="true"
                   >Menunggu Perbaikan</label
                 >
               </ng-template>
@@ -188,11 +188,11 @@
         >
           <a
             *ngIf="isApproveEnable"
-            class="btn btn-sm btn-soft-success me-1"
+            class="btn btn-success me-1"
             (click)="submit(false)"
             >Terima</a
           >
-          <a class="btn btn-sm btn-soft-danger" (click)="submit(true)">Tolak</a>
+          <a class="btn btn-danger" (click)="submit(true)">Tolak</a>
         </div>
       </div>
     </div>

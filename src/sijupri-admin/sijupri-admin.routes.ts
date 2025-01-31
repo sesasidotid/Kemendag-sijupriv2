@@ -13,8 +13,20 @@ export const routes: Routes = [
     data: {
       title: 'Home'
     },
-    children:
-      RouteLoader.loadRouter({
+    children: [
+      // Custom route outside of RouteLoader.loadRouter
+      {
+        path: '',
+        loadComponent: () =>
+          import('./admin-dashboard/admin-dashboard.component').then(
+            m => m.AdminDashboardComponent
+          ),
+        data: {
+          title: 'Dashboard'
+        }
+      },
+      // Routes loaded by RouteLoader.loadRouter
+      ...(RouteLoader.loadRouter({
         Formasi: {
           'Data Dukung Formasi': {
             components: () =>
@@ -78,10 +90,6 @@ export const routes: Routes = [
                 m => m.KknComponent
               ),
             routes: [
-              // {
-              //     path: 'add',
-              //     loadComponent: () => import('../sijupri-admin/akp/kkn-add/kkn-add.component').then(m => m.KknAddComponent),
-              // },
               {
                 path: ':id',
                 loadComponent: () =>
@@ -154,13 +162,6 @@ export const routes: Routes = [
                 m => m.UkomListComponent
               ),
             routes: [
-              //   {
-              //     path: 'add',
-              //     loadComponent: () =>
-              //       import(
-              //         '../sijupri-admin/ukom/ukom-add/ukom-add.component'
-              //       ).then(m => m.UkomAddComponent)
-              //   },
               {
                 path: ':id',
                 loadComponent: () =>
@@ -192,12 +193,6 @@ export const routes: Routes = [
               }
             ]
           },
-          //   'Import Nilai': {
-          //     components: () =>
-          //       import(
-          //         '../sijupri-admin/ukom/ukom-grade-import/ukom-grade-import.component'
-          //       ).then(m => m.UkomGradeImportComponent)
-          //   },
           Pertanyaan: {
             components: () =>
               import(
@@ -217,20 +212,6 @@ export const routes: Routes = [
                     './ukom/ukom-formula/ukom-formula-detail/ukom-formula-detail.component'
                   ).then(m => m.UkomFormulaDetailComponent)
               }
-              //   {
-              //     path: 'examiner',
-              //     loadComponent: () =>
-              //       import(
-              //         './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
-              //       ).then(m => m.UkomExaminerListComponent)
-              //   },
-              //   {
-              //     path: 'schedule',
-              //     loadComponent: () =>
-              //       import(
-              //         './ukom/ukom-exam-schedule/ukom-exam-schedule-list/ukom-exam-schedule-list.component'
-              //       ).then(m => m.UkomExamScheduleListComponent)
-              //   }
             ]
           },
           Kelas: {
@@ -239,13 +220,6 @@ export const routes: Routes = [
                 '../sijupri-admin/ukom/ukom-class/ukom-class-list/ukom-class-list.component'
               ).then(m => m.UkomClassListComponent),
             routes: [
-              //   {
-              //     path: 'add',
-              //     loadComponent: () =>
-              //       import(
-              //         '../sijupri-admin/ukom/ukom-class/ukom-class-add/ukom-class-add.component'
-              //       ).then(m => m.UkomClassAddComponent)
-              //   },
               {
                 path: ':id',
                 loadComponent: () =>
@@ -267,14 +241,6 @@ export const routes: Routes = [
                     './ukom/ukom-exam-schedule/ukom-exam-choose-comp-questions/ukom-exam-choose-comp-questions.component'
                   ).then(m => m.UkomExamChooseCompQuestionsComponent)
               }
-
-              //   {
-              //     path: 'detail/:id',
-              //     loadComponent: () =>
-              //       import(
-              //         './ukom/ukom-exam-schedule/ukom-exam-detail/ukom-exam-detail.component'
-              //       ).then(m => m.UkomExamDetailComponent)
-              //   }
             ]
           },
           'Penguji Ukom': {
@@ -283,12 +249,6 @@ export const routes: Routes = [
                 './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
               ).then(m => m.UkomExaminerListComponent)
           }
-          //   'Peserta Ukom': {
-          //     components: () =>
-          //       import(
-          //         '../sijupri-admin/ukom/ukom-kompetensi/ukom-kompetensi-list/ukom-kompetensi-list.component'
-          //       ).then(m => m.UkomKompetensiListComponent)
-          //   }
         },
         Maintenance: {
           Instansi: {
@@ -425,6 +385,7 @@ export const routes: Routes = [
               ).then(m => m.ReportUkomComponent)
           }
         }
-      }) ?? []
+      }) ?? [])
+    ]
   }
 ]

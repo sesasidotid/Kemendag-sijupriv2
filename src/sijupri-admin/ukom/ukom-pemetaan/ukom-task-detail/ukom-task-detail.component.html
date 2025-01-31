@@ -129,7 +129,9 @@
     <!-- Total Score -->
     <div class="total-score-container">
       <!-- <h3 class="total-score-title">Total Skor</h3> -->
-      <div class="total-score-value">{{ CATSchore?.score }}</div>
+      <div class="total-score-value">
+        {{ CATSchore?.score | number: '1.2-2' }}
+      </div>
     </div>
 
     <!-- Competency Scores -->

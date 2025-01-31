@@ -23,7 +23,7 @@ export class TopBarComponent {
 
   selectedTab: string = ''
   isExpanded: boolean = false
-  profileImageSrc: SafeUrl = 'assets/avatar.jpg'
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   notificationsDeleteId$ = new BehaviorSubject<string[]>([])
 
@@ -55,7 +55,7 @@ export class TopBarComponent {
       },
       error: err => {
         console.error('Error fetching profile image', err)
-        this.profileImageSrc = 'assets/avatar.jpg'
+        this.profileImageSrc = 'assets/no-profile.jpg'
       }
     })
   }

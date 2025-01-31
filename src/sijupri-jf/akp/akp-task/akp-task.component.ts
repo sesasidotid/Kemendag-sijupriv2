@@ -13,7 +13,8 @@ import { BehaviorSubject } from 'rxjs'
 import { AKPGradingPersonalComponent } from '../../../modules/base/components/akp-grading-personal/akp-grading-personal.component'
 import { ConverterService } from '../../../modules/base/services/converter.service'
 import { AKPTaskDetail } from '../../../modules/akp/models/akp-task-detail.modal'
-
+import { DomSanitizer } from '@angular/platform-browser'
+import { SafeUrl } from '@angular/platform-browser'
 @Component({
   selector: 'app-akp-task',
   standalone: true,
@@ -27,6 +28,7 @@ export class AkpTaskComponent {
   groupedPendingTaskHistory: { [key: string]: any[] } = {}
 
   wannaRequest: boolean = false
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   akpDataLoading$ = new BehaviorSubject<boolean>(true)
   akpStep$ = new BehaviorSubject<number>(1)
@@ -39,12 +41,26 @@ export class AkpTaskComponent {
     private handlerService: HandlerService,
     private alertService: AlertService,
     private router: Router,
-    private converterService: ConverterService
+    private converterService: ConverterService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit () {
     this.getJF()
     this.getAKPTask()
+  }
+
+  fetchPhotoProfile () {
+    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+      next: blob => {
+        const objectUrl = URL.createObjectURL(blob)
+        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+      },
+      error: err => {
+        console.error('Error fetching profile image', err)
+        this.profileImageSrc = 'assets/no-profile.jpg'
+      }
+    })
   }
 
   getJF () {

@@ -19,11 +19,6 @@ export const routes: Routes = [
             m => m.DashboardComponent
           )
       }
-      //   {
-      //     path: 'cat',
-      //     loadComponent: () =>
-      //       import('./cat-page/cat-page.component').then(m => m.CatPageComponent)
-      //   }
     ]
   },
   {

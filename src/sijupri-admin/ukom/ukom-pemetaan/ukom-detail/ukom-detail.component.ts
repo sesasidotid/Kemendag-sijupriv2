@@ -13,6 +13,9 @@ import { JfService } from '../../../../modules/siap/services/jf.service'
 import { JF } from '../../../../modules/siap/models/jf.model'
 import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
+import { ApiService } from '../../../../modules/base/services/api.service'
+import { DomSanitizer } from '@angular/platform-browser'
+import { SafeUrl } from '@angular/platform-browser'
 @Component({
   selector: 'app-ukom-detail',
   standalone: true,
@@ -26,10 +29,16 @@ export class UkomDetailComponent {
   jfLoading$ = new BehaviorSubject<boolean>(false)
 
   id: string
+  isBanned: boolean = false
+  bannedDue: string = ''
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
+
   constructor (
     private activatedRoute: ActivatedRoute,
     private jfService: JfService,
-    private router: Router
+    private router: Router,
+    private apiService: ApiService,
+    private sanitizer: DomSanitizer
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.id = params.get('id')
@@ -61,6 +70,7 @@ export class UkomDetailComponent {
       .build()
 
     this.getJF()
+    this.isUserBanned()
   }
 
   getJF () {
@@ -71,5 +81,29 @@ export class UkomDetailComponent {
         this.jfLoading$.next(false)
       }
     })
+  }
+
+  fetchPhotoProfile () {
+    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+      next: blob => {
+        const objectUrl = URL.createObjectURL(blob)
+        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+      },
+      error: err => {
+        console.error('Error fetching profile image', err)
+        this.profileImageSrc = 'assets/no-profile.jpg'
+      }
+    })
+  }
+
+  isUserBanned () {
+    this.apiService
+      .getData(`/api/v1/participant_ukom/search?limit=100&eq_nip=${this.id}`)
+      .subscribe({
+        next: (response: any) => {
+          this.isBanned = response.data[0].ukomBan != null
+          this.bannedDue = response.data[0].ukomBan?.until
+        }
+      })
   }
 }

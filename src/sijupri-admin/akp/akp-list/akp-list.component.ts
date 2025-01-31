@@ -21,6 +21,7 @@ export class AkpListComponent {
 
   constructor (private router: Router) {
     this.pagable = new PagableBuilder('/api/v1/jf/search')
+      // this.pagable = new PagableBuilder('/api/v1/akp/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Nama', 'name', ['user']).build()

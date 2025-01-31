@@ -29,7 +29,7 @@ import { HandlerService } from '../../services/handler.service'
 export class ProfileCardComponent {
   nip: string = LoginContext.getUserId()
   name: string = LoginContext.getName()
-  profileImageSrc: SafeUrl = 'assets/avatar.jpg'
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
   file: File | null = null
   filePreview: string = ''
 
@@ -55,7 +55,6 @@ export class ProfileCardComponent {
       },
       error: err => {
         console.error('Error fetching profile image', err)
-        // this.profileImageSrc = 'assets/avatar.jpg'
       }
     })
   }
