@@ -1,10 +1,112 @@
 <!-- <app-pagable [pagable]="pagable"></app-pagable> -->
 
 <ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable"></app-pagable>
+  <!-- <app-pagable [pagable]="pagable"></app-pagable> -->
+  <app-pagable
+    [pagable]="pagable$ | async"
+    [refresh]="refreshToggle"
+  ></app-pagable>
 </ng-container>
 <ng-container *ngIf="(tab$ | async) === 1">
   <app-ukom-class-add
     (changeTabActive)="handleTabChange(0)"
   ></app-ukom-class-add>
 </ng-container>
+<!-- <ng-container *ngIf="(tab$ | async) === 2">
+  <app-ukom-exam-schedule-add
+    (changeTabActive)="handleTabChange(0)"
+  ></app-ukom-exam-schedule-add>
+</ng-container> -->
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Update Kelas'"
+  (toggle)="toggleModal()"
+  [enableFooter]="false"
+  [size]="'lg'"
+>
+  <form [formGroup]="editRoomUkomForm">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nama</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        required
+        formControlName="name"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="jabatan_code" class="form-label">Jabatan</label>
+      <select
+        class="form-select"
+        name="jabatan_code"
+        id="jabatan_code"
+        formControlName="jabatan_code"
+        (change)="onJabatanSwitch($event)"
+      >
+        <option selected value="" style="display: none">Pilih Jabatan</option>
+        <option
+          *ngFor="let jabatan of jabatanList$ | async"
+          [value]="jabatan.code"
+        >
+          {{ jabatan.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="jenjang_code" class="form-label">Jenjang</label>
+      <select
+        class="form-select"
+        name="jenjang_code"
+        id="jenjang_code"
+        formControlName="jenjang_code"
+      >
+        <option selected value="" style="display: none">Pilih Jenjang</option>
+        <option
+          *ngFor="let jenjang of fixedJenjangList$ | async"
+          [value]="jenjang.code"
+        >
+          {{ jenjang.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="participant_quota" class="form-label">Kuota Peserta</label>
+      <input
+        type="text"
+        class="form-control"
+        id="participant_quota"
+        required
+        formControlName="participant_quota"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="exam_start_at" class="form-label">Waktu Mulai </label>
+      <input
+        type="datetime-local"
+        id="exam_start_at"
+        class="form-control"
+        required
+        formControlName="exam_start_at"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="exam_end_at" class="form-label">Waktu Mulai </label>
+      <input
+        type="datetime-local"
+        id="exam_end_at"
+        class="form-control"
+        required
+        formControlName="exam_end_at"
+      />
+    </div>
+
+    <button (click)="submit()" class="btn btn-primary w-100">Update</button>
+  </form>
+</app-modal>

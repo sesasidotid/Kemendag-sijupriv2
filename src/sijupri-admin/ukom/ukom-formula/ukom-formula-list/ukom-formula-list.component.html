@@ -1,0 +1,183 @@
+<app-pagable
+  [pagable]="pagable$ | async"
+  [refresh]="refreshToggle"
+></app-pagable>
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Update Formula'"
+  (toggle)="toggleModal()"
+  [enableFooter]="false"
+  [size]="'lg'"
+>
+  <form [formGroup]="editFormulaForm">
+    <div class="mb-3">
+      <label for="jabatan_code" class="form-label">Jabatan</label>
+      <select
+        class="form-select"
+        name="jabatan_code"
+        id="jabatan_code"
+        formControlName="jabatan_code"
+      >
+        <option selected value="" style="display: none">Pilih Jabatan</option>
+        <option
+          *ngFor="let jabatan of jabatanList$ | async"
+          [value]="jabatan.code"
+        >
+          {{ jabatan.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="jenjang_code" class="form-label">Jenjang</label>
+      <select
+        class="form-select"
+        name="jenjang_code"
+        id="jenjang_code"
+        formControlName="jenjang_code"
+      >
+        <option selected value="" style="display: none">Pilih Jenjang</option>
+        <option
+          *ngFor="let jenjang of jenjangList$ | async"
+          [value]="jenjang.code"
+        >
+          {{ jenjang.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="cat_percentage" class="form-label">CAT</label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="cat_percentage"
+        required
+        formControlName="cat_percentage"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="wawancara_percentage" class="form-label">Wawancara</label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="wawancara_percentage"
+        required
+        formControlName="wawancara_percentage"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="seminar_percentage" class="form-label">Seminar</label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="seminar_percentage"
+        required
+        formControlName="seminar_percentage"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="praktik_percentage" class="form-label">Praktik</label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="praktik_percentage"
+        required
+        formControlName="praktik_percentage"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="portofolio_percentage" class="form-label">Portofolia</label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="portofolio_percentage"
+        required
+        formControlName="portofolio_percentage"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="ukt_percentage" class="form-label">UKT</label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="ukt_percentage"
+        required
+        formControlName="ukt_percentage"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="ukmsk_percentage" class="form-label">UKSMK</label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="ukmsk_percentage"
+        required
+        formControlName="ukmsk_percentage"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="jpm_percentage" class="form-label">JPM </label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="jpm_percentage"
+        required
+        formControlName="jpm_percentage"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="grade_threshold" class="form-label"
+        >Ambang Batas Nilai
+      </label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="grade_threshold"
+        required
+        formControlName="grade_threshold"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="total_ukt_threshold" class="form-label"
+        >Ambang Batas UKT</label
+      >
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="total_ukt_threshold"
+        required
+        formControlName="total_ukt_threshold"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="jpm_threshold" class="form-label">Ambang Batas JPM</label>
+      <input
+        type="number"
+        step="1"
+        class="form-control"
+        id="jpm_threshold"
+        required
+        formControlName="jpm_threshold"
+      />
+    </div>
+
+    <button (click)="submit()" class="btn btn-primary w-100">Update</button>
+  </form>
+</app-modal>
+
+<app-confirmation-dialog></app-confirmation-dialog>

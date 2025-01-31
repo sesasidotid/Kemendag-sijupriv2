@@ -1,53 +1,67 @@
 <div id="layout-wrapper">
-    <app-top-bar></app-top-bar>
-    <app-side-bar></app-side-bar>
-    <div class="main-content">
-        <div class="page-content">
-            <div class="container-fluid">
-                <div class="row" *ngIf="this.applicationCode !== 'sijupri-external'">
-                    <div class="col-12 opacity-75">
-                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0 font-size-18">{{title}}</h4>
-                            <div class="page-title-right">
-                                <ol class="breadcrumb m-0">
-                                    <ng-container *ngFor="let route of routeTrail; let last = last">
-                                        <li *ngIf="!last" class="breadcrumb-item active">
-                                            <!-- <a [routerLink]="route.path">{{ route.title }}</a> -->
-                                            {{ route.title }}
-
-                                        </li>
-                                        <li *ngIf="last" class="breadcrumb-item active">
-                                            {{ route.title }}
-                                        </li>
-                                    </ng-container>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <ul class="nav justify-content-start arrow-navtabs nav-primary bg-light mb-3"
-                        role="tablist">
-                        <li class="nav-item cursor-pointer" *ngFor="let tab of tabs">
-                            <a class="nav-link {{tab.isActive ? 'active' : 'inactive'}}" role="tab" (click)="onTabClick(tab)">
-                                <span class="" style="margin-right: 8px;"><i class="{{tab.icon ? 'mdi ' + tab.icon : 'mdi mdi-account-circle'}}"></i></span>
-                                <span class="">{{ tab.label }}</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="card-body">
-                        <router-outlet />
-                    </div>
-                </div>
-                <ng-container *ngIf="isCurrentRouteMatching()">
-                    <router-outlet name="detached" />
-                </ng-container>
-                <app-confirmation-dialog></app-confirmation-dialog>
-                <app-file-preview></app-file-preview>
+  <app-top-bar></app-top-bar>
+  <app-side-bar></app-side-bar>
+  <div class="main-content">
+    <div class="page-content">
+      <div class="container-fluid">
+        <div class="row" *ngIf="this.applicationCode !== 'sijupri-external'">
+          <div class="col-12 opacity-75">
+            <div
+              class="page-title-box d-sm-flex align-items-center justify-content-between"
+            >
+              <h4 class="mb-sm-0 font-size-18">{{ title }}</h4>
+              <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                  <ng-container
+                    *ngFor="let route of routeTrail; let last = last"
+                  >
+                    <li *ngIf="!last" class="breadcrumb-item active">
+                      <!-- <a [routerLink]="route.path">{{ route.title }}</a> -->
+                      {{ route.title }}
+                    </li>
+                    <li *ngIf="last" class="breadcrumb-item active">
+                      {{ route.title }}
+                    </li>
+                  </ng-container>
+                </ol>
+              </div>
             </div>
+          </div>
         </div>
-        <app-footer></app-footer>
+        <div class="card">
+          <ul
+            class="nav justify-content-start arrow-navtabs nav-primary bg-light mb-3"
+            role="tablist"
+          >
+            <li class="nav-item cursor-pointer" *ngFor="let tab of tabs">
+              <a
+                class="nav-link {{ tab.isActive ? 'active' : 'inactive' }}"
+                role="tab"
+                (click)="onTabClick(tab)"
+              >
+                <span class="" style="margin-right: 8px"
+                  ><i
+                    class="{{
+                      tab.icon ? 'mdi ' + tab.icon : 'mdi mdi-account-circle'
+                    }}"
+                  ></i
+                ></span>
+                <span class="">{{ tab.label }}</span>
+              </a>
+            </li>
+          </ul>
+          <div class="card-body">
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+        <ng-container *ngIf="isCurrentRouteMatching()">
+          <router-outlet name="detached"></router-outlet>
+        </ng-container>
+        <app-confirmation-dialog></app-confirmation-dialog>
+        <app-file-preview></app-file-preview>
+      </div>
     </div>
+    <app-footer></app-footer>
+  </div>
 </div>
-<div class="toast-container position-fixed top-0 end-0 p-3">
-</div>
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>

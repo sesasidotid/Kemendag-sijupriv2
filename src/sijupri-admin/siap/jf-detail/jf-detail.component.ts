@@ -9,7 +9,10 @@ import { RwJabatanListComponent } from '../../../sijupri-jf/siap/rw-jabatan/rw-j
 import { RwKinerjaListComponent } from '../../../sijupri-jf/siap/rw-kinerja/rw-kinerja-list/rw-kinerja-list.component'
 import { RwKompetensiListComponent } from '../../../sijupri-jf/siap/rw-kompetensi/rw-kompetensi-list/rw-kompetensi-list.component'
 import { RwSertifikasiListComponent } from '../../../sijupri-jf/siap/rw-sertifikasi/rw-sertifikasi-list/rw-sertifikasi-list.component'
-
+import { LoginContext } from '../../../modules/base/commons/login-context'
+import { DomSanitizer } from '@angular/platform-browser'
+import { SafeUrl } from '@angular/platform-browser'
+import { ApiService } from '../../../modules/base/services/api.service'
 @Component({
   selector: 'app-jf-detail',
   standalone: true,
@@ -28,15 +31,31 @@ import { RwSertifikasiListComponent } from '../../../sijupri-jf/siap/rw-sertifik
 export class JfDetailComponent {
   nip: string
   jf: JF = new JF()
+  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   constructor (
     private jfService: JfService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private apiService: ApiService,
+    private sanitizer: DomSanitizer
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.nip = params.get('id')
     })
     this.getJF()
+  }
+
+  fetchPhotoProfile () {
+    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+      next: blob => {
+        const objectUrl = URL.createObjectURL(blob)
+        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+      },
+      error: err => {
+        console.error('Error fetching profile image', err)
+        this.profileImageSrc = 'assets/no-profile.jpg'
+      }
+    })
   }
 
   getJF () {

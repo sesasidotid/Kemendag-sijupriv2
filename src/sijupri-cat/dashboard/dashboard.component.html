@@ -1,0 +1,123 @@
+<section>
+  <!-- Room Information -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h3 class="card-title">{{ roomUkom.name }}</h3>
+      <p class="mb-0"><strong>Jabatan:</strong> {{ roomUkom.jabatanName }}</p>
+      <p><strong>Jenjang:</strong> {{ roomUkom.jenjangName }}</p>
+    </div>
+  </div>
+
+  <!-- Exam Schedule -->
+  <div class="card">
+    <div class="card-header">
+      <h4>Jadwal Ujian</h4>
+    </div>
+    <div class="card-body">
+      <div class="list-group">
+        <!-- Exam Item -->
+        <div
+          class="list-group-item d-flex justify-content-between align-items-center mb-3"
+          *ngFor="let exam of roomUkom.examScheduleDtoList"
+        >
+          <div>
+            <h5>{{ exam.examTypeCode }}</h5>
+            <p>
+              <!-- <strong>Waktu mulai:</strong>
+              {{ exam.startTime }}<br />
+              <strong>Waktu selesai:</strong>
+              {{ exam.endTime | date: 'MMMM d, y, h:mm a' }} -->
+              <strong>Waktu mulai:</strong>
+              {{ exam.startTime }}<br />
+              <strong>Waktu selesai:</strong>
+              {{ exam.endTime }}
+            </p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button
+              *ngIf="
+                exam.examTypeCode === 'CAT' &&
+                (!canStartExam(exam.startTime) || !CATSchore.score)
+              "
+              class="btn btn-primary btn-lg"
+              (click)="startExam(exam.roomUkomId)"
+              [disabled]="!canStartExam(exam.startTime) || CATSchore.score"
+            >
+              Mulai
+            </button>
+            <button
+              *ngIf="exam.examTypeCode === 'CAT' && CATSchore.score"
+              class="btn btn-success btn-lg"
+              (click)="toggleModal()"
+            >
+              Lihat Nilai
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Hasil Ujian'"
+  (toggle)="toggleModal()"
+  [size]="'lg'"
+  [enableFooter]="false"
+>
+  <div class="container">
+    <!-- Total Score -->
+    <!-- <div class="total-score mb-4">
+      <h3>Total Skor: {{ CATSchore?.score }}</h3>
+    </div> -->
+    <div class="total-score-container">
+      <!-- <h3 class="total-score-title">Total Skor</h3> -->
+      <div class="total-score-value">
+        {{ CATSchore?.score | number: '1.2-2' }}
+      </div>
+    </div>
+
+    <!-- Competency Scores -->
+    <div
+      *ngFor="let kompetensi of CATSchore?.kompetensiDtoList"
+      class="kompetensi-section mb-4"
+    >
+      <h4>{{ kompetensi.name }}</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Pertanyaan</th>
+            <th>Jawaban</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let question of kompetensi.questionDtoList">
+            <td>{{ question.question }}</td>
+            <td>{{ question.answerDto?.answerChoice }}</td>
+            <td>
+              <span
+                [ngClass]="{
+                  'text-success':
+                    question.answerDto?.answerChoice ===
+                    getCorrectAnswer(question),
+                  'text-danger':
+                    question.answerDto?.answerChoice !==
+                    getCorrectAnswer(question)
+                }"
+              >
+                {{
+                  question.answerDto?.answerChoice ===
+                  getCorrectAnswer(question)
+                    ? 'Benar'
+                    : 'Salah'
+                }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</app-modal>

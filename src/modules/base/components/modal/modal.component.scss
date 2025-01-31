@@ -1,0 +1,20 @@
+/* Default Bootstrap modal sizes override */
+.modal-lg-custom {
+  max-width: 80%; /* Adjust as needed */
+  width: 800px;
+}
+
+.modal-md-custom {
+  max-width: 60%;
+  width: 600px;
+}
+
+.modal-sm-custom {
+  max-width: 40%;
+  width: 400px;
+}
+
+/* Make sure modal content adjusts */
+.modal-content {
+  //   padding: 20px;
+}

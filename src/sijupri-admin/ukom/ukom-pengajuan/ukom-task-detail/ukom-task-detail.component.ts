@@ -8,7 +8,7 @@ import { ActivatedRoute } from '@angular/router'
 import { Task } from '../../../../modules/workflow/models/task.model'
 import { CommonModule } from '@angular/common'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
-
+import { PrevPendingTask } from '../../../../modules/workflow/models/prev-pending-task'
 @Component({
   selector: 'app-ukom-task-detail',
   standalone: true,
@@ -21,6 +21,9 @@ export class UkomTaskDetailComponent {
   pendingTask: PendingTask
   isApproveEnable: boolean = true
   id: string
+  body: any
+  prevPendingTask: PrevPendingTask
+  prevApprovedTask: any[] = []
 
   constructor (
     private apiService: ApiService,
@@ -43,19 +46,39 @@ export class UkomTaskDetailComponent {
       next: response => {
         this.pendingTask = new PendingTask(response)
         this.pesertaUkom = new PesertaUkom(this.pendingTask.objectTask.object)
+        this.prevPendingTask = new PrevPendingTask(
+          this.pendingTask.objectTask.prevObject
+        )
+        console.log('peserta', this.pesertaUkom)
+        console.log('prevpending', this.prevPendingTask)
+        console.log('pending', this.pendingTask)
+        this.findApproveDokumen(this.prevPendingTask.dokumenUkomList)
       },
       error: error => this.handlerService.handleException(error)
     })
   }
 
+  findApproveDokumen (dokumenUkomList: any[]) {
+    this.prevApprovedTask = dokumenUkomList.filter(
+      dokumen => dokumen.dokumenStatus === 'APPROVE'
+    )
+    console.log('prevApprovedTask', this.prevApprovedTask)
+  }
   preview (fileName: string, source: string) {
     this.filePreviewService.open(fileName, source)
   }
 
-  onFIleSwitch (index: number, status: 'APPROVE' | 'REJECT') {
-    this.pesertaUkom.dokumenPesertaUkom[index].status = status
+  isDocumentApproved (dokumenPersyaratanId: string): boolean {
+    return this.prevApprovedTask.some(
+      approvedDokumen =>
+        approvedDokumen.dokumenPersyaratanId === dokumenPersyaratanId
+    )
+  }
 
-    for (const formasiDokumen of this.pesertaUkom.dokumenPesertaUkom) {
+  onFIleSwitch (index: number, status: 'APPROVE' | 'REJECT') {
+    this.pesertaUkom.dokumenUkomList[index].status = status
+
+    for (const formasiDokumen of this.pesertaUkom.dokumenUkomList) {
       if (formasiDokumen.status == 'REJECT') {
         this.isApproveEnable = false
         break
@@ -73,10 +96,27 @@ export class UkomTaskDetailComponent {
         task.id = this.pendingTask.id
         task.remark = result.comment || null
         task.taskAction = isReject ? 'reject' : 'approve'
-        task.object = this.pesertaUkom
+
+        this.body = {
+          id: this.pendingTask.id,
+          taskAction: task.taskAction
+        }
+
+        if (isReject) {
+          const rejectedDokumenUkomList =
+            this.pesertaUkom.dokumenUkomList.filter(
+              dokumen => dokumen.status === 'REJECT'
+            )
+
+          if (rejectedDokumenUkomList.length > 0) {
+            this.body.object = {
+              dokumenUkomList: rejectedDokumenUkomList
+            }
+          }
+        }
 
         this.apiService
-          .postData(`/api/v1/peserta_ukom/task/submit`, task)
+          .postData(`/api/v1/participant_ukom/task/submit`, this.body)
           .subscribe({
             next: () =>
               this.handlerService.handleNavigate('/ukom/ukom-task-list'),

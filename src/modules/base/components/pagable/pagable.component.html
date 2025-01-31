@@ -51,7 +51,7 @@
     <thead>
       <tr>
         <th>#No</th>
-        <ng-container *ngFor="let column of pagable.primaryColumnList">
+        <!-- <ng-container *ngFor="let column of pagable.primaryColumnList">
           <th *ngIf="column.property" (click)="toggleSort(column.property)">
             {{ column.label }}
             <span
@@ -61,6 +61,19 @@
                             'ri-arrow-up-line': getSortIcon(column.property) == 'asc',
                             'ri-arrow-down-line': getSortIcon(column.property) == 'desc',
                         }"
+            ></span>
+          </th>
+        </ng-container> -->
+        <ng-container *ngFor="let column of pagable.primaryColumnList">
+          <th (click)="toggleSort(column.property)">
+            {{ column.label }}
+            <span
+              class="float-end text-primary"
+              [ngClass]="{
+                        'ri-filter-3-line': getSortIcon(column.property) == '',
+                        'ri-arrow-up-line': getSortIcon(column.property) == 'asc',
+                        'ri-arrow-down-line': getSortIcon(column.property) == 'desc',
+                    }"
             ></span>
           </th>
         </ng-container>

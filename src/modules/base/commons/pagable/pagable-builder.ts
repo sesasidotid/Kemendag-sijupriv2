@@ -39,7 +39,7 @@ export class PagableBuilder {
       this.primaryColumnList,
       this.actionColumnList,
       this.filterList,
-      this.limit,
+      this.limit
     )
   }
 }
@@ -142,6 +142,7 @@ export class PrimaryColumnBuilder {
   withDynamicValue (label: string, dynamic: Function): PrimaryColumnBuilder {
     this.label = label
     this.dynamic = dynamic
+
     return this
   }
 

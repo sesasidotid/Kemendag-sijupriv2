@@ -1,5 +1,10 @@
-import { Component } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core'
+import {
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet
+} from '@angular/router'
 
 @Component({
   selector: 'app-jf',
@@ -9,16 +14,15 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
   styleUrl: './jf.component.scss'
 })
 export class JfComponent {
+  currentPath: string
 
-  currentPath: string;
+  constructor (private router: Router) {}
 
-  constructor(private router: Router) { }
-
-  ngOnInit(): void {
-    this.getCurrentPath();
+  ngOnInit (): void {
+    this.getCurrentPath()
   }
 
-  getCurrentPath(): void {
-    this.currentPath = this.router.url.replace("pending", "").replace("add", "");
+  getCurrentPath (): void {
+    this.currentPath = this.router.url.replace('pending', '').replace('add', '')
   }
 }

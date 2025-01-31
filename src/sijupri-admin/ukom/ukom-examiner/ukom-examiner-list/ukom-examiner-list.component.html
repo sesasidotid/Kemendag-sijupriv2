@@ -1,0 +1,69 @@
+<ng-container *ngIf="(tab$ | async) === 0">
+  <app-pagable [pagable]="pagable"></app-pagable>
+</ng-container>
+
+<ng-container *ngIf="(tab$ | async) === 1">
+  <app-ukom-examiner-add
+    (changeTabActive)="handleTabChange(0)"
+  ></app-ukom-examiner-add>
+</ng-container>
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Update Kompetensi'"
+  (toggle)="toggleModal()"
+  [enableFooter]="false"
+  [size]="'lg'"
+>
+  <form [formGroup]="editExaminerForm">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nama</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        required
+        formControlName="name"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="nip" class="form-label">NIP</label>
+      <input
+        type="text"
+        class="form-control"
+        id="nip"
+        required
+        formControlName="nip"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="jenis_kelamin_code" class="form-label">Jenis Kelamin</label>
+      <div class="option-wrapper">
+        <input
+          formControlName="jenis_kelamin_code"
+          type="radio"
+          name="jenis_kelamin_code"
+          id="jenisKelaminM"
+          value="M"
+          class="option-input"
+          required
+          [defaultChecked]="true"
+        />
+        <label for="jenisKelaminM" class="option-label">Laki-Laki</label>
+
+        <input
+          formControlName="jenis_kelamin_code"
+          type="radio"
+          name="jenis_kelamin_code"
+          id="jenisKelaminF"
+          value="F"
+          class="option-input"
+          required
+        />
+        <label for="jenisKelaminF" class="option-label">Perempuan</label>
+      </div>
+    </div>
+
+    <button (click)="submit()" class="btn btn-primary w-100">Update</button>
+  </form></app-modal
+>

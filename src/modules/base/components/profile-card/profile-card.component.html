@@ -1,24 +1,79 @@
 <div class="card card-profile">
-    <div class="card-body row p-4">
-        <div class="col-12">
-            <a *ngIf="this.currentRoute !== '/'" routerLink="" class="btn btn-sm btn-soft-danger float-end">Kembali</a>
-            <a *ngIf="this.currentRoute === '/'" routerLink="/profile" class="btn btn-sm btn-soft-primary float-end">Lihat Detail</a>
-        </div>
-        <div class="col-12 text-center">
-            <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
-                <img src="assets/avatar.jpg" class="  rounded-circle avatar-xl img-thumbnail user-profile-image"
-                    alt="user-profile-image">
-                <div routerLink="profile" class="avatar-xs p-0 rounded-circle profile-photo-edit">
-                    <a class="profile-img-file-input"></a>
-                    <label class="profile-photo-edit avatar-xs">
-                        <span class="avatar-title rounded-circle bg-light text-body">
-                            <i class="ri-pencil-line"></i>
-                        </span>
-                    </label>
-                </div>
-            </div>
-            <h5 class="fs-16 mb-1 text-white">{{name}}</h5>
-            <h5 class="text-muted fs-10 mb-1">NIP : {{nip}}</h5>
-        </div>
+  <div class="card-body row p-4">
+    <div class="col-12">
+      <a
+        *ngIf="this.currentRoute !== '/'"
+        routerLink=""
+        class="btn btn-sm btn-soft-danger float-end"
+        >Kembali</a
+      >
+      <a
+        *ngIf="this.currentRoute === '/'"
+        routerLink="/profile"
+        class="btn btn-sm btn-soft-primary float-end"
+        >Lihat Detail</a
+      >
     </div>
+    <!-- <div class="col-12 text-center">
+      <div class="profile-user position-relative d-inline-block mx-auto mb-4">
+        <img
+          [src]="profileImageSrc"
+          class="rounded-circle avatar-xl img-thumbnail user-profile-image"
+          alt="user-profile-image"
+        />
+        <div class="avatar-xs p-0 rounded-circle profile-photo-edit">
+          <a class="profile-img-file-input"></a>
+          <label class="profile-photo-edit avatar-xs">
+            <span class="avatar-title rounded-circle bg-light text-body">
+              <i class="ri-pencil-line"></i>
+            </span>
+          </label>
+        </div>
+      </div>
+    </div> -->
+    <div class="col-12 text-center">
+      <div class="profile-user position-relative d-inline-block mx-auto mb-4">
+        <div
+          class="image-container"
+          *ngIf="file || filePreview; else placeholder"
+        >
+          <img
+            [src]="filePreview || profileImageSrc"
+            class="rounded-circle avatar-xl img-thumbnail user-profile-image"
+            alt="user-profile-image"
+          />
+        </div>
+
+        <ng-template #placeholder>
+          <img
+            [src]="profileImageSrc"
+            class="rounded-circle avatar-xl img-thumbnail user-profile-image"
+            alt="user-profile-image"
+          />
+        </ng-template>
+
+        <label for="avatar-input-file">
+          <div class="icon-wrapper">
+            <input
+              type="file"
+              id="avatar-input-file"
+              accept="image/*"
+              (change)="onFileChange($event)"
+            />
+            <i class="ri-pencil-line"></i>
+          </div>
+        </label>
+      </div>
+
+      <h5 class="fs-16 mb-1 text-white">{{ name }}</h5>
+      <h5 class="text-muted fs-10 mb-1">NIP : {{ nip }}</h5>
+      <button
+        *ngIf="file"
+        class="btn btn-primary mt-3"
+        (click)="saveProfileImage()"
+      >
+        Save Profile Image
+      </button>
+    </div>
+  </div>
 </div>

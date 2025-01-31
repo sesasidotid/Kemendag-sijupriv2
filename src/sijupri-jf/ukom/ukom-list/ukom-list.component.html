@@ -1,1 +1,31 @@
-<p>ukom-list works!</p>
+<section>
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">Jadwal UKom Mendatang</h4>
+    <div class="flex-shrink-0"></div>
+  </div>
+  <div class="card-body">
+    <div *ngIf="ukomSchedule?.examScheduleDtoList?.length > 0; else emptyState">
+      <app-pagable [pagable]="jadwalPagable"></app-pagable>
+    </div>
+    <ng-template #emptyState>
+      <app-empty-state
+        [title]="'Anda belum ada jadwal UKom'"
+        [description]="
+          'Anda bisa mendaftar di menu Pendaftaran UKom atau pengajuan kamu masih dalam proses verifikasi'
+        "
+      >
+      </app-empty-state>
+    </ng-template>
+  </div>
+</section>
+
+<section>
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">Daftar Riwayat Ukom</h4>
+    <div class="flex-shrink-0"></div>
+  </div>
+
+  <div class="card-body">
+    <app-pagable [pagable]="pagable"></app-pagable>
+  </div>
+</section>

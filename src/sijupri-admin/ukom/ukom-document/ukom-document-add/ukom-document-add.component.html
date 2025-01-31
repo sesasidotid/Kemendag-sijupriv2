@@ -1,0 +1,85 @@
+<section>
+  <form [formGroup]="documentForm" (ngSubmit)="submit()">
+    <div class="row mb-3">
+      <label for="exam_start_at" class="col-sm-2 col-form-label fw-bold"
+        >Nama Dokumen <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="text"
+          id="dokumenPersyaratanName"
+          class="form-control"
+          name="dokumenPersyaratanName"
+          formControlName="dokumenPersyaratanName"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            documentForm.get('dokumenPersyaratanName').invalid &&
+            documentForm.get('dokumenPersyaratanName').touched
+          "
+        >
+          <small
+            *ngIf="documentForm.get('dokumenPersyaratanName').errors?.['required']"
+            >Nama dokumen mulai perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="jenisUkom" class="col-sm-2 col-form-label fw-bold"
+        >Jenis Ukom <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <select
+          id="jenisUkom"
+          class="form-select"
+          name="jenisUkom"
+          formControlName="jenisUkom"
+        >
+          <option value="KENAIKAN_JENJANG">Kenaikan Jenjang</option>
+          <option value="PERPINDAHAN_JABATAN">Perpindahan Jabatan</option>
+          <option value="PROMOSI">Promosi</option>
+        </select>
+        <div
+          class="feedback"
+          *ngIf="
+            documentForm.get('jenisUkom').invalid &&
+            documentForm.get('jenisUkom').touched
+          "
+        >
+          <small *ngIf="documentForm.get('jenisUkom').errors?.['required']"
+            >Jenis ukom perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row text-center">
+      <div class="col-12">
+        <ng-container *ngIf="submitLoading$ | async; else noLoading">
+          <button class="btn btn-primary float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-primary float-end"
+            [disabled]="documentForm.invalid || (submitLoading$ | async)"
+          >
+            Simpan
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </form>
+</section>

@@ -1,133 +1,152 @@
 <div class="row">
-    <div class="col-xl-4">
-        <div class="card card-profile shadow-sm">
-            <div class="card-body p-4">
-                <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="profile-user">
-                            <img src="assets/avatar.jpg" class="rounded-circle avatar-md img-thumbnail user-profile-image" alt="user-profile-image">
-                        </div>
-                        <span class="badge rounded-pill text-bg-success">Aktif</span>
-                    </div>
-                    <div class="mt-3">
-                        <h4 class="text-white fs-18">{{jf.name}}</h4>
-                        <h6 class="text-muted fs-14">NIP : {{jf.nip}}</h6>
-                    </div>
-                    <hr class="text-white"/>
-                    <div class="row text-white">
-                        <!-- First Name -->
-                        <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
-                                NIK
-                            </label>
-                            <p class="text-muted">{{jf.nik ? jf.nik : '-'}}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
-                                Jenis Kelamin
-                            </label>
-                            <p class="text-muted">{{jf.jenisKelaminName ? jf.jenisKelaminName : '-'}}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
-                                Tempat Lahir
-                            </label>
-                            <p class="text-muted">{{jf.tempatLahir ? jf.tempatLahir : '-'}}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
-                                Tanggal Lahir
-                            </label>
-                            <p class="text-muted">{{jf.tanggalLahir ? jf.tanggalLahir : '-'}}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
-                                Email
-                            </label>
-                            <p class="text-muted">{{jf.email ? jf.email : '-'}}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
-                                No. HP
-                            </label>
-                            <p class="text-muted">{{jf.phone ? jf.phone : '-'}}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
-                                KTP
-                            </label>
-                            <p class="text-muted">{{jf.ktp ? jf.ktp : '-'}}</p>
-                        </div>
-                    </div>
-                </div>
+  <div class="col-xl-4">
+    <div class="card card-profile shadow-sm">
+      <div class="card-body p-4">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="profile-user">
+              <img
+                [src]="profileImageSrc"
+                class="rounded-circle avatar-md img-thumbnail user-profile-image"
+                alt="user-profile-image"
+              />
             </div>
+            <span class="badge rounded-pill text-bg-success">Aktif</span>
+          </div>
+          <div class="mt-3">
+            <h4 class="text-white fs-18">{{ jf.name }}</h4>
+            <h6 class="text-muted fs-14">NIP : {{ jf.nip }}</h6>
+          </div>
+          <hr class="text-white" />
+          <div class="row text-white">
+            <!-- First Name -->
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label"> NIK </label>
+              <p class="text-muted">{{ jf.nik ? jf.nik : '-' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Jenis Kelamin
+              </label>
+              <p class="text-muted">
+                {{ jf.jenisKelaminName ? jf.jenisKelaminName : '-' }}
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Tempat Lahir
+              </label>
+              <p class="text-muted">
+                {{ jf.tempatLahir ? jf.tempatLahir : '-' }}
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Tanggal Lahir
+              </label>
+              <p class="text-muted">
+                {{ jf.tanggalLahir ? jf.tanggalLahir : '-' }}
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label"> Email </label>
+              <p class="text-muted">{{ jf.email ? jf.email : '-' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label"> No. HP </label>
+              <p class="text-muted">{{ jf.phone ? jf.phone : '-' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label"> KTP </label>
+              <p class="text-muted">{{ jf.ktp ? jf.ktp : '-' }}</p>
+            </div>
+          </div>
         </div>
-        
+      </div>
     </div>
-    <div class="col-xl-8">
-        <div class="card">
-            <div class="card-header">
-                <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0 flex-wrap" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" role="tab" href="#Pendidikan">
-                            <i class="mdi mdi-school me-1"></i>
-                            Riwayat Pendidikan
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Pangkat">
-                            <i class="mdi mdi-star me-1"></i>
-                            Riwayat Pangkat
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Jabatan">
-                            <i class="mdi mdi-briefcase me-1"></i>
-                            Riwayat Jabatan
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Kinerja">
-                            <i class="mdi mdi-chart-box me-1"></i>
-                            Riwayat Kinerja
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Kompetensi">
-                            <i class="mdi mdi-file-certificate me-1"></i>
-                            Riwayat Kompetensi
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Sertifikasi">
-                            <i class="mdi mdi-certificate me-1"></i>
-                            Riwayat Sertifikasi
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body">
-                <div class="tab-content">
-                    <div class="tab-pane active" id="Pendidikan" role="tabpanel">
-                        <app-rw-pendidikan-list></app-rw-pendidikan-list>
-                    </div>
-                    <div class="tab-pane" id="Pangkat" role="tabpanel">
-                        <app-rw-pangkat-list></app-rw-pangkat-list>
-                    </div>
-                    <div class="tab-pane" id="Jabatan" role="tabpanel">
-                        <app-rw-jabatan-list></app-rw-jabatan-list>
-                    </div>
-                    <div class="tab-pane" id="Kinerja" role="tabpanel">
-                        <app-rw-kinerja-list></app-rw-kinerja-list>
-                    </div>
-                    <div class="tab-pane" id="Kompetensi" role="tabpanel">
-                        <app-rw-kompetensi-list></app-rw-kompetensi-list>
-                    </div>
-                    <div class="tab-pane" id="Sertifikasi" role="tabpanel">
-                        <app-rw-sertifikasi-list></app-rw-sertifikasi-list>
-                    </div>
-                </div>
-            </div>
+  </div>
+  <div class="col-xl-8">
+    <div class="card">
+      <div class="card-header">
+        <ul
+          class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0 flex-wrap"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              class="nav-link active"
+              data-bs-toggle="tab"
+              role="tab"
+              href="#Pendidikan"
+            >
+              <i class="mdi mdi-school me-1"></i>
+              Riwayat Pendidikan
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Pangkat">
+              <i class="mdi mdi-star me-1"></i>
+              Riwayat Pangkat
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Jabatan">
+              <i class="mdi mdi-briefcase me-1"></i>
+              Riwayat Jabatan
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" role="tab" href="#Kinerja">
+              <i class="mdi mdi-chart-box me-1"></i>
+              Riwayat Kinerja
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              role="tab"
+              href="#Kompetensi"
+            >
+              <i class="mdi mdi-file-certificate me-1"></i>
+              Riwayat Kompetensi
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              role="tab"
+              href="#Sertifikasi"
+            >
+              <i class="mdi mdi-certificate me-1"></i>
+              Riwayat Sertifikasi
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body">
+        <div class="tab-content">
+          <div class="tab-pane active" id="Pendidikan" role="tabpanel">
+            <app-rw-pendidikan-list></app-rw-pendidikan-list>
+          </div>
+          <div class="tab-pane" id="Pangkat" role="tabpanel">
+            <app-rw-pangkat-list></app-rw-pangkat-list>
+          </div>
+          <div class="tab-pane" id="Jabatan" role="tabpanel">
+            <app-rw-jabatan-list></app-rw-jabatan-list>
+          </div>
+          <div class="tab-pane" id="Kinerja" role="tabpanel">
+            <app-rw-kinerja-list></app-rw-kinerja-list>
+          </div>
+          <div class="tab-pane" id="Kompetensi" role="tabpanel">
+            <app-rw-kompetensi-list></app-rw-kompetensi-list>
+          </div>
+          <div class="tab-pane" id="Sertifikasi" role="tabpanel">
+            <app-rw-sertifikasi-list></app-rw-sertifikasi-list>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>

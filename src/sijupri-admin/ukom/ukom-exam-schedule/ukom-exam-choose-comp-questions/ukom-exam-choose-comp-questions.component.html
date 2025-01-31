@@ -1,0 +1,123 @@
+<section>
+  <div class="row mb-3">
+    <label for="" class="col-sm-2 col-form-label fw-bold">Nama Kelas</label>
+    <div class="col-sm-10 pt-2">
+      <p>: {{ RoomUkomDetail.name }}</p>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <label for="name" class="col-sm-2 col-form-label fw-bold">
+      Waktu Mulai
+    </label>
+    <div class="col-sm-10 pt-2">
+      <p>: {{ ExamDetail.startTime }}</p>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <label for="name" class="col-sm-2 col-form-label fw-bold">
+      Waktu Selesai
+    </label>
+    <div class="col-sm-10 pt-2">
+      <p>: {{ ExamDetail.endTime }}</p>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <label for="name" class="col-sm-2 col-form-label fw-bold">
+      Jenis Ujian
+    </label>
+    <div class="col-sm-10 pt-2">
+      <p>: {{ ExamDetail.examTypeCode }}</p>
+    </div>
+  </div>
+</section>
+
+<section class="mt-5">
+  <h5>List Kompetensi</h5>
+  <div class="row mb-3" *ngFor="let kompetensi of UkomRoomKompetensi">
+    <div class="row mb-3">
+      <label for="name" class="col-sm-2 col-form-label fw-bold">
+        Kompetensi
+      </label>
+      <div class="col-sm-10 pt-2">
+        <p>: {{ kompetensi.name }}</p>
+        <button
+          class="btn btn-sm btn-secondary"
+          (click)="openModal(kompetensi.id)"
+        >
+          Choose Questions
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="col-lg-12">
+    <div class="hstack gap-2 justify-content-end align-items-center">
+      <p class="mb-0">Jumlah Pertanyaan: {{ questCheckedList.length }}</p>
+      <a class="btn btn-sm btn-success" (click)="submit()">Simpan</a>
+    </div>
+  </div>
+</section>
+
+<section *ngIf="listSavedQuestion.length > 0" class="mt-5">
+  <div class="row question-container mb-3 pb-2">
+    <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
+    <div class="col-sm-12 mt-2">
+      <ng-container *ngFor="let pertanyaan of listSavedQuestion; index as i">
+        <div class="row card">
+          <label for="" class="col-12 col-form-label fw-bold mb-1"
+            >Pertanyaan {{ i + 1 }}</label
+          >
+          <div class="col">
+            <p>{{ pertanyaan.question }}</p>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Pilih pertanyaan'"
+  (toggle)="toggleModal()"
+  [size]="'lg'"
+  [enableFooter]="false"
+>
+  <form>
+    <div class="mb-3">
+      <input
+        type="text"
+        placeholder="Search questions..."
+        class="form-control"
+        [(ngModel)]="filterText"
+        (ngModelChange)="onSearchChange($event)"
+        [ngModelOptions]="{ standalone: true }"
+      />
+    </div>
+
+    <div
+      class="checklist-container"
+      *ngFor="let question of filteredQuestions$ | async"
+    >
+      <label class="checklist-item">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          [name]="'question-' + question.id"
+          [(ngModel)]="question.checked"
+          (change)="onQuestionSelect(question)"
+        />
+        <span class="checklist-label">{{ question.question }}</span>
+      </label>
+    </div>
+
+    <div *ngIf="(filteredQuestions$ | async)?.length === 0">
+      No questions found.
+    </div>
+  </form>
+</app-modal>

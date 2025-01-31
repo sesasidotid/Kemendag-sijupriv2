@@ -10,8 +10,14 @@ import {
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
-import { TabService } from '../../../../modules/base/services/tab.service'
 import { Router, RouterLink } from '@angular/router'
+import { ApiService } from '../../../../modules/base/services/api.service'
+import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
+import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
+import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
+import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 @Component({
   selector: 'app-ukom-class-add',
@@ -33,65 +39,93 @@ export class UkomClassAddComponent {
   kelasForm: FormGroup
   submitLoading$ = new BehaviorSubject<boolean>(false)
 
-  //change after api integration
-  kelasData: any = []
-  pengawasKelasList: any[] = [
-    { id: 1, nama: 'Pengawas 1' },
-    { id: 2, nama: 'Pengawas 2' }
-  ]
+  kelasData: RoomUkom = new RoomUkom()
+  jabatanList$: Observable<Jabatan[]>
+  jenjangList$: Observable<Jenjang[]>
 
   constructor (
     private confirmationService: ConfirmationService,
-    private tabService: TabService,
-    private router: Router
+    private router: Router,
+    private apiService: ApiService,
+    private handlerService: HandlerService
   ) {
     this.kelasForm = new FormGroup({
-      tempat: new FormControl('', [Validators.required]),
-      tanggal: new FormControl('', [Validators.required]),
-      jam: new FormControl('', [Validators.required]),
-      'pengawas kelas': new FormControl('', [Validators.required])
+      name: new FormControl('', Validators.required),
+      jabatan: new FormControl('', Validators.required),
+      jenjang: new FormControl('', Validators.required),
+      participant_quota: new FormControl('', Validators.required),
+      exam_start_at: new FormControl('', Validators.required),
+      exam_end_at: new FormControl('', Validators.required)
     })
   }
 
   ngOnInit () {
-    // if (this.tabService.getTabsLength() > 0) {
-    //   this.tabService.clearTabs()
-    // }
-    // this.tabService
-    //   .addTab({
-    //     label: 'Daftar Kelas',
-    //     icon: 'mdi-list-box',
-    //     onClick: () => this.handleTabChange(0)
-    //   })
-    //   .addTab({
-    //     label: 'Tambah Kelas',
-    //     isActive: true,
-    //     icon: 'mdi-plus-circle',
-    //     onClick: () => this.handleTabChange(1)
-    //   })
+    this.jabatanList$ = this.apiService
+      .getData(`/api/v1/jabatan`)
+      .pipe(
+        map(response =>
+          response.map(
+            (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+          )
+        )
+      )
+
+    this.jabatanList$.subscribe(jabatanList => {
+      console.log(jabatanList)
+    })
   }
 
-  //   handleTabChange (tab?: number) {
-  //     this.tab$.next(tab)
-  //     this.tabService.changeTabActive(tab)
-  //   }
+  getListJenjang (jabatanCode: string) {
+    this.jenjangList$ = this.apiService
+      //   .getData(`/api/v1/jenjang`)
+      .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
+      .pipe(
+        map(response =>
+          response.map(
+            (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+          )
+        )
+      )
+  }
+  onJabatanSwitch (event: Event) {
+    const jabatanCode = (event.target as HTMLSelectElement).value
 
+    if (jabatanCode) {
+      this.getListJenjang(jabatanCode)
+    }
+  }
   submit () {
     this.confirmationService.open(false).subscribe({
       next: result => {
         if (!result.confirmed) return
-        this.submitLoading$.next(true),
-          (this.kelasData.tempat = this.kelasForm.get('tempat')?.value),
-          (this.kelasData.tanggal = this.kelasForm.get('tanggal')?.value),
-          (this.kelasData.jam = this.kelasForm.get('jam')?.value),
-          (this.kelasData.pengawas = this.kelasForm.get('pengawas')?.value)
 
-        console.log(this.kelasData)
+        this.submitLoading$.next(true)
 
-        setTimeout(() => {
-          this.submitLoading$.next(false)
-          this.router.navigate(['/ukom/ukom-periode'])
-        }, 2000)
+        this.kelasData.name = this.kelasForm.get('name')?.value
+        this.kelasData.jabatan_code = this.kelasForm.get('jabatan')?.value
+        this.kelasData.jenjang_code = this.kelasForm.get('jenjang')?.value
+        this.kelasData.participant_quota =
+          this.kelasForm.get('participant_quota')?.value
+        this.kelasData.exam_start_at =
+          this.kelasForm.get('exam_start_at')?.value
+        this.kelasData.exam_end_at = this.kelasForm.get('exam_end_at')?.value
+
+        this.apiService
+          .postData(`/api/v1/room_ukom`, this.kelasData)
+          .subscribe({
+            next: (response: any) => {
+              this.router.navigate(['/ukom/ukom-room-list'])
+              this.changeTabActive.emit(0)
+            },
+            error: error => {
+              this.submitLoading$.next(false)
+              this.handlerService.handleException(error)
+            },
+            complete: () => {
+              this.submitLoading$.next(false)
+              this.router.navigate(['/ukom/ukom-room-list'])
+            }
+          })
       }
     })
   }

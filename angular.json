@@ -59,7 +59,8 @@
               "src/assets/Velzon/build/css/custom.min.css",
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/ag-grid-community/styles/ag-grid.css",
-              "node_modules/ag-grid-community/styles/ag-theme-alpine.css"
+              "node_modules/ag-grid-community/styles/ag-theme-alpine.css",
+              "node_modules/cropperjs/dist/cropper.css"
             ],
             "scripts": [
               "src/assets/Velzon/build/js/layout.js",
@@ -69,7 +70,8 @@
               "src/assets/Velzon/build/libs/feather-icons/feather.min.js",
               "src/assets/Velzon/build/js/pages/plugins/lord-icon-2.1.0.js",
               "src/assets/Velzon/build/js/plugins.js",
-              "src/assets/Velzon/build/js/app.js"
+              "src/assets/Velzon/build/js/app.js",
+              "node_modules/cropperjs/dist/cropper.js"
             ]
           },
           "configurations": {

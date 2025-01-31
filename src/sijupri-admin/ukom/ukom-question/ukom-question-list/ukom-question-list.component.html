@@ -1,0 +1,41 @@
+<!-- <ng-container *ngIf="(tab$ | async) === 0">
+  <h1>list</h1>
+</ng-container>
+<ng-container *ngIf="(tab$ | async) === 1">
+  <app-ukom-question-add
+    (changeTabActive)="handleTabChange(0)"
+  ></app-ukom-question-add>
+</ng-container> -->
+
+<section>
+  <form [formGroup]="templatePertanyaanForm" (ngSubmit)="submit()">
+    <div class="col-lg-12 mb-3">
+      <label for="jenisUkomInput">Jenis Ukom *</label>
+      <select
+        id="jenis_ukom_code"
+        name="jenis_ukom_code"
+        class="form-select"
+        formControlName="jenis_ukom_code"
+      >
+        <option
+          *ngFor="let jenisUkom of examTypeList$ | async"
+          [value]="jenisUkom.code"
+        >
+          {{ jenisUkom.code }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-lg-12">
+      <div class="row">
+        <app-file-handler [inputs]="inputs"></app-file-handler>
+      </div>
+    </div>
+
+    <div class="row text-center">
+      <div class="col-12">
+        <button type="submit" class="btn btn-success float-end">Import</button>
+      </div>
+    </div>
+  </form>
+</section>

@@ -1,20 +1,37 @@
 <div class="modal show d-block" tabindex="-1" aria-modal="true" role="dialog">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-light pb-3">
-          <h5 class="modal-title">{{ title }}</h5>
-          <button type="button" class="btn-close" aria-label="Close" (click)="toggleModal()"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Content from parent component will be injected here -->
-          <ng-content></ng-content>
-        </div>
-        <div *ngIf="enableFooter" class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="toggleModal()">Close</button>
-          <button type="button" class="btn btn-primary" (click)="save()">Save</button>
-        </div>
+  <div
+    class="modal-dialog modal-dialog-centered"
+    [ngClass]="{
+      'modal-sm-custom': size === 'sm',
+      'modal-md-custom': size === 'md',
+      'modal-lg-custom': size === 'lg',
+      '': size === ''
+    }"
+  >
+    <div class="modal-content">
+      <div class="modal-header bg-light pb-3">
+        <h5 class="modal-title">{{ title }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="toggleModal()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Content from parent component will be injected here -->
+        <ng-content></ng-content>
+      </div>
+      <div *ngIf="enableFooter" class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="toggleModal()">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" (click)="save()">
+          Save
+        </button>
       </div>
     </div>
+  </div>
 </div>
 
 <div class="modal-backdrop fade show"></div>

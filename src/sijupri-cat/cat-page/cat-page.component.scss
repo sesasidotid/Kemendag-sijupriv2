@@ -1,0 +1,105 @@
+.parent {
+  @media screen and (max-width: 768px) {
+    margin-left: 16px !important;
+    margin-right: 16px !important;
+    padding: 16px !important;
+  }
+
+  @media screen and (min-width: 768px) {
+    margin-left: 32px !important;
+    margin-right: 32px !important;
+    padding: 16px !important;
+  }
+
+  @media screen and (min-width: 1200px) {
+    margin-left: 200px !important;
+    margin-right: 200px !important;
+    padding: 32px !important;
+  }
+
+  margin-left: 160px !important;
+  margin-right: 160px !important;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+/* Add custom styles here */
+.center {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+.countdown-timer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem; /* Default size for large screens */
+  font-weight: bold;
+  background: #49ab49;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: fit-content;
+  margin: 20px auto;
+  transition: color 0.5s ease, background 0.5s ease;
+}
+
+// @media (max-width: 768px) {
+//   .countdown-timer {
+//     font-size: 2.5rem;
+//     padding: 15px 30px;
+//   }
+// }
+
+// @media (max-width: 480px) {
+//   .countdown-timer {
+//     font-size: 2rem;
+//     padding: 12px 24px;
+//   }
+// }
+
+.countdown-timer.warning {
+  background: #ff9800;
+  color: #fff;
+}
+
+.countdown-timer.danger {
+  background: #e53935;
+  color: #fff;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+.countdown-notification {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 30px auto;
+  text-align: center;
+}
+
+.warning-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ff9800;
+  color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  text-align: center;
+}

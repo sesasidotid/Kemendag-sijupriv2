@@ -14,6 +14,8 @@ import { HttpClient } from '@angular/common/http'
 })
 export class PagableComponent implements OnChanges {
   @Input() pagable!: Pagable
+  @Input() refresh!: boolean
+  @Input() specialS: string
 
   page: number = 1
   limit: number = 10
@@ -29,6 +31,10 @@ export class PagableComponent implements OnChanges {
         this.sortOrder[column.property] = ''
       })
       this.limit = this.pagable.limit
+      this.fetchData()
+    }
+
+    if (changes['refresh'] && !changes['refresh'].isFirstChange()) {
       this.fetchData()
     }
   }
@@ -98,29 +104,25 @@ export class PagableComponent implements OnChanges {
 
     const fetchObservable = isLocalEndpoint
       ? this.http.get(fetchUrl)
-      : this.apiService.getData(fetchUrl) // Use ApiService for other endpoints
+      : this.apiService.getData(fetchUrl)
 
     fetchObservable.subscribe({
       next: (response: any) => {
-        this.paginator = isLocalEndpoint ? { data: response } : response // Wrap response in data only for local endpoint
+        // Wrap response in data only if it isn't already wrapped
+        this.paginator = response?.data ? response : { data: response }
         this.onLoad = false
+
+        if (this.paginator.data?.roomUkomDto?.examScheduleDtoList) {
+          this.paginator.data =
+            this.paginator.data.roomUkomDto.examScheduleDtoList
+        }
+
         console.log(this.paginator)
       },
       error: e => {
         console.error('Error fetching data', e)
       }
     })
-
-    // this.apiService.getData(`${this.pagable.endpoint}${query}`).subscribe({
-    //   next: (response: any) => {
-    //     this.paginator = response
-    //     this.onLoad = false
-    //   },
-    //   error: e => {
-    //     console.error('Error fetching data', e)
-    //     // Optional: Add user-friendly error handling here
-    //   }
-    // })
   }
 
   getPropertyValue (object: any, property: string): any {
@@ -154,6 +156,13 @@ export class PagableComponent implements OnChanges {
   }
 
   toggleSort (columnProperty: string): void {
+    const column = this.pagable.primaryColumnList.find(
+      col => col.property === columnProperty
+    )
+    if (column && column.dynamic) {
+      return
+    }
+
     switch (this.sortOrder[columnProperty]) {
       case '':
         this.sortOrder[columnProperty] = 'asc'
@@ -165,6 +174,7 @@ export class PagableComponent implements OnChanges {
         this.sortOrder[columnProperty] = ''
         break
     }
+
     this.fetchData()
   }
 

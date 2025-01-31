@@ -1,11 +1,65 @@
 .card-profile {
-    background-color: #13182B;
-     /* SVG pattern overlay */
-     background-image: 
-     url('/assets/sun.svg');
+  background-color: #13182b;
+  /* SVG pattern overlay */
+  background-image: url('/assets/sun.svg');
 
-     /* Cover styling */
-     background-size: contain;
-     background-repeat: repeat;
-     background-blend-mode: overlay;
+  /* Cover styling */
+  background-size: contain;
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+}
+
+.avatar-container {
+  position: relative;
+  width: fit-content;
+}
+
+.image-container {
+  position: relative;
+  z-index: 1;
+  //   border-radius: 50%;
+  //   background-color: #fff;
+  background-position: center;
+  background-size: cover;
+  //   box-shadow: 0 10px 20px 20px #6c93001a;
+
+  &.avatar-placeholder {
+    background-image: url('/assets/sun.svg');
+  }
+}
+
+.icon-wrapper {
+  position: absolute;
+  height: 30px;
+  width: 30px;
+  padding: 0.35rem;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 0;
+  top: 75%;
+  z-index: 2;
+  cursor: pointer;
+
+  &:hover {
+    transition: all 0.25s;
+    background-color: darken(#2962ff, 15%);
+  }
+
+  .icon {
+    color: white;
+  }
+
+  label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input[type='file'] {
+    display: none;
+  }
 }

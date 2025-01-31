@@ -1,155 +1,200 @@
 <div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <h4 class="card-title mb-0 flex-grow-1">Pendaftaran Ukom</h4>
-                <div class="flex-shrink-0">
-                </div>
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Pendaftaran Ukom</h4>
+        <div class="flex-shrink-0"></div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="mb-3">
+              <label for="firstnameInput" class="form-label">
+                First Name
+              </label>
+              <p class="border-bottom">{{ pesertaUkom.name }}</p>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="mb-3">
-                            <label for="firstnameInput" class="form-label">
-                                First Name
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.name}}</p>
-                        </div>
-                    </div>
-                    <!--end col-->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="lastnameInput" class="form-label">
-                                No. HP
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.phone}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Email
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.email}}</p>
-                        </div>
-                    </div>
-                    <!--end col-->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Tempat Lahir
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.tempatLahir}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Tanggal Lahir
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.tanggalLahir}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Jenis Kelamin
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.jenisKelaminName}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                NIK
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.nik}}</p>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Jabatan
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.jabatanName}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Jabatan Yang Dituju
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.nextJabatanName}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Jenjang
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.jenjangName}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Jenjang Yang Dituju
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.nextJenjangName}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Pangkat
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.pangkatName}}</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label">
-                                Pangkat Yang Dituju
-                            </label>
-                            <p class="border-bottom">{{pesertaUkom.nextPangkatName}}</p>
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <!--end col-->
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="lastnameInput" class="form-label"> No. HP </label>
+              <p class="border-bottom">{{ pesertaUkom.phone }}</p>
             </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label"> Email </label>
+              <p class="border-bottom">{{ pesertaUkom.email }}</p>
+            </div>
+          </div>
+          <!--end col-->
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label"> Tempat Lahir </label>
+              <p class="border-bottom">{{ pesertaUkom.tempatLahir }}</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label"> Tanggal Lahir </label>
+              <p class="border-bottom">{{ pesertaUkom.tanggalLahir }}</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label"> Jenis Kelamin </label>
+              <p class="border-bottom">{{ pesertaUkom.jenisKelaminName }}</p>
+            </div>
+          </div>
+          <div class="col-lg-12">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label"> NIK </label>
+              <p class="border-bottom">{{ pesertaUkom.nik }}</p>
+            </div>
+          </div>
+          <hr />
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label"> Jabatan </label>
+              <p class="border-bottom">{{ pesertaUkom.jabatanName }}</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label">
+                Jabatan Yang Dituju
+              </label>
+              <p class="border-bottom">{{ pesertaUkom.nextJabatanName }}</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label"> Jenjang </label>
+              <p class="border-bottom">{{ pesertaUkom.jenjangName }}</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label">
+                Jenjang Yang Dituju
+              </label>
+              <p class="border-bottom">{{ pesertaUkom.nextJenjangName }}</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label"> Pangkat </label>
+              <p class="border-bottom">{{ pesertaUkom.pangkatName }}</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label for="emailInput" class="form-label">
+                Pangkat Yang Dituju
+              </label>
+              <p class="border-bottom">{{ pesertaUkom.nextPangkatName }}</p>
+            </div>
+          </div>
         </div>
-
-        <div class="card card-body">
-            <div *ngFor="let dokumenPeserta of pesertaUkom.dokumenPesertaUkom; index as i" class="row mb-3">
-                <label for="" class="col-sm-2 col-form-label fw-bold">{{dokumenPeserta.dokumenName}}</label>
-                <div class="col-sm-10">
-                    <tr>
-                        <td>
-                            <a class="btn btn-sm btn-info ms-2"
-                                (click)="preview(dokumenPeserta.dokumenName, dokumenPeserta.dokumenUrl)">lihat</a>
-                        </td>
-                        <td>
-                            <div class="ms-2">
-                                <input type="radio" class="btn-check" name="options-outlined_{{i}}"
-                                    (click)="onFIleSwitch(i, 'APPROVE')" id="btn-approve-toggle_{{i}}"
-                                    autocomplete="off" checked>
-                                <label class="btn btn-sm btn-soft-success" for="btn-approve-toggle_{{i}}">Terima</label>
-
-                                <input type="radio" class="btn-check" name="options-outlined_{{i}}"
-                                    (click)="onFIleSwitch(i, 'REJECT')" id="btn-reject-toggle_{{i}}" autocomplete="off">
-                                <label class="btn btn-sm btn-soft-danger" for="btn-reject-toggle_{{i}}">Tolak</label>
-                            </div>
-                        </td>
-                    </tr>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="hstack gap-2 justify-content-end">
-                    <a *ngIf="isApproveEnable" class="btn btn-sm btn-soft-success me-1"
-                        (click)="submit(false)">Terima</a>
-                    <a class="btn btn-sm btn-soft-danger" (click)="submit(true)">Tolak</a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+
+    <div class="card card-body">
+      <div
+        *ngFor="let dokumenPeserta of pesertaUkom.dokumenUkomList; index as i"
+        class="row mb-3"
+      >
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          {{ dokumenPeserta.dokumenPersyaratanName }}
+        </label>
+        <div class="col-sm-10">
+          <div class="row">
+            <div class="col">
+              <a
+                class="btn btn-sm btn-info ms-2"
+                (click)="
+                  preview(dokumenPeserta.dokumenName, dokumenPeserta.dokumenUrl)
+                "
+                >lihat</a
+              >
+            </div>
+            <div class="col">
+              <div
+                class=""
+                *ngIf="
+                  !isDocumentApproved(dokumenPeserta.dokumenPersyaratanId) ||
+                    dokumenPeserta.dokumenStatus === 'REJECT';
+                  else Approved
+                "
+              >
+                <div
+                  *ngIf="pendingTask.flowId !== 'ukom_flow_2'; else Disapproved"
+                >
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="options-outlined_{{ i }}"
+                    (click)="onFIleSwitch(i, 'APPROVE')"
+                    id="btn-approve-toggle_{{ i }}"
+                    autocomplete="off"
+                    checked
+                  />
+                  <label
+                    class="btn btn-sm btn-soft-success"
+                    for="btn-approve-toggle_{{ i }}"
+                    >Terima</label
+                  >
+
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="options-outlined_{{ i }}"
+                    (click)="onFIleSwitch(i, 'REJECT')"
+                    id="btn-reject-toggle_{{ i }}"
+                    autocomplete="off"
+                  />
+                  <label
+                    class="btn btn-sm btn-soft-danger"
+                    for="btn-reject-toggle_{{ i }}"
+                    >Tolak</label
+                  >
+                </div>
+              </div>
+              <ng-template #Approved>
+                <label class="btn btn-sm btn-soft-success" aria-disabled="true"
+                  >Disetujui</label
+                >
+              </ng-template>
+              <ng-template #Disapproved>
+                <label class="btn btn-sm btn-soft-danger" aria-disabled="true"
+                  >Menunggu Perbaikan</label
+                >
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-12">
+        <div
+          class="hstack gap-2 justify-content-end"
+          *ngIf="
+            !(
+              pendingTask?.flowId === 'ukom_flow_2' &&
+              pendingTask?.taskStatus === 'PENDING'
+            )
+          "
+        >
+          <a
+            *ngIf="isApproveEnable"
+            class="btn btn-success me-1"
+            (click)="submit(false)"
+            >Terima</a
+          >
+          <a class="btn btn-danger" (click)="submit(true)">Tolak</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

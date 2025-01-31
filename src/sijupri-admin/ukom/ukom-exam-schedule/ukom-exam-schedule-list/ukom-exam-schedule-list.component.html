@@ -1,0 +1,10 @@
+<ng-container *ngIf="(tab$ | async) === 0">
+  <!-- <app-pagable [pagable]="pagable"></app-pagable> -->
+  test
+</ng-container>
+
+<ng-container *ngIf="(tab$ | async) === 1">
+  <app-ukom-exam-schedule-add
+    (changeTabActive)="handleTabChange(0)"
+  ></app-ukom-exam-schedule-add>
+</ng-container>

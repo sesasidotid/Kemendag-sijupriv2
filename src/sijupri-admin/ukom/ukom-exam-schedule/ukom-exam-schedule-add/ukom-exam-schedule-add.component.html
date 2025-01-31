@@ -1,0 +1,123 @@
+<section>
+  <form [formGroup]="examScheduleForm" (ngSubmit)="submit()">
+    <div formArrayName="schedules">
+      <div
+        *ngFor="let schedule of schedules.controls; let i = index"
+        [formGroupName]="i"
+      >
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label for="" class="col-form-label fw-bold"
+              >Jadwal {{ i + 1 }}</label
+            >
+            <a
+              class="btn btn-sm btn-soft-danger"
+              *ngIf="i > 0"
+              (click)="removeSchedule(i)"
+              >Hapus</a
+            >
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label fw-bold">Waktu Mulai *</label>
+            <div class="col-sm-10">
+              <input
+                type="datetime-local"
+                formControlName="start_time"
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label fw-bold"
+              >Waktu Selesai *</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="datetime-local"
+                formControlName="end_time"
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label fw-bold">Jenis Ukom *</label>
+            <div class="col-sm-10">
+              <select formControlName="exam_type_code" class="form-select">
+                <option
+                  *ngFor="let jenisUkom of jenisUkomList$ | async"
+                  [value]="jenisUkom.code"
+                >
+                  {{ jenisUkom.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col-sm-12 text-end">
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="removeSchedule(i)"
+              >
+                Hapus Jadwal
+              </button>
+            </div>
+          </div> -->
+      </div>
+    </div>
+    <!-- <div class="row mb-3">
+      <div class="col-sm-12 text-center">
+        <button
+          type="button"
+          class="btn btn-success"
+          *ngIf="(jenisUkomList$ | async)?.length > schedules.length"
+          (click)="addSchedule()"
+        >
+          Tambah Jadwal
+        </button>
+      </div>
+    </div> -->
+    <div class="row text-center">
+      <div class="col-12">
+        <ng-container *ngIf="submitLoading$ | async; else noLoading">
+          <button class="btn btn-primary float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <div class="d-flex mb-3 justify-content-end gap-1">
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                *ngIf="(jenisUkomList$ | async)?.length > schedules.length"
+                (click)="addSchedule()"
+              >
+                Tambah Jadwal
+              </button>
+            </div>
+            <div>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="
+                  examScheduleForm.invalid || (submitLoading$ | async)
+                "
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </form>
+  <app-pagable [pagable]="pagable" [refresh]="refreshToggle"></app-pagable>
+</section>

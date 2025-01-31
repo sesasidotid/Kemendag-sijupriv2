@@ -1,65 +1,104 @@
 <div class="column">
-    <div class="">
-        <app-profile-card></app-profile-card>
+  <div class="">
+    <app-profile-card></app-profile-card>
+  </div>
+  <!--end col-->
+  <div class="">
+    <div class="card">
+      <div class="card-header" style="border-bottom: none">
+        <ul
+          class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              [routerLink]="'/profile'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              role="tab"
+            >
+              <i class="mdi mdi-card-account-details me-1"></i>
+              Detail Personal
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              [routerLink]="'/profile/rw-pendidikan'"
+              routerLinkActive="active"
+              role="tab"
+            >
+              <i class="mdi mdi-school me-1"></i>
+              Riwayat Pendidikan
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              [routerLink]="'/profile/rw-pangkat'"
+              routerLinkActive="active"
+              role="tab"
+            >
+              <i class="mdi mdi-star me-1"></i>
+              Riwayat Pangkat
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              [routerLink]="'/profile/rw-jabatan'"
+              routerLinkActive="active"
+              role="tab"
+            >
+              <i class="mdi mdi-briefcase me-1"></i>
+              Riwayat Jabatan
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              [routerLink]="'/profile/rw-kinerja'"
+              routerLinkActive="active"
+              role="tab"
+            >
+              <i class="mdi mdi-chart-box me-1"></i>
+              Riwayat Kinerja
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              [routerLink]="'/profile/rw-kompetensi'"
+              routerLinkActive="active"
+              role="tab"
+            >
+              <i class="mdi mdi-file-certificate me-1"></i>
+              Riwayat Kompetensi
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              [routerLink]="'/profile/rw-sertifikasi'"
+              routerLinkActive="active"
+              role="tab"
+            >
+              <i class="mdi mdi-certificate me-1"></i>
+              Riwayat Sertifikasi
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
-    <!--end col-->
-    <div class="">
-        <div class="card">
-            <div class="card-header" style="border-bottom: none;">
-                <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile'" routerLinkActive="active"
-                            [routerLinkActiveOptions]="{ exact: true }" role="tab">
-                            <i class="mdi mdi-card-account-details me-1"></i>
-                            Detail Personal
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-pendidikan'"
-                            routerLinkActive="active" role="tab">
-                            <i class="mdi mdi-school me-1"></i>
-                            Riwayat Pendidikan
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-pangkat'"
-                            routerLinkActive="active" role="tab">
-                            <i class="mdi mdi-star me-1"></i>
-                            Riwayat Pangkat
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-jabatan'"
-                            routerLinkActive="active" role="tab">
-                            <i class="mdi mdi-briefcase me-1"></i>
-                            Riwayat Jabatan
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-kinerja'"
-                            routerLinkActive="active" role="tab">
-                            <i class="mdi mdi-chart-box me-1"></i>
-                            Riwayat Kinerja
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-kompetensi'"
-                            routerLinkActive="active" role="tab">
-                            <i class="mdi mdi-file-certificate me-1"></i>
-                            Riwayat Kompetensi
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" [routerLink]="'/profile/rw-sertifikasi'"
-                            routerLinkActive="active" role="tab">
-                            <i class="mdi mdi-certificate me-1"></i>
-                            Riwayat Sertifikasi
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <router-outlet></router-outlet>
-    </div>
-    <!--end col-->
+    <router-outlet></router-outlet>
+  </div>
+  <!--end col-->
 </div>

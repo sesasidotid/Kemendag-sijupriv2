@@ -10,6 +10,14 @@ import {
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { LoginContext } from '../../../../modules/base/commons/login-context'
+import { TabService } from '../../../../modules/base/services/tab.service'
+import { BehaviorSubject } from 'rxjs'
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms'
 
 @Component({
   selector: 'app-ukom-task-list',
@@ -20,43 +28,88 @@ import { LoginContext } from '../../../../modules/base/commons/login-context'
 })
 export class UkomTaskListComponent {
   pagable: Pagable
+  pagable$ = new BehaviorSubject<Pagable | null>(null)
 
-  constructor (private router: Router) {
-    // this.pagable = new PagableBuilder('/api/v1/peserta_ukom/task/search')
-    this.pagable = new PagableBuilder(
-      'http://localhost:4200/assets/mockdata/ukom-list-mockdata.json'
+  constructor (private router: Router, private tabService: TabService) {
+    this.pagable$.next(
+      new PagableBuilder('/api/v1/participant_ukom/task/search')
+
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder('NIP', 'objectGroup').build()
+        )
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder('Nama', 'objectName').build()
+        )
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder('Proses', 'flowName').build()
+        )
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder('Last Update', 'lastUpdated').build()
+        )
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder('Status', 'taskStatus').build()
+        )
+        .addActionColumn(
+          new ActionColumnBuilder()
+            .setAction((pendingTask: any) => {
+              this.router.navigate([`/ukom/ukom-task-list/${pendingTask.id}`])
+            }, 'info')
+            .withIcon('detail')
+            .build()
+        )
+        .addFilter(
+          new PageFilterBuilder('equal')
+            .setProperty('flowId')
+            .withDefaultValue('ukom_flow_1')
+            .build()
+        )
+
+        .addFilter(
+          new PageFilterBuilder('like')
+            .setProperty('objectGroup')
+            .withField('NIP', 'text')
+            .build()
+        )
+        .addFilter(
+          new PageFilterBuilder('like')
+            .setProperty('objectName')
+            .withField('Nama', 'text')
+            .build()
+        )
+        .build()
     )
-      .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'NIP').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'Email').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'Nama').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Status', 'Status').build())
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((pendingTask: any) => {
-            this.router.navigate([`/ukom/ukom-task-list/${pendingTask.id}`])
-            // alert('Detail for peserta ukom, masih menunggu api sesungguhnya')
-          }, 'info')
-          .withIcon('detail')
-          .build()
+  }
+
+  ngOnInit () {
+    if (this.tabService.getTabsLength() > 0) {
+      this.tabService.clearTabs()
+    }
+
+    this.tabService
+      .addTab({
+        label: 'Verifikasi Pengajuan',
+        icon: 'mdi-list-box',
+        isActive: true,
+        onClick: () => this.handlePagableTabChange('ukom_flow_1', 0)
+      })
+      .addTab({
+        label: 'Perbaikan Dokumen',
+        icon: 'mdi-account-supervisor',
+        onClick: () => this.handlePagableTabChange('ukom_flow_2', 1)
+      })
+  }
+
+  handlePagableTabChange (tab: string, tabIndex: number) {
+    const currentPagable = this.pagable$.value
+
+    const updatedPagable = {
+      ...currentPagable,
+      filterLIst: currentPagable.filterLIst.map((item, index) =>
+        item.key === 'eq_flowId' ? { ...item, value: tab } : item
       )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('NIP')
-          .withField('NIP', 'text')
-          .build()
-      )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('Email')
-          .withField('Email', 'text')
-          .build()
-      )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('Nama')
-          .withField('Nama', 'text')
-          .build()
-      )
-      .build()
+    }
+
+    this.tabService.changeTabActive(tabIndex)
+    this.pagable$.next(updatedPagable)
   }
 }

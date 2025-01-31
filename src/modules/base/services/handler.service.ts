@@ -19,7 +19,7 @@ export class HandlerService {
         this.alertService.showToast('Info', 'Data sudah ada')
         break
       default:
-        this.alertService.showToast('Error', 'Masalaha Tidak Dijaga')
+        this.alertService.showToast('Error', 'Masalah Tidak Dijaga')
       // this.router.navigate(['/500']);
     }
   }

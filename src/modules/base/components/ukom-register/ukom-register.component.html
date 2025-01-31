@@ -1,0 +1,356 @@
+<div class="row card px-4 parent">
+  <div class="gradient-line"></div>
+  <h1 class="p-0">Pendafataran UKOM</h1>
+  <p class="mt-1 mb-0 text-muted p-0">
+    Silahkan isi form di bawah ini untuk mendaftar UKOM
+  </p>
+</div>
+
+<ng-template #hadCompleted>
+  <div class="flex flex-col items-center justify-center min-h-screen">
+    <div class="card parent bg-white shadow-lg rounded-2xl p-4 text-center">
+      <h1>{{ stringCode }}</h1>
+      <p class="text-success">
+        Silahkan simpan kode di atas untuk memantau status pendaftaran UKOM anda
+        atau download QR code di bawah
+      </p>
+      <div class="qrcodeImage">
+        <qrcode
+          [qrdata]="myAngularxQrCode"
+          [allowEmptyString]="true"
+          [alt]="'A custom alt attribute'"
+          [ariaLabel]="'QR Code image with the following content...'"
+          [cssClass]="'center'"
+          [colorDark]="'#000000'"
+          [colorLight]="'#ffffff'"
+          [elementType]="'img'"
+          [errorCorrectionLevel]="'M'"
+          [margin]="4"
+          [scale]="1"
+          [title]="'A custom title attribute'"
+          [width]="400"
+          class="mx-auto"
+          (qrCodeURL)="onChangeURL($event)"
+        ></qrcode>
+      </div>
+      <p class="mt-4 text-gray-700">
+        Silakan download dan simpan QR code ini untuk mengetahui <br />
+        status pendaftaran UKOM Anda.
+      </p>
+
+      <a
+        [href]="qrCodeDownloadLink"
+        download="qrcode"
+        class="btn btn-primary mt-3"
+        >Download</a
+      >
+    </div>
+  </div>
+</ng-template>
+
+<section *ngIf="registerComplete === false; else hadCompleted">
+  <div class="card parent">
+    <form [formGroup]="nonJFForm" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <label for="name" class="form-label">Nama</label>
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          required
+          formControlName="name"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          required
+          formControlName="email"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          required
+          formControlName="password"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="nip" class="form-label">NIP</label>
+        <input
+          type="text"
+          class="form-control"
+          id="nip"
+          required
+          formControlName="nip"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="nik" class="form-label">NIK</label>
+        <input
+          type="text"
+          class="form-control"
+          id="nik"
+          required
+          formControlName="nik"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="phone" class="form-label">Telepon</label>
+        <input
+          type="text"
+          class="form-control"
+          id="phone"
+          required
+          formControlName="phone"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="tempatLahir" class="form-label">Tempat Lahir</label>
+        <input
+          type="text"
+          class="form-control"
+          id="tempatLahir"
+          required
+          formControlName="tempatLahir"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="tanggalLahir" class="form-label">Tanggal Lahir</label>
+        <input
+          type="date"
+          class="form-control"
+          id="tanggalLahir"
+          required
+          formControlName="tanggalLahir"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="jenisKelaminCode" class="form-label">Jenis Kelamin</label>
+        <div class="option-wrapper">
+          <input
+            formControlName="jenisKelaminCode"
+            type="radio"
+            name="jenisKelaminCode"
+            id="jenisKelaminM"
+            value="M"
+            class="option-input"
+            required
+            [defaultChecked]="true"
+          />
+          <label for="jenisKelaminM" class="option-label">Laki-Laki</label>
+          <input
+            formControlName="jenisKelaminCode"
+            type="radio"
+            name="jenisKelaminCode"
+            id="jenisKelaminF"
+            value="F"
+            class="option-input"
+            required
+          />
+          <label for="jenisKelaminF" class="option-label">Perempuan</label>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="instansi_id" class="form-label">Instansi</label>
+
+        <input
+          type="text"
+          class="form-control mb-2"
+          placeholder="Search Instansi"
+          (input)="filterInstansi($event)"
+        />
+
+        <select
+          class="form-select"
+          id="instansi_id"
+          required
+          (change)="onInstansiSwitch($event)"
+        >
+          <option selected value="" style="display: none">
+            Pilih Instansi
+          </option>
+          <option
+            *ngFor="let instansi of filteredInstansiList"
+            [value]="instansi.id"
+          >
+            {{ instansi.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="unit_kerja_id" class="form-label">Unit Kerja</label>
+        <select
+          class="form-select"
+          id="unit_kerja_id"
+          required
+          (change)="onUnitKerjaSwitch($event)"
+        >
+          <option selected value="" style="display: none">
+            Pilih Instansi Terlebih Dahulu
+          </option>
+          <option
+            *ngFor="let unitKerja of unitKerjaList$ | async"
+            [value]="unitKerja.id"
+          >
+            {{ unitKerja.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="jenis_ukom" class="form-label">Jenis UKOM</label>
+        <select
+          class="form-select"
+          id="jenis_ukom"
+          required
+          (change)="onJenisUkomSwitch($event)"
+        >
+          <option selected value="" style="display: none">
+            Pilih Jenis UKom
+          </option>
+          <option value="PERPINDAHAN_JABATAN">Perpindahan Jabatan</option>
+          <option value="PROMOSI">Promosi</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="jabatanCode" class="form-label">Jabatan</label>
+        <select
+          class="form-select"
+          name="jabatanCode"
+          id="jabatanCode"
+          formControlName="jabatanCode"
+          (change)="onJabatanSwitch($event)"
+        >
+          <option selected value="" style="display: none">Pilih Jabatan</option>
+          <option
+            *ngFor="let jabatan of jabatanList$ | async"
+            [value]="jabatan.code"
+          >
+            {{ jabatan.name }}
+          </option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="jenjangCode" class="form-label">Jenjang</label>
+        <select
+          class="form-select"
+          name="jenjangCode"
+          id="jenjangCode"
+          formControlName="jenjangCode"
+          (change)="onJenjangSwitch($event)"
+        >
+          <ng-container *ngIf="pesertaUkom.jenis_ukom !== 'PROMOSI'">
+            <option selected value="" style="display: none">
+              Pilih Jenjang
+            </option>
+            <option
+              *ngFor="let jenjang of jenjangList$ | async"
+              [value]="jenjang.code"
+            >
+              {{ jenjang.name }}
+            </option>
+          </ng-container>
+
+          <ng-container *ngIf="pesertaUkom.jenis_ukom === 'PROMOSI'">
+            <option selected value="" style="display: none">
+              Pilih Jenjang
+            </option>
+            <option value="JJ1">Pemula</option>
+          </ng-container>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="pangkatCode" class="form-label">Pangkat</label>
+        <select
+          class="form-select"
+          name="pangkatCode"
+          id="pangkatCode"
+          formControlName="pangkatCode"
+        >
+          <option selected value="" style="display: none">Pilih Pangkat</option>
+          <option
+            *ngFor="let pangkat of pangkatList$ | async"
+            [value]="pangkat.code"
+          >
+            {{ pangkat.name }}
+          </option>
+        </select>
+      </div>
+      <div
+        class="mb-3"
+        *ngIf="this.pesertaUkom.jenis_ukom === 'PERPINDAHAN_JABATAN'"
+      >
+        <label for="nextJabatanCode" class="form-label"
+          >Jabatan Yang Dituju</label
+        >
+        <select
+          class="form-select"
+          name="nextJabatanCode"
+          id="nextJabatanCode"
+          formControlName="nextJabatanCode"
+        >
+          <option selected value="" style="display: none">
+            Pilih Jabatan Yang Dituju
+          </option>
+          <option
+            *ngFor="let jabatan of NextjabatanList$ | async"
+            [value]="jabatan.code"
+          >
+            {{ jabatan.name }}
+          </option>
+        </select>
+      </div>
+      <!-- <div class="mb-3" *ngIf="this.pesertaUkom.jenis_ukom === 'PROMOSI'">
+      <label for="nextJenjangCode" class="form-label"
+        >Jenjang Yang Dituju</label
+      >
+      <select
+        class="form-select"
+        name="nextJenjangCode"
+        id="nextJenjangCode"
+        formControlName="nextJenjangCode"
+        [disabled]="!nextJenjang"
+      >
+        <option selected value="" style="display: none">
+          Pilih Jenjang Anda Terlebih Dahulu
+        </option>
+        <option *ngIf="nextJenjang" [value]="nextJenjang.code">
+          {{ nextJenjang.name }}
+        </option>
+      </select>
+    </div> -->
+
+      <div class="col-lg-12">
+        <div class="mb-3">
+          <label for="emailInput" class="form-label"> File: </label>
+        </div>
+        <div class="row">
+          <app-file-handler [inputs]="inputs"></app-file-handler>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Daftar</button>
+    </form>
+  </div>
+
+  <div class="row mb-4">
+    <small class="text-muted text-center"
+      >Copyright &copy; Kementerian Perdagangan Republik Indonesia</small
+    >
+  </div>
+
+  <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+</section>
+
+<app-confirmation-dialog></app-confirmation-dialog>
