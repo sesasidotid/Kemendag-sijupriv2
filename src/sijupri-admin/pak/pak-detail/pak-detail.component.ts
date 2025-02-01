@@ -69,8 +69,6 @@ export class PakDetailComponent {
         }, "info").setInputType('checkbox').setChecked((rwKinerja: any) => {
           return this.rwKinerjaList.some(item => item.id === rwKinerja.id);
         }).build())
-        .addFilter(new PageFilterBuilder("equal").setProperty("user|email").withField("Email", "text").build())
-        .addFilter(new PageFilterBuilder("equal").setProperty("user|email").withField("Email", "text").build())
         .addFilter(new PageFilterBuilder("equal").setProperty("nip").withDefaultValue(nip).build())
         .build();
     });
