@@ -25,15 +25,15 @@ export class RWKinerja extends Serializable {
 
     ratingHasilId: string = undefined;
     ratingHasilName: string = undefined;
-    ratingHasilValue: string = undefined;
+    ratingHasilValue: number = undefined;
 
     ratingKinerjaId: string = undefined;
     ratingKinerjaName: string = undefined;
-    ratingKinerjaValue: string = undefined;
+    ratingKinerjaValue: number = undefined;
 
     predikatKinerjaId: string = undefined;
     predikatKinerjaName: string = undefined;
-    predikatKinerjaValue: string = undefined;
+    predikatKinerjaValue: number = undefined;
 
     constructor(object?: { [key: string]: any }) {
         super();

@@ -45,7 +45,7 @@ export class RwKinerjaListComponent {
 
   getRWKinerja(id: string) {
     this.loading$.next(true);
-    this.apiService.getData(`/api/v1/rw_Kinerja/${id}`).subscribe({
+    this.apiService.getData(`/api/v1/rw_kinerja/${id}`).subscribe({
       next: (response) => {
         this.rwKinerja = new RWKinerja(response);
         this.loading$.next(false);

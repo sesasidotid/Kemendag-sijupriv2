@@ -81,6 +81,21 @@ export const routes: Routes = [
                 ]
               }
             ]
+          },
+          'Konfirmasi Data Kinerja': {
+            components: () =>
+              import('../sijupri-admin/pak/pak-task-list/pak-task-list.component').then(
+                m => m.PakTaskListComponent
+              ),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/pak/pak-task-detail/pak-task-detail.component'
+                  ).then(m => m.PakTaskDetailComponent)
+              }
+            ]
           }
         },
         AKP: {

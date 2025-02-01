@@ -1,0 +1,11 @@
+.card-profile {
+    background-color: #13182B;
+    /* SVG pattern overlay */
+    background-image:
+        url('/assets/sun.svg');
+
+    /* Cover styling */
+    background-size: contain;
+    background-repeat: repeat;
+    background-blend-mode: overlay;
+}

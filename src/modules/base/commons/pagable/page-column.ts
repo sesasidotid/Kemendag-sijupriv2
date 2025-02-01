@@ -7,17 +7,21 @@ export class PageColumn {
   dynamic: Function
 
   process: Function
+  checked: Function
   inactive: Function
+  inputType: string
   icon: string
   color: string
 
-  constructor (object: {
+  constructor(object: {
     columnType?: 'primary' | 'action'
     label?: string
     property?: string
     dynamic?: Function
     defaultValue?: string | number | boolean
     process?: Function
+    checked?: Function
+    inputType?: string
     icon?: string
     color?: string
     inactive?: Function
@@ -28,6 +32,8 @@ export class PageColumn {
     this.dynamic = object.dynamic
     this.defaultValue = object.defaultValue
     this.process = object.process
+    this.checked = object.checked
+    this.inputType = object.inputType
     this.icon = object.icon
     this.color = object.color
     this.inactive = object.inactive
