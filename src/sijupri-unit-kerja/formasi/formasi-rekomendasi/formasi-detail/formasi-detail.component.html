@@ -1,0 +1,67 @@
+<section>
+  <div class="row">
+    <div class="col-12">
+      <h4 class="fw-bold">Rekapitulasi Usulan Formasi</h4>
+
+      <a
+        class="btn btn-primary float-end mb-2"
+        (click)="
+          preview(formasiDetail.rekomendasi, formasiDetail.rekomendasiUrl)
+        "
+        >Download File Rekomendasi</a
+      >
+    </div>
+    <div class="col-12">
+      <table class="table table-bordered table-hover">
+        <thead class="table-primary">
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Name Jabatan</th>
+            <th scope="col">Jenjang Jabatan</th>
+            <th scope="col">Rekapitulasi Usulan Formasi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container
+            *ngFor="
+              let item of formasiDetail.formasiDetailDtoList;
+              let i = index
+            "
+          >
+            <tr
+              *ngFor="let formasi of item.formasiResultDtoList; let j = index"
+            >
+              <td
+                *ngIf="j === 0"
+                class="align-middle text-center"
+                [attr.rowspan]="item.formasiResultDtoList.length"
+              >
+                {{ i + 1 }}
+              </td>
+              <td
+                *ngIf="j === 0"
+                class="align-middle"
+                [attr.rowspan]="item.formasiResultDtoList.length"
+              >
+                {{ item.jabatanName }}
+              </td>
+              <td class="align-middle">{{ formasi.jenjangName }}</td>
+              <td class="align-middle text-center">
+                {{ formasi.pembulatan || 0 }}
+              </td>
+            </tr>
+          </ng-container>
+
+          <tr>
+            <td colspan="3" class="align-middle text-center fw-bold">
+              Jumlah Usulan Formasi
+            </td>
+            <td class="align-middle text-center fw-bold">
+              {{ getTotalRekapitulasi() }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

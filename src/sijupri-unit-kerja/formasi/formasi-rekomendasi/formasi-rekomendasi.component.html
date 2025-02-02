@@ -1,1 +1,44 @@
-<p>formasi-rekomendasi works!</p>
+<section>
+  <div class="card-header align-items-center d-flex">
+    <h4 class="card-title mb-0 flex-grow-1">Daftar Rekomendasi Formasi</h4>
+    <div class="flex-shrink-0"></div>
+  </div>
+
+  <div class="card-body">
+    <app-pagable [pagable]="pagable"></app-pagable>
+  </div>
+</section>
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Informasi Pelaksanaan'"
+  (toggle)="toggleModal()"
+  [enableFooter]="false"
+>
+  <div class="row">
+    <div class="card-body">
+      <div class="mb-3">
+        <label class="fw-bold">Waktu Pelaksanaan:</label>
+        <div class="text-primary">
+          {{ convertDate(ProcessFormasi.waktuPelaksanaan) }}
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="fw-bold">Surat Undangan:</label>
+        <div>
+          <a
+            class="btn btn-primary"
+            (click)="
+              previewFile(
+                ProcessFormasi.suratUndangan,
+                ProcessFormasi.suratUndanganUrl
+              )
+            "
+          >
+            Lihat
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-modal>

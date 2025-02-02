@@ -301,6 +301,14 @@ export const routes: Routes = [
               }
             ]
           }
+        },
+        Formasi: {
+          Formasi: {
+            components: () =>
+              import(
+                '../sijupri-jf/formasi/formasi-list/formasi-list.component'
+              ).then(m => m.FormasiListComponent)
+          }
         }
       }) ?? [])
     ]

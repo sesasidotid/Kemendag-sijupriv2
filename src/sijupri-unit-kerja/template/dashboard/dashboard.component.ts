@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { LoginContext } from '../../../modules/base/commons/login-context';
-import { RouterLink } from '@angular/router';
-import { ProfileCardComponent } from '../../../modules/base/components/profile-card/profile-card.component';
+import { Component } from '@angular/core'
+import { LoginContext } from '../../../modules/base/commons/login-context'
+import { RouterLink } from '@angular/router'
+import { ProfileCardComponent } from '../../../modules/base/components/profile-card/profile-card.component'
 
 @Component({
   selector: 'app-dashboard',
@@ -11,6 +11,6 @@ import { ProfileCardComponent } from '../../../modules/base/components/profile-c
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
-  nip: string = LoginContext.getUserId();
-  name: string = LoginContext.getName();
+  nip: string = LoginContext.getUserId()
+  name: string = LoginContext.getName()
 }
