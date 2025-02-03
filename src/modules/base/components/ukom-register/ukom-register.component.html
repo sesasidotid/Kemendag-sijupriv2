@@ -52,7 +52,10 @@
   <div class="card parent">
     <form [formGroup]="nonJFForm" (ngSubmit)="submit()">
       <div class="mb-3">
-        <label for="name" class="form-label">Nama</label>
+        <label for="name" class="form-label"
+          >Nama
+          <span class="text-danger">*</span>
+        </label>
         <input
           type="text"
           class="form-control"
@@ -62,7 +65,9 @@
         />
       </div>
       <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
+        <label for="email" class="form-label"
+          >Email<span class="text-danger">*</span></label
+        >
         <input
           type="email"
           class="form-control"
@@ -72,7 +77,9 @@
         />
       </div>
       <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label"
+          >Password<span class="text-danger">*</span></label
+        >
         <input
           type="password"
           class="form-control"
@@ -83,7 +90,9 @@
       </div>
 
       <div class="mb-3">
-        <label for="nip" class="form-label">NIP</label>
+        <label for="nip" class="form-label"
+          >NIP<span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control"
@@ -93,7 +102,9 @@
         />
       </div>
       <div class="mb-3">
-        <label for="nik" class="form-label">NIK</label>
+        <label for="nik" class="form-label"
+          >NIK<span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control"
@@ -104,7 +115,9 @@
       </div>
 
       <div class="mb-3">
-        <label for="phone" class="form-label">Telepon</label>
+        <label for="phone" class="form-label"
+          >Telepon<span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control"
@@ -114,7 +127,9 @@
         />
       </div>
       <div class="mb-3">
-        <label for="tempatLahir" class="form-label">Tempat Lahir</label>
+        <label for="tempatLahir" class="form-label"
+          >Tempat Lahir<span class="text-danger">*</span></label
+        >
         <input
           type="text"
           class="form-control"
@@ -124,7 +139,9 @@
         />
       </div>
       <div class="mb-3">
-        <label for="tanggalLahir" class="form-label">Tanggal Lahir</label>
+        <label for="tanggalLahir" class="form-label"
+          >Tanggal Lahir<span class="text-danger">*</span></label
+        >
         <input
           type="date"
           class="form-control"
@@ -134,7 +151,9 @@
         />
       </div>
       <div class="mb-3">
-        <label for="jenisKelaminCode" class="form-label">Jenis Kelamin</label>
+        <label for="jenisKelaminCode" class="form-label"
+          >Jenis Kelamin<span class="text-danger">*</span></label
+        >
         <div class="option-wrapper">
           <input
             formControlName="jenisKelaminCode"
@@ -161,7 +180,9 @@
       </div>
 
       <div class="mb-3">
-        <label for="instansi_id" class="form-label">Instansi</label>
+        <label for="instansi_id" class="form-label"
+          >Instansi<span class="text-danger">*</span></label
+        >
 
         <input
           type="text"
@@ -189,14 +210,16 @@
       </div>
 
       <div class="mb-3">
-        <label for="unit_kerja_id" class="form-label">Unit Kerja</label>
+        <label for="unit_kerja_id" class="form-label"
+          >Unit Kerja<span class="text-danger">*</span></label
+        >
         <select
           class="form-select"
           id="unit_kerja_id"
           required
           (change)="onUnitKerjaSwitch($event)"
         >
-          <option selected value="" style="display: none">
+          <!-- <option selected value="" style="display: none">
             Pilih Instansi Terlebih Dahulu
           </option>
           <option
@@ -205,11 +228,28 @@
           >
             {{ unitKerja.name }}
           </option>
+        </select> -->
+          <option selected value="" style="display: none">Unit Kerja</option>
+          <ng-container
+            *ngIf="(unitKerjaList$ | async)?.length; else UnitKerjaNotFound"
+          >
+            <option
+              *ngFor="let unitKerja of unitKerjaList$ | async"
+              [value]="unitKerja.id"
+            >
+              {{ unitKerja.name }}
+            </option>
+          </ng-container>
         </select>
+        <ng-template #UnitKerjaNotFound>
+          <option disabled>Unit Kerja tidak ditemukan</option>
+        </ng-template>
       </div>
 
       <div class="mb-3">
-        <label for="jenis_ukom" class="form-label">Jenis UKOM</label>
+        <label for="jenis_ukom" class="form-label"
+          >Jenis UKOM<span class="text-danger">*</span></label
+        >
         <select
           class="form-select"
           id="jenis_ukom"
@@ -223,8 +263,11 @@
           <option value="PROMOSI">Promosi</option>
         </select>
       </div>
+
       <div class="mb-3">
-        <label for="jabatanCode" class="form-label">Jabatan</label>
+        <label for="jabatanCode" class="form-label"
+          >Jabatan<span class="text-danger">*</span></label
+        >
         <select
           class="form-select"
           name="jabatanCode"
@@ -241,8 +284,11 @@
           </option>
         </select>
       </div>
+
       <div class="mb-3">
-        <label for="jenjangCode" class="form-label">Jenjang</label>
+        <label for="jenjangCode" class="form-label"
+          >Jenjang<span class="text-danger">*</span></label
+        >
         <select
           class="form-select"
           name="jenjangCode"
@@ -250,28 +296,34 @@
           formControlName="jenjangCode"
           (change)="onJenjangSwitch($event)"
         >
+          <option selected value="" style="display: none">Pilih Jenjang</option>
           <ng-container *ngIf="pesertaUkom.jenis_ukom !== 'PROMOSI'">
-            <option selected value="" style="display: none">
-              Pilih Jenjang
-            </option>
-            <option
-              *ngFor="let jenjang of jenjangList$ | async"
-              [value]="jenjang.code"
+            <ng-container
+              *ngIf="(jenjangList$ | async)?.length; else JenjangNotFound"
             >
-              {{ jenjang.name }}
-            </option>
+              <option
+                *ngFor="let jenjang of jenjangList$ | async"
+                [value]="jenjang.code"
+              >
+                {{ jenjang.name }}
+              </option>
+            </ng-container>
           </ng-container>
 
           <ng-container *ngIf="pesertaUkom.jenis_ukom === 'PROMOSI'">
-            <option selected value="" style="display: none">
-              Pilih Jenjang
-            </option>
             <option value="JJ1">Pemula</option>
           </ng-container>
+
+          <ng-template #JenjangNotFound>
+            <option disabled>Mohon pilih jabatan</option>
+          </ng-template>
         </select>
       </div>
+
       <div class="mb-3">
-        <label for="pangkatCode" class="form-label">Pangkat</label>
+        <label for="pangkatCode" class="form-label"
+          >Pangkat<span class="text-danger">*</span></label
+        >
         <select
           class="form-select"
           name="pangkatCode"
@@ -279,20 +331,34 @@
           formControlName="pangkatCode"
         >
           <option selected value="" style="display: none">Pilih Pangkat</option>
-          <option
+          <!-- <option
             *ngFor="let pangkat of pangkatList$ | async"
             [value]="pangkat.code"
           >
             {{ pangkat.name }}
-          </option>
+          </option> -->
+          <ng-container
+            *ngIf="(pangkatList$ | async)?.length; else pangkatNotFound"
+          >
+            <option
+              *ngFor="let pangkat of pangkatList$ | async"
+              [value]="pangkat.code"
+            >
+              {{ pangkat.name }}
+            </option>
+          </ng-container>
         </select>
+        <ng-template #pangkatNotFound>
+          <option disabled>Mohon pilih jenjang</option>
+        </ng-template>
       </div>
+
       <div
         class="mb-3"
         *ngIf="this.pesertaUkom.jenis_ukom === 'PERPINDAHAN_JABATAN'"
       >
         <label for="nextJabatanCode" class="form-label"
-          >Jabatan Yang Dituju</label
+          >Jabatan Yang Dituju<span class="text-danger">*</span></label
         >
         <select
           class="form-select"
@@ -333,7 +399,9 @@
 
       <div class="col-lg-12">
         <div class="mb-3">
-          <label for="emailInput" class="form-label"> File: </label>
+          <label for="emailInput" class="form-label">
+            File: <span class="text-danger">*</span></label
+          >
         </div>
         <div class="row">
           <app-file-handler [inputs]="inputs"></app-file-handler>
@@ -354,3 +422,4 @@
 </section>
 
 <app-confirmation-dialog></app-confirmation-dialog>
+<app-file-preview></app-file-preview>

@@ -5,6 +5,7 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { FormasiDetail } from '../../../../modules/formasi/models/formasi-detail.model'
 import { ActivatedRoute } from '@angular/router'
+import { Input } from '@angular/core'
 @Component({
   selector: 'app-formasi-detail',
   standalone: true,
@@ -13,6 +14,8 @@ import { ActivatedRoute } from '@angular/router'
   styleUrl: './formasi-detail.component.scss'
 })
 export class FormasiDetailComponent {
+  @Input() exformasiId: string = ''
+
   formasiId: string = ''
   formasiDetail: FormasiDetail = new FormasiDetail()
 
@@ -25,7 +28,9 @@ export class FormasiDetailComponent {
     this.activatedRoute.paramMap.subscribe(params => {
       this.formasiId = params.get('formasiId')
     })
+  }
 
+  ngOnInit () {
     this.getRekomendasiFormasiDetail()
   }
 
@@ -40,7 +45,16 @@ export class FormasiDetailComponent {
   }
 
   getRekomendasiFormasiDetail () {
-    this.apiService.getData(`/api/v1/formasi/${this.formasiId}`).subscribe({
+    console.log('Formasi Detail Ex', this.exformasiId)
+    let id = ''
+
+    if (this.exformasiId) {
+      id = this.exformasiId
+    } else {
+      id = this.formasiId
+    }
+
+    this.apiService.getData(`/api/v1/formasi/${id}`).subscribe({
       next: res => {
         this.formasiDetail = res
         console.log('Formasi Detail', this.formasiDetail)

@@ -21,7 +21,7 @@ export class AdminDashboardComponent {
   }
 
   getTotalAKPPending () {
-    this.apiService.getData('/api/v1/formasi_proses/search').subscribe({
+    this.apiService.getData('/api/v1/akp/task/search?p').subscribe({
       next: res => {
         this.totalAKPPending = res.total
       }
@@ -37,7 +37,7 @@ export class AdminDashboardComponent {
   }
 
   getTotalFormasiPending () {
-    this.apiService.getData('/api/v1/formasi_proses/search').subscribe({
+    this.apiService.getData('/api/v1/formasi/task/search').subscribe({
       next: res => {
         this.totalFormasiPending = res.total
       }

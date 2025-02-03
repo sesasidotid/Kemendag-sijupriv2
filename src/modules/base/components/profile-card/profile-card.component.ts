@@ -50,11 +50,17 @@ export class ProfileCardComponent {
   fetchPhotoProfile () {
     this.apiService.getPhotoProfile(this.nip).subscribe({
       next: blob => {
+        console.log('Profile image fetched', blob)
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },
       error: err => {
         console.error('Error fetching profile image', err)
+        this.profileImageSrc = 'assets/no-profile.jpg'
       }
     })
   }

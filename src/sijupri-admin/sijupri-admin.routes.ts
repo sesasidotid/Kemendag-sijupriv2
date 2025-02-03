@@ -25,6 +25,16 @@ export const routes: Routes = [
           title: 'Dashboard'
         }
       },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./template/profile/profile.component').then(
+            m => m.ProfileComponent
+          ),
+        data: {
+          title: 'Profile'
+        }
+      },
       // Routes loaded by RouteLoader.loadRouter
       ...(RouteLoader.loadRouter({
         Formasi: {
@@ -55,6 +65,27 @@ export const routes: Routes = [
                   ).then(m => m.FormasiTaskDetailComponent)
               }
             ]
+          },
+          'Pemetaan Formasi Seluruh Indonesia': {
+            components: () =>
+              import(
+                '../sijupri-admin/formasi/formasi-pemetaan/formasi-pemetaan.component'
+              ).then(m => m.FormasiPemetaanComponent)
+          },
+          'Data Rekomendasi Formasi': {
+            components: () =>
+              import(
+                '../sijupri-admin/formasi/formasi-data-rekomendasi/formasi-data-rekomendasi.component'
+              ).then(m => m.FormasiDataRekomendasiComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/formasi/formasi-data-rekomendasi-detail/formasi-data-rekomendasi-detail.component'
+                  ).then(m => m.FormasiDataRekomendasiDetailComponent)
+              }
+            ]
           }
         },
         'Monitoring Kinerja': {
@@ -79,6 +110,21 @@ export const routes: Routes = [
                       ).then(m => m.PakGraphComponent)
                   }
                 ]
+              }
+            ]
+          },
+          'Konfirmasi Data Kinerja': {
+            components: () =>
+              import(
+                '../sijupri-admin/pak/pak-task-list/pak-task-list.component'
+              ).then(m => m.PakTaskListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/pak/pak-task-detail/pak-task-detail.component'
+                  ).then(m => m.PakTaskDetailComponent)
               }
             ]
           }
@@ -310,14 +356,30 @@ export const routes: Routes = [
                   import(
                     '../sijupri-admin/siap/user-instansi-add/user-instansi-add.component'
                   ).then(m => m.UserInstansiAddComponent)
+              },
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/siap/user-instasi-detail/user-instasi-detail.component'
+                  ).then(m => m.UserInstasiDetailComponent)
               }
             ]
           },
           'User Unit Kerja': {
             components: () =>
               import(
-                '../sijupri-admin/siap/user-unit-kerja-list/user-unit-kerja-list.component'
-              ).then(m => m.UserUnitKerjaListComponent)
+                './siap/user-unit-kerja-list/user-unit-kerja-list.component'
+              ).then(m => m.UserUnitKerjaListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/siap/user-unit-kerja-detail/user-unit-kerja-detail.component'
+                  ).then(m => m.UserUnitKerjaDetailComponent)
+              }
+            ]
           }
         },
         Security: {

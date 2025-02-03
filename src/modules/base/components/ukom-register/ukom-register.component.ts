@@ -21,11 +21,15 @@ import { CommonModule } from '@angular/common'
 import { map, filter } from 'rxjs/operators'
 import { Instansi } from '../../../maintenance/models/instansi.model'
 import { UnitKerja } from '../../../maintenance/models/unit-kerja.model'
+<<<<<<< HEAD
 
+=======
+>>>>>>> feisal_dev
 import { ModalComponent } from '../modal/modal.component'
 import { QRCodeModule } from 'angularx-qrcode'
 import { SafeUrl } from '@angular/platform-browser'
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
+import { FilePreviewComponent } from '../file-preview/file-preview.component'
 @Component({
   selector: 'app-ukom-register',
   standalone: true,
@@ -36,7 +40,8 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
     FileHandlerComponent,
     ModalComponent,
     QRCodeModule,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    FilePreviewComponent
   ],
   templateUrl: './ukom-register.component.html',
   styleUrl: './ukom-register.component.scss'
@@ -104,8 +109,8 @@ export class UkomRegisterComponent {
       nextJenjangCode: new FormControl('', Validators.required),
       instansi_id: new FormControl('', Validators.required),
       unit_kerja_id: new FormControl('', Validators.required),
-      password: new FormControl('', Validators.required),
-      instansi_name: new FormControl('', Validators.required)
+      password: new FormControl('', Validators.required)
+      //   instansi_name: new FormControl('', Validators.required)
     })
   }
 
@@ -386,6 +391,11 @@ export class UkomRegisterComponent {
       console.log('pesertaUkom', this.pesertaUkom.dokumenUkomList)
     }
     console.log('pesertaUkom', this.pesertaUkom)
+
+    // if (this.nonJFForm.invalid) {
+    //   this.handlerService.handleAlert('Error', 'Data belum lengkap')
+    //   return
+    // }
 
     this.confirmationService.open(false).subscribe({
       next: result => {

@@ -106,7 +106,8 @@ export class FormasiTaskComponent {
       if (
         task.flowId === 'for_flow_2' ||
         task.flowId === 'for_flow_4' ||
-        task.flowId === 'for_flow_3'
+        task.flowId === 'for_flow_3' ||
+        task.flowId === 'for_flow_5'
       ) {
         if (!acc[task.flowId]) {
           acc[task.flowId] = []
@@ -125,7 +126,7 @@ export class FormasiTaskComponent {
       })
     })
 
-    const flowOrder = ['for_flow_2', 'for_flow_4', 'for_flow_3']
+    const flowOrder = ['for_flow_2', 'for_flow_4', 'for_flow_3', 'for_flow_5']
     const sortedGrouped: { [key: string]: any[] } = {}
 
     flowOrder.forEach(flowId => {
@@ -180,6 +181,10 @@ export class FormasiTaskComponent {
             case 'for_flow_3':
               this.formasiStep$.next(3)
               this.currentFormasiStep$.next(3)
+              break
+            case 'for_flow_5':
+              this.formasiStep$.next(4)
+              this.currentFormasiStep$.next(4)
               break
             default:
               break

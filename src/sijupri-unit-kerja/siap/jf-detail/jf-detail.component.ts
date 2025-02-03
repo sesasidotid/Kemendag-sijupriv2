@@ -45,6 +45,9 @@ export class JfDetailComponent {
     this.getJF()
   }
 
+  ngOnInit () {
+    this.fetchPhotoProfile()
+  }
   getJF () {
     this.jfService.findByNip(this.nip).subscribe({
       next: (jf: JF) => (this.jf = jf)
@@ -52,8 +55,13 @@ export class JfDetailComponent {
   }
 
   fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+    console.log('Fetching photo profile')
+    this.apiService.getPhotoProfile(this.nip).subscribe({
       next: blob => {
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },

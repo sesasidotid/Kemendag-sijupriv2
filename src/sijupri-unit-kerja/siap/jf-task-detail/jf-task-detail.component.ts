@@ -58,11 +58,17 @@ export class JfTaskDetailComponent {
   ngOnInit () {
     this.getJF()
     this.getTaskDetail()
+    this.fetchPhotoProfile()
   }
 
   fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+    console.log('Fetching photo profile')
+    this.apiService.getPhotoProfile(this.nip).subscribe({
       next: blob => {
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },
@@ -73,7 +79,6 @@ export class JfTaskDetailComponent {
     })
   }
   getTaskDetail () {
-    this.pendingTaskloading$.next(true)
     this.apiService.getData(`/api/v1/jf/task/group/${this.nip}`).subscribe({
       next: (pendingTaskList: PendingTask[]) => {
         if (pendingTaskList.length == 0)

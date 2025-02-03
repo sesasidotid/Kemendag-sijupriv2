@@ -104,13 +104,31 @@ export const routes: Routes = [
             components: () =>
               import(
                 '../sijupri-unit-kerja/siap/user-instansi-list/user-instansi-list.component'
-              ).then(m => m.UserInstansiListComponent)
+              ).then(m => m.UserInstansiListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    './siap/user-instasi-detail/user-instasi-detail.component'
+                  ).then(m => m.UserInstasiDetailComponent)
+              }
+            ]
           },
           'User Unit Kerja': {
             components: () =>
               import(
                 '../sijupri-unit-kerja/siap/user-unit-kerja-list/user-unit-kerja-list.component'
-              ).then(m => m.UserUnitKerjaListComponent)
+              ).then(m => m.UserUnitKerjaListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    './siap/user-unit-kerja-detail/user-unit-kerja-detail.component'
+                  ).then(m => m.UserUnitKerjaDetailComponent)
+              }
+            ]
           }
         }
       }) ?? [])
