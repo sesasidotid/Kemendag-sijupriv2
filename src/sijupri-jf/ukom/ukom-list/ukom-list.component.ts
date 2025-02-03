@@ -75,12 +75,12 @@ export class UkomListComponent {
           .withDefaultValue(LoginContext.getUserId())
           .build()
       )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('taskStatus')
-          .withField('Status', 'text')
-          .build()
-      )
+      //   .addFilter(
+      //     new PageFilterBuilder('equal')
+      //       .setProperty('lastUpdated')
+      //       .withField('Tanggal', 'date')
+      //       .build()
+      //   )
       .build()
 
     this.jadwalPagable = new PagableBuilder(

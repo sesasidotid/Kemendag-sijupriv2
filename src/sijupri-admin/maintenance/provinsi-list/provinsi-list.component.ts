@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
-import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component';
-import { Pagable } from '../../../modules/base/commons/pagable/pagable';
-import { Router } from '@angular/router';
-import { ActionColumnBuilder, PagableBuilder, PageFilterBuilder, PrimaryColumnBuilder } from '../../../modules/base/commons/pagable/pagable-builder';
-import { LoginContext } from '../../../modules/base/commons/login-context';
+import { Component } from '@angular/core'
+import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
+import { Pagable } from '../../../modules/base/commons/pagable/pagable'
+import { Router } from '@angular/router'
+import {
+  ActionColumnBuilder,
+  PagableBuilder,
+  PageFilterBuilder,
+  PrimaryColumnBuilder
+} from '../../../modules/base/commons/pagable/pagable-builder'
+import { LoginContext } from '../../../modules/base/commons/login-context'
 
 @Component({
   selector: 'app-provinsi-list',
@@ -13,17 +18,25 @@ import { LoginContext } from '../../../modules/base/commons/login-context';
   styleUrl: './provinsi-list.component.scss'
 })
 export class ProvinsiListComponent {
-  pagable: Pagable;
+  pagable: Pagable
 
-  constructor(
-    private router: Router
-  ) {
-    this.pagable = new PagableBuilder("/api/v1/provinsi/search")
-      .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
-      .addActionColumn(new ActionColumnBuilder().setAction((provinsi: any) => {
-        this.router.navigate([`/${provinsi.nip}`])
-      }, "info").withIcon("detail").build())
-      .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
-      .build();
+  constructor (private router: Router) {
+    this.pagable = new PagableBuilder('/api/v1/provinsi/search')
+      .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
+      .addActionColumn(
+        new ActionColumnBuilder()
+          .setAction((provinsi: any) => {
+            this.router.navigate([`/${provinsi.nip}`])
+          }, 'info')
+          .withIcon('detail')
+          .build()
+      )
+      .addFilter(
+        new PageFilterBuilder('like')
+          .setProperty('name')
+          .withField('Nama', 'text')
+          .build()
+      )
+      .build()
   }
 }

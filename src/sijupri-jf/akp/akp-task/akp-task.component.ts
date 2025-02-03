@@ -48,11 +48,16 @@ export class AkpTaskComponent {
   ngOnInit () {
     this.getJF()
     this.getAKPTask()
+    this.fetchPhotoProfile()
   }
 
   fetchPhotoProfile () {
     this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
       next: blob => {
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },

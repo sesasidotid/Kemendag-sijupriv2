@@ -36,7 +36,7 @@ export class PakTaskDetailComponent {
   pendingTaskloading$ = new BehaviorSubject<boolean>(true)
   detailTaskloading$ = new BehaviorSubject<boolean>(true)
 
-  constructor(
+  constructor (
     private apiService: ApiService,
     private alertService: AlertService,
     private confirmationService: ConfirmationService,
@@ -51,14 +51,18 @@ export class PakTaskDetailComponent {
     })
   }
 
-  ngOnInit() {
+  ngOnInit () {
     this.getJF()
     this.getTaskDetail()
   }
 
-  fetchPhotoProfile() {
+  fetchPhotoProfile () {
     this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
       next: blob => {
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },
@@ -68,29 +72,31 @@ export class PakTaskDetailComponent {
       }
     })
   }
-  getTaskDetail() {
+  getTaskDetail () {
     this.pendingTaskloading$.next(true)
-    this.apiService.getData(`/api/v1/jf/task/kinerja/group/${this.nip}`).subscribe({
-      next: (pendingTaskList: PendingTask[]) => {
-        if (pendingTaskList.length == 0)
-          this.router.navigate(['/pak/pak-task-list'])
-        this.pendingTaskList = pendingTaskList
-        this.pendingTaskloading$.next(false)
-      },
-      error: error => {
-        console.error('Error fetching data', error)
-        this.alertService.showToast(
-          'Error',
-          'Gagal mendapatkan data verifikasi user JF!'
-        )
+    this.apiService
+      .getData(`/api/v1/jf/task/kinerja/group/${this.nip}`)
+      .subscribe({
+        next: (pendingTaskList: PendingTask[]) => {
+          if (pendingTaskList.length == 0)
+            this.router.navigate(['/pak/pak-task-list'])
+          this.pendingTaskList = pendingTaskList
+          this.pendingTaskloading$.next(false)
+        },
+        error: error => {
+          console.error('Error fetching data', error)
+          this.alertService.showToast(
+            'Error',
+            'Gagal mendapatkan data verifikasi user JF!'
+          )
 
-        this.pendingTaskloading$.next(false)
-        // this.getTaskDetail();
-      }
-    })
+          this.pendingTaskloading$.next(false)
+          // this.getTaskDetail();
+        }
+      })
   }
 
-  toggleExpand(pendingTask: PendingTask) {
+  toggleExpand (pendingTask: PendingTask) {
     pendingTask['isOpen'] = !(pendingTask['isOpen'] || false)
 
     if (
@@ -124,7 +130,7 @@ export class PakTaskDetailComponent {
     }
   }
 
-  openConfirmationDialog(
+  openConfirmationDialog (
     pendingTask: PendingTask,
     taskAction: string,
     withComment: boolean = false
@@ -142,21 +148,21 @@ export class PakTaskDetailComponent {
     })
   }
 
-  visibility(rwSertifikasi: any) {
+  visibility (rwSertifikasi: any) {
     return () => rwSertifikasi.kategoriSertifikasiValue == 2
   }
 
-  getTaskDate(date: string) {
+  getTaskDate (date: string) {
     return this.converterService.dateToHumanReadable(date)
   }
 
-  getJF() {
+  getJF () {
     this.jfService.findByNip(this.nip).subscribe({
       next: (jf: JF) => (this.jf = jf)
     })
   }
 
-  submit(pendingTask: PendingTask) {
+  submit (pendingTask: PendingTask) {
     const task = new Task()
     task.id = pendingTask.id
     task.taskAction = pendingTask.taskAction

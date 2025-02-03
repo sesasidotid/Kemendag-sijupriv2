@@ -303,11 +303,11 @@ export const routes: Routes = [
           }
         },
         Formasi: {
-          Formasi: {
+          'Daftar Formasi': {
             components: () =>
-              import(
-                '../sijupri-jf/formasi/formasi-list/formasi-list.component'
-              ).then(m => m.FormasiListComponent)
+              import('../sijupri-jf/jf-formasi/jf-formasi.component').then(
+                m => m.JfFormasiComponent
+              )
           }
         }
       }) ?? [])

@@ -42,7 +42,10 @@
 
 <div
   *ngIf="
-    flowId == 'for_flow_2' || flowId == 'for_flow_4' || flowId == 'for_flow_3'
+    flowId == 'for_flow_2' ||
+    flowId == 'for_flow_4' ||
+    flowId == 'for_flow_3' ||
+    flowId == 'for_flow_5'
   "
 >
   <div class="row px-3">
@@ -89,12 +92,26 @@
           </div>
           <div class="step-name">Verifikasi Formasi</div>
         </div>
+
+        <div
+          class="stepper-item"
+          [ngClass]="{
+            active: (currentFormasiStep$ | async) === 4,
+            completed: (currentFormasiStep$ | async) > 4
+          }"
+          (click)="handleStepClick(4)"
+        >
+          <div class="step-counter">
+            <i class="mdi mdi-account-multiple"></i>
+          </div>
+          <div class="step-name">Upload Rekomendasi</div>
+        </div>
       </div>
     </div>
 
     <ng-container
       *ngFor="
-        let flowId of ['for_flow_2', 'for_flow_4', 'for_flow_3'];
+        let flowId of ['for_flow_2', 'for_flow_4', 'for_flow_3', 'for_flow_5'];
         let i = index
       "
     >
@@ -146,6 +163,10 @@
                         *ngIf="history.flowId === 'for_flow_3'"
                         class="mdi mdi-account-multiple mdi-24px text-muted"
                       ></i>
+                      <i
+                        *ngIf="history.flowId === 'for_flow_5'"
+                        class="mdi mdi-account-multiple mdi-24px text-muted"
+                      ></i>
                     </div>
                     <div>
                       <ng-container *ngIf="history.taskStatus === 'COMPLETED'">
@@ -154,7 +175,8 @@
                           <span class="badge rounded-pill text-bg-success ms-2">
                             {{
                               history.flowId === 'for_flow_2' ||
-                              history.flowId === 'for_flow_4'
+                              history.flowId === 'for_flow_4' ||
+                              history.flowId === 'for_flow_3'
                                 ? 'Sudah Diverifikasi'
                                 : ''
                             }}
@@ -166,7 +188,9 @@
                           {{ history.flowName }}
                           <span class="badge rounded-pill text-bg-info ms-2">
                             {{
-                              history.flowId === 'for_flow_4'
+                              history.flowId === 'for_flow_5'
+                                ? 'Menunggu Admin Mengupload Rekomendasi Formasi'
+                                : history.flowId === 'for_flow_4'
                                 ? 'Dokumen Perlu Diperbaiki'
                                 : history.flowId === 'for_flow_2' ||
                                   history.flowId === 'for_flow_3'

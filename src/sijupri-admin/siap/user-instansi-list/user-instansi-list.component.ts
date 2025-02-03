@@ -32,8 +32,8 @@ export class UserInstansiListComponent {
       )
       .addActionColumn(
         new ActionColumnBuilder()
-          .setAction((unitKerja: any) => {
-            this.router.navigate([`/${unitKerja.id}`])
+          .setAction((data: any) => {
+            this.router.navigate([`/siap/user-instansi/${data.nip}`])
           }, 'info')
           .withIcon('detail')
           .build()

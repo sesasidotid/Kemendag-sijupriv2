@@ -50,6 +50,11 @@ export class TopBarComponent {
   fetchPhotoProfile () {
     this.apiService.getPhotoProfile(this.id).subscribe({
       next: blob => {
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
+
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },
@@ -215,6 +220,10 @@ export class TopBarComponent {
     }
 
     LoginContext.release()
+  }
+
+  profile () {
+    this.router.navigate(['/profile'])
   }
 
   private calculateAge (dateCreated: string): string {

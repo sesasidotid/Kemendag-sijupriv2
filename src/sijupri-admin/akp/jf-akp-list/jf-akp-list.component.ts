@@ -135,8 +135,12 @@ export class JfAkpListComponent {
   }
 
   fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+    this.apiService.getPhotoProfile(this.jf.nip).subscribe({
       next: blob => {
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },
@@ -153,6 +157,7 @@ export class JfAkpListComponent {
       next: (jf: JF) => {
         this.jf = jf
         this.jfLoading$.next(false)
+        this.fetchPhotoProfile()
       }
     })
   }

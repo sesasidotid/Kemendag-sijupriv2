@@ -13,6 +13,7 @@ import { LoginContext } from '../../../modules/base/commons/login-context'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { ApiService } from '../../../modules/base/services/api.service'
+import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 @Component({
   selector: 'app-jf-detail',
   standalone: true,
@@ -37,17 +38,23 @@ export class JfDetailComponent {
     private jfService: JfService,
     private activatedRoute: ActivatedRoute,
     private apiService: ApiService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private filePreviewService: FilePreviewService
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.nip = params.get('id')
     })
     this.getJF()
+    this.fetchPhotoProfile()
   }
 
   fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+    this.apiService.getPhotoProfile(this.nip).subscribe({
       next: blob => {
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },
@@ -56,6 +63,10 @@ export class JfDetailComponent {
         this.profileImageSrc = 'assets/no-profile.jpg'
       }
     })
+  }
+
+  preview (fileName: string, source: string) {
+    this.filePreviewService.open(fileName, source)
   }
 
   getJF () {

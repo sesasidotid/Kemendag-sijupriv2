@@ -89,8 +89,12 @@ export class AKPGradingComponent {
   }
 
   fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
+    this.apiService.getPhotoProfile(this.AKPGrading.nip).subscribe({
       next: blob => {
+        if (blob.size === 0) {
+          this.profileImageSrc = 'assets/no-profile.jpg'
+          return
+        }
         const objectUrl = URL.createObjectURL(blob)
         this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
       },
@@ -203,6 +207,7 @@ export class AKPGradingComponent {
         this.AKPLoading$.next(false)
 
         this.isIDValid$.next(true)
+        this.fetchPhotoProfile()
       },
       error: error => {
         this.AKPLoading$.next(false)

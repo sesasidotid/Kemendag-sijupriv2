@@ -32,7 +32,7 @@ export class UserUnitKerjaListComponent {
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((unitKerja: any) => {
-            this.router.navigate([`/${unitKerja.id}`])
+            this.router.navigate([`/siap/user-unit-kerja/${unitKerja.nip}`])
           }, 'info')
           .withIcon('detail')
           .build()

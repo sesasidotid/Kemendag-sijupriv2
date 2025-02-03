@@ -8,6 +8,7 @@ import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { CATSchore } from '../../../modules/ukom/models/cat/cat-schore'
+import { Router } from '@angular/router'
 @Component({
   selector: 'app-ukom-task-detail',
   standalone: true,
@@ -28,7 +29,8 @@ export class UkomTaskDetailComponent {
 
   constructor (
     private apiService: ApiService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.id = params.get('id')
@@ -50,7 +52,9 @@ export class UkomTaskDetailComponent {
         }
       })
   }
-
+  backToList () {
+    this.router.navigate(['/ukom/ukom-list'])
+  }
   getCorrectAnswer (question: any): string {
     const correctChoice = question.multipleChoiceDtoList.find(
       (choice: any) => choice.correct
