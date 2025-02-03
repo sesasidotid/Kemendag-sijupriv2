@@ -41,7 +41,7 @@ export const routes: Routes = [
               ).then(m => m.FormasiTaskListComponent),
             routes: [
               {
-                path: 'jabatan/:unitKerjaId/:jabatanCode',
+                path: 'jabatan/:formasi_id/:jabatanCode',
                 loadComponent: () =>
                   import(
                     '../sijupri-admin/formasi/formasi-task-jabatan/formasi-task-jabatan.component'

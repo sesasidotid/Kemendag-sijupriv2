@@ -35,10 +35,13 @@ export class FormasiTaskListComponent {
         new ActionColumnBuilder()
           .setAction((pendingTask: any) => {
             this.router.navigate([
-              `/formasi/formasi-task-list/${pendingTask.id}`
+              `/formasi/formasi-task-list/${pendingTask.objectGroup}`
             ])
           }, 'info')
           .withIcon('detail')
+          .addInactiveCondition(
+            (pendingTask: any) => pendingTask.flowId == 'for_flow_1'
+          )
           .build()
       )
       .addFilter(

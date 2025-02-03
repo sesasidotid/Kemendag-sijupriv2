@@ -1,14 +1,9 @@
 import { Serializable } from '../../base/commons/serializable'
 
-export class Formasi extends Serializable {
+export class ResultRecommened extends Serializable {
   id: string = undefined
-  waktuPelaksanaan: string = undefined
-  rekomendasi: string = undefined
-  suratUndangan: string = undefined
-  total: string = undefined
-  result: string = undefined
-  unitKerjaId: string = undefined
-  unitKerjaName: string = undefined
+  total: number = undefined
+  result: number = undefined
   jabatanCode: string = undefined
   jabatanName: string = undefined
   formasiId: string = undefined

@@ -49,9 +49,7 @@ export class UkomTaskDetailComponent {
         this.prevPendingTask = new PrevPendingTask(
           this.pendingTask.objectTask.prevObject
         )
-        console.log('peserta', this.pesertaUkom)
-        console.log('prevpending', this.prevPendingTask)
-        console.log('pending', this.pendingTask)
+
         this.findApproveDokumen(this.prevPendingTask.dokumenUkomList)
       },
       error: error => this.handlerService.handleException(error)
@@ -64,6 +62,7 @@ export class UkomTaskDetailComponent {
     )
     console.log('prevApprovedTask', this.prevApprovedTask)
   }
+
   preview (fileName: string, source: string) {
     this.filePreviewService.open(fileName, source)
   }
