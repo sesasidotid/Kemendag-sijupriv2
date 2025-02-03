@@ -1,4 +1,72 @@
-<hr>
+<hr />
+<form [formGroup]="addFormasiReportForm" (ngSubmit)="submit()">
+  <div class="mb-3">
+    <label for="provinsi" class="form-label">Provinsi</label>
+    <select
+      class="form-select"
+      name="provinsi"
+      id="provinsi"
+      formControlName="provinsi"
+      (change)="onProvinsiSwitch($event)"
+    >
+      <option selected value="" style="display: none">Provinsi</option>
+      <option
+        *ngFor="let provinsi of provinsiList$ | async"
+        [value]="provinsi.id"
+      >
+        {{ provinsi.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label for="kabKota" class="form-label">Kabupaten Kota</label>
+    <select
+      class="form-select"
+      name="kabKota"
+      id="kabKota"
+      formControlName="kabKota"
+      (change)="onKabKotaSwitch($event)"
+    >
+      <option selected value="" style="display: none">Kabupatan Kota</option>
+      <ng-container *ngIf="(kabKotaList$ | async)?.length; else KabnoUnitFound">
+        <option
+          *ngFor="let kabkota of kabKotaList$ | async"
+          [value]="kabkota.id"
+        >
+          {{ kabkota.name }}
+        </option>
+      </ng-container>
+    </select>
+    <ng-template #KabnoUnitFound>
+      <option disabled>Mohon pilih provinsi</option>
+    </ng-template>
+  </div>
+
+  <div class="mb-3">
+    <label for="unitKerja" class="form-label">Unit Kerja</label>
+    <select
+      class="form-select"
+      name="unitKerja"
+      id="unitKerja"
+      formControlName="unitKerja"
+    >
+      <option selected value="" style="display: none">Unit Kerja</option>
+      <ng-container *ngIf="(unitKerjaList$ | async)?.length; else noUnitFound">
+        <option
+          *ngFor="let unitKerja of unitKerjaList$ | async"
+          [value]="unitKerja.id"
+        >
+          {{ unitKerja.name }}
+        </option>
+      </ng-container>
+    </select>
+    <ng-template #noUnitFound>
+      <option disabled>Unit Kerja tidak ditemukan</option>
+    </ng-template>
+  </div>
+</form>
+
 <div class="row">
-    <app-pagable [pagable]="pagable"></app-pagable>
+  <app-pagable [pagable]="pagable"></app-pagable>
 </div>
