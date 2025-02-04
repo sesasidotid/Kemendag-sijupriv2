@@ -303,19 +303,11 @@ export const routes: Routes = [
           }
         },
         Formasi: {
-<<<<<<< HEAD
-          Formasi: {
-            components: () =>
-              import(
-                '../sijupri-jf/formasi/formasi-list/formasi-list.component'
-              ).then(m => m.FormasiListComponent)
-=======
           'Daftar Formasi': {
             components: () =>
               import('../sijupri-jf/jf-formasi/jf-formasi.component').then(
                 m => m.JfFormasiComponent
               )
->>>>>>> feisal_dev
           }
         }
       }) ?? [])

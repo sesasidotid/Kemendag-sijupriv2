@@ -1,1 +1,90 @@
-<p>provinsi-add works!</p>
+<div class="row">
+  <div [ngClass]="true ? 'col-lg-8' : 'col-lg-12'">
+    <form [formGroup]="addProvinsiForm" (ngSubmit)="submit()">
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold"
+          >Nama
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            id="name"
+            formControlName="name"
+          />
+          <div
+            class="feedback"
+            *ngIf="
+              addProvinsiForm.get('name').invalid &&
+              addProvinsiForm.get('name').touched
+            "
+          >
+            <small *ngIf="addProvinsiForm.get('name').errors?.['required']"
+              >Nama perlu diisi.</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold"
+          >Wilayah
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <select
+            id="inputState"
+            class="form-select"
+            name="wilayah_code"
+            id="wilayah_code"
+            formControlName="wilayah_code"
+          >
+            <option selected value="" style="display: none">
+              Pilih Wilayah
+            </option>
+            <option
+              *ngFor="let wilayahList of wilayahList"
+              [value]="wilayahList.code"
+            >
+              {{ wilayahList.name }}
+            </option>
+          </select>
+          <div
+            class="feedback"
+            *ngIf="
+              addProvinsiForm.get('wilayah_code').invalid &&
+              addProvinsiForm.get('wilayah_code').touched
+            "
+          >
+            <small
+              *ngIf="addProvinsiForm.get('wilayahCode').errors?.['required']"
+              >Wilayah perlu diisi.</small
+            >
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-warning" role="alert">
+        Pilih titik lokasi pada peta.
+      </div>
+      <div class="text-center float-end">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="addProvinsiForm.invalid"
+        >
+          Simpan
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="col-lg-4 mt-3 mt-lg-0">
+    <app-map
+      (coordinates)="onCoordinatesReceived($event)"
+      [name]="'indonesia'"
+      [type]="'indonesia'"
+    >
+    </app-map>
+  </div>
+</div>

@@ -1,58 +1,150 @@
 <div class="column">
-    <div class="col-12">
-        <app-profile-card></app-profile-card>
-    </div>
-    <!--end col-->
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body p-4">
-                <div class="tab-content">
-                    <form [formGroup]="userUnitKerjaForm" (ngSubmit)="submit()">
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6 mb-3"> <!-- Responsive to lg, md, and smaller -->
-                                <label for="name" class="form-label">Nama Lengkap <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" class="form-control" id="name" placeholder="Masukkan Nama Lengkap"
-                                    formControlName="name" name="name">
-                                    <div class="feedback" *ngIf="userUnitKerjaForm.get('name').invalid && userUnitKerjaForm.get('name').touched">
-                                        <small *ngIf="userUnitKerjaForm.get('name').errors?.['required']">Nama lengkap perlu
-                                            diisi.</small>
-                                    </div>
-                            </div>
-                            <div class="col-lg-4 col-md-6 mb-3"> <!-- Responsive to lg, md, and smaller -->
-                                <label for="phone" class="form-label">No. HP
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" class="form-control" id="phone" placeholder="Masukkan No. HP"
-                                    formControlName="phone" name="phone">
-                                    <div class="feedback" *ngIf="userUnitKerjaForm.get('phone').invalid && userUnitKerjaForm.get('phone').touched">
-                                        <small *ngIf="userUnitKerjaForm.get('phone').errors?.['required']">No. HP perlu
-                                            diisi.</small>
-                                        <small *ngIf="userUnitKerjaForm.get('phone').errors?.['pattern']">No. HP tidak valid.</small>
-                                    </div>
-                            </div>
-                            <div class="col-lg-4 mb-3"> <!-- Full width on md and below -->
-                                <label for="email" class="form-label">Email
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="email" class="form-control" id="email" placeholder="Masukkan email"
-                                    formControlName="email" name="email">
-                                    <div class="feedback" *ngIf="userUnitKerjaForm.get('email').invalid && userUnitKerjaForm.get('email').touched">
-                                        <small *ngIf="userUnitKerjaForm.get('email').errors?.['required']">Email perlu
-                                            diisi.</small>
-                                        <small *ngIf="userUnitKerjaForm.get('email').errors?.['email']">Email tidak valid.</small>
-                                    </div>
-                            </div>
-                        </div>
-                        <!--end row-->
-                        <div class="hstack gap-2 justify-content-end">
-                            <button type="submit" class="btn btn-primary" [disabled]="userUnitKerjaForm.invalid">Simpan Perubahan</button>
-                        </div>
-                    </form>
+  <div class="col-12">
+    <app-profile-card></app-profile-card>
+  </div>
+  <!--end col-->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body p-4">
+        <div class="tab-content">
+          <form [formGroup]="userUnitKerjaForm" (ngSubmit)="submit()">
+            <div class="row">
+              <div class="col-lg-4 col-md-6 mb-3">
+                <!-- Responsive to lg, md, and smaller -->
+                <label for="name" class="form-label"
+                  >Nama Lengkap <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  placeholder="Masukkan Nama Lengkap"
+                  formControlName="name"
+                  name="name"
+                />
+                <div
+                  class="feedback"
+                  *ngIf="
+                    userUnitKerjaForm.get('name').invalid &&
+                    userUnitKerjaForm.get('name').touched
+                  "
+                >
+                  <small
+                    *ngIf="userUnitKerjaForm.get('name').errors?.['required']"
+                    >Nama lengkap perlu diisi.</small
+                  >
                 </div>
-            </div>
-        </div>
-    </div>
+              </div>
+              <div class="col-lg-4 col-md-6 mb-3">
+                <!-- Responsive to lg, md, and smaller -->
+                <label for="phone" class="form-label"
+                  >No. HP
+                  <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="phone"
+                  placeholder="Masukkan No. HP"
+                  formControlName="phone"
+                  name="phone"
+                />
+                <div
+                  class="feedback"
+                  *ngIf="
+                    userUnitKerjaForm.get('phone').invalid &&
+                    userUnitKerjaForm.get('phone').touched
+                  "
+                >
+                  <small
+                    *ngIf="userUnitKerjaForm.get('phone').errors?.['required']"
+                    >No. HP perlu diisi.</small
+                  >
+                  <small
+                    *ngIf="userUnitKerjaForm.get('phone').errors?.['pattern']"
+                    >No. HP tidak valid.</small
+                  >
+                </div>
+              </div>
+              <div class="col-lg-4 mb-3">
+                <!-- Full width on md and below -->
+                <label for="email" class="form-label"
+                  >Email
+                  <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Masukkan email"
+                  formControlName="email"
+                  name="email"
+                />
+                <div
+                  class="feedback"
+                  *ngIf="
+                    userUnitKerjaForm.get('email').invalid &&
+                    userUnitKerjaForm.get('email').touched
+                  "
+                >
+                  <small
+                    *ngIf="userUnitKerjaForm.get('email').errors?.['required']"
+                    >Email perlu diisi.</small
+                  >
+                  <small
+                    *ngIf="userUnitKerjaForm.get('email').errors?.['email']"
+                    >Email tidak valid.</small
+                  >
+                </div>
+              </div>
 
-    <!--end col-->
+              <!-- <div class="col-lg-4 mb-3">
+                <label for="jenisKelaminCode" class="form-label"
+                  >Jenis Kelamin
+                  <span class="text-danger">*</span>
+                </label>
+                <select
+                  class="form-select"
+                  id="jenisKelaminCode"
+                  formControlName="jenisKelaminCode"
+                  name="jenisKelaminCode"
+                >
+                  <option value="" disabled selected>
+                    Pilih Jenis Kelamin
+                  </option>
+
+                  <option value="M" selected>pria</option>
+                  <option value="F">wanita</option>
+                </select>
+                <div
+                  class="feedback"
+                  *ngIf="
+                    userUnitKerjaForm.get('jenisKelaminCode').invalid &&
+                    userUnitKerjaForm.get('jenisKelaminCode').touched
+                  "
+                >
+                  <small
+                    *ngIf="userUnitKerjaForm.get('jenisKelaminCode').errors?.['required']"
+                    >Jenis kelamin perlu diisi.</small
+                  >
+                </div>
+              </div> -->
+            </div>
+            <!--end row-->
+            <div class="hstack gap-2 justify-content-end">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="userUnitKerjaForm.invalid"
+              >
+                Simpan Perubahan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--end col-->
 </div>

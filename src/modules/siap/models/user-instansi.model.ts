@@ -7,6 +7,7 @@ export class UserInstansi extends Serializable {
   name: string = undefined
   email: string = undefined
   password: string = undefined
+  phone: string = undefined
 
   constructor (object?: { [key: string]: any }) {
     super()

@@ -30,6 +30,19 @@ export class UserInstansiService {
     )
   }
 
+  findByNip (nip: string): Observable<UserInstansi> {
+    return this.apiService.getData(`${this.BASE_PATH}/${nip}`).pipe(
+      map((response: any) => {
+        return new UserInstansi(response)
+      }),
+      catchError(error => {
+        console.error('Error fetching data', error)
+        this.alertService.showToast('Error', error.message)
+        throw error
+      })
+    )
+  }
+
   save (user: UserInstansi): Observable<void> {
     return this.apiService.postData(this.BASE_PATH, user).pipe(
       catchError(error => {

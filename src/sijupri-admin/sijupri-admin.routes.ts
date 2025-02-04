@@ -301,31 +301,76 @@ export const routes: Routes = [
             components: () =>
               import(
                 '../sijupri-admin/maintenance/instansi-list/instansi-list.component'
-              ).then(m => m.InstansiListComponent)
+              ).then(m => m.InstansiListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/maintenance/instasi-detail/instasi-detail.component'
+                  ).then(m => m.InstasiDetailComponent)
+              }
+            ]
           },
           'Unit Kerja': {
             components: () =>
               import(
                 '../sijupri-admin/maintenance/unit-kerja-list/unit-kerja-list.component'
-              ).then(m => m.UnitKerjaListComponent)
+              ).then(m => m.UnitKerjaListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/maintenance/unit-kerja-detail/unit-kerja-detail.component'
+                  ).then(m => m.UnitKerjaDetailComponent)
+              }
+            ]
           },
           Provinsi: {
             components: () =>
               import(
                 '../sijupri-admin/maintenance/provinsi-list/provinsi-list.component'
-              ).then(m => m.ProvinsiListComponent)
+              ).then(m => m.ProvinsiListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/maintenance/provinsi-detail/provinsi-detail.component'
+                  ).then(m => m.ProvinsiDetailComponent)
+              }
+            ]
           },
           'Kabupaten/Kota': {
             components: () =>
               import(
                 '../sijupri-admin/maintenance/kab-kota-list/kab-kota-list.component'
-              ).then(m => m.KabKotaListComponent)
+              ).then(m => m.KabKotaListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/maintenance/kab-kota-detail/kab-kota-detail.component'
+                  ).then(m => m.KabKotaDetailComponent)
+              }
+            ]
           },
           Kompetensi: {
             components: () =>
               import(
                 '../sijupri-admin/ukom/ukom-kompetensi/ukom-kompetensi-list/ukom-kompetensi-list.component'
-              ).then(m => m.UkomKompetensiListComponent)
+              ).then(m => m.UkomKompetensiListComponent),
+            routes: [
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/ukom/ukom-kompetensi/ukom-kompetensi-detail/ukom-kompetensi-detail.component'
+                  ).then(m => m.UkomKompetensiDetailComponent)
+              }
+            ]
           }
         },
         SIAP: {

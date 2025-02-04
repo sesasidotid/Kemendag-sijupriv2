@@ -15,6 +15,13 @@ export const routes: Routes = [
     },
     children: [
       {
+        path: '',
+        loadComponent: () =>
+          import(
+            '../sijupri-instansi/template/dashboard/dashboard.component'
+          ).then(m => m.DashboardComponent)
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./template/profile/profile.component').then(
@@ -38,6 +45,13 @@ export const routes: Routes = [
                   import(
                     '../sijupri-instansi/maintenance/unit-kerja-add/unit-kerja-add.component'
                   ).then(m => m.UnitKerjaAddComponent)
+              },
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/maintenance/unit-kerja-detail/unit-kerja-detail.component'
+                  ).then(m => m.UnitKerjaDetailComponent)
               }
             ]
           }

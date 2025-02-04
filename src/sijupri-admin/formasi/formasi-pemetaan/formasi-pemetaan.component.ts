@@ -107,8 +107,13 @@ export class FormasiPemetaanComponent {
   }
 
   getProvince (isReset?: boolean): void {
-    this.apiService.getData(`/api/v1/provinsi/search?limit=100`).subscribe({
+    this.apiService.getData(`/api/v1/provinsi/search?limit=1000`).subscribe({
       next: response => {
+        // response.data.filter((provinsi: Provinsi) => {
+        //   if (provinsi.latitude && provinsi.longitude) {
+        //     this.provinceContainedData.push(provinsi)
+        //   }
+        // })
         this.provinceContainedData = response.data
         if (!isReset) {
           this.initMap()

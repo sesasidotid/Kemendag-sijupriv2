@@ -1,1 +1,119 @@
-<p>kab-kota-add works!</p>
+<div class="row">
+  <div [ngClass]="true ? 'col-lg-8' : 'col-lg-12'">
+    <form [formGroup]="addKabKotaForm" (ngSubmit)="submit()">
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold"
+          >Nama
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            id="name"
+            formControlName="name"
+          />
+          <div
+            class="feedback"
+            *ngIf="
+              addKabKotaForm.get('name').invalid &&
+              addKabKotaForm.get('name').touched
+            "
+          >
+            <small *ngIf="addKabKotaForm.get('name').errors?.['required']"
+              >Nama perlu diisi.</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold"
+          >Tipe
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <select
+            id="inputState"
+            class="form-select"
+            name="type"
+            id="type"
+            formControlName="type"
+          >
+            <option value="KOTA" selected>Kota</option>
+            <option value="KABUPATEN">Kabupaten</option>
+          </select>
+          <div
+            class="feedback"
+            *ngIf="
+              addKabKotaForm.get('type').invalid &&
+              addKabKotaForm.get('type').touched
+            "
+          >
+            <small *ngIf="addKabKotaForm.get('type').errors?.['required']"
+              >Tipe perlu diisi.</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold"
+          >Provinsi
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <select
+            id="inputState"
+            class="form-select"
+            name="provinsi_id"
+            id="provinsi_id"
+            formControlName="provinsi_id"
+          >
+            <option selected value="" style="display: none">
+              Pilih Wilayah
+            </option>
+            <option *ngFor="let provinsi of provinsiList" [value]="provinsi.id">
+              {{ provinsi.name }}
+            </option>
+          </select>
+
+          <div
+            class="feedback"
+            *ngIf="
+              addKabKotaForm.get('provinsi_id').invalid &&
+              addKabKotaForm.get('provinsi_id').touched
+            "
+          >
+            <small
+              *ngIf="addKabKotaForm.get('provinsi_id').errors?.['required']"
+              >Provinsi perlu diisi.</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning" role="alert">
+        Pilih titik lokasi pada peta.
+      </div>
+      <div class="text-center float-end">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="addKabKotaForm.invalid"
+        >
+          Simpan
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="col-lg-4 mt-3 mt-lg-0">
+    <app-map
+      (coordinates)="onCoordinatesReceived($event)"
+      [name]="'indonesia'"
+      [type]="'indonesia'"
+    >
+    </app-map>
+  </div>
+</div>

@@ -24,6 +24,7 @@
     "ag-grid-angular": "^32.3.2",
     "ag-grid-community": "^32.3.2",
     "angularx-qrcode": "^17.0.1",
+    "chart.js": "^4.4.7",
     "cropperjs": "^1.6.2",
     "firebase": "^10.14.1",
     "leaflet": "^1.9.4",

@@ -1,71 +1,240 @@
-<hr />
-<form [formGroup]="addFormasiReportForm" (ngSubmit)="submit()">
-  <div class="mb-3">
-    <label for="provinsi" class="form-label">Provinsi</label>
-    <select
-      class="form-select"
-      name="provinsi"
-      id="provinsi"
-      formControlName="provinsi"
-      (change)="onProvinsiSwitch($event)"
-    >
-      <option selected value="" style="display: none">Provinsi</option>
-      <option
-        *ngFor="let provinsi of provinsiList$ | async"
-        [value]="provinsi.id"
+<div class="row">
+  <form [formGroup]="addFormasiReportForm" (ngSubmit)="onSubmit()">
+    <ng-container *ngIf="exportTypeLoading$ | async">
+      <div
+        class="d-flex flex-column justify-content-center align-items-center my-4"
       >
-        {{ provinsi.name }}
-      </option>
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label for="kabKota" class="form-label">Kabupaten Kota</label>
-    <select
-      class="form-select"
-      name="kabKota"
-      id="kabKota"
-      formControlName="kabKota"
-      (change)="onKabKotaSwitch($event)"
-    >
-      <option selected value="" style="display: none">Kabupatan Kota</option>
-      <ng-container *ngIf="(kabKotaList$ | async)?.length; else KabnoUnitFound">
-        <option
-          *ngFor="let kabkota of kabKotaList$ | async"
-          [value]="kabkota.id"
+        <div class="spinner-border mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Mendapatkan Data...</p>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!(exportTypeLoading$ | async)">
+      <div class="row mb-3">
+        <label for="exportType" class="col-sm-2 col-form-label fw-bold"
+          >Tipe Report</label
         >
-          {{ kabkota.name }}
-        </option>
-      </ng-container>
-    </select>
-    <ng-template #KabnoUnitFound>
-      <option disabled>Mohon pilih provinsi</option>
-    </ng-template>
-  </div>
+        <div class="col-sm-10">
+          <select
+            id="exportType"
+            class="form-select"
+            name="exportType"
+            formControlName="exportType"
+          >
+            <option selected value="" style="display: none">
+              Pilih Tipe Report
+            </option>
+            <option [value]="'unitKerja'">Unit Kerja</option>
+            <option [value]="'provinsi'">Provinsi</option>
+            <option [value]="'kabKota'">Kabupaten/Kota</option>
+          </select>
+          <div class="text-muted mt-1">
+            <small> Jangan dipilih jika ingin mengekspor semua data. </small>
+          </div>
+        </div>
+      </div>
 
-  <div class="mb-3">
-    <label for="unitKerja" class="form-label">Unit Kerja</label>
-    <select
-      class="form-select"
-      name="unitKerja"
-      id="unitKerja"
-      formControlName="unitKerja"
-    >
-      <option selected value="" style="display: none">Unit Kerja</option>
-      <ng-container *ngIf="(unitKerjaList$ | async)?.length; else noUnitFound">
-        <option
-          *ngFor="let unitKerja of unitKerjaList$ | async"
-          [value]="unitKerja.id"
+      <div
+        class="row mb-3"
+        *ngIf="addFormasiReportForm.get('exportType').value === 'unitKerja'"
+      >
+        <label for="inputUnitKerjaId" class="col-sm-2 col-form-label fw-bold"
+          >Unit Kerja</label
         >
-          {{ unitKerja.name }}
-        </option>
-      </ng-container>
-    </select>
-    <ng-template #noUnitFound>
-      <option disabled>Unit Kerja tidak ditemukan</option>
-    </ng-template>
-  </div>
-</form>
+        <div class="col-sm-10">
+          <select
+            id="inputUnitKerjaId"
+            class="form-select"
+            formControlName="unitKerjaId"
+            name="unitKerjaId"
+            (change)="patchFormValue($event, 'unitKerja')"
+          >
+            <option selected value="" style="display: none">
+              Pilih Unit Kerja
+            </option>
+            <option
+              *ngFor="let unitKerja of unitKerjaList"
+              [value]="unitKerja.id"
+            >
+              {{ unitKerja.name }}
+            </option>
+          </select>
+          <div
+            class="feedback"
+            *ngIf="
+              addFormasiReportForm.get('unitKerjaId').invalid &&
+              addFormasiReportForm.get('unitKerjaId').touched
+            "
+          >
+            <small
+              *ngIf="addFormasiReportForm.get('unitKerjaId').errors?.['required']"
+            >
+              Unit Kerja perlu diisi.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="row mb-3"
+        *ngIf="addFormasiReportForm.get('exportType').value === 'provinsi'"
+      >
+        <label for="inputProvinsiId" class="col-sm-2 col-form-label fw-bold"
+          >Provinsi</label
+        >
+        <div class="col-sm-10">
+          <select
+            id="inputProvinsiId"
+            class="form-select"
+            formControlName="provinsiId"
+            name="provinsiId"
+            (change)="patchFormValue($event, 'provinsi')"
+          >
+            <option selected value="" style="display: none">
+              Pilih Provinsi
+            </option>
+            <option *ngFor="let provinsi of provinsiList" [value]="provinsi.id">
+              {{ provinsi.name }}
+            </option>
+          </select>
+          <div
+            class="feedback"
+            *ngIf="
+              addFormasiReportForm.get('provinsiId').invalid &&
+              addFormasiReportForm.get('provinsiId').touched
+            "
+          >
+            <small
+              *ngIf="addFormasiReportForm.get('provinsiId').errors?.['required']"
+            >
+              Provinsi perlu diisi.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="row mb-3"
+        *ngIf="addFormasiReportForm.get('exportType').value === 'kabKota'"
+      >
+        <label for="inputKabKotaId" class="col-sm-2 col-form-label fw-bold"
+          >Kabupaten/Kota</label
+        >
+        <div class="col-sm-10">
+          <select
+            id="inputKabKotaId"
+            class="form-select"
+            formControlName="kabKotaId"
+            name="kabKotaId"
+            (change)="patchFormValue($event, 'kabKota')"
+          >
+            <option selected value="" style="display: none">
+              Pilih Kabupaten/Kota
+            </option>
+            <option *ngFor="let kabKota of kabKotaList" [value]="kabKota.id">
+              {{ kabKota.name }}
+            </option>
+          </select>
+          <div
+            class="feedback"
+            *ngIf="
+              addFormasiReportForm.get('kabKotaId').invalid &&
+              addFormasiReportForm.get('kabKotaId').touched
+            "
+          >
+            <small
+              *ngIf="addFormasiReportForm.get('kabKotaId').errors?.['required']"
+            >
+              Kabupaten/Kota perlu diisi.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="inputfileType" class="col-sm-2 col-form-label fw-bold"
+          >Format File</label
+        >
+        <div class="col-sm-10">
+          <select
+            id="inputfileType"
+            class="form-select"
+            formControlName="fileType"
+            name="fileType"
+          >
+            <option selected value="" style="display: none">
+              Pilih Format File
+            </option>
+            <option [value]="'xlsx'">Excel 2007</option>
+            <option [value]="'xls'">Excel</option>
+            <option [value]="'csv'">CSV</option>
+          </select>
+          <div
+            class="feedback"
+            *ngIf="
+              addFormasiReportForm.get('fileType').invalid &&
+              addFormasiReportForm.get('fileType').touched
+            "
+          >
+            <small
+              *ngIf="addFormasiReportForm.get('fileType').errors?.['required']"
+            >
+              Format file perlu dipilih.
+            </small>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="row text-center">
+      <div class="col-12">
+        <button
+          *ngIf="addFormasiReportForm.get('exportType').value === ''"
+          type="submit"
+          class="btn btn-sm btn-success float-end"
+          [disabled]="addFormasiReportForm.invalid"
+        >
+          Generate Report
+        </button>
+        <button
+          *ngIf="addFormasiReportForm.get('exportType').value === 'unitKerja'"
+          type="submit"
+          class="btn btn-sm btn-success float-end"
+          [disabled]="
+            addFormasiReportForm.invalid ||
+            addFormasiReportForm.get('unitKerjaId').value === ''
+          "
+        >
+          Generate Report
+        </button>
+        <button
+          *ngIf="addFormasiReportForm.get('exportType').value === 'provinsi'"
+          type="submit"
+          class="btn btn-sm btn-success float-end"
+          [disabled]="
+            addFormasiReportForm.invalid ||
+            addFormasiReportForm.get('provinsiId').value === ''
+          "
+        >
+          Generate Report
+        </button>
+        <button
+          *ngIf="addFormasiReportForm.get('exportType').value === 'kabKota'"
+          type="submit"
+          class="btn btn-sm btn-success float-end"
+          [disabled]="
+            addFormasiReportForm.invalid ||
+            addFormasiReportForm.get('kabKotaId').value === ''
+          "
+        >
+          Generate Report
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+<hr />
 
 <div class="row">
   <app-pagable [pagable]="pagable"></app-pagable>

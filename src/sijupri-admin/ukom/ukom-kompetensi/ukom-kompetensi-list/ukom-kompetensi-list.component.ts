@@ -94,6 +94,16 @@ export class UkomKompetensiListComponent {
           .withField('Nama', 'text')
           .build()
       )
+      //   .addActionColumn(
+      //     new ActionColumnBuilder()
+      //       .setAction((kompetensi: any) => {
+      //         this.router.navigate([
+      //           `/maintenance/kompetensi-list/${kompetensi.id}`
+      //         ])
+      //       }, 'info')
+      //       .withIcon('detail')
+      //       .build()
+      //   )
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((data: any) => {

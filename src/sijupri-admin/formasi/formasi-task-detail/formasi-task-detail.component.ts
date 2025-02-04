@@ -422,12 +422,8 @@ export class FormasiTaskDetailComponent {
           .postData(`/api/v1/formasi/task/submit`, payload)
           .subscribe({
             next: () => {
-<<<<<<< HEAD
               window.location.reload(),
                 this.router.navigate(['/formasi/formasi-task-list'])
-=======
-              this.router.navigate(['/formasi/formasi-task-list'])
->>>>>>> feisal_dev
             },
             error: error => {
               console.error('Error fetching data', error)

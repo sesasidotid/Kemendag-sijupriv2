@@ -5,6 +5,7 @@ export class Provinsi extends Serializable {
   latitude: string = undefined
   longitude: string = undefined
   wilayahCode: string = undefined
+  wilayah_code: string = undefined
   name: string = undefined
   description: string = undefined
   updatedBy: string = undefined

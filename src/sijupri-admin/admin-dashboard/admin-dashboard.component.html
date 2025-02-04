@@ -1,5 +1,5 @@
 <section class="container-fluid">
-  <p>Pengajuan dengan status pending</p>
+  <p class="h3">Pengajuan dengan status pending</p>
   <div class="row">
     <div class="col-md-4">
       <div class="card text-center p-3 mb-4">
@@ -13,17 +13,66 @@
         <h2>{{ totalUKOMPending }}</h2>
       </div>
     </div>
-    <!-- <div class="col-md-3">
-      <div class="card text-center p-3 mb-4">
-        <h5>SIAP</h5>
-        <h2>3,462</h2>
-      </div>
-    </div> -->
     <div class="col-md-4">
       <div class="card text-center p-3 mb-4">
         <h5>FORMASI</h5>
         <h2>{{ totalFormasiPending }}</h2>
       </div>
     </div>
+  </div>
+
+  <br />
+  <p class="h3">Statistik Pendaftaran UKom</p>
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label for="startMonth">Bulan Awal</label>
+      <select
+        [(ngModel)]="startMonth"
+        (change)="applyFilters()"
+        class="form-control mx-0 mb-1 mt-0"
+      >
+        <option *ngFor="let month of months; let i = index" [value]="i + 1">
+          {{ month }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="endMonth">Bulan Akhir</label>
+      <select
+        [(ngModel)]="endMonth"
+        (change)="applyFilters()"
+        class="form-control mx-0 mb-1 mt-0"
+      >
+        <option *ngFor="let month of months; let i = index" [value]="i + 1">
+          {{ month }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="year">Tahun</label>
+      <select
+        [(ngModel)]="year"
+        (change)="applyFilters()"
+        class="form-control mx-0 mb-1 mt-0"
+      >
+        <option *ngFor="let y of [2024, 2025, 2026]" [value]="y">
+          {{ y }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Chart Container -->
+  <div
+    class="chart-container"
+    style="position: relative; height: 50vh; width: 100%"
+  >
+    <canvas
+      baseChart
+      [data]="barChartData"
+      [options]="barChartOptions"
+      chartType="bar"
+    >
+    </canvas>
   </div>
 </section>

@@ -7,7 +7,7 @@ export class KabKota extends Serializable {
   type: string = undefined
   latitude: string = undefined
   longitude: string = undefined
-
+  provinsi_id: string = undefined
   constructor (object?: { [key: string]: any }) {
     super()
     if (object) this.fromObject(object)

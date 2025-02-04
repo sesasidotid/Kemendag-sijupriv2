@@ -1,1 +1,6 @@
-<app-pagable [pagable]="pagable"></app-pagable>
+<ng-container *ngIf="(tab$ | async) === 0">
+  <app-pagable [pagable]="pagable" [refresh]="refreshToggle"></app-pagable>
+</ng-container>
+<ng-container *ngIf="(tab$ | async) === 1">
+  <app-instasi-add (changeTabActive)="handleTabChange(0)"></app-instasi-add>
+</ng-container>

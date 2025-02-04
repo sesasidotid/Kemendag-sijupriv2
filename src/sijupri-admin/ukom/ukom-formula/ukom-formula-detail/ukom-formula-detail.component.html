@@ -9,7 +9,7 @@
   </div>
 
   <ng-template #formulaHadItem>
-    <div class="card-body">
+    <!-- <div class="card-body">
       <div class="row">
         <div class="col-lg-12">
           <div class="row mb-3">
@@ -31,16 +31,16 @@
           <div
             *ngFor="
               let field of [
-                'catPercentage',
-                'wawancaraPercentage',
-                'seminarPercentage',
-                'praktikPercentage',
-                'portofolioPercentage',
-                'uktPercentage',
-                'ukmskPercentage',
-                'gradeThreshold',
-                'uktThreshold',
-                'jpmThreshold'
+                'Persentase CAT',
+                'Persentase Wawancara',
+                'Persentase Seminar',
+                'Persentase Praktik',
+                'Persentase Portofolio',
+                'Persentase UKT',
+                'Persentase UKMSK',
+                'Ambang Batas Nilai',
+                'Ambang Batas UKT',
+                'Ambang Batas JPM'
               ]
             "
             class="row mb-3"
@@ -52,6 +52,111 @@
               <p>: {{ FormulaDetail[field] }} %</p>
             </div>
           </div>
+        </div>
+      </div>
+    </div> -->
+    <div>
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Jabatan</label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ (filteredJabatan$ | async)?.name || 'Not Found' }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold">
+          Jenjang
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ (filteredJenjang$ | async)?.name || 'Not Found' }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Persentase CAT
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.catPercentage }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Persentase Wawancara
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.wawancaraPercentage }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Persentase Seminar
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.seminarPercentage }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Persentase Praktik
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.praktikPercentage }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Persentase Portofolio
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.portofolioPercentage }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Persentase UKT
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.uktPercentage }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Persentase UKMSK
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.ukmskPercentage }}</p>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Ambang Batas Nilai
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.gradeThreshold }}</p>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Ambang Batas UKT
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.uktThreshold }}</p>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Ambang Batas JPM
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ FormulaDetail.jpmThreshold }}</p>
         </div>
       </div>
     </div>

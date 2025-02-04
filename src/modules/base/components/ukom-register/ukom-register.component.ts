@@ -21,10 +21,6 @@ import { CommonModule } from '@angular/common'
 import { map, filter } from 'rxjs/operators'
 import { Instansi } from '../../../maintenance/models/instansi.model'
 import { UnitKerja } from '../../../maintenance/models/unit-kerja.model'
-<<<<<<< HEAD
-
-=======
->>>>>>> feisal_dev
 import { ModalComponent } from '../modal/modal.component'
 import { QRCodeModule } from 'angularx-qrcode'
 import { SafeUrl } from '@angular/platform-browser'
