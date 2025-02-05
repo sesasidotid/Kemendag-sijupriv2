@@ -24,7 +24,7 @@ export class UserInstansiService {
       }),
       catchError(error => {
         console.error('Error fetching data', error)
-        this.alertService.showToast('Error', error.message)
+        // this.alertService.showToast('Error', error.message)
         throw error
       })
     )

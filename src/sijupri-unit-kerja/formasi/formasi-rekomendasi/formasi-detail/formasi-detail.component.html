@@ -33,7 +33,7 @@
             >
               <td
                 *ngIf="j === 0"
-                class="align-middle text-center"
+                class="align-middle"
                 [attr.rowspan]="item.formasiResultDtoList.length"
               >
                 {{ i + 1 }}
@@ -46,8 +46,8 @@
                 {{ item.jabatanName }}
               </td>
               <td class="align-middle">{{ formasi.jenjangName }}</td>
-              <td class="align-middle text-center">
-                {{ formasi.pembulatan || 0 }}
+              <td class="align-middle">
+                {{ formasi.result || 0 }}
               </td>
             </tr>
           </ng-container>
@@ -56,7 +56,7 @@
             <td colspan="3" class="align-middle text-center fw-bold">
               Jumlah Usulan Formasi
             </td>
-            <td class="align-middle text-center fw-bold">
+            <td class="align-middle fw-bold">
               {{ getTotalRekapitulasi() }}
             </td>
           </tr>

@@ -43,7 +43,7 @@ export class FormasiDataRekomendasiComponent {
 
       .addFilter(
         new PageFilterBuilder('like')
-          .setProperty('unitKerjaName')
+          .setProperty('unit_kerja|name')
           .withField('Unit Kerja', 'text')
           .build()
       )
@@ -54,7 +54,7 @@ export class FormasiDataRekomendasiComponent {
             this.router.navigate([
               `/formasi/formasi-rekomendasi-list/${formasi.id}`
             ])
-          }, 'primary')
+          }, 'info')
           .build()
       )
       .build()

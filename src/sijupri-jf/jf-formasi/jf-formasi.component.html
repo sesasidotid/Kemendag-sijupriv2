@@ -25,7 +25,7 @@
                 <tr *ngFor="let formasi of item.jenjangSumList; let j = index">
                   <td
                     *ngIf="j === 0"
-                    class="align-middle text-center"
+                    class="align-middle"
                     [attr.rowspan]="item.jenjangSumList.length"
                   >
                     {{ i + 1 }}
@@ -38,7 +38,7 @@
                     {{ item.jabatanName }}
                   </td>
                   <td class="align-middle">{{ formasi.jenjangName }}</td>
-                  <td class="align-middle text-center">
+                  <td class="align-middle">
                     {{ formasi.resultSum || 0 }}
                   </td>
                 </tr>
@@ -48,7 +48,7 @@
                 <td colspan="3" class="align-middle text-center fw-bold">
                   Jumlah Formasi yang Tersedia
                 </td>
-                <td class="align-middle text-center fw-bold">
+                <td class="align-middle fw-bold">
                   {{ getTotalRekapitulasi() }}
                 </td>
               </tr>

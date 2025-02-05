@@ -1,1 +1,183 @@
-<p>unit-kerja-update works!</p>
+<div class="row">
+  <div [ngClass]="true ? 'col-lg-8' : 'col-lg-12'">
+    <form [formGroup]="updateUnitKerjaForm" (ngSubmit)="submit()">
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Nama
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            id="name"
+            formControlName="name"
+          />
+          <div
+            class="feedback"
+            *ngIf="
+              updateUnitKerjaForm.get('name').invalid &&
+              updateUnitKerjaForm.get('name').touched
+            "
+          >
+            <small *ngIf="updateUnitKerjaForm.get('name').errors?.['required']">
+              Nama perlu diisi.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Email
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            name="email"
+            id="email"
+            formControlName="email"
+          />
+          <div
+            class="feedback"
+            *ngIf="
+              updateUnitKerjaForm.get('email').invalid &&
+              updateUnitKerjaForm.get('email').touched
+            "
+          >
+            <small
+              *ngIf="updateUnitKerjaForm.get('email').errors?.['required']"
+            >
+              Email perlu diisi.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Telp
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            name="phone"
+            id="phone"
+            formControlName="phone"
+          />
+          <div
+            class="feedback"
+            *ngIf="
+              updateUnitKerjaForm.get('phone').invalid &&
+              updateUnitKerjaForm.get('phone').touched
+            "
+          >
+            <small *ngIf="updateUnitKerjaForm.get('phone').errors?.['required']"
+              >Telp perlu diisi.</small
+            >
+            <small *ngIf="updateUnitKerjaForm.get('phone').errors?.['pattern']"
+              >Telp tidak valid.</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold"
+          >Alamat
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            name="alamat"
+            id="alamat"
+            formControlName="alamat"
+          />
+          <div
+            class="feedback"
+            *ngIf="
+              updateUnitKerjaForm.get('alamat').invalid &&
+              updateUnitKerjaForm.get('alamat').touched
+            "
+          >
+            <small
+              *ngIf="updateUnitKerjaForm.get('alamat').errors?.['required']"
+              >Alamat perlu diisi.</small
+            >
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">
+          Wilayah
+          <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+          <select
+            id="inputState"
+            class="form-select"
+            name="wilayah_code"
+            id="wilayah_code"
+            formControlName="wilayah_code"
+          >
+            <option selected value="" style="display: none">
+              Pilih Wilayah
+            </option>
+            <option *ngFor="let wilayah of wilayahList" [value]="wilayah.code">
+              {{ wilayah.name }}
+            </option>
+          </select>
+          <div
+            class="feedback"
+            *ngIf="
+              updateUnitKerjaForm.get('wilayah_code').invalid &&
+              updateUnitKerjaForm.get('wilayah_code').touched
+            "
+          >
+            <small
+              *ngIf="updateUnitKerjaForm.get('wilayah_code').errors?.['required']"
+            >
+              Wilayah perlu diisi.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning" role="alert">
+        Pilih titik lokasi pada peta.
+      </div>
+
+      <div class="text-center float-end">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="updateUnitKerjaForm.invalid"
+        >
+          Simpan
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="col-lg-4 mt-3 mt-lg-0">
+    <app-map
+      *ngIf="
+        updateUnitKerjaForm.get('latitude').value &&
+        updateUnitKerjaForm.get('longitude').value
+      "
+      (coordinates)="onCoordinatesReceived($event)"
+      [name]="'indonesia'"
+      [type]="'indonesia'"
+      [defaultLat]="updateUnitKerjaForm.get('latitude').value"
+      [defaultLng]="updateUnitKerjaForm.get('longitude').value"
+    >
+    </app-map>
+  </div>
+</div>

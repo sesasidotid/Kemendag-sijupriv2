@@ -1,17 +1,40 @@
+<section *ngIf="undangan.length > 0">
+  <div class="card" *ngFor="let undangan of undangan">
+    <h5 class="card-header">Undangan Verifikasi</h5>
+    <div class="card-body">
+      <h5 class="card-title">{{ undangan.suratUndangan }}</h5>
+      <p class="card-text">
+        Dimohon kehadiranya pada tanggal
+        <span class="text-primary">{{ undangan.waktuPelaksanaan }} </span>untuk
+        verifikasi formasi
+      </p>
+      <a
+        class="btn btn-primary"
+        (click)="preview(undangan.suratUndangan, undangan.suratUndanganUrl)"
+        >Lihat Undangan</a
+      >
+    </div>
+  </div>
+</section>
+<br />
+
 <div *ngIf="!flowId || flowId == 'for_flow_1'">
   <div class="row">
     <div class="col-lg-12">
       <div class="card">
-        <div class="card-header align-items-center d-flex">
-          <h4 class="card-title mb-0 flex-grow-1">Pendaftaran Formasi</h4>
-          <div class="flex-shrink-0">
-            <!-- <a
+        <!-- <div class="card-header align-items-center d-flex"> -->
+        <h4 class="card-title">Pendaftaran Formasi</h4>
+        <!-- <h5>
+            Pendaftaran Formasi
+          </h5> -->
+        <div class="flex-shrink-0">
+          <!-- <a
               *ngIf="pendingTask"
               class="btn btn-sm btn-outline-success"
               (click)="isRequestPage = !isRequestPage"
               >{{ isRequestPage ? 'Ubah Dokumen' : 'Kembali' }}</a
             > -->
-          </div>
+          <!-- </div> -->
         </div>
       </div>
     </div>
@@ -414,7 +437,7 @@
         <!-- <button type="submit" class="btn btn-sm btn-success">Simpan</button> -->
         <button
           (click)="submitFl4()"
-          class="btn btn-sm btn-success"
+          class="btn btn-success"
           [disabled]="isAnyFileMissing()"
         >
           Simpan

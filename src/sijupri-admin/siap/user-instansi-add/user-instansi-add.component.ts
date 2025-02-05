@@ -183,7 +183,10 @@ export class UserInstansiAddComponent {
         this.handlerService.handleAlert('Success', 'Berhasil')
         this.handlerService.handleNavigate('/siap/user-instansi')
       },
-      error: error => this.handlerService.handleException(error)
+      error: error => {
+        this.handlerService.handleAlert('Error', 'Gagal membuat user instasi'),
+          console.log(error)
+      }
     })
   }
 }

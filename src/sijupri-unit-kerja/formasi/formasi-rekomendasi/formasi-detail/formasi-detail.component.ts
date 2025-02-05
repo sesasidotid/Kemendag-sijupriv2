@@ -34,11 +34,11 @@ export class FormasiDetailComponent {
     this.getRekomendasiFormasiDetail()
   }
 
-  getTotalRekapitulasi (): number {
+  getTotalRekapitulasi () {
     let total = 0
     this.formasiDetail.formasiDetailDtoList.forEach(item => {
       item.formasiResultDtoList.forEach(formasi => {
-        total += formasi.pembulatan || 0
+        total += Number(formasi.result) || 0
       })
     })
     return total

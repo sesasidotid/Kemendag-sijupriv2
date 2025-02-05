@@ -59,6 +59,4 @@ export class JfFormasiComponent {
     })
     return total
   }
-
-  
 }

@@ -21,7 +21,7 @@ export class UserInstansiListComponent {
   pagable: Pagable
 
   constructor (private router: Router) {
-    this.pagable = new PagableBuilder('/api/v1/user_instansi/search')
+    this.pagable = new PagableBuilder(`/api/v1/user_instansi/search`)
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
       .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'user|name').build())
       .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'user|email').build())
@@ -45,6 +45,12 @@ export class UserInstansiListComponent {
           .withField('Nama', 'text')
           .build()
       )
+      //   .addFilter(
+      //     new PageFilterBuilder('equal')
+      //       .setProperty('instansiId')
+      //       .withDefaultValue(LoginContext.getInstansiId())
+      //       .build()
+      //   )
       .addFilter(
         new PageFilterBuilder('like')
           .setProperty('user|email')

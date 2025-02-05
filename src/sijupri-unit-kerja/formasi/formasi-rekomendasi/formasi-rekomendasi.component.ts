@@ -53,15 +53,15 @@ export class FormasiRekomendasiComponent {
           .withDefaultValue(this.unitKerjaId)
           .build()
       )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .withIcon('detail')
-          .setAction((formasi: any) => {
-            this.getDetail(formasi.id)
-            this.toggleModal()
-          }, 'primary')
-          .build()
-      )
+      //   .addActionColumn(
+      //     new ActionColumnBuilder()
+      //       .withIcon('detail')
+      //       .setAction((formasi: any) => {
+      //         this.getDetail(formasi.id)
+      //         this.toggleModal()
+      //       }, 'primary')
+      //       .build()
+      //   )
       .addActionColumn(
         new ActionColumnBuilder()
           .withIcon('detail')

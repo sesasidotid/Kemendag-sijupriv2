@@ -26,6 +26,9 @@ import { FIleHandler } from '../../../modules/base/commons/file-handler/file-han
 import { PengaturanFormasiJabatan } from '../../../modules/formasi/models/formasi-pengaturan-jabatan.model'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
+import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
+import { UndanganVerifikasiFormasi } from '../../../modules/formasi/models/undangan.model'
+
 @Component({
   selector: 'app-formasi-task',
   standalone: true,
@@ -92,12 +95,15 @@ export class FormasiTaskComponent {
     }
   }
 
+  undangan: UndanganVerifikasiFormasi[] = []
+
   constructor (
     private apiService: ApiService,
     private alertService: AlertService,
     private confirmationService: ConfirmationService,
     private handlerService: HandlerService,
-    private converterService: ConverterService
+    private converterService: ConverterService,
+    private filePreviewService: FilePreviewService
   ) {}
 
   groupAndSortTasksByFlowId (tasks: any[]): { [key: string]: any[] } {
@@ -190,6 +196,7 @@ export class FormasiTaskComponent {
               break
           }
 
+          this.getUndangan(this.pendingTask.objectId)
           if (this.pendingTask.pendingTaskHistory.length > 0) {
             this.groupedFormasiPendingTaskHistory =
               this.groupAndSortTasksByFlowId(
@@ -218,6 +225,22 @@ export class FormasiTaskComponent {
       })
   }
 
+  preview (fileName: string, source: string) {
+    this.filePreviewService.open(fileName, source)
+  }
+
+  getUndangan (formasiId: string) {
+    this.apiService
+      .getData(`/api/v1/formasi_proses/search?eq_formasiId=${formasiId}`)
+      .subscribe({
+        next: (res: any) => {
+          this.undangan = res.data.map(
+            (data: any) => new UndanganVerifikasiFormasi(data)
+          )
+          console.log('formasiId', this.undangan)
+        }
+      })
+  }
   getRejectedDokumen () {
     console.log('this.pendingTask', this.pendingTask)
     if (this.pendingTask?.formasiDokumenList?.length) {

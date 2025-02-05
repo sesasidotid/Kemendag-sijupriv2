@@ -23,7 +23,7 @@
         <tr *ngFor="let formasi of item.jenjangSumList; let j = index">
           <td
             *ngIf="j === 0"
-            class="align-middle text-center"
+            class="align-middle"
             [attr.rowspan]="item.jenjangSumList.length"
           >
             {{ i + 1 }}
@@ -36,7 +36,7 @@
             {{ item.jabatanName }}
           </td>
           <td class="align-middle">{{ formasi.jenjangName }}</td>
-          <td class="align-middle text-center">
+          <td class="align-middle">
             {{ formasi.resultSum || 0 }}
           </td>
         </tr>
@@ -46,32 +46,10 @@
         <td colspan="3" class="align-middle text-center fw-bold">
           Jumlah Formasi yang Tersedia
         </td>
-        <td class="align-middle text-center fw-bold">
+        <td class="align-middle fw-bold">
           {{ getTotalRekapitulasi() }}
         </td>
       </tr>
     </tbody>
   </table>
-  <!-- <table>
-    <thead>
-      <tr>
-        <th>Jabatan Code</th>
-        <th>Jabatan Name</th>
-        <th>Jenjang Code</th>
-        <th>Jenjang Name</th>
-        <th>Result Sum</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let formation of availableFormation">
-        <tr *ngFor="let jenjang of formation.jenjangSumList">
-          <td>{{ formation.jabatanCode }}</td>
-          <td>{{ formation.jabatanName }}</td>
-          <td>{{ jenjang.jenjangCode }}</td>
-          <td>{{ jenjang.jenjangName }}</td>
-          <td>{{ jenjang.resultSum }}</td>
-        </tr>
-      </ng-container>
-    </tbody>
-  </table> -->
 </div>

@@ -14,14 +14,16 @@ import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
 import { BehaviorSubject } from 'rxjs'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { UnitKerjaUpdateComponent } from '../unit-kerja-update/unit-kerja-update.component'
+import { CommonModule } from '@angular/common'
+
 @Component({
   selector: 'app-unit-kerja-list',
   standalone: true,
   imports: [
     PagableComponent,
-    RouterLink,
     ModalComponent,
-    UnitKerjaUpdateComponent
+    UnitKerjaUpdateComponent,
+    CommonModule
   ],
   templateUrl: './unit-kerja-list.component.html',
   styleUrl: './unit-kerja-list.component.scss'

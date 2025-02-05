@@ -1,1 +1,12 @@
 <app-pagable [pagable]="pagable"></app-pagable>
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Update User Unit Kerja'"
+  (toggle)="toggleModal()"
+  [enableFooter]="false"
+>
+  <app-user-unit-kerja-update
+    [userUnitKerja]="SelecterUserUnitKerja"
+  ></app-user-unit-kerja-update>
+</app-modal>

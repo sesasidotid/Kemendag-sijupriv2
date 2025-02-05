@@ -14,11 +14,12 @@ import {
   Validators
 } from '@angular/forms'
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component'
-
+import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
+import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 @Component({
   selector: 'app-unit-kerja-update',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, MapComponent, FormsModule, ReactiveFormsModule],
   templateUrl: './unit-kerja-update.component.html',
   styleUrl: './unit-kerja-update.component.scss'
 })
@@ -28,6 +29,8 @@ export class UnitKerjaUpdateComponent {
   wilayahList: Wilayah[] = []
   unitKerja: UnitKerja = new UnitKerja()
   updateUnitKerjaForm!: FormGroup
+  provinsi: Provinsi = new Provinsi()
+  instansi: Instansi = new Instansi()
 
   constructor (
     private apiService: ApiService,
@@ -36,9 +39,13 @@ export class UnitKerjaUpdateComponent {
   ) {
     this.updateUnitKerjaForm = new FormGroup({
       name: new FormControl('', Validators.required),
-      email: new FormControl('', Validators.required),
-      phone: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      phone: new FormControl('', [
+        Validators.required,
+        Validators.pattern('^[0-9]*$')
+      ]),
       wilayah_code: new FormControl('', Validators.required),
+      alamat: new FormControl('', Validators.required),
       latitude: new FormControl(''),
       longitude: new FormControl('')
     })
@@ -48,7 +55,6 @@ export class UnitKerjaUpdateComponent {
     if (this.id) {
       this.fetchUnitKerjaData(this.id)
     }
-    this.getWilayahList()
   }
 
   fetchUnitKerjaData (id: string): void {
@@ -60,10 +66,14 @@ export class UnitKerjaUpdateComponent {
           name: unitKerja.name,
           email: unitKerja.email,
           phone: unitKerja.phone,
+          alamat: unitKerja.alamat,
           wilayah_code: unitKerja.wilayahCode,
           latitude: unitKerja.latitude,
-          longitude: unitKerja.longitude
+          longitude: unitKerja.longitude,
+          instansiid: unitKerja.instansiId
         })
+
+        this.getUnitKerjaInstasi()
       },
       error: error => {
         this.handlerService.handleAlert('Error', error.error.message)
@@ -71,10 +81,45 @@ export class UnitKerjaUpdateComponent {
     })
   }
 
+  getUnitKerjaInstasi () {
+    this.apiService
+      .getData(`/api/v1/instansi/${this.unitKerja.instansiId}`)
+      .subscribe({
+        next: (instansi: Instansi) => {
+          this.instansi = instansi
+          this.getUnitKerjaProvinsiDetail()
+        },
+        error: error => {
+          this.handlerService.handleAlert('Error', error.error.message)
+        }
+      })
+  }
+
+  getUnitKerjaProvinsiDetail () {
+    this.apiService
+      .getData(`/api/v1/provinsi/${this.instansi.provinsiId}`)
+      .subscribe({
+        next: (provinsi: Provinsi) => {
+          this.provinsi = provinsi
+          this.getWilayahList()
+        },
+        error: error => {
+          this.handlerService.handleAlert('Error', error.error.message)
+        }
+      })
+  }
   getWilayahList (): void {
     this.apiService.getData(`/api/v1/wilayah`).subscribe({
       next: (wilayahList: Wilayah[]) => {
-        this.wilayahList = wilayahList
+        // this.wilayahList = wilayahList
+        wilayahList.forEach(wilayah => {
+          if (
+            ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
+            wilayah.code == this.provinsi.wilayahCode
+          ) {
+            this.wilayahList.push(wilayah)
+          }
+        })
       },
       error: error => {
         this.handlerService.handleAlert('Error', error.error.message)

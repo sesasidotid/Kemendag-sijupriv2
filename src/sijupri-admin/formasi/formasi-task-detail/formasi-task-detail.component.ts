@@ -176,6 +176,7 @@ export class FormasiTaskDetailComponent {
         },
         error: error => {
           console.error('Error fetching data', error)
+
           //   this.alertService.showToast('Error', error.message)
           //   throw error
         }
@@ -337,6 +338,18 @@ export class FormasiTaskDetailComponent {
         )
         return
       }
+
+      if (
+        this.waktuInput.fileUndangan === undefined ||
+        this.waktuInput.fileUndangan === '' ||
+        this.waktuInput.fileUndangan === null
+      ) {
+        this.handlerService.handleAlert(
+          'Error',
+          'Surat Undangan tidak boleh kosong'
+        )
+        return
+      }
       this.task.object.waktuPelaksanaan = waktuPelaksanaan
       this.task.object.fileSuratUndangan = this.waktuInput.fileUndangan
     }
@@ -376,7 +389,7 @@ export class FormasiTaskDetailComponent {
       id: item.id,
       formasiResultDtoList: item.formasiResultDtoList.map((formasi, j) => ({
         id: formasi.id,
-        result: this.flow3Form.get(`formasi_${i}_${j}`)?.value
+        result: this.flow3Form.get(`formasi_${i}_${j}`)?.value.toString()
       }))
     }))
 
@@ -389,12 +402,12 @@ export class FormasiTaskDetailComponent {
       }
     }
 
+    console.log('payload', payload)
+
     this.confirmationService.open(false).subscribe({
       next: result => {
         if (!result.confirmed) return
-
         console.log('Form submitted successfully', payload)
-
         this.apiService
           .postData(`/api/v1/formasi/task/submit`, payload)
           .subscribe({
@@ -422,8 +435,7 @@ export class FormasiTaskDetailComponent {
           .postData(`/api/v1/formasi/task/submit`, payload)
           .subscribe({
             next: () => {
-              window.location.reload(),
-                this.router.navigate(['/formasi/formasi-task-list'])
+              this.router.navigate(['/formasi/formasi-task-list'])
             },
             error: error => {
               console.error('Error fetching data', error)

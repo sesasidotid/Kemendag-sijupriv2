@@ -1,8 +1,8 @@
 <div class="row">
   <div [ngClass]="true ? 'col-lg-8' : 'col-lg-12'">
     <div *ngIf="instasi" class="row mb-3">
-      <label for="" class="col-sm-2 col-form-label fw-bold">Instasi</label>
-      <div class="col-sm-10">
+      <label for="" class="col-sm-3 col-form-label fw-bold">Instasi</label>
+      <div class="col-sm-9">
         <div
           *ngIf="isInstansiLoading$ | async; else instansiHadItem"
           class="d-flex"
@@ -21,23 +21,27 @@
     </div>
 
     <div class="row mb-3">
-      <label for="" class="col-sm-2 col-form-label fw-bold">Unit Kerja </label>
-      <div class="col-sm-10">
+      <label for="" class="col-sm-3 col-form-label fw-bold">Unit Kerja </label>
+      <div class="col-sm-9">
         <p>: {{ unitKerja.name }}</p>
       </div>
     </div>
 
     <div class="row mb-3">
-      <label for="" class="col-sm-2 col-form-label fw-bold">Phone </label>
-      <div class="col-sm-10">
+      <label for="" class="col-sm-3 col-form-label fw-bold">Phone </label>
+      <div class="col-sm-9">
         <p>: {{ unitKerja.phone }}</p>
       </div>
     </div>
     <div class="row mb-3">
-      <label for="" class="col-sm-2 col-form-label fw-bold">Alamat </label>
-      <div class="col-sm-10">
+      <label for="" class="col-sm-3 col-form-label fw-bold">Alamat </label>
+      <div class="col-sm-9">
         <p>: {{ unitKerja.alamat }}</p>
       </div>
+    </div>
+    <div class="row mb-3">
+      <label for="" class="col-sm-3 col-form-label fw-bold">Wilayah </label>
+      <div class="col-sm-9">: {{ wilayahName }}</div>
     </div>
   </div>
   <div

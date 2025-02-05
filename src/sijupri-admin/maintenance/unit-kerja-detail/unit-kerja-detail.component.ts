@@ -20,6 +20,8 @@ export class UnitKerjaDetailComponent {
   instasi: Instansi = new Instansi()
   isUnitKerjaLoading$ = new BehaviorSubject<boolean>(false)
   isInstansiLoading$ = new BehaviorSubject<boolean>(false)
+  wilayahName: string = ''
+
   constructor (
     private apiService: ApiService,
     private handlerService: HandlerService,
@@ -36,6 +38,7 @@ export class UnitKerjaDetailComponent {
         this.unitKerja = new UnitKerja(response)
         console.log(this.unitKerja)
         this.getInstasiDetail()
+        this.getWilayahName(this.unitKerja.wilayahCode)
       },
       error: err => {
         this.handlerService.handleAlert(
@@ -67,5 +70,15 @@ export class UnitKerjaDetailComponent {
           this.isInstansiLoading$.next(false)
         }
       })
+  }
+
+  getWilayahName (wilayahCode: string) {
+    this.apiService.getData(`/api/v1/wilayah`).subscribe({
+      next: (response: any) => {
+        this.wilayahName = response.find(
+          (item: any) => item.code === wilayahCode
+        ).name
+      }
+    })
   }
 }

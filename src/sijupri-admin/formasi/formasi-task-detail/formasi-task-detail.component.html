@@ -173,7 +173,7 @@
             <button
               *ngIf="isApproveEnable && pendingTask.flowId !== 'for_flow_4'"
               type="submit"
-              class="btn btn-sm btn-success me-2"
+              class="btn btn-success me-2"
               (click)="submitFl2(true)"
             >
               Terima
@@ -181,7 +181,7 @@
             <button
               *ngIf="pendingTask.flowId !== 'for_flow_4'"
               type="submit"
-              class="btn btn-sm btn-danger"
+              class="btn btn-danger"
               (click)="submitFl2(false)"
             >
               Tolak
@@ -194,6 +194,7 @@
 </div>
 
 <ng-container *ngIf="pendingTask.flowId == 'for_flow_3'">
+  <h3>Verifikasi Formasi</h3>
   <!-- <div class="card">
     <div class="card-header">
       <ul
@@ -345,7 +346,7 @@
                     <!-- No and Name Jabatan should span multiple rows -->
                     <td
                       *ngIf="j === 0"
-                      class="align-middle text-center"
+                      class="align-middle"
                       [attr.rowspan]="item.formasiResultDtoList.length"
                     >
                       {{ i + 1 }}
@@ -362,7 +363,7 @@
                       {{ findJenjangName(formasi.jenjangCode) }}
                     </td>
                     <!-- Rekapitulasi Usulan Formasi -->
-                    <td class="align-middle text-center">
+                    <td class="align-middle">
                       {{ formasi.pembulatan || 0 }}
                     </td>
                     <!-- Rekomendasi Formasi -->
@@ -370,7 +371,7 @@
                       <input
                         [formControlName]="'formasi_' + i + '_' + j"
                         type="number"
-                        class="form-control text-center"
+                        class="form-control"
                         [value]="formasi.pembulatan || 0"
                       />
                     </td>
@@ -382,10 +383,10 @@
                   <td colspan="2" class="align-middle text-center fw-bold">
                     Jumlah Usulan Formasi
                   </td>
-                  <td class="align-middle text-center fw-bold">
+                  <td class="align-middle fw-bold">
                     {{ getTotalRekapitulasi() }}
                   </td>
-                  <td class="align-middle text-center fw-bold">
+                  <td class="align-middle fw-bold">
                     {{ getTotalRekomendasi() }}
                   </td>
                 </tr>
@@ -407,7 +408,7 @@
   <div class="row col">
     <div class="card">
       <div class="card-header align-items-center d-flex">
-        <h4 class="card-title mb-0 flex-grow-1">Proses Rekomendasi Formasi</h4>
+        <h4 class="card-title mb-0 flex-grow-1">Rekomendasi Formasi</h4>
         <div class="flex-shrink-0"></div>
       </div>
       <div class="card-body">
@@ -433,7 +434,7 @@
             </div>
           </div>
           <div class="text-center float-end">
-            <button type="submit" class="btn btn-sm btn-success">Simpan</button>
+            <button type="submit" class="btn btn-success">Simpan</button>
           </div>
         </form>
       </div>

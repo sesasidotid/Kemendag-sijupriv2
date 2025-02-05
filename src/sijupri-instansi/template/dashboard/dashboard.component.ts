@@ -26,4 +26,8 @@ export class DashboardComponent {
 
   readonly ScrollText = BookUser
   readonly FileText = Database
+
+  constructor () {
+    console.log('Dashboard component initialized', LoginContext.getName())
+  }
 }
