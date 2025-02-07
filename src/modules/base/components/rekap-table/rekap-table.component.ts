@@ -16,6 +16,7 @@ import { HandlerService } from '../../services/handler.service'
 import { AlertService } from '../../services/alert.service'
 import { FilePreviewService } from '../../services/file-preview.service'
 import { DomSanitizer } from '@angular/platform-browser'
+import { FormsModule } from '@angular/forms'
 
 interface RekapData {
   dokumenVerifikasi: string | null
@@ -37,7 +38,13 @@ interface RekapData {
 @Component({
   selector: 'app-rekap-table',
   standalone: true,
-  imports: [CommonModule, AgGridAngular, ModalComponent, FileHandlerComponent],
+  imports: [
+    CommonModule,
+    AgGridAngular,
+    ModalComponent,
+    FileHandlerComponent,
+    FormsModule
+  ],
   templateUrl: './rekap-table.component.html',
   styleUrl: './rekap-table.component.scss'
 })
@@ -56,6 +63,9 @@ export class RekapTableComponent {
 
   selectedRekapData: RekapData
   action$ = new BehaviorSubject<'APPROVE' | 'REJECT'>('APPROVE')
+
+  comment: string = ''
+  commentTouched = false
 
   pagination = true
   paginationPageSize = 10
@@ -101,24 +111,25 @@ export class RekapTableComponent {
     //   filter: true,
     //   floatingFilter: true
     // },
-    {
-      field: 'verified',
-      headerName: 'Verified',
-      filter: true,
-      floatingFilter: true,
-      cellStyle: params => {
-        switch (params.value) {
-          case 'APPROVE':
-            return { backgroundColor: '#198754', color: 'white' } // Green for APPROVE
-          case 'REJECT':
-            return { backgroundColor: '#dc3545', color: 'white' } // Red for REJECT
-          case 'PENDING':
-            return { backgroundColor: '#ffc107', color: 'black' } // Yellow for PENDING
-          default:
-            return null // Default style
-        }
-      }
-    },
+    // {
+    //   field: 'verified',
+    //   headerName: 'Verified',
+    //   filter: true,
+    //   floatingFilter: true,
+    //   cellStyle: params => {
+    //     switch (params.value) {
+    //       case 'APPROVE':
+    //         return { backgroundColor: '#198754', color: '198754' } // Green for APPROVE
+    //       case 'REJECT':
+    //         return { backgroundColor: '#dc3545', color: 'dc3545' } // Red for REJECT
+    //       case 'PENDING':
+    //         return { backgroundColor: '#ffc107', color: 'ffc107' } // Yellow for PENDING
+    //       default:
+    //         return null // Default style
+    //     }
+    //   }
+    // },
+
     {
       field: 'jenisPengembanganKompetensi',
       headerName: 'Jenis Pengembangan Kompetensi',
@@ -131,6 +142,30 @@ export class RekapTableComponent {
       headerName: 'Pelatihan Teknis',
       filter: true,
       floatingFilter: true
+    },
+    {
+      field: 'remark',
+      headerName: 'Catatan',
+      filter: true,
+      floatingFilter: true
+    },
+    {
+      field: 'verified',
+      headerName: 'Verified',
+      filter: true,
+      floatingFilter: true,
+      cellStyle: params => {
+        switch (params.value) {
+          case 'APPROVE':
+            return { color: '#198754', fontWeight: 'bold' } // Green text for APPROVE
+          case 'REJECT':
+            return { color: '#dc3545', fontWeight: 'bold' } // Red text for REJECT
+          case 'PENDING':
+            return { color: '#ffc107', fontWeight: 'bold' } // Yellow text for PENDING
+          default:
+            return { fontWeight: 'base' } // Default bold text
+        }
+      }
     }
   ]
 
@@ -283,6 +318,11 @@ export class RekapTableComponent {
   }
 
   verifyDocument (data?: RekapData) {
+    this.commentTouched = true
+    if (!this.comment) {
+      return // Prevent saving if remark is empty
+    }
+
     if (!data) {
       console.error('No data provided for verification')
       return
@@ -294,9 +334,11 @@ export class RekapTableComponent {
 
         const payload = {
           id: data.id.toString(),
-          verified: this.action$.value
+          verified: this.action$.value,
+          remark: this.comment
         }
 
+        console.log('pppp', payload)
         this.apiService
           .postData(
             '/api/v1/akp_pelatihan_teknis/validate/dokumen_verifikasi',

@@ -63,6 +63,23 @@
               >
             </div>
 
+            <div *ngIf="(action$ | async) == 'REJECT'" class="mb-3">
+              <label for="commentTextarea" class="form-label fw-semibold"
+                >Catatan <span class="text-danger">*</span></label
+              >
+              <textarea
+                class="form-control"
+                id="commentTextarea"
+                rows="3"
+                [(ngModel)]="comment"
+                name="comment"
+                placeholder="Tuliskan catatan atau revisi"
+              ></textarea>
+              <div class="feedback" *ngIf="!comment && commentTouched">
+                <small>Catatan perlu diisi.</small>
+              </div>
+            </div>
+
             <div class="float-end">
               <button
                 class="btn btn-soft-secondary me-2"

@@ -22,6 +22,7 @@ export class PagableComponent implements OnChanges {
   sortOrder: { [key: string]: 'asc' | 'desc' | '' } = {}
   paginator: any
   onLoad: boolean = false
+  enablePagination: boolean = true
 
   constructor (private apiService: ApiService, private http: HttpClient) {}
 

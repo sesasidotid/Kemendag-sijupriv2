@@ -59,6 +59,30 @@
           <div class="row">
             <div class="col-12 mb-2">
               <label class="form-label"> Jabatan </label>
+              <ng-container
+                *ngIf="filteredJabatan$ | async as jabatan; else loading"
+              >
+                <p>{{ jabatan?.name || '-' }}</p>
+              </ng-container>
+              <ng-template #loading>
+                <p>Loading...</p>
+              </ng-template>
+            </div>
+            <div class="col-12 mb-2">
+              <label class="form-label"> Jenjang </label>
+              <ng-container
+                *ngIf="filteredJenjang$ | async as jenjang; else loading"
+              >
+                <p>{{ jenjang?.name || '-' }}</p>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="card-body">
+          <div class="row">
+            <div class="col-12 mb-2">
+              <label class="form-label"> Jabatan </label>
               <p>{{ (filteredJabatan$ | async)?.name || '-' }}</p>
             </div>
             <div class="col-12 mb-2">
@@ -66,7 +90,7 @@
               <p>{{ (filteredJenjang$ | async)?.name || '-' }}</p>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </ng-template>

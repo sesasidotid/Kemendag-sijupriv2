@@ -79,7 +79,7 @@ export class AdminDashboardComponent {
     this.getTotalFormasiPending()
 
     this.pagable = new PagableBuilder(
-      '/api/v1/participant_ukom/search?desc_lastUpdated=true'
+      '/api/v1/participant_ukom/search?desc_lastUpdated=true&limit=10'
     )
       // this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
       .addPrimaryColumn(
@@ -94,6 +94,7 @@ export class AdminDashboardComponent {
           .build()
       )
       //   .setLimit(5)
+      .setEnablePagination(false)
       .build()
   }
 

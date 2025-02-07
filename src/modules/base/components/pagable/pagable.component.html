@@ -150,7 +150,10 @@
     </tbody>
   </table>
 </div>
-<nav *ngIf="paginator" aria-label="Page navigation example">
+<nav
+  *ngIf="paginator && pagable.enablePagination"
+  aria-label="Page navigation example"
+>
   <ul class="pagination justify-content-end">
     <li class="page-item cursor-pointer" [ngClass]="{ disabled: page == 1 }">
       <a class="page-link py-1 px-2" (click)="prev()">Previous</a>

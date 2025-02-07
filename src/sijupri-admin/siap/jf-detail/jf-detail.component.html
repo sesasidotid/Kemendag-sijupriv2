@@ -132,25 +132,27 @@
           </li>
         </ul>
       </div>
-      <div class="card-body">
-        <div class="tab-content">
-          <div class="tab-pane active" id="Pendidikan" role="tabpanel">
-            <app-rw-pendidikan-list></app-rw-pendidikan-list>
-          </div>
-          <div class="tab-pane" id="Pangkat" role="tabpanel">
-            <app-rw-pangkat-list></app-rw-pangkat-list>
-          </div>
-          <div class="tab-pane" id="Jabatan" role="tabpanel">
-            <app-rw-jabatan-list></app-rw-jabatan-list>
-          </div>
-          <div class="tab-pane" id="Kinerja" role="tabpanel">
-            <app-rw-kinerja-list></app-rw-kinerja-list>
-          </div>
-          <div class="tab-pane" id="Kompetensi" role="tabpanel">
-            <app-rw-kompetensi-list></app-rw-kompetensi-list>
-          </div>
-          <div class="tab-pane" id="Sertifikasi" role="tabpanel">
-            <app-rw-sertifikasi-list></app-rw-sertifikasi-list>
+      <div *ngIf="nip">
+        <div class="card-body">
+          <div class="tab-content">
+            <div class="tab-pane active" id="Pendidikan" role="tabpanel">
+              <app-rw-pendidikan-list [nip]="nip"></app-rw-pendidikan-list>
+            </div>
+            <div class="tab-pane" id="Pangkat" role="tabpanel">
+              <app-rw-pangkat-list [nip]="nip"></app-rw-pangkat-list>
+            </div>
+            <div class="tab-pane" id="Jabatan" role="tabpanel">
+              <app-rw-jabatan-list [nip]="nip"></app-rw-jabatan-list>
+            </div>
+            <div class="tab-pane" id="Kinerja" role="tabpanel">
+              <app-rw-kinerja-list [nip]="nip"></app-rw-kinerja-list>
+            </div>
+            <div class="tab-pane" id="Kompetensi" role="tabpanel">
+              <app-rw-kompetensi-list [nip]="nip"></app-rw-kompetensi-list>
+            </div>
+            <div class="tab-pane" id="Sertifikasi" role="tabpanel">
+              <app-rw-sertifikasi-list [nip]="nip"></app-rw-sertifikasi-list>
+            </div>
           </div>
         </div>
       </div>

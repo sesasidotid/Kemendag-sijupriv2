@@ -8,6 +8,7 @@ export class PagableBuilder {
   private actionColumnList: PageColumn[] = []
   private filterList: PageFilter[] = []
   private limit: number = 10
+  private enablePagination: boolean = true
 
   constructor (endpoint: string) {
     this.endpoint = endpoint
@@ -33,12 +34,18 @@ export class PagableBuilder {
     return this
   }
 
+  setEnablePagination (enablePagination: boolean) {
+    this.enablePagination = enablePagination
+    return this
+  }
+
   build (): Pagable {
     return new Pagable(
       this.endpoint,
       this.primaryColumnList,
       this.actionColumnList,
       this.filterList,
+      this.enablePagination,
       this.limit
     )
   }

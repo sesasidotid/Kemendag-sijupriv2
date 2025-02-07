@@ -27,9 +27,11 @@
               </label>
               <p class="text-muted">
                 {{
-                  userInstansiDetail.jenisKelaminCode == 'f' || 'F'
-                    ? 'Wanita'
-                    : 'Pria'
+                  userInstansiDetail?.jenisKelaminCode
+                    ? userInstansiDetail.jenisKelaminCode.toLowerCase() === 'f'
+                      ? 'Wanita'
+                      : 'Pria'
+                    : '-'
                 }}
               </p>
             </div>
@@ -53,7 +55,9 @@
               </p>
             </div>
             <div class="col-md-6 mb-3">
-              <label for="firstnameInput" class="form-label"> Instansi </label>
+              <label for="firstnameInput" class="form-label">
+                Tipe Instansi
+              </label>
               <p class="text-muted">
                 {{ instansiType.name ? instansiType.name : '-' }}
               </p>
