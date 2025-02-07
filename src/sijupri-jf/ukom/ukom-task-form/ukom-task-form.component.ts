@@ -174,27 +174,59 @@ export class UkomTaskFormComponent {
   }
 
   submit () {
+    // if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
+    //   this.pesertaUkom.dokumenUkomList = []
+    // }
+    // for (const key in this.detectedDokumen) {
+    //   if (this.detectedDokumen.hasOwnProperty(key)) {
+    //     const detected = this.detectedDokumen[key]
+    //     this.pesertaUkom.dokumenUkomList.push({
+    //       dokumenFile: detected.base64,
+    //       //   dokumenPersyaratanName: this.jf.nip + '_' + 'dokumenPersyaratanUkom'
+    //       dokumenPersyaratanName:
+    //         this.dokumenPersyaratanList.find(
+    //           dokumen => dokumen.dokumenPersyaratanName == detected.label
+    //         ).dokumenPersyaratanName +
+    //         '_' +
+    //         this.jf.nip +
+    //         '_' +
+    //         Date.now(),
+    //       dokumenPersyaratanId: detected.id
+    //     })
+    //   }
+    // }
+
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
     }
+
+    const documentMap = new Map()
+
     for (const key in this.detectedDokumen) {
       if (this.detectedDokumen.hasOwnProperty(key)) {
         const detected = this.detectedDokumen[key]
-        this.pesertaUkom.dokumenUkomList.push({
-          dokumenFile: detected.base64,
-          //   dokumenPersyaratanName: this.jf.nip + '_' + 'dokumenPersyaratanUkom'
-          dokumenPersyaratanName:
-            this.dokumenPersyaratanList.find(
-              dokumen => dokumen.dokumenPersyaratanName == detected.label
-            ).dokumenPersyaratanName +
-            '_' +
-            this.jf.nip +
-            '_' +
-            Date.now(),
-          dokumenPersyaratanId: detected.id
-        })
+
+        const dokumenPersyaratan = this.dokumenPersyaratanList.find(
+          dokumen => dokumen.dokumenPersyaratanName === detected.label
+        )
+
+        if (dokumenPersyaratan) {
+          const newDoc = {
+            dokumenFile: detected.base64,
+            dokumenPersyaratanName: `${
+              dokumenPersyaratan.dokumenPersyaratanName
+            }_${this.jf.nip}_${Date.now()}`,
+            dokumenPersyaratanId: detected.id
+          }
+
+          // Store only the latest document for each dokumenPersyaratanId
+          documentMap.set(detected.id, newDoc)
+        }
       }
     }
+
+    // Convert the Map values to an array and assign it to pesertaUkom.dokumenUkomList
+    this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
 
     this.confirmationService.open(false).subscribe({
       next: result => {

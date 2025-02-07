@@ -92,31 +92,12 @@ export class UkomQuestionListComponent {
       this.tabService.clearTabs()
     }
 
-    this.tabService
-      //   .addTab({
-      //     label: 'Daftar Pertanyaan',
-      //     isActive: true,
-      //     icon: 'mdi-list-box',
-      //     onClick: () => this.handleDownloadTemplate()
-      //   })
-      //   .addTab({
-      //     label: 'Tambah Pertanyaan}',
-      //     icon: 'mdi-plus-circle',
-      //     onClick: () => this.handleTabChange(1)
-      //   })
-      .addTab({
-        label: 'Template Pertanyaan',
-        isActive: true,
-        icon: 'mdi-file-download',
-        onClick: () => this.handleDownloadTemplate()
-      })
-  }
-
-  handleTabChange (tab?: number) {
-    console.log('tab', tab)
-
-    this.tab$.next(tab)
-    this.tabService.changeTabActive(tab)
+    this.tabService.addTab({
+      label: 'Template Pertanyaan',
+      isActive: true,
+      icon: 'mdi-file-download',
+      onClick: () => this.handleDownloadTemplate()
+    })
   }
 
   handleDownloadTemplate () {
@@ -163,8 +144,6 @@ export class UkomQuestionListComponent {
                 'Berhasil menambahkan pertanyaan'
               )
               window.location.reload()
-              //   this.router.navigate(['/ukom/ukom-question'])
-              // window.re
             },
             error: error => this.handlerService.handleException(error)
           })

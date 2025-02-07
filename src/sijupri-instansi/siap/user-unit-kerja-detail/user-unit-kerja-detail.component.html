@@ -52,8 +52,25 @@
                 }}
               </p>
             </div>
+            <!-- <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Unit Kerja
+              </label>
+              <p class="text-muted">
+                {{ unitKerjaDetail.name ? unitKerjaDetail.name : '-' }}
+              </p>
+            </div> -->
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-8" *ngIf="unitKerjaDetail?.id">
+    <div class="card">
+      <div class="card-body">
+        <app-unit-kerja-detail
+          [unitKerjaIdFromParent]="unitKerjaDetail.id"
+        ></app-unit-kerja-detail>
       </div>
     </div>
   </div>

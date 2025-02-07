@@ -60,7 +60,9 @@ export class AkpVerifikasiPelatihanComponent {
     private apiService: ApiService,
     private confirmationService: ConfirmationService,
     private handlerService: HandlerService
-  ) {}
+  ) {
+    setTimeout(() => {}, 0)
+  }
 
   ngOnInit () {
     if (this.tabService.getTabsLength() > 0) {
@@ -101,8 +103,6 @@ export class AkpVerifikasiPelatihanComponent {
                 'Berhasil mengunggah nilai'
               )
               window.location.reload()
-              //   this.router.navigate(['/ukom/ukom-question'])
-              // window.re
             },
             error: error => this.handlerService.handleException(error)
           })

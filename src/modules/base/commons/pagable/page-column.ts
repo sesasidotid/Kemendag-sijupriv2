@@ -12,8 +12,9 @@ export class PageColumn {
   inputType: string
   icon: string
   color: string
+  sortable: boolean
 
-  constructor(object: {
+  constructor (object: {
     columnType?: 'primary' | 'action'
     label?: string
     property?: string
@@ -25,6 +26,7 @@ export class PageColumn {
     icon?: string
     color?: string
     inactive?: Function
+    sortable?: boolean
   }) {
     this.columnType = object.columnType
     this.label = object.label
@@ -37,5 +39,6 @@ export class PageColumn {
     this.icon = object.icon
     this.color = object.color
     this.inactive = object.inactive
+    this.sortable = object.sortable !== undefined ? object.sortable : true
   }
 }

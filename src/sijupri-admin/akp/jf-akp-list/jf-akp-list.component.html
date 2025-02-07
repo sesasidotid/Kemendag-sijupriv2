@@ -72,6 +72,12 @@
               <div class="col-md-6 mb-3">
                 <label for="firstnameInput" class="form-label"> KTP </label>
                 <p class="text-muted">{{ jf.ktp ? jf.ktp : '-' }}</p>
+                <button
+                  class="btn btn-soft-primary"
+                  (click)="preview(jf.ktp, jf.ktpUrl)"
+                >
+                  Lihat
+                </button>
               </div>
             </div>
           </div>

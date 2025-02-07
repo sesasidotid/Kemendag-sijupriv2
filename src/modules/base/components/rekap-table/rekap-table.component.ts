@@ -30,7 +30,7 @@ interface RekapData {
   pertanyaanId: number
   pertanyaanName: string
   rankPrioritas: string
-  verified: boolean
+  verified: string
   dokumenVerifikasiUrl: string
 }
 
@@ -55,13 +55,12 @@ export class RekapTableComponent {
   selectedRekapId$ = new BehaviorSubject<number | null>(null)
 
   selectedRekapData: RekapData
+  action$ = new BehaviorSubject<'APPROVE' | 'REJECT'>('APPROVE')
 
   pagination = true
   paginationPageSize = 10
   paginationPageSizeSelector = [10, 20, 30, 100]
 
-  // Column Definitions: Defines the columns to be displayed.
-  // pertanyaan_name, keterangan, 'kategori', 'penyebabDiskrepansiUtama'. 'jenisPengembanganKompetensi', 'rankPrioritas', 'dokumenVerifikasiUrl (preview), 'verified (true sama false ini klo dah di verifikasi kasih centang atau status gitu aja keknya)
   colDefs: ColDef[] = [
     {
       field: 'pertanyaanName',
@@ -106,12 +105,19 @@ export class RekapTableComponent {
       field: 'verified',
       headerName: 'Verified',
       filter: true,
-      floatingFilter: true
-      //   cellStyle: {
-      //     display: 'flex',
-      //     justifyContent: 'center',
-      //     alignItems: 'center'
-      //   }
+      floatingFilter: true,
+      cellStyle: params => {
+        switch (params.value) {
+          case 'APPROVE':
+            return { backgroundColor: '#198754', color: 'white' } // Green for APPROVE
+          case 'REJECT':
+            return { backgroundColor: '#dc3545', color: 'white' } // Red for REJECT
+          case 'PENDING':
+            return { backgroundColor: '#ffc107', color: 'black' } // Yellow for PENDING
+          default:
+            return null // Default style
+        }
+      }
     },
     {
       field: 'jenisPengembanganKompetensi',
@@ -143,8 +149,6 @@ export class RekapTableComponent {
     }
   }
 
-  //   sourceFile: string =
-  //     'https://drive.google.com/file/d/1Nj7PXf3U_T4BXoAn1RTRqCoQ4LMMikjI/preview'
   sourceFile: string
 
   constructor (
@@ -153,7 +157,7 @@ export class RekapTableComponent {
     private handlerService: HandlerService,
     private alertService: AlertService,
     private filePreviewService: FilePreviewService,
-    private sanitizer: DomSanitizer // Inject the sanitizer
+    private sanitizer: DomSanitizer
   ) {
     if (LoginContext.getRoleCodes().includes('USER_EXTERNAL')) {
       this.colDefs.push({
@@ -161,28 +165,38 @@ export class RekapTableComponent {
         cellRenderer: RekapButtonComponent,
         cellRendererParams: {
           onClickButtonOne: this.toggleModal.bind(this),
-          // onClikButtonTwo: this.toggleModal.bind(this),
           showFirstButton: (data: RekapData) => {
             return (
-              //   data.jenisPengembanganKompetensi ===
-              //     'Seminar/Bimtek/Belajar Mandiri' ||
-              //   data.jenisPengembanganKompetensi === 'Magang' ||
-              //   data.verified === false
-              !data.verified && // Ensure it's not verified
-              (data.jenisPengembanganKompetensi ===
+              (data.verified == 'EMPTY' ||
+                data.verified == 'REJECT' ||
+                data.verified == 'PENDING') &&
+              (data.jenisPengembanganKompetensi ==
                 'Seminar/Bimtek/Belajar Mandiri' ||
-                data.jenisPengembanganKompetensi === 'Magang')
+                data.jenisPengembanganKompetensi == 'Magang')
             )
+            // return true
           },
           showSecondButton: (data: RekapData) => {
             return false
           },
           disabledFirstButton: (data: RekapData) => {
-            return false
+            return data.verified == 'PENDING'
           },
-          titleFirst: 'Upload Verifikasi',
+          titleFirst: (data: RekapData) => {
+            if (data.verified == 'PENDING') {
+              return 'Menunggu Verifikasi Admin'
+            } else if (data.verified == 'REJECT') {
+              return 'Perbaiki Dokumen'
+            }
+            return 'Upload Verifikasi'
+          },
           iconFirst: 'upload',
-          colorFirst: 'primary'
+          colorFirst: (data: RekapData) => {
+            if (data.verified == 'REJECT') {
+              return 'danger'
+            }
+            return 'primary'
+          }
         }
       })
     }
@@ -194,31 +208,46 @@ export class RekapTableComponent {
         cellRendererParams: {
           onClickButtonOne: this.toggleModalPreview.bind(this),
           showFirstButton: (data: RekapData) => {
-            return data.dokumenVerifikasi !== null
+            return true
           },
-
           disabledFirstButton: (data: RekapData) => {
-            return false
+            return data.verified == 'EMPTY'
+          },
+          titleFirst: (data: RekapData) => {
+            if (data.verified == 'EMPTY') {
+              return 'Dokumen Belum Diupload'
+            } else if (data.verified == 'REJECT') {
+              return 'Menunggu Perbaikan Dokumen oleh User'
+            }
+            return 'Preview'
+          },
+          iconFirst: 'eye-outline',
+          colorFirst: (data: RekapData) => {
+            if (data.verified == 'REJECT') {
+              return 'danger'
+            }
+            return 'primary'
           },
 
-          titleFirst: 'Preview',
-          iconFirst: 'eye-outline',
-          colorFirst: 'primary',
-          onClikButtonTwo: this.verifyDocument.bind(this),
-
+          onClickButtonTwo: this.toggleModal.bind(this),
           showSecondButton: (data: RekapData) => {
-            return (
-              data.verified === false &&
-              data.jenisPengembanganKompetensi !== 'Pelatihan Teknis'
-            )
+            return data.verified == 'PENDING'
+            // return true
           },
           disabledSecondButton: (data: RekapData) => {
-            return false
+            return data.verified == 'EMPTY'
+            // return false
           },
-
-          titleSecond: 'Verifikasi',
+          titleSecond: (data: RekapData) => {
+            if (data.verified == 'PENDING') {
+              return 'Verifikasi'
+            }
+            return 'Verifikasi'
+          },
           iconSecond: 'shield-check',
-          colorSecond: 'success'
+          colorSecond: () => {
+            return 'success'
+          }
         }
       })
     }
@@ -226,11 +255,6 @@ export class RekapTableComponent {
 
   get sanitizedSource () {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.sourceFile)
-  }
-
-  openLink (data?: RekapData): void {
-    // window.open(data.dokumenVerifikasi, '_blank')
-    window.open('google.com', '_blank')
   }
 
   toggleModal (data?: RekapData) {
@@ -258,10 +282,6 @@ export class RekapTableComponent {
     )
   }
 
-  //   toggleModalPreview (fileName: string, source: string) {
-  //     this.filePreviewService.open(fileName, source)
-  //   }
-
   verifyDocument (data?: RekapData) {
     if (!data) {
       console.error('No data provided for verification')
@@ -274,7 +294,7 @@ export class RekapTableComponent {
 
         const payload = {
           id: data.id.toString(),
-          verified: true
+          verified: this.action$.value
         }
 
         this.apiService
@@ -287,7 +307,15 @@ export class RekapTableComponent {
               this.alertService.showToast('Success', 'Verification successful')
               this.isModalOpen$.next(false)
             },
-            error: error => this.handlerService.handleException(error)
+            error: error => {
+              console.error('Error verifying document', error)
+              this.alertService.showToast('Error', 'Failed to verify document')
+            },
+            complete: () => {
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
+            }
           })
       }
     })
@@ -309,20 +337,17 @@ export class RekapTableComponent {
               this.alertService.showToast('Success', 'Upload Success')
               this.isModalOpen$.next(!this.isModalOpen$.value)
             },
-            error: error => this.handlerService.handleException(error)
+            error: error => {
+              console.log(error)
+              this.handlerService.handleAlert('Error', 'Upload Failed')
+            },
+            complete: () => {
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
+            }
           })
       }
     })
   }
-
-  //   openModal () {
-  //     this.isModalPreviewOpen$.next(true)
-  //   }
-
-  //   // Method to close the modal
-  //   closeModal () {
-  //     this.showModal = false
-  //   }
-
-  ngOnInit () {}
 }

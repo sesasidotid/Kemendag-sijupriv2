@@ -218,7 +218,7 @@ export class FormasiTaskDetailComponent {
     return total
   }
 
-  getListJenjang () {
+  getListJenjang () {   
     // this.jenjangList$ = this.apiService
     //   .getData(`/api/v1/jenjang`)
     //   .pipe(

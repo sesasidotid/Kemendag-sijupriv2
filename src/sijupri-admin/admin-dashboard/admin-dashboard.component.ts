@@ -78,10 +78,22 @@ export class AdminDashboardComponent {
     this.getTotalUKOMPending()
     this.getTotalFormasiPending()
 
-    this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
-      .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'email').build())
+    this.pagable = new PagableBuilder(
+      '/api/v1/participant_ukom/search?desc_lastUpdated=true'
+    )
+      // this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('NIP', 'nip').withSortable(false).build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Nama', 'name').withSortable(false).build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Update Terakhir', 'lastUpdated')
+          .withSortable(false)
+          .build()
+      )
+      //   .setLimit(5)
       .build()
   }
 

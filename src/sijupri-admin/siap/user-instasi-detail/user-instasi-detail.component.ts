@@ -1,3 +1,4 @@
+import { filter } from 'rxjs/operators'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ApiService } from '../../../modules/base/services/api.service'
@@ -7,10 +8,13 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
+import { InstasiDetailComponent } from '../../maintenance/instasi-detail/instasi-detail.component'
+import { Instansi } from '../../../modules/maintenance/models/instansi.model'
+import { InstansiType } from '../../../modules/maintenance/models/instansi-type.model'
 @Component({
   selector: 'app-user-instasi-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, InstasiDetailComponent],
   templateUrl: './user-instasi-detail.component.html',
   styleUrl: './user-instasi-detail.component.scss'
 })
@@ -18,6 +22,8 @@ export class UserInstasiDetailComponent {
   nip: string = ''
   userInstansiDetail: UserInstansiDetail = new UserInstansiDetail()
   profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
+  instasiDetail: Instansi = new Instansi()
+  instansiType: InstansiType = new InstansiType()
 
   constructor (
     private activatedRoute: ActivatedRoute,
@@ -33,6 +39,15 @@ export class UserInstasiDetailComponent {
 
   ngOnInit () {
     this.getInstansiDetail()
+  }
+
+  getUserInstasiDetail (instasi_id: string) {
+    this.apiService.getData(`/api/v1/instansi/${instasi_id}`).subscribe({
+      next: (data: Instansi) => {
+        this.instasiDetail = data
+        this.getInstasiType(this.instasiDetail.instansiTypeCode)
+      }
+    })
   }
 
   fetchPhotoProfile () {
@@ -56,10 +71,21 @@ export class UserInstasiDetailComponent {
     this.apiService.getData(`/api/v1/user_instansi/${this.nip}`).subscribe({
       next: (data: UserInstansiDetail) => {
         this.userInstansiDetail = data
+        this.getUserInstasiDetail(this.userInstansiDetail.instansiId)
       },
       error: err => {
         console.error(err)
         this.handlerService.handleAlert('Error', 'Gagal mengambil data')
+      }
+    })
+  }
+
+  getInstasiType (instasi_code: string) {
+    this.apiService.getData('/api/v1/instansi_type').subscribe({
+      next: res => {
+        this.instansiType = res.filter(
+          (data: InstansiType) => data.code === instasi_code
+        )[0]
       }
     })
   }

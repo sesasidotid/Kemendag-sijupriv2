@@ -80,7 +80,12 @@ export class PagableComponent implements OnChanges {
 
   fetchData (): void {
     this.onLoad = true
-    let query = `?page=${this.page}&limit=${this.limit}`
+
+    let query = ''
+    const hasExistingQuery = this.pagable.endpoint.includes('?')
+    query += `${hasExistingQuery ? '&' : '?'}page=${this.page}&limit=${
+      this.limit
+    }`
 
     for (const property in this.sortOrder) {
       if (this.sortOrder[property] !== '') {
@@ -95,6 +100,22 @@ export class PagableComponent implements OnChanges {
         }
       })
     }
+
+    // let query = `?page=${this.page}&limit=${this.limit}`
+
+    // for (const property in this.sortOrder) {
+    //   if (this.sortOrder[property] !== '') {
+    //     query += `&${this.sortOrder[property]}_${property}=true`
+    //   }
+    // }
+
+    // if (this.pagable.filterLIst) {
+    //   this.pagable.filterLIst.forEach(filter => {
+    //     if (filter.value) {
+    //       query += `&${filter.key}=${filter.value}`
+    //     }
+    //   })
+    // }
 
     const isLocalEndpoint = this.pagable.endpoint.startsWith('http://localhost')
 
@@ -155,10 +176,38 @@ export class PagableComponent implements OnChanges {
     this.fetchData()
   }
 
+  //   toggleSort (columnProperty: string): void {
+  //     const column = this.pagable.primaryColumnList.find(
+  //       col => col.property === columnProperty
+  //     )
+  //     if (column && column.dynamic) {
+  //       return
+  //     }
+
+  //     switch (this.sortOrder[columnProperty]) {
+  //       case '':
+  //         this.sortOrder[columnProperty] = 'asc'
+  //         break
+  //       case 'asc':
+  //         this.sortOrder[columnProperty] = 'desc'
+  //         break
+  //       case 'desc':
+  //         this.sortOrder[columnProperty] = ''
+  //         break
+  //     }
+
+  //     this.fetchData()
+  //   }
   toggleSort (columnProperty: string): void {
     const column = this.pagable.primaryColumnList.find(
       col => col.property === columnProperty
     )
+
+    // Check if the column is sortable
+    if (column && !column.sortable) {
+      return
+    }
+
     if (column && column.dynamic) {
       return
     }

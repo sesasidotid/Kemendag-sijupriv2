@@ -53,11 +53,14 @@ export class AkpPelatihanListComponent {
     private alertService: AlertService
   ) {
     this.pagable = new PagableBuilder('/api/v1/akp_pelatihan_teknis/search')
+      .addPrimaryColumn(new PrimaryColumnBuilder('Kode', 'code').build())
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Nama Pelatihan', 'name').build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Jabatan', 'jabatanName').build()
+        new PrimaryColumnBuilder('Jabatan', 'jabatanName')
+          .withSortable(false)
+          .build()
       )
       .addActionColumn(
         new ActionColumnBuilder()

@@ -12,38 +12,30 @@
       </div>
       <div class="card-body">
         <form>
-          <div class="row mb-3">
-            <label for="" class="col-sm-2 col-form-label fw-bold"
-              >Unit Kerja</label
-            >
+          <div class="row border-bottom align-items-center">
+            <label class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
             <div class="col-sm-10">
-              <p>
-                <b>{{ unitKerja?.name }}</b>
+              <p class="form-control-plaintext m-0">: {{ unitKerja?.name }}</p>
+            </div>
+          </div>
+          <div class="row border-bottom align-items-center">
+            <label class="col-sm-2 col-form-label fw-bold">Alamat</label>
+            <div class="col-sm-10">
+              <p class="form-control-plaintext m-0">
+                : {{ unitKerja?.alamat }}
               </p>
             </div>
           </div>
-          <div class="row mb-3">
-            <label for="" class="col-sm-2 col-form-label fw-bold">Alamat</label>
+          <div class="row border-bottom align-items-center">
+            <label class="col-sm-2 col-form-label fw-bold">Email</label>
             <div class="col-sm-10">
-              <p>
-                <b>{{ unitKerja?.alamat }}</b>
-              </p>
+              <p class="form-control-plaintext m-0">: {{ unitKerja?.email }}</p>
             </div>
           </div>
-          <div class="row mb-3">
-            <label for="" class="col-sm-2 col-form-label fw-bold">Email</label>
+          <div class="row border-bottom align-items-center">
+            <label class="col-sm-2 col-form-label fw-bold">Phone</label>
             <div class="col-sm-10">
-              <p>
-                <b>{{ unitKerja?.email }}</b>
-              </p>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <label for="" class="col-sm-2 col-form-label fw-bold">Phone</label>
-            <div class="col-sm-10">
-              <p>
-                <b>{{ unitKerja?.phone }}</b>
-              </p>
+              <p class="form-control-plaintext m-0">: {{ unitKerja?.phone }}</p>
             </div>
           </div>
           <hr />
@@ -142,12 +134,6 @@
             class="row mb-3"
           >
             <div class="col0">
-              <!-- <input
-                type="file"
-                class="form-control"
-                (change)="onFileChange($event)"
-                name=" fileSuratUndangan"
-              /> -->
               <div class="row">
                 <app-file-handler [inputs]="inputs"></app-file-handler>
               </div>
@@ -195,210 +181,119 @@
 
 <ng-container *ngIf="pendingTask.flowId == 'for_flow_3'">
   <h3>Verifikasi Formasi</h3>
-  <!-- <div class="card">
-    <div class="card-header">
-      <ul
-        class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0 flex-nowrap mt-3"
-        role="tablist"
-      >
-        <li class="nav-item">
-          <a
-            class="nav-link active"
-            data-bs-toggle="tab"
-            href="#Verifikasi"
-            role="tab"
-          >
-            <i class="las la-user-graduate"></i>
-            Proses Verifikasi
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            data-bs-toggle="tab"
-            href="#Rekomendasi"
-            role="tab"
-          >
-            <i class="las la-sort-up"></i>
-            Proses Rekomendasi Formasi
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div> -->
 
   <div class="tab-content">
-    <div class="tab-pane active" id="Verifikasi" role="tabpanel">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="card">
-            <!-- <div class="card-header align-items-center d-flex">
-              <h4 class="card-title mb-0 flex-grow-1">Proses Verifikasi</h4>
-              <div class="flex-shrink-0"></div>
-            </div> -->
-            <div class="card-body">
-              <div class="row border-bottom">
-                <label for="" class="col-sm-2 col-form-label fw-bold"
-                  >Unit Kerja</label
-                >
-                <div class="col-sm-10">
-                  <p>
-                    <b>{{ unitKerja?.name }}</b>
-                  </p>
-                </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row border-bottom align-items-center">
+              <label class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
+              <div class="col-sm-10">
+                <p class="form-control-plaintext m-0">
+                  : {{ unitKerja?.name }}
+                </p>
               </div>
-              <div class="row border-bottom">
-                <label for="" class="col-sm-2 col-form-label fw-bold"
-                  >Alamat</label
-                >
-                <div class="col-sm-10">
-                  <p>
-                    <b>{{ unitKerja?.alamat }}</b>
-                  </p>
-                </div>
+            </div>
+            <div class="row border-bottom align-items-center">
+              <label class="col-sm-2 col-form-label fw-bold">Alamat</label>
+              <div class="col-sm-10">
+                <p class="form-control-plaintext m-0">
+                  : {{ unitKerja?.alamat }}
+                </p>
               </div>
-              <div class="row border-bottom">
-                <label for="" class="col-sm-2 col-form-label fw-bold"
-                  >Email</label
-                >
-                <div class="col-sm-10">
-                  <p>
-                    <b>{{ unitKerja?.email }}</b>
-                  </p>
-                </div>
+            </div>
+            <div class="row border-bottom align-items-center">
+              <label class="col-sm-2 col-form-label fw-bold">Email</label>
+              <div class="col-sm-10">
+                <p class="form-control-plaintext m-0">
+                  : {{ unitKerja?.email }}
+                </p>
               </div>
-              <div class="row border-bottom">
-                <label for="" class="col-sm-2 col-form-label fw-bold"
-                  >Phone</label
-                >
-                <div class="col-sm-10">
-                  <p>
-                    <b>{{ unitKerja?.phone }}</b>
-                  </p>
-                </div>
+            </div>
+            <div class="row border-bottom align-items-center">
+              <label class="col-sm-2 col-form-label fw-bold">Phone</label>
+              <div class="col-sm-10">
+                <p class="form-control-plaintext m-0">
+                  : {{ unitKerja?.phone }}
+                </p>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- <ng-container *ngFor="let formasi of formasiList"> -->
-        <div class="col-lg-12 row">
-          <form [formGroup]="flow3Form" (submit)="submitFl3()">
-            <!-- <div *ngIf="jabatanMapping[formasi.jabatanCode]" class="col"> -->
-            <!-- <div
-                class="card card-animate"
-                [routerLink]="
-                  '/formasi/formasi-task-list/jabatan/' +
-                  formasi.formasiId +
-                  '/' +
-                  formasi.jabatanCode
-                "
-              > -->
-            <!-- <div class="card card-animate">
-                <div class="card-body">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar-sm flex-shrink-0">
-                      <span
-                        class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2"
-                      >
-                        <i data-feather="briefcase" class="text-primary"></i>
-                      </span>
-                    </div>
-                    <div class="flex-grow-1 overflow-hidden ms-3">
-                      <div class="d-flex align-items-center mb-3">
-                        <h4 class="flex-grow-1 mb-0">
-                          <span class="counter-value">
-                            {{ jabatanMapping[formasi.jabatanCode] }}
-                          </span>
-                        </h4>
-                        <span
-                          class="badge bg-warning-subtle text-warning fs-12"
-                        >
-                          <i
-                            class="ri-arrow-right-s-line fs-13 align-middle me-1"
-                          ></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
-            <!-- </div> -->
-
-            <table class="table table-bordered table-hover">
-              <thead class="table-primary">
-                <tr>
-                  <th scope="col">No</th>
-                  <th scope="col">Name Jabatan</th>
-                  <th scope="col">Jenjang Jabatan</th>
-                  <th scope="col">Rekapitulasi Usulan Formasi</th>
-                  <th scope="col">Rekomendasi Formasi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <ng-container *ngFor="let item of formasiList; let i = index">
-                  <tr
-                    *ngFor="
-                      let formasi of item.formasiResultDtoList;
-                      let j = index
-                    "
+      <div class="col-lg-12">
+        <form [formGroup]="flow3Form" (submit)="submitFl3()">
+          <table class="table table-bordered table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th scope="col" class="align-middle">No</th>
+                <th scope="col" class="align-middle">Jabatan</th>
+                <th scope="col" class="align-middle">Jenjang Jabatan</th>
+                <th scope="col" class="align-middle">
+                  Rekapitulasi Usulan Formasi
+                </th>
+                <th scope="col" class="align-middle">Rekomendasi Formasi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let item of formasiList; let i = index">
+                <tr
+                  *ngFor="
+                    let formasi of item.formasiResultDtoList;
+                    let j = index
+                  "
+                >
+                  <td
+                    *ngIf="j === 0"
+                    class="align-middle"
+                    [attr.rowspan]="item.formasiResultDtoList.length"
                   >
-                    <!-- No and Name Jabatan should span multiple rows -->
-                    <td
-                      *ngIf="j === 0"
-                      class="align-middle"
-                      [attr.rowspan]="item.formasiResultDtoList.length"
-                    >
-                      {{ i + 1 }}
-                    </td>
-                    <td
-                      *ngIf="j === 0"
-                      class="align-middle"
-                      [attr.rowspan]="item.formasiResultDtoList.length"
-                    >
-                      {{ item.jabatanName }}
-                    </td>
-                    <!-- Jenjang Jabatan -->
-                    <td class="align-middle">
-                      {{ findJenjangName(formasi.jenjangCode) }}
-                    </td>
-                    <!-- Rekapitulasi Usulan Formasi -->
-                    <td class="align-middle">
-                      {{ formasi.pembulatan || 0 }}
-                    </td>
-                    <!-- Rekomendasi Formasi -->
-                    <td class="align-middle">
-                      <input
-                        [formControlName]="'formasi_' + i + '_' + j"
-                        type="number"
-                        class="form-control"
-                        [value]="formasi.pembulatan || 0"
-                      />
-                    </td>
-                  </tr>
-                </ng-container>
-
-                <!-- Baris Jumlah Usulan Formasi -->
-                <tr>
-                  <td colspan="2" class="align-middle text-center fw-bold">
-                    Jumlah Usulan Formasi
+                    {{ i + 1 }}
                   </td>
-                  <td class="align-middle fw-bold">
-                    {{ getTotalRekapitulasi() }}
+                  <td
+                    *ngIf="j === 0"
+                    class="align-middle"
+                    [attr.rowspan]="item.formasiResultDtoList.length"
+                  >
+                    {{ item.jabatanName }}
                   </td>
-                  <td class="align-middle fw-bold">
-                    {{ getTotalRekomendasi() }}
+                  <td class="align-middle">
+                    {{ findJenjangName(formasi.jenjangCode) }}
+                  </td>
+                  <td class="align-middle">
+                    {{ formasi.pembulatan || 0 }}
+                  </td>
+                  <td class="align-middle">
+                    <input
+                      [formControlName]="'formasi_' + i + '_' + j"
+                      type="number"
+                      class="form-control"
+                      [value]="formasi.pembulatan || 0"
+                    />
                   </td>
                 </tr>
-              </tbody>
-            </table>
+              </ng-container>
 
-            <button type="submit" class="btn btn-success float-end">
-              Submit
-            </button>
-          </form>
-        </div>
-        <!-- </ng-container> -->
+              <tr>
+                <td colspan="3" class="align-middle text-center fw-bold">
+                  Jumlah Usulan Formasi
+                </td>
+                <td class="align-middle fw-bold">
+                  {{ getTotalRekapitulasi() }}
+                </td>
+                <td class="align-middle fw-bold">
+                  {{ getTotalRekomendasi() }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button type="submit" class="btn btn-success float-end">
+            Submit
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -406,42 +301,23 @@
 
 <ng-container *ngIf="pendingTask.flowId == 'for_flow_5'">
   <div class="row col">
-    <div class="card">
-      <div class="card-header align-items-center d-flex">
-        <h4 class="card-title mb-0 flex-grow-1">Rekomendasi Formasi</h4>
-        <div class="flex-shrink-0"></div>
-      </div>
-      <div class="card-body">
-        <form (submit)="submitFl5()">
+    <div class="card-header align-items-center d-flex">
+      <h4 class="card-title mb-0 flex-grow-1">Rekomendasi Formasi</h4>
+      <div class="flex-shrink-0"></div>
+    </div>
+    <div class="card-body">
+      <form (submit)="submitFl5()">
+        <div class="row">
           <div class="row">
-            <!-- <label for="" class="col-sm-2 col-form-label fw-bold"
-              >Rekomendasi Formasi</label
-            > -->
-            <!-- <div class="col-sm-10">
-              <input
-                type="file"
-                class="form-control"
-                id="emailInput"
-                placeholder="Masukkan KTP"
-                (change)="onFileChange($event)"
-                name="file_ktp"
-              />
-            </div> -->
-            <div class="row">
-              <app-file-handler
-                [inputs]="inputsFileRekomendasi"
-              ></app-file-handler>
-            </div>
+            <app-file-handler
+              [inputs]="inputsFileRekomendasi"
+            ></app-file-handler>
           </div>
-          <div class="text-center float-end">
-            <button type="submit" class="btn btn-success">Simpan</button>
-          </div>
-        </form>
-      </div>
+        </div>
+        <div class="text-center float-end">
+          <button type="submit" class="btn btn-success">Simpan</button>
+        </div>
+      </form>
     </div>
   </div>
-</ng-container>
-
-<ng-container *ngIf="pendingTask.flowId == 'for_flow_1'">
-  <p></p>
 </ng-container>

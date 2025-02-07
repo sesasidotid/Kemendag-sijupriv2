@@ -59,7 +59,8 @@ export class PakDetailComponent {
         .addActionColumn(
           new ActionColumnBuilder()
             .setAction((rwKinerja: any) => {
-              this.router.navigate([`/${rwKinerja.nip}`])
+              //   this.router.navigate([`/${rwKinerja.nip}`])
+              this.router.navigate([`/pak/pak-list/${nip}/${rwKinerja.id}`])
             }, 'info')
             .withIcon('detail')
             .build()

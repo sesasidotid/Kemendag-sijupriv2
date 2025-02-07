@@ -1,7 +1,16 @@
-import { Component } from '@angular/core';
-import { Chart, RadialLinearScale, RadarController, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
-import { RWKinerja } from '../../../modules/siap/models/rw-kinerja.model';
-import { ActivatedRoute } from '@angular/router';
+import { Component } from '@angular/core'
+import {
+  Chart,
+  RadialLinearScale,
+  RadarController,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+} from 'chart.js'
+import { RWKinerja } from '../../../modules/siap/models/rw-kinerja.model'
+import { ActivatedRoute } from '@angular/router'
 
 @Component({
   selector: 'app-pak-graph',
@@ -11,24 +20,30 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './pak-graph.component.scss'
 })
 export class PakGraphComponent {
-  rwKinerja: RWKinerja = new RWKinerja();
-  rwKinerjaId: string;
+  rwKinerja: RWKinerja = new RWKinerja()
+  rwKinerjaId: string
 
-  constructor(
-    private activatedRoute: ActivatedRoute
-  ) {
+  constructor (private activatedRoute: ActivatedRoute) {
     this.activatedRoute.paramMap.subscribe(params => {
-      this.rwKinerjaId = params.get('rwKinerjaId');
-    });
+      this.rwKinerjaId = params.get('rwKinerjaId')
+    })
   }
 
-  ngOnInit(): void {
-    Chart.register(RadialLinearScale, RadarController, PointElement, LineElement, Filler, Tooltip, Legend);
-    this.createRadarChart();
+  ngOnInit (): void {
+    Chart.register(
+      RadialLinearScale,
+      RadarController,
+      PointElement,
+      LineElement,
+      Filler,
+      Tooltip,
+      Legend
+    )
+    this.createRadarChart()
   }
 
-  createRadarChart() {
-    const ctx = document.getElementById('radarChart') as HTMLCanvasElement;
+  createRadarChart () {
+    const ctx = document.getElementById('radarChart') as HTMLCanvasElement
 
     new Chart(ctx, {
       type: 'radar',
@@ -71,7 +86,6 @@ export class PakGraphComponent {
           }
         }
       }
-    });
+    })
   }
-
 }

@@ -191,7 +191,7 @@ export const routes: Routes = [
           'Validasi Pelatihan': {
             components: () =>
               import(
-                '../sijupri-admin/akp/akp-verifikasi-pelatihan/akp-verifikasi-pelatihan.component'
+                './akp/akp-verifikasi-pelatihan/akp-verifikasi-pelatihan.component'
               ).then(m => m.AkpVerifikasiPelatihanComponent)
           }
         },

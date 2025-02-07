@@ -4,6 +4,7 @@ export class UserUnitKerjaDetail extends Serializable {
   nip: string = undefined
   jenisKelaminCode: any = undefined
   instansiId: string = undefined
+  unitKerjaId: string = undefined
   updatedBy: any = undefined
   lastUpdated: string = undefined
   version: number = undefined

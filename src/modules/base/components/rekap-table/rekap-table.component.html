@@ -10,8 +10,8 @@
       '<span class=\'no-rows-message\'>Data tidak ditemukan</span>'
     "
   >
-    >
   </ag-grid-angular>
+
   <app-modal
     *ngIf="isModalOpen$ | async"
     [title]="'Aksi Pelatihan'"
@@ -29,7 +29,7 @@
           <div class="col-12">
             <button
               type="button"
-              class="btn btn-sm btn-success float-end"
+              class="btn btn-success float-end"
               (click)="submit()"
             >
               Import
@@ -37,62 +37,51 @@
           </div>
         </div>
       </div>
+
       <div class="col-lg-12" *ngIf="role.includes('ADMIN')">
         <div class="row">
-          <!-- <app-file-handler [inputs]="inputs"></app-file-handler> -->
-          <!-- <app-file-preview></app-file-preview> -->
+          <div class="col-lg-12">
+            <div class="category-list">
+              <label> Aksi : </label>
+              <a
+                (click)="action$.next('APPROVE')"
+                class="btn"
+                [ngClass]="{
+                  'btn-success': (action$ | async) === 'APPROVE',
+                  'btn-soft-success': (action$ | async) === 'REJECT'
+                }"
+                >Terima</a
+              >
+              <a
+                (click)="action$.next('REJECT')"
+                class="btn"
+                [ngClass]="{
+                  'btn-danger': (action$ | async) === 'REJECT',
+                  'btn-soft-danger': (action$ | async) === 'APPROVE'
+                }"
+                >Tolak</a
+              >
+            </div>
+
+            <div class="float-end">
+              <button
+                class="btn btn-soft-secondary me-2"
+                (click)="toggleModal()"
+                type="button"
+              >
+                Batal
+              </button>
+              <button
+                class="btn btn-primary"
+                type="button"
+                (click)="verifyDocument(selectedRekapData)"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </form>
   </app-modal>
-
-  <!-- <app-modal
-    *ngIf="isModalPreviewOpen$ | async"
-    [title]="'Review Dokumen'"
-    (toggle)="toggleModalPreview()"
-    [enableFooter]="false"
-  >
-    <app-file-handler
-      [inputs]="{
-        files: {
-            dokumenVerifikasi: { label: 'dokumenVerifikasi', source: this.selectedRekapData.dokumenVerifikasi },
-        },
-        viewOnly: true
-      }"
-    ></app-file-handler>
-  </app-modal> -->
-  <!-- <app-file-handler
-    [inputs]="{
-        files: {
-            dokumenVerifikasi: { label: 'dokumenVerifikasi', source: this.selectedRekapData.dokumenVerifikasi },
-        },
-        viewOnly: true
-      }"
-  ></app-file-handler> -->
-
-  <!-- <div
-    class="modal fade"
-    tabindex="-1"
-    role="dialog"
-    [ngClass]="{ 'show d-block': isModalPreviewOpen$ | async }"
-  >
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Test saja</h5>
-          <button
-            type="button"
-            class="close"
-            (click)="toggleModalPreview()"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <iframe [src]="sanitizedSource" width="100%" height="600px"></iframe>
-        </div>
-      </div>
-    </div>
-  </div> -->
 </div>

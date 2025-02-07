@@ -59,13 +59,19 @@ export class AKPTaskComponent {
           new PrimaryColumnBuilder('NIP', 'objectGroup').build()
         )
         .addPrimaryColumn(
-          new PrimaryColumnBuilder('Nama AKP', 'objectName').build()
+          new PrimaryColumnBuilder('Nama AKP', 'objectName')
+            // .withSortable(false)
+            .build()
         )
         .addPrimaryColumn(
-          new PrimaryColumnBuilder('Proses', 'flowName').build()
+          new PrimaryColumnBuilder('Proses', 'flowName')
+            // .withSortable(false)
+            .build()
         )
         .addPrimaryColumn(
-          new PrimaryColumnBuilder('Status', 'taskStatus').build()
+          new PrimaryColumnBuilder('Status', 'taskStatus')
+            // .withSortable(false)
+            .build()
         )
         .addActionColumn(
           new ActionColumnBuilder()
@@ -166,6 +172,8 @@ export class AKPTaskComponent {
           namaAtasan: this.form.get('nama_atasan').value
         }
 
+        console.log(this.payload)
+
         this.akpTaskService.verifAKPTask(this.payload).subscribe({
           next: () => {
             this.alertService.showToast(
@@ -192,6 +200,7 @@ export class AKPTaskComponent {
         this.payload.taskAction = 'reject'
         this.payload.remark = this.form.get('remark').value
 
+        console.log(this.payload)
         this.akpTaskService.verifAKPTask(this.payload).subscribe({
           next: () => {
             this.alertService.showToast(

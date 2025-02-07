@@ -24,13 +24,19 @@ export class AkpListComponent {
       // this.pagable = new PagableBuilder('/api/v1/akp/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Nama', 'name', ['user']).build()
+        new PrimaryColumnBuilder('Nama', 'name', ['user'])
+          //   .withSortable(false)
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Email', 'email', ['user']).build()
+        new PrimaryColumnBuilder('Email', 'email', ['user'])
+          //   .withSortable(false)
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Status', 'status', ['user']).build()
+        new PrimaryColumnBuilder('Status', 'status', ['user'])
+          //   .withSortable(false)
+          .build()
       )
       .addActionColumn(
         new ActionColumnBuilder()

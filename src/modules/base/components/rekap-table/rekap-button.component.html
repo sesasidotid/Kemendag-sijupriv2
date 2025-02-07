@@ -1,18 +1,21 @@
 <div class="d-flex gap-2" style="margin-top: 6px">
   <button
-    *ngIf="params.showFirstButton(this.params.data)"
-    [disabled]="params.disabledFirstButton(this.params.data)"
+    *ngIf="params.showFirstButton(params.data)"
+    [disabled]="params.disabledFirstButton(params.data)"
     (click)="onFirstButtonClick()"
-    class="btn btn-sm btn-{{ params.colorFirst }}"
+    class="btn btn-sm btn-{{ params.colorFirst(params.data) }}"
   >
-    <i class="mdi mdi-{{ params.iconFirst }} me-1"></i>{{ params.titleFirst }}
+    <i class="mdi mdi-{{ params.iconFirst }} me-1"></i
+    >{{ params.titleFirst(params.data) }}
   </button>
+
   <button
-    *ngIf="params.showSecondButton(this.params.data)"
-    [disabled]="params.disabledSecondButton(this.params.data)"
+    *ngIf="params.showSecondButton(params.data)"
+    [disabled]="params.disabledSecondButton(params.data)"
     (click)="onSecondButtonClick()"
-    class="btn btn-sm btn-{{ params.colorSecond }}"
+    class="btn btn-sm btn-{{ params.colorSecond(params.data) }}"
   >
-    <i class="mdi mdi-{{ params.iconSecond }} me-1"></i>{{ params.titleSecond }}
+    <i class="mdi mdi-{{ params.iconSecond }} me-1"></i>
+    {{ params.titleSecond(params.data) }}
   </button>
 </div>

@@ -7,11 +7,11 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
-
+import { UnitKerjaDetailComponent } from '../../maintenance/unit-kerja-detail/unit-kerja-detail.component'
 @Component({
   selector: 'app-user-unit-kerja-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, UnitKerjaDetailComponent],
   templateUrl: './user-unit-kerja-detail.component.html',
   styleUrl: './user-unit-kerja-detail.component.scss'
 })
@@ -57,6 +57,7 @@ export class UserUnitKerjaDetailComponent {
     this.apiService.getData(`/api/v1/user_unit_kerja/${this.nip}`).subscribe({
       next: (data: UserUnitKerjaDetail) => {
         this.userUnitKerjaDetail = data
+        console.log('111', this.userUnitKerjaDetail)
       },
       error: err => {
         console.error(err)

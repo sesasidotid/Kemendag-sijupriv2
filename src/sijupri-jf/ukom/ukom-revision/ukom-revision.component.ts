@@ -94,20 +94,48 @@ export class UkomRevisionComponent {
       this.pesertaUkom.dokumenUkomList = []
     }
 
+    // for (const key in this.detectedDokumen) {
+    //   if (this.detectedDokumen.hasOwnProperty(key)) {
+    //     const detected = this.detectedDokumen[key]
+
+    //     this.pesertaUkom.dokumenUkomList.push({
+    //       dokumenFile: detected.base64,
+    //       dokumenPersyaratanName:
+    //         this.jf.nip + '_' + 'dokumenPersyaratanUkom' + '_' + Date.now(),
+    //       dokumenPersyaratanId: this.pendingTask.dokumenUkomList.find(
+    //         dokumen => dokumen.dokumenPersyaratanName === detected.label
+    //       )?.dokumenPersyaratanId
+    //     })
+    //   }
+    // }
+
+    const documentMap = new Map()
+
     for (const key in this.detectedDokumen) {
       if (this.detectedDokumen.hasOwnProperty(key)) {
         const detected = this.detectedDokumen[key]
 
-        this.pesertaUkom.dokumenUkomList.push({
-          dokumenFile: detected.base64,
-          dokumenPersyaratanName:
-            this.jf.nip + '_' + 'dokumenPersyaratanUkom' + '_' + Date.now(),
-          dokumenPersyaratanId: this.pendingTask.dokumenUkomList.find(
-            dokumen => dokumen.dokumenPersyaratanName === detected.label
-          )?.dokumenPersyaratanId
-        })
+        const existingDokumen = this.pendingTask.dokumenUkomList.find(
+          dokumen => dokumen.dokumenPersyaratanName === detected.label
+        )
+
+        if (existingDokumen) {
+          const newDoc = {
+            dokumenFile: detected.base64,
+            dokumenPersyaratanName: `${
+              this.jf.nip
+            }_dokumenPersyaratanUkom_${Date.now()}`,
+            dokumenPersyaratanId: existingDokumen.dokumenPersyaratanId
+          }
+
+          // Store only the latest document for each dokumenPersyaratanId
+          documentMap.set(existingDokumen.dokumenPersyaratanId, newDoc)
+        }
       }
     }
+
+    // Convert the Map values to an array and assign it to pesertaUkom.dokumenUkomList
+    this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
 
     this.confirmationService.open(false).subscribe({
       next: result => {

@@ -4,9 +4,18 @@
       <ng-container *ngFor="let fillter of pagable.filterLIst">
         <ng-container *ngIf="fillter.fieldType">
           <div>
-            <div class="mb-0 cursor-pointer" *ngIf="fillter.fieldType == 'select'">
-              <label class="col-form-label p-1"><b>{{ fillter.label }}</b></label>
-              <select class="form-select p-1 cursor-pointer" [(ngModel)]="fillter.value" name="{{ fillter.label }}">
+            <div
+              class="mb-0 cursor-pointer"
+              *ngIf="fillter.fieldType == 'select'"
+            >
+              <label class="col-form-label p-1"
+                ><b>{{ fillter.label }}</b></label
+              >
+              <select
+                class="form-select p-1 cursor-pointer"
+                [(ngModel)]="fillter.value"
+                name="{{ fillter.label }}"
+              >
                 <option [value]="''">pilih</option>
                 <ng-container *ngFor="let data of fillter.optionList">
                   <option [value]="data.value">{{ data.label }}</option>
@@ -14,13 +23,24 @@
               </select>
             </div>
             <div class="mb-0" *ngIf="fillter.fieldType == 'text'">
-              <label class="col-form-label p-1"><b>{{ fillter.label }}</b></label>
-              <input class="form-control p-1" [(ngModel)]="fillter.value" name="{{ fillter.label }}" />
+              <label class="col-form-label p-1"
+                ><b>{{ fillter.label }}</b></label
+              >
+              <input
+                class="form-control p-1"
+                [(ngModel)]="fillter.value"
+                name="{{ fillter.label }}"
+              />
             </div>
           </div>
         </ng-container>
       </ng-container>
-      <button *ngIf="isSearchExist()" type="submit" class="btn btn-sm btn-outline-primary" style="bottom: 0">
+      <button
+        *ngIf="isSearchExist()"
+        type="submit"
+        class="btn btn-sm btn-outline-primary"
+        style="bottom: 0"
+      >
         Terapkan
       </button>
     </div>
@@ -47,16 +67,21 @@
         <ng-container *ngFor="let column of pagable.primaryColumnList">
           <th (click)="toggleSort(column.property)">
             {{ column.label }}
-            <span class="float-end text-primary" [ngClass]="{
+            <span
+              class="float-end text-primary"
+              [ngClass]="{
                         'ri-filter-3-line': getSortIcon(column.property) == '',
                         'ri-arrow-up-line': getSortIcon(column.property) == 'asc',
                         'ri-arrow-down-line': getSortIcon(column.property) == 'desc',
-                    }"></span>
+                    }"
+            ></span>
           </th>
         </ng-container>
-        <th *ngIf="
+        <th
+          *ngIf="
             pagable.actionColumnList && pagable.actionColumnList.length > 0
-          ">
+          "
+        >
           Action
         </th>
       </tr>
@@ -89,19 +114,34 @@
               {{ column.dynamic(row) }}
             </td>
           </ng-container>
-          <td *ngIf="
+          <td
+            *ngIf="
               pagable.actionColumnList && pagable.actionColumnList.length > 0
-            " class="m-1 p-1">
+            "
+            class="m-1 p-1"
+          >
             <div class="btn-group" role="group" aria-label="Basic example">
               <ng-container *ngFor="let action of pagable.actionColumnList">
-
-                <a *ngIf="action.inputType == 'button'" (click)="action.process(row)" class="text-light btn btn-sm btn-{{
-                        action.inactive && action.inactive(row) ? 'grey disabled' : action.color
-                    }} {{ action.icon }}">
+                <a
+                  *ngIf="action.inputType == 'button'"
+                  (click)="action.process(row)"
+                  class="text-light btn btn-sm btn-{{
+                    action.inactive && action.inactive(row)
+                      ? 'grey disabled'
+                      : action.color
+                  }} {{ action.icon }}"
+                >
                 </a>
 
-                <input *ngIf="action.inputType == 'checkbox'" (change)="action.process(row, $event)" [checked]="action.checked(row)" class="form-check-input custom-checkbox ms-2 me-2" type="checkbox"
-                  id="inlineCheckbox1" value="option1">
+                <input
+                  *ngIf="action.inputType == 'checkbox'"
+                  (change)="action.process(row, $event)"
+                  [checked]="action.checked(row)"
+                  class="form-check-input custom-checkbox ms-2 me-2"
+                  type="checkbox"
+                  id="inlineCheckbox1"
+                  value="option1"
+                />
               </ng-container>
             </div>
           </td>
@@ -118,14 +158,22 @@
 
     <ng-container *ngFor="let item of getPages(); let i = index">
       <li *ngIf="item !== '...'" class="page-item cursor-pointer">
-        <a class="page-link py-1 px-2" [ngClass]="{ active: page == item }" (click)="select(item)">{{ item }}</a>
+        <a
+          class="page-link py-1 px-2"
+          [ngClass]="{ active: page == item }"
+          (click)="select(item)"
+          >{{ item }}</a
+        >
       </li>
       <li *ngIf="item === '...'" class="page-item disabled">
         <a class="page-link py-1 px-2">{{ item }}</a>
       </li>
     </ng-container>
 
-    <li class="page-item cursor-pointer" [ngClass]="{ disabled: page == paginator.lastPage }">
+    <li
+      class="page-item cursor-pointer"
+      [ngClass]="{ disabled: page == paginator.lastPage }"
+    >
       <a class="page-link py-1 px-2" (click)="next()">Next</a>
     </li>
   </ul>

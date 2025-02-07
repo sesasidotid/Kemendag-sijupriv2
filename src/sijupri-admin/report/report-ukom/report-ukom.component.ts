@@ -18,6 +18,7 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms'
+import { ReportGenerate } from '../../../modules/report/models/report-generate.model'
 @Component({
   selector: 'app-report-ukom',
   standalone: true,
@@ -126,6 +127,39 @@ export class ReportUkomComponent {
   }
 
   onSubmit () {
-    console.log(this.addUKomReportForm.value)
+    this.addUKomReportForm.markAllAsTouched()
+
+    if (this.addUKomReportForm.valid) {
+      this.confirmationService.open(false).subscribe({
+        next: result => {
+          if (!result.confirmed) return
+
+          const reportGenerate = new ReportGenerate()
+          reportGenerate.reportId = 'ukomReport'
+          reportGenerate.fileType = this.addUKomReportForm.value.fileType
+          reportGenerate.parameter = {
+            dateFrom: this.addUKomReportForm.value.dateFrom,
+            dateTo: this.addUKomReportForm.value.dateTo
+          }
+
+          this.apiService
+            .postData('/api/v1/report_generate', reportGenerate)
+            .subscribe({
+              next: () => {
+                this.handlerService.handleAlert('Success', 'Report Generating')
+                this.pagableComponent.fetchData()
+                this.ngOnInit()
+              },
+              error: error => {
+                console.error('Error generating report', error)
+                this.handlerService.handleAlert(
+                  'Error',
+                  'Gagal membuat report. Silahkan Coba Lagi'
+                )
+              }
+            })
+        }
+      })
+    }
   }
 }

@@ -90,23 +90,59 @@ export class UkomRegisterComponent {
   ) {
     this.nonJFForm = new FormGroup({
       jenis_ukom: new FormControl('', Validators.required),
-      nip: new FormControl('', Validators.required),
-      nik: new FormControl('', Validators.required),
+      nip: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^\d{18}$/) // Ensures exactly 18 digits
+      ]),
+      nik: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^\d{16}$/) // Ensures exactly 16 digits
+      ]),
       name: new FormControl('', Validators.required),
       email: new FormControl('', Validators.required),
-      phone: new FormControl('', Validators.required),
+      phone: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^\d+$/) // Ensures only numbers
+      ]),
       tempatLahir: new FormControl('', Validators.required),
       tanggalLahir: new FormControl('', Validators.required),
       jenisKelaminCode: new FormControl('M', Validators.required),
       jabatanCode: new FormControl('', Validators.required),
       jenjangCode: new FormControl('', Validators.required),
       pangkatCode: new FormControl('', Validators.required),
-      nextJabatanCode: new FormControl('', Validators.required),
-      nextJenjangCode: new FormControl('', Validators.required),
-      instansi_id: new FormControl('', Validators.required),
-      unit_kerja_id: new FormControl('', Validators.required),
-      password: new FormControl('', Validators.required)
+      nextJabatanCode: new FormControl(''),
+      nextJenjangCode: new FormControl(''),
+      instansi_id: new FormControl(''),
+      unit_kerja_id: new FormControl(''),
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(8)
+      ]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        this.passwordMatchValidator.bind(this)
+      ])
+
       //   instansi_name: new FormControl('', Validators.required)
+    })
+  }
+
+  passwordMatchValidator (
+    control: FormControl
+  ): { [key: string]: boolean } | null {
+    if (this.nonJFForm) {
+      const password = this.nonJFForm.get('password')?.value
+      const confirmPassword = control.value
+      if (password !== confirmPassword) {
+        return { mismatch: true }
+      }
+    }
+    return null
+  }
+
+  isAnyFileMissing (): boolean {
+    return Object.keys(this.inputs.files).some(key => {
+      return !this.detectedDokumen[key]
     })
   }
 
@@ -205,6 +241,7 @@ export class UkomRegisterComponent {
       this.getListJenjang(jabatanCode)
     }
   }
+
   getListJenjang (jabatanCode: string) {
     this.jenjangList$ = this.apiService
       .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
@@ -291,7 +328,7 @@ export class UkomRegisterComponent {
 
       if (jenis_ukom == 'PROMOSI') {
         // this.getNextJenjang()
-        this.nonJFForm.get('jenjangCode')?.setValue('JJ1')
+        // this.nonJFForm.get('jenjangCode')?.setValue('JJ1')
         this.getDokumenPersyaratan(jenis_ukom)
       }
     }
@@ -314,6 +351,7 @@ export class UkomRegisterComponent {
 
     if (instansiId) {
       this.pesertaUkom.instansi_id = instansiId
+      this.nonJFForm.get('instansi_id')?.setValue(instansiId)
       this.getListUnitKerja(instansiId)
     }
   }
@@ -322,6 +360,8 @@ export class UkomRegisterComponent {
     const unitKerjaId = (event.target as HTMLSelectElement).value
 
     if (unitKerjaId) {
+      this.nonJFForm.get('unit_kerja_id')?.setValue(unitKerjaId)
+
       this.pesertaUkom.unit_kerja_id = unitKerjaId
     }
   }
@@ -364,29 +404,59 @@ export class UkomRegisterComponent {
         this.nonJFForm.get('jabatanCode')?.value
     }
 
+    // if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
+    //   this.pesertaUkom.dokumenUkomList = []
+    // }
+
+    // for (const key in this.detectedDokumen) {
+    //   if (this.detectedDokumen.hasOwnProperty(key)) {
+    //     const detected = this.detectedDokumen[key]
+    //     this.pesertaUkom.dokumenUkomList.push({
+    //       dokumenFile: detected.base64,
+    //       dokumenPersyaratanName:
+    //         this.dokumenPersyaratanList.find(
+    //           dokumen => dokumen.dokumenPersyaratanName == detected.label
+    //         ).dokumenPersyaratanName +
+    //         '_' +
+    //         this.pesertaUkom.nip +
+    //         '_' +
+    //         Date.now(),
+    //       dokumenPersyaratanId: detected.id
+    //     })
+    //   }
+    // }
+
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
     }
 
+    const documentMap = new Map()
+
     for (const key in this.detectedDokumen) {
       if (this.detectedDokumen.hasOwnProperty(key)) {
         const detected = this.detectedDokumen[key]
-        this.pesertaUkom.dokumenUkomList.push({
-          dokumenFile: detected.base64,
-          dokumenPersyaratanName:
-            this.dokumenPersyaratanList.find(
-              dokumen => dokumen.dokumenPersyaratanName == detected.label
-            ).dokumenPersyaratanName +
-            '_' +
-            this.pesertaUkom.nip +
-            '_' +
-            Date.now(),
-          dokumenPersyaratanId: detected.id
-        })
+
+        const dokumenPersyaratan = this.dokumenPersyaratanList.find(
+          dokumen => dokumen.dokumenPersyaratanName === detected.label
+        )
+
+        if (dokumenPersyaratan) {
+          const newDoc = {
+            dokumenFile: detected.base64,
+            dokumenPersyaratanName: `${
+              dokumenPersyaratan.dokumenPersyaratanName
+            }_${this.pesertaUkom.nip}_${Date.now()}`,
+            dokumenPersyaratanId: detected.id
+          }
+
+          // Store only the latest document for each dokumenPersyaratanId
+          documentMap.set(detected.id, newDoc)
+        }
       }
-      console.log('pesertaUkom', this.pesertaUkom.dokumenUkomList)
     }
-    console.log('pesertaUkom', this.pesertaUkom)
+
+    // Convert the Map values to an array and assign it to pesertaUkom.dokumenUkomList
+    this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
 
     // if (this.nonJFForm.invalid) {
     //   this.handlerService.handleAlert('Error', 'Data belum lengkap')
@@ -409,7 +479,13 @@ export class UkomRegisterComponent {
                 'Data berhasil disimpan'
               )
             },
-            error: error => this.handlerService.handleException(error)
+            error: error => {
+              console.log('error', error)
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal mendaftar UKom, silahkan coba lagi'
+              )
+            }
           })
       },
       error: error => {

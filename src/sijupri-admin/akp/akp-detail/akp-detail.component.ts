@@ -31,7 +31,7 @@ export class AkpDetailComponent {
 
   AKPDetail = new AKPDetail()
   currentTab$ = new BehaviorSubject<number>(1)
-
+  //   currentTab$ = new BehaviorSubject<number>(4)
   AKPDetailLoading$ = new BehaviorSubject<boolean>(false)
 
   constructor (

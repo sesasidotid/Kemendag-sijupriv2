@@ -9,256 +9,65 @@
   </div>
 
   <ng-template #formulaHadItem>
-    <!-- <div class="card-body">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="row mb-3">
-            <label for="" class="form-label">Jabatan</label>
-            <div class="col-sm-10 pt-2">
-              <p class="">
-                {{ (filteredJabatan$ | async)?.name || 'Not Found' }}
-              </p>
+    <div class="p-0 d-flex flex-column flex-xl-row gap-3">
+      <div class="card flex-grow-1 m-0 detail-jf">
+        <div class="card-header">
+          <h5 class="m-0">
+            <i class="mdi mdi-account me-2"></i> Informasi Detail Formula
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <label class="form-label">Persentase CAT</label>
+              <p>{{ FormulaDetail.catPercentage }}%</p>
             </div>
-          </div>
-
-          <div class="row mb-3">
-            <label for="name" class="form-label">Jenjang</label>
-            <div class="col-sm-10 pt-2">
-              <p>{{ (filteredJenjang$ | async)?.name || 'Not Found' }}</p>
+            <div class="col-md-6 mb-2">
+              <label class="form-label"> Persentase Wawancara </label>
+              <p>{{ FormulaDetail.wawancaraPercentage }}%</p>
             </div>
-          </div>
-
-          <div
-            *ngFor="
-              let field of [
-                'Persentase CAT',
-                'Persentase Wawancara',
-                'Persentase Seminar',
-                'Persentase Praktik',
-                'Persentase Portofolio',
-                'Persentase UKT',
-                'Persentase UKMSK',
-                'Ambang Batas Nilai',
-                'Ambang Batas UKT',
-                'Ambang Batas JPM'
-              ]
-            "
-            class="row mb-3"
-          >
-            <label for="name" class="col-sm-2 col-form-label fw-bold">{{
-              field | titlecase
-            }}</label>
-            <div class="col-sm-10 pt-2">
-              <p>: {{ FormulaDetail[field] }} %</p>
+            <div class="col-md-6 mb-2">
+              <label class="form-label"> Persentase Praktik </label>
+              <p>{{ FormulaDetail.praktikPercentage }}%</p>
+            </div>
+            <div class="col-md-6 mb-2">
+              <label class="form-label"> Persentase Portofolio </label>
+              <p>{{ FormulaDetail.portofolioPercentage }}%</p>
+            </div>
+            <div class="col-md-6 mb-2">
+              <label class="form-label"> Ambang Batas Nilai </label>
+              <p>{{ FormulaDetail.gradeThreshold }}</p>
+            </div>
+            <div class="col-md-6 mb-2">
+              <label class="form-label"> Ambang Batas UKT </label>
+              <p>{{ FormulaDetail.uktThreshold }}</p>
+            </div>
+            <div class="col-md-6 mb-2">
+              <label class="form-label"> Ambang Batas JPM </label>
+              <p>{{ FormulaDetail.jpmThreshold }}</p>
             </div>
           </div>
         </div>
       </div>
-    </div> -->
-    <div>
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Jabatan</label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ (filteredJabatan$ | async)?.name || 'Not Found' }}</p>
+      <div class="card flex-grow-1 m-0 detail-atasan">
+        <div class="card-header">
+          <h5 class="m-0">
+            <i class="mdi mdi-account-multiple me-2"></i> Informasi Jabatan
+          </h5>
         </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Jenjang
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ (filteredJenjang$ | async)?.name || 'Not Found' }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Persentase CAT
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.catPercentage }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Persentase Wawancara
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.wawancaraPercentage }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Persentase Seminar
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.seminarPercentage }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Persentase Praktik
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.praktikPercentage }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Persentase Portofolio
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.portofolioPercentage }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Persentase UKT
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.uktPercentage }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Persentase UKMSK
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.ukmskPercentage }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Ambang Batas Nilai
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.gradeThreshold }}</p>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Ambang Batas UKT
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.uktThreshold }}</p>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">
-          Ambang Batas JPM
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.jpmThreshold }}</p>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12 mb-2">
+              <label class="form-label"> Jabatan </label>
+              <p>{{ (filteredJabatan$ | async)?.name || '-' }}</p>
+            </div>
+            <div class="col-12 mb-2">
+              <label class="form-label"> Jenjang </label>
+              <p>{{ (filteredJenjang$ | async)?.name || '-' }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </ng-template>
-
-  <!-- <ng-template #formulaHadItem>
-    <div>
-      <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Jabatan</label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ (filteredJabatan$ | async)?.name || 'Not Found' }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Jenjang
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ (filteredJenjang$ | async)?.name || 'Not Found' }}</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold"> CAT </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.catPercentage }} %</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Wawancara
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.wawancaraPercentage }} %</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Seminar
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.seminarPercentage }} %</p>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Praktik
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.praktikPercentage }} %</p>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Portofolio
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.portofolioPercentage }} %</p>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold"> UKT </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.uktPercentage }} %</p>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          UKMSk
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.ukmskPercentage }} %</p>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Ambang Batas Nilai
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.gradeThreshold }} %</p>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Ambang Batas UKT
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.uktThreshold }} %</p>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-          Ambang Batas JPM
-        </label>
-        <div class="col-sm-10 pt-2">
-          <p>: {{ FormulaDetail.jpmThreshold }} %</p>
-        </div>
-      </div>
-    </div>
-  </ng-template> -->
 </ng-container>

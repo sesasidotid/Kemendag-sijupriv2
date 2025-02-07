@@ -7,11 +7,12 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
-
+import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
+import { UnitKerjaDetailComponent } from '../../../sijupri-admin/maintenance/unit-kerja-detail/unit-kerja-detail.component'
 @Component({
   selector: 'app-user-unit-kerja-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, UnitKerjaDetailComponent],
   templateUrl: './user-unit-kerja-detail.component.html',
   styleUrl: './user-unit-kerja-detail.component.scss'
 })
@@ -19,6 +20,7 @@ export class UserUnitKerjaDetailComponent {
   nip: string = ''
   userUnitKerjaDetail: UserUnitKerjaDetail = new UserUnitKerjaDetail()
   profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
+  unitKerjaDetail: UnitKerja = new UnitKerja()
 
   constructor (
     private activatedRoute: ActivatedRoute,
@@ -57,10 +59,19 @@ export class UserUnitKerjaDetailComponent {
     this.apiService.getData(`/api/v1/user_unit_kerja/${this.nip}`).subscribe({
       next: (data: UserUnitKerjaDetail) => {
         this.userUnitKerjaDetail = data
+        this.getUnitKerjaDetail(data.unitKerjaId)
       },
       error: err => {
         console.error(err)
         this.handlerService.handleAlert('Error', 'Gagal mengambil data')
+      }
+    })
+  }
+
+  getUnitKerjaDetail (unitKerjaId: string) {
+    this.apiService.getData(`/api/v1/unit_kerja/${unitKerjaId}`).subscribe({
+      next: (res: UnitKerja) => {
+        this.unitKerjaDetail = res
       }
     })
   }

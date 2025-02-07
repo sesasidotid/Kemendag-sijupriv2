@@ -29,6 +29,12 @@ export class UserUnitKerjaListComponent {
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Email', 'email', ['user']).build()
       )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Unit Kerja', 'name', ['unitKerja']).build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Instansi', 'name', ['instansi']).build()
+      )
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((unitKerja: any) => {

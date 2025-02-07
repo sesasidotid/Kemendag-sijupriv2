@@ -13,6 +13,7 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
+import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 @Component({
   selector: 'app-jf-detail',
   standalone: true,
@@ -37,7 +38,8 @@ export class JfDetailComponent {
     private jfService: JfService,
     private activatedRoute: ActivatedRoute,
     private sanitizer: DomSanitizer,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private filePreviewService: FilePreviewService
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.nip = params.get('id')
@@ -52,6 +54,10 @@ export class JfDetailComponent {
     this.jfService.findByNip(this.nip).subscribe({
       next: (jf: JF) => (this.jf = jf)
     })
+  }
+
+  preview (filename: string, filesource: string) {
+    this.filePreviewService.open(filename, filesource)
   }
 
   fetchPhotoProfile () {

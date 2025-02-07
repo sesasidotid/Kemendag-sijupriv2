@@ -1,8 +1,8 @@
 <div class="row card px-4 parent">
   <div class="gradient-line"></div>
-  <h1 class="p-0">Pendafataran UKOM</h1>
+  <h1 class="p-0">Pendaftaran UKom</h1>
   <p class="mt-1 mb-0 text-muted p-0">
-    Silahkan isi form di bawah ini untuk mendaftar UKOM
+    Silahkan isi form di bawah ini untuk mendaftar UKom
   </p>
 </div>
 
@@ -11,7 +11,7 @@
     <div class="card parent bg-white shadow-lg rounded-2xl p-4 text-center">
       <h1>{{ stringCode }}</h1>
       <p class="text-success">
-        Silahkan simpan kode di atas untuk memantau status pendaftaran UKOM anda
+        Silahkan simpan kode di atas untuk memantau status pendaftaran UKom anda
         atau download QR code di bawah
       </p>
       <div class="qrcodeImage">
@@ -63,7 +63,17 @@
           required
           formControlName="name"
         />
+        <div
+          *ngIf="
+            nonJFForm.get('name')?.invalid &&
+            (nonJFForm.get('name')?.touched || nonJFForm.get('name')?.dirty)
+          "
+          class="text-danger"
+        >
+          Nama tidak boleh kosong.
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="email" class="form-label"
           >Email<span class="text-danger">*</span></label
@@ -75,7 +85,17 @@
           required
           formControlName="email"
         />
+        <div
+          *ngIf="
+            nonJFForm.get('email')?.invalid &&
+            (nonJFForm.get('email')?.touched || nonJFForm.get('email')?.dirty)
+          "
+          class="text-danger"
+        >
+          Email tidak boleh kosong.
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="password" class="form-label"
           >Password<span class="text-danger">*</span></label
@@ -87,6 +107,44 @@
           required
           formControlName="password"
         />
+        <div
+          *ngIf="
+            nonJFForm.get('password')?.invalid &&
+            (nonJFForm.get('password')?.touched ||
+              nonJFForm.get('password')?.dirty)
+          "
+          class="text-danger"
+        >
+          Password tidak boleh kosong.
+        </div>
+        <div
+          *ngIf="
+    nonJFForm.get('password')?.errors?.['minlength'] &&
+    (nonJFForm.get('password')?.touched || nonJFForm.get('password')?.dirty)
+  "
+          class="text-danger"
+        >
+          Password minimal 8 karakter.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label"
+          >Konfirmasi Password<span class="text-danger">*</span></label
+        >
+        <input
+          type="password"
+          class="form-control"
+          id="confirmPassword"
+          required
+          formControlName="confirmPassword"
+        />
+        <div
+          *ngIf="nonJFForm.get('confirmPassword')?.hasError('mismatch')"
+          class="text-danger"
+        >
+          Password dan Konfirmasi Password tidak cocok.
+        </div>
       </div>
 
       <div class="mb-3">
@@ -100,7 +158,26 @@
           required
           formControlName="nip"
         />
+        <div
+          *ngIf="
+            nonJFForm.get('nip')?.invalid &&
+            (nonJFForm.get('nip')?.touched || nonJFForm.get('nip')?.dirty)
+          "
+          class="text-danger"
+        >
+          NIP tidak boleh kosong.
+        </div>
+        <div
+          *ngIf="
+           nonJFForm.get('nip')?.errors?.['pattern'] &&
+           (nonJFForm.get('nip')?.touched || nonJFForm.get('nip')?.dirty)
+          "
+          class="text-danger"
+        >
+          NIP harus 18 digit.
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="nik" class="form-label"
           >NIK<span class="text-danger">*</span></label
@@ -112,6 +189,24 @@
           required
           formControlName="nik"
         />
+        <div
+          *ngIf="
+            nonJFForm.get('nik')?.invalid &&
+            (nonJFForm.get('nik')?.touched || nonJFForm.get('nik')?.dirty)
+          "
+          class="text-danger"
+        >
+          NIK tidak boleh kosong.
+        </div>
+        <div
+          *ngIf="
+         nonJFForm.get('nik')?.errors?.['pattern'] &&
+         (nonJFForm.get('nik')?.touched || nonJFForm.get('nik')?.dirty)
+        "
+          class="text-danger"
+        >
+          NIK harus 16 digit.
+        </div>
       </div>
 
       <div class="mb-3">
@@ -125,7 +220,26 @@
           required
           formControlName="phone"
         />
+        <div
+          *ngIf="
+            nonJFForm.get('phone')?.invalid &&
+            (nonJFForm.get('phone')?.touched || nonJFForm.get('phone')?.dirty)
+          "
+          class="text-danger"
+        >
+          Nomor telepon tidak boleh kosong.
+        </div>
+        <div
+          *ngIf="
+       nonJFForm.get('phone')?.errors?.['pattern'] &&
+       (nonJFForm.get('phone')?.touched || nonJFForm.get('phone')?.dirty)
+      "
+          class="text-danger"
+        >
+          Nomor telepon harus angka.
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="tempatLahir" class="form-label"
           >Tempat Lahir<span class="text-danger">*</span></label
@@ -137,7 +251,18 @@
           required
           formControlName="tempatLahir"
         />
+        <div
+          *ngIf="
+            nonJFForm.get('tempatLahir')?.invalid &&
+            (nonJFForm.get('tempatLahir')?.touched ||
+              nonJFForm.get('tempatLahir')?.dirty)
+          "
+          class="text-danger"
+        >
+          Tempat lahir tidak boleh kosong.
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="tanggalLahir" class="form-label"
           >Tanggal Lahir<span class="text-danger">*</span></label
@@ -149,7 +274,18 @@
           required
           formControlName="tanggalLahir"
         />
+        <div
+          *ngIf="
+            nonJFForm.get('tanggalLahir')?.invalid &&
+            (nonJFForm.get('tanggalLahir')?.touched ||
+              nonJFForm.get('tanggalLahir')?.dirty)
+          "
+          class="text-danger"
+        >
+          Tanggal lahir tidak boleh kosong.
+        </div>
       </div>
+
       <div class="mb-3">
         <label for="jenisKelaminCode" class="form-label"
           >Jenis Kelamin<span class="text-danger">*</span></label
@@ -183,7 +319,6 @@
         <label for="instansi_id" class="form-label"
           >Instansi<span class="text-danger">*</span></label
         >
-
         <input
           type="text"
           class="form-control mb-2"
@@ -207,6 +342,13 @@
             {{ instansi.name }}
           </option>
         </select>
+
+        <div
+          *ngIf="nonJFForm.get('instansi_id')?.value == ''"
+          class="text-danger"
+        >
+          Instansi tidak boleh kosong.
+        </div>
       </div>
 
       <div class="mb-3">
@@ -219,16 +361,6 @@
           required
           (change)="onUnitKerjaSwitch($event)"
         >
-          <!-- <option selected value="" style="display: none">
-            Pilih Instansi Terlebih Dahulu
-          </option>
-          <option
-            *ngFor="let unitKerja of unitKerjaList$ | async"
-            [value]="unitKerja.id"
-          >
-            {{ unitKerja.name }}
-          </option>
-        </select> -->
           <option selected value="" style="display: none">Unit Kerja</option>
           <ng-container
             *ngIf="(unitKerjaList$ | async)?.length; else UnitKerjaNotFound"
@@ -242,13 +374,21 @@
           </ng-container>
         </select>
         <ng-template #UnitKerjaNotFound>
-          <option disabled>Unit Kerja tidak ditemukan</option>
+          <option disabled>
+            Anda belum memilih instansi atau Unit Kerja tidak ditemukan.
+          </option>
         </ng-template>
+        <div
+          *ngIf="nonJFForm.get('unit_kerja_id')?.value == ''"
+          class="text-danger"
+        >
+          Unit Kerja tidak boleh kosong.
+        </div>
       </div>
 
       <div class="mb-3">
         <label for="jenis_ukom" class="form-label"
-          >Jenis UKOM<span class="text-danger">*</span></label
+          >Jenis UKom<span class="text-danger">*</span></label
         >
         <select
           class="form-select"
@@ -262,6 +402,12 @@
           <option value="PERPINDAHAN_JABATAN">Perpindahan Jabatan</option>
           <option value="PROMOSI">Promosi</option>
         </select>
+        <div
+          *ngIf="nonJFForm.get('jenis_ukom')?.value == ''"
+          class="text-danger"
+        >
+          Jenis UKom tidak boleh kosong.
+        </div>
       </div>
 
       <div class="mb-3">
@@ -283,6 +429,12 @@
             {{ jabatan.name }}
           </option>
         </select>
+        <div
+          *ngIf="nonJFForm.get('jabatanCode')?.value == ''"
+          class="text-danger"
+        >
+          Jabatan tidak boleh kosong.
+        </div>
       </div>
 
       <div class="mb-3">
@@ -318,6 +470,12 @@
             <option disabled>Mohon pilih jabatan</option>
           </ng-template>
         </select>
+        <div
+          *ngIf="nonJFForm.get('jenjangCode')?.value == ''"
+          class="text-danger"
+        >
+          Jenjang tidak boleh kosong.
+        </div>
       </div>
 
       <div class="mb-3">
@@ -331,12 +489,7 @@
           formControlName="pangkatCode"
         >
           <option selected value="" style="display: none">Pilih Pangkat</option>
-          <!-- <option
-            *ngFor="let pangkat of pangkatList$ | async"
-            [value]="pangkat.code"
-          >
-            {{ pangkat.name }}
-          </option> -->
+
           <ng-container
             *ngIf="(pangkatList$ | async)?.length; else pangkatNotFound"
           >
@@ -351,6 +504,12 @@
         <ng-template #pangkatNotFound>
           <option disabled>Mohon pilih jenjang</option>
         </ng-template>
+        <div
+          *ngIf="nonJFForm.get('pangkatCode')?.value == ''"
+          class="text-danger"
+        >
+          Pangkat tidak boleh kosong.
+        </div>
       </div>
 
       <div
@@ -376,6 +535,12 @@
             {{ jabatan.name }}
           </option>
         </select>
+        <div
+          *ngIf="nonJFForm.get('nextJabatanCode')?.value == ''"
+          class="text-danger"
+        >
+          Jabatan yang dituju tidak boleh kosong.
+        </div>
       </div>
       <!-- <div class="mb-3" *ngIf="this.pesertaUkom.jenis_ukom === 'PROMOSI'">
       <label for="nextJenjangCode" class="form-label"
@@ -408,7 +573,13 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100">Daftar</button>
+      <button
+        type="submit"
+        class="btn btn-primary w-100"
+        [disabled]="!nonJFForm.valid || isAnyFileMissing()"
+      >
+        Daftar
+      </button>
     </form>
   </div>
 

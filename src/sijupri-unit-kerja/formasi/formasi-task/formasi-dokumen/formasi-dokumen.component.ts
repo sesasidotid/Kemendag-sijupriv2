@@ -130,22 +130,32 @@ export class FormasiDokumenComponent {
   }
 
   submit () {
+    const documentMap = new Map()
+
     for (const key in this.detectedDokumen) {
       if (this.detectedDokumen.hasOwnProperty(key)) {
         const detected = this.detectedDokumen[key]
-        this.payload.formasiDokumenList.push({
-          dokumenFile: detected.base64,
-          dokumenPersyaratanName:
-            this.formasiDokumenList.find(
-              dokumen => dokumen.dokumenPersyaratanName == detected.label
-            ).dokumenPersyaratanName +
-            '_' +
-            '_' +
-            Date.now(),
-          dokumenPersyaratanId: detected.id
-        })
+
+        const dokumenPersyaratan = this.formasiDokumenList.find(
+          dokumen => dokumen.dokumenPersyaratanName == detected.label
+        )
+
+        if (dokumenPersyaratan) {
+          const newDoc = {
+            dokumenFile: detected.base64,
+            dokumenPersyaratanName:
+              dokumenPersyaratan.dokumenPersyaratanName + '__' + Date.now(),
+            dokumenPersyaratanId: detected.id
+          }
+
+          // Always store the latest document by overwriting existing ones
+          documentMap.set(detected.id, newDoc)
+        }
       }
     }
+
+    // Convert the Map values to an array and assign it to payload.formasiDokumenList
+    this.payload.formasiDokumenList = Array.from(documentMap.values())
     console.log('payload', this.payload)
 
     this.confirmationService.open(false).subscribe({

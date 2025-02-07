@@ -10,11 +10,12 @@ import { ConfirmationService } from '../../modules/base/services/confirmation.se
 import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
 import { ModalComponent } from '../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
+import { EmptyStateComponent } from '../../modules/base/components/empty-state/empty-state.component'
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ModalComponent],
+  imports: [CommonModule, ModalComponent, EmptyStateComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -79,6 +80,7 @@ export class DashboardComponent {
       .subscribe({
         next: (response: any) => {
           this.roomUkom = new RoomUkom(response.roomUkomDto)
+          console.log('roomUkom', this.roomUkom)
           this.participant_id = response.id
           this.getCATScore()
         },

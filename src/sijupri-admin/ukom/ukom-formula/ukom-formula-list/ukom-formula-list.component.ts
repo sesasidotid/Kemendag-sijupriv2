@@ -83,9 +83,6 @@ export class UkomFormulaListComponent {
           new PrimaryColumnBuilder('UKMS', 'ukmskPercentage').build()
         )
         .addPrimaryColumn(
-          new PrimaryColumnBuilder('JPM', 'jpmPercentage').build()
-        )
-        .addPrimaryColumn(
           new PrimaryColumnBuilder(
             'Ambang Batas Nilai',
             'gradeThreshold'
@@ -146,7 +143,7 @@ export class UkomFormulaListComponent {
       ukmsk_percentage: new FormControl('', Validators.required),
       jpm_percentage: new FormControl('', Validators.required),
       grade_threshold: new FormControl('', Validators.required),
-      total_ukt_threshold: new FormControl('', Validators.required),
+      ukt_threshold: new FormControl('', Validators.required),
       jpm_threshold: new FormControl('', Validators.required)
     })
 
@@ -169,7 +166,7 @@ export class UkomFormulaListComponent {
       ukmsk_percentage: data.ukmskPercentage || '',
       jpm_percentage: data.jpmPercentage || '',
       grade_threshold: data.gradeThreshold || '',
-      total_ukt_threshold: data.totalUktThreshold || '',
+      ukt_threshold: data.ukt_threshold || '',
       jpm_threshold: data.jpmThreshold || ''
     })
   }
@@ -227,7 +224,7 @@ export class UkomFormulaListComponent {
       ukmsk_percentage: this.editFormulaForm.value.ukmsk_percentage,
       jpm_percentage: this.editFormulaForm.value.jpm_percentage,
       grade_threshold: this.editFormulaForm.value.grade_threshold,
-      total_ukt_threshold: this.editFormulaForm.value.total_ukt_threshold,
+      ukt_threshold: this.editFormulaForm.value.ukt_threshold,
       jpm_threshold: this.editFormulaForm.value.jpm_threshold
     }
     this.confirmationService.open(false).subscribe({

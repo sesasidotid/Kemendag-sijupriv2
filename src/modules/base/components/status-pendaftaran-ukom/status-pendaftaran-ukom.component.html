@@ -10,7 +10,18 @@
   ></app-nonjf-revisi-ukom>
 </app-modal>
 
-<div class="card parent">
+<div *ngIf="!pendingTask.id" class="card parent">
+  <app-empty-state
+    [title]="'Link Status Pendaftaran UKom Kadaluwarsa atau Tidak Valid'"
+    [description]="
+      'Tolong periksa kembali link yang kamu buka, pastikan sudah benar.'
+    "
+    [icon]="'mdi-package-variant-closed-remove'"
+    [iconColor]="'danger'"
+  ></app-empty-state>
+</div>
+
+<div class="card parent" *ngIf="pendingTask.id">
   <div class="row px-3">
     <div class="card card-profile shadow-sm">
       <div class="card-body p-3 p-md-4">

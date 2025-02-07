@@ -12,6 +12,7 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { NonjfRevisiUkomComponent } from '../nonjf-revisi-ukom/nonjf-revisi-ukom.component'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
+import { EmptyStateComponent } from '../empty-state/empty-state.component'
 @Component({
   selector: 'app-status-pendaftaran-ukom',
   standalone: true,
@@ -19,7 +20,8 @@ import { SafeUrl } from '@angular/platform-browser'
     ModalComponent,
     UkomRevisionComponent,
     CommonModule,
-    NonjfRevisiUkomComponent
+    NonjfRevisiUkomComponent,
+    EmptyStateComponent
   ],
   templateUrl: './status-pendaftaran-ukom.component.html',
   styleUrl: './status-pendaftaran-ukom.component.scss'

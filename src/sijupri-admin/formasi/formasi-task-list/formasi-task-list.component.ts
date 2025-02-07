@@ -28,6 +28,7 @@ export class FormasiTaskListComponent {
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Unit Kerja', 'objectName').build()
       )
+      .addPrimaryColumn(new PrimaryColumnBuilder('Proses', 'flowName').build())
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Status', 'taskStatus').build()
       )

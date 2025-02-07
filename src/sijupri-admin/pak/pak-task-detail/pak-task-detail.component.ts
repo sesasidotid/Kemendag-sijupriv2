@@ -17,6 +17,7 @@ import { ConverterService } from '../../../modules/base/services/converter.servi
 import { BehaviorSubject } from 'rxjs'
 import { SafeUrl } from '@angular/platform-browser'
 import { RWKinerja } from '../../../modules/siap/models/rw-kinerja.model'
+import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 
 @Component({
   selector: 'app-pak-task-detail',
@@ -44,7 +45,8 @@ export class PakTaskDetailComponent {
     private activatedRoute: ActivatedRoute,
     private converterService: ConverterService,
     private jfService: JfService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private filePreviewService: FilePreviewService
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.nip = params.get('id')
@@ -72,6 +74,7 @@ export class PakTaskDetailComponent {
       }
     })
   }
+
   getTaskDetail () {
     this.pendingTaskloading$.next(true)
     this.apiService
@@ -156,6 +159,9 @@ export class PakTaskDetailComponent {
     return this.converterService.dateToHumanReadable(date)
   }
 
+  preview (filename: string, source: string) {
+    this.filePreviewService.open(filename, source)
+  }
   getJF () {
     this.jfService.findByNip(this.nip).subscribe({
       next: (jf: JF) => (this.jf = jf)

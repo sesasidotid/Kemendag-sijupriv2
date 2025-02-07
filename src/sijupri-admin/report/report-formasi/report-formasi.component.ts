@@ -343,19 +343,26 @@ export class ReportFormasiComponent {
               kabKotaName: this.addFormasiReportForm.value.kabKotaName
             }
           }
-          // console.log(reportGenerate);
-          //   this.apiService
-          //     .postData('/api/v1/report_generate/async', reportGenerate)
-          //     .subscribe({
-          //       next: () => {
-          //         this.handlerService.handleAlert(
-          //           'Success',
-          //           'Generating Report...'
-          //         )
-          //         this.pagableComponent.fetchData()
-          //         this.ngOnInit()
-          //       }
-          //     })
+          console.log(reportGenerate)
+          this.apiService
+            .postData('/api/v1/report_generate', reportGenerate)
+            .subscribe({
+              next: () => {
+                this.handlerService.handleAlert(
+                  'Success',
+                  'Generating Report...'
+                )
+                this.pagableComponent.fetchData()
+                this.ngOnInit()
+              },
+              error: error => {
+                console.error('Error generating report', error)
+                this.handlerService.handleAlert(
+                  'Error',
+                  'Gagal membuat report. Silahkan Coba Lagi'
+                )
+              }
+            })
         }
       })
     }

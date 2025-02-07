@@ -1,110 +1,152 @@
 <div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-header align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Pendaftaran Formasi {{ jabatan.name }}</h4>
-                    <div class="flex-shrink-0"></div>
-                </div>
-                <div class="card-body">
-                    <table class="w-100 border-bottom mb-2">
-                        <tr>
-                            <th class="fw-bold h6">Unsur</th>
-                            <th class="fw-bold h6" style="text-align: right">Jenjang</th>
-                            <th class="fw-bold h6" style="text-align: right">Volume (menit)</th>
-                        </tr>
-                    </table>
-                    <!-- Loop through formasiUnsurList -->
-                    <ng-container *ngFor="let item of formasiUnsurList; let i = index">
-                        <!-- Pass individual items to the recursive template -->
-                        <ng-container
-                            *ngTemplateOutlet="recursiveTemplate; context: { $implicit: item, level: 0, index: i }">
-                        </ng-container>
-                    </ng-container>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header align-items-center d-flex">
+          <h4 class="card-title mb-0 flex-grow-1">
+            Pendaftaran Formasi {{ jabatan.name }}
+          </h4>
+          <div class="flex-shrink-0"></div>
         </div>
+        <div class="card-body">
+          <table class="w-100 border-bottom mb-2">
+            <tr>
+              <th class="fw-bold h6">Unsur</th>
+              <th class="fw-bold h6" style="text-align: right">Jenjang</th>
+              <th class="fw-bold h6" style="text-align: right">
+                Volume (menit)
+              </th>
+            </tr>
+          </table>
+          <!-- Loop through formasiUnsurList -->
+          <ng-container *ngFor="let item of formasiUnsurList; let i = index">
+            <!-- Pass individual items to the recursive template -->
+            <ng-container
+              *ngTemplateOutlet="
+                recursiveTemplate;
+                context: { $implicit: item, level: 0, index: i }
+              "
+            >
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 <button class="btn btn-md btn-soft-success floating-btn" (click)="calculate()">
-    Hitung
+  Hitung
 </button>
 
 <!-- Modal -->
 <div *ngIf="isModalOpen" class="modal-backdrop fade show"></div>
-<div *ngIf="isModalOpen" class="modal show d-block" tabindex="-1" role="dialog" aria-labelledby="resultsModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="resultsModalLabel">Formasi Results</h5>
-                <button type="button" class="close" (click)="isModalOpen = false" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Jenjang Name</th>
-                            <th>Pembulatan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let item of formasiResultList">
-                            <td>{{ item.jenjangName }}</td>
-                            <td>{{ item.pembulatan }}</td>
-                        </tr>
-                        <!-- Row to display the total sum -->
-                        <tr>
-                            <td><strong class="fw-bold">Total</strong></td>
-                            <td><strong class="fw-bold">{{ totalPembulatan() }}</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <p>
-                    <span class="text-danger">*</span> Jika anda menekan tombol simpan. anda tidak akan dapan mengupdate
-                    data ini kembali
-                </p>
-                <button type="button" class="btn btn-success" (click)="submit()">Simpan</button>
-                <button type=" button" class="btn btn-danger" (click)="isModalOpen = false">Tutup</button>
-            </div>
-        </div>
+<div
+  *ngIf="isModalOpen"
+  class="modal show d-block"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="resultsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resultsModalLabel">Formasi Results</h5>
+        <button
+          type="button"
+          class="close"
+          (click)="isModalOpen = false"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Jenjang Name</th>
+              <th>Pembulatan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of formasiResultList">
+              <td>{{ item.jenjangName }}</td>
+              <td>{{ item.pembulatan }}</td>
+            </tr>
+            <!-- Row to display the total sum -->
+            <tr>
+              <td><strong class="fw-bold">Total</strong></td>
+              <td>
+                <strong class="fw-bold">{{ totalPembulatan() }}</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <p>
+          <span class="text-danger">*</span> Jika anda menekan tombol simpan.
+          anda tidak akan dapat mengubah data ini kembali
+        </p>
+        <button type="button" class="btn btn-success" (click)="submit()">
+          Simpan
+        </button>
+        <button
+          type=" button"
+          class="btn btn-danger"
+          (click)="isModalOpen = false"
+        >
+          Tutup
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
 <ng-template #recursiveTemplate let-item let-level="level" let-index="index">
-    <div [ngStyle]="{ 'margin-left': level * 20 + 'px' }" class="unsur-item">
-        <div class="row">
-            <div class="col-lg-6">
-                <!-- Display unsur -->
-                <p>{{ item.unsur }}</p>
-            </div>
-            <!-- Bottom-level child: Add jenjangName and input field -->
-            <ng-container *ngIf="!item.child || item.child.length === 0">
-                <div class="col-lg-3">
-                    <!-- Display jenjangName -->
-                    <p>{{ item.jenjangName || 'N/A' }}</p>
-                </div>
-                <div *ngIf="initiate(item)" class="col-lg-3">
-                    <!-- Input field for unsur value -->
-                    <input type="number" placeholder="Masukkan Volume" [(ngModel)]="unsurVolumeData[item.id].volume"
-                        name="{{'volume'+item.id}}" class="form-control" />
-                </div>
-                <hr>
-            </ng-container>
+  <div [ngStyle]="{ 'margin-left': level * 20 + 'px' }" class="unsur-item">
+    <div class="row">
+      <div class="col-lg-6">
+        <!-- Display unsur -->
+        <p>{{ item.unsur }}</p>
+      </div>
+      <!-- Bottom-level child: Add jenjangName and input field -->
+      <ng-container *ngIf="!item.child || item.child.length === 0">
+        <div class="col-lg-3">
+          <!-- Display jenjangName -->
+          <p>{{ item.jenjangName || 'N/A' }}</p>
         </div>
+        <div *ngIf="initiate(item)" class="col-lg-3">
+          <!-- Input field for unsur value -->
+          <input
+            type="number"
+            placeholder="Masukkan Volume"
+            [(ngModel)]="unsurVolumeData[item.id].volume"
+            name="{{ 'volume' + item.id }}"
+            class="form-control"
+          />
+        </div>
+        <hr />
+      </ng-container>
     </div>
+  </div>
 
-    <!-- Loop through the children, if any -->
-    <div *ngIf="item.child && item.child.length > 0">
-        <ng-container *ngFor="let child of item.child; let childIndex = index">
-            <!-- Recursive call -->
-            <ng-container
-                *ngTemplateOutlet="recursiveTemplate; context: { $implicit: child, level: level + 1, index: index + '-' + childIndex }">
-            </ng-container>
-        </ng-container>
-    </div>
+  <!-- Loop through the children, if any -->
+  <div *ngIf="item.child && item.child.length > 0">
+    <ng-container *ngFor="let child of item.child; let childIndex = index">
+      <!-- Recursive call -->
+      <ng-container
+        *ngTemplateOutlet="
+          recursiveTemplate;
+          context: {
+            $implicit: child,
+            level: level + 1,
+            index: index + '-' + childIndex
+          }
+        "
+      >
+      </ng-container>
+    </ng-container>
+  </div>
 </ng-template>

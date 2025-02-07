@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common'
 import { BehaviorSubject } from 'rxjs'
 import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component'
+import { Input } from '@angular/core'
 @Component({
   selector: 'app-unit-kerja-detail',
   standalone: true,
@@ -15,6 +16,7 @@ import { MapComponent } from '../../../modules/map-leaflet/components/map/map.co
   styleUrl: './unit-kerja-detail.component.scss'
 })
 export class UnitKerjaDetailComponent {
+  @Input() unitKerjaIdFromParent: string = ''
   id: string = ''
   unitKerja: UnitKerja = new UnitKerja()
   instasi: Instansi = new Instansi()
@@ -26,9 +28,18 @@ export class UnitKerjaDetailComponent {
     private apiService: ApiService,
     private handlerService: HandlerService,
     private activatedRoute: ActivatedRoute
-  ) {
-    this.id = this.activatedRoute.snapshot.paramMap.get('id') || ''
-    this.getDetailUnitKerja()
+  ) {}
+
+  ngOnInit () {
+    console.log('1', this.unitKerjaIdFromParent)
+    if (this.unitKerjaIdFromParent === '') {
+      this.id = this.activatedRoute.snapshot.paramMap.get('id') || ''
+      this.getDetailUnitKerja()
+    } else {
+      console.log('3', this.unitKerjaIdFromParent)
+      this.id = this.unitKerjaIdFromParent
+      this.getDetailUnitKerja()
+    }
   }
 
   getDetailUnitKerja () {

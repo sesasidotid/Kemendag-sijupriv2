@@ -18,6 +18,7 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { LoginContext } from '../../../modules/base/commons/login-context'
+import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 @Component({
   selector: 'app-jf-akp-list',
   standalone: true,
@@ -40,7 +41,8 @@ export class JfAkpListComponent {
     private apiService: ApiService,
     private confirmationService: ConfirmationService,
     private handlerService: HandlerService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private filePreviewService: FilePreviewService
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.jfNip = params.get('id')
@@ -52,13 +54,19 @@ export class JfAkpListComponent {
           new PrimaryColumnBuilder('Nama Atasan', 'namaAtasan').build()
         )
         .addPrimaryColumn(
-          new PrimaryColumnBuilder('Email Atasan', 'emailAtasan').build()
+          new PrimaryColumnBuilder('Email Atasan', 'emailAtasan')
+            // .withSortable(false)
+            .build()
         )
         .addPrimaryColumn(
-          new PrimaryColumnBuilder('Diajukan Pada', 'dateCreated').build()
+          new PrimaryColumnBuilder('Diajukan Pada', 'dateCreated')
+            // .withSortable(false)
+            .build()
         )
         .addPrimaryColumn(
-          new PrimaryColumnBuilder('Selesai Pada', 'lastUpdated').build()
+          new PrimaryColumnBuilder('Selesai Pada', 'lastUpdated')
+            // .withSortable(false)
+            .build()
         )
         .addActionColumn(
           new ActionColumnBuilder()
@@ -132,6 +140,10 @@ export class JfAkpListComponent {
       limit: 10
     }
     this.pagable$.next(updatedPagable)
+  }
+
+  preview (fileName: string, source: string) {
+    this.filePreviewService.open(fileName, source)
   }
 
   fetchPhotoProfile () {

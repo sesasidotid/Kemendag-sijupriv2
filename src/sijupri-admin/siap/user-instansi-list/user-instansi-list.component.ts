@@ -18,6 +18,7 @@ import { ModalComponent } from '../../../modules/base/components/modal/modal.com
 import { UserInstansi } from '../../../modules/siap/models/user-instansi.model'
 import { UserInstansiUpdateComponent } from '../user-instansi-update/user-instansi-update.component'
 import { CommonModule } from '@angular/common'
+import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 @Component({
   selector: 'app-user-instansi-list',
   standalone: true,
@@ -36,6 +37,7 @@ export class UserInstansiListComponent {
 
   isModalOpen$ = new BehaviorSubject<boolean>(false)
   selectedUserInstansi: UserInstansi = new UserInstansi()
+  detailInstansi: Instansi = new Instansi()
   constructor (
     private tabService: TabService,
     private router: Router,
@@ -115,6 +117,14 @@ export class UserInstansiListComponent {
         icon: 'mdi-plus-circle',
         onClick: () => this.router.navigate(['/siap/user-instansi/add'])
       })
+  }
+
+  getDetailInstansi (instansiId: string) {
+    this.apiService.getData(`/api/v1/instansi/${instansiId}`).subscribe({
+      next: (data: any) => {
+        this.detailInstansi = data
+      }
+    })
   }
 
   handleDelete (userNip: string) {

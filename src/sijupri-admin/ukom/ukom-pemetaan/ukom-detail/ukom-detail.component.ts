@@ -16,6 +16,7 @@ import { CommonModule } from '@angular/common'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
+import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
 @Component({
   selector: 'app-ukom-detail',
   standalone: true,
@@ -38,7 +39,8 @@ export class UkomDetailComponent {
     private jfService: JfService,
     private router: Router,
     private apiService: ApiService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private filePreviewService: FilePreviewService
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.id = params.get('id')
@@ -71,6 +73,10 @@ export class UkomDetailComponent {
 
     this.getJF()
     this.isUserBanned()
+  }
+
+  preview (fileName: string, fileSource: string) {
+    this.filePreviewService.open(fileName, fileSource)
   }
 
   getJF () {

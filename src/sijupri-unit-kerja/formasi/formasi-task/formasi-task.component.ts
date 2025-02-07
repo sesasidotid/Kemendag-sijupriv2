@@ -28,6 +28,7 @@ import { BehaviorSubject, Observable } from 'rxjs'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { UndanganVerifikasiFormasi } from '../../../modules/formasi/models/undangan.model'
+import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 
 @Component({
   selector: 'app-formasi-task',
@@ -39,7 +40,8 @@ import { UndanganVerifikasiFormasi } from '../../../modules/formasi/models/undan
     FormsModule,
     ModalComponent,
     FileHandlerComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    EmptyStateComponent
   ],
   templateUrl: './formasi-task.component.html',
   styleUrl: './formasi-task.component.scss'
@@ -366,6 +368,34 @@ export class FormasiTaskComponent {
       this.revisiedFormasiDokumen = []
     }
 
+    // for (const key in this.detectedDokumen) {
+    //   if (this.detectedDokumen.hasOwnProperty(key)) {
+    //     const detected = this.detectedDokumen[key]
+
+    //     const dokumen = this.pendingTask.formasiDokumenList.find(
+    //       dok =>
+    //         dok.dokumenPersyaratanName === detected.label &&
+    //         dok.dokumenStatus === 'REJECT'
+    //     )
+
+    //     if (dokumen) {
+    //       this.revisiedFormasiDokumen.push({
+    //         dokumenFile: detected.base64,
+    //         dokumenPersyaratanName:
+    //           this.pendingTask.id +
+    //           '_' +
+    //           'dokumenPersaratanFormasi' +
+    //           '_' +
+    //           Date.now(),
+    //         dokumenPersyaratanId: dokumen.dokumenPersyaratanId,
+    //         dokumenStatus: 'APPROVE'
+    //       })
+    //     }
+    //   }
+    // }
+
+    const documentMap = new Map()
+
     for (const key in this.detectedDokumen) {
       if (this.detectedDokumen.hasOwnProperty(key)) {
         const detected = this.detectedDokumen[key]
@@ -377,20 +407,23 @@ export class FormasiTaskComponent {
         )
 
         if (dokumen) {
-          this.revisiedFormasiDokumen.push({
+          const newDoc = {
             dokumenFile: detected.base64,
-            dokumenPersyaratanName:
-              this.pendingTask.id +
-              '_' +
-              'dokumenPersaratanFormasi' +
-              '_' +
-              Date.now(),
+            dokumenPersyaratanName: `${
+              this.pendingTask.id
+            }_dokumenPersaratanFormasi_${Date.now()}`,
             dokumenPersyaratanId: dokumen.dokumenPersyaratanId,
             dokumenStatus: 'APPROVE'
-          })
+          }
+
+          // Store only the latest document for each dokumenPersyaratanId
+          documentMap.set(dokumen.dokumenPersyaratanId, newDoc)
         }
       }
     }
+
+    // Convert the Map values to an array and assign it to revisiedFormasiDokumen
+    this.revisiedFormasiDokumen = Array.from(documentMap.values())
 
     console.log('task', this.revisiedFormasiDokumen)
 
