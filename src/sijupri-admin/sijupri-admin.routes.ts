@@ -96,20 +96,18 @@ export const routes: Routes = [
               ),
             routes: [
               {
+                path: ':id/:rwKinerjaId',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/pak/pak-detail-child/pak-detail-child.component'
+                  ).then(m => m.PakDetailChildComponent)
+              },
+              {
                 path: ':id',
                 loadComponent: () =>
                   import(
                     '../sijupri-admin/pak/pak-detail/pak-detail.component'
                   ).then(m => m.PakDetailComponent),
-                children: [
-                  {
-                    path: ':rwKinerjaId',
-                    loadComponent: () =>
-                      import(
-                        '../sijupri-admin/pak/pak-graph/pak-graph.component'
-                      ).then(m => m.PakGraphComponent)
-                  }
-                ]
               }
             ]
           },
