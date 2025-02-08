@@ -15,21 +15,23 @@ export class TabService {
   private tabsSubject = new BehaviorSubject<Tab[]>([])
   tabs$ = this.tabsSubject.asObservable()
 
-  addTab (tab: Tab): TabService {
-    const currentTabs = this.tabsSubject.getValue()
-    this.tabsSubject.next([...currentTabs, tab])
+  addTab(tab: Tab): TabService {
+    setTimeout(() => {
+      const currentTabs = this.tabsSubject.getValue()
+      this.tabsSubject.next([...currentTabs, tab])
+    }, 0);
     return this
   }
 
-  clearTabs (): void {
+  clearTabs(): void {
     this.tabsSubject.next([])
   }
 
-  getTabsLength (): number {
+  getTabsLength(): number {
     return this.tabsSubject.getValue().length
   }
 
-  changeTabActive (tab: number) {
+  changeTabActive(tab: number) {
     const currentTabs = this.tabsSubject.value
     const updatedTabs = currentTabs.map((item, index) => {
       if (index === tab) {

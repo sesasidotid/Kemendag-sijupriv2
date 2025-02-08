@@ -18,16 +18,11 @@ import { TabService } from '../../../modules/base/services/tab.service'
 })
 export class UkomGradeImportComponent {
   ukomList: Ukom[] = []
-  gradeImport: {
-    ukomId?: string
-    fileNilaiMansoskul?: string
-    fileNilaiTeknis?: string
-  } = {}
+  file_grade: string = "";
 
   inputs: FIleHandler = {
     files: {
-      mansoskul: { label: 'File Nilai Mansoskul' }
-      //   teknis: { label: 'File Nilai Teknis' }
+      file_grade: { label: 'File Nilai Ukom' }
     },
     listen: (
       key: string,
@@ -36,72 +31,49 @@ export class UkomGradeImportComponent {
       label: string
     ) => {
       switch (key) {
-        case 'mansoskul':
-          this.gradeImport.fileNilaiMansoskul = base64Data
+        case 'file_grade':
+          this.file_grade = base64Data
           break
-        // case 'teknis':
-        //   this.gradeImport.fileNilaiTeknis = base64Data
-        //   break
       }
     }
   }
 
-  constructor (
+  constructor(
     private apiService: ApiService,
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService,
     private tabService: TabService
-  ) {}
+  ) { }
 
-  ngOnInit () {
+  ngOnInit() {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()
     }
 
-    this.tabService.addTab({
-      label: 'Template Mansoskul',
-      isActive: true,
-      icon: 'mdi-file-download',
-      onClick: () => this.downloadTemplate('template_mansoskul')
-    })
-    // .addTab({
-    //   label: 'Template Teknis',
-    //   isActive: true,
-    //   icon: 'mdi-file-download',
-    //   onClick: () => this.downloadTemplate('template_teknis'),
-    // });
-
-    this.getUkomList()
+    this.tabService
+      .addTab({
+        label: 'Template Nilai',
+        isActive: true,
+        icon: 'mdi-file-download',
+        onClick: () => this.downloadTemplate()
+      })
   }
 
-  downloadTemplate (filename: string) {
+  downloadTemplate() {
     this.apiService
-      .getDownload(
-        `/storage_system/template/${filename}.xlsx/download`,
-        `${filename}.xlsx`
-      )
+      .getDownload(`/api/v1/exam_grade/download`, 'template_grade.xlsx')
       .subscribe({
         error: error => this.handlerService.handleException(error)
       })
   }
 
-  getUkomList () {
-    this.apiService.getData('/api/v1/ukom').subscribe({
-      next: response =>
-        (this.ukomList = response.map(
-          (ukom: { [key: string]: any }) => new Ukom(ukom)
-        )),
-      error: error => this.handlerService.handleException(error)
-    })
-  }
-
-  submit () {
+  submit() {
     this.confirmationService.open(false).subscribe({
       next: result => {
         if (!result.confirmed) return
 
         this.apiService
-          .postData('/api/v1/nilai_ukom/import', this.gradeImport)
+          .postData('/api/v1/exam_grade/upload', { file_grade: this.file_grade })
           .subscribe({
             next: () => window.location.reload(),
             error: error => this.handlerService.handleException(error)

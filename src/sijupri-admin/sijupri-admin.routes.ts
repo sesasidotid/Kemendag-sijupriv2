@@ -292,6 +292,12 @@ export const routes: Routes = [
               import(
                 './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
               ).then(m => m.UkomExaminerListComponent)
+          },
+          'Import Nilai': {
+            components: () =>
+              import(
+                './ukom/ukom-grade-import/ukom-grade-import.component'
+              ).then(m => m.UkomGradeImportComponent)
           }
         },
         Maintenance: {
