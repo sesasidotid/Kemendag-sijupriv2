@@ -1,0 +1,46 @@
+<div class="row">
+    <form [formGroup]="sysConfForm" (submit)="submit()">
+        <div class="col-12">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>
+                            Nilai
+                            <a class="float-end btn btn-sm"
+                                [ngClass]="isUpdate ? 'btn-soft-warning ri-arrow-go-back-line' : 'btn-soft-info ri-pencil-line'"
+                                (click)="isUpdate = !isUpdate">
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="sysConfList.length > 0">
+                    <tr *ngFor="let sysConf of sysConfList">
+                        <td>{{ sysConf.name }}</td>
+                        <td>
+                            <ng-container *ngIf="!isUpdate">
+                                {{ sysConf.value }}
+                            </ng-container>
+                            <ng-container *ngIf="isUpdate">
+                                <input type="text" class="form-control" formControlName="{{sysConf.code}}_value"
+                                    name="nip" />
+                                <div class="feedback" *ngIf="
+                                    sysConfForm.get(sysConf.code + '_value').invalid &&
+                                    sysConfForm.get(sysConf.code + '_value').touched
+                                ">
+                                    <small *ngIf="sysConfForm.get(sysConf.code + '_value').errors?.['required']">
+                                        nilai perlu diisi.
+                                    </small>
+                                </div>
+                            </ng-container>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div *ngIf="isUpdate" class="col-12">
+            <button type="submit" class="float-end btn btn-sm btn-success"
+                [disabled]="!sysConfForm.valid">Simpan</button>
+        </div>
+    </form>
+</div>

@@ -369,7 +369,13 @@ export const routes: Routes = [
                   ).then(m => m.UkomKompetensiDetailComponent)
               }
             ]
-          }
+          },
+          'Konfigurasi Sistem': {
+            components: () =>
+              import(
+                '../sijupri-admin/maintenance/sys-conf-list/sys-conf-list.component'
+              ).then(m => m.SysConfListComponent)
+          },
         },
         SIAP: {
           'User JF': {
