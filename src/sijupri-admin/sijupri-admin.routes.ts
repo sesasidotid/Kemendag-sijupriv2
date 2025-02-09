@@ -96,20 +96,18 @@ export const routes: Routes = [
               ),
             routes: [
               {
+                path: ':id/:rwKinerjaId',
+                loadComponent: () =>
+                  import(
+                    '../sijupri-admin/pak/pak-detail-child/pak-detail-child.component'
+                  ).then(m => m.PakDetailChildComponent)
+              },
+              {
                 path: ':id',
                 loadComponent: () =>
                   import(
                     '../sijupri-admin/pak/pak-detail/pak-detail.component'
                   ).then(m => m.PakDetailComponent),
-                children: [
-                  {
-                    path: ':rwKinerjaId',
-                    loadComponent: () =>
-                      import(
-                        '../sijupri-admin/pak/pak-graph/pak-graph.component'
-                      ).then(m => m.PakGraphComponent)
-                  }
-                ]
               }
             ]
           },
@@ -294,6 +292,21 @@ export const routes: Routes = [
               import(
                 './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
               ).then(m => m.UkomExaminerListComponent)
+          },
+          'Nilai Ukom': {
+            components: () =>
+              import(
+                './ukom/ukom-grade-list/ukom-grade-list.component'
+              ).then(m => m.UkomGradeListComponent),
+            routes: [
+              {
+                path: 'import',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-grade-import/ukom-grade-import.component'
+                  ).then(m => m.UkomGradeImportComponent)
+              }
+            ]
           }
         },
         Maintenance: {
@@ -371,7 +384,13 @@ export const routes: Routes = [
                   ).then(m => m.UkomKompetensiDetailComponent)
               }
             ]
-          }
+          },
+          'Konfigurasi Sistem': {
+            components: () =>
+              import(
+                '../sijupri-admin/maintenance/sys-conf-list/sys-conf-list.component'
+              ).then(m => m.SysConfListComponent)
+          },
         },
         SIAP: {
           'User JF': {

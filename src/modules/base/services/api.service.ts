@@ -7,8 +7,8 @@ import { LoginContext } from '../commons/login-context'
   providedIn: 'root'
 })
 export class ApiService {
-  //   private baseUrl: string = "http://localhost:8000"
-  private baseUrl: string = 'http://sijupri.com:8000'
+    private baseUrl: string = "http://localhost:8000"
+  // private baseUrl: string = 'http://sijupri.com:8000'
 
   constructor (private http: HttpClient) {}
 

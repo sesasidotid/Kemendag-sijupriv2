@@ -1,0 +1,44 @@
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label">
+            Tanggal Mulai
+        </label>
+        <p class="border-bottom pb-2">{{rwKinerja.dateStart}}</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label
+                ">Tanggal Selesai</label>
+        <p class="border-bottom pb-2">{{rwKinerja.dateEnd}}</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label
+                ">Angka Kredit</label>
+        <p class="border-bottom pb-2">{{rwKinerja.angkaKredit}}</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label
+                ">Rating Hasil</label>
+        <p class="border-bottom pb-2">{{rwKinerja.ratingHasilName}}</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label
+                ">Rating Kinerja</label>
+        <p class="border-bottom pb-2">{{rwKinerja.ratingKinerjaName}}</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label
+                ">Predikat Kinerja</label>
+        <p class="border-bottom pb-2">{{rwKinerja.predikatKinerjaName}}</p>
+    </div>
+    <div class="col-md-6 mb-3">
+        <app-file-handler [inputs]="{
+                files: {
+                  docEvaluas: { label: 'Preview Dokumen Evaluasi', fileName: this.rwKinerja.docEvaluasi, source: this.rwKinerja.docEvaluasiUrl },
+                  docPredikat: { label: 'Preview Dokumen Predikat', fileName: this.rwKinerja.docPredikat, source: this.rwKinerja.docPredikatUrl },
+                  docAkumulasiAk: { label: 'Preview Dokumen Akumulasi Angka Kredit', fileName: this.rwKinerja.docAkumulasiAk, source: this.rwKinerja.docAkumulasiAkUrl },
+                  docPenetapanAk: { label: 'Preview Dokumen Penetapan Angka Kredit', fileName: this.rwKinerja.docPenetapanAk, source: this.rwKinerja.docPenetapanAkUrl },
+                },
+                viewOnly: true
+              }"></app-file-handler>
+    </div>
+</div>
