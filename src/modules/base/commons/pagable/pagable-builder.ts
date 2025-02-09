@@ -124,7 +124,7 @@ export class PrimaryColumnBuilder {
   private property: string
   private dynamic: Function
   private defaultValue: string | number | boolean | null
-  private sortable: boolean = true // Default to true
+  private sortable: boolean = false // Default to true
 
   constructor (label?: string, property?: string, parentsProperty?: string[]) {
     if (label) {

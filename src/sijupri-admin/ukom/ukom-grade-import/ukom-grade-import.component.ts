@@ -8,6 +8,7 @@ import { FileHandlerComponent } from '../../../modules/base/components/file-hand
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { TabService } from '../../../modules/base/services/tab.service'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-ukom-grade-import',
@@ -39,6 +40,7 @@ export class UkomGradeImportComponent {
   }
 
   constructor(
+    private router: Router,
     private apiService: ApiService,
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService,
@@ -51,6 +53,18 @@ export class UkomGradeImportComponent {
     }
 
     this.tabService
+      .addTab({
+        label: 'List Nilai Ukom',
+        isActive: false,
+        icon: 'mdi-list-box',
+        onClick: () => this.router.navigate([`/ukom/ukom-grade-list`])
+      })
+      .addTab({
+        label: 'Import Nilai',
+        isActive: true,
+        icon: 'mdi-plus-circle',
+        onClick: () => this.router.navigate([`/ukom/ukom-grade-list/import`])
+      })
       .addTab({
         label: 'Template Nilai',
         isActive: true,

@@ -293,11 +293,20 @@ export const routes: Routes = [
                 './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
               ).then(m => m.UkomExaminerListComponent)
           },
-          'Import Nilai': {
+          'Nilai Ukom': {
             components: () =>
               import(
-                './ukom/ukom-grade-import/ukom-grade-import.component'
-              ).then(m => m.UkomGradeImportComponent)
+                './ukom/ukom-grade-list/ukom-grade-list.component'
+              ).then(m => m.UkomGradeListComponent),
+            routes: [
+              {
+                path: 'import',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-grade-import/ukom-grade-import.component'
+                  ).then(m => m.UkomGradeImportComponent)
+              }
+            ]
           }
         },
         Maintenance: {
