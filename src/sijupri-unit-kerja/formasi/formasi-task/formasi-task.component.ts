@@ -1,4 +1,3 @@
-import { ConfirmationDialogComponent } from './../../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
 import { ConverterService } from './../../../modules/base/services/converter.service'
 import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
@@ -29,7 +28,6 @@ import { ModalComponent } from '../../../modules/base/components/modal/modal.com
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { UndanganVerifikasiFormasi } from '../../../modules/formasi/models/undangan.model'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
-
 @Component({
   selector: 'app-formasi-task',
   standalone: true,
@@ -110,7 +108,6 @@ export class FormasiTaskComponent {
 
   groupAndSortTasksByFlowId (tasks: any[]): { [key: string]: any[] } {
     const grouped = tasks.reduce((acc, task) => {
-      // Hanya proses jika flowId adalah "for_flow_2" atau "for_flow_4"
       if (
         task.flowId === 'for_flow_2' ||
         task.flowId === 'for_flow_4' ||
@@ -125,7 +122,6 @@ export class FormasiTaskComponent {
       return acc
     }, {} as { [key: string]: any[] })
 
-    // Sort each group by lastUpdated in descending order
     Object.keys(grouped).forEach(flowId => {
       grouped[flowId].sort((a: any, b: any) => {
         return (
@@ -160,9 +156,6 @@ export class FormasiTaskComponent {
 
   getPendingTask () {
     this.apiService
-      //   .getData(
-      //     `/api/v1/pending_task/wf_name/${'formasi_task'}/${LoginContext.getUnitKerjaId()}`
-      //   )
       .getData(
         `/api/v1/formasi/task/unit_kerja/${LoginContext.getUnitKerjaId()}`
       )
@@ -243,6 +236,7 @@ export class FormasiTaskComponent {
         }
       })
   }
+
   getRejectedDokumen () {
     console.log('this.pendingTask', this.pendingTask)
     if (this.pendingTask?.formasiDokumenList?.length) {
@@ -368,32 +362,6 @@ export class FormasiTaskComponent {
       this.revisiedFormasiDokumen = []
     }
 
-    // for (const key in this.detectedDokumen) {
-    //   if (this.detectedDokumen.hasOwnProperty(key)) {
-    //     const detected = this.detectedDokumen[key]
-
-    //     const dokumen = this.pendingTask.formasiDokumenList.find(
-    //       dok =>
-    //         dok.dokumenPersyaratanName === detected.label &&
-    //         dok.dokumenStatus === 'REJECT'
-    //     )
-
-    //     if (dokumen) {
-    //       this.revisiedFormasiDokumen.push({
-    //         dokumenFile: detected.base64,
-    //         dokumenPersyaratanName:
-    //           this.pendingTask.id +
-    //           '_' +
-    //           'dokumenPersaratanFormasi' +
-    //           '_' +
-    //           Date.now(),
-    //         dokumenPersyaratanId: dokumen.dokumenPersyaratanId,
-    //         dokumenStatus: 'APPROVE'
-    //       })
-    //     }
-    //   }
-    // }
-
     const documentMap = new Map()
 
     for (const key in this.detectedDokumen) {
@@ -416,22 +384,18 @@ export class FormasiTaskComponent {
             dokumenStatus: 'APPROVE'
           }
 
-          // Store only the latest document for each dokumenPersyaratanId
           documentMap.set(dokumen.dokumenPersyaratanId, newDoc)
         }
       }
     }
 
-    // Convert the Map values to an array and assign it to revisiedFormasiDokumen
     this.revisiedFormasiDokumen = Array.from(documentMap.values())
 
-    console.log('task', this.revisiedFormasiDokumen)
-
     // this.confirmationService.open(false).subscribe({
-    //   next: result => {
-    //     if (!result.confirmed) return
-
-    // this.formasiRequest.formasi_dokumen_list = this.formasiDokumenList
+    //   next: response => {
+    //     if (!response.confirmed) {
+    //       return
+    //     }
     const task = new Task({
       id: this.pendingTask.id,
       taskAction: 'approve',
@@ -439,7 +403,6 @@ export class FormasiTaskComponent {
     })
 
     this.apiService.postData(`/api/v1/formasi/task/submit`, task).subscribe({
-      //   next: () => window.location.reload(),
       next: () => window.location.reload(),
 
       error: error => {
@@ -448,9 +411,15 @@ export class FormasiTaskComponent {
         throw error
       }
     })
+    //   },
+    //   error: error => {
+    //     console.error('Error fetching data', error)
+    //   },
+    //   complete: () => {
+    //     console.log('complete')
+    //   }
+    // })
   }
-  //     })
-  //   }
 
   ngOnDestroy () {
     this.formasiStep$.unsubscribe()

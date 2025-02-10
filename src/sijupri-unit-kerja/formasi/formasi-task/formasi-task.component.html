@@ -187,6 +187,7 @@
                         class="mdi mdi-account-multiple mdi-24px text-muted"
                       ></i>
                     </div>
+
                     <div>
                       <ng-container *ngIf="history.taskStatus === 'COMPLETED'">
                         <h5>
@@ -232,6 +233,12 @@
                           {{ convertDate(history.lastUpdated) }}
                         </p>
                       </ng-container>
+                      <ng-container *ngIf="history.remark !== null">
+                        <div class="alert alert-warning mt-1">
+                          <strong>Catatan Revisi : </strong>
+                          {{ history.remark }}
+                        </div>
+                      </ng-container>
                     </div>
                   </div>
                 </div>
@@ -241,145 +248,9 @@
         </div>
       </ng-container>
     </ng-container>
-
-    <!-- <ng-container
-      *ngFor="
-        let task of groupedFormasiPendingTaskHistory | keyvalue;
-        let i = index
-      "
-    >
-      <div
-        style="margin-bottom: 12px !important"
-        *ngIf="(formasiStep$ | async) === i + 1"
-      >
-        <div class="d-flex flex-column mt-2 gap-3" *ngIf="task.key">
-          <ng-container *ngFor="let history of task.value">
-            <a
-              (click)="
-                history.taskStatus === 'PENDING' &&
-                history.flowId === 'for_flow_4'
-                  ? toggleModal()
-                  : null
-              "
-              [ngClass]="{
-                'link-with-pointer':
-                  history.taskStatus === 'PENDING' &&
-                  history.flowId === 'for_flow_4',
-                'disabled-link': !(
-                  history.taskStatus === 'PENDING' &&
-                  history.flowId === 'for_flow_4'
-                )
-              }"
-            >
-              <div
-                class="card m-0 p-4 d-flex flex-row align-items-center justify-content-between"
-              >
-                <div
-                  class="d-flex flex-column flex-md-row align-items-center gap-3"
-                >
-                  <div
-                    class="p-3 border rounded-circle d-flex flex-column justify-content-center"
-                    style="height: 58px"
-                  >
-                    <i
-                      *ngIf="history.flowId === 'for_flow_2'"
-                      class="mdi mdi-clipboard-multiple-outline mdi-24px text-muted"
-                    ></i>
-                    <i
-                      *ngIf="history.flowId === 'for_flow_4'"
-                      class="mdi mdi-account-multiple mdi-24px text-muted"
-                    ></i>
-                    <i
-                      *ngIf="history.flowId === 'for_flow_3'"
-                      class="mdi mdi-account-multiple mdi-24px text-muted"
-                    ></i>
-                  </div>
-                  <div class="">
-                    <ng-container *ngIf="history.taskStatus === 'COMPLETED'">
-                      <h5 class="">
-                        {{ history.flowName }}
-                        <span class="badge rounded-pill text-bg-success ms-2">
-                          {{
-                            history.flowId === 'for_flow_2'
-                              ? 'Sudah Diverifikasi'
-                              : ''
-                          }}
-                          {{
-                            history.flowId === 'for_flow_4'
-                              ? 'Sudah Diverifikasi'
-                              : ''
-                          }}
-                          {{
-                            history.flowId === 'for_flow_3'
-                              ? 'Sudah Diverifikasi'
-                              : ''
-                          }}
-                        </span>
-                      </h5>
-                    </ng-container>
-                    <ng-container *ngIf="history.taskStatus === 'PENDING'">
-                      <h5 class="">
-                        {{ history.flowName }}
-                        <span class="badge rounded-pill text-bg-info ms-2"
-                          >{{
-                            history.flowId === 'for_flow_4'
-                              ? 'Dokumen Perlu Diperbaiki'
-                              : ''
-                          }}{{
-                            history.flowId === 'for_flow_2'
-                              ? 'Belum Diverifikasi'
-                              : ''
-                          }}
-                          {{
-                            history.flowId === 'for_flow_3'
-                              ? 'Belum Diverifikasi'
-                              : ''
-                          }}
-                        </span>
-                      </h5>
-                    </ng-container>
-                    <ng-container *ngIf="history.taskStatus === 'REJECTED'">
-                      <h5 class="">
-                        {{ history.flowName }}
-                        <span class="badge rounded-pill text-bg-danger ms-2"
-                          >Ditolak</span
-                        >
-                      </h5>
-                    </ng-container>
-                    <ng-container *ngIf="history.taskStatus === 'COMPLETED'">
-                      <p
-                        *ngIf="history.flowId === 'for_flow_2'"
-                        class="text-muted mb-0"
-                      >
-                        {{ convertDate(history.lastUpdated) }}
-                      </p>
-                      <p
-                        *ngIf="history.flowId === 'for_flow_4'"
-                        class="text-muted mb-0"
-                      >
-                        {{ convertDate(history.lastUpdated) }}
-                      </p>
-                      <p
-                        *ngIf="history.flowId === 'for_flow_3'"
-                        class="text-muted mb-0"
-                      >
-                        {{ convertDate(history.lastUpdated) }}
-                      </p>
-                    </ng-container>
-
-        
-                  </div>
-                </div>
-              </div>
-            </a>
-          </ng-container>
-        </div>
-      </div>
-    </ng-container> -->
   </div>
 </div>
 
-<!-- <div *ngIf="flowId == 'for_flow_45'"> -->
 <app-modal
   *ngIf="isModalOpen$ | async"
   [title]="'Perbaiki Dokumen Persyaratan Formasi'"
@@ -398,39 +269,8 @@
           <app-file-handler [inputs]="inputs"></app-file-handler>
         </div>
       </div>
-      <!-- <ng-container
-            *ngFor="let formasiDokumen of formasiDokumenList; index as i"
-          >
-            <div
-              *ngIf="
-                formasiDokumen.dokumenStatus == 'REJECT' ||
-                formasiDokumen.dokumenStatus == 'PENDING'
-              "
-              class="row mb-3"
-            >
-              <label for="" class="col-sm-2 col-form-label fw-bold">{{
-                formasiDokumen.dokumenName
-              }}</label>
-              <div class="col-sm-10">
-                <tr>
-                  <td class="w-75">
-                    <input
-                      type="file"
-                      class="form-control"
-                      (change)="onFileChange($event, i)"
-                      [(ngModel)]="formasiDokumen.file_url"
-                      name=" file"
-                    />
-                  </td>
-                  <td *ngIf="formasiDokumen.file_url">
-                    <a class="btn btn-sm btn-info ms-2">lihat</a>
-                  </td>
-                </tr>
-              </div>
-            </div>
-          </ng-container> -->
+
       <div class="text-center float-end">
-        <!-- <button type="submit" class="btn btn-sm btn-success">Simpan</button> -->
         <button
           (click)="submitFl4()"
           class="btn btn-success"
@@ -442,6 +282,3 @@
     </div>
   </div>
 </app-modal>
-<!-- </div> -->
-
-<!-- <app-confirmation-dialog></app-confirmation-dialog> -->

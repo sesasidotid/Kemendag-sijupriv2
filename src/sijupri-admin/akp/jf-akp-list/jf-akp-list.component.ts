@@ -58,11 +58,11 @@ export class JfAkpListComponent {
             // .withSortable(false)
             .build()
         )
-        .addPrimaryColumn(
-          new PrimaryColumnBuilder('Diajukan Pada', 'dateCreated')
-            // .withSortable(false)
-            .build()
-        )
+        // .addPrimaryColumn(
+        //   new PrimaryColumnBuilder('Diajukan Pada', 'dateCreated')
+        //     // .withSortable(false)
+        //     .build()
+        // )
         .addPrimaryColumn(
           new PrimaryColumnBuilder('Selesai Pada', 'lastUpdated')
             // .withSortable(false)

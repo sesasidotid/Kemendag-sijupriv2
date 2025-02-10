@@ -67,8 +67,29 @@ export class UkomTaskFormComponent {
     private confirmationService: ConfirmationService
   ) {
     this.passwordForm = new FormGroup({
-      password: new FormControl('', Validators.required)
+      //   password: new FormControl('', Validators.required),
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(8)
+      ]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        this.passwordMatchValidator.bind(this)
+      ])
     })
+  }
+
+  passwordMatchValidator (
+    control: FormControl
+  ): { [key: string]: boolean } | null {
+    if (this.passwordForm) {
+      const password = this.passwordForm.get('password')?.value
+      const confirmPassword = control.value
+      if (password !== confirmPassword) {
+        return { mismatch: true }
+      }
+    }
+    return null
   }
 
   ngOnChanges (changes: SimpleChanges) {
@@ -122,6 +143,12 @@ export class UkomTaskFormComponent {
         },
         error: error => this.handlerService.handleException(error)
       })
+  }
+
+  isAnyFileMissing (): boolean {
+    return Object.keys(this.inputs.files).some(key => {
+      return !this.detectedDokumen[key]
+    })
   }
 
   getListJabatan () {

@@ -19,6 +19,7 @@ import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 })
 export class AkpListComponent {
   pagable: Pagable
+  rejectedPagable: Pagable
 
   constructor (private router: Router) {
     this.pagable = new PagableBuilder(`/api/v1/akp/search`)
@@ -28,9 +29,9 @@ export class AkpListComponent {
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Email Atasan', 'emailAtasan').build()
       )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Diajukan Pada', 'dateCreated').build()
-      )
+      //   .addPrimaryColumn(
+      //     new PrimaryColumnBuilder('Diajukan Pada', 'dateCreated').build()
+      //   )
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Selesai Pada', 'lastUpdated').build()
       )
@@ -55,6 +56,31 @@ export class AkpListComponent {
           .withField('Email Atasan', 'text')
           .build()
       )
+      .build()
+
+    this.rejectedPagable = new PagableBuilder(`/api/v1/akp/task/failed/search`)
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Diajukan Pada', 'dateCreated').build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Catatan', (akp: any) => {
+            return akp.remark || '-'
+          })
+          .build()
+      )
+      //   .addFilter(
+      //     new PageFilterBuilder('like')
+      //       .setProperty('namaAtasan')
+      //       .withField('Nama Atasan', 'text')
+      //       .build()
+      //   )
+      //   .addFilter(
+      //     new PageFilterBuilder('like')
+      //       .setProperty('emailAtasan')
+      //       .withField('Email Atasan', 'text')
+      //       .build()
+      //   )
       .build()
   }
 }

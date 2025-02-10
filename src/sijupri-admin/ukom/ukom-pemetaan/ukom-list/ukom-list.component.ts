@@ -44,9 +44,10 @@ export class UkomListComponent {
     this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
       .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
+      .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'email').build())
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
-          .withDynamicValue('Jenis Ukom', (data: any) =>
+          .withDynamicValue('Jenis UKom', (data: any) =>
             data.jenisUkom === 'KENAIKAN_JENJANG'
               ? 'Kenaikan Jenjang'
               : data.jenisUkom === 'PERPINDAHAN_JABATAN'
@@ -83,6 +84,12 @@ export class UkomListComponent {
         new PageFilterBuilder('like')
           .setProperty('name')
           .withField('Nama', 'text')
+          .build()
+      )
+      .addFilter(
+        new PageFilterBuilder('like')
+          .setProperty('user|email')
+          .withField('Email', 'text')
           .build()
       )
       .build()

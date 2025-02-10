@@ -41,6 +41,7 @@ export class AKPTaskComponent {
   pagable: Pagable
 
   payload = new VerifAKPTask()
+  submitButtonLoading$ = new BehaviorSubject<boolean>(false)
 
   isModalOpen$ = new BehaviorSubject<boolean>(false)
   taskId$ = new BehaviorSubject<string>('')
@@ -160,6 +161,8 @@ export class AKPTaskComponent {
   }
 
   handleSave () {
+    this.submitButtonLoading$.next(true)
+
     if (this.action$.value === 'approve') {
       if (
         this.form.get('nama_atasan').valid &&
@@ -191,6 +194,9 @@ export class AKPTaskComponent {
               'Gagal menerima pengajuan AKP.'
             )
             this.toggleModal()
+          },
+          complete: () => {
+            this.submitButtonLoading$.next(false)
           }
         })
       }
@@ -201,6 +207,7 @@ export class AKPTaskComponent {
         this.payload.remark = this.form.get('remark').value
 
         console.log(this.payload)
+        // return
         this.akpTaskService.verifAKPTask(this.payload).subscribe({
           next: () => {
             this.alertService.showToast(
@@ -215,6 +222,9 @@ export class AKPTaskComponent {
           error: error => {
             this.alertService.showToast('Error', 'Gagal menolak pengajuan AKP.')
             this.toggleModal()
+          },
+          complete: () => {
+            this.submitButtonLoading$.next(false)
           }
         })
       }

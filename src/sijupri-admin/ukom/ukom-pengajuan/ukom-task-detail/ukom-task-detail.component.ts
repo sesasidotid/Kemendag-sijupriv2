@@ -96,6 +96,9 @@ export class UkomTaskDetailComponent {
         task.remark = result.comment || null
         task.taskAction = isReject ? 'reject' : 'approve'
 
+        // console.log(task.remark)
+        // return
+
         this.body = {
           id: this.pendingTask.id,
           taskAction: task.taskAction
@@ -112,6 +115,8 @@ export class UkomTaskDetailComponent {
               dokumenUkomList: rejectedDokumenUkomList
             }
           }
+
+          this.body.remark = task.remark
         }
 
         this.apiService

@@ -72,34 +72,56 @@ export class AdminDashboardComponent {
   totalUKOMPending: number = 0
   totalFormasiPending: number = 0
   totalSIAPPending: number = 0
+  totalPAKPending: number = 0
 
   constructor (private apiService: ApiService) {
     this.getTotalAKPPending()
     this.getTotalUKOMPending()
     this.getTotalFormasiPending()
+    this.getTotalPAKPending()
 
-    this.pagable = new PagableBuilder(
-      '/api/v1/participant_ukom/search?desc_lastUpdated=true&limit=10'
-    )
-      // this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
+    // this.pagable = new PagableBuilder(
+    //   '/api/v1/participant_ukom/search?desc_lastUpdated=true&limit=10'
+    // )
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder('NIP', 'nip').withSortable(false).build()
+    //   )
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder('Nama', 'name').withSortable(false).build()
+    //   )
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder('Update Terakhir', 'lastUpdated')
+    //       .withSortable(false)
+    //       .build()
+    //   )
+    //   .setEnablePagination(false)
+    //   .build()
+
+    this.pagable = new PagableBuilder('/api/v1/ukom_grade/search?limit=10')
       .addPrimaryColumn(
         new PrimaryColumnBuilder('NIP', 'nip').withSortable(false).build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Nama', 'name').withSortable(false).build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Update Terakhir', 'lastUpdated')
+        new PrimaryColumnBuilder('Nama', 'participantName')
           .withSortable(false)
           .build()
       )
-      //   .setLimit(5)
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Kelas', 'roomUkomName')
+          .withSortable(false)
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Skor CAT', 'catGradeScore')
+          .withSortable(false)
+          .build()
+      )
       .setEnablePagination(false)
       .build()
   }
 
   getTotalAKPPending () {
-    this.apiService.getData('/api/v1/akp/task/search?p').subscribe({
+    this.apiService.getData('/api/v1/akp/task/search').subscribe({
       next: res => {
         this.totalAKPPending = res.total
       }
@@ -118,6 +140,14 @@ export class AdminDashboardComponent {
     this.apiService.getData('/api/v1/formasi/task/search').subscribe({
       next: res => {
         this.totalFormasiPending = res.total
+      }
+    })
+  }
+
+  getTotalPAKPending () {
+    this.apiService.getData('/api/v1/jf/task/kinerja/search').subscribe({
+      next: res => {
+        this.totalPAKPending = res.total
       }
     })
   }

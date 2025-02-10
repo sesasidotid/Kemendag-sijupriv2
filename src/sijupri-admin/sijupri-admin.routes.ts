@@ -107,7 +107,7 @@ export const routes: Routes = [
                 loadComponent: () =>
                   import(
                     '../sijupri-admin/pak/pak-detail/pak-detail.component'
-                  ).then(m => m.PakDetailComponent),
+                  ).then(m => m.PakDetailComponent)
               }
             ]
           },
@@ -295,9 +295,9 @@ export const routes: Routes = [
           },
           'Nilai Ukom': {
             components: () =>
-              import(
-                './ukom/ukom-grade-list/ukom-grade-list.component'
-              ).then(m => m.UkomGradeListComponent),
+              import('./ukom/ukom-grade-list/ukom-grade-list.component').then(
+                m => m.UkomGradeListComponent
+              ),
             routes: [
               {
                 path: 'import',
@@ -390,7 +390,7 @@ export const routes: Routes = [
               import(
                 '../sijupri-admin/maintenance/sys-conf-list/sys-conf-list.component'
               ).then(m => m.SysConfListComponent)
-          },
+          }
         },
         SIAP: {
           'User JF': {

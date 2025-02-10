@@ -162,11 +162,11 @@ export class FormasiTaskDetailComponent {
             this.pendingTask.objectTask.prevObject
           )
 
-          this.findApproveDokumen(this.prevPendingTask.formasiDokumenList)
           if (this.formasiRequest.unitKerjaId) {
             this.getUnitKerja(this.formasiRequest.unitKerjaId)
           }
 
+          this.findApproveDokumen(this.prevPendingTask.formasiDokumenList)
           this.getPendingFormasi(this.pendingTask.objectId)
 
           console.log('pendingTa222sk', this.formasiRequest.formasiDokumenList)
@@ -218,16 +218,7 @@ export class FormasiTaskDetailComponent {
     return total
   }
 
-  getListJenjang () {   
-    // this.jenjangList$ = this.apiService
-    //   .getData(`/api/v1/jenjang`)
-    //   .pipe(
-    //     map(response =>
-    //       response.map(
-    //         (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
-    //       )
-    //     )
-    //   )
+  getListJenjang () {
     this.apiService.getData(`/api/v1/jenjang`).subscribe({
       next: res => {
         this.JenjangList = res.map(
@@ -259,8 +250,12 @@ export class FormasiTaskDetailComponent {
   }
 
   getUnitKerja (unitKerjaId: string) {
+    console.log('aaaa232', unitKerjaId)
+
     this.apiService.getData(`/api/v1/unit_kerja/${unitKerjaId}`).subscribe({
       next: response => {
+        console.log('aaaa', this.unitKerja)
+
         this.unitKerja = new UnitKerja(response)
       },
       error: error => {
@@ -367,12 +362,13 @@ export class FormasiTaskDetailComponent {
       }
     }
 
-    this.confirmationService.open(false).subscribe({
+    this.confirmationService.open(!isApprove).subscribe({
       next: result => {
         if (!result.confirmed) return
         this.task.remark = result.comment || null
 
         console.log('task', this.task)
+        // return
         this.apiService
           .postData(`/api/v1/formasi/task/submit`, this.task)
           .subscribe({

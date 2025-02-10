@@ -153,28 +153,35 @@ export class AkpPelatihanListComponent {
   updateSumbit () {
     if (this.form.valid) {
       // console.log("this.form.value", this.form.value);
-      this.apiService
-        .putData(`/api/v1/akp_pelatihan_teknis`, this.form.value)
-        .subscribe({
-          next: () => {
-            this.alertService.showToast(
-              'Success',
-              'Pelatihan Teknis berhasil diubah!'
-            )
-            this.toggleModal()
-            this.tab$.next(null)
-            setTimeout(() => {
-              this.tab$.next(0)
-            }, 100)
-          },
-          error: error => {
-            console.log('error', error)
-            this.alertService.showToast(
-              'Error',
-              'Gagal mengubah pelatihan teknis!'
-            )
-          }
-        })
+      this.confirmationService.open(false).subscribe({
+        next: result => {
+          if (!result.confirmed) return
+          console.log('this.form.value', this.form.value)
+
+          this.apiService
+            .putData(`/api/v1/akp_pelatihan_teknis`, this.form.value)
+            .subscribe({
+              next: () => {
+                this.alertService.showToast(
+                  'Success',
+                  'Pelatihan Teknis berhasil diubah!'
+                )
+                this.toggleModal()
+                this.tab$.next(null)
+                setTimeout(() => {
+                  this.tab$.next(0)
+                }, 100)
+              },
+              error: error => {
+                console.log('error', error)
+                this.alertService.showToast(
+                  'Error',
+                  'Gagal mengubah pelatihan teknis!'
+                )
+              }
+            })
+        }
+      })
     }
   }
 }

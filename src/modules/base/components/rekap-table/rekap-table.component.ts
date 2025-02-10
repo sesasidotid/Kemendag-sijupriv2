@@ -319,7 +319,7 @@ export class RekapTableComponent {
 
   verifyDocument (data?: RekapData) {
     this.commentTouched = true
-    if (!this.comment) {
+    if (!this.comment && this.action$.value == 'REJECT') {
       return // Prevent saving if remark is empty
     }
 
@@ -339,6 +339,7 @@ export class RekapTableComponent {
         }
 
         console.log('pppp', payload)
+        // return
         this.apiService
           .postData(
             '/api/v1/akp_pelatihan_teknis/validate/dokumen_verifikasi',

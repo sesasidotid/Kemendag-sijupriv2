@@ -37,6 +37,13 @@ export class InstansiListComponent {
       //       .withIcon('detail')
       //       .build()
       //   )
+      .addActionColumn(
+        new ActionColumnBuilder()
+          .setAction((item: any) => {}, 'danger')
+          .withIcon('danger')
+          .addInactiveCondition((item: any) => true)
+          .build()
+      )
       .addFilter(
         new PageFilterBuilder('like')
           .setProperty('name')

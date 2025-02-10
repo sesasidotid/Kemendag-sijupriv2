@@ -75,7 +75,8 @@ export class UkomDocumentAddComponent {
                 'Success',
                 'Data berhasil disimpan'
               )
-              this.router.navigate(['/ukom/ukom-document-list'])
+              //   this.router.navigate(['/ukom/ukom-document-list'])
+              this.changeTabActive.emit(0)
             },
             error: error => {
               this.handlerService.handleAlert('Error', error.error.message)

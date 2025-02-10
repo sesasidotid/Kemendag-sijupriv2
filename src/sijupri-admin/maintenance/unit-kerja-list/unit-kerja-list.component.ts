@@ -44,12 +44,12 @@ export class UnitKerjaListComponent {
           .withField('Nama', 'text')
           .build()
       )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('instansi|name')
-          .withField('Instansi', 'text')
-          .build()
-      )
+      //   .addFilter(
+      //     new PageFilterBuilder('like')
+      //       .setProperty('instansi|name')
+      //       .withField('Instansi', 'text')
+      //       .build()
+      //   )
       .build()
   }
 }

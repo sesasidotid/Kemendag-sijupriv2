@@ -35,6 +35,12 @@ export class PakListComponent {
       )
       .addFilter(
         new PageFilterBuilder('like')
+          .setProperty('nip')
+          .withField('N', 'text')
+          .build()
+      )
+      .addFilter(
+        new PageFilterBuilder('like')
           .setProperty('user|name')
           .withField('Nama', 'text')
           .build()
