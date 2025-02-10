@@ -11,37 +11,39 @@
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
-
-        <ng-template #instansiHadItem>
-          <p class="pt-2">
-            <b>: {{ instasi.name }}</b>
-          </p>
-        </ng-template>
       </div>
+
+      <ng-template #instansiHadItem>
+        <p class="pt-2">: {{ instasi.name }}</p>
+      </ng-template>
     </div>
 
     <div class="row mb-3">
       <label for="" class="col-sm-3 col-form-label fw-bold">Unit Kerja </label>
       <div class="col-sm-9">
-        <p>: {{ unitKerja.name }}</p>
+        <p class="pt-2">: {{ unitKerja.name }}</p>
       </div>
     </div>
 
     <div class="row mb-3">
       <label for="" class="col-sm-3 col-form-label fw-bold">Phone </label>
       <div class="col-sm-9">
-        <p>: {{ unitKerja.phone }}</p>
+        <p class="pt-2">: {{ unitKerja.phone }}</p>
       </div>
     </div>
+
     <div class="row mb-3">
       <label for="" class="col-sm-3 col-form-label fw-bold">Alamat </label>
       <div class="col-sm-9">
-        <p>: {{ unitKerja.alamat }}</p>
+        <p class="pt-2">: {{ unitKerja.alamat }}</p>
       </div>
     </div>
+
     <div class="row mb-3">
       <label for="" class="col-sm-3 col-form-label fw-bold">Wilayah </label>
-      <div class="col-sm-9">: {{ wilayahName }}</div>
+      <div class="col-sm-9">
+        <p class="pt-2">: {{ wilayahName }}</p>
+      </div>
     </div>
   </div>
   <div
@@ -56,6 +58,7 @@
       [type]="'unit-kerja'"
       [defaultLat]="unitKerja.latitude"
       [defaultLng]="unitKerja.longitude"
+      [enableEditMarker]="enableEditMap"
     >
     </app-map>
     <!-- <app-map [type]="'unit-kerja'" [defaultLat]="-6.1754" [defaultLng]="106.8272">

@@ -31,6 +31,7 @@ export class MapComponent {
   @Input() type: 'provinsi' | 'kabupaten' | 'indonesia' | 'unit-kerja'
   @Input() defaultLat: number | null = null // Default latitude
   @Input() defaultLng: number | null = null // Default longitude
+  @Input() enableEditMarker: boolean = true
 
   constructor (private geoCodingService: GeoCodingService) {}
 
@@ -80,9 +81,13 @@ export class MapComponent {
         .openPopup()
     }
 
-    this.map.on('click', (e: L.LeafletMouseEvent) => {
-      this.onMapClick(e)
-    })
+    console.log('makrer', this.enableEditMarker)
+
+    if (this.enableEditMarker === true) {
+      this.map.on('click', (e: L.LeafletMouseEvent) => {
+        this.onMapClick(e)
+      })
+    }
   }
 
   private onMapClick (e: L.LeafletMouseEvent): void {

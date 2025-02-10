@@ -70,6 +70,7 @@
               <label for="firstnameInput" class="form-label"> KTP </label>
               <p class="text-muted">{{ jf.ktp ? jf.ktp : '-' }}</p>
               <button
+                *ngIf="jf.ktpUrl"
                 class="btn btn-soft-primary"
                 (click)="preview(jf.ktp, jf.ktpUrl)"
               >

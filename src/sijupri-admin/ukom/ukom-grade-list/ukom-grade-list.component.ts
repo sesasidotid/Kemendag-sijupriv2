@@ -29,9 +29,19 @@ export class UkomGradeListComponent {
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Kelas', 'roomUkomName').build()
       )
-      .addPrimaryColumn(new PrimaryColumnBuilder('NB CAT', 'nbCat').build())
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Skor CAT', 'catGradeScore').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB CAT', (item: any) => {
+            return this.rounding(item.nbCat)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Skor CAT', (item: any) => {
+            return this.rounding(item.catGradeScore)
+          })
+          .build()
       )
       .addPrimaryColumn(
         new PrimaryColumnBuilder('NB Wawancara', 'nbWawancara').build()
@@ -101,6 +111,11 @@ export class UkomGradeListComponent {
       //       .build()
       //   )
       .build()
+  }
+
+  rounding (value: string): string {
+    console.log(value) // Check input value
+    return parseFloat(value).toFixed(2) // Return the rounded value as a string
   }
 
   ngOnInit () {

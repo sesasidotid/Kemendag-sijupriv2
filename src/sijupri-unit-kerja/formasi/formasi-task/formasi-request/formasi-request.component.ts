@@ -30,7 +30,7 @@ export class FormasiRequestComponent {
   //jika ketemu, return true, jika tidak ketemu return false
   isSubmitted (jabatanCode: string) {
     return this.PengaturanFormasiJabatan.some(
-      jabatan => jabatan.jabatanCode === jabatanCode
+      jabatan => jabatan.jabatanCode == jabatanCode
     )
   }
 }

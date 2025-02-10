@@ -114,18 +114,10 @@
           <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">
             Batal
           </button>
-          <button
-            *ngIf="(action$ | async) === 'approve'"
-            class="btn btn-primary"
-            (click)="handleSave()"
-            [disabled]="
-              form.get('email_atasan').invalid ||
-              form.get('nama_atasan').invalid
-            "
+
+          <ng-container
+            *ngIf="submitButtonLoading$ | async; else buttonOptions"
           >
-            Simpan
-          </button>
-          <ng-container *ngIf="submitButtonLoading$ | async; else noLoading">
             <button class="btn btn-primary" disabled>
               <div
                 class="spinner-border"
@@ -137,7 +129,19 @@
             </button>
           </ng-container>
 
-          <ng-template #noLoading>
+          <ng-template #buttonOptions>
+            <button
+              *ngIf="(action$ | async) === 'approve'"
+              class="btn btn-primary"
+              (click)="handleSave()"
+              [disabled]="
+                form.get('email_atasan').invalid ||
+                form.get('nama_atasan').invalid
+              "
+            >
+              Simpan
+            </button>
+
             <button
               *ngIf="(action$ | async) === 'reject'"
               class="btn btn-primary"

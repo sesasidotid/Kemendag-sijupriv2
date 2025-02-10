@@ -78,7 +78,9 @@ export class UkomClassListComponent {
         .addPrimaryColumn(
           new PrimaryColumnBuilder('Mulai', 'examStartAt').build()
         )
-        .addPrimaryColumn(new PrimaryColumnBuilder('Jam', 'examEndAt').build())
+        .addPrimaryColumn(
+          new PrimaryColumnBuilder('Selesai', 'examEndAt').build()
+        )
         .addPrimaryColumn(
           new PrimaryColumnBuilder()
             .withDynamicValue(
@@ -134,7 +136,18 @@ export class UkomClassListComponent {
                             this.refreshPagableData()
                           },
                           error: (err: any) => {
-                            this.handlerService.handleAlert('Error', err.error)
+                            if (err.error.code == 'UKM-00001') {
+                              this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menghapus kelas. Kelas memiliki jadwal ujian'
+                              )
+                              return
+                            }
+
+                            this.handlerService.handleAlert(
+                              'Error',
+                              'Gagal menghapus data'
+                            )
                           }
                         })
                     }

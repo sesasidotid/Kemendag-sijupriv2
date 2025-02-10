@@ -41,10 +41,9 @@ export class UnitKerjaListComponent {
       `/api/v1/unit_kerja/instansi/${this.instasiId}`
     )
       .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Instansi', 'instansi|name').build()
-      )
-
+      //   .addPrimaryColumn(
+      //     new PrimaryColumnBuilder('Instansi', 'instansi|name').build()
+      //   )
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((unitKerja: any) => {

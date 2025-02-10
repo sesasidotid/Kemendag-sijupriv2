@@ -57,9 +57,24 @@
               <p class="text-muted">{{ jf.phone ? jf.phone : '-' }}</p>
             </div>
             <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label"> Instansi </label>
+              <p class="text-muted">
+                {{ jf.instansiName ? jf.instansiName : '-' }}
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Unit Kerja
+              </label>
+              <p class="text-muted">
+                {{ jf.unitKerjaName ? jf.unitKerjaName : '-' }}
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
               <label for="firstnameInput" class="form-label"> KTP </label>
               <p class="text-muted">{{ jf.ktp ? jf.ktp : '-' }}</p>
               <button
+                *ngIf="jf.ktpUrl"
                 class="btn btn-soft-primary"
                 (click)="preview(jf.ktp, jf.ktpUrl)"
               >

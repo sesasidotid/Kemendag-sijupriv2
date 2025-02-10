@@ -1,4 +1,5 @@
 <div class="row">
+  <!-- User Unit Kerja Detail -->
   <div class="col-xl-4">
     <div class="card card-profile shadow-sm">
       <div class="card-body p-4">
@@ -21,8 +22,6 @@
           </div>
           <hr class="text-white" />
           <div class="row text-white">
-            <!-- First Name -->
-
             <div class="col-md-6 mb-3">
               <label for="firstnameInput" class="form-label">
                 Jenis Kelamin
@@ -52,20 +51,13 @@
                 }}
               </p>
             </div>
-
-            <!-- <div class="col-md-6 mb-3">
-              <label for="firstnameInput" class="form-label">
-                Unit Kerja
-              </label>
-              <p class="text-muted">
-                {{ unitKerjaDetail.name ? unitKerjaDetail.name : '-' }}
-              </p>
-            </div> -->
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Unit Kerja Detail  -->
   <div class="col-xl-8" *ngIf="userUnitKerjaDetail?.unitKerjaId">
     <div class="card">
       <div class="card-body">

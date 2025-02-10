@@ -13,6 +13,8 @@ export class JF extends Serializable {
   jenisKelaminName: string = undefined
   unitKerjaId: string = undefined
   password?: string = undefined
+  instansiName: string = undefined
+  unitKerjaName: string = undefined
 
   phone: string = undefined
   fileKtp?: string = undefined

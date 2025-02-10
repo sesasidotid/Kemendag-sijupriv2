@@ -17,6 +17,8 @@ import { Input } from '@angular/core'
 })
 export class UnitKerjaDetailComponent {
   @Input() unitKerjaIdFromParent: string = ''
+  @Input() enableEditMap?: boolean
+
   id: string = ''
   unitKerja: UnitKerja = new UnitKerja()
   instasi: Instansi = new Instansi()

@@ -112,12 +112,20 @@ export class AdminDashboardComponent {
           .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Skor CAT', 'catGradeScore')
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Skor CAT', (item: any) => {
+            return this.rounding(item.catGradeScore)
+          })
           .withSortable(false)
           .build()
       )
       .setEnablePagination(false)
       .build()
+  }
+
+  rounding (value: string): string {
+    console.log(value) // Check input value
+    return parseFloat(value).toFixed(2) // Return the rounded value as a string
   }
 
   getTotalAKPPending () {

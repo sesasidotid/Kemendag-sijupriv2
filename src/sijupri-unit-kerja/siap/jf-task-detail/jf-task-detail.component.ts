@@ -1,3 +1,4 @@
+import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
 import { JfService } from '../../../modules/siap/services/jf.service'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -13,7 +14,6 @@ import { RWJabatan } from '../../../modules/siap/models/rw-jabatan.model'
 import { RWKompetensi } from '../../../modules/siap/models/rw-kompetensi.model'
 import { RWSertifikasi } from '../../../modules/siap/models/rw-sertifikasi.model'
 import { Task } from '../../../modules/workflow/models/task.model'
-import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { AlertService } from '../../../modules/base/services/alert.service'
@@ -78,6 +78,7 @@ export class JfTaskDetailComponent {
       }
     })
   }
+
   getTaskDetail () {
     this.apiService.getData(`/api/v1/jf/task/group/${this.nip}`).subscribe({
       next: (pendingTaskList: PendingTask[]) => {

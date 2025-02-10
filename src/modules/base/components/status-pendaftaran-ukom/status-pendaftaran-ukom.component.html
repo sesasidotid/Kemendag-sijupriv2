@@ -249,6 +249,12 @@
                         Dinilai Pada : -
                       </p>
                     </ng-container>
+                    <ng-container *ngIf="history.remark !== null">
+                      <div class="alert alert-warning mt-1">
+                        <strong>Catatan Revisi : </strong>
+                        {{ history.remark }}
+                      </div>
+                    </ng-container>
                   </div>
                 </div>
               </div>
