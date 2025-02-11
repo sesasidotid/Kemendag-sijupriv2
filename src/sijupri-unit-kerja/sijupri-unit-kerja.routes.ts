@@ -16,7 +16,6 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        // outlet: 'detached',
         loadComponent: () =>
           import(
             '../sijupri-unit-kerja/template/dashboard/dashboard.component'

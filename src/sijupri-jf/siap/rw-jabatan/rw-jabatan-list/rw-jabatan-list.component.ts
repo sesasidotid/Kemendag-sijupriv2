@@ -63,13 +63,13 @@ export class RwJabatanListComponent {
       )
       .addFilter(
         new PageFilterBuilder('like')
-          .setProperty('dateStart')
+          .setProperty('jabatan|name')
           .withField('Jabatan', 'text')
           .build()
       )
       .addFilter(
         new PageFilterBuilder('like')
-          .setProperty('dateEnd')
+          .setProperty('jenjang|name')
           .withField('Jenjang', 'text')
           .build()
       )

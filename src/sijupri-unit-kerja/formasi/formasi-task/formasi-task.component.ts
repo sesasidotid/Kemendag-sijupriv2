@@ -295,40 +295,32 @@ export class FormasiTaskComponent {
     )
   }
 
-  //confirmation gk mau muncul, BUGGED
   submitFl1 () {
-    // this.confirmationService.open(false).subscribe({
-    //   next: result => {
-    //     console.log('Dialog result:', result)
-
-    //     if (!result.confirmed) return
-
-    this.apiService
-      .postData('/api/v1/formasi/task/submit', {
-        id: this.pendingTask.id,
-        task_action: 'approve'
-      })
-      .subscribe({
-        next: res => {
-          window.location.reload()
-        },
-        error: err => {
-          console.error('Error fetching data', err)
-          this.handlerService.handleAlert(
-            'Error',
-            'Gagal Menyimpan Data. Pastikan Data Sudah Lengkap'
-          )
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) {
+          return
         }
-      })
-    //   },
-    //   error: err => {
-    //     console.error('Error fetching data', err)
-    //     this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
-    //   },
-    //   complete: () => {
-    //     console.log('complete')
-    //   }
-    // })
+
+        this.apiService
+          .postData('/api/v1/formasi/task/submit', {
+            id: this.pendingTask.id,
+            task_action: 'approve'
+          })
+          .subscribe({
+            next: res => {
+              window.location.reload()
+            },
+            error: err => {
+              console.error('Error fetching data', err)
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal Menyimpan Data. Pastikan Data Sudah Lengkap'
+              )
+            }
+          })
+      }
+    })
   }
 
   onFileChange (event: any, index: number) {
@@ -391,34 +383,40 @@ export class FormasiTaskComponent {
 
     this.revisiedFormasiDokumen = Array.from(documentMap.values())
 
-    // this.confirmationService.open(false).subscribe({
-    //   next: response => {
-    //     if (!response.confirmed) {
-    //       return
-    //     }
-    const task = new Task({
-      id: this.pendingTask.id,
-      taskAction: 'approve',
-      object: { formasi_dokumen_list: this.revisiedFormasiDokumen }
-    })
+    this.confirmationService.open(false).subscribe({
+      next: response => {
+        if (!response.confirmed) {
+          return
+        }
+        const task = new Task({
+          id: this.pendingTask.id,
+          taskAction: 'approve',
+          object: { formasi_dokumen_list: this.revisiedFormasiDokumen }
+        })
 
-    this.apiService.postData(`/api/v1/formasi/task/submit`, task).subscribe({
-      next: () => window.location.reload(),
+        this.apiService
+          .postData(`/api/v1/formasi/task/submit`, task)
+          .subscribe({
+            next: () => {
+              this.handlerService.handleAlert(
+                'Success',
+                'Berhasil Menyimpan Data'
+              )
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
+            },
 
+            error: error => {
+              console.error('Error fetching data', error)
+              this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
+            }
+          })
+      },
       error: error => {
-        console.error('Error fetching data', error)
-        this.alertService.showToast('Error', error.message)
-        throw error
+        console.error('Error F14', error)
       }
     })
-    //   },
-    //   error: error => {
-    //     console.error('Error fetching data', error)
-    //   },
-    //   complete: () => {
-    //     console.log('complete')
-    //   }
-    // })
   }
 
   ngOnDestroy () {

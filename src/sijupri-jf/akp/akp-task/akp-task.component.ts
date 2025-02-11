@@ -15,6 +15,7 @@ import { ConverterService } from '../../../modules/base/services/converter.servi
 import { AKPTaskDetail } from '../../../modules/akp/models/akp-task-detail.modal'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
+import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 @Component({
   selector: 'app-akp-task',
   standalone: true,
@@ -42,7 +43,8 @@ export class AkpTaskComponent {
     private alertService: AlertService,
     private router: Router,
     private converterService: ConverterService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit () {
@@ -122,17 +124,25 @@ export class AkpTaskComponent {
   }
 
   saveAKPTask () {
-    this.akpTaskService.saveTask(LoginContext.getUserId()).subscribe({
-      next: () => {
-        this.alertService.showToast('Success', 'Berhasil mengajukan AKP')
-        setTimeout(() => {
-          this.router.navigate(['/akp/akp-task']).then(() => {
-            window.location.reload()
-          })
-        }, 1000)
-      },
-      error: error => {
-        this.alertService.showToast('Error', 'Gagal mengajukan AKP')
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) {
+          return
+        }
+
+        this.akpTaskService.saveTask(LoginContext.getUserId()).subscribe({
+          next: () => {
+            this.alertService.showToast('Success', 'Berhasil mengajukan AKP')
+            setTimeout(() => {
+              this.router.navigate(['/akp/akp-task']).then(() => {
+                window.location.reload()
+              })
+            }, 1000)
+          },
+          error: error => {
+            this.alertService.showToast('Error', 'Gagal mengajukan AKP')
+          }
+        })
       }
     })
   }

@@ -15,11 +15,17 @@ import { DokumenUkomPersyaratan } from '../../../../modules/maintenance/models/d
 import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
 import { switchMap } from 'rxjs'
 import { RevisiDokumenUkom } from '../../../../modules/ukom/models/revisi-dokumen-ukom.model'
-
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
+import { FilePreviewComponent } from '../file-preview/file-preview.component'
 @Component({
   selector: 'app-nonjf-revisi-ukom',
   standalone: true,
-  imports: [FileHandlerComponent, CommonModule],
+  imports: [
+    FileHandlerComponent,
+    CommonModule,
+    ConfirmationDialogComponent,
+    FilePreviewComponent
+  ],
   templateUrl: './nonjf-revisi-ukom.component.html',
   styleUrl: './nonjf-revisi-ukom.component.scss'
 })
@@ -85,6 +91,7 @@ export class NonjfRevisiUkomComponent {
 
   onSave () {
     console.log(this.key)
+
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
     }
@@ -140,14 +147,21 @@ export class NonjfRevisiUkomComponent {
     this.revisedDokumen.taskAction = 'approve'
     this.revisedDokumen.object = this.pesertaUkom
 
-    this.apiService
-      .postData(
-        `/api/v1/participant_ukom/task/non_jf/submit?key=${this.key}`,
-        this.revisedDokumen
-      )
-      .subscribe({
-        next: () => window.location.reload(),
-        error: error => this.handlerService.handleException(error)
-      })
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) {
+          return
+        }
+        this.apiService
+          .postData(
+            `/api/v1/participant_ukom/task/non_jf/submit?key=${this.key}`,
+            this.revisedDokumen
+          )
+          .subscribe({
+            next: () => window.location.reload(),
+            error: error => this.handlerService.handleException(error)
+          })
+      }
+    })
   }
 }

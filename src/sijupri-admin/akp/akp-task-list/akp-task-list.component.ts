@@ -22,6 +22,7 @@ import {
 } from '@angular/forms'
 import { AkpTaskService } from '../../../modules/akp/services/akp-task.service'
 import { VerifAKPTask } from '../../../modules/akp/models/verif-akp-task.model'
+import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 
 @Component({
   selector: 'app-akp-task-list',
@@ -52,7 +53,8 @@ export class AKPTaskComponent {
     private tabService: TabService,
     private akpTaskService: AkpTaskService,
     private alertService: AlertService,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService
   ) {
     this.pagable$.next(
       new PagableBuilder('/api/v1/akp/task/search')
@@ -161,73 +163,83 @@ export class AKPTaskComponent {
   }
 
   handleSave () {
-    this.submitButtonLoading$.next(true)
-
-    if (this.action$.value === 'approve') {
-      if (
-        this.form.get('nama_atasan').valid &&
-        this.form.get('email_atasan').valid
-      ) {
-        this.payload.id = this.taskId$.value
-        this.payload.taskAction = 'approve'
-        this.payload.object = {
-          emailAtasan: this.form.get('email_atasan').value,
-          namaAtasan: this.form.get('nama_atasan').value
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) {
+          return
         }
+        this.submitButtonLoading$.next(true)
 
-        console.log(this.payload)
+        if (this.action$.value === 'approve') {
+          if (
+            this.form.get('nama_atasan').valid &&
+            this.form.get('email_atasan').valid
+          ) {
+            this.payload.id = this.taskId$.value
+            this.payload.taskAction = 'approve'
+            this.payload.object = {
+              emailAtasan: this.form.get('email_atasan').value,
+              namaAtasan: this.form.get('nama_atasan').value
+            }
 
-        this.akpTaskService.verifAKPTask(this.payload).subscribe({
-          next: () => {
-            this.alertService.showToast(
-              'Success',
-              'Berhasil menerima pengajuan AKP.'
-            )
-            this.toggleModal()
-            setTimeout(() => {
-              window.location.reload()
-            }, 1000)
-          },
-          error: error => {
-            this.alertService.showToast(
-              'Error',
-              'Gagal menerima pengajuan AKP.'
-            )
-            this.toggleModal()
-          },
-          complete: () => {
-            this.submitButtonLoading$.next(false)
+            console.log(this.payload)
+
+            this.akpTaskService.verifAKPTask(this.payload).subscribe({
+              next: () => {
+                this.alertService.showToast(
+                  'Success',
+                  'Berhasil menerima pengajuan AKP.'
+                )
+                this.toggleModal()
+                setTimeout(() => {
+                  window.location.reload()
+                }, 1000)
+              },
+              error: error => {
+                this.alertService.showToast(
+                  'Error',
+                  'Gagal menerima pengajuan AKP.'
+                )
+                this.toggleModal()
+              },
+              complete: () => {
+                this.submitButtonLoading$.next(false)
+              }
+            })
           }
-        })
-      }
-    } else if (this.action$.value === 'reject') {
-      if (this.form.get('remark').valid) {
-        this.payload.id = this.taskId$.value
-        this.payload.taskAction = 'reject'
-        this.payload.remark = this.form.get('remark').value
+        } else if (this.action$.value === 'reject') {
+          if (this.form.get('remark').valid) {
+            this.payload.id = this.taskId$.value
+            this.payload.taskAction = 'reject'
+            this.payload.remark = this.form.get('remark').value
 
-        console.log(this.payload)
+            console.log(this.payload)
 
-        this.akpTaskService.verifAKPTask(this.payload).subscribe({
-          next: () => {
-            this.alertService.showToast(
-              'Success',
-              'Berhasil menolak pengajuan AKP.'
-            )
-            this.toggleModal()
-            setTimeout(() => {
-              window.location.reload()
-            }, 1000)
-          },
-          error: error => {
-            this.alertService.showToast('Error', 'Gagal menolak pengajuan AKP.')
-            this.toggleModal()
-          },
-          complete: () => {
-            this.submitButtonLoading$.next(false)
+            this.akpTaskService.verifAKPTask(this.payload).subscribe({
+              next: () => {
+                this.alertService.showToast(
+                  'Success',
+                  'Berhasil menolak pengajuan AKP.'
+                )
+                this.toggleModal()
+                setTimeout(() => {
+                  window.location.reload()
+                }, 1000)
+              },
+              error: error => {
+                this.alertService.showToast(
+                  'Error',
+                  'Gagal menolak pengajuan AKP.'
+                )
+                this.toggleModal()
+              },
+              complete: () => {
+                this.submitButtonLoading$.next(false)
+              }
+            })
           }
-        })
+        }
       }
-    }
+    })
   }
 }

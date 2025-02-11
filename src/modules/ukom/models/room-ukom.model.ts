@@ -8,6 +8,7 @@ export class RoomUkom extends Serializable {
   jenjang_code: string = undefined
   jenjangName: string = undefined
   participant_quota: string = undefined
+  vid_call_link: string = undefined
   exam_start_at: string = undefined
   exam_end_at: string = undefined
   examScheduleDtoList: ExamScheduleDtoList[] = []

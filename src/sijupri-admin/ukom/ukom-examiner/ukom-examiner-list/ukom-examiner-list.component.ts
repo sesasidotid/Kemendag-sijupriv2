@@ -161,6 +161,9 @@ export class UkomExaminerListComponent {
             )
             this.handleRefreshToggle()
             this.toggleModal()
+            setTimeout(() => {
+              window.location.reload()
+            }, 1000)
           },
           error: error => this.handlerService.handleException(error)
         })

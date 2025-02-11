@@ -8,10 +8,13 @@
       <p>
         Silahkan untuk dapat join Zoom melalui link berikut:
         <a
-          href="https://uny-ac-id.zoom.us/j/96351220447?pwd=DvvDaSg1glAM6WbVlaR1nxTzO1tFD9.1#success"
+          href="{{ roomUkom.vidCallLink }}"
           target="_blank"
+          [ngClass]="{ 'text-danger': !roomUkom.vidCallLink }"
         >
-          https://uny-ac-id.zoom.us/j/96351220447?pwd=DvvDaSg1glAM6WbVlaR1nxTzO1tFD9.1#success
+          {{
+            roomUkom.vidCallLink ? roomUkom.vidCallLink : 'Belum ada link Zoom'
+          }}
         </a>
       </p>
     </div>

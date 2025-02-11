@@ -123,12 +123,23 @@
       <div class="col-sm-10">
         <input
           type="text"
-          id="link_zoom"
+          id="vid_call_link"
           class="form-control"
-          name="link_zoom"
-          formControlName="link_zoom"
+          name="vid_call_link"
+          formControlName="vid_call_link"
           placeholder="Masukan Link Zoom, contoh: https://zoom.us/j/1234567890"
         />
+        <div
+          class="feedback"
+          *ngIf="
+            kelasForm.get('vid_call_link').invalid &&
+            kelasForm.get('vid_call_link').touched
+          "
+        >
+          <small *ngIf="kelasForm.get('vid_call_link').errors?.['required']"
+            >Link Zoom perlu diisi.</small
+          >
+        </div>
       </div>
     </div>
 

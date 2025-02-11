@@ -4,6 +4,8 @@ export class RoomUkomDetail extends Serializable {
   id: string = undefined
   name: string = undefined
   participantQuota: number = undefined
+  vid_call_link: string = undefined
+  vidCallLink: string = undefined
   examStartAt: string = undefined
   examEndAt: string = undefined
   jabatanCode: string = undefined

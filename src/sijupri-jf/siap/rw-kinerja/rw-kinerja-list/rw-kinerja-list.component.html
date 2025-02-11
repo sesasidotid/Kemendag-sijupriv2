@@ -1,46 +1,43 @@
 <app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
 <div *ngIf="isDetailOpen" class="">
-    <div *ngIf="loading$ | async; else hadItem" class="d-flex justify-content-center">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
+  <div
+    *ngIf="loading$ | async; else hadItem"
+    class="d-flex justify-content-center"
+  >
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
-    
-    <ng-template #hadItem>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label">
-                    Tanggal Mulai
-                </label>
-                <p class="border-bottom pb-2">{{rwKinerja.dateStart}}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label
-                    ">Tanggal Selesai</label>
-                <p class="border-bottom pb-2">{{rwKinerja.dateEnd}}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label
-                    ">Angka Kredit</label>
-                <p class="border-bottom pb-2">{{rwKinerja.angkaKredit}}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label
-                    ">Rating Hasil</label>
-                <p class="border-bottom pb-2">{{rwKinerja.ratingHasilName}}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label
-                    ">Rating Kinerja</label>
-                <p class="border-bottom pb-2">{{rwKinerja.ratingKinerjaName}}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label
-                    ">Predikat Kinerja</label>
-                <p class="border-bottom pb-2">{{rwKinerja.predikatKinerjaName}}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-                    <app-file-handler [inputs]="{
+  </div>
+
+  <ng-template #hadItem>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label"> Tanggal Mulai </label>
+        <p class="border-bottom pb-2">{{ rwKinerja.dateStart }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label">Tanggal Selesai</label>
+        <p class="border-bottom pb-2">{{ rwKinerja.dateEnd }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label">Angka Kredit</label>
+        <p class="border-bottom pb-2">{{ rwKinerja.angkaKredit }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label">Rating Hasil</label>
+        <p class="border-bottom pb-2">{{ rwKinerja.ratingHasilName }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label">Rating Kinerja</label>
+        <p class="border-bottom pb-2">{{ rwKinerja.ratingKinerjaName }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="firstnameInput" class="form-label">Predikat Kinerja</label>
+        <p class="border-bottom pb-2">{{ rwKinerja.predikatKinerjaName }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <app-file-handler
+          [inputs]="{
                     files: {
                       docEvaluas: { label: 'Preview Dokumen Evaluasi', fileName: this.rwKinerja.docEvaluasi, source: this.rwKinerja.docEvaluasiUrl },
                       docPredikat: { label: 'Preview Dokumen Predikat', fileName: this.rwKinerja.docPredikat, source: this.rwKinerja.docPredikatUrl },
@@ -48,15 +45,18 @@
                       docPenetapanAk: { label: 'Preview Dokumen Penetapan Angka Kredit', fileName: this.rwKinerja.docPenetapanAk, source: this.rwKinerja.docPenetapanAkUrl },
                     },
                     viewOnly: true
-                  }"></app-file-handler>
-            </div>
+                  }"
+        ></app-file-handler>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="hstack gap-2 justify-content-end">
+          <a class="btn btn-secondary" (click)="isDetailOpen = false"
+            >Kembali</a
+          >
         </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="hstack gap-2 justify-content-end">
-                    <a class="btn btn-secondary" (click)="isDetailOpen = false">Kembali</a>
-                </div>
-            </div>
-        </div>
-    </ng-template>
+      </div>
+    </div>
+  </ng-template>
 </div>

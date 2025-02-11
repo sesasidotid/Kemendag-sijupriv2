@@ -44,42 +44,102 @@ export class UkomGradeListComponent {
           .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('NB Wawancara', 'nbWawancara').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB Wawancara', (item: any) => {
+            return this.rounding(item.nbWawancara)
+          })
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder(
-          'Skor Wawancara',
-          'wawancaraGradeScore'
-        ).build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Skor Wawancara', (item: any) => {
+            return this.rounding(item.wawancaraGradeScore)
+          })
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('NB Seminar', 'nbSeminar').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB Seminar', (item: any) => {
+            return this.rounding(item.nbSeminar)
+          })
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Skor Seminar', 'seminarGradeScore').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Skor Seminar', (item: any) => {
+            return this.rounding(item.seminarGradeScore)
+          })
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('NB Praktik', 'nbPraktik').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB Praktik', (item: any) => {
+            return this.rounding(item.nbPraktik)
+          })
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Skor Praktik', 'praktikGradeScore').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Skor Praktik', (item: any) => {
+            return this.rounding(item.praktikGradeScore)
+          })
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('NB Portofolio', 'nbPortofolio').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB Portofolio', (item: any) => {
+            return this.rounding(item.nbPortofolio)
+          })
+          .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder(
-          'Skor Portofolio',
-          'portofolioGradeScore'
-        ).build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Skor Portofolio', (item: any) => {
+            return this.rounding(item.portofolioGradeScore)
+          })
+          .build()
       )
-      .addPrimaryColumn(new PrimaryColumnBuilder('JPM', 'jpm').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('Skor', 'score').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('NB UKT', 'nbUkt').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('UKT', 'ukt').build())
-      .addPrimaryColumn(new PrimaryColumnBuilder('UKMSK', 'ukmsk').build())
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Nilai Akhir', 'grade').build()
+        new PrimaryColumnBuilder()
+          .withDynamicValue('JPM', (item: any) => {
+            return this.rounding(item.jpm)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Skor', (item: any) => {
+            return this.rounding(item.score)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB UKT', (item: any) => {
+            return this.rounding(item.nbUkt)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('UKT', (item: any) => {
+            return this.rounding(item.ukt)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('UKMSK', (item: any) => {
+            return this.rounding(item.ukmsk)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Nilai Akhir', (item: any) => {
+            return this.rounding(item.grade)
+          })
+          .build()
       )
       .addPrimaryColumn(new PrimaryColumnBuilder('Status', 'status').build())
       .addFilter(
@@ -91,7 +151,7 @@ export class UkomGradeListComponent {
       .addFilter(
         new PageFilterBuilder('like')
           .setProperty('participantUkom|name')
-          .withField('Name', 'text')
+          .withField('Nama', 'text')
           .build()
       )
       .addFilter(
@@ -100,16 +160,13 @@ export class UkomGradeListComponent {
           .withField('Kelas', 'text')
           .build()
       )
-      //   .addActionColumn(
-      //     new ActionColumnBuilder()
-      //       .setAction((participantUkom: any) => {
-      //         this.router.navigate([
-      //           `/pak/ukom-grade-list/${participantUkom.nip}`
-      //         ])
-      //       }, 'info')
-      //       .withIcon('detail')
-      //       .build()
-      //   )
+      .addActionColumn(
+        new ActionColumnBuilder()
+          .setAction((participantUkom: any) => {}, 'primary')
+          .addInactiveCondition(() => true)
+          .withIcon('update')
+          .build()
+      )
       .build()
   }
 

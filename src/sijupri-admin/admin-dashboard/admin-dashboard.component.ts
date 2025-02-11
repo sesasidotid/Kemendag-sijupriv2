@@ -28,19 +28,34 @@ export class AdminDashboardComponent {
   endMonth: number = 12
   year: number = new Date().getFullYear()
 
+  //   months = [
+  //     'January',
+  //     'February',
+  //     'March',
+  //     'April',
+  //     'May',
+  //     'June',
+  //     'July',
+  //     'August',
+  //     'September',
+  //     'October',
+  //     'November',
+  //     'December'
+  //   ]
+
   months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
+    { id: 'Januari', eng: 'January' },
+    { id: 'Februari', eng: 'February' },
+    { id: 'Maret', eng: 'March' },
+    { id: 'April', eng: 'April' },
+    { id: 'Mei', eng: 'May' },
+    { id: 'Juni', eng: 'June' },
+    { id: 'Juli', eng: 'July' },
+    { id: 'Agustus', eng: 'August' },
+    { id: 'September', eng: 'September' },
+    { id: 'Oktober', eng: 'October' },
+    { id: 'November', eng: 'November' },
+    { id: 'Desember', eng: 'December' }
   ]
 
   apiData: any[] = [] // Store full API response
@@ -79,23 +94,6 @@ export class AdminDashboardComponent {
     this.getTotalUKOMPending()
     this.getTotalFormasiPending()
     this.getTotalPAKPending()
-
-    // this.pagable = new PagableBuilder(
-    //   '/api/v1/participant_ukom/search?desc_lastUpdated=true&limit=10'
-    // )
-    //   .addPrimaryColumn(
-    //     new PrimaryColumnBuilder('NIP', 'nip').withSortable(false).build()
-    //   )
-    //   .addPrimaryColumn(
-    //     new PrimaryColumnBuilder('Nama', 'name').withSortable(false).build()
-    //   )
-    //   .addPrimaryColumn(
-    //     new PrimaryColumnBuilder('Update Terakhir', 'lastUpdated')
-    //       .withSortable(false)
-    //       .build()
-    //   )
-    //   .setEnablePagination(false)
-    //   .build()
 
     this.pagable = new PagableBuilder('/api/v1/ukom_grade/search?limit=10')
       .addPrimaryColumn(
@@ -169,7 +167,7 @@ export class AdminDashboardComponent {
       .getData('/api/v1/dashboard/participant_ukom_count')
       .subscribe({
         next: res => {
-          this.apiData = res // Store raw API response
+          this.apiData = res
           //   this.apiData = [
           //     {
           //       month: 'March',
@@ -232,7 +230,7 @@ export class AdminDashboardComponent {
           //       count: 4
           //     }
           //   ]
-          this.applyFilters() // Apply frontend filtering
+          this.applyFilters()
         },
         error: err => {
           console.error('Error fetching data', err)
@@ -242,7 +240,8 @@ export class AdminDashboardComponent {
 
   applyFilters () {
     this.filteredData = this.apiData.filter((item: any) => {
-      const monthIndex = this.months.indexOf(item.month) + 1
+      const monthObj = this.months.find(m => m.eng === item.month)
+      const monthIndex = monthObj ? this.months.indexOf(monthObj) + 1 : 0
       return (
         monthIndex >= this.startMonth &&
         monthIndex <= this.endMonth &&
@@ -250,12 +249,34 @@ export class AdminDashboardComponent {
       )
     })
 
-    // Update chart data
-    this.barChartData.labels = this.filteredData.map(item => item.month)
+    // Update chart data with Indonesian month names
+    this.barChartData.labels = this.filteredData.map(item => {
+      const monthObj = this.months.find(m => m.eng === item.month)
+      return monthObj ? monthObj.id : item.month // Fallback to English if not found
+    })
     this.barChartData.datasets[0].data = this.filteredData.map(
       item => item.count
     )
 
     this.chart?.update()
   }
+
+  //   applyFilters () {
+  //     this.filteredData = this.apiData.filter((item: any) => {
+  //       const monthIndex = this.months.indexOf(item.month) + 1
+  //       return (
+  //         monthIndex >= this.startMonth &&
+  //         monthIndex <= this.endMonth &&
+  //         item.year == this.year.toString()
+  //       )
+  //     })
+
+  //     // Update chart data
+  //     this.barChartData.labels = this.filteredData.map(item => item.month)
+  //     this.barChartData.datasets[0].data = this.filteredData.map(
+  //       item => item.count
+  //     )
+
+  //     this.chart?.update()
+  //   }
 }

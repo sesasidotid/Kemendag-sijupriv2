@@ -135,17 +135,13 @@
       <div class="text-center">
         <button
           type="submit"
-          class="btn btn-sm btn-success float-end"
+          class="btn btn-success float-end"
           [disabled]="kknForm.invalid"
         >
           Simpan
         </button>
-        <a class="btn btn-sm btn-danger me-2 float-end" (click)="onDelete()"
-          >Hapus</a
-        >
-        <a
-          class="btn btn-sm btn-warning me-2 float-end"
-          (click)="isEdit = false"
+        <a class="btn btn-danger me-2 float-end" (click)="onDelete()">Hapus</a>
+        <a class="btn btn-warning me-2 float-end" (click)="isEdit = false"
           >Kembali</a
         >
       </div>
@@ -201,10 +197,8 @@
     </div>
     <div class="row">
       <div class="text-center">
-        <a class="btn btn-sm btn-info float-end" (click)="isEdit = true"
-          >Ubah</a
-        >
-        <a class="btn btn-sm btn-warning me-2 float-end" (click)="backToList()"
+        <a class="btn btn-info float-end" (click)="isEdit = true">Ubah</a>
+        <a class="btn btn-warning me-2 float-end" (click)="backToList()"
           >Kembali</a
         >
       </div>

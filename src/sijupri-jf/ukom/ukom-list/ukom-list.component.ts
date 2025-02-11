@@ -99,8 +99,8 @@ export class UkomListComponent {
         new ActionColumnBuilder()
           .setAction((ukom: any) => {
             this.navigateToCATPage()
-          }, 'info')
-          .withIcon('detail')
+          }, 'warning')
+          .withIcon('navigate')
           .build()
       )
       .build()

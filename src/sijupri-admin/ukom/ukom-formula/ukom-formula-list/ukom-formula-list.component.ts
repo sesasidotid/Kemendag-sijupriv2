@@ -132,8 +132,8 @@ export class UkomFormulaListComponent {
 
     this.editFormulaForm = new FormGroup({
       id: new FormControl(''),
-      jabatan_code: new FormControl('', Validators.required),
-      jenjang_code: new FormControl('', Validators.required),
+      //   jabatan_code: new FormControl('', Validators.required),
+      //   jenjang_code: new FormControl('', Validators.required),
       cat_percentage: new FormControl('', Validators.required),
       wawancara_percentage: new FormControl('', Validators.required),
       seminar_percentage: new FormControl('', Validators.required),
@@ -141,7 +141,7 @@ export class UkomFormulaListComponent {
       portofolio_percentage: new FormControl('', Validators.required),
       ukt_percentage: new FormControl('', Validators.required),
       ukmsk_percentage: new FormControl('', Validators.required),
-      jpm_percentage: new FormControl('', Validators.required),
+      //   jpm_percentage: new FormControl('', Validators.required),
       grade_threshold: new FormControl('', Validators.required),
       ukt_threshold: new FormControl('', Validators.required),
       jpm_threshold: new FormControl('', Validators.required)
@@ -164,7 +164,7 @@ export class UkomFormulaListComponent {
       portofolio_percentage: data.portofolioPercentage || '',
       ukt_percentage: data.uktPercentage || '',
       ukmsk_percentage: data.ukmskPercentage || '',
-      jpm_percentage: data.jpmPercentage || '',
+      //   jpm_percentage: data.jpmPercentage || '',
       grade_threshold: data.gradeThreshold || '',
       ukt_threshold: data.ukt_threshold || '',
       jpm_threshold: data.jpmThreshold || ''
@@ -213,8 +213,8 @@ export class UkomFormulaListComponent {
   submit () {
     const payload = {
       id: this.editFormulaForm.value.id,
-      jabatan_code: this.editFormulaForm.value.jabatan_code,
-      jenjang_code: this.editFormulaForm.value.jenjang_code,
+      //   jabatan_code: this.editFormulaForm.value.jabatan_code,
+      //   jenjang_code: this.editFormulaForm.value.jenjang_code,
       cat_percentage: this.editFormulaForm.value.cat_percentage,
       wawancara_percentage: this.editFormulaForm.value.wawancara_percentage,
       seminar_percentage: this.editFormulaForm.value.seminar_percentage,
@@ -222,7 +222,7 @@ export class UkomFormulaListComponent {
       portofolio_percentage: this.editFormulaForm.value.portofolio_percentage,
       ukt_percentage: this.editFormulaForm.value.ukt_percentage,
       ukmsk_percentage: this.editFormulaForm.value.ukmsk_percentage,
-      jpm_percentage: this.editFormulaForm.value.jpm_percentage,
+      //   jpm_percentage: this.editFormulaForm.value.jpm_percentage,
       grade_threshold: this.editFormulaForm.value.grade_threshold,
       ukt_threshold: this.editFormulaForm.value.ukt_threshold,
       jpm_threshold: this.editFormulaForm.value.jpm_threshold
@@ -233,6 +233,7 @@ export class UkomFormulaListComponent {
           return
         }
 
+        console.log('payload', payload)
         this.apiService.putData('/api/v1/ukom_formula', payload).subscribe({
           next: () => {
             this.handlerService.handleAlert('Success', 'Data berhasil disimpan')
@@ -240,7 +241,11 @@ export class UkomFormulaListComponent {
             this.handleRefreshToggle()
           },
           error: error => {
-            this.handlerService.handleAlert('Error', error.error.message)
+            console.log('error', error.error.message)
+            this.handlerService.handleAlert(
+              'Error',
+              'Gagal mengubah data, silahkan coba lagi'
+            )
           }
         })
       }

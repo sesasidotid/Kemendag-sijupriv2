@@ -38,7 +38,7 @@
         class="form-control mx-0 mb-1 mt-0"
       >
         <option *ngFor="let month of months; let i = index" [value]="i + 1">
-          {{ month }}
+          {{ month.id }}
         </option>
       </select>
     </div>
@@ -50,7 +50,7 @@
         class="form-control mx-0 mb-1 mt-0"
       >
         <option *ngFor="let month of months; let i = index" [value]="i + 1">
-          {{ month }}
+          {{ month.id }}
         </option>
       </select>
     </div>

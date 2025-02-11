@@ -47,7 +47,7 @@ export class InstansiListComponent {
       .addFilter(
         new PageFilterBuilder('like')
           .setProperty('name')
-          .withField('Nama Kab/Kota', 'text')
+          .withField('Nama', 'text')
           .build()
       )
       .build()

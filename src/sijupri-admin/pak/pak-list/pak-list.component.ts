@@ -36,7 +36,7 @@ export class PakListComponent {
       .addFilter(
         new PageFilterBuilder('like')
           .setProperty('nip')
-          .withField('N', 'text')
+          .withField('NIP', 'text')
           .build()
       )
       .addFilter(

@@ -54,6 +54,7 @@ export class UkomClassAddComponent {
       jabatan: new FormControl('', Validators.required),
       jenjang: new FormControl('', Validators.required),
       participant_quota: new FormControl('', Validators.required),
+      vid_call_link: new FormControl('', Validators.required),
       exam_start_at: new FormControl('', Validators.required),
       exam_end_at: new FormControl('', Validators.required)
     })
@@ -106,6 +107,8 @@ export class UkomClassAddComponent {
         this.kelasData.jenjang_code = this.kelasForm.get('jenjang')?.value
         this.kelasData.participant_quota =
           this.kelasForm.get('participant_quota')?.value
+        this.kelasData.vid_call_link =
+          this.kelasForm.get('vid_call_link')?.value
         this.kelasData.exam_start_at =
           this.kelasForm.get('exam_start_at')?.value
         this.kelasData.exam_end_at = this.kelasForm.get('exam_end_at')?.value

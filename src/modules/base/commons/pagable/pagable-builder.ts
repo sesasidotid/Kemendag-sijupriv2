@@ -205,12 +205,13 @@ export class ActionColumnBuilder {
     update: 'ri-pencil-line',
     detail: 'ri-eye-line',
     danger: 'ri-delete-bin-line',
-    download: 'ri-download-line'
+    download: 'ri-download-line',
+    navigate: 'ri-external-link-line'
   }
 
   setAction (
     process: Function,
-    color: 'primary' | 'success' | 'info' | 'danger'
+    color: 'primary' | 'success' | 'info' | 'danger' | 'warning'
   ): ActionColumnBuilder {
     this.process = process
     this.color = color
@@ -223,7 +224,7 @@ export class ActionColumnBuilder {
   }
 
   withIcon (
-    icon: 'create' | 'detail' | 'danger' | 'update' | 'download'
+    icon: 'create' | 'detail' | 'danger' | 'update' | 'download' | 'navigate'
   ): ActionColumnBuilder {
     this.icon = this.icons[icon]
     return this

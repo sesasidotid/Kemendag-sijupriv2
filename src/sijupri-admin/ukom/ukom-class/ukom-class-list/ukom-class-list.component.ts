@@ -173,6 +173,7 @@ export class UkomClassListComponent {
       jabatan_code: new FormControl('', Validators.required),
       jenjang_code: new FormControl('', Validators.required),
       participant_quota: new FormControl('', Validators.required),
+      vid_call_link: new FormControl('', Validators.required),
       exam_start_at: new FormControl('', Validators.required),
       exam_end_at: new FormControl('', Validators.required)
     })
@@ -217,6 +218,7 @@ export class UkomClassListComponent {
       jabatan_code: data.jabatanCode || '',
       jenjang_code: data.jenjangCode || '',
       participant_quota: data.participantQuota || '',
+      vid_call_link: data.vidCallLink || '',
       exam_start_at: data.examStartAt || '',
       exam_end_at: data.examEndAt || ''
     })
@@ -250,6 +252,7 @@ export class UkomClassListComponent {
         }
       })
   }
+
   getJenjang (jabatanCode?: string) {
     this.apiService.getData(`/api/v1/jenjang/`).subscribe({
       next: (response: any) => {
@@ -310,6 +313,7 @@ export class UkomClassListComponent {
       jabatan_code: this.editRoomUkomForm.value.jabatan_code,
       jenjang_code: this.editRoomUkomForm.value.jenjang_code,
       participant_quota: this.editRoomUkomForm.value.participant_quota,
+      vid_call_link: this.editRoomUkomForm.value.vid_call_link,
       exam_start_at: this.editRoomUkomForm.value.exam_start_at,
       exam_end_at: this.editRoomUkomForm.value.exam_end_at
     }
@@ -328,7 +332,10 @@ export class UkomClassListComponent {
             this.handleRefreshToggle()
             this.toggleModal()
           },
-          error: error => this.handlerService.handleException(error)
+          error: error => {
+            console.log('error', error)
+            this.handlerService.handleAlert('Error', 'Gagal menambahkan data')
+          }
         })
       }
     })

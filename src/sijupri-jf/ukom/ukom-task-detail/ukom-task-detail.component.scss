@@ -22,15 +22,15 @@
 .total-score-value {
   font-size: 3rem;
   font-weight: bold;
-  padding: 15px 30px;
-  background: #f8f9fa; /* Bootstrap Light Gray */
+  //   padding: 15px 30px;
+  //   background: #f8f9fa; /* Bootstrap Light Gray */
   color: #212529; /* Bootstrap Dark Gray */
-  border-radius: 50px; /* Biar lebih bulat */
-  display: inline-block;
+  //   border-radius: 50px; /* Biar lebih bulat */
+  //   display: inline-block;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .total-score-value:hover {
   transform: scale(1.1);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  //   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }

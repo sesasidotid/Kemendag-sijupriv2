@@ -243,7 +243,11 @@ export class RekapTableComponent {
         cellRendererParams: {
           onClickButtonOne: this.toggleModalPreview.bind(this),
           showFirstButton: (data: RekapData) => {
-            return true
+            return (
+              data.jenisPengembanganKompetensi ==
+                'Seminar/Bimtek/Belajar Mandiri' ||
+              data.jenisPengembanganKompetensi == 'Magang'
+            )
           },
           disabledFirstButton: (data: RekapData) => {
             return data.verified == 'EMPTY'

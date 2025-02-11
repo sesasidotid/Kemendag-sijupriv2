@@ -1,16 +1,23 @@
 .unsur-item {
-    padding: 5px;
+  padding: 5px;
 }
 
 .unsur-item p {
-    font-size: 14px;
-    font-weight: bold;
+  font-size: 14px;
+  font-weight: bold;
 }
 
+// .floating-btn {
+//   position: fixed;
+//   bottom: 60px;
+//   right: 40px;
+//   z-index: 1000;
+// }
+
 .floating-btn {
-    position: fixed;
-    bottom: 60px;
-    right: 40px;
-    z-index: 1000;
-    /* You can add box-shadow or other styling if needed */
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

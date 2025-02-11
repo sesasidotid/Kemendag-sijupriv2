@@ -22,12 +22,7 @@ import { ConfirmationDialogComponent } from '../../../../modules/base/components
 @Component({
   selector: 'app-formasi-dokumen',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    FileHandlerComponent,
-    ConfirmationDialogComponent
-  ],
+  imports: [CommonModule, FormsModule, FileHandlerComponent],
   templateUrl: './formasi-dokumen.component.html',
   styleUrl: './formasi-dokumen.component.scss'
 })
@@ -167,19 +162,25 @@ export class FormasiDokumenComponent {
           .postData(`/api/v1/formasi/task`, this.payload)
           .subscribe({
             next: () => (
-              console.log('payload3', this.payload), window.location.reload()
+              this.handlerService.handleAlert(
+                'Success',
+                'Data Berhasil Disimpan'
+              ),
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
             ),
-            error: error => (
-              this.handlerService.handleException(error),
-              console.log('payload4', this.payload),
-              (this.payload = { formasiDokumenList: [] }),
-              (this.detectedDokumen = {})
-            )
+            error: error => {
+              console.log(error)
+              this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
+              this.payload = { formasiDokumenList: [] }
+              this.detectedDokumen = {}
+            }
           })
       },
       error: error => {
         console.log('error', error)
-        this.handlerService.handleAlert('Error', error.error.message)
+        this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
       }
     })
   }

@@ -1,16 +1,3 @@
-<!-- <div class="container">
-  <p class="warning">
-    Jika Anda yakin menolak, Anda tidak dapat mengikuti ujian dalam waktu satu
-    bulan atau dalam waktu yang sudah ditentukan.
-  </p>
-
-  <div class="d-flex justify-content-center gap-2">
-    <button class="back-button" (click)="cancel()">Batal</button>
-    <button class="reject-button" (click)="reject()">Tolak</button>
-  </div>
-  <p class="key-info">Key: {{ key }}</p>
-</div> -->
-
 <div class="container">
   <h2>Peringatan!</h2>
   <p>
@@ -18,15 +5,10 @@
     dalam waktu yang sudah ditentukan.
   </p>
 
-  <!-- <button (click)="reject()">Tolak</button> -->
   <div class="d-flex justify-content-center gap-2">
     <button class="back-button" (click)="cancel()">Batal</button>
     <button class="reject-button" (click)="reject(key)">Tolak</button>
   </div>
-
-  <!-- <div *ngIf="key" class="key-display">
-    <p>Key: {{ key }}</p>
-  </div> -->
 </div>
 
 <app-confirmation-dialog></app-confirmation-dialog>
