@@ -372,9 +372,20 @@ export class FormasiTaskDetailComponent {
         this.apiService
           .postData(`/api/v1/formasi/task/submit`, this.task)
           .subscribe({
-            next: () => window.location.reload(),
-            error: error =>
+            next: () => {
+              this.handlerService.handleAlert(
+                'Success',
+                'Data berhasil disimpan'
+              )
+
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
+            },
+            error: error => {
+              console.error('Error fetching data', error)
               this.handlerService.handleAlert('Error', 'Gagal mengirim data')
+            }
           })
       }
     })
@@ -407,7 +418,19 @@ export class FormasiTaskDetailComponent {
         this.apiService
           .postData(`/api/v1/formasi/task/submit`, payload)
           .subscribe({
-            next: () => window.location.reload()
+            next: () => {
+              this.handlerService.handleAlert(
+                'Success',
+                'Data berhasil disimpan'
+              )
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
+            },
+            error: error => {
+              console.error('Error fetching data', error)
+              this.handlerService.handleAlert('Error', 'Gagal mengirim data')
+            }
           })
       }
     })
@@ -431,6 +454,10 @@ export class FormasiTaskDetailComponent {
           .postData(`/api/v1/formasi/task/submit`, payload)
           .subscribe({
             next: () => {
+              this.handlerService.handleAlert(
+                'Success',
+                'Data berhasil disimpan'
+              )
               this.router.navigate(['/formasi/formasi-task-list'])
             },
             error: error => {

@@ -40,6 +40,7 @@ export class ProvinsiListComponent {
   provinsi: Provinsi = new Provinsi()
   updateProvinsiData = new Provinsi()
   isModalOpen$ = new BehaviorSubject<boolean>(false)
+  refresh: boolean = false
 
   constructor (private router: Router, private tabService: TabService) {
     this.pagable = new PagableBuilder('/api/v1/provinsi/search')
@@ -47,7 +48,6 @@ export class ProvinsiListComponent {
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((provinsi: any) => {
-            // this.router.navigate([`/${provinsi.nip}`])
             this.toggleModal()
             this.updateProvinsiData = provinsi
           }, 'primary')
@@ -61,6 +61,17 @@ export class ProvinsiListComponent {
           .build()
       )
       .build()
+  }
+
+  toggleModal () {
+    this.isModalOpen$.next(!this.isModalOpen$.value)
+    console.log(';lasd', this.isModalOpen$.value)
+  }
+
+  toggleRefresh () {
+    console.log('refresh')
+    this.toggleModal()
+    this.refresh = !this.refresh
   }
 
   ngOnInit () {
@@ -81,9 +92,7 @@ export class ProvinsiListComponent {
         onClick: () => this.handleTabChange(1)
       })
   }
-  toggleModal () {
-    this.isModalOpen$.next(!this.isModalOpen$.value)
-  }
+
   handleTabChange (tab?: number) {
     this.tab$.next(tab)
     this.tabService.changeTabActive(tab)

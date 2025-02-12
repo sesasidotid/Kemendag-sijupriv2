@@ -1,7 +1,4 @@
-<!-- <app-pagable [pagable]="pagable"></app-pagable> -->
-
 <ng-container *ngIf="(tab$ | async) === 0">
-  <!-- <app-pagable [pagable]="pagable"></app-pagable> -->
   <app-pagable
     [pagable]="pagable$ | async"
     [refresh]="refreshToggle"
@@ -12,11 +9,6 @@
     (changeTabActive)="handleTabChange(0)"
   ></app-ukom-class-add>
 </ng-container>
-<!-- <ng-container *ngIf="(tab$ | async) === 2">
-  <app-ukom-exam-schedule-add
-    (changeTabActive)="handleTabChange(0)"
-  ></app-ukom-exam-schedule-add>
-</ng-container> -->
 
 <app-modal
   *ngIf="isModalOpen$ | async"
@@ -27,7 +19,9 @@
 >
   <form [formGroup]="editRoomUkomForm">
     <div class="mb-3">
-      <label for="name" class="form-label">Nama</label>
+      <label for="name" class="form-label"
+        >Nama<span class="text-danger">*</span></label
+      >
       <input
         type="text"
         class="form-control"
@@ -35,10 +29,23 @@
         required
         formControlName="name"
       />
+      <div
+        class="feedback"
+        *ngIf="
+          editRoomUkomForm.get('name').invalid &&
+          editRoomUkomForm.get('name').touched
+        "
+      >
+        <small *ngIf="editRoomUkomForm.get('name').errors?.['required']"
+          >Nama kelas UKom perlu diisi.</small
+        >
+      </div>
     </div>
 
     <div class="mb-3">
-      <label for="jabatan_code" class="form-label">Jabatan</label>
+      <label for="jabatan_code" class="form-label"
+        >Jabatan<span class="text-danger">*</span></label
+      >
       <select
         class="form-select"
         name="jabatan_code"
@@ -46,7 +53,9 @@
         formControlName="jabatan_code"
         (change)="onJabatanSwitch($event)"
       >
-        <option selected value="" style="display: none">Pilih Jabatan</option>
+        <option selected value="" style="display: none">
+          Pilih Jabatan<span class="text-danger">*</span>
+        </option>
         <option
           *ngFor="let jabatan of jabatanList$ | async"
           [value]="jabatan.code"
@@ -54,10 +63,23 @@
           {{ jabatan.name }}
         </option>
       </select>
+      <div
+        class="feedback"
+        *ngIf="
+          editRoomUkomForm.get('jabatan_code').invalid &&
+          editRoomUkomForm.get('jabatan_code').touched
+        "
+      >
+        <small *ngIf="editRoomUkomForm.get('jabatan_code').errors?.['required']"
+          >Jabatan perlu diisi.</small
+        >
+      </div>
     </div>
 
     <div class="mb-3">
-      <label for="jenjang_code" class="form-label">Jenjang</label>
+      <label for="jenjang_code" class="form-label"
+        >Jenjang<span class="text-danger">*</span></label
+      >
       <select
         class="form-select"
         name="jenjang_code"
@@ -72,10 +94,23 @@
           {{ jenjang.name }}
         </option>
       </select>
+      <div
+        class="feedback"
+        *ngIf="
+          editRoomUkomForm.get('jenjang_code').invalid &&
+          editRoomUkomForm.get('jenjang_code').touched
+        "
+      >
+        <small *ngIf="editRoomUkomForm.get('jenjang_code').errors?.['required']"
+          >Jenjang perlu diisi.</small
+        >
+      </div>
     </div>
 
     <div class="mb-3">
-      <label for="participant_quota" class="form-label">Kuota Peserta</label>
+      <label for="participant_quota" class="form-label"
+        >Kuota Peserta<span class="text-danger">*</span></label
+      >
       <input
         type="text"
         class="form-control"
@@ -83,10 +118,24 @@
         required
         formControlName="participant_quota"
       />
+      <div
+        class="feedback"
+        *ngIf="
+          editRoomUkomForm.get('participant_quota').invalid &&
+          editRoomUkomForm.get('participant_quota').touched
+        "
+      >
+        <small
+          *ngIf="editRoomUkomForm.get('participant_quota').errors?.['required']"
+          >Kuota peserta perlu diisi.</small
+        >
+      </div>
     </div>
 
     <div class="mb-3">
-      <label for="vid_call_link" class="form-label">Link Zoom</label>
+      <label for="vid_call_link" class="form-label"
+        >Link Zoom<span class="text-danger">*</span></label
+      >
       <input
         type="text"
         class="form-control"
@@ -94,10 +143,24 @@
         required
         formControlName="vid_call_link"
       />
+      <div
+        class="feedback"
+        *ngIf="
+          editRoomUkomForm.get('vid_call_link').invalid &&
+          editRoomUkomForm.get('vid_call_link').touched
+        "
+      >
+        <small
+          *ngIf="editRoomUkomForm.get('vid_call_link').errors?.['required']"
+          >Link Zoom perlu diisi.</small
+        >
+      </div>
     </div>
 
     <div class="mb-3">
-      <label for="exam_start_at" class="form-label">Waktu Mulai </label>
+      <label for="exam_start_at" class="form-label"
+        >Waktu Mulai<span class="text-danger">*</span></label
+      >
       <input
         type="datetime-local"
         id="exam_start_at"
@@ -105,10 +168,24 @@
         required
         formControlName="exam_start_at"
       />
+      <div
+        class="feedback"
+        *ngIf="
+          editRoomUkomForm.get('exam_start_at').invalid &&
+          editRoomUkomForm.get('exam_start_at').touched
+        "
+      >
+        <small
+          *ngIf="editRoomUkomForm.get('exam_start_at').errors?.['required']"
+          >Waktu mulai perlu diisi.</small
+        >
+      </div>
     </div>
 
     <div class="mb-3">
-      <label for="exam_end_at" class="form-label">Waktu Mulai </label>
+      <label for="exam_end_at" class="form-label"
+        >Waktu Selesai<span class="text-danger">*</span>
+      </label>
       <input
         type="datetime-local"
         id="exam_end_at"
@@ -116,8 +193,40 @@
         required
         formControlName="exam_end_at"
       />
+      <div
+        class="feedback"
+        *ngIf="
+          editRoomUkomForm.get('exam_end_at').invalid &&
+          editRoomUkomForm.get('exam_end_at').touched
+        "
+      >
+        <small *ngIf="editRoomUkomForm.get('exam_end_at').errors?.['required']"
+          >Waktu selesai perlu diisi.</small
+        >
+      </div>
     </div>
 
-    <button (click)="submit()" class="btn btn-primary w-100">Update</button>
+    <!-- <button (click)="submit()" class="btn btn-primary w-100">Update</button> -->
+    <ng-container *ngIf="submitLoading$ | async; else noLoading">
+      <button class="btn btn-primary w-100" disabled>
+        <div
+          class="spinner-border"
+          style="width: 19px; height: 19px"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </button>
+    </ng-container>
+    <ng-template #noLoading>
+      <button
+        type="button"
+        class="btn btn-primary w-100"
+        [disabled]="editRoomUkomForm.invalid || (submitLoading$ | async)"
+        (click)="submit()"
+      >
+        Simpan
+      </button>
+    </ng-template>
   </form>
 </app-modal>

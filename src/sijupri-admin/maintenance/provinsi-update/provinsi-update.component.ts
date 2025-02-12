@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
@@ -14,6 +14,7 @@ import {
   Validators
 } from '@angular/forms'
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component'
+
 @Component({
   selector: 'app-provinsi-update',
   standalone: true,
@@ -21,8 +22,9 @@ import { MapComponent } from '../../../modules/map-leaflet/components/map/map.co
   templateUrl: './provinsi-update.component.html',
   styleUrl: './provinsi-update.component.scss'
 })
-export class ProvinsiUpdateComponent implements OnInit {
+export class ProvinsiUpdateComponent {
   @Input() id: string
+  @Output() refreshList = new EventEmitter<void>() // Create an event emitter
 
   wilayahList: Wilayah[] = []
   provinsi: Provinsi = new Provinsi()
@@ -114,8 +116,8 @@ export class ProvinsiUpdateComponent implements OnInit {
                   'Success',
                   'Provinsi berhasil diperbarui'
                 )
-                this.updateProvinsiForm.reset()
-                window.location.reload()
+                // this.updateProvinsiForm.reset()
+                this.refreshList.emit()
               },
               error: error => {
                 this.handlerService.handleAlert('Error', error.error.message)

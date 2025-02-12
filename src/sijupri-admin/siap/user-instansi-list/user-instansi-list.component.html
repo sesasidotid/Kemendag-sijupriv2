@@ -1,4 +1,4 @@
-<app-pagable [pagable]="pagable"></app-pagable>
+<app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 
 <app-modal
   *ngIf="isModalOpen$ | async"
@@ -8,5 +8,6 @@
 >
   <app-user-instansi-update
     [userInstansi]="selectedUserInstansi"
+    (refreshList)="toggleRefresh()"
   ></app-user-instansi-update>
 </app-modal>

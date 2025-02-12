@@ -143,9 +143,18 @@ export class UkomQuestionListComponent {
                 'Success',
                 'Berhasil menambahkan pertanyaan'
               )
-              window.location.reload()
+
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
             },
-            error: error => this.handlerService.handleException(error)
+            error: error => {
+              console.log('error', error)
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal menambahkan pertanyaan, pastikan format file benar'
+              )
+            }
           })
       }
     })

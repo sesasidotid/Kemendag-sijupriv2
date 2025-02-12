@@ -86,6 +86,10 @@ export class UkomTaskDetailComponent {
     }
   }
 
+  back () {
+    history.back()
+  }
+
   submit (isReject: boolean) {
     this.confirmationService.open(isReject).subscribe({
       next: result => {
@@ -95,9 +99,6 @@ export class UkomTaskDetailComponent {
         task.id = this.pendingTask.id
         task.remark = result.comment || null
         task.taskAction = isReject ? 'reject' : 'approve'
-
-        // console.log(task.remark)
-        // return
 
         this.body = {
           id: this.pendingTask.id,
@@ -122,9 +123,20 @@ export class UkomTaskDetailComponent {
         this.apiService
           .postData(`/api/v1/participant_ukom/task/submit`, this.body)
           .subscribe({
-            next: () =>
-              this.handlerService.handleNavigate('/ukom/ukom-task-list'),
-            error: error => this.handlerService.handleException(error)
+            next: () => {
+              this.handlerService.handleAlert(
+                'Success',
+                'Berhasil mengirimkan tugas'
+              )
+              this.handlerService.handleNavigate('/ukom/ukom-task-list')
+            },
+            error: error => {
+              console.log(error)
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal mengirimkan tugas'
+              )
+            }
           })
       }
     })

@@ -1,6 +1,7 @@
 <ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable"></app-pagable>
+  <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 </ng-container>
+
 <ng-container *ngIf="(tab$ | async) === 1">
   <app-provinsi-add (changeTabActive)="handleTabChange(0)"></app-provinsi-add>
 </ng-container>
@@ -12,5 +13,8 @@
   [enableFooter]="false"
   [size]="'lg'"
 >
-  <app-provinsi-update [id]="updateProvinsiData.id"></app-provinsi-update>
+  <app-provinsi-update
+    [id]="updateProvinsiData.id"
+    (refreshList)="toggleRefresh()"
+  ></app-provinsi-update>
 </app-modal>

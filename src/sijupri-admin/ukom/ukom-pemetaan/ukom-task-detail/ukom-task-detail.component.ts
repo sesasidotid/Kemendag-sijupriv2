@@ -55,6 +55,11 @@ export class UkomTaskDetailComponent {
         }
       })
   }
+
+  back () {
+    history.back()
+  }
+
   getParticipantUkomDetail () {
     this.ukomDetailLoading$.next(true)
     this.apiService

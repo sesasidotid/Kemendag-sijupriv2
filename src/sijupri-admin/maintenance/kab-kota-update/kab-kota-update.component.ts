@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { Router } from '@angular/router'
@@ -38,6 +38,7 @@ import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
 })
 export class KabKotaUpdateComponent {
   @Input() id: string
+  @Output() refreshList = new EventEmitter<void>()
 
   KabKota: KabKota = new KabKota()
   provinsiList: Provinsi[] = []
@@ -123,10 +124,15 @@ export class KabKotaUpdateComponent {
                 'Kabupaten Kota berhasil diperbarui'
               )
               this.updateKabKotaForm.reset()
-              window.location.reload()
+              //   window.location.reload()
+              this.refreshList.emit()
             },
             error: error => {
-              this.handlerService.handleAlert('Error', error.error.message)
+              console.log(error)
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal memperbarui kabupaten kota'
+              )
             }
           })
         }

@@ -2,7 +2,7 @@
   <form [formGroup]="examinerForm" (ngSubmit)="submit()">
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Nama <span class="text-danger">*</span></label
+        >Nama<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -27,7 +27,7 @@
     </div>
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >NIP <span class="text-danger">*</span></label
+        >NIP<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -52,7 +52,7 @@
     </div>
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Jenis Kelamin <span class="text-danger">*</span></label
+        >Jenis Kelamin<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <select
@@ -82,7 +82,7 @@
 
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Password <span class="text-danger">*</span></label
+        >Password<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -101,7 +101,27 @@
           "
         >
           <small *ngIf="examinerForm.get('password').errors?.['required']"
-            >Kuota peserta perlu diisi.</small
+            >Password perlu diisi.</small
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="confirmPassword" class="col-sm-2 col-form-label fw-bold"
+        >Konfirmasi Password<span class="text-danger">*</span></label
+      >
+      <div class="col-sm-10">
+        <input
+          type="password"
+          class="form-control"
+          id="confirmPassword"
+          required
+          formControlName="confirmPassword"
+        />
+        <div *ngIf="examinerForm.get('confirmPassword')?.hasError('mismatch')">
+          <small class="text-danger">
+            Password dan Konfirmasi Password tidak cocok.</small
           >
         </div>
       </div>

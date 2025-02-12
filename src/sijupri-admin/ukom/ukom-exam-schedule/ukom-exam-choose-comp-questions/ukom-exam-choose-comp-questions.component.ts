@@ -238,6 +238,7 @@ export class UkomExamChooseCompQuestionsComponent {
         }
       })
   }
+
   openModal (kompetensi_id: string) {
     this.getDropDownQuestionList(kompetensi_id)
     this.updateCheckedState()
@@ -260,16 +261,15 @@ export class UkomExamChooseCompQuestionsComponent {
             next: (res: any) => {
               this.handlerService.handleAlert(
                 'Success',
-                'Questions added successfully'
+                'Berhasil menambahkan pertanyaan'
               )
-              this.router.navigate([
-                `/ukom/ukom-room-list/${this.room_ukom_id}`
-              ])
+              this.getListPertanyaan()
             },
             error: (err: any) => {
+              console.error('Error:', err)
               this.handlerService.handleAlert(
                 'Error',
-                'Failed to add questions'
+                'Gagal menambahkan pertanyaan'
               )
             }
           })
@@ -277,7 +277,7 @@ export class UkomExamChooseCompQuestionsComponent {
       },
       error: (err: any) => {
         console.error('Error:', err)
-        this.handlerService.handleAlert('Error', 'Failed to add questions')
+        this.handlerService.handleAlert('Error', 'Gagal menambahkan pertanyaan')
       }
     })
   }

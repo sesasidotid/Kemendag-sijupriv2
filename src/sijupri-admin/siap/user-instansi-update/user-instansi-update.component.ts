@@ -15,7 +15,8 @@ import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 import { InstansiType } from '../../../modules/maintenance/models/instansi-type.model'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
 import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
-
+import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
+import { Output, EventEmitter } from '@angular/core'
 @Component({
   selector: 'app-user-instansi-update',
   standalone: true,
@@ -24,6 +25,8 @@ import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
   styleUrl: './user-instansi-update.component.scss'
 })
 export class UserInstansiUpdateComponent {
+  @Output() refreshList = new EventEmitter<void>() // Create an event emitter
+
   @Input() userInstansi: UserInstansi
   instansiTypeList: InstansiType[]
   instansiList: Instansi[]
@@ -39,7 +42,8 @@ export class UserInstansiUpdateComponent {
 
   constructor (
     private apiService: ApiService,
-    private handlerService: HandlerService
+    private handlerService: HandlerService,
+    private confirmationService: ConfirmationService
   ) {
     this.updateUserInstasi = new FormGroup({
       name: new FormControl('', Validators.required),
@@ -77,9 +81,6 @@ export class UserInstansiUpdateComponent {
             this.getProvinsiList()
           }
 
-          //   if (['IT1', 'IT2'].includes(res.instansiTypeCode)) {
-          //     this.getInstansiList()
-          //   }
           this.getInstansiList()
 
           console.log('z', this.updateUserInstasi.value)
@@ -275,34 +276,44 @@ export class UserInstansiUpdateComponent {
   }
 
   submit () {
-    if (this.updateUserInstasi.valid) {
-      console.log('submit', this.updateUserInstasi.value)
-      const updatedUserInstansi = {
-        // ...this.userInstansi,
-        // ...this.updateUserInstasi.value
-        nip: this.userInstansi.nip,
-        name: this.updateUserInstasi.get('name').value,
-        email: this.updateUserInstasi.get('email').value,
-        instansi_id: this.updateUserInstasi.get('instansi_id').value
-      }
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) {
+          return
+        }
 
-      this.apiService
-        .putData(`/api/v1/user_instansi`, updatedUserInstansi)
-        .subscribe({
-          next: () => {
-            this.handlerService.handleAlert(
-              'Success',
-              'Berhasil mengupdate user instansi'
-            )
-            // this.handlerService.handleNavigate('/siap/user-instansi')
-            setTimeout(() => {
-              window.location.reload()
-            }, 100)
-          },
-          error: error => this.handlerService.handleException(error)
-        })
-    } else {
-      this.handlerService.handleAlert('Error', 'Form tidak valid')
-    }
+        if (this.updateUserInstasi.valid) {
+          console.log('submit', this.updateUserInstasi.value)
+          const updatedUserInstansi = {
+            // ...this.userInstansi,
+            // ...this.updateUserInstasi.value
+            nip: this.userInstansi.nip,
+            name: this.updateUserInstasi.get('name').value,
+            email: this.updateUserInstasi.get('email').value,
+            instansi_id: this.updateUserInstasi.get('instansi_id').value
+          }
+
+          this.apiService
+            .putData(`/api/v1/user_instansi`, updatedUserInstansi)
+            .subscribe({
+              next: () => {
+                this.handlerService.handleAlert(
+                  'Success',
+                  'Berhasil mengupdate user instansi'
+                )
+                this.refreshList.emit()
+
+                // this.handlerService.handleNavigate('/siap/user-instansi')
+                // setTimeout(() => {
+                //   window.location.reload()
+                // }, 100)
+              },
+              error: error => this.handlerService.handleException(error)
+            })
+        } else {
+          this.handlerService.handleAlert('Error', 'Form tidak valid')
+        }
+      }
+    })
   }
 }

@@ -46,6 +46,7 @@ export class UkomExaminerListComponent {
 
   isModalOpen$ = new BehaviorSubject<boolean>(false)
   editExaminerForm: FormGroup
+  isLoading$ = new BehaviorSubject<boolean>(false)
 
   constructor (
     private tabService: TabService,
@@ -153,6 +154,7 @@ export class UkomExaminerListComponent {
       next: result => {
         if (!result.confirmed) return
 
+        this.isLoading$.next(true)
         this.apiService.putData('/api/v1/examiner_ukom', payload).subscribe({
           next: response => {
             this.handlerService.handleAlert(
@@ -161,11 +163,16 @@ export class UkomExaminerListComponent {
             )
             this.handleRefreshToggle()
             this.toggleModal()
-            setTimeout(() => {
-              window.location.reload()
-            }, 1000)
+            this.isLoading$.next(false)
+            // setTimeout(() => {
+            //   window.location.reload()
+            // }, 1000)
           },
-          error: error => this.handlerService.handleException(error)
+          error: error => {
+            console.log('error', error)
+            this.isLoading$.next(false)
+            this.handlerService.handleAlert('Error', 'Gagal mengubah data')
+          }
         })
       }
     })

@@ -18,7 +18,9 @@
             >
           </div>
           <div class="row mb-3">
-            <label class="col-sm-2 col-form-label fw-bold">Waktu Mulai *</label>
+            <label class="col-sm-2 col-form-label fw-bold"
+              >Waktu Mulai<span class="text-danger">*</span></label
+            >
             <div class="col-sm-10">
               <input
                 type="datetime-local"
@@ -29,7 +31,7 @@
           </div>
           <div class="row mb-3">
             <label class="col-sm-2 col-form-label fw-bold"
-              >Waktu Selesai *</label
+              >Waktu Selesai<span class="text-danger">*</span></label
             >
             <div class="col-sm-10">
               <input
@@ -40,7 +42,9 @@
             </div>
           </div>
           <div class="row mb-3">
-            <label class="col-sm-2 col-form-label fw-bold">Jenis UKom *</label>
+            <label class="col-sm-2 col-form-label fw-bold"
+              >Jenis UKom<span class="text-danger">*</span></label
+            >
             <div class="col-sm-10">
               <select formControlName="exam_type_code" class="form-select">
                 <option
@@ -53,31 +57,9 @@
             </div>
           </div>
         </div>
-        <!-- <div class="row">
-            <div class="col-sm-12 text-end">
-              <button
-                type="button"
-                class="btn btn-danger btn-sm"
-                (click)="removeSchedule(i)"
-              >
-                Hapus Jadwal
-              </button>
-            </div>
-          </div> -->
       </div>
     </div>
-    <!-- <div class="row mb-3">
-      <div class="col-sm-12 text-center">
-        <button
-          type="button"
-          class="btn btn-success"
-          *ngIf="(jenisUkomList$ | async)?.length > schedules.length"
-          (click)="addSchedule()"
-        >
-          Tambah Jadwal
-        </button>
-      </div>
-    </div> -->
+
     <div class="row text-center">
       <div class="col-12">
         <ng-container *ngIf="submitLoading$ | async; else noLoading">

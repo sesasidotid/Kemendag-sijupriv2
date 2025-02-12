@@ -1,5 +1,5 @@
 <ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable"></app-pagable>
+  <app-pagable [pagable]="pagable" [refresh]="refreshToggle"></app-pagable>
 </ng-container>
 
 <ng-container *ngIf="(tab$ | async) === 1">
@@ -16,7 +16,9 @@
 >
   <form [formGroup]="editExaminerForm">
     <div class="mb-3">
-      <label for="name" class="form-label">Nama</label>
+      <label for="name" class="form-label"
+        >Nama<span class="text-danger">*</span></label
+      >
       <input
         type="text"
         class="form-control"
@@ -24,45 +26,67 @@
         required
         formControlName="name"
       />
-    </div>
-    <!-- <div class="mb-3">
-      <label for="nip" class="form-label">NIP</label>
-      <input
-        type="text"
-        class="form-control"
-        id="nip"
-        required
-        formControlName="nip"
-      />
-    </div> -->
-    <div class="mb-3">
-      <label for="jenis_kelamin_code" class="form-label">Jenis Kelamin</label>
-      <div class="option-wrapper">
-        <input
-          formControlName="jenis_kelamin_code"
-          type="radio"
-          name="jenis_kelamin_code"
-          id="jenisKelaminM"
-          value="M"
-          class="option-input"
-          required
-          [defaultChecked]="true"
-        />
-        <label for="jenisKelaminM" class="option-label">Laki-Laki</label>
-
-        <input
-          formControlName="jenis_kelamin_code"
-          type="radio"
-          name="jenis_kelamin_code"
-          id="jenisKelaminF"
-          value="F"
-          class="option-input"
-          required
-        />
-        <label for="jenisKelaminF" class="option-label">Perempuan</label>
+      <div
+        class="feedback"
+        *ngIf="
+          editExaminerForm.get('name').invalid &&
+          editExaminerForm.get('name').touched
+        "
+      >
+        <small *ngIf="editExaminerForm.get('name').errors?.['required']"
+          >Nama tempat UKom perlu diisi.</small
+        >
       </div>
     </div>
 
-    <button (click)="submit()" class="btn btn-primary w-100">Update</button>
+    <div class="mb-3">
+      <label for="jenis_kelamin_code" class="form-label"
+        >Jenis Kelamin<span class="text-danger">*</span></label
+      >
+      <select
+        id="jenis_kelamin_code"
+        class="form-select"
+        name="jenis_kelamin_code"
+        formControlName="jenis_kelamin_code"
+      >
+        <option [value]="'F'">Wanita</option>
+        <option [value]="'M'">Pria</option>
+      </select>
+      <div
+        class="feedback"
+        *ngIf="
+          editExaminerForm.get('jenis_kelamin_code').invalid &&
+          editExaminerForm.get('jenis_kelamin_code').touched
+        "
+      >
+        <small
+          *ngIf="editExaminerForm.get('jenis_kelamin_code').errors?.['required']"
+          >Jenis kelamin perlu diisi.</small
+        >
+      </div>
+    </div>
+
+    <!-- <button (click)="submit()" class="btn btn-primary w-100">Update</button> -->
+    <ng-container *ngIf="isLoading$ | async; else noLoading">
+      <button class="btn btn-primary w-100" disabled>
+        <div
+          class="spinner-border"
+          style="width: 19px; height: 19px"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </button>
+    </ng-container>
+    <ng-template #noLoading>
+      <button
+        type="button"
+        (click)="submit()"
+        class="btn btn-primary w-100"
+        [disabled]="editExaminerForm.invalid || (isLoading$ | async)"
+      >
+        Simpan
+      </button>
+    </ng-template>
   </form></app-modal
 >

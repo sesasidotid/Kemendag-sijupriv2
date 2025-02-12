@@ -76,38 +76,42 @@ export class JfAkpListComponent {
             .withIcon('detail')
             .build()
         )
-        .addActionColumn(
-          new ActionColumnBuilder()
-            .setAction(
-              (akp: any) =>
-                this.confirmationService.open(false).subscribe({
-                  next: (result: any) => {
-                    if (result) {
-                      if (!result.confirmed) return
+        // .addActionColumn(
+        //   new ActionColumnBuilder()
+        //     .setAction(
+        //       (akp: any) =>
+        //         this.confirmationService.open(false).subscribe({
+        //           next: (result: any) => {
+        //             if (result) {
+        //               if (!result.confirmed) return
 
-                      this.apiService
-                        .deleteData(`/api/v1/akp/${akp.id}`)
-                        .subscribe({
-                          next: (response: any) => {
-                            this.handlerService.handleAlert(
-                              'Success',
-                              'Data berhasil dihapus'
-                            )
+        //               this.apiService
+        //                 .deleteData(`/api/v1/akp/${akp.id}`)
+        //                 .subscribe({
+        //                   next: (response: any) => {
+        //                     this.handlerService.handleAlert(
+        //                       'Success',
+        //                       'Data berhasil dihapus'
+        //                     )
 
-                            this.refreshPagableData()
-                          },
-                          error: (err: any) => {
-                            this.handlerService.handleAlert('Error', err.error)
-                          }
-                        })
-                    }
-                  }
-                }),
-              'danger'
-            )
-            .withIcon('danger')
-            .build()
-        )
+        //                     this.refreshPagableData()
+        //                   },
+        //                   error: (err: any) => {
+        //                     console.log(err)
+        //                     this.handlerService.handleAlert(
+        //                       'Error',
+        //                       'Gagal menghapus data, coba lagi lain kali'
+        //                     )
+        //                   }
+        //                 })
+        //             }
+        //           }
+        //         }),
+        //       'danger'
+        //     )
+        //     .withIcon('danger')
+        //     .build()
+        // )
         .addFilter(
           new PageFilterBuilder('equal')
             .setProperty('nip')

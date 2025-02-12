@@ -3,6 +3,7 @@ import { Serializable } from '../../base/commons/serializable'
 export class ExaminerUkom extends Serializable {
   id: string = undefined
   jenisKelaminCode: string = undefined
+  jenis_kelamin_code: string = undefined
   updatedBy: any = undefined
   lastUpdated: string = undefined
   version: number = undefined

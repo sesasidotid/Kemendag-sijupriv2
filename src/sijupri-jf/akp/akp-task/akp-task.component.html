@@ -105,8 +105,16 @@
               silahkan tekan tombol lanjutkan.
             </div>
             <div class="hstack gap-2 justify-content-end">
-              <a class="btn btn-soft-danger" (click)="reqChange()">Batal</a>
-              <a class="btn btn-primary" (click)="saveAKPTask()">Lanjutkan</a>
+              <button class="btn btn-soft-danger" (click)="reqChange()">
+                Batal
+              </button>
+              <button
+                [disabled]="isAnyFieldEmpty()"
+                class="btn btn-primary"
+                (click)="saveAKPTask()"
+              >
+                Lanjutkan
+              </button>
             </div>
           </div>
         </div>

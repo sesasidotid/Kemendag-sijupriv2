@@ -34,7 +34,7 @@ import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 })
 export class UserInstansiListComponent {
   pagable: Pagable
-
+  refresh: boolean = false
   isModalOpen$ = new BehaviorSubject<boolean>(false)
   selectedUserInstansi: UserInstansi = new UserInstansi()
   detailInstansi: Instansi = new Instansi()
@@ -100,6 +100,11 @@ export class UserInstansiListComponent {
       .build()
   }
 
+  toggleRefresh () {
+    this.refresh = !this.refresh
+    this.toggleModal()
+  }
+
   ngOnInit () {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()
@@ -139,9 +144,10 @@ export class UserInstansiListComponent {
                 'Success',
                 'Berhasil menghapus user instansi.'
               )
-              setTimeout(() => {
-                window.location.reload()
-              }, 100)
+              //   setTimeout(() => {
+              //     window.location.reload()
+              //   }, 100)
+              this.refresh = !this.refresh
             },
             error: error => {
               console.log('error', error)

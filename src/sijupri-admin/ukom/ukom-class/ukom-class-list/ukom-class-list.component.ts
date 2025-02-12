@@ -60,6 +60,7 @@ export class UkomClassListComponent {
   isModalOpen$ = new BehaviorSubject<boolean>(false)
 
   editRoomUkomForm: FormGroup
+  submitLoading$ = new BehaviorSubject<boolean>(false)
 
   constructor (
     private tabService: TabService,
@@ -178,6 +179,7 @@ export class UkomClassListComponent {
       exam_end_at: new FormControl('', Validators.required)
     })
   }
+
   refreshPagableData () {
     const currentPagable = this.pagable$.value
 
@@ -322,19 +324,19 @@ export class UkomClassListComponent {
     this.confirmationService.open(false).subscribe({
       next: result => {
         if (!result.confirmed) return
+        this.submitLoading$.next(true)
 
         this.apiService.putData('/api/v1/room_ukom', payload).subscribe({
           next: response => {
-            this.handlerService.handleAlert(
-              'Success',
-              'Berhasil menambahkan data'
-            )
+            this.handlerService.handleAlert('Success', 'Berhasil mengubah data')
             this.handleRefreshToggle()
             this.toggleModal()
+            this.submitLoading$.next(false)
           },
           error: error => {
             console.log('error', error)
-            this.handlerService.handleAlert('Error', 'Gagal menambahkan data')
+            this.handlerService.handleAlert('Error', 'Gagal mengubah data')
+            this.submitLoading$.next(false)
           }
         })
       }

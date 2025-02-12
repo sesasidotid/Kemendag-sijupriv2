@@ -1,6 +1,8 @@
 <form (submit)="submit()" #userForm="ngForm">
   <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold">NIP</label>
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >NIP<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <input
         type="text"
@@ -10,23 +12,39 @@
         required
         minlength="18"
         maxlength="18"
+        #nip="ngModel"
+        id="nip"
       />
+      <div class="feedback" *ngIf="nip.touched && nip.invalid">
+        <small class="text-danger">NIP harus terdiri dari 18 karakter. </small>
+      </div>
     </div>
   </div>
+
   <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold">Nama</label>
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Nama<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <input
         type="text"
         class="form-control"
         [(ngModel)]="userInstansi.name"
         name="name"
+        id="name"
+        #name="ngModel"
         required
       />
+      <div class="feedback" *ngIf="name.touched && name.invalid">
+        <small class="text-danger">Nama harus diisi. </small>
+      </div>
     </div>
   </div>
+
   <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold">Email</label>
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Email<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <input
         type="email"
@@ -34,11 +52,18 @@
         [(ngModel)]="userInstansi.email"
         name="email"
         required
+        #email="ngModel"
+        id="email"
       />
+      <div class="feedback" *ngIf="email.touched && email.invalid">
+        <small class="text-danger">Email harus diisi dan valid.</small>
+      </div>
     </div>
   </div>
   <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold">Password</label>
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Password<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <input
         type="password"
@@ -46,11 +71,51 @@
         [(ngModel)]="userInstansi.password"
         name="password"
         required
+        #password="ngModel"
+        id="password"
       />
+      <div class="feedback" *ngIf="password.touched && password.invalid">
+        <small class="text-danger">Password harus diisi. </small>
+      </div>
     </div>
   </div>
+
   <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold">Operasional</label>
+    <label class="col-sm-2 col-form-label fw-bold"
+      >Konfirmasi Password<span class="text-danger">*</span></label
+    >
+    <div class="col-sm-10">
+      <input
+        type="password"
+        class="form-control"
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+        required
+        #confirmPass="ngModel"
+      />
+      <div class="feedback">
+        <small
+          class="text-danger"
+          *ngIf="confirmPass.touched && confirmPass.invalid"
+        >
+          Konfirmasi password harus diisi.
+        </small>
+        <small
+          class="text-danger"
+          *ngIf="
+            confirmPass.touched && confirmPassword !== userInstansi.password
+          "
+        >
+          Konfirmasi password tidak cocok.
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Operasional<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <select
         id="inputState"
@@ -74,7 +139,9 @@
     (change)="onProvinsiChange()"
     class="row mb-3"
   >
-    <label for="" class="col-sm-2 col-form-label fw-bold">Provinsi</label>
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Provinsi<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <select
         id="inputState"
@@ -94,7 +161,9 @@
     (change)="onKabKotaChange()"
     class="row mb-3"
   >
-    <label for="" class="col-sm-2 col-form-label fw-bold">Kabupaten</label>
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Kabupaten<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <select
         id="inputState"
@@ -114,7 +183,9 @@
     (change)="onKabKotaChange()"
     class="row mb-3"
   >
-    <label for="" class="col-sm-2 col-form-label fw-bold">Kota</label>
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Kota<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <select
         id="inputState"
@@ -139,7 +210,9 @@
     "
     class="row mb-3"
   >
-    <label for="" class="col-sm-2 col-form-label fw-bold">Instansi</label>
+    <label for="" class="col-sm-2 col-form-label fw-bold"
+      >Instansi<span class="text-danger">*</span></label
+    >
     <div class="col-sm-10">
       <select
         id="inputState"
@@ -160,7 +233,7 @@
       <button
         type="submit"
         class="btn btn-success float-end"
-        [disabled]="!userForm.valid"
+        [disabled]="!userForm.valid || !isLoading"
       >
         Simpan
       </button>

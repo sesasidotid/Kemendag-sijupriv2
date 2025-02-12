@@ -45,8 +45,25 @@ export class UkomExaminerAddComponent {
       name: new FormControl('', Validators.required),
       nip: new FormControl('', Validators.required),
       jenis_kelamin_code: new FormControl('', Validators.required),
-      password: new FormControl('', Validators.required)
+      password: new FormControl('', [Validators.required]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        this.passwordMatchValidator.bind(this)
+      ])
     })
+  }
+
+  passwordMatchValidator (
+    control: FormControl
+  ): { [key: string]: boolean } | null {
+    if (this.examinerForm) {
+      const password = this.examinerForm.get('password')?.value
+      const confirmPassword = control.value
+      if (password !== confirmPassword) {
+        return { mismatch: true }
+      }
+    }
+    return null
   }
 
   submit () {
@@ -56,7 +73,7 @@ export class UkomExaminerAddComponent {
 
         this.examinerData.name = this.examinerForm.get('name').value
         this.examinerData.nip = this.examinerForm.get('nip').value
-        this.examinerData.jenisKelaminCode =
+        this.examinerData.jenis_kelamin_code =
           this.examinerForm.get('jenis_kelamin_code').value
         this.examinerData.password = this.examinerForm.get('password').value
 
@@ -70,7 +87,8 @@ export class UkomExaminerAddComponent {
                 'Success',
                 'Data berhasil disimpan'
               )
-              this.router.navigate(['/ukom/ukom-examiner-list'])
+              //   this.router.navigate(['/ukom/ukom-examiner-list'])
+              this.changeTabActive.emit(0)
             },
             error: () => {
               this.handlerService.handleAlert('Error', 'Data gagal disimpan')

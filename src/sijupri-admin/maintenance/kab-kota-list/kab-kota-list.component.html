@@ -1,5 +1,5 @@
 <ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable"></app-pagable>
+  <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 </ng-container>
 <ng-container *ngIf="(tab$ | async) === 1">
   <app-kab-kota-add (changeTabActive)="handleTabChange(0)"></app-kab-kota-add>
@@ -11,5 +11,8 @@
   [enableFooter]="false"
   [size]="'lg'"
 >
-  <app-kab-kota-update [id]="updateKabKotaData.id"></app-kab-kota-update>
+  <app-kab-kota-update
+    [id]="updateKabKotaData.id"
+    (refreshList)="toggleRefresh()"
+  ></app-kab-kota-update>
 </app-modal>

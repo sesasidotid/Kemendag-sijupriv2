@@ -102,7 +102,8 @@ export class KabKotaAddComponent {
               )
               this.addKabKotaForm.reset()
               this.kabkota = new KabKota()
-              window.location.reload()
+              //   window.location.reload()
+              this.changeTabActive.emit(0)
             },
             error: error => {
               this.handlerService.handleAlert('Error', error.error.message)

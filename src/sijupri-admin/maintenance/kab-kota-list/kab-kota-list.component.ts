@@ -37,6 +37,8 @@ export class KabKotaListComponent {
   isModalOpen$ = new BehaviorSubject<boolean>(false)
   updateKabKotaData = new KabKota()
 
+  refresh: boolean = false
+
   constructor (private router: Router, private tabService: TabService) {
     this.pagable = new PagableBuilder('/api/v1/kab_kota/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
@@ -79,6 +81,10 @@ export class KabKotaListComponent {
       .build()
   }
 
+  toggleRefresh () {
+    this.refresh = !this.refresh
+    this.isModalOpen$.next(false)
+  }
   ngOnInit () {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()

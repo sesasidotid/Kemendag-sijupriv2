@@ -30,6 +30,8 @@ import {
 })
 export class AkpVerifikasiPelatihanComponent {
   tab$ = new BehaviorSubject<number | null>(0)
+  isLoading$ = new BehaviorSubject<boolean>(false)
+
   fileValidasiNilai: FormGroup
 
   payload: {
@@ -91,6 +93,7 @@ export class AkpVerifikasiPelatihanComponent {
       next: result => {
         if (!result.confirmed) return
 
+        this.isLoading$.next(true)
         this.apiService
           .postData(
             '/api/v1/akp_pelatihan_teknis/validate/pelatihan',
@@ -102,9 +105,14 @@ export class AkpVerifikasiPelatihanComponent {
                 'Success',
                 'Berhasil mengunggah nilai'
               )
-              window.location.reload()
+              this.payload.file_dokumen_verifikasi = undefined
+              this.isLoading$.next(false)
             },
-            error: error => this.handlerService.handleException(error)
+            error: error => {
+              console.log('error', error)
+              this.handlerService.handleAlert('Error', 'Gagal mengunggah nilai')
+              this.isLoading$.next(false)
+            }
           })
       }
     })

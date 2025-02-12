@@ -87,7 +87,14 @@ export class UnitKerjaUpdateComponent {
       .subscribe({
         next: (instansi: Instansi) => {
           this.instansi = instansi
-          this.getUnitKerjaProvinsiDetail()
+          if (
+            this.instansi.instansiTypeCode !== 'IT1' &&
+            this.instansi.instansiTypeCode !== 'IT2'
+          ) {
+            this.getUnitKerjaProvinsiDetail()
+          } else {
+            this.getWilayahList()
+          }
         },
         error: error => {
           this.handlerService.handleAlert('Error', error.error.message)
@@ -108,18 +115,34 @@ export class UnitKerjaUpdateComponent {
         }
       })
   }
+
   getWilayahList (): void {
     this.apiService.getData(`/api/v1/wilayah`).subscribe({
       next: (wilayahList: Wilayah[]) => {
         // this.wilayahList = wilayahList
-        wilayahList.forEach(wilayah => {
-          if (
-            ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
-            wilayah.code == this.provinsi.wilayahCode
-          ) {
-            this.wilayahList.push(wilayah)
-          }
-        })
+        // wilayahList.forEach(wilayah => {
+        //   if (
+        //     ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
+        //     wilayah.code == this.provinsi.wilayahCode
+        //   ) {
+        //     this.wilayahList.push(wilayah)
+        //   }
+        // })
+        if (this.provinsi.id) {
+          console.log('provinsi called', this.provinsi)
+          wilayahList.forEach(wilayah => {
+            if (
+              ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
+              wilayah.code == this.provinsi.wilayahCode
+            ) {
+              this.wilayahList.push(wilayah)
+            }
+          })
+        } else {
+          console.log('not provinsi called')
+
+          this.wilayahList = wilayahList
+        }
       },
       error: error => {
         this.handlerService.handleAlert('Error', error.error.message)

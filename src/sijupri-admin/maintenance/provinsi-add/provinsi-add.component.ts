@@ -104,10 +104,13 @@ export class ProvinsiAddComponent {
                 )
                 this.addProvinsiForm.reset()
                 this.provinsi = new Provinsi()
-                window.location.reload()
+                this.changeTabActive.emit(0)
               },
               error: error => {
-                this.handlerService.handleAlert('Error', error.error.message)
+                this.handlerService.handleAlert(
+                  'Error',
+                  'Gagal menambahkan provinsi'
+                )
                 console.log(error)
               }
             })

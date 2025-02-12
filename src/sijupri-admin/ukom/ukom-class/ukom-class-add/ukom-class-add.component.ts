@@ -117,16 +117,23 @@ export class UkomClassAddComponent {
           .postData(`/api/v1/room_ukom`, this.kelasData)
           .subscribe({
             next: (response: any) => {
-              this.router.navigate(['/ukom/ukom-room-list'])
+              this.submitLoading$.next(false)
+              this.handlerService.handleAlert(
+                'Success',
+                'Berhasil menambahkan data kelas'
+              )
               this.changeTabActive.emit(0)
             },
             error: error => {
               this.submitLoading$.next(false)
-              this.handlerService.handleException(error)
+              console.log(error)
+              this.handlerService.handleAlert(
+                'Info',
+                'Gagal menambahkan data kelas'
+              )
             },
             complete: () => {
               this.submitLoading$.next(false)
-              this.router.navigate(['/ukom/ukom-room-list'])
             }
           })
       }

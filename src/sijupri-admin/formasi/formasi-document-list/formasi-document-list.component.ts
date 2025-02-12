@@ -25,6 +25,7 @@ export class FormasiDocumentListComponent {
   dokumenPersyaratan: DokumenPersyaratan = new DokumenPersyaratan()
   dokumenPersyaratanList: DokumenPersyaratan[] = []
   pagable: Pagable
+  refresh: boolean = false
 
   constructor (
     private apiService: ApiService,
@@ -76,13 +77,15 @@ export class FormasiDocumentListComponent {
           .postData(`/api/v1/doc_persyaratan`, this.dokumenPersyaratan)
           .subscribe({
             next: () => {
-              //   this.getDokumentPersyaratanList()
-              window.location.reload()
+              this.handlerService.handleAlert(
+                'Success',
+                'Data berhasil disimpan'
+              )
+              this.refresh = !this.refresh
             },
             error: error => {
               console.error('Error fetching data', error)
-              this.alertService.showToast('Error', error.message)
-              throw error
+              this.alertService.showToast('Error', 'Gagal menyimpan data')
             }
           })
       }
@@ -96,13 +99,12 @@ export class FormasiDocumentListComponent {
 
         this.apiService.deleteData(`/api/v1/doc_persyaratan/${id}`).subscribe({
           next: () => {
-            window.location.reload()
-            // this.getDokumentPersyaratanList()
+            this.handlerService.handleAlert('Success', 'Data berhasil dihapus')
+            this.refresh = !this.refresh
           },
           error: error => {
             console.error('Error fetching data', error)
-            this.alertService.showToast('Error', error.message)
-            throw error
+            this.alertService.showToast('Error', 'Gagal menghapus data')
           }
         })
       }

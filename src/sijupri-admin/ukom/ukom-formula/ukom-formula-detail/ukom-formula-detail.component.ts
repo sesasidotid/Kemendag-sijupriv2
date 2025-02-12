@@ -83,6 +83,10 @@ export class UkomFormulaDetailComponent {
     })
   }
 
+  back () {
+    history.back()
+  }
+
   getDetailFormula () {
     this.FormulaDetailLoading$.next(true)
     this.apiService.getData(`/api/v1/ukom_formula/${this.id}`).subscribe({
@@ -93,14 +97,14 @@ export class UkomFormulaDetailComponent {
           map(jabatanList =>
             jabatanList.find(j => j.code === this.FormulaDetail.jabatanCode)
           ),
-          startWith(undefined) // Ensures the async pipe can handle undefined
+          startWith(undefined)
         )
 
         this.filteredJenjang$ = this.jenjangList$.pipe(
           map(jenjangList =>
             jenjangList.find(j => j.code === this.FormulaDetail.jenjangCode)
           ),
-          startWith(undefined) // Ensures the async pipe can handle undefined
+          startWith(undefined)
         )
       },
       error: err => {

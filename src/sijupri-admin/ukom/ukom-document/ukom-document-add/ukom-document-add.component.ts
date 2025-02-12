@@ -51,6 +51,7 @@ export class UkomDocumentAddComponent {
       jenisUkom: new FormControl('', Validators.required)
     })
   }
+
   submit () {
     this.confirmationService.open(false).subscribe({
       next: result => {
@@ -75,11 +76,11 @@ export class UkomDocumentAddComponent {
                 'Success',
                 'Data berhasil disimpan'
               )
-              //   this.router.navigate(['/ukom/ukom-document-list'])
               this.changeTabActive.emit(0)
             },
             error: error => {
-              this.handlerService.handleAlert('Error', error.error.message)
+              console.error(error.error.message)
+              this.handlerService.handleAlert('Error', 'Gagal menyimpan data')
             },
             complete: () => {
               this.submitLoading$.next(false)

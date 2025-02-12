@@ -12,6 +12,7 @@ import { TabService } from '../../../modules/base/services/tab.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
+import { BehaviorSubject } from 'rxjs'
 @Component({
   selector: 'app-user-instansi-add',
   standalone: true,
@@ -29,6 +30,8 @@ export class UserInstansiAddComponent {
   provinsiId: number = null
   kabupatenId: number = null
   kotaId: number = null
+  confirmPassword: string = null
+  isLoading: BehaviorSubject<boolean> = new BehaviorSubject(false)
 
   constructor (
     private apiService: ApiService,
@@ -185,12 +188,20 @@ export class UserInstansiAddComponent {
           return
         }
 
+        this.isLoading.next(true)
         this.userInstansiService.save(this.userInstansi).subscribe({
           next: () => {
-            this.handlerService.handleAlert('Success', 'Berhasil')
+            this.isLoading.next(false)
+
+            this.handlerService.handleAlert(
+              'Success',
+              'Berhasil menambah user instansi'
+            )
             this.handlerService.handleNavigate('/siap/user-instansi')
           },
           error: error => {
+            this.isLoading.next(false)
+
             this.handlerService.handleAlert(
               'Error',
               'Gagal membuat user instasi'

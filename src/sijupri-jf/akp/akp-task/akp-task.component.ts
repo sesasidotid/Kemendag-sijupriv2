@@ -159,6 +159,21 @@ export class AkpTaskComponent {
     })
   }
 
+  isAnyFieldEmpty (): boolean {
+    return (
+      !this.jf?.name ||
+      !this.jf?.phone ||
+      !this.jf?.email ||
+      !this.jf?.tempatLahir ||
+      !this.jf?.tanggalLahir ||
+      !this.jf?.jenisKelaminName ||
+      !this.jf?.nik ||
+      !this.jf?.jabatanName ||
+      !this.jf?.jenjangName ||
+      !this.jf?.pangkatName
+    )
+  }
+
   groupAndSortTasksByFlowId (tasks: any[]): { [key: string]: any[] } {
     const grouped = tasks.reduce((acc, task) => {
       // Initialize array for each flowId if it doesn't exist

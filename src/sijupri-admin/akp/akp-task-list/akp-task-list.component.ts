@@ -201,6 +201,7 @@ export class AKPTaskComponent {
                   'Gagal menerima pengajuan AKP.'
                 )
                 this.toggleModal()
+                this.submitButtonLoading$.next(false)
               },
               complete: () => {
                 this.submitButtonLoading$.next(false)
@@ -232,6 +233,7 @@ export class AKPTaskComponent {
                   'Gagal menolak pengajuan AKP.'
                 )
                 this.toggleModal()
+                this.submitButtonLoading$.next(false)
               },
               complete: () => {
                 this.submitButtonLoading$.next(false)

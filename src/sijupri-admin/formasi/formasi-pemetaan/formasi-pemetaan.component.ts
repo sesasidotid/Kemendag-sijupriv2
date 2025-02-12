@@ -270,6 +270,7 @@ export class FormasiPemetaanComponent {
   getInstansiDetail (instansiId: string): Observable<any> {
     return this.apiService.getData(`/api/v1/instansi/${instansiId}`)
   }
+  
   addUnitKerjaMarkers (): void {
     this.unitKerjaData.forEach(unitkerja => {
       const marker = L.marker([unitkerja.latitude, unitkerja.longitude], {
