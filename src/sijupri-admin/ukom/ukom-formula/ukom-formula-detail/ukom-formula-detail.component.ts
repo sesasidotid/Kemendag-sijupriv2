@@ -8,6 +8,7 @@ import { Observable, BehaviorSubject } from 'rxjs'
 import { FormulaDetail } from '../../../../modules/ukom/models/formula-detail'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { map } from 'rxjs/operators'
+import { startWith } from 'rxjs/operators'
 
 @Component({
   selector: 'app-ukom-formula-detail',
@@ -91,13 +92,15 @@ export class UkomFormulaDetailComponent {
         this.filteredJabatan$ = this.jabatanList$.pipe(
           map(jabatanList =>
             jabatanList.find(j => j.code === this.FormulaDetail.jabatanCode)
-          )
+          ),
+          startWith(undefined) // Ensures the async pipe can handle undefined
         )
 
         this.filteredJenjang$ = this.jenjangList$.pipe(
           map(jenjangList =>
             jenjangList.find(j => j.code === this.FormulaDetail.jenjangCode)
-          )
+          ),
+          startWith(undefined) // Ensures the async pipe can handle undefined
         )
       },
       error: err => {

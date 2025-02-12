@@ -85,6 +85,9 @@ export class ProfileComponent {
             'Success',
             'Berhasil memperbarui data user instasi!'
           )
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
         },
         error: () =>
           this.alertService.showToast(

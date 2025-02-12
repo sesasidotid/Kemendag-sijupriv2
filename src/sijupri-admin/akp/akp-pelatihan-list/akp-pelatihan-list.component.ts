@@ -83,10 +83,17 @@ export class AkpPelatihanListComponent {
       )
       .addFilter(
         new PageFilterBuilder('like')
+          .setProperty('code')
+          .withField('Kode Pelatihan', 'text')
+          .build()
+      )
+      .addFilter(
+        new PageFilterBuilder('like')
           .setProperty('name')
           .withField('Nama Pelatihan', 'text')
           .build()
       )
+
       .build()
 
     this.form = new FormGroup({

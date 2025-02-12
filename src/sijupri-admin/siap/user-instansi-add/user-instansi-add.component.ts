@@ -1,3 +1,4 @@
+import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { CommonModule } from '@angular/common'
@@ -11,7 +12,6 @@ import { TabService } from '../../../modules/base/services/tab.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
-
 @Component({
   selector: 'app-user-instansi-add',
   standalone: true,
@@ -34,7 +34,8 @@ export class UserInstansiAddComponent {
     private apiService: ApiService,
     private userInstansiService: UserInstansiService,
     private tabService: TabService,
-    private handlerService: HandlerService
+    private handlerService: HandlerService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit () {
@@ -178,14 +179,25 @@ export class UserInstansiAddComponent {
   }
 
   submit () {
-    this.userInstansiService.save(this.userInstansi).subscribe({
-      next: () => {
-        this.handlerService.handleAlert('Success', 'Berhasil')
-        this.handlerService.handleNavigate('/siap/user-instansi')
-      },
-      error: error => {
-        this.handlerService.handleAlert('Error', 'Gagal membuat user instasi'),
-          console.log(error)
+    this.confirmationService.open().subscribe({
+      next: result => {
+        if (!result.confirmed) {
+          return
+        }
+
+        this.userInstansiService.save(this.userInstansi).subscribe({
+          next: () => {
+            this.handlerService.handleAlert('Success', 'Berhasil')
+            this.handlerService.handleNavigate('/siap/user-instansi')
+          },
+          error: error => {
+            this.handlerService.handleAlert(
+              'Error',
+              'Gagal membuat user instasi'
+            ),
+              console.log(error)
+          }
+        })
       }
     })
   }

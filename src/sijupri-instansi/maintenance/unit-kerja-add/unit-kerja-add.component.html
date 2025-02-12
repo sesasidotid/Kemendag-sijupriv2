@@ -1,11 +1,12 @@
 <div class="row">
-  <div
+  <!-- <div
     [ngClass]="
       this.instansi?.provinsiId || this.instansi?.kabupatenId
         ? 'col-lg-8'
         : 'col-lg-12'
     "
-  >
+  > -->
+  <div class="col-lg-8">
     <form [formGroup]="unitKerjaForm" (ngSubmit)="submit()">
       <div class="row mb-3">
         <label for="" class="col-sm-2 col-form-label fw-bold">Instansi</label>
@@ -26,6 +27,7 @@
           </ng-template>
         </div>
       </div>
+
       <div *ngIf="provinsi || (loadingProvinsi$ | async)" class="row mb-3">
         <label for="" class="col-sm-2 col-form-label fw-bold">Provinsi</label>
         <div class="col-sm-10">
@@ -236,11 +238,43 @@
       </div>
     </form>
   </div>
+
   <div
     class="col-lg-4 mt-3 mt-lg-0"
     *ngIf="
       !(loadingKabKota$ | async) &&
-      ((kabKotaName$ | async) || (provinceName$ | async) || instansi?.kotaId)
+      ((kabKotaName$ | async) ||
+        (provinceName$ | async) ||
+        instansi?.kotaId ||
+        instansi)
+    "
+  >
+    <app-map
+      (coordinates)="onCoordinatesReceived($event)"
+      [name]="
+        instansi?.kabupatenId || instansi?.kotaId
+          ? (kabKotaName$ | async)
+          : (provinceName$ | async) || 'indonesia'
+      "
+      [type]="
+        instansi?.kabupatenId || instansi?.kotaId
+          ? 'kabupaten'
+          : (provinceName$ | async)
+          ? 'provinsi'
+          : 'indonesia'
+      "
+    >
+    </app-map>
+  </div>
+
+  <!-- <div
+    class="col-lg-4 mt-3 mt-lg-0"
+    *ngIf="
+      (!(loadingKabKota$ | async) &&
+        ((kabKotaName$ | async) ||
+          (provinceName$ | async) ||
+          instansi?.kotaId)) ||
+      instansi
     "
   >
     <app-map
@@ -255,5 +289,5 @@
       "
     >
     </app-map>
-  </div>
+  </div> -->
 </div>

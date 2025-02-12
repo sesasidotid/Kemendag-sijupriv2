@@ -1,3 +1,4 @@
+import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component'
 import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
@@ -20,7 +21,6 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AlertService } from '../../../modules/base/services/alert.service'
-
 @Component({
   selector: 'app-unit-kerja-add',
   standalone: true,
@@ -49,7 +49,8 @@ export class UnitKerjaAddComponent {
     private apiService: ApiService,
     private tabService: TabService,
     private handlerService: HandlerService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private confirmationService: ConfirmationService
   ) {
     this.unitKerjaForm = new FormGroup({
       name: new FormControl('', Validators.required),
@@ -94,14 +95,18 @@ export class UnitKerjaAddComponent {
   getWilayahList () {
     this.apiService.getData(`/api/v1/wilayah`).subscribe({
       next: (wilayahList: Wilayah[]) => {
-        wilayahList.forEach(wilayah => {
-          if (
-            ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
-            wilayah.code == this.provinsi.wilayahCode
-          ) {
-            this.wilayahList.push(wilayah)
-          }
-        })
+        if (this.provinsi) {
+          wilayahList.forEach(wilayah => {
+            if (
+              ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
+              wilayah.code == this.provinsi.wilayahCode
+            ) {
+              this.wilayahList.push(wilayah)
+            }
+          })
+        } else {
+          this.wilayahList = wilayahList
+        }
       }
     })
   }
@@ -112,9 +117,16 @@ export class UnitKerjaAddComponent {
       next: (instansi: Instansi) => {
         this.instansi = instansi
         this.unitKerja.instansiId = this.instansi.id
+        console.log(this.instansi)
+        if (!this.instansi.provinsiId) {
+          console.log('getWilayahList')
+          this.getWilayahList()
+        }
+
         if (this.instansi.provinsiId) {
           if (this.instansi.provinsiId) {
             this.getProvinsi()
+            console.log('getProvinsi')
           }
           if (this.instansi.kabupatenId || this.instansi.kotaId) {
             this.getKabKota()
@@ -136,12 +148,9 @@ export class UnitKerjaAddComponent {
         next: (provinsi: Provinsi) => {
           this.provinsi = provinsi
           this.unitKerja.wilayahCode = this.provinsi.wilayahCode
-          this.getWilayahList()
           this.provinceName$.next(provinsi.name)
-          this.provinceName$.subscribe(name => {
-            console.log(name)
-          })
           this.loadingProvinsi$.next(false)
+          this.getWilayahList()
         }
       })
   }
@@ -159,6 +168,15 @@ export class UnitKerjaAddComponent {
   }
 
   submit () {
+    console.log(this.unitKerja)
+    if (!this.unitKerja.latitude || !this.unitKerja.longitude) {
+      this.handlerService.handleAlert(
+        'Error',
+        'Silahkan pilih lokasi unit kerja pada peta'
+      )
+      return
+    }
+
     if (this.unitKerjaForm.valid) {
       this.unitKerja.name = this.unitKerjaForm.value.name
       this.unitKerja.email = this.unitKerjaForm.value.email
@@ -166,17 +184,31 @@ export class UnitKerjaAddComponent {
       this.unitKerja.alamat = this.unitKerjaForm.value.alamat
       this.unitKerja.wilayahCode = this.unitKerjaForm.value.wilayahCode
 
-      this.apiService.postData(`/api/v1/unit_kerja`, this.unitKerja).subscribe({
-        next: () => {
-          this.alertService.showToast(
-            'Success',
-            'Unit Kerja berhasil ditambahkan'
-          )
-          this.handlerService.handleNavigate('/maintenance/unit-kerja')
-        },
-        error: error => {
-          this.alertService.showToast('Error', error.error.message)
-          console.log(error)
+      this.confirmationService.open(false).subscribe({
+        next: result => {
+          if (!result.confirmed) {
+            return
+          }
+
+          this.apiService
+            .postData(`/api/v1/unit_kerja`, this.unitKerja)
+            .subscribe({
+              next: () => {
+                this.alertService.showToast(
+                  'Success',
+                  'Unit Kerja berhasil ditambahkan'
+                )
+                this.handlerService.handleNavigate('/maintenance/unit-kerja')
+              },
+              error: error => {
+                // this.alertService.showToast('Error', error.error.message)
+                this.handlerService.handleAlert(
+                  'Error',
+                  'Gagal menambahkan unit kerja'
+                )
+                console.log(error)
+              }
+            })
         }
       })
     }

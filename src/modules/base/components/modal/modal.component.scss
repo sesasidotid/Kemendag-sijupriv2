@@ -2,19 +2,22 @@
 .modal-lg-custom {
   max-width: 80%; /* Adjust as needed */
   width: 800px;
+  margin: auto; /* Ensures centering */
 }
 
 .modal-md-custom {
   max-width: 60%;
   width: 600px;
+  margin: auto; /* Ensures centering */
 }
 
 .modal-sm-custom {
   max-width: 40%;
   width: 400px;
+  margin: auto; /* Ensures centering */
 }
 
 /* Make sure modal content adjusts */
-.modal-content {
-  //   padding: 20px;
-}
+// .modal-content {
+//   padding: 20px;
+// }

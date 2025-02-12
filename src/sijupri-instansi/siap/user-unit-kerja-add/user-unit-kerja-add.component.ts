@@ -1,3 +1,4 @@
+import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import {
@@ -15,7 +16,6 @@ import { ApiService } from '../../../modules/base/services/api.service'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { AlertService } from '../../../modules/base/services/alert.service'
-
 @Component({
   selector: 'app-user-unit-kerja-add',
   standalone: true,
@@ -33,7 +33,8 @@ export class UserUnitKerjaAddComponent {
     private apiService: ApiService,
     private handlerService: HandlerService,
     private tabService: TabService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private confirmationService: ConfirmationService
   ) {
     this.unitKerjaForm = new FormGroup({
       unitKerja: new FormControl('', [Validators.required]),
@@ -89,18 +90,33 @@ export class UserUnitKerjaAddComponent {
       this.userUnitKerja.password = this.unitKerjaForm.value.password
 
       console.log(this.userUnitKerja)
-      this.apiService
-        .postData(`/api/v1/user_unit_kerja`, this.userUnitKerja)
-        .subscribe({
-          next: () => {
-            this.alertService.showToast(
-              'Success',
-              'User Unit Kerja berhasil ditambahkan'
-            )
-            this.handlerService.handleNavigate(`/siap/user-unit-kerja`)
-          },
-          error: error => this.handlerService.handleException(error)
-        })
+      this.confirmationService.open(false).subscribe({
+        next: result => {
+          if (!result.confirmed) {
+            return
+          }
+
+          this.apiService
+            .postData(`/api/v1/user_unit_kerja`, this.userUnitKerja)
+            .subscribe({
+              next: () => {
+                this.alertService.showToast(
+                  'Success',
+                  'User Unit Kerja berhasil ditambahkan'
+                )
+                this.handlerService.handleNavigate(`/siap/user-unit-kerja`)
+              },
+              error: error => {
+                console.log(error)
+                this.handlerService.handleAlert(
+                  'Error',
+                  'Gagal menambahkan user unit kerja'
+                )
+                // this.handlerService.handleException(error)
+              }
+            })
+        }
+      })
     }
   }
 }

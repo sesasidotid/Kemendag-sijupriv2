@@ -71,6 +71,9 @@ export class UkomFormulaListComponent {
           new PrimaryColumnBuilder('Wawancara', 'wawancaraPercentage').build()
         )
         .addPrimaryColumn(
+          new PrimaryColumnBuilder('Seminar', 'seminarPercentage').build()
+        )
+        .addPrimaryColumn(
           new PrimaryColumnBuilder('Praktik', 'praktikPercentage').build()
         )
         .addPrimaryColumn(
@@ -89,10 +92,7 @@ export class UkomFormulaListComponent {
           ).build()
         )
         .addPrimaryColumn(
-          new PrimaryColumnBuilder(
-            'Ambang Batas UKT',
-            'totalUktThreshold'
-          ).build()
+          new PrimaryColumnBuilder('Ambang Batas UKT', 'uktThreshold').build()
         )
         .addPrimaryColumn(
           new PrimaryColumnBuilder('Ambang Batas JPM', 'jpmThreshold').build()
@@ -121,12 +121,12 @@ export class UkomFormulaListComponent {
             .withField('Jabatan', 'text')
             .build()
         )
-        // .addFilter(
-        //   new PageFilterBuilder('like')
-        //     .setProperty('Jenjang|name')
-        //     .withField('Jenjang', 'text')
-        //     .build()
-        // )
+        .addFilter(
+          new PageFilterBuilder('like')
+            .setProperty('Jenjang|name')
+            .withField('Jenjang', 'text')
+            .build()
+        )
         .build()
     )
 
@@ -166,7 +166,7 @@ export class UkomFormulaListComponent {
       ukmsk_percentage: data.ukmskPercentage || '',
       //   jpm_percentage: data.jpmPercentage || '',
       grade_threshold: data.gradeThreshold || '',
-      ukt_threshold: data.ukt_threshold || '',
+      ukt_threshold: data.uktThreshold || '',
       jpm_threshold: data.jpmThreshold || ''
     })
   }
