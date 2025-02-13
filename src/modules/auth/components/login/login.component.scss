@@ -41,7 +41,24 @@ main {
   width: fit-content;
 }
 
-re-captcha.is-invalid > div {
-  border: 1px solid #dc3545 !important;
-  border-radius: 0.2rem;
+.recaptcha-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.recaptcha-container > div {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.g-recaptcha {
+  width: 100% !important;
+  transform: scale(1);
+  transform-origin: center;
+}
+
+.g-recaptcha iframe {
+  width: 100% !important;
+  min-width: 100% !important;
 }

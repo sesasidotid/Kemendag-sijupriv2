@@ -105,11 +105,14 @@
                   </div>
 
                   <div class="col-12">
-                    <re-captcha
-                      [siteKey]="recaptchaSiteKey"
-                      (resolved)="onCaptchaResolved($event)"
-                      formControlName="recaptcha"
-                    ></re-captcha>
+                    <div class="recaptcha-container">
+                      <re-captcha
+                        [siteKey]="recaptchaSiteKey"
+                        (resolved)="onCaptchaResolved($event)"
+                        formControlName="recaptcha"
+                        [size]="'normal'"
+                      ></re-captcha>
+                    </div>
                     <div
                       *ngIf="
                         loginForm.get('recaptcha').invalid &&

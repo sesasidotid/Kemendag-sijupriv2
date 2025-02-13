@@ -36,7 +36,6 @@ import { Router } from '@angular/router'
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink,
     FileHandlerComponent,
     LucideAngularModule,
     ReactiveFormsModule
@@ -144,6 +143,12 @@ export class FormasiTaskDetailComponent {
 
   ngOnInit () {
     this.getPendingTask()
+  }
+
+  hoveredJabatanIndex: number | null = null
+
+  hoverJabatan (index: number, isHovering: boolean) {
+    this.hoveredJabatanIndex = isHovering ? index : null
   }
 
   getPendingTask () {

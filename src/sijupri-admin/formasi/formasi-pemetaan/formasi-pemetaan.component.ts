@@ -82,6 +82,12 @@ export class FormasiPemetaanComponent {
     this.initMap()
   }
 
+  hoveredJabatanIndex: number | null = null
+
+  hoverJabatan (index: number, isHovering: boolean) {
+    this.hoveredJabatanIndex = isHovering ? index : null
+  }
+
   getProvinceAvailableFormation (
     provinsi_id: string
   ): Observable<AvailableFormasiInMap[]> {
@@ -270,7 +276,7 @@ export class FormasiPemetaanComponent {
   getInstansiDetail (instansiId: string): Observable<any> {
     return this.apiService.getData(`/api/v1/instansi/${instansiId}`)
   }
-  
+
   addUnitKerjaMarkers (): void {
     this.unitKerjaData.forEach(unitkerja => {
       const marker = L.marker([unitkerja.latitude, unitkerja.longitude], {

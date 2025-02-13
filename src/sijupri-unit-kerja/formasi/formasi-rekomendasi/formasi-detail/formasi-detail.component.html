@@ -12,13 +12,15 @@
       >
     </div>
     <div class="col-12">
-      <table class="table table-bordered table-hover">
+      <table class="table table-bordered">
         <thead class="table-primary">
           <tr>
-            <th scope="col">No</th>
-            <th scope="col">Name Jabatan</th>
-            <th scope="col">Jenjang Jabatan</th>
-            <th scope="col">Rekapitulasi Usulan Formasi</th>
+            <th scope="col" class="align-middle">No</th>
+            <th scope="col" class="align-middle">Name Jabatan</th>
+            <th scope="col" class="align-middle">Jenjang Jabatan</th>
+            <th scope="col" class="align-middle">
+              Rekapitulasi Usulan Formasi
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -30,11 +32,16 @@
           >
             <tr
               *ngFor="let formasi of item.formasiResultDtoList; let j = index"
+              [class.highlight]="hoveredJabatanIndex === i"
+              (mouseover)="hoverJabatan(i, true)"
+              (mouseleave)="hoverJabatan(i, false)"
+              [class.highlight]="hoveredJabatanIndex === i"
             >
               <td
                 *ngIf="j === 0"
                 class="align-middle"
                 [attr.rowspan]="item.formasiResultDtoList.length"
+                [class.highlight]="hoveredJabatanIndex === i"
               >
                 {{ i + 1 }}
               </td>
@@ -42,6 +49,7 @@
                 *ngIf="j === 0"
                 class="align-middle"
                 [attr.rowspan]="item.formasiResultDtoList.length"
+                [class.highlight]="hoveredJabatanIndex === i"
               >
                 {{ item.jabatanName }}
               </td>

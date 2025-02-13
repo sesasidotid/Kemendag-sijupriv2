@@ -27,6 +27,12 @@ export class JfFormasiComponent {
     this.getUnitKerjaDetail(LoginContext.getUnitKerjaId())
   }
 
+  hoveredJabatanIndex: number | null = null
+
+  hoverJabatan (index: number, isHovering: boolean) {
+    this.hoveredJabatanIndex = isHovering ? index : null
+  }
+
   getUnitKerjaAvailableFormation (unit_kerja_id: string) {
     console.log('unit_kerja2_id', unit_kerja_id)
 

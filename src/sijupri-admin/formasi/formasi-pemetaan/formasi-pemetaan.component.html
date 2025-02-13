@@ -9,7 +9,7 @@
   <p class="h3" *ngIf="availableFormation.length > 0">
     Formasi Tersedia Untuk {{ untuK }}
   </p>
-  <table class="table table-bordered table-hover">
+  <table class="table table-bordered">
     <thead class="table-primary">
       <tr>
         <th scope="col" class="align-middle">No</th>
@@ -20,11 +20,17 @@
     </thead>
     <tbody>
       <ng-container *ngFor="let item of availableFormation; let i = index">
-        <tr *ngFor="let formasi of item.jenjangSumList; let j = index">
+        <tr
+          *ngFor="let formasi of item.jenjangSumList; let j = index"
+          (mouseover)="hoverJabatan(i, true)"
+          (mouseleave)="hoverJabatan(i, false)"
+          [class.highlight]="hoveredJabatanIndex === i"
+        >
           <td
             *ngIf="j === 0"
             class="align-middle"
             [attr.rowspan]="item.jenjangSumList.length"
+            [class.highlight]="hoveredJabatanIndex === i"
           >
             {{ i + 1 }}
           </td>
@@ -32,6 +38,7 @@
             *ngIf="j === 0"
             class="align-middle"
             [attr.rowspan]="item.jenjangSumList.length"
+            [class.highlight]="hoveredJabatanIndex === i"
           >
             {{ item.jabatanName }}
           </td>

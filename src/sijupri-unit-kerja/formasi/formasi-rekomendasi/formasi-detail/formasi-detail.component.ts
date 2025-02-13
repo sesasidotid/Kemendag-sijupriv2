@@ -34,6 +34,11 @@ export class FormasiDetailComponent {
     this.getRekomendasiFormasiDetail()
   }
 
+  hoveredJabatanIndex: number | null = null
+
+  hoverJabatan (index: number, isHovering: boolean) {
+    this.hoveredJabatanIndex = isHovering ? index : null
+  }
   getTotalRekapitulasi () {
     let total = 0
     this.formasiDetail.formasiDetailDtoList.forEach(item => {

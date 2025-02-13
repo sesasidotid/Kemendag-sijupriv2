@@ -13,3 +13,11 @@ td {
 tr {
   text-transform: capitalize;
 }
+
+.jabatan-cell {
+  transition: background-color 0.3s;
+}
+
+.highlight {
+  background-color: rgba(234, 234, 233, 0.5) !important; /* Highlight effect */
+}

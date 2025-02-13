@@ -9,7 +9,7 @@
       </div>
       <div class="card-body">
         <div class="mt-3">
-          <table class="table table-bordered table-hover">
+          <table class="table table-bordered">
             <thead class="table-primary">
               <tr>
                 <th scope="col" class="align-middle">No</th>
@@ -22,25 +22,30 @@
               <ng-container
                 *ngFor="let item of availableFormation; let i = index"
               >
-                <tr *ngFor="let formasi of item.jenjangSumList; let j = index">
+                <tr
+                  *ngFor="let formasi of item.jenjangSumList; let j = index"
+                  (mouseover)="hoverJabatan(i, true)"
+                  (mouseleave)="hoverJabatan(i, false)"
+                  [class.highlight]="hoveredJabatanIndex === i"
+                >
                   <td
                     *ngIf="j === 0"
-                    class="align-middle"
+                    class="align-middle jabatan-cell"
                     [attr.rowspan]="item.jenjangSumList.length"
+                    [class.highlight]="hoveredJabatanIndex === i"
                   >
                     {{ i + 1 }}
                   </td>
                   <td
                     *ngIf="j === 0"
-                    class="align-middle"
+                    class="align-middle jabatan-cell"
                     [attr.rowspan]="item.jenjangSumList.length"
+                    [class.highlight]="hoveredJabatanIndex === i"
                   >
                     {{ item.jabatanName }}
                   </td>
                   <td class="align-middle">{{ formasi.jenjangName }}</td>
-                  <td class="align-middle">
-                    {{ formasi.resultSum || 0 }}
-                  </td>
+                  <td class="align-middle">{{ formasi.resultSum || 0 }}</td>
                 </tr>
               </ng-container>
 
