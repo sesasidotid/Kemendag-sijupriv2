@@ -16,6 +16,8 @@ import { LoginContext } from '../../../base/commons/login-context'
 import { Router } from '@angular/router'
 import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
 import { BehaviorSubject } from 'rxjs'
+import { RecaptchaModule } from 'ng-recaptcha'
+import { environment } from '../../../../environments/environment'
 
 @Component({
   selector: 'app-login',
@@ -24,7 +26,8 @@ import { BehaviorSubject } from 'rxjs'
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    LucideAngularModule
+    LucideAngularModule,
+    RecaptchaModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
@@ -41,6 +44,7 @@ export class LoginComponent {
     status: '',
     message: ''
   })
+  recaptchaSiteKey = environment.recaptcha.siteKey
 
   readonly Eye = Eye
   readonly EyeOff = EyeOff
@@ -63,7 +67,8 @@ export class LoginComponent {
         Validators.pattern('^[0-9]+$'),
         Validators.minLength(18)
       ]),
-      password: new FormControl('', [Validators.required])
+      password: new FormControl('', [Validators.required]),
+      recaptcha: new FormControl(null, [Validators.required])
     })
   }
 
@@ -74,6 +79,10 @@ export class LoginComponent {
         // this.auth.applicationCode = this.applicationList[0].code;
       }
     })
+  }
+
+  onCaptchaResolved (token: string) {
+    this.loginForm.get('recaptcha').setValue(token)
   }
 
   togglePasswordVisibility (): void {

@@ -10,7 +10,7 @@
           >
             <div class="card mb-3">
               <div class="card-body py-4">
-                <div class="p-3 border rounded-circle w-fit w-fit mx-auto mb-3">
+                <div class="p-3 border rounded-circle w-fit mx-auto mb-3">
                   <img src="assets/logo/kemendag-logo.svg" alt="" width="32" />
                 </div>
                 <div class="pb-2">
@@ -103,6 +103,24 @@
                       >
                     </div>
                   </div>
+
+                  <div class="col-12">
+                    <re-captcha
+                      [siteKey]="recaptchaSiteKey"
+                      (resolved)="onCaptchaResolved($event)"
+                      formControlName="recaptcha"
+                    ></re-captcha>
+                    <div
+                      *ngIf="
+                        loginForm.get('recaptcha').invalid &&
+                        loginForm.get('recaptcha').touched
+                      "
+                      class="text-danger"
+                    >
+                      Please complete the reCAPTCHA.
+                    </div>
+                  </div>
+
                   <div class="col-12 pt-3">
                     <button
                       *ngIf="!(isLoginLoading$ | async)"

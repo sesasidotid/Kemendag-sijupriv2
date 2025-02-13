@@ -16,7 +16,8 @@ import { LoginContext } from '../../../base/commons/login-context'
 import { Router } from '@angular/router'
 import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
 import { BehaviorSubject } from 'rxjs'
-
+import { RecaptchaModule } from 'ng-recaptcha'
+import { environment } from '../../../../environments/environment'
 @Component({
   selector: 'app-login-cat',
   standalone: true,
@@ -24,7 +25,8 @@ import { BehaviorSubject } from 'rxjs'
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    LucideAngularModule
+    LucideAngularModule,
+    RecaptchaModule
   ],
   templateUrl: './login-cat.component.html',
   styleUrl: './login-cat.component.scss'
@@ -45,6 +47,8 @@ export class LoginCatComponent {
   isPasswordVisible: boolean = false
   applicationList: Application[]
 
+  recaptchaSiteKey = environment.recaptcha.siteKey
+
   constructor (
     private applicationServce: ApplicationService,
     private authService: AuthService,
@@ -63,7 +67,8 @@ export class LoginCatComponent {
         Validators.pattern('^[0-9]+$'),
         Validators.minLength(18)
       ]),
-      password: new FormControl('', [Validators.required])
+      password: new FormControl('', [Validators.required]),
+      recaptcha: new FormControl(null, [Validators.required])
     })
   }
 
@@ -74,6 +79,10 @@ export class LoginCatComponent {
         // this.auth.applicationCode = this.applicationList[0].code;
       }
     })
+  }
+
+  onCaptchaResolved (token: string) {
+    this.loginForm.get('recaptcha').setValue(token)
   }
 
   togglePasswordVisibility (): void {

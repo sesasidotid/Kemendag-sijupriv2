@@ -1,26 +1,46 @@
 <main>
-    <div class="container">
-        <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                        <div class="card mb-3">
-                            <div class="card-body py-4">
-                                <div class="p-3 border rounded-circle w-fit w-fit mx-auto mb-3">
-                                    <img src="assets/logo/kemendag-logo.svg" alt="" width="32">
-                                </div>
-                                <div class="pb-2">
-                                    <h5 class="card-title text-center pb-0 fs-3">Masuk ke akun anda</h5>
-                                    <p class="text-center small text-subtitle mt-2">Silahkan isi data dibawah untuk
-                                        masuk</p>
-                                </div>
-                                <div *ngIf="loginMessage$ | async as loginMessage">
-                                    <div *ngIf="loginMessage.status !== ''" class="alert" [ngClass]="loginMessage.status === 'error' ? 'alert-danger' : 'alert-success'" role="alert">
-                                        {{loginMessage.message}}
-                                    </div>
-                                </div>
-                                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="row g-3 needs-validation">
-                                    <!-- <div class="col-12">
+  <div class="container">
+    <section
+      class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4"
+    >
+      <div class="container">
+        <div class="row justify-content-center">
+          <div
+            class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center"
+          >
+            <div class="card mb-3">
+              <div class="card-body py-4">
+                <div class="p-3 border rounded-circle w-fit w-fit mx-auto mb-3">
+                  <img src="assets/logo/kemendag-logo.svg" alt="" width="32" />
+                </div>
+                <div class="pb-2">
+                  <h5 class="card-title text-center pb-0 fs-3">
+                    Masuk ke akun anda
+                  </h5>
+                  <p class="text-center small text-subtitle mt-2">
+                    Silahkan isi data dibawah untuk masuk
+                  </p>
+                </div>
+                <div *ngIf="loginMessage$ | async as loginMessage">
+                  <div
+                    *ngIf="loginMessage.status !== ''"
+                    class="alert"
+                    [ngClass]="
+                      loginMessage.status === 'error'
+                        ? 'alert-danger'
+                        : 'alert-success'
+                    "
+                    role="alert"
+                  >
+                    {{ loginMessage.message }}
+                  </div>
+                </div>
+                <form
+                  [formGroup]="loginForm"
+                  (ngSubmit)="onSubmit()"
+                  class="row g-3 needs-validation"
+                >
+                  <!-- <div class="col-12">
                                         <label for="nip" class="form-label">Masuk Sebagai</label>
                                         <div class="input-group has-validation">
                                             <a *ngFor="let application of applicationList"
@@ -31,60 +51,121 @@
                                         </div>
                                     </div> -->
 
-                                    <div class="col-12">
-                                        <label for="nip" class="form-label">NIP</label>
-                                        <div class="input-group has-validation">
-                                            <input type="text" name="nip" class="form-control" id="nip"
-                                                formControlName="nip">
-                                        </div>
-                                        <div class="feedback"
-                                            *ngIf="loginForm.get('nip').invalid && loginForm.get('nip').touched">
-                                            <small *ngIf="loginForm.get('nip').errors?.['required']">NIP perlu
-                                                diisi.</small>
-                                            <small *ngIf="loginForm.get('nip').errors?.['minlength']">NIP
-                                                minimal 18 karakter.</small>
-                                            <small *ngIf="loginForm.get('nip').errors?.['pattern']">NIP harus
-                                                angka.</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <label for="password" class="form-label">Kata Sandi</label>
-                                        <div class="input-group has-validation">
-                                            <input [type]="isPasswordVisible ? 'text' :'password'" name="password"
-                                                class="form-control" id="password" formControlName="password">
-                                            <span class="input-group-text cursor-pointer"
-                                                (click)="togglePasswordVisibility()"><i-lucide
-                                                    [img]="isPasswordVisible ? Eye : EyeOff" [size]="16"
-                                                    class="my-icon"></i-lucide></span>
-                                        </div>
-                                        <div class="feedback"
-                                            *ngIf="loginForm.get('password').invalid && loginForm.get('password').touched">
-                                            <small *ngIf="loginForm.get('password').errors?.['required']">Password
-                                                perlu diisi.</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 pt-3">
-                                        <button *ngIf="!(isLoginLoading$ | async)" class="btn grad-button w-100" type="submit"
-                                            [disabled]="loginForm.invalid">Masuk
-                                            Sekarang</button>
-                                        <button *ngIf="(isLoginLoading$ | async)" class="btn grad-button w-100" disabled>
-                                            <div class="spinner-border" style="width: 19px; height: 19px;"
-                                                role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <small class="text-muted text-center">Copyright &copy; Kementerian Perdagangan Republik
-                            Indonesia</small>
+                  <div class="col-12">
+                    <label for="nip" class="form-label">NIP</label>
+                    <div class="input-group has-validation">
+                      <input
+                        type="text"
+                        name="nip"
+                        class="form-control"
+                        id="nip"
+                        formControlName="nip"
+                      />
                     </div>
-                </div>
+                    <div
+                      class="feedback"
+                      *ngIf="
+                        loginForm.get('nip').invalid &&
+                        loginForm.get('nip').touched
+                      "
+                    >
+                      <small *ngIf="loginForm.get('nip').errors?.['required']"
+                        >NIP perlu diisi.</small
+                      >
+                      <small *ngIf="loginForm.get('nip').errors?.['minlength']"
+                        >NIP minimal 18 karakter.</small
+                      >
+                      <small *ngIf="loginForm.get('nip').errors?.['pattern']"
+                        >NIP harus angka.</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="password" class="form-label">Kata Sandi</label>
+                    <div class="input-group has-validation">
+                      <input
+                        [type]="isPasswordVisible ? 'text' : 'password'"
+                        name="password"
+                        class="form-control"
+                        id="password"
+                        formControlName="password"
+                      />
+                      <span
+                        class="input-group-text cursor-pointer"
+                        (click)="togglePasswordVisibility()"
+                        ><i-lucide
+                          [img]="isPasswordVisible ? Eye : EyeOff"
+                          [size]="16"
+                          class="my-icon"
+                        ></i-lucide
+                      ></span>
+                    </div>
+                    <div
+                      class="feedback"
+                      *ngIf="
+                        loginForm.get('password').invalid &&
+                        loginForm.get('password').touched
+                      "
+                    >
+                      <small
+                        *ngIf="loginForm.get('password').errors?.['required']"
+                        >Password perlu diisi.</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <re-captcha
+                      [siteKey]="recaptchaSiteKey"
+                      (resolved)="onCaptchaResolved($event)"
+                      formControlName="recaptcha"
+                    ></re-captcha>
+                    <div
+                      *ngIf="
+                        loginForm.get('recaptcha').invalid &&
+                        loginForm.get('recaptcha').touched
+                      "
+                      class="text-danger"
+                    >
+                      Please complete the reCAPTCHA.
+                    </div>
+                  </div>
+
+                  <div class="col-12 pt-3">
+                    <button
+                      *ngIf="!(isLoginLoading$ | async)"
+                      class="btn grad-button w-100"
+                      type="submit"
+                      [disabled]="loginForm.invalid"
+                    >
+                      Masuk Sekarang
+                    </button>
+                    <button
+                      *ngIf="isLoginLoading$ | async"
+                      class="btn grad-button w-100"
+                      disabled
+                    >
+                      <div
+                        class="spinner-border"
+                        style="width: 19px; height: 19px"
+                        role="status"
+                      >
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-
-        </section>
-
-    </div>
-</main><!-- End #main -->
+            <small class="text-muted text-center"
+              >Copyright &copy; Kementerian Perdagangan Republik
+              Indonesia</small
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<!-- End #main -->
