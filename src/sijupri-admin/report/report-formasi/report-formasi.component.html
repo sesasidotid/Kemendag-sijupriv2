@@ -192,7 +192,7 @@
         <button
           *ngIf="addFormasiReportForm.get('exportType').value === ''"
           type="submit"
-          class="btn btn-sm btn-success float-end"
+          class="btn btn-success float-end"
           [disabled]="addFormasiReportForm.invalid"
         >
           Generate Report
@@ -200,7 +200,7 @@
         <button
           *ngIf="addFormasiReportForm.get('exportType').value === 'unitKerja'"
           type="submit"
-          class="btn btn-sm btn-success float-end"
+          class="btn btn-success float-end"
           [disabled]="
             addFormasiReportForm.invalid ||
             addFormasiReportForm.get('unitKerjaId').value === ''
@@ -211,7 +211,7 @@
         <button
           *ngIf="addFormasiReportForm.get('exportType').value === 'provinsi'"
           type="submit"
-          class="btn btn-sm btn-success float-end"
+          class="btn btn-success float-end"
           [disabled]="
             addFormasiReportForm.invalid ||
             addFormasiReportForm.get('provinsiId').value === ''
@@ -222,7 +222,7 @@
         <button
           *ngIf="addFormasiReportForm.get('exportType').value === 'kabKota'"
           type="submit"
-          class="btn btn-sm btn-success float-end"
+          class="btn btn-success float-end"
           [disabled]="
             addFormasiReportForm.invalid ||
             addFormasiReportForm.get('kabKotaId').value === ''

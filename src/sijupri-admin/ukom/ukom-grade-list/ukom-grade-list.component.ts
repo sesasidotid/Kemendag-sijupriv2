@@ -9,7 +9,7 @@ import {
   PrimaryColumnBuilder
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { TabService } from '../../../modules/base/services/tab.service'
-
+import { UkomGradeExportComponent } from '../ukom-grade-export/ukom-grade-export.component'
 @Component({
   selector: 'app-ukom-grade-list',
   standalone: true,
@@ -192,6 +192,12 @@ export class UkomGradeListComponent {
         isActive: false,
         icon: 'mdi-plus-circle',
         onClick: () => this.router.navigate([`/ukom/ukom-grade-list/import`])
+      })
+      .addTab({
+        label: 'Export Nilai',
+        isActive: false,
+        icon: 'mdi-export',
+        onClick: () => this.router.navigate([`/ukom/ukom-grade-list/export`])
       })
   }
 }

@@ -19,7 +19,7 @@ import { Router } from '@angular/router'
 })
 export class UkomGradeImportComponent {
   ukomList: Ukom[] = []
-  file_grade: string = "";
+  file_grade: string = ''
 
   inputs: FIleHandler = {
     files: {
@@ -39,15 +39,15 @@ export class UkomGradeImportComponent {
     }
   }
 
-  constructor(
+  constructor (
     private router: Router,
     private apiService: ApiService,
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService,
     private tabService: TabService
-  ) { }
+  ) {}
 
-  ngOnInit() {
+  ngOnInit () {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()
     }
@@ -71,9 +71,15 @@ export class UkomGradeImportComponent {
         icon: 'mdi-file-download',
         onClick: () => this.downloadTemplate()
       })
+      .addTab({
+        label: 'Export Nilai',
+        isActive: false,
+        icon: 'mdi-export',
+        onClick: () => this.router.navigate([`/ukom/ukom-grade-list/export`])
+      })
   }
 
-  downloadTemplate() {
+  downloadTemplate () {
     this.apiService
       .getDownload(`/api/v1/exam_grade/download`, 'template_grade.xlsx')
       .subscribe({
@@ -81,13 +87,15 @@ export class UkomGradeImportComponent {
       })
   }
 
-  submit() {
+  submit () {
     this.confirmationService.open(false).subscribe({
       next: result => {
         if (!result.confirmed) return
 
         this.apiService
-          .postData('/api/v1/exam_grade/upload', { file_grade: this.file_grade })
+          .postData('/api/v1/exam_grade/upload', {
+            file_grade: this.file_grade
+          })
           .subscribe({
             next: () => window.location.reload(),
             error: error => this.handlerService.handleException(error)

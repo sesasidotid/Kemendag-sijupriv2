@@ -9,7 +9,12 @@ import { UkomRoomKompetensi } from '../../../../modules/ukom/models/ukom-room-ko
 import { UkomQuestion } from '../../../../modules/ukom/models/ukom-question'
 import { CommonModule } from '@angular/common'
 import { Observable } from 'rxjs'
-import { map, filter } from 'rxjs/operators'
+import {
+  map,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap
+} from 'rxjs/operators'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
 import { FormsModule } from '@angular/forms'
@@ -34,6 +39,7 @@ export class UkomExamChooseCompQuestionsComponent {
   questCheckedList: UkomQuestion[] = []
 
   filterText: string = ''
+  private searchSubject = new BehaviorSubject<string>('')
 
   listSavedQuestion: UkomQuestion[] = []
 
@@ -151,17 +157,36 @@ export class UkomExamChooseCompQuestionsComponent {
         )
       )
 
-    this.filteredQuestions$ = this.listQuestion$
-  }
-
-  onSearchChange (search: string) {
-    this.filteredQuestions$ = this.listQuestion$.pipe(
-      map(questions =>
-        questions.filter(q =>
-          q.question.toLowerCase().includes(search.toLowerCase())
+    // this.filteredQuestions$ = this.listQuestion$
+    this.filteredQuestions$ = this.searchSubject.pipe(
+      debounceTime(300), // Delays input processing by 1 second
+      distinctUntilChanged(), // Only emit if value changed
+      switchMap(search =>
+        this.listQuestion$.pipe(
+          map(questions =>
+            questions.filter(q =>
+              q.question.toLowerCase().includes(search.toLowerCase())
+            )
+          )
         )
       )
     )
+  }
+
+  //   onSearchChange (search: string) {
+  //     this.filteredQuestions$ = this.listQuestion$.pipe(
+  //       debounceTime(1000), //
+  //       distinctUntilChanged(), // Only emit if the current value is different from the last
+  //       map(questions =>
+  //         questions.filter(q =>
+  //           q.question.toLowerCase().includes(search.toLowerCase())
+  //         )
+  //       )
+  //     )
+  //   }
+
+  onSearchChange (search: string) {
+    this.searchSubject.next(search)
   }
 
   toggleModal (kompetensi_id?: string) {

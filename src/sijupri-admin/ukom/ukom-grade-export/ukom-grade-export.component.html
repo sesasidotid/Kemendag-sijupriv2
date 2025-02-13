@@ -1,5 +1,5 @@
 <div class="row">
-  <form [formGroup]="addUKomReportForm" (submit)="onSubmit()">
+  <form [formGroup]="exportGradeForm">
     <div class="row mb-3">
       <label for="inputDate" class="col-sm-2 col-form-label fw-bold"
         >Tanggal</label
@@ -15,11 +15,11 @@
         <div
           class="feedback"
           *ngIf="
-            addUKomReportForm.get('dateFrom').invalid &&
-            addUKomReportForm.get('dateFrom').touched
+            exportGradeForm.get('dateFrom').invalid &&
+            exportGradeForm.get('dateFrom').touched
           "
         >
-          <small *ngIf="addUKomReportForm.get('dateFrom').errors?.['required']">
+          <small *ngIf="exportGradeForm.get('dateFrom').errors?.['required']">
             Tanggal mulai perlu diisi.
           </small>
         </div>
@@ -35,11 +35,11 @@
         <div
           class="feedback"
           *ngIf="
-            addUKomReportForm.get('dateTo').invalid &&
-            addUKomReportForm.get('dateTo').touched
+            exportGradeForm.get('dateTo').invalid &&
+            exportGradeForm.get('dateTo').touched
           "
         >
-          <small *ngIf="addUKomReportForm.get('dateTo').errors?.['required']">
+          <small *ngIf="exportGradeForm.get('dateTo').errors?.['required']">
             Tanggal tujuan perlu diisi.
           </small>
         </div>
@@ -65,26 +65,55 @@
         <div
           class="feedback"
           *ngIf="
-            addUKomReportForm.get('fileType').invalid &&
-            addUKomReportForm.get('fileType').touched
+            exportGradeForm.get('fileType').invalid &&
+            exportGradeForm.get('fileType').touched
           "
         >
-          <small *ngIf="addUKomReportForm.get('fileType').errors?.['required']">
+          <small *ngIf="exportGradeForm.get('fileType').errors?.['required']">
             File type perlu diisi.
           </small>
         </div>
       </div>
     </div>
+
     <div class="row text-center">
       <div class="col-12">
-        <button type="submit" class="btn btn-success float-end">
-          Generate
-        </button>
+        <ng-container *ngIf="isLoading$ | async; else noLoading">
+          <button class="btn btn-success float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="button"
+            (click)="submit()"
+            class="btn btn-success float-end"
+            [disabled]="exportGradeForm.invalid || (isLoading$ | async)"
+          >
+            Export
+          </button>
+        </ng-template>
+
+        <!-- <button
+          type="button"
+          class="btn btn-success float-end"
+          (click)="submit()"
+          [disabled]="!exportGradeForm.valid"
+        >
+          Export
+        </button> -->
       </div>
     </div>
   </form>
 </div>
+
 <hr />
 <div class="row">
-  <app-pagable [pagable]="pagable"></app-pagable>
+  <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 </div>

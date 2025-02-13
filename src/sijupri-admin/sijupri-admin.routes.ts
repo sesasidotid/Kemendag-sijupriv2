@@ -305,6 +305,13 @@ export const routes: Routes = [
                   import(
                     './ukom/ukom-grade-import/ukom-grade-import.component'
                   ).then(m => m.UkomGradeImportComponent)
+              },
+              {
+                path: 'export',
+                loadComponent: () =>
+                  import(
+                    './ukom/ukom-grade-export/ukom-grade-export.component'
+                  ).then(m => m.UkomGradeExportComponent)
               }
             ]
           }
