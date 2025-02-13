@@ -1,3 +1,11 @@
+<button
+  *ngIf="showBackButton"
+  class="btn btn-sm btn-outline-secondary mb-3"
+  (click)="backToList()"
+>
+  <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
+
 <div class="row">
   <div [ngClass]="true ? 'col-lg-8' : 'col-lg-12'">
     <div *ngIf="instasi" class="row mb-3">

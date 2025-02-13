@@ -55,6 +55,8 @@ export class UkomTaskComponent {
   isModalOpen$ = new BehaviorSubject<boolean>(false)
   profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
+  canRegister: boolean = true
+
   constructor (
     private apiService: ApiService,
     private handlerService: HandlerService,
@@ -82,6 +84,7 @@ export class UkomTaskComponent {
   ngOnInit () {
     this.getPendingTask()
     this.getJF()
+    this.getJFRegisterStatus()
     // this.getUkomTask()
   }
 
@@ -127,6 +130,29 @@ export class UkomTaskComponent {
         this.profileImageSrc = 'assets/no-profile.jpg'
       }
     })
+  }
+
+  getJFRegisterStatus () {
+    this.apiService
+      .getData(`/api/v1/participant_ukom/latest/${LoginContext.getUserId()}`)
+      .subscribe({
+        next: response => {
+          if (response.id) {
+            this.canRegister = false
+            console.log('resg', this.canRegister)
+          }
+        },
+        error: error => {
+          if (error.error.code == 'RCD-00001') {
+            this.canRegister = true
+            console.log('resg', this.canRegister)
+
+            return
+          }
+          console.log('error', error)
+          this.handlerService.handleException(error)
+        }
+      })
   }
 
   getPendingTask () {

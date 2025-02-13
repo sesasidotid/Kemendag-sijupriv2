@@ -48,6 +48,10 @@ export class JfDetailComponent {
     this.fetchPhotoProfile()
   }
 
+  backToList () {
+    history.back()
+  }
+
   fetchPhotoProfile () {
     this.apiService.getPhotoProfile(this.nip).subscribe({
       next: blob => {

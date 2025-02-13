@@ -20,6 +20,7 @@ import { CommonModule } from '@angular/common'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { ReportGenerate } from '../../../modules/report/models/report-generate.model'
+import { BehaviorSubject } from 'rxjs'
 
 @Component({
   selector: 'app-report-akp',
@@ -30,7 +31,7 @@ import { ReportGenerate } from '../../../modules/report/models/report-generate.m
 })
 export class ReportAkpComponent {
   pagable: Pagable
-
+  isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
   addAkpReportForm!: FormGroup
 
   unitKerjaList: UnitKerja[]
@@ -159,7 +160,7 @@ export class ReportAkpComponent {
       this.confirmationService.open(false).subscribe({
         next: result => {
           if (!result.confirmed) return
-
+          this.isLoading$.next(true)
           const reportGenerate = new ReportGenerate()
           reportGenerate.reportId = this.reportId
           reportGenerate.fileType = this.addAkpReportForm.value.fileType
@@ -174,9 +175,18 @@ export class ReportAkpComponent {
             .postData('/api/v1/report_generate/async', reportGenerate)
             .subscribe({
               next: () => {
+                this.isLoading$.next(false)
                 this.handlerService.handleAlert('Success', 'Report Generating')
                 this.pagableComponent.fetchData()
                 this.ngOnInit()
+              },
+              error: error => {
+                console.log(error)
+                this.isLoading$.next(false)
+                this.handlerService.handleAlert(
+                  'Error',
+                  'Gagal menambahkan report'
+                )
               }
             })
         }

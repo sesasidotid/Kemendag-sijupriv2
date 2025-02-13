@@ -33,7 +33,7 @@ import { BehaviorSubject } from 'rxjs'
 })
 export class ReportSiapComponent {
   pagable: Pagable
-
+  isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
   addSiapReportForm!: FormGroup
 
   instansiList: Instansi[]
@@ -260,6 +260,7 @@ export class ReportSiapComponent {
         next: result => {
           if (!result.confirmed) return
 
+          this.isLoading$.next(true)
           const reportGenerate = new ReportGenerate()
           reportGenerate.reportId = this.reportId
           reportGenerate.fileType = this.addSiapReportForm.value.fileType
@@ -295,12 +296,21 @@ export class ReportSiapComponent {
             .postData('/api/v1/report_generate/async', reportGenerate)
             .subscribe({
               next: () => {
+                this.isLoading$.next(false)
                 this.handlerService.handleAlert(
                   'Success',
                   'Generating Report...'
                 )
                 this.pagableComponent.fetchData()
                 this.ngOnInit()
+              },
+              error: error => {
+                console.log(error)
+                this.isLoading$.next(false)
+                this.handlerService.handleAlert(
+                  'Error',
+                  'Failed to generate report'
+                )
               }
             })
         }

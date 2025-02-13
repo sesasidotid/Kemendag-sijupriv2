@@ -19,6 +19,7 @@ import {
   Validators
 } from '@angular/forms'
 import { ReportGenerate } from '../../../modules/report/models/report-generate.model'
+import { BehaviorSubject } from 'rxjs'
 @Component({
   selector: 'app-report-ukom',
   standalone: true,
@@ -28,7 +29,7 @@ import { ReportGenerate } from '../../../modules/report/models/report-generate.m
 })
 export class ReportUkomComponent {
   pagable: Pagable
-
+  isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
   addUKomReportForm!: FormGroup
 
   reportId: string = 'ukomReport'
@@ -134,6 +135,7 @@ export class ReportUkomComponent {
         next: result => {
           if (!result.confirmed) return
 
+          this.isLoading$.next(true)
           const reportGenerate = new ReportGenerate()
           reportGenerate.reportId = 'ukomReport'
           reportGenerate.fileType = this.addUKomReportForm.value.fileType
@@ -147,11 +149,13 @@ export class ReportUkomComponent {
             .postData('/api/v1/report_generate', reportGenerate)
             .subscribe({
               next: () => {
+                this.isLoading$.next(false)
                 this.handlerService.handleAlert('Success', 'Report Generating')
                 this.pagableComponent.fetchData()
                 this.ngOnInit()
               },
               error: error => {
+                this.isLoading$.next(false)
                 console.error('Error generating report', error)
                 this.handlerService.handleAlert(
                   'Error',

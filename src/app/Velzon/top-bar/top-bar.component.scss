@@ -1,41 +1,46 @@
 .topnav-hamburger {
-    @media (min-width: 768px) {
-        display: none;
-    }
+  @media (min-width: 768px) {
+    display: none;
+  }
 }
 
+// .topnav-hamburger {
+//   @media (min-width: 1024px) {
+//     display: none;
+//   }
+// }
+
 .dropdown-header-lg {
-    font-size: 16px;
-    font-weight: 500;
-    color: #272a3a;
-    font-weight: bold;
+  font-size: 16px;
+  font-weight: 500;
+  color: #272a3a;
+  font-weight: bold;
 }
 
 .card-bg {
-    background-color: #13182B;
-     /* SVG pattern overlay */
-     background-image: 
-     url('/assets/sun.svg');
+  background-color: #13182b;
+  /* SVG pattern overlay */
+  background-image: url('/assets/sun.svg');
 
-     /* Cover styling */
-     background-size: contain;
-     background-repeat: repeat;
-     background-blend-mode: overlay;
+  /* Cover styling */
+  background-size: contain;
+  background-repeat: repeat;
+  background-blend-mode: overlay;
 }
 
 .w-xl {
-    width: 500px;
+  width: 500px;
 }
 
 .trash-button {
-    background-color: #ffffff;
-    color: rgb(219, 45, 45);
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    padding: 5px 10px;
-    
-    &:hover {
-        background-color: rgb(234, 234, 234);
-    }
+  background-color: #ffffff;
+  color: rgb(219, 45, 45);
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 5px 10px;
+
+  &:hover {
+    background-color: rgb(234, 234, 234);
+  }
 }

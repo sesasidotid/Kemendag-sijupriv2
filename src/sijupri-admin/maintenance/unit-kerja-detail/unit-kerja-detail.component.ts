@@ -18,6 +18,7 @@ import { Input } from '@angular/core'
 export class UnitKerjaDetailComponent {
   @Input() unitKerjaIdFromParent: string = ''
   @Input() enableEditMap?: boolean
+  @Input() showBackButton?: boolean = true
 
   id: string = ''
   unitKerja: UnitKerja = new UnitKerja()
@@ -31,6 +32,10 @@ export class UnitKerjaDetailComponent {
     private handlerService: HandlerService,
     private activatedRoute: ActivatedRoute
   ) {}
+
+  backToList () {
+    history.back()
+  }
 
   ngOnInit () {
     console.log('1', this.unitKerjaIdFromParent)

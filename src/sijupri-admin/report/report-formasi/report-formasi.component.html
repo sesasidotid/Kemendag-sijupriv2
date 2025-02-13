@@ -189,47 +189,61 @@
 
     <div class="row text-center">
       <div class="col-12">
-        <button
-          *ngIf="addFormasiReportForm.get('exportType').value === ''"
-          type="submit"
-          class="btn btn-success float-end"
-          [disabled]="addFormasiReportForm.invalid"
-        >
-          Generate Report
-        </button>
-        <button
-          *ngIf="addFormasiReportForm.get('exportType').value === 'unitKerja'"
-          type="submit"
-          class="btn btn-success float-end"
-          [disabled]="
-            addFormasiReportForm.invalid ||
-            addFormasiReportForm.get('unitKerjaId').value === ''
-          "
-        >
-          Generate Report
-        </button>
-        <button
-          *ngIf="addFormasiReportForm.get('exportType').value === 'provinsi'"
-          type="submit"
-          class="btn btn-success float-end"
-          [disabled]="
-            addFormasiReportForm.invalid ||
-            addFormasiReportForm.get('provinsiId').value === ''
-          "
-        >
-          Generate Report
-        </button>
-        <button
-          *ngIf="addFormasiReportForm.get('exportType').value === 'kabKota'"
-          type="submit"
-          class="btn btn-success float-end"
-          [disabled]="
-            addFormasiReportForm.invalid ||
-            addFormasiReportForm.get('kabKotaId').value === ''
-          "
-        >
-          Generate Report
-        </button>
+        <ng-container *ngIf="isLoading$ | async; else noLoading">
+          <button class="btn btn-success float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+
+        <ng-template #noLoading>
+          <button
+            *ngIf="addFormasiReportForm.get('exportType').value === ''"
+            type="submit"
+            class="btn btn-success float-end"
+            [disabled]="addFormasiReportForm.invalid"
+          >
+            Generate Report
+          </button>
+          <button
+            *ngIf="addFormasiReportForm.get('exportType').value === 'unitKerja'"
+            type="submit"
+            class="btn btn-success float-end"
+            [disabled]="
+              addFormasiReportForm.invalid ||
+              addFormasiReportForm.get('unitKerjaId').value === ''
+            "
+          >
+            Generate Report
+          </button>
+          <button
+            *ngIf="addFormasiReportForm.get('exportType').value === 'provinsi'"
+            type="submit"
+            class="btn btn-success float-end"
+            [disabled]="
+              addFormasiReportForm.invalid ||
+              addFormasiReportForm.get('provinsiId').value === ''
+            "
+          >
+            Generate Report
+          </button>
+          <button
+            *ngIf="addFormasiReportForm.get('exportType').value === 'kabKota'"
+            type="submit"
+            class="btn btn-success float-end"
+            [disabled]="
+              addFormasiReportForm.invalid ||
+              addFormasiReportForm.get('kabKotaId').value === ''
+            "
+          >
+            Generate Report
+          </button>
+        </ng-template>
       </div>
     </div>
   </form>

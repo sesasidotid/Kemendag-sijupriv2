@@ -1,5 +1,5 @@
 import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
-import { Component, Input } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { UserInstansi } from '../../../modules/siap/models/user-instansi.model'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
@@ -25,6 +25,7 @@ import { LoginContext } from '../../../modules/base/commons/login-context'
 })
 export class UserUnitKerjaUpdateComponent {
   @Input() userUnitKerja: UserUnitKerja
+  @Output() refresh = new EventEmitter<void>()
 
   unitKerjaList: UnitKerja[] = []
   instansiId: string = LoginContext.getInstansiId()
@@ -115,10 +116,11 @@ export class UserUnitKerjaUpdateComponent {
               'Success',
               'User Unit Kerja berhasil diupdate'
             )
-            this.handlerService.handleNavigate(`/siap/user-unit-kerja`)
-            setTimeout(() => {
-              window.location.reload()
-            }, 1000) // Adjust the delay as needed
+            this.refresh.emit()
+            // this.handlerService.handleNavigate(`/siap/user-unit-kerja`)
+            // setTimeout(() => {
+            //   window.location.reload()
+            // }, 1000) // Adjust the delay as needed
           },
           error: error => {
             console.log(error)

@@ -24,7 +24,15 @@
   <div class="row px-3">
     <div *ngIf="!pendingTask.jenisUkom; else hadData" class="col-lg-12">
       <app-empty-state
-        *ngIf="!wannaRequest"
+        *ngIf="!canRegister"
+        [title]="
+          'Anda belum bisa mendaftar UKom. Masih ada proses UKom yang berjalan'
+        "
+        [description]="'Cek status proses UKom anda pada menu riwayat UKom.'"
+      ></app-empty-state>
+
+      <app-empty-state
+        *ngIf="!wannaRequest && canRegister"
         [title]="'Belum ada proses UKom yang berjalan'"
         [description]="
           'Kamu bisa mengajukan proses UKom dengan menekan tombol dibawah ini.'

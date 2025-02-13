@@ -35,6 +35,10 @@ export class UserInstasiDetailComponent {
     this.getInstansiDetail()
   }
 
+  backToList () {
+    history.back()
+  }
+
   fetchPhotoProfile () {
     this.apiService.getPhotoProfile(this.nip).subscribe({
       next: blob => {

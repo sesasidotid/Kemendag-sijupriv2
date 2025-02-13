@@ -14,6 +14,7 @@ import { SafeUrl } from '@angular/platform-browser'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
+
 @Component({
   selector: 'app-jf-detail',
   standalone: true,
@@ -50,6 +51,11 @@ export class JfDetailComponent {
   ngOnInit () {
     this.fetchPhotoProfile()
   }
+
+  backToList () {
+    history.back()
+  }
+
   getJF () {
     this.jfService.findByNip(this.nip).subscribe({
       next: (jf: JF) => (this.jf = jf)

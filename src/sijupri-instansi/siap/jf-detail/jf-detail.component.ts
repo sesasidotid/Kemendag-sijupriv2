@@ -52,6 +52,10 @@ export class JfDetailComponent {
     this.fetchPhotoProfile()
   }
 
+  backToList () {
+    history.back()
+  }
+
   getJF () {
     this.jfService.findByNip(this.nip).subscribe({
       next: (jf: JF) => (this.jf = jf)

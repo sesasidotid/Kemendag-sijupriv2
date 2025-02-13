@@ -14,7 +14,7 @@ import {
 } from '@angular/forms'
 import { RouterLink } from '@angular/router'
 import { UserUnitKerjaService } from '../../../modules/siap/services/user-unit-kerja.service'
-
+import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { ProfileCardComponent } from '../../../modules/base/components/profile-card/profile-card.component'
 import { UserInstansi } from '../../../modules/siap/models/user-instansi.model'
 
@@ -40,7 +40,8 @@ export class ProfileComponent {
 
   constructor (
     private UserInstansiService: UserInstansiService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private confirmationService: ConfirmationService
   ) {
     this.getUserInstansi()
 
@@ -75,25 +76,33 @@ export class ProfileComponent {
 
   submit () {
     if (this.userInstasiForm.valid) {
-      this.userInstasi.name = this.userInstasiForm.value.name
-      this.userInstasi.email = this.userInstasiForm.value.email
-      this.userInstasi.phone = this.userInstasiForm.value.phone
+      this.confirmationService.open(false).subscribe({
+        next: result => {
+          if (!result.confirmed) {
+            return
+          }
 
-      this.UserInstansiService.update(this.userInstasi).subscribe({
-        next: () => {
-          this.alertService.showToast(
-            'Success',
-            'Berhasil memperbarui data user instasi!'
-          )
-          setTimeout(() => {
-            window.location.reload()
-          }, 1000)
-        },
-        error: () =>
-          this.alertService.showToast(
-            'Error',
-            'Gagal memperbarui data user instasi!'
-          )
+          this.userInstasi.name = this.userInstasiForm.value.name
+          this.userInstasi.email = this.userInstasiForm.value.email
+          this.userInstasi.phone = this.userInstasiForm.value.phone
+
+          this.UserInstansiService.update(this.userInstasi).subscribe({
+            next: () => {
+              this.alertService.showToast(
+                'Success',
+                'Berhasil memperbarui data user instasi!'
+              )
+              //   setTimeout(() => {
+              //     window.location.reload()
+              //   }, 1000)
+            },
+            error: () =>
+              this.alertService.showToast(
+                'Error',
+                'Gagal memperbarui data user instasi!'
+              )
+          })
+        }
       })
     }
   }

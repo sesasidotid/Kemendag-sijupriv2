@@ -111,15 +111,37 @@
         </div>
       </div>
     </div>
+
     <div class="row text-center">
       <div class="col-12">
-        <button
+        <ng-container *ngIf="isLoading$ | async; else noLoading">
+          <button class="btn btn-success float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-success float-end"
+            [disabled]="addAkpReportForm.invalid || (isLoading$ | async)"
+          >
+            Generate Report
+          </button>
+        </ng-template>
+
+        <!-- <button
           type="submit"
           class="btn btn-success float-end"
           [disabled]="addAkpReportForm.invalid"
         >
           Generate Report
-        </button>
+        </button> -->
       </div>
     </div>
   </form>

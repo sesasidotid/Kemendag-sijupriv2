@@ -54,8 +54,25 @@ export class JfAddComponent {
         Validators.minLength(18)
       ]),
       email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required])
+      password: new FormControl('', [Validators.required]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        this.passwordMatchValidator.bind(this)
+      ])
     })
+  }
+
+  passwordMatchValidator (
+    control: FormControl
+  ): { [key: string]: boolean } | null {
+    if (this.jfAddForm) {
+      const password = this.jfAddForm.get('password')?.value
+      const confirmPassword = control.value
+      if (password !== confirmPassword) {
+        return { mismatch: true }
+      }
+    }
+    return null
   }
 
   ngOnInit () {

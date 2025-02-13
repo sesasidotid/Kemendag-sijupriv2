@@ -62,6 +62,9 @@ export class RoleUpdateComponent {
       })
   }
 
+  backToList () {
+    this.router.navigate(['/security/role'])
+  }
   submit () {
     this.role.menuCodeList.length = 0
     for (const menu of this.menuTree) {

@@ -1,3 +1,6 @@
+<button class="btn btn-sm btn-outline-secondary mb-3" (click)="backToList()">
+  <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
 <div class="row">
   <div class="col-xl-4">
     <div class="card card-profile shadow-sm">
@@ -63,6 +66,7 @@
         <app-unit-kerja-detail
           [unitKerjaIdFromParent]="unitKerjaDetail.id"
           [enableEditMap]="false"
+          [showBackButton]="false"
         ></app-unit-kerja-detail>
       </div>
     </div>

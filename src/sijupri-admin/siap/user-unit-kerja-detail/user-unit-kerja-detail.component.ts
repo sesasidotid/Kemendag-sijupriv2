@@ -36,6 +36,10 @@ export class UserUnitKerjaDetailComponent {
     this.getUserUnitKerjaDetail()
   }
 
+  backToList () {
+    history.back()
+  }
+
   fetchPhotoProfile () {
     this.apiService.getPhotoProfile(this.nip).subscribe({
       next: blob => {

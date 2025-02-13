@@ -37,6 +37,7 @@ export class UserUnitKerjaListComponent {
   isModalOpen$ = new BehaviorSubject<boolean>(false)
   SelecterUserUnitKerja: UserUnitKerja = new UserUnitKerja()
 
+  refresh: boolean = false
   constructor (
     private router: Router,
     private tabService: TabService,
@@ -105,6 +106,11 @@ export class UserUnitKerjaListComponent {
   }
   toggleModal () {
     this.isModalOpen$.next(!this.isModalOpen$.value)
+  }
+
+  handleRefresh () {
+    this.refresh = !this.refresh
+    this.isModalOpen$.next(false)
   }
 
   ngOnInit () {

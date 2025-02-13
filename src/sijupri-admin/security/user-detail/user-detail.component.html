@@ -1,3 +1,7 @@
+<button class="btn btn-sm btn-outline-secondary mb-3" (click)="backToList()">
+  <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
+
 <div>
   <div class="row mb-1">
     <label for="" class="col-sm-2 col-form-label fw-bold">NIP</label>
@@ -44,14 +48,14 @@
     <div class="text-center">
       <a
         type="submit"
-        class="btn btn-sm btn-danger float-end"
+        class="btn btn-danger float-end"
         [ngClass]="{ disabled: userData.status === 'DELETED' }"
         (click)="delete()"
         >Hapus</a
       >
-      <a class="btn btn-sm btn-warning me-2 float-end" (click)="backToList()"
+      <!-- <a class="btn btn-warning me-2 float-end" (click)="backToList()"
         >Kembali</a
-      >
+      > -->
     </div>
   </div>
 </div>

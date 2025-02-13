@@ -1,3 +1,7 @@
+<button class="btn btn-sm btn-outline-secondary mb-3" (click)="backToList()">
+  <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
+
 <div class="d-flex flex-column gap-3">
   <div class="">
     <form (submit)="submit()">
@@ -14,18 +18,12 @@
         </div>
       </div>
       <div *ngIf="!editable" class="text-center float-end">
-        <a (click)="editable = true" class="btn btn-sm btn-primary ms-2"
-          >Ubah</a
-        >
+        <a (click)="editable = true" class="btn btn-primary ms-2">Ubah</a>
         <!-- <a type="submit" class="btn btn-sm btn-danger ms-2">Hapus</a> -->
       </div>
       <div *ngIf="editable" class="text-center float-end">
-        <button type="submit" class="btn btn-sm btn-primary ms-2">
-          Simpan
-        </button>
-        <a (click)="editable = false" class="btn btn-sm btn-secondary ms-2"
-          >Kembali</a
-        >
+        <button type="submit" class="btn btn-primary ms-2">Simpan</button>
+        <a (click)="editable = false" class="btn btn-secondary ms-2">Batal</a>
       </div>
     </form>
   </div>

@@ -25,7 +25,6 @@ import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
 import { map, filter } from 'rxjs/operators'
 import { BehaviorSubject } from 'rxjs'
 import { ReportGenerate } from '../../../modules/report/models/report-generate.model'
-
 @Component({
   selector: 'app-report-formasi',
   standalone: true,
@@ -41,7 +40,7 @@ import { ReportGenerate } from '../../../modules/report/models/report-generate.m
 })
 export class ReportFormasiComponent {
   pagable: Pagable
-
+  isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
   addFormasiReportForm!: FormGroup
 
   reportId: string = 'formasiReport'
@@ -314,6 +313,7 @@ export class ReportFormasiComponent {
       this.confirmationService.open(false).subscribe({
         next: result => {
           if (!result.confirmed) return
+          this.isLoading$.next(true)
 
           const reportGenerate = new ReportGenerate()
           reportGenerate.reportId = this.reportId
@@ -348,6 +348,8 @@ export class ReportFormasiComponent {
             .postData('/api/v1/report_generate', reportGenerate)
             .subscribe({
               next: () => {
+                this.isLoading$.next(false)
+
                 this.handlerService.handleAlert(
                   'Success',
                   'Generating Report...'
@@ -356,6 +358,8 @@ export class ReportFormasiComponent {
                 this.ngOnInit()
               },
               error: error => {
+                this.isLoading$.next(false)
+
                 console.error('Error generating report', error)
                 this.handlerService.handleAlert(
                   'Error',
