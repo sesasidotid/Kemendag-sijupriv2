@@ -107,6 +107,10 @@ export class AkpVerifikasiPelatihanComponent {
               )
               this.payload.file_dokumen_verifikasi = undefined
               this.isLoading$.next(false)
+
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
             },
             error: error => {
               console.log('error', error)

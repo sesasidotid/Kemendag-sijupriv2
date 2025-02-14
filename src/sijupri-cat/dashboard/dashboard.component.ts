@@ -91,25 +91,33 @@ export class DashboardComponent {
   }
 
   startExam (room_ukom_id: string) {
-    this.api
-      .postData('/api/v1/exam/start', {
-        examTypeCode: 'CAT',
-        roomUkomId: room_ukom_id
-      })
-      .subscribe({
-        next: (response: any) => {
-          console.log('test e', response)
-
-          this.router.navigate(['/cat'])
-        },
-        error: err => {
-          this.handler.handleAlert(
-            'Error',
-            'Gagal memulai ujian, silahkan coba lagi'
-          )
-          console.error('Error fetching RoomUkom:', err)
+    this.confirmationService.open(false).subscribe({
+      next: response => {
+        if (!response.confirmed) {
+          return
         }
-      })
+
+        this.api
+          .postData('/api/v1/exam/start', {
+            examTypeCode: 'CAT',
+            roomUkomId: room_ukom_id
+          })
+          .subscribe({
+            next: (response: any) => {
+              console.log('test e', response)
+
+              this.router.navigate(['/cat'])
+            },
+            error: err => {
+              this.handler.handleAlert(
+                'Error',
+                'Gagal memulai ujian, silahkan coba lagi'
+              )
+              console.error('Error fetching RoomUkom:', err)
+            }
+          })
+      }
+    })
   }
 
   getCATScore () {
