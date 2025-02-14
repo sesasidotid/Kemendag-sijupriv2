@@ -78,6 +78,10 @@ export class UkomExamChooseCompQuestionsComponent {
     console.log('q', this.listSavedQuestion)
   }
 
+  back () {
+    history.back()
+  }
+
   getRoomUkomDetail () {
     this.apiService
       .getData(`/api/v1/room_ukom/${this.room_ukom_id}`)

@@ -51,7 +51,9 @@ export class RwJabatanListComponent {
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Jenjang', 'jenjang|name').build()
       )
-      .addPrimaryColumn(new PrimaryColumnBuilder('TMT', 'tmt').build())
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder('Terhitung Mulai', 'tmt').build()
+      )
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((rwJabatan: any) => {
