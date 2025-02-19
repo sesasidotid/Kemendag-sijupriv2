@@ -2,14 +2,13 @@ import { Injectable } from '@angular/core'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { map, Observable, Subscription } from 'rxjs'
 import { LoginContext } from '../commons/login-context'
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl: string = 'http://localhost:8000'
-  //   private baseUrl: string = 'http://sijupri.com:8000'
-  //   private baseUrl: string = 'https://pusbinjfdag.id:8000'
+    private baseUrl: string = environment.apiBaseUrl;
 
   constructor (private http: HttpClient) {}
 

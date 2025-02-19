@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms'
-import { Router } from '@angular/router'
+import { Router, RouterLink } from '@angular/router'
 import { LucideAngularModule, SquareX, SquareCheck } from 'lucide-angular'
 import * as L from 'leaflet'
 
@@ -18,7 +18,8 @@ import * as L from 'leaflet'
     CommonModule,
     LucideAngularModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss'

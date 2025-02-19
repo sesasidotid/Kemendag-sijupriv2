@@ -1,5 +1,7 @@
 export const environment = {
-  production: false,
+  production: true,
+  appBaseHref: '/sijupri',
+  apiBaseUrl: 'https://localhost:8000',
   firebaseConfig: {
     apiKey: 'AIzaSyBHvB-ce9lpJdWbDJCBP2XLVJHYzV62oLw',
     authDomain: 'sijupri.firebaseapp.com',

@@ -9,7 +9,7 @@
           <a
             class="nav-link"
             data-bs-toggle="tab"
-            [routerLink]="currentPath"
+            routerLink="{{currentPath}}"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             role="tab"
@@ -22,7 +22,7 @@
           <a
             class="nav-link"
             data-bs-toggle="tab"
-            [routerLink]="currentPath + '/pending'"
+            routerLink="{{currentPath}}/pending"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
             role="tab"
