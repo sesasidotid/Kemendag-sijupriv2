@@ -77,6 +77,7 @@ export class FileHandlerComponent {
   }
 
   previewFile (fileName: string, fileSource: string) {
+    console.log('test', fileName, fileSource)
     this.filePreviewService.open(fileName, fileSource)
   }
 }

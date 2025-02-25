@@ -61,6 +61,7 @@
               <p class="text-muted">{{ jf.ktp ? jf.ktp : '-' }}</p>
               <button
                 class="btn btn-soft-primary"
+                *ngIf="jf.ktpUrl"
                 (click)="preview(jf.ktp, jf.ktpUrl)"
               >
                 Lihat

@@ -89,6 +89,10 @@ export class LoginComponent {
     this.isPasswordVisible = !this.isPasswordVisible // Toggle the visibility
   }
 
+  backToLandingPage () {
+    this.router.navigate([''])
+  }
+
   onSubmit () {
     this.isLoginLoading$.next(true)
     if (this.loginForm.valid) {

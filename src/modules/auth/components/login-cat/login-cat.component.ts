@@ -59,6 +59,10 @@ export class LoginCatComponent {
     }
   }
 
+  backToLandingPage () {
+    this.router.navigate([''])
+  }
+
   ngOnInit () {
     this.getApplicationList()
     this.loginForm = new FormGroup({

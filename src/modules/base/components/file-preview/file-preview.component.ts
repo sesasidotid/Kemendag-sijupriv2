@@ -35,6 +35,10 @@ export class FilePreviewComponent implements OnInit {
   open (fileName: string, fileSource: string) {
     this.fileName = fileName
     this.fileSource = this.fileSource
+    // this.fileSource = this.sanitizer.bypassSecurityTrustResourceUrl(
+    //   fileSource
+    // ) as string
+
     this.showModal = true // Show modal when triggered
   }
 
