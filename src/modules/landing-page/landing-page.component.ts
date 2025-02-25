@@ -10,6 +10,9 @@ import {
 import { Router, RouterLink } from '@angular/router'
 import { LucideAngularModule, SquareX, SquareCheck } from 'lucide-angular'
 import * as L from 'leaflet'
+import { DataDokumenUkom } from '../ukom/models/data-dukung'
+import { ApiService } from '../base/services/api.service'
+import { forkJoin, of, timer } from 'rxjs'
 
 @Component({
   selector: 'app-landing-page',
@@ -43,7 +46,11 @@ export class LandingPageComponent {
   readonly SquareX = SquareX
   readonly SquareCheck = SquareCheck
 
-  constructor (private router: Router) {}
+  dokumenPromosi: DataDokumenUkom[] = []
+  dokumenPindahJabatan: DataDokumenUkom[] = []
+  dokumenKenaikanJenjang: DataDokumenUkom[] = []
+
+  constructor (private router: Router, private service: ApiService) {}
 
   ngOnInit () {
     this.ukomForm = new FormGroup({
@@ -54,6 +61,25 @@ export class LandingPageComponent {
       ])
     })
     // this.initMap();
+    this.fetchDokumenUkom()
+
+    this.dokumenKenaikanJenjang
+  }
+
+  fetchDokumenUkom () {
+    forkJoin({
+      kenaikanJenjang: this.service.getData(
+        '/api/v1/document_ukom/jenis_ukom/KENAIKAN_JENJANG'
+      ),
+      pindahJabatan: this.service.getData(
+        '/api/v1/document_ukom/jenis_ukom/PERPINDAHAN_JABATAN'
+      ),
+      promosi: this.service.getData('/api/v1/document_ukom/jenis_ukom/PROMOSI')
+    }).subscribe(({ kenaikanJenjang, pindahJabatan, promosi }) => {
+      this.dokumenKenaikanJenjang = kenaikanJenjang
+      this.dokumenPindahJabatan = pindahJabatan
+      this.dokumenPromosi = promosi
+    })
   }
 
   // private initMap(): void {

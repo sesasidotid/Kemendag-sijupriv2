@@ -58,6 +58,9 @@ export class StatusPendaftaranUkomComponent {
     })
   }
 
+  backToLandingPage () {
+    this.router.navigate(['/'])
+  }
   fetchPhotoProfile () {
     this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
       next: blob => {

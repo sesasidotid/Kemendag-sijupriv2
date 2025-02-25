@@ -11,7 +11,9 @@
     <li><a href="#lokasi">Lokasi</a></li>
     <li><a href="#kontak">Kontak</a></li>
     <li>
-      <a routerLink="login" class="btn btn-secondary grad-button">Masuk Sekarang</a>
+      <a routerLink="login" class="btn btn-secondary grad-button"
+        >Masuk Sekarang</a
+      >
     </li>
   </ul>
 </nav>
@@ -43,40 +45,48 @@
         Dikhususkan untuk internal Kementerian Perdagangan Republik Indonesia
       </p>
       <div class="req-parent">
-        <h6 class="req-title">Dokumen Promosi</h6>
+        <h6 class="req-title">Dokumen Kenaikan Jenjang</h6>
         <div class="req-items">
-          <div class="req-item">
-            <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
-            <p class="">Dokumen Perserahan</p>
+          <div
+            *ngIf="
+              dokumenKenaikanJenjang.length > 0;
+              else noKenaikanJenjangDokumenInternal
+            "
+          >
+            <div class="req-item" *ngFor="let item of dokumenKenaikanJenjang">
+              <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
+              <p class="capitalize">{{ item.dokumenPersyaratanName }}</p>
+            </div>
           </div>
-          <div class="req-item">
-            <i-lucide [img]="SquareX" [color]="'#bf4b4b'"></i-lucide>
-            <p class="">Dokumen Mana Tahu</p>
-          </div>
-          <div class="req-item">
-            <i-lucide [img]="SquareX" [color]="'#bf4b4b'"></i-lucide>
-            <p class="">Dokumen Tertentu</p>
-          </div>
+
+          <ng-template #noKenaikanJenjangDokumenInternal>
+            <p class="text-gray-500">-</p>
+          </ng-template>
         </div>
       </div>
       <div class="req-parent">
         <h6 class="req-title">Dokumen Perpindahan Jabatan</h6>
         <div class="req-items">
-          <div class="req-item">
-            <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
-            <p class="">Dokumen Perserahan</p>
+          <div
+            *ngIf="
+              dokumenPindahJabatan.length > 0;
+              else NoPerpindahanJabatanInternal
+            "
+          >
+            <div class="req-item" *ngFor="let item of dokumenPindahJabatan">
+              <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
+              <p class="capitalize">{{ item.dokumenPersyaratanName }}</p>
+            </div>
           </div>
-          <div class="req-item">
-            <i-lucide [img]="SquareX" [color]="'#bf4b4b'"></i-lucide>
-            <p class="">Dokumen Mana Tahu</p>
-          </div>
-          <div class="req-item">
-            <i-lucide [img]="SquareX" [color]="'#bf4b4b'"></i-lucide>
-            <p class="">Dokumen Tertentu</p>
-          </div>
+
+          <ng-template #NoPerpindahanJabatanInternal>
+            <p class="text-gray-500">-</p>
+          </ng-template>
         </div>
       </div>
-      <a routerLink="login" class="btn btn-secondary grad-button">Daftar Sekarang</a>
+      <a routerLink="login" class="btn btn-secondary grad-button"
+        >Daftar Sekarang</a
+      >
     </div>
 
     <div class="feature feature-2">
@@ -90,35 +100,36 @@
       <div class="req-parent">
         <h6 class="req-title">Dokumen Promosi</h6>
         <div class="req-items">
-          <div class="req-item">
-            <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
-            <p class="">Dokumen Perserahan</p>
+          <div *ngIf="dokumenPromosi.length > 0; else NoDokumenPromosiExternal">
+            <div class="req-item" *ngFor="let item of dokumenPromosi">
+              <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
+              <p class="capitalize">{{ item.dokumenPersyaratanName }}</p>
+            </div>
           </div>
-          <div class="req-item">
-            <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
-            <p class="">Dokumen Mana Tahu</p>
-          </div>
-          <div class="req-item">
-            <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
-            <p class="">Dokumen Tertentu</p>
-          </div>
+
+          <ng-template #NoDokumenPromosiExternal>
+            <p class="text-gray-500">-</p>
+          </ng-template>
         </div>
       </div>
       <div class="req-parent">
         <h6 class="req-title">Dokumen Perpindahan Jabatan</h6>
         <div class="req-items">
-          <div class="req-item">
-            <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
-            <p class="">Dokumen Perserahan</p>
+          <div
+            *ngIf="
+              dokumenPindahJabatan.length > 0;
+              else noDokumenPindahJabatanExternal
+            "
+          >
+            <div class="req-item" *ngFor="let item of dokumenPindahJabatan">
+              <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
+              <p class="capitalize">{{ item.dokumenPersyaratanName }}</p>
+            </div>
           </div>
-          <div class="req-item">
-            <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
-            <p class="">Dokumen Mana Tahu</p>
-          </div>
-          <div class="req-item">
-            <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
-            <p class="">Dokumen Tertentu</p>
-          </div>
+
+          <ng-template #noDokumenPindahJabatanExternal>
+            <p class="text-gray-500">-</p>
+          </ng-template>
         </div>
       </div>
       <a routerLink="ukom/external" class="btn btn-secondary grad-button"
