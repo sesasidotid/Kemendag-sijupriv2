@@ -12,7 +12,8 @@ import {
   PrimaryColumnBuilder
 } from '../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../modules/base/components/pagable/pagable.component'
-
+import { Router } from '@angular/router'
+import { forkJoin } from 'rxjs'
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -27,21 +28,6 @@ export class AdminDashboardComponent {
   startMonth: number = 1
   endMonth: number = 12
   year: number = new Date().getFullYear()
-
-  //   months = [
-  //     'January',
-  //     'February',
-  //     'March',
-  //     'April',
-  //     'May',
-  //     'June',
-  //     'July',
-  //     'August',
-  //     'September',
-  //     'October',
-  //     'November',
-  //     'December'
-  //   ]
 
   months = [
     { id: 'Januari', eng: 'January' },
@@ -58,8 +44,8 @@ export class AdminDashboardComponent {
     { id: 'Desember', eng: 'December' }
   ]
 
-  apiData: any[] = [] // Store full API response
-  filteredData: any[] = [] // Store filtered data
+  apiData: any[] = []
+  filteredData: any[] = []
 
   barChartData: ChartConfiguration<'bar'>['data'] = {
     labels: [],
@@ -89,7 +75,12 @@ export class AdminDashboardComponent {
   totalSIAPPending: number = 0
   totalPAKPending: number = 0
 
-  constructor (private apiService: ApiService) {
+  totalUserJF: number = 0
+  totalUserUnitKerja: number = 0
+  totalUserAdmin: number = 0
+  totalUserInstansi: number = 0
+
+  constructor (private apiService: ApiService, private router: Router) {
     this.getTotalAKPPending()
     this.getTotalUKOMPending()
     this.getTotalFormasiPending()
@@ -122,8 +113,8 @@ export class AdminDashboardComponent {
   }
 
   rounding (value: string): string {
-    console.log(value) // Check input value
-    return parseFloat(value).toFixed(2) // Return the rounded value as a string
+    console.log(value)
+    return parseFloat(value).toFixed(2)
   }
 
   getTotalAKPPending () {
@@ -158,8 +149,40 @@ export class AdminDashboardComponent {
     })
   }
 
+  getUserStats () {
+    forkJoin({
+      totalUserJF: this.apiService.getData('/api/v1/jf/search?page=1&limit=1'),
+      totalUserUnitKerja: this.apiService.getData(
+        '/api/v1/user_unit_kerja/search?page=1&limit=1'
+      ),
+      totalUserAdmin: this.apiService.getData(
+        '/api/v1/user/search?eq_userApplicationChannel|applicationCode=sijupri-admin'
+      ),
+      totalUserInstansi: this.apiService.getData(
+        '/api/v1/user_instansi/search?page=1&limit=1'
+      )
+    }).subscribe({
+      next: ({
+        totalUserJF,
+        totalUserUnitKerja,
+        totalUserAdmin,
+        totalUserInstansi
+      }) => {
+        this.totalUserJF = totalUserJF.total
+        this.totalUserUnitKerja = totalUserUnitKerja.total
+        this.totalUserAdmin = totalUserAdmin.total
+        this.totalUserInstansi = totalUserInstansi.total
+      }
+    })
+  }
+
   ngOnInit () {
     this.fetchData()
+    this.getUserStats()
+  }
+
+  navigateTo (path: string) {
+    this.router.navigate([path])
   }
 
   fetchData () {

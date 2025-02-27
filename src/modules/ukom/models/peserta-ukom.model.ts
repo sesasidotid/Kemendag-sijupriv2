@@ -35,6 +35,8 @@ export class PesertaUkom extends Serializable {
   dokumenUkomList: any[] = undefined
   pendingTaskHistory: any[] = undefined
 
+  unitKerjaName: string = undefined
+
   constructor (object?: { [key: string]: any }) {
     super()
     if (object) this.fromObject(object)

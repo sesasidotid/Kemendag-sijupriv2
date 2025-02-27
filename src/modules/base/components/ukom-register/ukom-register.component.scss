@@ -68,3 +68,38 @@
   flex: 1;
   justify-content: center;
 }
+
+.grad-button {
+  color: white !important;
+  background: linear-gradient(45deg, #2967be, #49ab49) !important;
+  border: none !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, #49ab49, #2967be) !important;
+  }
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 32px;
+  padding-left: 32px;
+  background-color: white;
+  color: white;
+  height: 70px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  top: 0;
+  position: sticky;
+  z-index: 100;
+}
+
+.nav-links {
+  padding: 0 !important;
+  cursor: pointer;
+  margin: 0 !important;
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+}

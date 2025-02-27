@@ -60,6 +60,7 @@ export class LoginComponent {
   }
 
   ngOnInit () {
+    this.isLoginLoading$.next(false)
     this.getApplicationList()
     this.loginForm = new FormGroup({
       nip: new FormControl('', [

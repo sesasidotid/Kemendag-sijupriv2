@@ -124,7 +124,7 @@
                     </div>
                   </div>
 
-                  <div class="col-12 pt-3">
+                  <div class="col-12">
                     <button
                       *ngIf="!(isLoginLoading$ | async)"
                       class="btn grad-button w-100"
@@ -146,16 +146,14 @@
                         <span class="visually-hidden">Loading...</span>
                       </div>
                     </button>
-                  </div>
-
-                  <div class="col-12">
                     <button
-                      class="btn grad-button w-100"
+                      class="btn grad-button w-100 mt-1"
                       (click)="backToLandingPage()"
                     >
                       Kembali
                     </button>
                   </div>
+
                   <a href="/login" class="btn btn-link text-primary"
                     >Masuk halaman Sijupri</a
                   >

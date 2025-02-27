@@ -126,6 +126,10 @@ export class UkomQuestionListComponent {
     })
   }
 
+  isAnyFileMissing (): boolean {
+    return !this.buldPertanyaan.file_question
+  }
+
   submit () {
     this.buldPertanyaan.exam_type =
       this.templatePertanyaanForm.get('jenis_ukom_code')?.value

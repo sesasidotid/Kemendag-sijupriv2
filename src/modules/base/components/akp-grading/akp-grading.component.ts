@@ -18,7 +18,7 @@ import { ApiService } from '../../services/api.service'
 import { SafeUrl } from '@angular/platform-browser'
 import { DomSanitizer } from '@angular/platform-browser'
 import { LoginContext } from '../../commons/login-context'
-
+import { LandingPageComponent } from '../../../landing-page/landing-page.component'
 interface Option {
   id: number
   label: string
@@ -27,7 +27,13 @@ interface Option {
 @Component({
   selector: 'app-akp-grading',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, CommonModule, EmptyStateComponent],
+  imports: [
+    RouterLink,
+    ReactiveFormsModule,
+    CommonModule,
+    EmptyStateComponent,
+    LandingPageComponent
+  ],
   templateUrl: './akp-grading.component.html',
   styleUrl: './akp-grading.component.scss'
 })

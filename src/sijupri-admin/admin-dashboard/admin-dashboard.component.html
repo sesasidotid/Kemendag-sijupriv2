@@ -1,28 +1,147 @@
 <section class="container-fluid">
   <p class="h3">Pengajuan Dengan Status Pending</p>
   <div class="row">
-    <div class="col-md-3">
-      <div class="card text-center p-3 mb-4">
+    <div
+      class="col-lg-3 col-md-6 col-12 cursor-pointer"
+      (click)="navigateTo('/akp/akp-task-list')"
+      style="cursor: pointer"
+    >
+      <div class="card text-center p-3 mb-0">
         <h5>AKP</h5>
         <h2>{{ totalAKPPending }}</h2>
       </div>
+      <p class="text-muted small">Jumlah pengajuan AKP</p>
     </div>
-    <div class="col-md-3">
-      <div class="card text-center p-3 mb-4">
+
+    <div
+      class="col-lg-3 col-md-6 col-12 cursor-pointer"
+      (click)="navigateTo('/ukom/ukom-task-list')"
+      style="cursor: pointer"
+    >
+      <div class="card text-center p-3 mb-0">
         <h5>UKom</h5>
         <h2>{{ totalUKOMPending }}</h2>
       </div>
+      <p class="text-muted small">Jumlah pengajuan UKom</p>
     </div>
-    <div class="col-md-3">
-      <div class="card text-center p-3 mb-4">
+
+    <div
+      class="col-lg-3 col-md-6 col-12 cursor-pointer"
+      (click)="navigateTo('/formasi/formasi-task-list')"
+      style="cursor: pointer"
+    >
+      <div class="card text-center p-3 mb-0">
         <h5>FORMASI</h5>
         <h2>{{ totalFormasiPending }}</h2>
       </div>
+      <p class="text-muted small">Jumlah pengajuan Formasi</p>
     </div>
-    <div class="col-md-3">
-      <div class="card text-center p-3 mb-4">
+
+    <div
+      class="col-lg-3 col-md-6 col-12 cursor-pointer"
+      (click)="navigateTo('/pak/pak-task-list')"
+      style="cursor: pointer"
+    >
+      <div class="card text-center p-3 mb-0">
         <h5>PAK</h5>
         <h2>{{ totalPAKPending }}</h2>
+      </div>
+      <p class="text-muted small">Jumlah konfirmasi Data Kinerja</p>
+    </div>
+  </div>
+
+  <br />
+  <p class="h3">User Sijupri</p>
+  <div class="row">
+    <div
+      class="col-lg-3 col-md-6 col-12 cursor-pointer"
+      (click)="navigateTo('/security/user')"
+      style="cursor: pointer"
+    >
+      <div class="card">
+        <div class="card-body">
+          <div class="media d-flex justify-content-between">
+            <div class="media-body text-left">
+              <h3 class="success">{{ totalUserAdmin }}</h3>
+              <span>Admin Sijupri</span>
+            </div>
+            <div class="align-self-center">
+              <span
+                class="mdi mdi-account-key-outline"
+                style="font-size: 2.5rem"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-lg-3 col-md-6 col-12 cursor-pointer"
+      (click)="navigateTo('/siap/user-instansi')"
+      style="cursor: pointer"
+    >
+      <div class="card">
+        <div class="card-body">
+          <div class="media d-flex justify-content-between">
+            <div class="media-body text-left">
+              <h3 class="success">{{ totalUserInstansi }}</h3>
+              <span>Admin Instansi</span>
+            </div>
+            <div class="align-self-center">
+              <span
+                class="mdi mdi-account-outline"
+                style="font-size: 2.5rem"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-lg-3 col-md-6 col-12 cursor-pointer"
+      (click)="navigateTo('/siap/user-unit-kerja')"
+      style="cursor: pointer"
+    >
+      <div class="card">
+        <div class="card-body">
+          <div class="media d-flex justify-content-between">
+            <div class="media-body text-left">
+              <h3 class="success">{{ totalUserUnitKerja }}</h3>
+              <span>Admin Unit Kerja</span>
+            </div>
+            <div class="align-self-center">
+              <span
+                class="mdi mdi-account-supervisor-outline"
+                style="font-size: 2.5rem"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-lg-3 col-md-6 col-12 cursor-pointer"
+      (click)="navigateTo('/siap/user-jf')"
+      style="cursor: pointer"
+    >
+      <div class="card">
+        <div class="card-body">
+          <div class="media d-flex justify-content-between">
+            <div class="media-body text-left">
+              <h3 class="success">{{ totalUserJF }}</h3>
+              <span>User JF</span>
+            </div>
+            <div class="align-self-center">
+              <span
+                class="mdi mdi-account-group-outline"
+                style="font-size: 2.5rem"
+              ></span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

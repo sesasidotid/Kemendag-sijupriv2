@@ -13,6 +13,7 @@ import { NonjfRevisiUkomComponent } from '../nonjf-revisi-ukom/nonjf-revisi-ukom
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { EmptyStateComponent } from '../empty-state/empty-state.component'
+import { LandingPageComponent } from '../../../landing-page/landing-page.component'
 @Component({
   selector: 'app-status-pendaftaran-ukom',
   standalone: true,
@@ -21,7 +22,8 @@ import { EmptyStateComponent } from '../empty-state/empty-state.component'
     UkomRevisionComponent,
     CommonModule,
     NonjfRevisiUkomComponent,
-    EmptyStateComponent
+    EmptyStateComponent,
+    LandingPageComponent
   ],
   templateUrl: './status-pendaftaran-ukom.component.html',
   styleUrl: './status-pendaftaran-ukom.component.scss'
@@ -48,7 +50,7 @@ export class StatusPendaftaranUkomComponent {
 
   ngOnInit () {
     this.activatedRoute.queryParams.subscribe(params => {
-      const key = params['key'] // Retrieves the `id` value
+      const key = params['key']
       console.log('ID from query params:', key)
 
       if (key) {

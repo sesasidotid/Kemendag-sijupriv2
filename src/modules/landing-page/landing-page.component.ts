@@ -13,7 +13,7 @@ import * as L from 'leaflet'
 import { DataDokumenUkom } from '../ukom/models/data-dukung'
 import { ApiService } from '../base/services/api.service'
 import { forkJoin, of, timer } from 'rxjs'
-
+import { Input } from '@angular/core'
 @Component({
   selector: 'app-landing-page',
   standalone: true,
@@ -28,6 +28,8 @@ import { forkJoin, of, timer } from 'rxjs'
   styleUrl: './landing-page.component.scss'
 })
 export class LandingPageComponent {
+  @Input() imported?: boolean
+
   currentYear: number = new Date().getFullYear()
   isMenuOpen = false
   ukomForm!: FormGroup
@@ -118,6 +120,10 @@ export class LandingPageComponent {
 
   toggleMenu () {
     this.isMenuOpen = !this.isMenuOpen
+  }
+
+  navigateTo (path: string) {
+    this.router.navigate([path])
   }
 
   onSubmit () {

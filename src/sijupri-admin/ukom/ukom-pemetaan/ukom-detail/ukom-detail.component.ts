@@ -109,6 +109,7 @@ export class UkomDetailComponent {
   back () {
     history.back()
   }
+
   isUserBanned () {
     this.apiService
       .getData(`/api/v1/participant_ukom/search?limit=100&eq_nip=${this.id}`)

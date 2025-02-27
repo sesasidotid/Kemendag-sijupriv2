@@ -97,8 +97,14 @@ export class UkomGradeImportComponent {
             file_grade: this.file_grade
           })
           .subscribe({
-            next: () => window.location.reload(),
-            error: error => this.handlerService.handleException(error)
+            next: () => {
+              this.router.navigate([`/ukom/ukom-grade-list`])
+              this.handlerService.handleAlert('Info', 'Data berhasil diimport')
+            },
+            error: error => {
+              console.log(error)
+              this.handlerService.handleAlert('Error', 'Gagal mengimport data')
+            }
           })
       }
     })

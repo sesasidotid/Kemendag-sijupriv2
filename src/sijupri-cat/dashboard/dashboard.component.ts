@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { LoginContext } from './../../modules/base/commons/login-context'
-import { Component } from '@angular/core'
+import { Component, AfterViewInit, ElementRef } from '@angular/core'
 import { RoomUkom } from '../../modules/ukom/models/cat/roomukom'
 import { ApiService } from '../../modules/base/services/api.service'
 import { Router } from '@angular/router'
@@ -11,6 +11,7 @@ import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
 import { ModalComponent } from '../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../modules/base/components/empty-state/empty-state.component'
+declare var bootstrap: any // Ensure Bootstrap JS is accessible
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +20,7 @@ import { EmptyStateComponent } from '../../modules/base/components/empty-state/e
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements AfterViewInit {
   roomUkom: RoomUkom = new RoomUkom()
   now: number = Date.now()
   currentDate = new Date()
@@ -33,7 +34,8 @@ export class DashboardComponent {
     private api: ApiService,
     private router: Router,
     private handler: HandlerService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private elRef: ElementRef
   ) {
     this.getRoomUkom()
     this.updateCurrentTime()
@@ -44,6 +46,17 @@ export class DashboardComponent {
     this.exitFullScreen()
   }
 
+  ngAfterViewInit () {
+    this.initializeTooltips()
+  }
+  initializeTooltips () {
+    const tooltipTriggerList = this.elRef.nativeElement.querySelectorAll(
+      '[data-bs-toggle="tooltip"]'
+    )
+    tooltipTriggerList.forEach((tooltipTriggerEl: any) => {
+      new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  }
   updateCurrentTime () {
     interval(1000).subscribe(() => {
       this.now = Date.now()
@@ -80,6 +93,7 @@ export class DashboardComponent {
       .subscribe({
         next: (response: any) => {
           this.roomUkom = new RoomUkom(response.roomUkomDto)
+          //   this.roomUkom = new RoomUkom()
           console.log('roomUkom', this.roomUkom)
           this.participant_id = response.id
           this.getCATScore()

@@ -174,7 +174,13 @@
   </div>
   <div class="row text-center">
     <div class="col-12">
-      <button type="submit" class="btn btn-success float-end">Simpan</button>
+      <button
+        type="submit"
+        class="btn btn-success float-end"
+        [disabled]="addUserForm.invalid || roleCodes.length === 0"
+      >
+        Simpan
+      </button>
     </div>
   </div>
 </form>

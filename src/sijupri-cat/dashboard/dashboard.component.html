@@ -1,6 +1,6 @@
 <section>
   <!-- Room Information -->
-  <div class="card mb-4">
+  <div class="card mb-4" *ngIf="roomUkom.id">
     <div class="card-body">
       <h3 class="card-title">{{ roomUkom.name }}</h3>
       <p class="mb-0"><strong>Jabatan:</strong> {{ roomUkom.jabatanName }}</p>
@@ -8,27 +8,29 @@
       <p>
         Silahkan untuk dapat join Zoom melalui link berikut:
         <a
+          *ngIf="roomUkom.vidCallLink; else noLink"
           href="{{ roomUkom.vidCallLink }}"
           target="_blank"
-          [ngClass]="{ 'text-danger': !roomUkom.vidCallLink }"
+          class="text-primary"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          [attr.title]="roomUkom.vidCallLink"
         >
-          {{
-            roomUkom.vidCallLink ? roomUkom.vidCallLink : 'Belum ada link Zoom'
-          }}
+          Join Zoom
         </a>
+        <ng-template #noLink>
+          <span class="text-danger">Belum ada link Zoom</span>
+        </ng-template>
       </p>
     </div>
   </div>
 
   <!-- Exam Schedule -->
   <div
-    class="card"
+    class=""
     *ngIf="roomUkom?.examScheduleDtoList?.length > 0; else emptyState"
   >
-    <div class="card-header">
-      <h4>Jadwal Ujian</h4>
-    </div>
-    <div class="card-body">
+    <div class="">
       <div class="list-group">
         <div
           class="list-group-item d-flex justify-content-between align-items-center mb-3"

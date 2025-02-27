@@ -56,6 +56,7 @@ export class UkomTaskComponent {
   profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   canRegister: boolean = true
+  registerOpened: boolean = false
 
   constructor (
     private apiService: ApiService,

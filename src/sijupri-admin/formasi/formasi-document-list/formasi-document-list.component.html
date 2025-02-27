@@ -3,21 +3,36 @@
     <!-- <form (submit)="submit()"> -->
     <form>
       <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold"
-          >Nama Dokumen</label
+        <label for="dokumenName" class="col-sm-2 col-form-label fw-bold"
+          >Nama Dokumend<span class="text-danger">*</span></label
         >
         <div class="col-sm-10">
           <input
             type="text"
             class="form-control"
             [(ngModel)]="dokumenPersyaratan.name"
-            name="nip"
+            name="dokumenName"
+            #dokumenInput="ngModel"
+            required
           />
+          <div
+            *ngIf="
+              dokumenInput.invalid &&
+              (dokumenInput.touched || dokumenInput.dirty)
+            "
+            class="text-danger"
+          >
+            Nama Dokumen perlu diisi
+          </div>
         </div>
       </div>
       <div class="text-center float-end">
-        <!-- <button (click) class="btn btn-success">Tambah</button> -->
-        <button type="button" class="btn btn-success" (click)="submit()">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="submit()"
+          [disabled]="dokumenInput.invalid"
+        >
           Tambah
         </button>
       </div>

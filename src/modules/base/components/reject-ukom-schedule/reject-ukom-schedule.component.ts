@@ -6,11 +6,11 @@ import { CommonModule } from '@angular/common'
 import { ApiService } from '../../services/api.service'
 import { HandlerService } from '../../services/handler.service'
 import { timeInterval } from 'rxjs'
-
+import { LandingPageComponent } from '../../../landing-page/landing-page.component'
 @Component({
   selector: 'app-reject-ukom-schedule',
   standalone: true,
-  imports: [ConfirmationDialogComponent, CommonModule],
+  imports: [ConfirmationDialogComponent, CommonModule, LandingPageComponent],
   templateUrl: './reject-ukom-schedule.component.html',
   styleUrl: './reject-ukom-schedule.component.scss'
 })
@@ -25,8 +25,14 @@ export class RejectUkomScheduleComponent {
     private handlerService: HandlerService
   ) {
     this.route.queryParams.subscribe(params => {
-      this.key = params['key'] || 'Tidak ada key'
+      this.key = params['key'] || ''
     })
+  }
+
+  ngOnInit () {
+    if (!this.key) {
+      this.router.navigate(['/'])
+    }
   }
 
   reject (key: string) {
@@ -35,17 +41,26 @@ export class RejectUkomScheduleComponent {
         if (!result.confirmed) return
         this.apiService.getData(`/api/v1/ukom_ban/banme?key=${key}`).subscribe({
           next: response => {
-            this.handlerService.handleAlert('Success', 'Data berhasil disimpan')
+            this.handlerService.handleAlert(
+              'Success',
+              'Berhasil menolak jadwal UKOM'
+            )
             setTimeout(() => {
               this.router.navigate(['/'])
             }, 3000)
           },
-          error: error => this.handlerService.handleException(error)
+          error: error => {
+            console.log('error', error)
+            this.handlerService.handleAlert(
+              'Error',
+              'Gagal menolak jadwal UKOM'
+            )
+          }
         })
       },
       error: error => {
         console.log('error', error)
-        this.handlerService.handleAlert('Error', error.error.message)
+        this.handlerService.handleAlert('Error', 'Gagal menolak jadwal UKOM')
       }
     })
   }

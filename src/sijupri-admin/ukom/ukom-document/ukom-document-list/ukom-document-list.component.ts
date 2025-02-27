@@ -53,10 +53,10 @@ export class UkomDocumentListComponent {
       .addActionColumn(
         new ActionColumnBuilder()
           .setAction((item: any) => {
-            this.delete(item.id)
+            this.delete(item.dokumenPersyaratanId)
           }, 'danger')
           .withIcon('danger')
-          //   .addInactiveCondition((item: any) => true)
+          .addInactiveCondition((item: any) => true)
           .build()
       )
       .build()
@@ -90,7 +90,6 @@ export class UkomDocumentListComponent {
           .deleteData(`/api/v1/document_ukom/dokumen_persyaratan/${id}`)
           .subscribe({
             next: () => {
-              //   window.location.reload()
               this.handlerService.handleAlert(
                 'Success',
                 'Dokumen berhasil di hapus'
