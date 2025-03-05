@@ -181,7 +181,7 @@
         <button
           type="submit"
           class="btn btn-primary float-end"
-          [disabled]="kknForm.invalid || (submitLoading$ | async)"
+          [disabled]="!kategoriInstrument?.pertanyaanList?.[0]?.name || kknForm.invalid || (submitLoading$ | async)"
         >
           Simpan
         </button>

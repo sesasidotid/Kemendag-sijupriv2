@@ -102,7 +102,7 @@ export class UkomRegisterComponent {
       ]),
       name: new FormControl('', Validators.required),
       email: new FormControl('', Validators.required),
-      jabatanCode: new FormControl('', Validators.required),
+      jabatanCode: new FormControl(''),
       jenjangCode: new FormControl('', Validators.required),
       pangkatCode: new FormControl('', Validators.required),
       nextJabatanCode: new FormControl('', Validators.required),
@@ -116,6 +116,17 @@ export class UkomRegisterComponent {
         this.passwordMatchValidator.bind(this)
       ]),
       unitKerjaName: new FormControl('', Validators.required)
+    })
+
+    this.nonJFForm.get('jenis_ukom')?.valueChanges.subscribe(value => {
+      const jabatanCodeControl = this.nonJFForm.get('jabatanCode')
+      if (value === 'PERPINDAHAN_JABATAN') {
+        jabatanCodeControl?.setValidators(Validators.required)
+      } else {
+        jabatanCodeControl?.clearValidators()
+        jabatanCodeControl?.setValue('')
+      }
+      jabatanCodeControl?.updateValueAndValidity()
     })
   }
 
@@ -250,29 +261,30 @@ export class UkomRegisterComponent {
   }
 
   submit () {
-    const jenis_ukom = this.nonJFForm.get('jenis_ukom')?.value
+    const jenis_ukom = this.nonJFForm.get('jenis_ukom').value
     this.pesertaUkom.jenis_ukom = jenis_ukom
-    this.pesertaUkom.password = this.nonJFForm.get('password')?.value
-    this.pesertaUkom.nip = this.nonJFForm.get('nip')?.value
-    this.pesertaUkom.name = this.nonJFForm.get('name')?.value
-    this.pesertaUkom.email = this.nonJFForm.get('email')?.value
-    this.pesertaUkom.jabatanCode = this.nonJFForm.get('jabatanCode')?.value
-    this.pesertaUkom.jenjangCode = this.nonJFForm.get('jenjangCode')?.value
-    this.pesertaUkom.pangkatCode = this.nonJFForm.get('pangkatCode')?.value
+    this.pesertaUkom.password = this.nonJFForm.get('password').value
+    this.pesertaUkom.nip = this.nonJFForm.get('nip').value
+    this.pesertaUkom.name = this.nonJFForm.get('name').value
+    this.pesertaUkom.email = this.nonJFForm.get('email').value
+    // this.pesertaUkom.jenjangCode = this.nonJFForm.get('jenjangCode')?.value
+    // this.pesertaUkom.pangkatCode = this.nonJFForm.get('pangkatCode')?.value
     this.pesertaUkom.nextPangkatCode = this.nonJFForm.get('pangkatCode')?.value
     this.pesertaUkom.unitKerjaName = this.nonJFForm.get('unitKerjaName')?.value
 
     if (jenis_ukom === 'PERPINDAHAN_JABATAN') {
+      this.pesertaUkom.jabatanCode = this.nonJFForm.get('jabatanCode')?.value
       this.pesertaUkom.nextJabatanCode =
         this.nonJFForm.get('nextJabatanCode')?.value
       this.pesertaUkom.nextJenjangCode =
         this.nonJFForm.get('jenjangCode')?.value
     }
+
     if (jenis_ukom === 'PROMOSI') {
       this.pesertaUkom.nextJenjangCode =
         this.nonJFForm.get('jenjangCode')?.value
       this.pesertaUkom.nextJabatanCode =
-        this.nonJFForm.get('jabatanCode')?.value
+        this.nonJFForm.get('nextJabatanCode')?.value
     }
 
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {

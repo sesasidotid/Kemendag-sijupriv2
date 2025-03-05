@@ -233,16 +233,23 @@
           *ngIf="this.pesertaUkom.jenis_ukom === 'PERPINDAHAN_JABATAN'"
         >
           <label for="jabatanCode" class="form-label"
-            >Jabatan<span class="text-danger">*</span></label
+            >Jabatan Saat Ini<span class="text-danger">*</span></label
           >
-          <select
+          <input
+            type="text"
+            class="form-control"
+            id="jabatanCode"
+            required
+            formControlName="jabatanCode"
+          />
+          <!-- <select
             class="form-select"
             name="jabatanCode"
             id="jabatanCode"
             formControlName="jabatanCode"
           >
             <option selected value="" style="display: none">
-              Pilih Jabatan
+              Pilih Jabatan Saat Ini
             </option>
             <option
               *ngFor="let jabatan of jabatanList$ | async"
@@ -250,11 +257,12 @@
             >
               {{ jabatan.name }}
             </option>
-          </select>
+          </select> -->
           <div
             *ngIf="
               nonJFForm.get('jabatanCode')?.invalid &&
-              nonJFForm.get('jabatanCode')?.touched
+              (nonJFForm.get('jabatanCode')?.touched ||
+                nonJFForm.get('jabatanCode')?.dirty)
             "
             class="text-danger"
           >
@@ -304,27 +312,21 @@
             formControlName="jenjangCode"
           >
             <option selected value="" style="display: none">
-              Pilih Jenjang
+              Pilih Jenjang Yang Dituju
             </option>
-            <ng-container *ngIf="pesertaUkom.jenis_ukom !== 'PROMOSI'">
-              <ng-container
-                *ngIf="(jenjangList$ | async)?.length; else JenjangNotFound"
+            <ng-container
+              *ngIf="(jenjangList$ | async)?.length; else JenjangNotFound"
+            >
+              <option
+                *ngFor="let jenjang of jenjangList$ | async"
+                [value]="jenjang.code"
               >
-                <option
-                  *ngFor="let jenjang of jenjangList$ | async"
-                  [value]="jenjang.code"
-                >
-                  {{ jenjang.name }}
-                </option>
-              </ng-container>
-            </ng-container>
-
-            <ng-container *ngIf="pesertaUkom.jenis_ukom === 'PROMOSI'">
-              <option value="JJ1">Pemula</option>
+                {{ jenjang.name }}
+              </option>
             </ng-container>
 
             <ng-template #JenjangNotFound>
-              <option disabled>Mohon pilih jabatan</option>
+              <option disabled>Jenjang tidak ditemukan</option>
             </ng-template>
           </select>
           <div
@@ -351,7 +353,7 @@
             formControlName="pangkatCode"
           >
             <option selected value="" style="display: none">
-              Pilih Pangkat
+              Pilih Pangkat Dituju
             </option>
 
             <ng-container
@@ -366,7 +368,7 @@
             </ng-container>
           </select>
           <ng-template #pangkatNotFound>
-            <option disabled>Mohon pilih jenjang</option>
+            <option disabled>Pankat tidak ditemukan</option>
           </ng-template>
           <div
             *ngIf="

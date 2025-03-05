@@ -29,13 +29,7 @@ export class UkomGradeListComponent {
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Kelas', 'roomUkomName').build()
       )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue('NB CAT', (item: any) => {
-            return this.rounding(item.nbCat)
-          })
-          .build()
-      )
+
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
           .withDynamicValue('Skor CAT', (item: any) => {
@@ -43,24 +37,11 @@ export class UkomGradeListComponent {
           })
           .build()
       )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue('NB Wawancara', (item: any) => {
-            return this.rounding(item.nbWawancara)
-          })
-          .build()
-      )
+
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
           .withDynamicValue('Skor Wawancara', (item: any) => {
             return this.rounding(item.wawancaraGradeScore)
-          })
-          .build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue('NB Seminar', (item: any) => {
-            return this.rounding(item.nbSeminar)
           })
           .build()
       )
@@ -73,18 +54,54 @@ export class UkomGradeListComponent {
       )
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
-          .withDynamicValue('NB Praktik', (item: any) => {
-            return this.rounding(item.nbPraktik)
-          })
-          .build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
           .withDynamicValue('Skor Praktik', (item: any) => {
             return this.rounding(item.praktikGradeScore)
           })
           .build()
       )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('Skor Portofolio', (item: any) => {
+            return this.rounding(item.portofolioGradeScore)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('UKT', (item: any) => {
+            return this.rounding(item.ukt)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB CAT', (item: any) => {
+            return this.rounding(item.nbCat)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB Wawancara', (item: any) => {
+            return this.rounding(item.nbWawancara)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB Seminar', (item: any) => {
+            return this.rounding(item.nbSeminar)
+          })
+          .build()
+      )
+      .addPrimaryColumn(
+        new PrimaryColumnBuilder()
+          .withDynamicValue('NB Praktik', (item: any) => {
+            return this.rounding(item.nbPraktik)
+          })
+          .build()
+      )
+
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
           .withDynamicValue('NB Portofolio', (item: any) => {
@@ -94,8 +111,8 @@ export class UkomGradeListComponent {
       )
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
-          .withDynamicValue('Skor Portofolio', (item: any) => {
-            return this.rounding(item.portofolioGradeScore)
+          .withDynamicValue('NB UKT', (item: any) => {
+            return this.rounding(item.nbUkt)
           })
           .build()
       )
@@ -110,20 +127,6 @@ export class UkomGradeListComponent {
         new PrimaryColumnBuilder()
           .withDynamicValue('Skor', (item: any) => {
             return this.rounding(item.score)
-          })
-          .build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue('NB UKT', (item: any) => {
-            return this.rounding(item.nbUkt)
-          })
-          .build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue('UKT', (item: any) => {
-            return this.rounding(item.ukt)
           })
           .build()
       )

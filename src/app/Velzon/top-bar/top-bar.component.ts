@@ -211,12 +211,17 @@ export class TopBarComponent {
       this.document.body.classList.toggle('twocolumn-panel')
     }
   }
-
   logOut () {
     if (LoginContext.getApplicationCode() === 'siukom-participant') {
-      this.router.navigate(['/login-cat'])
+      this.router.navigate(['/login-cat']).then(() => {
+        console.log('reload')
+        window.location.reload()
+      })
     } else {
-      this.router.navigate(['/login'])
+      this.router.navigate(['/login']).then(() => {
+        console.log('reload')
+        window.location.reload()
+      })
     }
 
     LoginContext.release()

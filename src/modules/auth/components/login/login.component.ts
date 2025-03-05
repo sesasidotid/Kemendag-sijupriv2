@@ -54,6 +54,8 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {
+    setTimeout(() => {}, 0)
+
     if (LoginContext.isLogin()) {
       this.router.navigate(['/'])
     }
@@ -66,7 +68,8 @@ export class LoginComponent {
       nip: new FormControl('', [
         Validators.required,
         Validators.pattern('^[0-9]+$'),
-        Validators.minLength(18)
+        Validators.minLength(18),
+        Validators.maxLength(18)
       ]),
       password: new FormControl('', [Validators.required]),
       recaptcha: new FormControl(null, [Validators.required])
@@ -91,10 +94,14 @@ export class LoginComponent {
   }
 
   backToLandingPage () {
+    this.isLoginLoading$.next(false)
     this.router.navigate([''])
+    // this.router.navigateByUrl('/')
   }
 
   onSubmit () {
+    if (this.loginForm.invalid) return
+
     this.isLoginLoading$.next(true)
     if (this.loginForm.valid) {
       console.log(this.loginForm.value)

@@ -75,7 +75,8 @@ export class UserAddComponent {
       nip: new FormControl('', [
         Validators.required,
         Validators.pattern('^[0-9]+$'),
-        Validators.minLength(18)
+        Validators.minLength(18),
+        Validators.maxLength(18)
       ]),
       name: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),

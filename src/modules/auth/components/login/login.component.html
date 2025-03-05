@@ -72,8 +72,9 @@
                       <small *ngIf="loginForm.get('nip').errors?.['required']"
                         >NIP perlu diisi.</small
                       >
-                      <small *ngIf="loginForm.get('nip').errors?.['minlength']"
-                        >NIP minimal 18 karakter.</small
+                      <small
+                        *ngIf="loginForm.get('nip').errors?.['minlength'] || loginForm.get('nip').errors?.['maxlength']"
+                        >NIP harus 18 karakter.</small
                       >
                       <small *ngIf="loginForm.get('nip').errors?.['pattern']"
                         >NIP harus angka.</small
@@ -144,6 +145,7 @@
                     >
                       Masuk Sekarang
                     </button>
+
                     <button
                       *ngIf="isLoginLoading$ | async"
                       class="btn grad-button w-100"
@@ -157,6 +159,7 @@
                         <span class="visually-hidden">Loading...</span>
                       </div>
                     </button>
+
                     <button
                       class="btn grad-button w-100 mt-1"
                       (click)="backToLandingPage()"

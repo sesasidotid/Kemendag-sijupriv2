@@ -14,6 +14,7 @@ import {
 import { PagableComponent } from '../../modules/base/components/pagable/pagable.component'
 import { Router } from '@angular/router'
 import { forkJoin } from 'rxjs'
+import { LoginContext } from '../../modules/base/commons/login-context'
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -24,6 +25,7 @@ import { forkJoin } from 'rxjs'
 export class AdminDashboardComponent {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective
 
+  userRole: string[] = []
   pagable: Pagable
   startMonth: number = 1
   endMonth: number = 12
@@ -68,6 +70,33 @@ export class AdminDashboardComponent {
       y: { beginAtZero: true }
     }
   }
+
+  allMenuItems = [
+    {
+      role: 'ADMIN_AKP',
+      label: 'AKP',
+      route: '/akp/akp-task-list',
+      count: 'totalAKPPending'
+    },
+    {
+      role: 'ADMIN_UKOM',
+      label: 'UKom',
+      route: '/ukom/ukom-task-list',
+      count: 'totalUKOMPending'
+    },
+    {
+      role: 'ADMIN_FORMASI',
+      label: 'FORMASI',
+      route: '/formasi/formasi-task-list',
+      count: 'totalFormasiPending'
+    },
+    {
+      role: 'ADMIN_PAK',
+      label: 'PAK',
+      route: '/pak/pak-task-list',
+      count: 'totalPAKPending'
+    }
+  ]
 
   totalAKPPending: number = 0
   totalUKOMPending: number = 0
@@ -177,6 +206,9 @@ export class AdminDashboardComponent {
   }
 
   ngOnInit () {
+    this.userRole = LoginContext.getRoleCodes()
+    console.log(this.userRole)
+
     this.fetchData()
     this.getUserStats()
   }

@@ -45,12 +45,15 @@ export class AkpTaskComponent {
     private converterService: ConverterService,
     private sanitizer: DomSanitizer,
     private confirmationService: ConfirmationService
-  ) {}
+  ) {
+    console.log('constructor', this.AKPTask)
+  }
 
   ngOnInit () {
     this.getJF()
     this.getAKPTask()
     this.fetchPhotoProfile()
+    console.log('ngOnInit', this.AKPTask)
   }
 
   fetchPhotoProfile () {
@@ -85,8 +88,10 @@ export class AkpTaskComponent {
     this.akpDataLoading$.next(true)
     this.akpTaskService.findByNip(LoginContext.getUserId()).subscribe({
       next: response => {
+        console.log('pregetAKPTask', this.AKPTask)
+
         this.AKPTask = response
-        console.log('AKPTask', this.AKPTask)
+        console.log('postgetAKPTask', this.AKPTask)
 
         switch (this.AKPTask.flowId) {
           case 'akp_flow_1':

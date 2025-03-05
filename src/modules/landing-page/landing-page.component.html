@@ -1,5 +1,5 @@
 <nav class="navbar">
-  <img src="assets/logo/kemendag-logo-light.png" width="120" />
+  <a href="/"> <img src="assets/logo/kemendag-logo-light.png" width="120" /></a>
   <div class="toggle" (click)="toggleMenu()">
     <span></span>
     <span></span>
@@ -183,10 +183,17 @@
               >Kode UKom harus angka.</small
             > -->
             </div>
-            <button
+            <!-- <button
               routerLink="/login"
               class="btn btn-secondary grad-button mt-4"
               [disabled]="ukomForm.invalid"
+            >
+              Ikuti UKom
+            </button> -->
+            <button
+              class="btn btn-secondary grad-button mt-4"
+              [disabled]="ukomForm.invalid"
+              type="submit"
             >
               Ikuti UKom
             </button>

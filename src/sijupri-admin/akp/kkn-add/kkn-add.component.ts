@@ -118,6 +118,7 @@ export class KknAddComponent {
 
   add () {
     this.kategoriInstrument.pertanyaanList.push(new Pertanyaan())
+    console.log('as', this.kategoriInstrument.pertanyaanList)
   }
 
   remove (index: number) {

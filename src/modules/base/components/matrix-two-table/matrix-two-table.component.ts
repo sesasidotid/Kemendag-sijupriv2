@@ -33,7 +33,6 @@ export class MatrixTwoTableComponent {
   paginationPageSize = 10
   paginationPageSizeSelector = [10, 20, 30, 100]
 
-  // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
     {
       field: 'pertanyaanName',

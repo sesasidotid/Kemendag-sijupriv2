@@ -12,7 +12,9 @@
       />
       <div
         class="feedback"
-        *ngIf="addUserForm.get('nip').invalid && addUserForm.get('nip').touched"
+        *ngIf="
+          addUserForm.get('name').invalid && addUserForm.get('name').touched
+        "
       >
         <small *ngIf="addUserForm.get('name').errors?.['required']"
           >Nama perlu diisi.</small
@@ -39,8 +41,9 @@
         <small *ngIf="addUserForm.get('nip').errors?.['required']"
           >NIP perlu diisi.</small
         >
-        <small *ngIf="addUserForm.get('nip').errors?.['minlength']"
-          >NIP minimal 18 karakter.</small
+        <small
+          *ngIf="addUserForm.get('nip').errors?.['minlength'] || addUserForm.get('nip').errors?.['maxlength']"
+          >NIP harus 18 karakter.</small
         >
         <small *ngIf="addUserForm.get('nip').errors?.['pattern']"
           >NIP harus angka.</small
