@@ -7,96 +7,107 @@
     <div class="card">
       <div class="card-header align-items-center d-flex">
         <h4 class="card-title mb-0 flex-grow-1">Pendaftaran UKom</h4>
-        <div class="flex-shrink-0"></div>
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-lg-12">
+          <div class="col-lg-12" *ngIf="pesertaUkom.name">
             <div class="mb-3">
-              <label for="firstnameInput" class="form-label">
-                First Name
-              </label>
+              <label class="form-label">First Name</label>
               <p class="border-bottom">{{ pesertaUkom.name }}</p>
             </div>
           </div>
-          <!--end col-->
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.phone">
             <div class="mb-3">
-              <label for="lastnameInput" class="form-label"> No. HP </label>
+              <label class="form-label">No. HP</label>
               <p class="border-bottom">{{ pesertaUkom.phone }}</p>
             </div>
           </div>
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.email">
             <div class="mb-3">
-              <label for="emailInput" class="form-label"> Email </label>
+              <label class="form-label">Email</label>
               <p class="border-bottom">{{ pesertaUkom.email }}</p>
             </div>
           </div>
-          <!--end col-->
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.tempatLahir">
             <div class="mb-3">
-              <label for="emailInput" class="form-label"> Tempat Lahir </label>
+              <label class="form-label">Tempat Lahir</label>
               <p class="border-bottom">{{ pesertaUkom.tempatLahir }}</p>
             </div>
           </div>
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.tanggalLahir">
             <div class="mb-3">
-              <label for="emailInput" class="form-label"> Tanggal Lahir </label>
+              <label class="form-label">Tanggal Lahir</label>
               <p class="border-bottom">{{ pesertaUkom.tanggalLahir }}</p>
             </div>
           </div>
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.jenisKelaminName">
             <div class="mb-3">
-              <label for="emailInput" class="form-label"> Jenis Kelamin </label>
+              <label class="form-label">Jenis Kelamin</label>
               <p class="border-bottom">{{ pesertaUkom.jenisKelaminName }}</p>
             </div>
           </div>
-          <div class="col-lg-12">
+
+          <div class="col-lg-12" *ngIf="pesertaUkom.nik">
             <div class="mb-3">
-              <label for="emailInput" class="form-label"> NIK </label>
+              <label class="form-label">NIK</label>
               <p class="border-bottom">{{ pesertaUkom.nik }}</p>
             </div>
           </div>
-          <hr />
-          <div class="col-lg-6">
+
+          <hr
+            *ngIf="
+              pesertaUkom.jabatanName ||
+              pesertaUkom.nextJabatanName ||
+              pesertaUkom.jenjangName ||
+              pesertaUkom.nextJenjangName ||
+              pesertaUkom.pangkatName ||
+              pesertaUkom.nextPangkatName
+            "
+          />
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.jabatanName">
             <div class="mb-3">
-              <label for="emailInput" class="form-label"> Jabatan </label>
+              <label class="form-label">Jabatan</label>
               <p class="border-bottom">{{ pesertaUkom.jabatanName }}</p>
             </div>
           </div>
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.nextJabatanName">
             <div class="mb-3">
-              <label for="emailInput" class="form-label">
-                Jabatan Yang Dituju
-              </label>
+              <label class="form-label">Jabatan Yang Dituju</label>
               <p class="border-bottom">{{ pesertaUkom.nextJabatanName }}</p>
             </div>
           </div>
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.jenjangName">
             <div class="mb-3">
-              <label for="emailInput" class="form-label"> Jenjang </label>
+              <label class="form-label">Jenjang</label>
               <p class="border-bottom">{{ pesertaUkom.jenjangName }}</p>
             </div>
           </div>
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.nextJenjangName">
             <div class="mb-3">
-              <label for="emailInput" class="form-label">
-                Jenjang Yang Dituju
-              </label>
+              <label class="form-label">Jenjang Yang Dituju</label>
               <p class="border-bottom">{{ pesertaUkom.nextJenjangName }}</p>
             </div>
           </div>
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.pangkatName">
             <div class="mb-3">
-              <label for="emailInput" class="form-label"> Pangkat </label>
+              <label class="form-label">Pangkat</label>
               <p class="border-bottom">{{ pesertaUkom.pangkatName }}</p>
             </div>
           </div>
-          <div class="col-lg-6">
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.nextPangkatName">
             <div class="mb-3">
-              <label for="emailInput" class="form-label">
-                Pangkat Yang Dituju
-              </label>
+              <label class="form-label">Pangkat Yang Dituju</label>
               <p class="border-bottom">{{ pesertaUkom.nextPangkatName }}</p>
             </div>
           </div>
@@ -191,18 +202,48 @@
           "
         >
           <button
-            *ngIf="isApproveEnable"
+            *ngIf="isApproveEnable && !(hadItemsLoading$ | async)"
             class="btn btn-success me-1"
             (click)="submit(false)"
           >
             Terima
           </button>
+
           <button
             class="btn btn-danger"
             [disabled]="isApproveEnable"
             (click)="submit(true)"
+            *ngIf="!(hadItemsLoading$ | async)"
           >
             Tolak
+          </button>
+
+          <button
+            *ngIf="isApproveEnable && hadItemsLoading$ | async"
+            class="btn btn-success me-1"
+            disabled
+          >
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+
+          <button
+            *ngIf="!isApproveEnable && hadItemsLoading$ | async"
+            class="btn btn-danger"
+            disabled
+          >
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
           </button>
         </div>
       </div>

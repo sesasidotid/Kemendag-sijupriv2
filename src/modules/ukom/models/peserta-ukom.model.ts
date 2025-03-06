@@ -36,6 +36,8 @@ export class PesertaUkom extends Serializable {
   pendingTaskHistory: any[] = undefined
 
   unitKerjaName: string = undefined
+  JabatanName: string = undefined
+  JenjangName: string = undefined
 
   constructor (object?: { [key: string]: any }) {
     super()

@@ -14,7 +14,7 @@
           placeholder="Masukan nama tempat UKom"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kompetensiForm.get('code').invalid &&
             kompetensiForm.get('code').touched
@@ -41,7 +41,7 @@
           placeholder="Masukan nama kompetensi"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kompetensiForm.get('name').invalid &&
             kompetensiForm.get('name').touched
@@ -64,7 +64,6 @@
           class="form-select"
           name="jabatan_code"
           formControlName="jabatan_code"
-          (change)="onSwitchJabatan($event)"
         >
           <option selected value="" style="display: none">Pilih Jabatan</option>
           <option
@@ -75,7 +74,7 @@
           </option>
         </select>
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kompetensiForm.get('jabatan_code').invalid &&
             kompetensiForm.get('jabatan_code').touched
@@ -98,8 +97,8 @@
           class="form-select"
           name="jenjang_code"
           formControlName="jenjang_code"
-          (change)="onSwitchJenjang($event)"
         >
+          <option selected value="" style="display: none">Pilih Jenjang</option>
           <option
             *ngFor="let jenjang of jenjangList$ | async"
             [value]="jenjang.code"
@@ -109,7 +108,7 @@
         </select>
 
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kompetensiForm.get('jenjang_code').invalid &&
             kompetensiForm.get('jenjang_code').touched

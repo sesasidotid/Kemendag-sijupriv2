@@ -10,7 +10,6 @@ import {
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
-import { Router, RouterLink } from '@angular/router'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
@@ -45,10 +44,11 @@ export class UkomClassAddComponent {
 
   constructor (
     private confirmationService: ConfirmationService,
-    private router: Router,
     private apiService: ApiService,
     private handlerService: HandlerService
-  ) {
+  ) {}
+
+  ngOnInit () {
     this.kelasForm = new FormGroup({
       name: new FormControl('', Validators.required),
       jabatan: new FormControl('', Validators.required),
@@ -58,9 +58,12 @@ export class UkomClassAddComponent {
       exam_start_at: new FormControl('', Validators.required),
       exam_end_at: new FormControl('', Validators.required)
     })
+
+    this.getJabatanList()
+    this.getListJenjang()
   }
 
-  ngOnInit () {
+  getJabatanList () {
     this.jabatanList$ = this.apiService
       .getData(`/api/v1/jabatan`)
       .pipe(
@@ -70,16 +73,11 @@ export class UkomClassAddComponent {
           )
         )
       )
-
-    this.jabatanList$.subscribe(jabatanList => {
-      console.log(jabatanList)
-    })
   }
 
-  getListJenjang (jabatanCode: string) {
+  getListJenjang () {
     this.jenjangList$ = this.apiService
-      //   .getData(`/api/v1/jenjang`)
-      .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
+      .getData(`/api/v1/jenjang`)
       .pipe(
         map(response =>
           response.map(
@@ -88,13 +86,7 @@ export class UkomClassAddComponent {
         )
       )
   }
-  onJabatanSwitch (event: Event) {
-    const jabatanCode = (event.target as HTMLSelectElement).value
 
-    if (jabatanCode) {
-      this.getListJenjang(jabatanCode)
-    }
-  }
   submit () {
     this.confirmationService.open(false).subscribe({
       next: result => {

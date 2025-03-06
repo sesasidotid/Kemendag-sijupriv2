@@ -1,22 +1,17 @@
-import { DokumenUkomList } from '../../../../modules/ukom/models/ukom-task-detail.modal'
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
-import { Ukom } from '../../../../modules/ukom/models/ukom.model'
-import { JF } from '../../../../modules/siap/models/jf.model'
+import { Component, Input } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { PesertaUkom } from '../../../../modules/ukom/models/peserta-ukom.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { DokumenUkomPersyaratan } from '../../../../modules/maintenance/models/dokumen-persyaratan-ukom'
 import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
-import { switchMap } from 'rxjs'
 import { RevisiDokumenUkom } from '../../../../modules/ukom/models/revisi-dokumen-ukom.model'
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
 import { FilePreviewComponent } from '../file-preview/file-preview.component'
+import { BehaviorSubject } from 'rxjs'
+
 @Component({
   selector: 'app-nonjf-revisi-ukom',
   standalone: true,
@@ -39,6 +34,14 @@ export class NonjfRevisiUkomComponent {
 
   inputs: FIleHandler = {
     files: {},
+    maxSize: 5 * 1024 * 1024,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'application/pdf'
+    ],
     listen: (
       key: string,
       source: string,
@@ -51,6 +54,7 @@ export class NonjfRevisiUkomComponent {
       }
     }
   }
+  hadItemsLoading$ = new BehaviorSubject<boolean>(false)
 
   constructor (
     private apiService: ApiService,
@@ -90,30 +94,12 @@ export class NonjfRevisiUkomComponent {
   }
 
   onSave () {
+    this.hadItemsLoading$.next(true)
     console.log(this.key)
 
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
     }
-
-    // for (const key in this.detectedDokumen) {
-    //   if (this.detectedDokumen.hasOwnProperty(key)) {
-    //     const detected = this.detectedDokumen[key]
-
-    //     this.pesertaUkom.dokumenUkomList.push({
-    //       dokumenFile: detected.base64,
-    //       dokumenPersyaratanName:
-    //         this.pendingTask.nip +
-    //         '_' +
-    //         'dokumenPersyaratanUkom' +
-    //         '_' +
-    //         Date.now(),
-    //       dokumenPersyaratanId: this.pendingTask.dokumenUkomList.find(
-    //         dokumen => dokumen.dokumenPersyaratanName === detected.label
-    //       )?.dokumenPersyaratanId
-    //     })
-    //   }
-    // }
 
     const documentMap = new Map()
 
@@ -134,13 +120,11 @@ export class NonjfRevisiUkomComponent {
             dokumenPersyaratanId: existingDokumen.dokumenPersyaratanId
           }
 
-          // Store only the latest document for each dokumenPersyaratanId
           documentMap.set(existingDokumen.dokumenPersyaratanId, newDoc)
         }
       }
     }
 
-    // Convert the Map values to an array and assign it to pesertaUkom.dokumenUkomList
     this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
 
     this.revisedDokumen.id = this.pendingTask.id
@@ -158,8 +142,17 @@ export class NonjfRevisiUkomComponent {
             this.revisedDokumen
           )
           .subscribe({
-            next: () => window.location.reload(),
-            error: error => this.handlerService.handleException(error)
+            next: () => {
+              this.hadItemsLoading$.next(false)
+              window.location.reload()
+            },
+            error: error => {
+              this.hadItemsLoading$.next(false)
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal mengupload dokumen'
+              )
+            }
           })
       }
     })

@@ -62,3 +62,19 @@ main {
   width: 100% !important;
   min-width: 100% !important;
 }
+
+.grad-button-secondary {
+  color: #2967be !important; /* Use primary color for text */
+  background: linear-gradient(
+    45deg,
+    #dbeafe,
+    #e5f5e5
+  ) !important; /* Lighter shades */
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, #e5f5e5, #dbeafe) !important;
+    color: #1d4ed8 !important; /* Darker text on hover */
+    border-color: #1d4ed8 !important;
+  }
+}

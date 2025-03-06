@@ -111,7 +111,7 @@ export class UkomClassListComponent {
             .setAction((data: any) => {
               this.setDefaultFormValues(data)
               this.toggleModal()
-              this.getListJenjang(data.jabatanCode)
+              this.getListJenjang()
             }, 'primary')
             .withIcon('update')
             .build()
@@ -226,36 +226,26 @@ export class UkomClassListComponent {
     })
   }
 
-  onJabatanSwitch (event: Event) {
-    const jabatanCode = (event.target as HTMLSelectElement).value
+  getListJenjang () {
+    this.apiService.getData(`/api/v1/jenjang`).subscribe({
+      next: (response: any) => {
+        const jenjangs = response.map(
+          (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+        )
 
-    if (jabatanCode) {
-      this.getListJenjang(jabatanCode)
-    }
+        jenjangs.forEach((jenjang: any) => {
+          this.jenjangMap[jenjang.code] = jenjang.name
+        })
+
+        this.fixedJenjangList$ = new BehaviorSubject(jenjangs).asObservable()
+      },
+      error: err => {
+        console.error('Error fetching jenjang data:', err)
+      }
+    })
   }
 
-  getListJenjang (jabatanCode?: string) {
-    this.apiService
-      .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
-      .subscribe({
-        next: (response: any) => {
-          const jenjangs = response.map(
-            (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
-          )
-
-          jenjangs.forEach((jenjang: any) => {
-            this.jenjangMap[jenjang.code] = jenjang.name
-          })
-
-          this.fixedJenjangList$ = new BehaviorSubject(jenjangs).asObservable()
-        },
-        error: err => {
-          console.error('Error fetching jenjang data:', err)
-        }
-      })
-  }
-
-  getJenjang (jabatanCode?: string) {
+  getJenjang () {
     this.apiService.getData(`/api/v1/jenjang/`).subscribe({
       next: (response: any) => {
         const jenjangs = response.map(

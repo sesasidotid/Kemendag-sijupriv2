@@ -1,5 +1,5 @@
 import { PesertaUkom } from '../../../ukom/models/peserta-ukom.model'
-import { Component } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import { Jabatan } from '../../../maintenance/models/jabatan.model'
 import { Jenjang } from '../../../maintenance/models/jenjang.modle'
 import { Pangkat } from '../../../maintenance/models/pangkat.model'
@@ -27,6 +27,8 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 import { FilePreviewComponent } from '../file-preview/file-preview.component'
 import { Router } from '@angular/router'
 import { LandingPageComponent } from '../../../landing-page/landing-page.component'
+import { BehaviorSubject } from 'rxjs'
+
 @Component({
   selector: 'app-ukom-register',
   standalone: true,
@@ -44,6 +46,8 @@ import { LandingPageComponent } from '../../../landing-page/landing-page.compone
   styleUrl: './ukom-register.component.scss'
 })
 export class UkomRegisterComponent {
+  @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
+
   nonJFForm: FormGroup
 
   jabatanList$: Observable<Jabatan[]>
@@ -71,6 +75,14 @@ export class UkomRegisterComponent {
   qrCodeDownloadLink: SafeUrl = ''
   inputs: FIleHandler = {
     files: {},
+    maxSize: 5 * 1024 * 1024,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'application/pdf'
+    ],
     listen: (
       key: string,
       source: string,
@@ -86,6 +98,8 @@ export class UkomRegisterComponent {
     }
   }
 
+  hadItemsLoading$ = new BehaviorSubject<boolean>(false)
+
   constructor (
     private apiService: ApiService,
     private handlerService: HandlerService,
@@ -93,41 +107,6 @@ export class UkomRegisterComponent {
     private router: Router
   ) {
     setTimeout(() => {}, 0)
-
-    this.nonJFForm = new FormGroup({
-      jenis_ukom: new FormControl('', Validators.required),
-      nip: new FormControl('', [
-        Validators.required,
-        Validators.pattern(/^\d{18}$/)
-      ]),
-      name: new FormControl('', Validators.required),
-      email: new FormControl('', Validators.required),
-      jabatanCode: new FormControl(''),
-      jenjangCode: new FormControl('', Validators.required),
-      pangkatCode: new FormControl('', Validators.required),
-      nextJabatanCode: new FormControl('', Validators.required),
-      nextJenjangCode: new FormControl(''),
-      password: new FormControl('', [
-        Validators.required,
-        Validators.minLength(8)
-      ]),
-      confirmPassword: new FormControl('', [
-        Validators.required,
-        this.passwordMatchValidator.bind(this)
-      ]),
-      unitKerjaName: new FormControl('', Validators.required)
-    })
-
-    this.nonJFForm.get('jenis_ukom')?.valueChanges.subscribe(value => {
-      const jabatanCodeControl = this.nonJFForm.get('jabatanCode')
-      if (value === 'PERPINDAHAN_JABATAN') {
-        jabatanCodeControl?.setValidators(Validators.required)
-      } else {
-        jabatanCodeControl?.clearValidators()
-        jabatanCodeControl?.setValue('')
-      }
-      jabatanCodeControl?.updateValueAndValidity()
-    })
   }
 
   passwordMatchValidator (
@@ -151,16 +130,6 @@ export class UkomRegisterComponent {
 
   backToLandingPage () {
     this.router.navigate([''])
-  }
-
-  ngOnInit () {
-    this.getListJabatan()
-    this.getListJenjang()
-    this.getListPanngkat()
-
-    this.instansiList$.subscribe(instansiList => {
-      this.filteredInstansiList = instansiList
-    })
   }
 
   getDokumenPersyaratan (jenis_ukom: string) {
@@ -233,6 +202,7 @@ export class UkomRegisterComponent {
   }
 
   onJenisUkomSwitch (event: Event) {
+    this.clearFilesName()
     const jenis_ukom = (event.target as HTMLSelectElement).value
 
     this.nonJFForm.get('nextJabatanCode')?.setValue('')
@@ -241,6 +211,8 @@ export class UkomRegisterComponent {
     this.nonJFForm.get('jenjangCode')?.setValue('')
     this.nonJFForm.get('pangkatCode')?.setValue('')
 
+    this.inputs.files = {}
+    this.detectedDokumen = {}
     if (jenis_ukom) {
       this.nonJFForm.patchValue({ jenis_ukom })
       this.pesertaUkom.jenis_ukom = jenis_ukom
@@ -256,36 +228,32 @@ export class UkomRegisterComponent {
     }
   }
 
+  clearFilesName () {
+    if (this.fileHandler) {
+      this.fileHandler.clearFileName()
+    }
+  }
+
   onChangeURL (url: SafeUrl) {
     this.qrCodeDownloadLink = url
   }
 
   submit () {
+    this.hadItemsLoading$.next(true)
     const jenis_ukom = this.nonJFForm.get('jenis_ukom').value
-    this.pesertaUkom.jenis_ukom = jenis_ukom
-    this.pesertaUkom.password = this.nonJFForm.get('password').value
-    this.pesertaUkom.nip = this.nonJFForm.get('nip').value
     this.pesertaUkom.name = this.nonJFForm.get('name').value
     this.pesertaUkom.email = this.nonJFForm.get('email').value
-    // this.pesertaUkom.jenjangCode = this.nonJFForm.get('jenjangCode')?.value
-    // this.pesertaUkom.pangkatCode = this.nonJFForm.get('pangkatCode')?.value
-    this.pesertaUkom.nextPangkatCode = this.nonJFForm.get('pangkatCode')?.value
+    this.pesertaUkom.password = this.nonJFForm.get('password').value
+    this.pesertaUkom.nip = this.nonJFForm.get('nip').value
     this.pesertaUkom.unitKerjaName = this.nonJFForm.get('unitKerjaName')?.value
-
-    if (jenis_ukom === 'PERPINDAHAN_JABATAN') {
-      this.pesertaUkom.jabatanCode = this.nonJFForm.get('jabatanCode')?.value
-      this.pesertaUkom.nextJabatanCode =
-        this.nonJFForm.get('nextJabatanCode')?.value
-      this.pesertaUkom.nextJenjangCode =
-        this.nonJFForm.get('jenjangCode')?.value
-    }
-
-    if (jenis_ukom === 'PROMOSI') {
-      this.pesertaUkom.nextJenjangCode =
-        this.nonJFForm.get('jenjangCode')?.value
-      this.pesertaUkom.nextJabatanCode =
-        this.nonJFForm.get('nextJabatanCode')?.value
-    }
+    this.pesertaUkom.jenis_ukom = jenis_ukom
+    this.pesertaUkom.jabatanName = this.nonJFForm.get('jabatanName')?.value
+    this.pesertaUkom.jenjangName = this.nonJFForm.get('jenjangName')?.value
+    this.pesertaUkom.pangkatCode = this.nonJFForm.get('pangkatCode')?.value
+    this.pesertaUkom.nextJabatanCode =
+      this.nonJFForm.get('nextJabatanCode')?.value
+    this.pesertaUkom.nextJenjangCode =
+      this.nonJFForm.get('nextJenjangCode')?.value
 
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
@@ -323,31 +291,79 @@ export class UkomRegisterComponent {
 
         console.log('payload', this.pesertaUkom)
 
-        // this.apiService
-        //   .postData('/api/v1/participant_ukom/task', this.pesertaUkom)
-        //   .subscribe({
-        //     next: response => {
-        //       this.registerComplete = true
-        //       this.myAngularxQrCode = `${window.location.origin}/ukom/external/status?key=${response.key}`
-        //       this.stringCode = response.key
-        //       this.handlerService.handleAlert(
-        //         'Success',
-        //         'Data berhasil disimpan'
-        //       )
-        //     },
-        //     error: error => {
-        //       console.log('error', error)
-        //       this.handlerService.handleAlert(
-        //         'Error',
-        //         'Gagal mendaftar UKom, silahkan coba lagi'
-        //       )
-        //     }
-        //   })
+        this.apiService
+          .postData('/api/v1/participant_ukom/task', this.pesertaUkom)
+          .subscribe({
+            next: response => {
+              this.registerComplete = true
+              this.myAngularxQrCode = `${window.location.origin}/ukom/external/status?key=${response.key}`
+              this.stringCode = response.key
+              this.handlerService.handleAlert(
+                'Success',
+                'Data berhasil disimpan'
+              )
+              this.hadItemsLoading$.next(false)
+            },
+            error: error => {
+              this.hadItemsLoading$.next(false)
+              console.log('error', error)
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal mendaftar UKom, silahkan coba lagi'
+              )
+            }
+          })
       },
       error: error => {
+        this.hadItemsLoading$.next(false)
         console.log('error', error)
         this.handlerService.handleAlert('Error', error.error.message)
       }
+    })
+  }
+
+  ngOnInit () {
+    this.nonJFForm = new FormGroup({
+      name: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(8)
+      ]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        this.passwordMatchValidator.bind(this)
+      ]),
+      jenis_ukom: new FormControl('', Validators.required),
+      nip: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^\d{18}$/)
+      ]),
+      unitKerjaName: new FormControl('', Validators.required),
+      jabatanName: new FormControl('', Validators.required),
+      jenjangName: new FormControl(''),
+      pangkatCode: new FormControl('', Validators.required),
+      nextJabatanCode: new FormControl('', Validators.required),
+      nextJenjangCode: new FormControl('', Validators.required)
+    })
+
+    this.nonJFForm.get('jenis_ukom')?.valueChanges.subscribe(value => {
+      const jabatanCodeControl = this.nonJFForm.get('jabatanCode')
+      if (value === 'PERPINDAHAN_JABATAN') {
+        jabatanCodeControl?.setValidators(Validators.required)
+      } else {
+        jabatanCodeControl?.clearValidators()
+        jabatanCodeControl?.setValue('')
+      }
+      jabatanCodeControl?.updateValueAndValidity()
+    })
+
+    this.getListJabatan()
+    this.getListJenjang()
+    this.getListPanngkat()
+
+    this.instansiList$.subscribe(instansiList => {
+      this.filteredInstansiList = instansiList
     })
   }
 }

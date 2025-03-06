@@ -4,6 +4,11 @@
       <label for="emailInput" class="form-label">
         File yang perlu diperbaiki
       </label>
+      <small class="text-muted d-block">
+        Jenis file yang diperbolehkan:
+        {{ inputs.allowedTypes?.join(', ') }} <br />
+        Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
+      </small>
     </div>
     <div class="row">
       <app-file-handler [inputs]="inputs"></app-file-handler>
@@ -16,8 +21,19 @@
         (click)="onSave()"
         class="btn btn-success"
         [disabled]="isAnyFileMissing()"
+        *ngIf="!(hadItemsLoading$ | async)"
       >
         Simpan
+      </button>
+
+      <button *ngIf="hadItemsLoading$ | async" class="btn btn-success" disabled>
+        <div
+          class="spinner-border"
+          style="width: 19px; height: 19px"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
       </button>
     </div>
   </div>

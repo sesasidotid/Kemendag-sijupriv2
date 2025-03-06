@@ -1,5 +1,4 @@
 <section>
-  <!-- <form [formGroup]="kelasForm" (ngSubmit)="submit()"> -->
   <form [formGroup]="kelasForm">
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
@@ -15,7 +14,7 @@
           placeholder="Masukan nama tempat UKom"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="kelasForm.get('name').invalid && kelasForm.get('name').touched"
         >
           <small *ngIf="kelasForm.get('name').errors?.['required']"
@@ -27,7 +26,7 @@
 
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Jabatan <span class="text-danger">*</span></label
+        >Jabatan<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <select
@@ -35,18 +34,24 @@
           class="form-select"
           name="jabatan"
           formControlName="jabatan"
-          (change)="onJabatanSwitch($event)"
         >
-          <!-- <option [value]="">Pilih</option> -->
-          <option
-            *ngFor="let jabatan of jabatanList$ | async"
-            [value]="jabatan.code"
+          <option selected value="" style="display: none">Pilih Jabatan</option>
+          <ng-container
+            *ngIf="(jabatanList$ | async)?.length; else jabatanNotFound"
           >
-            {{ jabatan.name }}
-          </option>
+            <option
+              *ngFor="let jabatan of jabatanList$ | async"
+              [value]="jabatan.code"
+            >
+              {{ jabatan.name }}
+            </option>
+          </ng-container>
+          <ng-template #jabatanNotFound>
+            <option disabled>Jabatan tidak ditemukan</option>
+          </ng-template>
         </select>
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kelasForm.get('jabatan').invalid && kelasForm.get('jabatan').touched
           "
@@ -60,7 +65,7 @@
 
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Jenjang <span class="text-danger">*</span></label
+        >Jenjang<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <select
@@ -69,6 +74,8 @@
           name="jenjang"
           formControlName="jenjang"
         >
+          <option selected value="" style="display: none">Pilih Jenjang</option>
+
           <ng-container
             *ngIf="(jenjangList$ | async)?.length; else jabatanNotSelected"
           >
@@ -80,12 +87,12 @@
             </option>
           </ng-container>
           <ng-template #jabatanNotSelected>
-            <option disabled>Silahkan pilih jabatan</option>
+            <option disabled>Jenjang tidak ditemukan</option>
           </ng-template>
         </select>
 
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kelasForm.get('jenjang').invalid && kelasForm.get('jenjang').touched
           "
@@ -99,7 +106,7 @@
 
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Kuota Peserta <span class="text-danger">*</span></label
+        >Kuota Peserta<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -111,7 +118,7 @@
           placeholder="Masukan kuota peserta"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kelasForm.get('participant_quota').invalid &&
             kelasForm.get('participant_quota').touched
@@ -138,7 +145,7 @@
           placeholder="Masukan Link Zoom, contoh: https://zoom.us/j/1111"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kelasForm.get('vid_call_link').invalid &&
             kelasForm.get('vid_call_link').touched
@@ -153,7 +160,7 @@
 
     <div class="row mb-3">
       <label for="exam_start_at" class="col-sm-2 col-form-label fw-bold"
-        >Waktu Mulai <span class="text-danger">*</span></label
+        >Waktu Mulai<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -164,7 +171,7 @@
           formControlName="exam_start_at"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kelasForm.get('exam_start_at').invalid &&
             kelasForm.get('exam_start_at').touched
@@ -179,7 +186,7 @@
 
     <div class="row mb-3">
       <label for="exam_end_at" class="col-sm-2 col-form-label fw-bold"
-        >Waktu Selesai <span class="text-danger">*</span></label
+        >Waktu Selesai<span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -190,7 +197,7 @@
           formControlName="exam_end_at"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             kelasForm.get('exam_end_at').invalid &&
             kelasForm.get('exam_end_at').touched

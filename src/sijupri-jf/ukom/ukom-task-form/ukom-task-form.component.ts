@@ -1,6 +1,12 @@
 import { DokumenPersyaratan } from '../../../modules/maintenance/models/dokumen-persyaratan.model'
 import { CommonModule } from '@angular/common'
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { Jabatan } from '../../../modules/maintenance/models/jabatan.model'
@@ -20,6 +26,8 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms'
+import { BehaviorSubject } from 'rxjs'
+
 @Component({
   selector: 'app-ukom-task-form',
   standalone: true,
@@ -33,6 +41,8 @@ import {
   styleUrl: './ukom-task-form.component.scss'
 })
 export class UkomTaskFormComponent {
+  @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
+
   @Input() jf: JF
   @Input() ukom: Ukom = new Ukom()
   pesertaUkom: PesertaUkom = new PesertaUkom()
@@ -46,6 +56,14 @@ export class UkomTaskFormComponent {
 
   inputs: FIleHandler = {
     files: {},
+    maxSize: 5 * 1024 * 1024,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'application/pdf'
+    ],
     listen: (
       key: string,
       source: string,
@@ -60,24 +78,13 @@ export class UkomTaskFormComponent {
       }
     }
   }
+  hadItemsLoading$ = new BehaviorSubject<boolean>(false)
 
   constructor (
     private apiService: ApiService,
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService
-  ) {
-    this.passwordForm = new FormGroup({
-      //   password: new FormControl('', Validators.required),
-      password: new FormControl('', [
-        Validators.required,
-        Validators.minLength(8)
-      ]),
-      confirmPassword: new FormControl('', [
-        Validators.required,
-        this.passwordMatchValidator.bind(this)
-      ])
-    })
-  }
+  ) {}
 
   passwordMatchValidator (
     control: FormControl
@@ -92,6 +99,12 @@ export class UkomTaskFormComponent {
     return null
   }
 
+  clearFilesName () {
+    if (this.fileHandler) {
+      this.fileHandler.clearFileName()
+    }
+  }
+
   ngOnChanges (changes: SimpleChanges) {
     if (changes['ukom']) {
       console.log('Ukom changed:', changes['ukom'].currentValue)
@@ -101,7 +114,18 @@ export class UkomTaskFormComponent {
     }
   }
 
-  ngOnInit () {}
+  ngOnInit () {
+    this.passwordForm = new FormGroup({
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(8)
+      ]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        this.passwordMatchValidator.bind(this)
+      ])
+    })
+  }
 
   getDokumenPersyaratan () {
     console.log('jf', this.jf)
@@ -171,8 +195,9 @@ export class UkomTaskFormComponent {
   }
 
   onJenisUkomSwitch (event: Event) {
+    this.clearFilesName()
+
     const jenis_ukom = (event.target as HTMLSelectElement).value
-    console.log('Jenis Ukom changed to:', jenis_ukom)
 
     this.pesertaUkom.nextJabatanCode = null
     this.pesertaUkom.nextJenjangCode = null
@@ -201,28 +226,7 @@ export class UkomTaskFormComponent {
   }
 
   submit () {
-    // if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
-    //   this.pesertaUkom.dokumenUkomList = []
-    // }
-    // for (const key in this.detectedDokumen) {
-    //   if (this.detectedDokumen.hasOwnProperty(key)) {
-    //     const detected = this.detectedDokumen[key]
-    //     this.pesertaUkom.dokumenUkomList.push({
-    //       dokumenFile: detected.base64,
-    //       //   dokumenPersyaratanName: this.jf.nip + '_' + 'dokumenPersyaratanUkom'
-    //       dokumenPersyaratanName:
-    //         this.dokumenPersyaratanList.find(
-    //           dokumen => dokumen.dokumenPersyaratanName == detected.label
-    //         ).dokumenPersyaratanName +
-    //         '_' +
-    //         this.jf.nip +
-    //         '_' +
-    //         Date.now(),
-    //       dokumenPersyaratanId: detected.id
-    //     })
-    //   }
-    // }
-
+    this.hadItemsLoading$.next(true)
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
     }
@@ -246,13 +250,11 @@ export class UkomTaskFormComponent {
             dokumenPersyaratanId: detected.id
           }
 
-          // Store only the latest document for each dokumenPersyaratanId
           documentMap.set(detected.id, newDoc)
         }
       }
     }
 
-    // Convert the Map values to an array and assign it to pesertaUkom.dokumenUkomList
     this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
 
     this.confirmationService.open(false).subscribe({
@@ -277,13 +279,20 @@ export class UkomTaskFormComponent {
         this.apiService
           .postData(`/api/v1/participant_ukom/task/jf`, this.pesertaUkom)
           .subscribe({
-            next: () => window.location.reload(),
-            error: error => this.handlerService.handleException(error)
+            next: () => {
+              this.hadItemsLoading$.next(false)
+              window.location.reload()
+            },
+            error: error => {
+              this.hadItemsLoading$.next(false)
+              this.handlerService.handleException(error)
+            }
           })
       },
       error: error => {
         console.log('error', error)
         this.handlerService.handleAlert('Error', error.error.message)
+        this.hadItemsLoading$.next(false)
       }
     })
   }

@@ -4,7 +4,7 @@ import { FilePreviewService } from '../../services/file-preview.service'
 import { FIleHandler } from '../../commons/file-handler/file-handler'
 import { FileConverterService } from '../../services/file-converter.service'
 import { BehaviorSubject } from 'rxjs'
-
+import { HandlerService } from '../../services/handler.service'
 @Component({
   selector: 'app-file-handler',
   standalone: true,
@@ -23,7 +23,8 @@ export class FileHandlerComponent {
 
   constructor (
     private filePreviewService: FilePreviewService,
-    private fileConverterService: FileConverterService
+    private fileConverterService: FileConverterService,
+    private handlerService: HandlerService
   ) {}
 
   ngOnInit () {
@@ -51,19 +52,75 @@ export class FileHandlerComponent {
     }
   }
 
+  //   handleFileUpload (event: any, key: any) {
+  //     const file = event.target.files[0]
+  //     if (file) {
+  //       const reader = new FileReader()
+
+  //       reader.onload = (e: any) => {
+  //         const base64Data = e.target.result
+  //         const source = e.target.result
+  //         const label = this.inputs.files[key].label
+  //         const id = this.inputs.files[key].id
+  //         this.inputs.files[key].source = source
+  //         this.fileNames[key] = file.name // Update displayed file name
+  //         this.fileNames[key] = file.id
+  //         this.inputs.listen(key, source, base64Data, label, id)
+  //       }
+
+  //       reader.readAsDataURL(file)
+  //     }
+  //   }
+
+  clearFileName (key?: string) {
+    if (key) {
+      delete this.fileNames[key]
+      if (this.inputs.files[key]) {
+        this.inputs.files[key].source = ''
+      }
+    } else {
+      this.fileNames = {}
+      for (const fileKey in this.inputs.files) {
+        this.inputs.files[fileKey].source = ''
+      }
+    }
+  }
+
   handleFileUpload (event: any, key: any) {
     const file = event.target.files[0]
-    if (file) {
-      const reader = new FileReader()
 
+    if (file) {
+      if (
+        this.inputs.allowedTypes?.length &&
+        !this.inputs.allowedTypes.includes(file.type)
+      ) {
+        this.handlerService.handleAlert(
+          'Error',
+          `Invalid file type! Allowed types: ${this.inputs.allowedTypes.join(
+            ', '
+          )}`
+        )
+        return
+      }
+
+      if (this.inputs.maxSize && file.size > this.inputs.maxSize) {
+        this.handlerService.handleAlert(
+          'Error',
+          `File size exceeds the limit of ${
+            this.inputs.maxSize / (1024 * 1024)
+          }MB`
+        )
+        return
+      }
+
+      const reader = new FileReader()
       reader.onload = (e: any) => {
         const base64Data = e.target.result
         const source = e.target.result
         const label = this.inputs.files[key].label
         const id = this.inputs.files[key].id
         this.inputs.files[key].source = source
-        this.fileNames[key] = file.name // Update displayed file name
-        this.fileNames[key] = file.id
+        this.fileNames[key] = file.name
         this.inputs.listen(key, source, base64Data, label, id)
       }
 
@@ -77,7 +134,6 @@ export class FileHandlerComponent {
   }
 
   previewFile (fileName: string, fileSource: string) {
-    console.log('test', fileName, fileSource)
     this.filePreviewService.open(fileName, fileSource)
   }
 }

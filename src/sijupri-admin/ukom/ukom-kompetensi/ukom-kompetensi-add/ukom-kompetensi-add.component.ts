@@ -45,24 +45,21 @@ export class UkomKompetensiAddComponent {
 
   constructor (
     private confirmationService: ConfirmationService,
-    private router: Router,
     private apiService: ApiService,
     private handlerService: HandlerService
-  ) {
+  ) {}
+
+  ngOnInit () {
     this.kompetensiForm = new FormGroup({
       code: new FormControl('', Validators.required),
       name: new FormControl('', Validators.required),
       jabatan_code: new FormControl('', Validators.required),
       jenjang_code: new FormControl('', Validators.required)
-      //   bidang_jabatan_code: new FormControl('', Validators.required)
     })
 
     this.getJabatanList()
+    this.getListJenjang()
   }
-
-  //   ngOnInit () {
-  //     this.getJabatanList()
-  //   }
 
   getJabatanList () {
     this.jabatanList$ = this.apiService
@@ -80,10 +77,9 @@ export class UkomKompetensiAddComponent {
     })
   }
 
-  onSwitchJabatan (event: Event) {
-    const jabatanCode = (event.target as HTMLInputElement).value
+  getListJenjang () {
     this.jenjangList$ = this.apiService
-      .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
+      .getData(`/api/v1/jenjang`)
       .pipe(
         map(response =>
           response.map(
@@ -91,28 +87,6 @@ export class UkomKompetensiAddComponent {
           )
         )
       )
-
-    this.jenjangList$.forEach(jenjangList => {
-      console.log(jenjangList)
-    })
-  }
-
-  onSwitchJenjang (event: Event) {
-    const jenjangCode = (event.target as HTMLInputElement).value
-
-    this.pangkatList$ = this.apiService
-      .getData(`/api/v1/pangkat/jenjang/${jenjangCode}`)
-      .pipe(
-        map(response =>
-          response.map(
-            (pangkat: { [key: string]: any }) => new Pangkat(pangkat)
-          )
-        )
-      )
-
-    this.pangkatList$.forEach(pangkatList => {
-      console.log(pangkatList)
-    })
   }
 
   submit () {

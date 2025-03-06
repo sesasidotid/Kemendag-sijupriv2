@@ -9,6 +9,7 @@ import { Task } from '../../../../modules/workflow/models/task.model'
 import { CommonModule } from '@angular/common'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
 import { PrevPendingTask } from '../../../../modules/workflow/models/prev-pending-task'
+import { BehaviorSubject } from 'rxjs'
 @Component({
   selector: 'app-ukom-task-detail',
   standalone: true,
@@ -24,6 +25,7 @@ export class UkomTaskDetailComponent {
   body: any
   prevPendingTask: PrevPendingTask
   prevApprovedTask: any[] = []
+  hadItemsLoading$ = new BehaviorSubject<boolean>(false)
 
   constructor (
     private apiService: ApiService,
@@ -94,6 +96,7 @@ export class UkomTaskDetailComponent {
     this.confirmationService.open(isReject).subscribe({
       next: result => {
         if (!result.confirmed) return
+        this.hadItemsLoading$.next(true)
 
         const task = new Task()
         task.id = this.pendingTask.id
@@ -124,6 +127,7 @@ export class UkomTaskDetailComponent {
           .postData(`/api/v1/participant_ukom/task/submit`, this.body)
           .subscribe({
             next: () => {
+              this.hadItemsLoading$.next(false)
               this.handlerService.handleAlert(
                 'Success',
                 'Berhasil mengirimkan tugas'
@@ -131,6 +135,7 @@ export class UkomTaskDetailComponent {
               this.handlerService.handleNavigate('/ukom/ukom-task-list')
             },
             error: error => {
+              this.hadItemsLoading$.next(false)
               console.log(error)
               this.handlerService.handleAlert(
                 'Error',

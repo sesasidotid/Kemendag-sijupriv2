@@ -115,30 +115,30 @@ export class AdminDashboardComponent {
     this.getTotalFormasiPending()
     this.getTotalPAKPending()
 
-    this.pagable = new PagableBuilder('/api/v1/ukom_grade/search?limit=10')
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('NIP', 'nip').withSortable(false).build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Nama', 'participantName')
-          .withSortable(false)
-          .build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Kelas', 'roomUkomName')
-          .withSortable(false)
-          .build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue('Skor CAT', (item: any) => {
-            return this.rounding(item.catGradeScore)
-          })
-          .withSortable(false)
-          .build()
-      )
-      .setEnablePagination(false)
-      .build()
+    // this.pagable = new PagableBuilder('/api/v1/ukom_grade/search?limit=10')
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder('NIP', 'nip').withSortable(false).build()
+    //   )
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder('Nama', 'participantName')
+    //       .withSortable(false)
+    //       .build()
+    //   )
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder('Kelas', 'roomUkomName')
+    //       .withSortable(false)
+    //       .build()
+    //   )
+    //   .addPrimaryColumn(
+    //     new PrimaryColumnBuilder()
+    //       .withDynamicValue('Skor CAT', (item: any) => {
+    //         return this.rounding(item.catGradeScore)
+    //       })
+    //       .withSortable(false)
+    //       .build()
+    //   )
+    //   .setEnablePagination(false)
+    //   .build()
   }
 
   rounding (value: string): string {
@@ -207,7 +207,6 @@ export class AdminDashboardComponent {
 
   ngOnInit () {
     this.userRole = LoginContext.getRoleCodes()
-    console.log(this.userRole)
 
     this.fetchData()
     this.getUserStats()

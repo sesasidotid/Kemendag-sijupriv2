@@ -30,7 +30,7 @@
         formControlName="name"
       />
       <div
-        class="feedback"
+        class="text-danger"
         *ngIf="
           editRoomUkomForm.get('name').invalid &&
           editRoomUkomForm.get('name').touched
@@ -51,20 +51,24 @@
         name="jabatan_code"
         id="jabatan_code"
         formControlName="jabatan_code"
-        (change)="onJabatanSwitch($event)"
       >
-        <option selected value="" style="display: none">
-          Pilih Jabatan<span class="text-danger">*</span>
-        </option>
-        <option
-          *ngFor="let jabatan of jabatanList$ | async"
-          [value]="jabatan.code"
+        <option selected value="" style="display: none">Pilih Jabatan</option>
+        <ng-container
+          *ngIf="(jabatanList$ | async)?.length; else jabatanNotFound"
         >
-          {{ jabatan.name }}
-        </option>
+          <option
+            *ngFor="let jabatan of jabatanList$ | async"
+            [value]="jabatan.code"
+          >
+            {{ jabatan.name }}
+          </option>
+        </ng-container>
+        <ng-template #jabatanNotFound>
+          <option disabled>Jabatan tidak ditemukan</option>
+        </ng-template>
       </select>
       <div
-        class="feedback"
+        class="text-danger"
         *ngIf="
           editRoomUkomForm.get('jabatan_code').invalid &&
           editRoomUkomForm.get('jabatan_code').touched
@@ -87,15 +91,22 @@
         formControlName="jenjang_code"
       >
         <option selected value="" style="display: none">Pilih Jenjang</option>
-        <option
-          *ngFor="let jenjang of fixedJenjangList$ | async"
-          [value]="jenjang.code"
+        <ng-container
+          *ngIf="(fixedJenjangList$ | async)?.length; else jabatanNotSelected"
         >
-          {{ jenjang.name }}
-        </option>
+          <option
+            *ngFor="let jenjang of fixedJenjangList$ | async"
+            [value]="jenjang.code"
+          >
+            {{ jenjang.name }}
+          </option>
+        </ng-container>
+        <ng-template #jabatanNotSelected>
+          <option disabled>Jenjang tidak ditemukan</option>
+        </ng-template>
       </select>
       <div
-        class="feedback"
+        class="text-danger"
         *ngIf="
           editRoomUkomForm.get('jenjang_code').invalid &&
           editRoomUkomForm.get('jenjang_code').touched

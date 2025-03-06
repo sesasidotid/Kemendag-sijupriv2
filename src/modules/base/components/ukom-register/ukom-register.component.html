@@ -55,8 +55,7 @@
       <form [formGroup]="nonJFForm" (ngSubmit)="submit()">
         <div class="mb-3">
           <label for="name" class="form-label"
-            >Nama
-            <span class="text-danger">*</span>
+            >Nama<span class="text-danger">*</span>
           </label>
           <input
             type="text"
@@ -89,12 +88,22 @@
           />
           <div
             *ngIf="
-              nonJFForm.get('email')?.invalid &&
+              nonJFForm.get('email')?.hasError('required') &&
               (nonJFForm.get('email')?.touched || nonJFForm.get('email')?.dirty)
             "
             class="text-danger"
           >
             Email tidak boleh kosong.
+          </div>
+
+          <div
+            *ngIf="
+              nonJFForm.get('email')?.hasError('email') &&
+              (nonJFForm.get('email')?.touched || nonJFForm.get('email')?.dirty)
+            "
+            class="text-danger"
+          >
+            Format email tidak valid.
           </div>
         </div>
 
@@ -142,7 +151,21 @@
             formControlName="confirmPassword"
           />
           <div
-            *ngIf="nonJFForm.get('confirmPassword')?.hasError('mismatch')"
+            *ngIf="
+              nonJFForm.get('confirmPassword')?.hasError('required') &&
+              (nonJFForm.get('confirmPassword')?.touched ||
+                nonJFForm.get('confirmPassword')?.dirty)
+            "
+            class="text-danger"
+          >
+            Konfirmasi Password tidak boleh kosong.
+          </div>
+          <div
+            *ngIf="
+              nonJFForm.get('confirmPassword')?.hasError('mismatch') &&
+              (nonJFForm.get('confirmPassword')?.touched ||
+                nonJFForm.get('confirmPassword')?.dirty)
+            "
             class="text-danger"
           >
             Password dan Konfirmasi Password tidak cocok.
@@ -228,45 +251,81 @@
           </div>
         </div>
 
-        <div
-          class="mb-3"
-          *ngIf="this.pesertaUkom.jenis_ukom === 'PERPINDAHAN_JABATAN'"
-        >
-          <label for="jabatanCode" class="form-label"
+        <div class="mb-3">
+          <label for="jabatanName" class="form-label"
             >Jabatan Saat Ini<span class="text-danger">*</span></label
           >
           <input
             type="text"
             class="form-control"
-            id="jabatanCode"
+            id="jabatanName"
             required
-            formControlName="jabatanCode"
+            formControlName="jabatanName"
           />
-          <!-- <select
-            class="form-select"
-            name="jabatanCode"
-            id="jabatanCode"
-            formControlName="jabatanCode"
-          >
-            <option selected value="" style="display: none">
-              Pilih Jabatan Saat Ini
-            </option>
-            <option
-              *ngFor="let jabatan of jabatanList$ | async"
-              [value]="jabatan.code"
-            >
-              {{ jabatan.name }}
-            </option>
-          </select> -->
           <div
             *ngIf="
-              nonJFForm.get('jabatanCode')?.invalid &&
-              (nonJFForm.get('jabatanCode')?.touched ||
-                nonJFForm.get('jabatanCode')?.dirty)
+              nonJFForm.get('jabatanName')?.invalid &&
+              (nonJFForm.get('jabatanName')?.touched ||
+                nonJFForm.get('jabatanName')?.dirty)
             "
             class="text-danger"
           >
-            Jabatan tidak boleh kosong.
+            Jabatan saat ini tidak boleh kosong.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="jenjangName" class="form-label">Jenjang Saat Ini</label>
+          <input
+            type="text"
+            class="form-control"
+            id="jenjangName"
+            required
+            formControlName="jenjangName"
+          />
+          <small id="jenjangHelp" class="form-text text-muted">
+            Kosongkan jika tidak mempunyai jenjang.
+          </small>
+        </div>
+
+        <div class="mb-3">
+          <label for="pangkatCode" class="form-label"
+            >Pangkat/Golongan Saat Ini<span class="text-danger">*</span></label
+          >
+          <select
+            class="form-select"
+            name="pangkatCode"
+            id="pangkatCode"
+            formControlName="pangkatCode"
+          >
+            <option selected value="" style="display: none">
+              Pilih Pangkat Saat Ini
+            </option>
+
+            <ng-container
+              *ngIf="(pangkatList$ | async)?.length; else pangkatNotFound"
+            >
+              <option
+                *ngFor="let pangkat of pangkatList$ | async"
+                [value]="pangkat.code"
+              >
+                {{ pangkat.name }} / {{ pangkat.golongan }}
+              </option>
+            </ng-container>
+          </select>
+          <ng-template #pangkatNotFound>
+            <option disabled>
+              Pangkat/Golongan yang dituju tidak ditemukan
+            </option>
+          </ng-template>
+          <div
+            *ngIf="
+              nonJFForm.get('pangkatCode')?.invalid &&
+              nonJFForm.get('pangkatCode')?.touched
+            "
+            class="text-danger"
+          >
+            Pangkat/Golongan yang dituju tidak boleh kosong.
           </div>
         </div>
 
@@ -283,12 +342,19 @@
             <option selected value="" style="display: none">
               Pilih Jabatan Yang Dituju
             </option>
-            <option
-              *ngFor="let jabatan of jabatanList$ | async"
-              [value]="jabatan.code"
+            <ng-container
+              *ngIf="(jabatanList$ | async)?.length; else NextJenjangNotFound"
             >
-              {{ jabatan.name }}
-            </option>
+              <option
+                *ngFor="let jabatan of jabatanList$ | async"
+                [value]="jabatan.code"
+              >
+                {{ jabatan.name }}
+              </option>
+            </ng-container>
+            <ng-template #NextJenjangNotFound>
+              <option disabled>Jabatan tidak ditemukan</option>
+            </ng-template>
           </select>
           <div
             *ngIf="
@@ -302,14 +368,14 @@
         </div>
 
         <div class="mb-3">
-          <label for="jenjangCode" class="form-label"
+          <label for="nextJenjangCode" class="form-label"
             >Jenjang Yang Dituju<span class="text-danger">*</span></label
           >
           <select
             class="form-select"
-            name="jenjangCode"
-            id="jenjangCode"
-            formControlName="jenjangCode"
+            name="nextJenjangCode"
+            id="nextJenjangCode"
+            formControlName="nextJenjangCode"
           >
             <option selected value="" style="display: none">
               Pilih Jenjang Yang Dituju
@@ -326,58 +392,17 @@
             </ng-container>
 
             <ng-template #JenjangNotFound>
-              <option disabled>Jenjang tidak ditemukan</option>
+              <option disabled>Jenjang yang dituju tidak ditemukan</option>
             </ng-template>
           </select>
           <div
             *ngIf="
-              nonJFForm.get('jenjangCode')?.invalid &&
-              nonJFForm.get('jenjangCode')?.touched
+              nonJFForm.get('nextJenjangCode')?.invalid &&
+              nonJFForm.get('nextJenjangCode')?.touched
             "
             class="text-danger"
           >
-            Jenjang tidak boleh kosong.
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label for="pangkatCode" class="form-label"
-            >Pangkat/Golongan Yang Dituju<span class="text-danger"
-              >*</span
-            ></label
-          >
-          <select
-            class="form-select"
-            name="pangkatCode"
-            id="pangkatCode"
-            formControlName="pangkatCode"
-          >
-            <option selected value="" style="display: none">
-              Pilih Pangkat Dituju
-            </option>
-
-            <ng-container
-              *ngIf="(pangkatList$ | async)?.length; else pangkatNotFound"
-            >
-              <option
-                *ngFor="let pangkat of pangkatList$ | async"
-                [value]="pangkat.code"
-              >
-                {{ pangkat.name }} / {{ pangkat.golongan }}
-              </option>
-            </ng-container>
-          </select>
-          <ng-template #pangkatNotFound>
-            <option disabled>Pankat tidak ditemukan</option>
-          </ng-template>
-          <div
-            *ngIf="
-              nonJFForm.get('pangkatCode')?.invalid &&
-              nonJFForm.get('pangkatCode')?.touched
-            "
-            class="text-danger"
-          >
-            Pangkat tidak boleh kosong.
+            Jenjang yang dituju tidak boleh kosong.
           </div>
         </div>
 
@@ -386,6 +411,12 @@
             <label for="emailInput" class="form-label">
               File: <span class="text-danger">*</span></label
             >
+            <small class="text-muted d-block">
+              Pilih jenis UKom untuk melihat dokumen persyaratan<br />
+              Jenis file yang diperbolehkan:
+              {{ inputs.allowedTypes?.join(', ') }} <br />
+              Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
+            </small>
           </div>
           <div class="row">
             <app-file-handler [inputs]="inputs"></app-file-handler>
@@ -396,12 +427,28 @@
           type="submit"
           class="btn grad-button w-100 mb-1"
           [disabled]="!nonJFForm.valid || isAnyFileMissing()"
+          *ngIf="!(hadItemsLoading$ | async)"
         >
           Daftar
         </button>
+
+        <button
+          *ngIf="hadItemsLoading$ | async"
+          class="btn grad-button w-100 mb-1"
+          disabled
+        >
+          <div
+            class="spinner-border"
+            style="width: 19px; height: 19px"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </button>
+
         <button
           type="button"
-          class="btn grad-button w-100"
+          class="btn grad-button-secondary w-100"
           (click)="backToLandingPage()"
         >
           Kembali
