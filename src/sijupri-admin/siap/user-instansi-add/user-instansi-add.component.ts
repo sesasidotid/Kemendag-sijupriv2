@@ -187,8 +187,10 @@ export class UserInstansiAddComponent {
         if (!result.confirmed) {
           return
         }
-
+        // console.log(this.userInstansi)
+        // return
         this.isLoading.next(true)
+
         this.userInstansiService.save(this.userInstansi).subscribe({
           next: () => {
             this.isLoading.next(false)

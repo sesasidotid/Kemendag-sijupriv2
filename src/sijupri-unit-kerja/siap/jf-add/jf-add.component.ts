@@ -34,6 +34,9 @@ export class JfAddComponent {
 
   loadingInstansi$ = new BehaviorSubject<boolean>(true)
   loadingUnitKerja$ = new BehaviorSubject<boolean>(true)
+  createJFLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  )
 
   jfAddForm!: FormGroup
 
@@ -53,27 +56,27 @@ export class JfAddComponent {
         Validators.pattern('^[0-9]+$'),
         Validators.minLength(18)
       ]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required]),
-      confirmPassword: new FormControl('', [
-        Validators.required,
-        this.passwordMatchValidator.bind(this)
-      ])
+      email: new FormControl('', [Validators.required, Validators.email])
+      //   password: new FormControl('', [Validators.required]),
+      //   confirmPassword: new FormControl('', [
+      //     Validators.required,
+      //     this.passwordMatchValidator.bind(this)
+      //   ])
     })
   }
 
-  passwordMatchValidator (
-    control: FormControl
-  ): { [key: string]: boolean } | null {
-    if (this.jfAddForm) {
-      const password = this.jfAddForm.get('password')?.value
-      const confirmPassword = control.value
-      if (password !== confirmPassword) {
-        return { mismatch: true }
-      }
-    }
-    return null
-  }
+  //   passwordMatchValidator (
+  //     control: FormControl
+  //   ): { [key: string]: boolean } | null {
+  //     if (this.jfAddForm) {
+  //       const password = this.jfAddForm.get('password')?.value
+  //       const confirmPassword = control.value
+  //       if (password !== confirmPassword) {
+  //         return { mismatch: true }
+  //       }
+  //     }
+  //     return null
+  //   }
 
   ngOnInit () {
     if (this.tabService.getTabsLength() > 0) {
@@ -145,6 +148,7 @@ export class JfAddComponent {
           return
         }
 
+        this.createJFLoading$.next(true)
         if (this.jfAddForm.valid) {
           this.jf.name = this.jfAddForm.value.name
           this.jf.jenisKelaminCode = this.jfAddForm.value.jenisKelaminCode
@@ -155,14 +159,18 @@ export class JfAddComponent {
 
           this.jfService.save(this.jf).subscribe({
             next: () => {
+              this.createJFLoading$.next(false)
+
               this.alertService.showToast(
                 'Success',
                 'Berhasil menambah user JF.'
               )
               this.handlerService.handleNavigate(`/siap/user-jf`)
             },
-            error: error =>
+            error: error => {
+              this.createJFLoading$.next(false)
               this.alertService.showToast('Error', 'Gagal menambahkan user JF!')
+            }
           })
         }
       }

@@ -81,7 +81,7 @@
     </div>
   </div>
 
-  <div class="row mb-3">
+  <!-- <div class="row mb-3">
     <label for="" class="col-sm-2 col-form-label fw-bold"
       >Password<span class="text-danger">*</span>
     </label>
@@ -133,7 +133,7 @@
         >
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="row mb-3">
     <label for="" class="col-sm-2 col-form-label fw-bold"
@@ -172,9 +172,9 @@
       <button
         type="submit"
         class="btn btn-primary float-end"
-        [disabled]="unitKerjaForm.invalid"
+        [disabled]="unitKerjaForm.invalid || (createLoading$ | async)"
       >
-        Simpan
+        {{ (createLoading$ | async) ? 'Menyimpan...' : 'Simpan' }}
       </button>
     </div>
   </div>

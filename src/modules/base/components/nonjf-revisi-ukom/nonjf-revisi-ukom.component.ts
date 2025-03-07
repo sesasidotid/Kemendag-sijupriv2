@@ -94,7 +94,6 @@ export class NonjfRevisiUkomComponent {
   }
 
   onSave () {
-    this.hadItemsLoading$.next(true)
     console.log(this.key)
 
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
@@ -136,6 +135,8 @@ export class NonjfRevisiUkomComponent {
         if (!result.confirmed) {
           return
         }
+        this.hadItemsLoading$.next(true)
+
         this.apiService
           .postData(
             `/api/v1/participant_ukom/task/non_jf/submit?key=${this.key}`,

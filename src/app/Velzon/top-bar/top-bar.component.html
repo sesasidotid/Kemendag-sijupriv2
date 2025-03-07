@@ -405,6 +405,15 @@
               ></i>
               <span class="align-middle">Pengaturan</span></a
             >
+            <a
+              class="dropdown-item cursor-pointer"
+              *ngIf="role.length > 0"
+              (click)="toggleModal()"
+              ><i
+                class="mdi mdi-account-cog-outline text-muted fs-16 align-middle me-1"
+              ></i>
+              <span class="align-middle">Ganti Password</span></a
+            >
             <a class="dropdown-item cursor-pointer" (click)="logOut()"
               ><i class="bx bx-power-off font-size-16 align-middle me-1"></i>
               <span key="t-logout">Keluar</span>
@@ -420,4 +429,63 @@
       </div>
     </div>
   </div>
+
+  <app-modal
+    *ngIf="isModalOpen$ | async"
+    [title]="'Ganti Password'"
+    (toggle)="toggleModal()"
+    [enableFooter]="false"
+  >
+    <form (ngSubmit)="onSubmit()" #passwordForm="ngForm">
+      <div class="mb-3">
+        <label for="oldPassword" class="form-label"
+          >Password Lama:<span class="text-danger">*</span></label
+        >
+        <input
+          id="oldPassword"
+          type="password"
+          name="oldPassword"
+          [(ngModel)]="formData.oldPassword"
+          required
+          class="form-control"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label"
+          >Password Baru:<span class="text-danger">*</span></label
+        >
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [(ngModel)]="formData.password"
+          required
+          class="form-control"
+        />
+      </div>
+
+      <ng-container *ngIf="submitLoading$ | async; else noLoading">
+        <button class="btn btn-primary w-100" disabled>
+          <div
+            class="spinner-border"
+            style="width: 19px; height: 19px"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </button>
+      </ng-container>
+
+      <ng-template #noLoading>
+        <button
+          type="submit"
+          class="btn btn-primary w-100"
+          [disabled]="!passwordForm.valid || (submitLoading$ | async)"
+        >
+          Simpan
+        </button>
+      </ng-template>
+    </form>
+  </app-modal>
 </header>

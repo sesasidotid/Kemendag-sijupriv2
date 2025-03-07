@@ -1,3 +1,5 @@
+import { HandlerService } from './../../../modules/base/services/handler.service'
+import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { CommonModule, DOCUMENT } from '@angular/common'
 import { Component, ElementRef, Inject } from '@angular/core'
@@ -8,10 +10,13 @@ import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
+import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
+import { FormsModule } from '@angular/forms'
+
 @Component({
   selector: 'app-top-bar',
   standalone: true,
-  imports: [CommonModule, EmptyStateComponent],
+  imports: [CommonModule, EmptyStateComponent, ModalComponent, FormsModule],
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.scss'
 })
@@ -29,22 +34,38 @@ export class TopBarComponent {
 
   notificationMessagePersonalList: NotificationMessage[] = []
   notificationMessageGroupList: NotificationMessage[] = []
+  isModalOpen$ = new BehaviorSubject<boolean>(false)
+  submitLoading$ = new BehaviorSubject<boolean>(false)
+
+  formData = {
+    userId: '',
+    oldPassword: '',
+    password: ''
+  }
 
   constructor (
     @Inject(DOCUMENT) private document: Document,
     private router: Router,
     private apiService: ApiService,
     private el: ElementRef,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private confirmationService: ConfirmationService,
+    private handlerService: HandlerService
   ) {
     this.id = LoginContext.getUserId()
     this.name = LoginContext.getName()
     this.role = LoginContext.getRoleCodes()
     this.getNotificationPersonal()
+
+    this.formData.userId = this.id
   }
 
   ngOnInit () {
     this.fetchPhotoProfile()
+  }
+
+  toggleModal () {
+    this.isModalOpen$.next(!this.isModalOpen$.value)
   }
 
   fetchPhotoProfile () {
@@ -317,5 +338,42 @@ export class TopBarComponent {
           }
         })
     }
+  }
+
+  onSubmit () {
+    this.confirmationService.open(false).subscribe({
+      next: result => {
+        if (!result.confirmed) {
+          return
+        }
+        console.log(this.formData)
+
+        this.submitLoading$.next(true)
+        this.apiService.putData(`/api/v1/password`, this.formData).subscribe({
+          next: result => {
+            this.submitLoading$.next(false)
+            this.toggleModal()
+            this.handlerService.handleAlert(
+              'Success',
+              'Password berhasil diubah'
+            )
+          },
+          error: err => {
+            this.submitLoading$.next(false)
+            if (err.error.code === 'PSS-00001') {
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal mengubah password, paassword lama salah'
+              )
+            } else {
+              this.handlerService.handleAlert(
+                'Error',
+                'Gagal mengubah password'
+              )
+            }
+          }
+        })
+      }
+    })
   }
 }

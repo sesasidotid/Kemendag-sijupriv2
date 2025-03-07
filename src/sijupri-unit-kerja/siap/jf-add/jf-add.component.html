@@ -105,7 +105,8 @@
       </div>
     </div>
   </div>
-  <div class="row mb-3">
+
+  <!-- <div class="row mb-3">
     <label for="password" class="col-sm-2 col-form-label fw-bold"
       >Password<span class="text-danger">*</span></label
     >
@@ -126,7 +127,6 @@
         <small *ngIf="jfAddForm.get('password').errors?.['required']"
           >Password perlu diisi.</small
         >
-        <!-- <small *ngIf="jfAddForm.get('password').errors?.['minlength']">Password minimal 6 karakter.</small> -->
       </div>
     </div>
   </div>
@@ -157,7 +157,7 @@
         >
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="row mb-3">
     <label for="kelamin" class="col-sm-2 col-form-label fw-bold"
@@ -199,9 +199,9 @@
       <button
         type="submit"
         class="btn btn-primary float-end"
-        [disabled]="jfAddForm.invalid"
+        [disabled]="jfAddForm.invalid || (createJFLoading$ | async)"
       >
-        Simpan
+        {{ (createJFLoading$ | async) ? 'Menyimpan...' : 'Simpan' }}
       </button>
     </div>
   </div>

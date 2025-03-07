@@ -16,6 +16,7 @@ import { ApiService } from '../../../modules/base/services/api.service'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { AlertService } from '../../../modules/base/services/alert.service'
+import { BehaviorSubject } from 'rxjs'
 @Component({
   selector: 'app-user-unit-kerja-add',
   standalone: true,
@@ -28,6 +29,8 @@ export class UserUnitKerjaAddComponent {
   unitKerjaList: UnitKerja[]
 
   unitKerjaForm!: FormGroup
+
+  createLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
 
   constructor (
     private apiService: ApiService,
@@ -43,27 +46,27 @@ export class UserUnitKerjaAddComponent {
         Validators.pattern('^[0-9]*$')
       ]),
       name: new FormControl('', [Validators.required]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required]),
-      confirmPassword: new FormControl('', [
-        Validators.required,
-        this.passwordMatchValidator.bind(this)
-      ])
+      email: new FormControl('', [Validators.required, Validators.email])
+      //   password: new FormControl('', [Validators.required]),
+      //   confirmPassword: new FormControl('', [
+      //     Validators.required,
+      //     this.passwordMatchValidator.bind(this)
+      //   ])
     })
   }
 
-  passwordMatchValidator (
-    control: FormControl
-  ): { [key: string]: boolean } | null {
-    if (this.unitKerjaForm) {
-      const password = this.unitKerjaForm.get('password')?.value
-      const confirmPassword = control.value
-      if (password !== confirmPassword) {
-        return { mismatch: true }
-      }
-    }
-    return null
-  }
+  //   passwordMatchValidator (
+  //     control: FormControl
+  //   ): { [key: string]: boolean } | null {
+  //     if (this.unitKerjaForm) {
+  //       const password = this.unitKerjaForm.get('password')?.value
+  //       const confirmPassword = control.value
+  //       if (password !== confirmPassword) {
+  //         return { mismatch: true }
+  //       }
+  //     }
+  //     return null
+  //   }
 
   ngOnInit () {
     if (this.tabService.getTabsLength() > 0) {
@@ -113,10 +116,14 @@ export class UserUnitKerjaAddComponent {
             return
           }
 
+          this.createLoading$.next(true)
+
           this.apiService
             .postData(`/api/v1/user_unit_kerja`, this.userUnitKerja)
             .subscribe({
               next: () => {
+                this.createLoading$.next(false)
+
                 this.alertService.showToast(
                   'Success',
                   'User Unit Kerja berhasil ditambahkan'
@@ -124,6 +131,7 @@ export class UserUnitKerjaAddComponent {
                 this.handlerService.handleNavigate(`/siap/user-unit-kerja`)
               },
               error: error => {
+                this.createLoading$.next(false)
                 console.log(error)
                 this.handlerService.handleAlert(
                   'Error',
