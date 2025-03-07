@@ -54,21 +54,17 @@ export class UkomRegisterComponent {
   jenjangList$: Observable<Jenjang[]>
   pangkatList$: Observable<Pangkat[]>
 
-  instansiSearch = new Subject<string>()
-  instansiList$: Observable<Instansi[]>
-  unitKerjaList$: Observable<UnitKerja[]>
-
   NextjabatanList$: Observable<Jabatan[]>
 
   nextJenjang: Jenjang
   detectedDokumen: any = {}
   pesertaUkom: PesertaUkom = new PesertaUkom()
-  filteredInstansiList: any[] = []
   dokumenPersyaratanList: DokumenUkomPersyaratan[] = []
 
   registerComplete: boolean = false
-
-  registerOpened: boolean = true
+  registerOpened$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  )
 
   myAngularxQrCode: string = ''
   stringCode: string = ''
@@ -238,6 +234,14 @@ export class UkomRegisterComponent {
     this.qrCodeDownloadLink = url
   }
 
+  checkStatusRegister () {
+    this.apiService.getData(`/api/v1/sys_conf/UKM_REGISTRATION`).subscribe({
+      next: response => {
+        this.registerOpened$.next(response.value == 'ya')
+      }
+    })
+  }
+
   submit () {
     this.hadItemsLoading$.next(true)
     const jenis_ukom = this.nonJFForm.get('jenis_ukom').value
@@ -248,7 +252,8 @@ export class UkomRegisterComponent {
     this.pesertaUkom.unitKerjaName = this.nonJFForm.get('unitKerjaName')?.value
     this.pesertaUkom.jenis_ukom = jenis_ukom
     this.pesertaUkom.jabatanName = this.nonJFForm.get('jabatanName')?.value
-    this.pesertaUkom.jenjangName = this.nonJFForm.get('jenjangName')?.value
+    this.pesertaUkom.jenjangName =
+      this.nonJFForm.get('jenjangName')?.value || '-'
     this.pesertaUkom.pangkatCode = this.nonJFForm.get('pangkatCode')?.value
     this.pesertaUkom.nextJabatanCode =
       this.nonJFForm.get('nextJabatanCode')?.value
@@ -323,6 +328,7 @@ export class UkomRegisterComponent {
   }
 
   ngOnInit () {
+    this.checkStatusRegister()
     this.nonJFForm = new FormGroup({
       name: new FormControl('', Validators.required),
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -347,23 +353,12 @@ export class UkomRegisterComponent {
       nextJenjangCode: new FormControl('', Validators.required)
     })
 
-    this.nonJFForm.get('jenis_ukom')?.valueChanges.subscribe(value => {
-      const jabatanCodeControl = this.nonJFForm.get('jabatanCode')
-      if (value === 'PERPINDAHAN_JABATAN') {
-        jabatanCodeControl?.setValidators(Validators.required)
-      } else {
-        jabatanCodeControl?.clearValidators()
-        jabatanCodeControl?.setValue('')
-      }
-      jabatanCodeControl?.updateValueAndValidity()
+    this.registerOpened$.subscribe(opened => {
+      console.log('re', opened)
     })
 
     this.getListJabatan()
     this.getListJenjang()
     this.getListPanngkat()
-
-    this.instansiList$.subscribe(instansiList => {
-      this.filteredInstansiList = instansiList
-    })
   }
 }

@@ -59,7 +59,7 @@ export class UkomDetailComponent {
           .build()
       )
       .addPrimaryColumn(
-        new PrimaryColumnBuilder('Tanggal', 'lastUpdated').build()
+        new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
       )
       .addActionColumn(
         new ActionColumnBuilder()

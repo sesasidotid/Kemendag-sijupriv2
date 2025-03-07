@@ -13,7 +13,7 @@
           formControlName="dokumenPersyaratanName"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             documentForm.get('dokumenPersyaratanName').invalid &&
             documentForm.get('dokumenPersyaratanName').touched
@@ -43,7 +43,7 @@
           <option value="PROMOSI">Promosi</option>
         </select>
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             documentForm.get('jenisUkom').invalid &&
             documentForm.get('jenisUkom').touched

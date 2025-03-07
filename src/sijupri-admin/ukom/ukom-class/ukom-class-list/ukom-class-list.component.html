@@ -130,7 +130,7 @@
         formControlName="participant_quota"
       />
       <div
-        class="feedback"
+        class="text-danger"
         *ngIf="
           editRoomUkomForm.get('participant_quota').invalid &&
           editRoomUkomForm.get('participant_quota').touched
@@ -155,7 +155,7 @@
         formControlName="vid_call_link"
       />
       <div
-        class="feedback"
+        class="text-danger"
         *ngIf="
           editRoomUkomForm.get('vid_call_link').invalid &&
           editRoomUkomForm.get('vid_call_link').touched
@@ -180,7 +180,7 @@
         formControlName="exam_start_at"
       />
       <div
-        class="feedback"
+        class="text-danger"
         *ngIf="
           editRoomUkomForm.get('exam_start_at').invalid &&
           editRoomUkomForm.get('exam_start_at').touched
@@ -205,7 +205,7 @@
         formControlName="exam_end_at"
       />
       <div
-        class="feedback"
+        class="text-danger"
         *ngIf="
           editRoomUkomForm.get('exam_end_at').invalid &&
           editRoomUkomForm.get('exam_end_at').touched

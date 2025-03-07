@@ -123,6 +123,8 @@ export class UkomTaskDetailComponent {
           this.body.remark = task.remark
         }
 
+        console.log('body', this.body)
+        // return
         this.apiService
           .postData(`/api/v1/participant_ukom/task/submit`, this.body)
           .subscribe({

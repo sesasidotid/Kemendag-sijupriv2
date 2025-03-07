@@ -56,7 +56,9 @@ export class UkomTaskComponent {
   profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
   canRegister: boolean = true
-  registerOpened: boolean = true
+  registerOpened$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  )
 
   constructor (
     private apiService: ApiService,
@@ -83,6 +85,7 @@ export class UkomTaskComponent {
   }
 
   ngOnInit () {
+    this.checkStatusRegister()
     this.getPendingTask()
     this.getJF()
     this.getJFRegisterStatus()
@@ -100,6 +103,14 @@ export class UkomTaskComponent {
   //       }
   //     })
   //   }
+
+  checkStatusRegister () {
+    this.apiService.getData(`/api/v1/sys_conf/UKM_REGISTRATION`).subscribe({
+      next: response => {
+        this.registerOpened$.next(response.value == 'ya')
+      }
+    })
+  }
 
   isAnyFieldEmpty (): boolean {
     return (
@@ -151,7 +162,6 @@ export class UkomTaskComponent {
             return
           }
           console.log('error', error)
-          this.handlerService.handleException(error)
         }
       })
   }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import { ApplicationService } from '../../../security/services/application.service'
 import { Application } from '../../../security/models/application.mode'
 import { CommonModule } from '@angular/common'
@@ -16,7 +16,7 @@ import { LoginContext } from '../../../base/commons/login-context'
 import { Router } from '@angular/router'
 import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
 import { BehaviorSubject } from 'rxjs'
-import { RecaptchaModule } from 'ng-recaptcha'
+import { RecaptchaModule, RecaptchaComponent } from 'ng-recaptcha'
 import { environment } from '../../../../environments/environment'
 
 @Component({
@@ -33,6 +33,8 @@ import { environment } from '../../../../environments/environment'
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
+  @ViewChild(RecaptchaComponent) recaptcha: RecaptchaComponent
+
   auth: Auth = new Auth()
   authResponse: AuthResponse
   applicationList: Application[]
@@ -132,6 +134,12 @@ export class LoginComponent {
             status: 'error',
             message: 'Login gagal, tolong coba lagi.'
           })
+
+          if (this.recaptcha) {
+            this.recaptcha.reset()
+          }
+
+          this.loginForm.get('recaptcha')?.setValue(null)
         }
       })
     }

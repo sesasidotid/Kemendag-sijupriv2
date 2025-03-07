@@ -39,6 +39,14 @@ export class UkomRevisionComponent {
 
   inputs: FIleHandler = {
     files: {},
+    maxSize: 5 * 1024 * 1024,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'application/pdf'
+    ],
     listen: (
       key: string,
       source: string,

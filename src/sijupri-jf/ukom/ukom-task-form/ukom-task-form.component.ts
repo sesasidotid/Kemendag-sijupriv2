@@ -226,7 +226,6 @@ export class UkomTaskFormComponent {
   }
 
   submit () {
-    this.hadItemsLoading$.next(true)
     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
       this.pesertaUkom.dokumenUkomList = []
     }
@@ -259,6 +258,8 @@ export class UkomTaskFormComponent {
 
     this.confirmationService.open(false).subscribe({
       next: result => {
+        this.hadItemsLoading$.next(true)
+
         if (!result.confirmed) return
 
         this.pesertaUkom.nip = this.jf.nip

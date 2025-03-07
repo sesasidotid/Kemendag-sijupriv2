@@ -26,6 +26,8 @@ export class UkomDocumentListComponent {
   tab$ = new BehaviorSubject<number | null>(0)
   pagable: Pagable
 
+  refresh: boolean = false
+
   constructor (
     private tabService: TabService,
     private router: Router,
@@ -56,7 +58,6 @@ export class UkomDocumentListComponent {
             this.delete(item.dokumenPersyaratanId)
           }, 'danger')
           .withIcon('danger')
-          .addInactiveCondition((item: any) => true)
           .build()
       )
       .build()
@@ -86,23 +87,19 @@ export class UkomDocumentListComponent {
       next: result => {
         if (!result.confirmed) return
 
-        this.apiService
-          .deleteData(`/api/v1/document_ukom/dokumen_persyaratan/${id}`)
-          .subscribe({
-            next: () => {
-              this.handlerService.handleAlert(
-                'Success',
-                'Dokumen berhasil di hapus'
-              )
-            },
-            error: error => {
-              console.error('Error fetching data', error)
-              this.handlerService.handleAlert(
-                'Error',
-                'Gagal menghapus dokumen'
-              )
-            }
-          })
+        this.apiService.deleteData(`/api/v1/doc_persyaratan/${id}`).subscribe({
+          next: () => {
+            this.refresh = !this.refresh
+            this.handlerService.handleAlert(
+              'Success',
+              'Dokumen berhasil di hapus'
+            )
+          },
+          error: error => {
+            console.error('Error fetching data', error)
+            this.handlerService.handleAlert('Error', 'Gagal menghapus dokumen')
+          }
+        })
       }
     })
   }

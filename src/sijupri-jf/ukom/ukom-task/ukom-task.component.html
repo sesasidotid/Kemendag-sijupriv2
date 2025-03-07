@@ -21,7 +21,7 @@
 </app-modal>
 
 <ng-template #ukomHadItem>
-  <div *ngIf="registerOpened; else registerClosed">
+  <div *ngIf="registerOpened$ | async; else registerClosed">
     <div class="row px-3">
       <div *ngIf="!pendingTask.jenisUkom; else hadData" class="col-lg-12">
         <app-empty-state
@@ -34,9 +34,9 @@
 
         <app-empty-state
           *ngIf="!wannaRequest && canRegister"
-          [title]="'Belum ada proses UKom yang berjalan'"
+          [title]="'Belum ada pendaftaran UKom yang berjalan'"
           [description]="
-            'Kamu bisa mengajukan proses UKom dengan menekan tombol dibawah ini.'
+            'Anda bisa mengajukan pendaftaran UKom dengan menekan tombol dibawah ini.'
           "
           [buttonText]="'Ajukan Ukom'"
           [buttonAction]="reqChange.bind(this)"

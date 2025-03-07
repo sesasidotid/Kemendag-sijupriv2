@@ -1,5 +1,5 @@
 <app-landing-page [imported]="true"></app-landing-page>
-<div *ngIf="registerOpened; else registerClosed">
+<div *ngIf="registerOpened$ | async; else registerClosed">
   <div class="row card px-4 parent">
     <div class="gradient-line"></div>
     <h1 class="p-0">Pendaftaran UKom</h1>
@@ -280,7 +280,6 @@
             type="text"
             class="form-control"
             id="jenjangName"
-            required
             formControlName="jenjangName"
           />
           <small id="jenjangHelp" class="form-text text-muted">
@@ -314,9 +313,7 @@
             </ng-container>
           </select>
           <ng-template #pangkatNotFound>
-            <option disabled>
-              Pangkat/Golongan yang dituju tidak ditemukan
-            </option>
+            <option disabled>Pangkat/Golongan saat ini tidak ditemukan</option>
           </ng-template>
           <div
             *ngIf="
@@ -353,7 +350,7 @@
               </option>
             </ng-container>
             <ng-template #NextJenjangNotFound>
-              <option disabled>Jabatan tidak ditemukan</option>
+              <option disabled>Jabatan yang dituju tidak ditemukan</option>
             </ng-template>
           </select>
           <div
