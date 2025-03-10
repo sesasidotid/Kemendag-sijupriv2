@@ -104,10 +104,26 @@
     </div>
   </div>
 
+  <!-- Dokumen Pendaftaran -->
+  <div class="card m-0 detail-jf" *ngIf="dataDokumenUkom.length > 0">
+    <div class="card-header">
+      <h5 class="m-0">
+        <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen
+        Pendaftaran UKom
+      </h5>
+    </div>
+    <div class="card-body">
+      <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
+    </div>
+  </div>
+
   <!-- nilai -->
   <div class="card m-0 detail-jf" *ngIf="CATSchore.examTypeCode === 'CAT'">
     <div class="card-header">
-      <h5 class="m-0"><i class="mdi mdi-account me-2"></i>Detail Nilai UKom</h5>
+      <h5 class="m-0">
+        <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>Detail Nilai
+        UKom
+      </h5>
     </div>
     <div class="list-group">
       <div

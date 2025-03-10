@@ -47,15 +47,12 @@ import { BehaviorSubject } from 'rxjs'
 })
 export class UkomRegisterComponent {
   @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
-
   nonJFForm: FormGroup
 
   jabatanList$: Observable<Jabatan[]>
   jenjangList$: Observable<Jenjang[]>
   pangkatList$: Observable<Pangkat[]>
-
   NextjabatanList$: Observable<Jabatan[]>
-
   nextJenjang: Jenjang
   detectedDokumen: any = {}
   pesertaUkom: PesertaUkom = new PesertaUkom()
@@ -66,7 +63,6 @@ export class UkomRegisterComponent {
     false
   )
 
-  myAngularxQrCode: string = ''
   stringCode: string = ''
   qrCodeDownloadLink: SafeUrl = ''
   inputs: FIleHandler = {
@@ -95,6 +91,7 @@ export class UkomRegisterComponent {
   }
 
   hadItemsLoading$ = new BehaviorSubject<boolean>(false)
+  imageUrl: string = ''
 
   constructor (
     private apiService: ApiService,
@@ -243,7 +240,6 @@ export class UkomRegisterComponent {
   }
 
   submit () {
-    this.hadItemsLoading$.next(true)
     const jenis_ukom = this.nonJFForm.get('jenis_ukom').value
     this.pesertaUkom.name = this.nonJFForm.get('name').value
     this.pesertaUkom.email = this.nonJFForm.get('email').value
@@ -294,15 +290,16 @@ export class UkomRegisterComponent {
       next: result => {
         if (!result.confirmed) return
 
-        console.log('payload', this.pesertaUkom)
+        this.hadItemsLoading$.next(true)
 
         this.apiService
           .postData('/api/v1/participant_ukom/task', this.pesertaUkom)
           .subscribe({
             next: response => {
               this.registerComplete = true
-              this.myAngularxQrCode = `${window.location.origin}/ukom/external/status?key=${response.key}`
               this.stringCode = response.key
+              this.imageUrl = response.imageUrl
+
               this.handlerService.handleAlert(
                 'Success',
                 'Data berhasil disimpan'
@@ -325,6 +322,22 @@ export class UkomRegisterComponent {
         this.handlerService.handleAlert('Error', error.error.message)
       }
     })
+  }
+
+  downloadImage () {
+    fetch(this.imageUrl)
+      .then(response => response.blob()) // Convert to Blob
+      .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = blobUrl
+        a.download = 'sample-image.jpg' // Set filename
+        document.body.appendChild(a)
+        a.click() // Auto-click to start download
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(blobUrl) // Cleanup
+      })
+      .catch(error => console.error('Download failed:', error))
   }
 
   ngOnInit () {

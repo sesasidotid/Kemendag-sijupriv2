@@ -193,6 +193,10 @@
   cursor: pointer;
 }
 
+.stepper-item .step-counter.disabled {
+  cursor: default; /* Remove pointer effect */
+}
+
 .stepper-item.active .step-counter {
   background-color: #2967be;
 

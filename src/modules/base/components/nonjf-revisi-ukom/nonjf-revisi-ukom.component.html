@@ -1,43 +1,145 @@
 <div class="row">
   <div class="col-lg-12">
-    <div class="mb-3">
-      <label for="emailInput" class="form-label">
-        File yang perlu diperbaiki
-      </label>
-      <small class="text-muted d-block">
-        Jenis file yang diperbolehkan:
-        {{ inputs.allowedTypes?.join(', ') }} <br />
-        Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
-      </small>
-    </div>
-    <div class="row">
-      <app-file-handler [inputs]="inputs"></app-file-handler>
-    </div>
-  </div>
+    <div class="col-lg-12">
+      <div class="mb-3">
+        <label for="emailInput" class="form-label">
+          File yang perlu diperbaiki
+        </label>
+        <small class="text-muted d-block">
+          Jenis file yang diperbolehkan:
+          {{ inputs.allowedTypes?.join(', ') }} <br />
+          Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
+        </small>
+      </div>
+      <div class="row">
+        <app-file-handler [inputs]="inputs"></app-file-handler>
+      </div>
 
-  <div class="col-lg-12">
-    <div class="hstack gap-2 justify-content-end">
-      <button
-        (click)="onSave()"
-        class="btn btn-success"
-        [disabled]="isAnyFileMissing()"
-        *ngIf="!(hadItemsLoading$ | async)"
-      >
-        Simpan
-      </button>
+      <div class="form-check mb-3">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          id="showFormCheckbox"
+          [(ngModel)]="showForm"
+          (change)="onCheckboxChange()"
+        />
+        <label class="form-check-label" for="showFormCheckbox">
+          Perbaiki data diri.
+        </label>
+      </div>
 
-      <button *ngIf="hadItemsLoading$ | async" class="btn btn-success" disabled>
-        <div
-          class="spinner-border"
-          style="width: 19px; height: 19px"
-          role="status"
+      <!-- Information message -->
+      <div class="alert alert-info" *ngIf="!showForm">
+        Jika ada kesalahan pada data anda, centang kotak di atas untuk
+        memperbarui informasi Anda.
+      </div>
+
+      <div *ngIf="showForm">
+        <form [formGroup]="updateNonJFForm">
+          <div class="mb-3">
+            <label for="name" class="form-label"
+              >Nama<span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              required
+              formControlName="name"
+            />
+            <div
+              class="text-danger"
+              *ngIf="
+                updateNonJFForm.get('name').invalid &&
+                updateNonJFForm.get('name').touched
+              "
+            >
+              <small *ngIf="updateNonJFForm.get('name').errors?.['required']"
+                >Nama perlu diisi.</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label"
+              >Email<span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="email"
+              required
+              formControlName="email"
+            />
+            <div
+              class="text-danger"
+              *ngIf="
+                updateNonJFForm.get('email').invalid &&
+                updateNonJFForm.get('email').touched
+              "
+            >
+              <small *ngIf="updateNonJFForm.get('email').errors?.['required']"
+                >Email perlu diisi.</small
+              >
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="unitKerjaName" class="form-label"
+              >Unit Kerja<span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="unitKerjaName"
+              required
+              formControlName="unitKerjaName"
+            />
+            <div
+              class="text-danger"
+              *ngIf="
+                updateNonJFForm.get('unitKerjaName').invalid &&
+                updateNonJFForm.get('unitKerjaName').touched
+              "
+            >
+              <small
+                *ngIf="updateNonJFForm.get('unitKerjaName').errors?.['required']"
+                >Unit Kerja perlu diisi.</small
+              >
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-12">
+      <div class="hstack gap-2 justify-content-end">
+        <button
+          (click)="onSave()"
+          class="btn btn-success"
+          [disabled]="isAnyFileMissing() || updateNonJFForm.invalid"
+          *ngIf="!(hadItemsLoading$ | async)"
         >
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </button>
+          Simpan
+        </button>
+
+        <button
+          *ngIf="hadItemsLoading$ | async"
+          class="btn btn-success"
+          disabled
+        >
+          <div
+            class="spinner-border"
+            style="width: 19px; height: 19px"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<app-confirmation-dialog></app-confirmation-dialog>
-<app-file-preview></app-file-preview>
+  <app-confirmation-dialog></app-confirmation-dialog>
+  <app-file-preview></app-file-preview>
+</div>

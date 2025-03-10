@@ -1,10 +1,10 @@
 export const environment = {
   production: true,
-  //   appBaseHref: '/sijupri',
-  appBaseHref: '',
-  apiBaseUrl: 'http://sijupri.com:8000',
+//   appBaseHref: '/sijupri',
+    appBaseHref: '',
+    apiBaseUrl: 'http://sijupri.com:8000',
   //   apiBaseUrl: 'https://localhost:8000',
-  //   apiBaseUrl: 'https://pusbinjfdag.id:8000',
+//   apiBaseUrl: 'https://pusbinjfdag.id:8000',
   firebaseConfig: {
     apiKey: 'AIzaSyBHvB-ce9lpJdWbDJCBP2XLVJHYzV62oLw',
     authDomain: 'sijupri.firebaseapp.com',

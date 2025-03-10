@@ -1,7 +1,7 @@
+import { FilePreviewComponent } from './../file-preview/file-preview.component'
 import { Component } from '@angular/core'
 import { UkomTaskDetail } from '../../../ukom/models/ukom-task-detail.modal'
 import { BehaviorSubject, Observable } from 'rxjs'
-import { UkomTaskService } from '../../../ukom/services/ukom-task.service'
 import { LoginContext } from '../../commons/login-context'
 import { ModalComponent } from '../modal/modal.component'
 import { UkomRevisionComponent } from '../../../../sijupri-jf/ukom/ukom-revision/ukom-revision.component'
@@ -15,17 +15,26 @@ import { SafeUrl } from '@angular/platform-browser'
 import { EmptyStateComponent } from '../empty-state/empty-state.component'
 import { LandingPageComponent } from '../../../landing-page/landing-page.component'
 import { CATSchore } from '../../../../modules/ukom/models/cat/cat-schore'
+import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
+import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
+import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 
+export enum JenisUkomEnum {
+  PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
+  KENAIKAN_JENJANG = 'Kenaikan Jenjang',
+  PROMOSI = 'Promosi'
+}
 @Component({
   selector: 'app-status-pendaftaran-ukom',
   standalone: true,
   imports: [
     ModalComponent,
-    UkomRevisionComponent,
     CommonModule,
     NonjfRevisiUkomComponent,
     EmptyStateComponent,
-    LandingPageComponent
+    LandingPageComponent,
+    FileHandlerComponent,
+    FilePreviewComponent
   ],
   templateUrl: './status-pendaftaran-ukom.component.html',
   styleUrl: './status-pendaftaran-ukom.component.scss'
@@ -43,10 +52,15 @@ export class StatusPendaftaranUkomComponent {
   finishTask: UkomTaskDetail = new UkomTaskDetail()
   CATSchore: CATSchore = new CATSchore()
   isCATModalOpen$ = new BehaviorSubject<boolean>(false)
+  dataDokumenUkom: DataDokumenUkom[] = []
+
+  fileHandlerData: FIleHandler = {
+    files: {},
+    viewOnly: true
+  }
 
   key: string = undefined
   constructor (
-    private ukomTaskService: UkomTaskService,
     private converterService: ConverterService,
     private apiService: ApiService,
     private router: Router,
@@ -57,7 +71,6 @@ export class StatusPendaftaranUkomComponent {
   ngOnInit () {
     this.activatedRoute.queryParams.subscribe(params => {
       const key = params['key']
-      console.log('ID from query params:', key)
 
       if (key) {
         this.key = key
@@ -66,24 +79,26 @@ export class StatusPendaftaranUkomComponent {
     })
   }
 
+  mapDokumenUkom () {
+    console.log('aa', this.dataDokumenUkom)
+    this.dataDokumenUkom.forEach((doc, index) => {
+      this.fileHandlerData.files[`file${index}`] = {
+        label: doc.dokumenPersyaratanName,
+        source: doc.dokumenUrl,
+        id: doc.id,
+        required: false
+      }
+    })
+  }
+
   toggleCATModal () {
     this.isCATModalOpen$.next(!this.isCATModalOpen$.value)
-  }
-  getCATScore (id: string) {
-    const exam_type_code = 'CAT'
-
-    this.apiService
-      .getData(`/api/v1/exam_grade/${exam_type_code}/${id}`)
-      .subscribe({
-        next: (response: any) => {
-          this.CATSchore = new CATSchore(response)
-        }
-      })
   }
 
   backToLandingPage () {
     this.router.navigate(['/'])
   }
+
   fetchPhotoProfile () {
     this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
       next: blob => {
@@ -101,11 +116,13 @@ export class StatusPendaftaranUkomComponent {
     })
   }
 
+  getJenisUkomLabel (jenisUkom: string): string {
+    return JenisUkomEnum[jenisUkom as keyof typeof JenisUkomEnum] || '-'
+  }
+
   getPendingTask (key: string) {
     this.ukomDataLoading$.next(true)
-    // this.ukomTaskService.findByNip(LoginContext.getUserId()).subscribe({
     this.apiService
-      //   .getData(`/api/v1/participant_ukom/task/non_jf?key=${key}`)
       .getData(`/api/v1/participant_ukom_detail?key=${key}`)
       .subscribe({
         next: (response: any) => {
@@ -137,7 +154,8 @@ export class StatusPendaftaranUkomComponent {
 
           if (response.status == 'finish') {
             this.finishTask = response.data
-            this.getCATScore(this.finishTask.id)
+            this.dataDokumenUkom = response.data.documentUkomList
+            this.mapDokumenUkom()
           }
 
           this.ukomDataLoading$.next(false)

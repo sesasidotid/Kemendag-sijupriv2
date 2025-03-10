@@ -9,10 +9,13 @@ import { CommonModule } from '@angular/common'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { CATSchore } from '../../../modules/ukom/models/cat/cat-schore'
 import { Router } from '@angular/router'
+import { DataDokumenUkom } from '../../../modules/ukom/models/data-dukung'
+import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
+import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 @Component({
   selector: 'app-ukom-task-detail',
   standalone: true,
-  imports: [CommonModule, ModalComponent],
+  imports: [CommonModule, ModalComponent, FileHandlerComponent],
   templateUrl: './ukom-task-detail.component.html',
   styleUrl: './ukom-task-detail.component.scss'
 })
@@ -26,17 +29,52 @@ export class UkomTaskDetailComponent {
   ukomDetail = new UkomTaskDetail()
   ukomDetailLoading$ = new BehaviorSubject<boolean>(false)
   isModalOpen$ = new BehaviorSubject<boolean>(false)
+  dataDokumenUkom: DataDokumenUkom[] = []
+
+  fileHandlerData: FIleHandler = {
+    files: {},
+    viewOnly: true
+  }
 
   constructor (
     private apiService: ApiService,
     private activatedRoute: ActivatedRoute,
     private router: Router
-  ) {
+  ) {}
+
+  ngOnInit () {
     this.activatedRoute.paramMap.subscribe(params => {
       this.id = params.get('id')
+      this.getParticipantUkomDetail()
+      this.getDokumenUkomList()
     })
-    this.getParticipantUkomDetail()
   }
+
+  mapDokumenUkom () {
+    this.dataDokumenUkom.forEach((doc, index) => {
+      this.fileHandlerData.files[`file${index}`] = {
+        label: doc.dokumenPersyaratanName,
+        source: doc.dokumenUrl,
+        id: doc.id,
+        required: false
+      }
+    })
+  }
+
+  getDokumenUkomList () {
+    this.apiService
+      .getData(`/api/v1/document_ukom/participant/${this.id}`)
+      .subscribe({
+        next: (response: DataDokumenUkom[]) => {
+          this.dataDokumenUkom = response
+          this.mapDokumenUkom()
+        },
+        error: error => {
+          console.log(error)
+        }
+      })
+  }
+
   toggleModal () {
     this.isModalOpen$.next(!this.isModalOpen$.value)
   }
@@ -55,6 +93,7 @@ export class UkomTaskDetailComponent {
   backToList () {
     this.router.navigate(['/ukom/ukom-list'])
   }
+
   getCorrectAnswer (question: any): string {
     const correctChoice = question.multipleChoiceDtoList.find(
       (choice: any) => choice.correct

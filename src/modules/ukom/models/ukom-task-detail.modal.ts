@@ -1,56 +1,57 @@
 import { Serializable } from '../../base/commons/serializable'
 
 export class UkomTaskDetail extends Serializable {
-  id: string
-  objectId: string
-  objectName: any
-  objectGroup: string
-  comment: any
-  taskType: string
-  taskAction: any
-  taskStatus: string
-  workflowName: string
-  workflowTemplate: string
-  flowName: string
-  flowId: string
-  remark: any
-  instanceId: string
-  workflowId: string
-  objectTaskId: string
-  pendingTaskHistory: PendingTaskHistory[]
-  participantUkomId: any
-  nip: string
-  nik: any
-  phone: any
-  name: any
-  email: string
-  tempatLahir: any
-  tanggalLahir: any
-  jenisUkom: string
-  jenisKelaminCode: any
-  jenisKelaminName: string
-  rekomendasi: any
-  rekomendasiUrl: any
-  rekomendasiFile: any
-  jabatanCode: any
-  jabatanName: string
-  jenjangCode: any
-  jenjangName: string
-  pangkatCode: any
-  pangkatName: string
-  nextJabatanCode: string
-  nextJabatanName: string
-  nextJenjangCode: string
-  nextJenjangName: string
-  nextPangkatCode: string
-  nextPangkatName: string
-  instansiId: any
-  instansiName: string
-  unitKerjaId: any
-  unitKerjaName: string
-  ukomId: any
-  dokumenUkomList: DokumenUkomList[]
-  grade: any
+  id: string = undefined
+  objectId: string = undefined
+  objectName: any = undefined
+  objectGroup: string = undefined
+  comment: any = undefined
+  taskType: string = undefined
+  taskAction: any = undefined
+  taskStatus: string = undefined
+  workflowName: string = undefined
+  workflowTemplate: string = undefined
+  flowName: string = undefined
+  flowId: string = undefined
+  remark: any = undefined
+  instanceId: string = undefined
+  workflowId: string = undefined
+  objectTaskId: string = undefined
+  pendingTaskHistory: PendingTaskHistory[] = []
+  participantUkomId: any = undefined
+  nip: string = undefined
+  nik: any = undefined
+  phone: any = undefined
+  name: any = undefined
+  email: string = undefined
+  tempatLahir: any = undefined
+  tanggalLahir: any = undefined
+  jenisUkom: string = undefined
+  jenisKelaminCode: any = undefined
+  jenisKelaminName: string = undefined
+  rekomendasi: any = undefined
+  rekomendasiUrl: any = undefined
+  rekomendasiFile: any = undefined
+  jabatanCode: any = undefined
+  jabatanName: string = undefined
+  jenjangCode: any = undefined
+  jenjangName: string = undefined
+  pangkatCode: any = undefined
+  pangkatName: string = undefined
+  nextJabatanCode: string = undefined
+  nextJabatanName: string = undefined
+  nextJenjangCode: string = undefined
+  nextJenjangName: string = undefined
+  nextPangkatCode: string = undefined
+  nextPangkatName: string = undefined
+  instansiId: any = undefined
+  instansiName: string = undefined
+  unitKerjaId: any = undefined
+  unitKerjaName: string = undefined
+  ukomId: any = undefined
+  dokumenUkomList: DokumenUkomList[] = []
+  documentUkomList: DokumenUkomList[] = []
+  grade: any = undefined
 
   constructor (object?: { [key: string]: any }) {
     super()

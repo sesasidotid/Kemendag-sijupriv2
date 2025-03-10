@@ -81,9 +81,16 @@ export class UkomDetailComponent {
 
   getJF () {
     this.jfLoading$.next(true)
-    this.jfService.findByNip(this.id).subscribe({
-      next: (jf: JF) => {
-        this.jf = jf
+    // this.jfService.findByNip(this.id).subscribe({
+    //   next: (jf: JF) => {
+    //     this.jf = jf
+    //     this.jfLoading$.next(false)
+    //   }
+    // })
+
+    this.apiService.getData(`/api/v1/jf/${this.id}`).subscribe({
+      next: (response: any) => {
+        this.jf = new JF(response)
         this.jfLoading$.next(false)
       }
     })

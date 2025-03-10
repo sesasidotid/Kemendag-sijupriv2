@@ -72,6 +72,7 @@ export class UkomDocumentAddComponent {
           )
           .subscribe({
             next: response => {
+                this.submitLoading$.next(false)
               this.handlerService.handleAlert(
                 'Success',
                 'Data berhasil disimpan'
@@ -79,6 +80,7 @@ export class UkomDocumentAddComponent {
               this.changeTabActive.emit(0)
             },
             error: error => {
+                this.submitLoading$.next(false)
               console.error(error.error.message)
               this.handlerService.handleAlert('Error', 'Gagal menyimpan data')
             },

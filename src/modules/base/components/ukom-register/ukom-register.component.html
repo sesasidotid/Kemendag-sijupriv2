@@ -16,36 +16,23 @@
           Silahkan simpan kode di atas untuk memantau status pendaftaran UKom
           anda atau download QR code di bawah
         </p>
-        <div class="qrcodeImage">
-          <qrcode
-            [qrdata]="myAngularxQrCode"
-            [allowEmptyString]="true"
-            [alt]="'A custom alt attribute'"
-            [ariaLabel]="'QR Code image with the following content...'"
-            [cssClass]="'center'"
-            [colorDark]="'#000000'"
-            [colorLight]="'#ffffff'"
-            [elementType]="'img'"
-            [errorCorrectionLevel]="'M'"
-            [margin]="4"
-            [scale]="1"
-            [title]="'A custom title attribute'"
-            [width]="400"
-            class="mx-auto"
-            (qrCodeURL)="onChangeURL($event)"
-          ></qrcode>
-        </div>
-        <p class="mt-4 text-gray-700">
-          Silakan download dan simpan QR code ini untuk mengetahui <br />
-          status pendaftaran UKOM Anda.
-        </p>
 
-        <a
-          [href]="qrCodeDownloadLink"
-          download="qrcode"
-          class="btn btn-primary mt-3"
-          >Download</a
-        >
+        <div *ngIf="imageUrl">
+          <div class="text-center">
+            <h2 class="mb-4">Download QRCode</h2>
+            <img
+              id="image"
+              [src]="imageUrl"
+              class="img-fluid border rounded"
+              alt="Sample Image"
+            />
+            <div class="mt-3">
+              <button (click)="downloadImage()" class="btn btn-primary">
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </ng-template>

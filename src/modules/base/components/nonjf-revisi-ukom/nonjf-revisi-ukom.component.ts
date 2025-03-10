@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, SimpleChanges } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { PesertaUkom } from '../../../../modules/ukom/models/peserta-ukom.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
@@ -11,6 +11,16 @@ import { RevisiDokumenUkom } from '../../../../modules/ukom/models/revisi-dokume
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
 import { FilePreviewComponent } from '../file-preview/file-preview.component'
 import { BehaviorSubject } from 'rxjs'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms'
+import { Pangkat } from '../../../maintenance/models/pangkat.model'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 @Component({
   selector: 'app-nonjf-revisi-ukom',
@@ -19,7 +29,9 @@ import { BehaviorSubject } from 'rxjs'
     FileHandlerComponent,
     CommonModule,
     ConfirmationDialogComponent,
-    FilePreviewComponent
+    FilePreviewComponent,
+    ReactiveFormsModule,
+    FormsModule
   ],
   templateUrl: './nonjf-revisi-ukom.component.html',
   styleUrl: './nonjf-revisi-ukom.component.scss'
@@ -31,6 +43,9 @@ export class NonjfRevisiUkomComponent {
   rejectedDokumen: any[] = []
   detectedDokumen: any = {}
   pesertaUkom: PesertaUkom = new PesertaUkom()
+  isDetailIncorrect: boolean = false
+  pangkatList$: Observable<Pangkat[]>
+  showForm: boolean = false
 
   inputs: FIleHandler = {
     files: {},
@@ -55,7 +70,8 @@ export class NonjfRevisiUkomComponent {
     }
   }
   hadItemsLoading$ = new BehaviorSubject<boolean>(false)
-
+  defaultValues: any = {}
+  updateNonJFForm: FormGroup
   constructor (
     private apiService: ApiService,
     private handlerService: HandlerService,
@@ -63,11 +79,37 @@ export class NonjfRevisiUkomComponent {
   ) {}
 
   ngOnInit () {
+    this.updateNonJFForm = new FormGroup({
+      name: new FormControl('', Validators.required),
+      email: new FormControl('', Validators.required),
+      unitKerjaName: new FormControl('', Validators.required)
+    })
+
     this.getRejectedDokumen()
     this.handleRejectedDokumen()
+    this.getListPanngkat()
+    this.setDefaultFormValues(this.pendingTask)
+  }
+
+  setDefaultFormValues (data: UkomTaskDetail) {
+    this.defaultValues = { ...data }
+
+    this.updateNonJFForm.patchValue({
+      name: data.name || '',
+      email: data.email || '',
+      unitKerjaName: data.unitKerjaName || ''
+    })
+  }
+
+  onCheckboxChange () {
+    if (!this.showForm) {
+      this.setDefaultFormValues(this.defaultValues)
+      this.updateNonJFForm.markAsPristine() // Mark form as untouched
+    }
   }
 
   getRejectedDokumen () {
+    console.log('getRejectedDokumen called')
     if (this.pendingTask?.dokumenUkomList?.length) {
       this.rejectedDokumen = this.pendingTask.dokumenUkomList.filter(
         dokumen => dokumen.dokumenStatus.toLowerCase() === 'reject'
@@ -77,6 +119,17 @@ export class NonjfRevisiUkomComponent {
     }
   }
 
+  getListPanngkat () {
+    this.pangkatList$ = this.apiService
+      .getData(`/api/v1/pangkat`)
+      .pipe(
+        map(response =>
+          response.map(
+            (pangkat: { [key: string]: any }) => new Pangkat(pangkat)
+          )
+        )
+      )
+  }
   handleRejectedDokumen () {
     this.inputs.files = {}
     this.rejectedDokumen.forEach((dokumen, index) => {
@@ -126,6 +179,13 @@ export class NonjfRevisiUkomComponent {
 
     this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
 
+    if (this.showForm) {
+      this.pesertaUkom.name = this.updateNonJFForm.get('name').value
+      this.pesertaUkom.email = this.updateNonJFForm.get('email').value
+      this.pesertaUkom.unitKerjaName =
+        this.updateNonJFForm.get('unitKerjaName').value
+    }
+
     this.revisedDokumen.id = this.pendingTask.id
     this.revisedDokumen.taskAction = 'approve'
     this.revisedDokumen.object = this.pesertaUkom
@@ -136,6 +196,14 @@ export class NonjfRevisiUkomComponent {
           return
         }
         this.hadItemsLoading$.next(true)
+
+        console.log(this.revisedDokumen)
+        console.log(
+          'path',
+          `/api/v1/participant_ukom/task/non_jf/submit?key=${this.key}`
+        )
+
+        console.log('revisedDokumen', this.revisedDokumen)
 
         this.apiService
           .postData(
