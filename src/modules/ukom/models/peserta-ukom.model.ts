@@ -38,6 +38,7 @@ export class PesertaUkom extends Serializable {
   unitKerjaName: string = undefined
   JabatanName: string = undefined
   JenjangName: string = undefined
+  jenisUkom: string = undefined
 
   constructor (object?: { [key: string]: any }) {
     super()

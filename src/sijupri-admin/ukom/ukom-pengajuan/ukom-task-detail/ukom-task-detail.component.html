@@ -10,10 +10,17 @@
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-lg-12" *ngIf="pesertaUkom.name">
+          <div class="col-lg-6" *ngIf="pesertaUkom.name">
             <div class="mb-3">
-              <label class="form-label">First Name</label>
+              <label class="form-label">Nama Lengkap</label>
               <p class="border-bottom">{{ pesertaUkom.name }}</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.nip">
+            <div class="mb-3">
+              <label class="form-label">NIP</label>
+              <p class="border-bottom">{{ pesertaUkom.nip }}</p>
             </div>
           </div>
 
@@ -52,10 +59,17 @@
             </div>
           </div>
 
-          <div class="col-lg-12" *ngIf="pesertaUkom.nik">
+          <div class="col-lg-6" *ngIf="pesertaUkom.nik">
             <div class="mb-3">
               <label class="form-label">NIK</label>
               <p class="border-bottom">{{ pesertaUkom.nik }}</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.unitKerjaName">
+            <div class="mb-3">
+              <label class="form-label">Unit Kerja</label>
+              <p class="border-bottom">{{ pesertaUkom.unitKerjaName }}</p>
             </div>
           </div>
 
@@ -109,6 +123,23 @@
             <div class="mb-3">
               <label class="form-label">Pangkat Yang Dituju</label>
               <p class="border-bottom">{{ pesertaUkom.nextPangkatName }}</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6" *ngIf="pesertaUkom.jenisUkom">
+            <div class="mb-3">
+              <label class="form-label">Jenis UKom</label>
+              <p class="border-bottom">
+                {{
+                  pesertaUkom.jenisUkom === 'KENAIKAN_JENJANG'
+                    ? 'Kenaikan Jenjang'
+                    : pesertaUkom.jenisUkom === 'PERPINDAHAN_JABATAN'
+                    ? 'Perpindahan Jabatan'
+                    : pesertaUkom.jenisUkom === 'PROMOSI'
+                    ? 'Promosi'
+                    : pesertaUkom.jenisUkom
+                }}
+              </p>
             </div>
           </div>
         </div>
@@ -206,16 +237,16 @@
             class="btn btn-success me-1"
             (click)="submit(false)"
           >
-            Terima
+            Submit
           </button>
 
           <button
             class="btn btn-danger"
             [disabled]="isApproveEnable"
             (click)="submit(true)"
-            *ngIf="!(hadItemsLoading$ | async)"
+            *ngIf="!(hadItemsLoading$ | async) && !isApproveEnable"
           >
-            Tolak
+            Submit
           </button>
 
           <button

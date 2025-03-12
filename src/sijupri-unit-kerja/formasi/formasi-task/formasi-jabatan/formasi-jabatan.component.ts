@@ -147,6 +147,13 @@ export class FormasiJabatanComponent {
         next: (response: FormasiResult[]) => {
           this.formasiResultList = response
           this.isModalOpen = true
+        },
+        error: error => {
+          if (error.error.code == 'VAL-00001') {
+            this.handlerSerivce.handleAlert('Error', 'Semua volume harus diisi')
+          } else {
+            this.handlerSerivce.handleAlert('Error', 'Gagal menghitung formasi')
+          }
         }
       })
   }

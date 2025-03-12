@@ -16,88 +16,140 @@
     <div class="card flex-grow-1 m-0 detail-jf">
       <div class="card-header">
         <h5 class="m-0">
-          <i class="mdi mdi-account me-2"></i> Detail Peserta UKom
+          <i class="mdi mdi-account me-2"></i>Detail Peserta UKom
         </h5>
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.name">
-            <label class="form-label">Nama Lengkap</label>
-            <p>{{ ukomDetail.name }}</p>
+          <div class="col-lg-6" *ngIf="ukomDetail.name">
+            <div class="mb-3">
+              <label class="form-label">Nama Lengkap</label>
+              <p class="border-bottom">{{ ukomDetail.name }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.nip">
-            <label class="form-label">NIP</label>
-            <p>{{ ukomDetail.nip }}</p>
+          <div class="col-lg-6" *ngIf="ukomDetail.nip">
+            <div class="mb-3">
+              <label class="form-label">NIP</label>
+              <p class="border-bottom">{{ ukomDetail.nip }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.email">
-            <label class="form-label">Email</label>
-            <p>{{ ukomDetail.email }}</p>
+          <div class="col-md-6" *ngIf="ukomDetail.phone">
+            <div class="mb-3">
+              <label class="form-label">No. HP</label>
+              <p class="border-bottom">{{ ukomDetail.phone }}</p>
+            </div>
           </div>
 
-          <div
-            class="col-md-6 mb-2"
-            *ngIf="ukomDetail.tempatLahir || ukomDetail.tanggalLahir"
-          >
-            <label class="form-label">Tempat, Tanggal Lahir</label>
-            <p *ngIf="ukomDetail.tempatLahir && ukomDetail.tanggalLahir">
-              {{ ukomDetail.tempatLahir + ', ' + ukomDetail.tanggalLahir }}
-            </p>
-            <p *ngIf="ukomDetail.tempatLahir && !ukomDetail.tanggalLahir">
-              {{ ukomDetail.tempatLahir }}
-            </p>
-            <p *ngIf="!ukomDetail.tempatLahir && ukomDetail.tanggalLahir">
-              {{ ukomDetail.tanggalLahir }}
-            </p>
+          <div class="col-lg-6 mb-2" *ngIf="ukomDetail.email">
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <p class="border-bottom">{{ ukomDetail.email }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.jenisKelaminName">
-            <label class="form-label">Jenis Kelamin</label>
-            <p>{{ ukomDetail.jenisKelaminName }}</p>
+          <div class="col-lg-6" *ngIf="ukomDetail.tempatLahir">
+            <div class="mb-3">
+              <label class="form-label">Tempat Lahir</label>
+              <p class="border-bottom">{{ ukomDetail.tempatLahir }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.jenisUkom">
-            <label class="form-label">Jenis Ukom</label>
-            <p>
-              {{
-                ukomDetail.jenisUkom === 'KENAIKAN_JENJANG'
-                  ? 'Kenaikan Jenjang'
-                  : ukomDetail.jenisUkom === 'PERPINDAHAN_JABATAN'
-                  ? 'Perpindahan Jabatan'
-                  : ukomDetail.jenisUkom
-              }}
-            </p>
+          <div class="col-lg-6" *ngIf="ukomDetail.tanggalLahir">
+            <div class="mb-3">
+              <label class="form-label">Tanggal Lahir</label>
+              <p class="border-bottom">{{ ukomDetail.tanggalLahir }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.unitKerjaName">
+          <div class="col-lg-6" *ngIf="ukomDetail.jenisKelaminName">
+            <div class="mb-3">
+              <label class="form-label">Jenis Kelamin</label>
+              <p class="border-bottom">{{ ukomDetail.jenisKelaminName }}</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6" *ngIf="ukomDetail.nik">
+            <div class="mb-3">
+              <label class="form-label">NIK</label>
+              <p class="border-bottom">{{ ukomDetail.nik }}</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6" *ngIf="ukomDetail.unitKerjaName">
             <label class="form-label">Unit Kerja</label>
-            <p>{{ ukomDetail.unitKerjaName }}</p>
+            <p class="border-bottom">{{ ukomDetail.unitKerjaName }}</p>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.instansiName">
-            <label class="form-label">Instansi</label>
-            <p>{{ ukomDetail.instansiName }}</p>
+          <div class="col-lg-6" *ngIf="ukomDetail.instansiName">
+            <div class="mb-3">
+              <label class="form-label">Instansi</label>
+              <p class="border-bottom">{{ ukomDetail.instansiName }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.jabatanName">
-            <label class="form-label">Jabatan</label>
-            <p>{{ ukomDetail.jabatanName }}</p>
+          <hr
+            *ngIf="
+              ukomDetail.jabatanName ||
+              ukomDetail.nextJabatanName ||
+              ukomDetail.jenjangName ||
+              ukomDetail.nextJenjangName ||
+              ukomDetail.pangkatName ||
+              ukomDetail.nextPangkatName
+            "
+          />
+
+          <div class="col-lg-6" *ngIf="ukomDetail.jabatanName">
+            <div class="mb-3">
+              <label class="form-label">Jabatan</label>
+              <p class="border-bottom">{{ ukomDetail.jabatanName }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.jenjangName">
-            <label class="form-label">Jenjang</label>
-            <p>{{ ukomDetail.jenjangName }}</p>
+          <div class="col-lg-6" *ngIf="ukomDetail.nextJabatanName">
+            <div class="mb-3">
+              <label class="form-label">Jabatan Yang Dituju</label>
+              <p class="border-bottom">{{ ukomDetail.nextJabatanName }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.nextJabatanName">
-            <label class="form-label">Jabatan Yang Dituju</label>
-            <p>{{ ukomDetail.nextJabatanName }}</p>
+          <div class="col-lg-6" *ngIf="ukomDetail.jenjangName">
+            <div class="mb-3">
+              <label class="form-label">Jenjang</label>
+              <p class="border-bottom">{{ ukomDetail.jenjangName }}</p>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-2" *ngIf="ukomDetail.nextJenjangName">
-            <label class="form-label">Jenjang Yang Dituju</label>
-            <p>{{ ukomDetail.nextJenjangName }}</p>
+          <div class="col-lg-6" *ngIf="ukomDetail.nextJenjangName">
+            <div class="mb-3">
+              <label class="form-label">Jenjang Yang Dituju</label>
+              <p>{{ ukomDetail.nextJenjangName }}</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6" *ngIf="ukomDetail.pangkatName">
+            <div class="mb-3">
+              <label class="form-label">Pangkat</label>
+              <p class="border-bottom">{{ ukomDetail.pangkatName }}</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6" *ngIf="ukomDetail.jenisUkom">
+            <div class="mb-3">
+              <label class="form-label">Jenis UKom</label>
+              <p class="border-bottom">
+                {{
+                  ukomDetail.jenisUkom === 'KENAIKAN_JENJANG'
+                    ? 'Kenaikan Jenjang'
+                    : ukomDetail.jenisUkom === 'PERPINDAHAN_JABATAN'
+                    ? 'Perpindahan Jabatan'
+                    : ukomDetail.jenisUkom === 'PROMOSI'
+                    ? 'Promosi'
+                    : ukomDetail.jenisUkom
+                }}
+              </p>
+            </div>
           </div>
         </div>
       </div>

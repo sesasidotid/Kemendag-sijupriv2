@@ -20,10 +20,10 @@
               >Aktif</span
             >
             <span class="badge rounded-pill text-bg-danger" *ngIf="!jf.nip"
-              >JF tidak terdaftar</span
+              >Non JF Perdagangan</span
             >
             <span class="badge rounded-pill text-bg-danger" *ngIf="isBanned"
-              >Di banned sampai {{ bannedDue ? bannedDue : 'N/A' }}</span
+              >Di banned sampai {{ bannedDue ? bannedDue : '-' }}</span
             >
           </div>
           <div class="mt-3">
