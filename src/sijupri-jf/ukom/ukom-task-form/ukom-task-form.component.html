@@ -59,16 +59,6 @@
         </div>
 
         <div class="col-lg-12">
-          <div class="mb-3">
-            <label for="emailInput" class="form-label">
-              File:<span class="text-danger">*</span> </label
-            ><small class="text-muted d-block">
-              Pilih jenis UKom untuk melihat dokumen persyaratan<br />
-              Jenis file yang diperbolehkan:
-              {{ inputs.allowedTypes?.join(', ') }} <br />
-              Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
-            </small>
-          </div>
           <div class="row">
             <app-file-handler [inputs]="inputs"></app-file-handler>
           </div>
@@ -77,7 +67,7 @@
         <div *ngIf="pesertaUkom.jenis_ukom !== undefined" class="col-lg-12">
           <div class="mb-3 col-lg-6">
             <label for="password" class="form-label"
-              >Password<span class="text-danger">*</span></label
+              >Password <span class="text-danger">*</span></label
             >
             <input
               type="password"
@@ -109,7 +99,7 @@
 
           <div class="mb-3 col-lg-6">
             <label for="confirmPassword" class="form-label"
-              >Konfirmasi Password<span class="text-danger">*</span></label
+              >Konfirmasi Password <span class="text-danger">*</span></label
             >
             <input
               type="password"

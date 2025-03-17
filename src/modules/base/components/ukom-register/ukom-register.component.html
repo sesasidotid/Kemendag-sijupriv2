@@ -42,7 +42,7 @@
       <form [formGroup]="nonJFForm" (ngSubmit)="submit()">
         <div class="mb-3">
           <label for="name" class="form-label"
-            >Nama<span class="text-danger">*</span>
+            >Nama <span class="text-danger">*</span>
           </label>
           <input
             type="text"
@@ -64,7 +64,7 @@
 
         <div class="mb-3">
           <label for="email" class="form-label"
-            >Email<span class="text-danger">*</span></label
+            >Email <span class="text-danger">*</span></label
           >
           <input
             type="email"
@@ -96,7 +96,7 @@
 
         <div class="mb-3">
           <label for="password" class="form-label"
-            >Password<span class="text-danger">*</span></label
+            >Password <span class="text-danger">*</span></label
           >
           <input
             type="password"
@@ -128,7 +128,7 @@
 
         <div class="mb-3">
           <label for="confirmPassword" class="form-label"
-            >Konfirmasi Password<span class="text-danger">*</span></label
+            >Konfirmasi Password <span class="text-danger">*</span></label
           >
           <input
             type="password"
@@ -161,7 +161,7 @@
 
         <div class="mb-3">
           <label for="nip" class="form-label"
-            >NIP<span class="text-danger">*</span></label
+            >NIP <span class="text-danger">*</span></label
           >
           <input
             type="text"
@@ -192,7 +192,7 @@
 
         <div class="mb-3">
           <label for="unitKerjaName" class="form-label"
-            >Unit Kerja<span class="text-danger">*</span></label
+            >Unit Kerja <span class="text-danger">*</span></label
           >
           <input
             type="text"
@@ -215,7 +215,7 @@
 
         <div class="mb-3">
           <label for="jenis_ukom" class="form-label"
-            >Jenis UKom<span class="text-danger">*</span></label
+            >Jenis UKom <span class="text-danger">*</span></label
           >
           <select
             class="form-select"
@@ -240,7 +240,7 @@
 
         <div class="mb-3">
           <label for="jabatanName" class="form-label"
-            >Jabatan Saat Ini<span class="text-danger">*</span></label
+            >Jabatan Saat Ini <span class="text-danger">*</span></label
           >
           <input
             type="text"
@@ -276,7 +276,7 @@
 
         <div class="mb-3">
           <label for="pangkatCode" class="form-label"
-            >Pangkat/Golongan Saat Ini<span class="text-danger">*</span></label
+            >Pangkat/Golongan Saat Ini <span class="text-danger">*</span></label
           >
           <select
             class="form-select"
@@ -315,7 +315,7 @@
 
         <div class="mb-3">
           <label for="nextJabatanCode" class="form-label"
-            >Jabatan Yang Dituju<span class="text-danger">*</span></label
+            >Jabatan Yang Dituju <span class="text-danger">*</span></label
           >
           <select
             class="form-select"
@@ -353,7 +353,7 @@
 
         <div class="mb-3">
           <label for="nextJenjangCode" class="form-label"
-            >Jenjang Yang Dituju<span class="text-danger">*</span></label
+            >Jenjang Yang Dituju <span class="text-danger">*</span></label
           >
           <select
             class="form-select"
@@ -391,17 +391,6 @@
         </div>
 
         <div class="col-lg-12">
-          <div class="mb-3">
-            <label for="emailInput" class="form-label">
-              File: <span class="text-danger">*</span></label
-            >
-            <small class="text-muted d-block">
-              Pilih jenis UKom untuk melihat dokumen persyaratan<br />
-              Jenis file yang diperbolehkan:
-              {{ inputs.allowedTypes?.join(', ') }} <br />
-              Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
-            </small>
-          </div>
           <div class="row">
             <app-file-handler [inputs]="inputs"></app-file-handler>
           </div>

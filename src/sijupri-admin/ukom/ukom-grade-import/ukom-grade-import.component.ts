@@ -25,6 +25,14 @@ export class UkomGradeImportComponent {
     files: {
       file_grade: { label: 'File Nilai Ukom' }
     },
+    allowedTypes: [
+      { label: 'xls', type: 'application/vnd.ms-excel' },
+      {
+        label: 'xlsx',
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      }
+    ],
+
     listen: (
       key: string,
       source: string,

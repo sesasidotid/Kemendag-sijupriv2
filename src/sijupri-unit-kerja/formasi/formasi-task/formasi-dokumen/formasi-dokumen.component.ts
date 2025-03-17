@@ -18,6 +18,7 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { DokumenUkomPersyaratan } from '../../../../modules/maintenance/models/dokumen-persyaratan-ukom'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { ConfirmationDialogComponent } from '../../../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
+import { BehaviorSubject } from 'rxjs'
 
 @Component({
   selector: 'app-formasi-dokumen',
@@ -30,6 +31,7 @@ export class FormasiDokumenComponent {
   formasiDokumenList: DokumenUkomPersyaratan[] = []
   formasiRequest: FormasiRequest = new FormasiRequest()
   detectedDokumen: any = {}
+  hadItemsLoading$ = new BehaviorSubject<boolean>(false)
 
   payload: {
     formasiDokumenList: {
@@ -45,6 +47,9 @@ export class FormasiDokumenComponent {
 
   inputs: FIleHandler = {
     files: {},
+    maxSize: 2 * 1024 * 1024,
+    allowedTypes: [{ type: 'application/pdf' }],
+
     listen: (
       key: string,
       source: string,
@@ -157,6 +162,7 @@ export class FormasiDokumenComponent {
       next: result => {
         if (!result.confirmed) return
         console.log('payload2', this.payload)
+        this.hadItemsLoading$.next(true)
 
         this.apiService
           .postData(`/api/v1/formasi/task`, this.payload)
@@ -168,9 +174,12 @@ export class FormasiDokumenComponent {
               ),
               setTimeout(() => {
                 window.location.reload()
-              }, 1000)
+              }, 1000),
+              this.hadItemsLoading$.next(false)
             ),
             error: error => {
+              this.hadItemsLoading$.next(false)
+
               console.log(error)
               this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
               this.payload = { formasiDokumenList: [] }
@@ -179,6 +188,7 @@ export class FormasiDokumenComponent {
           })
       },
       error: error => {
+        this.hadItemsLoading$.next(false)
         console.log('error', error)
         this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
       }

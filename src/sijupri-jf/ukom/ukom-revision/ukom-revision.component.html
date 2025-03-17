@@ -1,16 +1,5 @@
 <div class="row">
   <div class="col-lg-12">
-    <div class="mb-3">
-      <label for="emailInput" class="form-label">
-        File yang perlu diperbaiki
-      </label>
-      <small class="text-muted d-block">
-        Pilih jenis UKom untuk melihat dokumen persyaratan<br />
-        Jenis file yang diperbolehkan:
-        {{ inputs.allowedTypes?.join(', ') }} <br />
-        Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
-      </small>
-    </div>
     <div class="row">
       <app-file-handler [inputs]="inputs"></app-file-handler>
     </div>

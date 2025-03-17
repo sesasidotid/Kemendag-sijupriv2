@@ -56,14 +56,8 @@ export class UkomTaskFormComponent {
 
   inputs: FIleHandler = {
     files: {},
-    maxSize: 5 * 1024 * 1024,
-    allowedTypes: [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/webp',
-      'application/pdf'
-    ],
+    maxSize: 2 * 1024 * 1024,
+    allowedTypes: [{ type: 'application/pdf' }],
     listen: (
       key: string,
       source: string,

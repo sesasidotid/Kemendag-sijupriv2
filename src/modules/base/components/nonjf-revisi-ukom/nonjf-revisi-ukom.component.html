@@ -1,16 +1,6 @@
 <div class="row">
   <div class="col-lg-12">
     <div class="col-lg-12">
-      <div class="mb-3">
-        <label for="emailInput" class="form-label">
-          File yang perlu diperbaiki
-        </label>
-        <small class="text-muted d-block">
-          Jenis file yang diperbolehkan:
-          {{ inputs.allowedTypes?.join(', ') }} <br />
-          Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
-        </small>
-      </div>
       <div class="row">
         <app-file-handler [inputs]="inputs"></app-file-handler>
       </div>
@@ -38,7 +28,7 @@
         <form [formGroup]="updateNonJFForm">
           <div class="mb-3">
             <label for="name" class="form-label"
-              >Nama<span class="text-danger">*</span></label
+              >Nama <span class="text-danger">*</span></label
             >
             <input
               type="text"
@@ -62,7 +52,7 @@
 
           <div class="mb-3">
             <label for="email" class="form-label"
-              >Email<span class="text-danger">*</span></label
+              >Email <span class="text-danger">*</span></label
             >
             <input
               type="text"
@@ -86,7 +76,7 @@
 
           <div class="mb-3">
             <label for="unitKerjaName" class="form-label"
-              >Unit Kerja<span class="text-danger">*</span></label
+              >Unit Kerja <span class="text-danger">*</span></label
             >
             <input
               type="text"

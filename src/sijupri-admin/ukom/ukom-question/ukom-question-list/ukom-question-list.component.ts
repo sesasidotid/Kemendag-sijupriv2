@@ -57,8 +57,15 @@ export class UkomQuestionListComponent {
 
   inputs: FIleHandler = {
     files: {
-      question_template: { label: 'File Template Pertanyaan' }
+      question_template: { label: 'File Pertanyaan' }
     },
+    allowedTypes: [
+      { label: 'xls', type: 'application/vnd.ms-excel' },
+      {
+        label: 'xlsx',
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      }
+    ],
     listen: (
       key: string,
       source: string,

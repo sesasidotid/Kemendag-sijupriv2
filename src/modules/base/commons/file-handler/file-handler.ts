@@ -2,7 +2,7 @@ export class FIleHandler {
   files: { [key: string]: EygileFile }
   viewOnly?: boolean = false
   listen?: Function
-  allowedTypes?: string[] // Optional allowed file types
+  allowedTypes?: { type: string; label?: string }[]
   maxSize?: number // Optional max file size in bytes
   errors?: { [key: string]: string } = {} // Store errors for each file key
 }

@@ -71,6 +71,8 @@ export class UkomTaskComponent {
 
   inputs: FIleHandler = {
     files: {},
+    maxSize: 2 * 1024 * 1024,
+    allowedTypes: [{ type: 'application/pdf' }],
     listen: (
       key: string,
       source: string,

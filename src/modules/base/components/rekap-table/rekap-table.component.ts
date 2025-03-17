@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, Input } from '@angular/core'
+import { Component, Input, ViewChild } from '@angular/core'
 import { ColDef } from 'ag-grid-community'
 import { AgGridAngular } from 'ag-grid-angular'
 import { BehaviorSubject, timeout } from 'rxjs'
@@ -49,6 +49,7 @@ interface RekapData {
   styleUrl: './rekap-table.component.scss'
 })
 export class RekapTableComponent {
+  @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
   @Input() data: RekapData[] = []
 
   dokumentImport: {
@@ -173,6 +174,8 @@ export class RekapTableComponent {
     files: {
       dokumentFile: { label: 'Dokumen Verifikasi' }
     },
+    allowedTypes: [{ type: 'application/pdf' }],
+    maxSize: 2 * 1024 * 1024,
     listen: (
       key: string,
       source: string,
@@ -296,13 +299,27 @@ export class RekapTableComponent {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.sourceFile)
   }
 
+  clearFilesName () {
+    if (this.fileHandler) {
+      this.fileHandler.clearFileName()
+    }
+  }
+
   toggleModal (data?: RekapData) {
     if (data) {
       this.selectedRekapId$.next(Number(data.id))
       this.selectedRekapData = data
       console.log(this.selectedRekapData)
     }
+    this.dokumentImport.fileDokumenVerifikasi = null
+    this.clearFilesName()
+
     this.isModalOpen$.next(!this.isModalOpen$.value)
+  }
+
+  isAnyFileMissing (): boolean {
+    console.log('dokumenImport', this.dokumentImport.fileDokumenVerifikasi)
+    return !this.dokumentImport.fileDokumenVerifikasi
   }
 
   toggleModalPreview (data?: RekapData) {

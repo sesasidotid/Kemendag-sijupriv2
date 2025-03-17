@@ -42,6 +42,13 @@ export class AkpVerifikasiPelatihanComponent {
     files: {
       nilai_template: { label: 'Upload Nilai Pelatihan Teknis' }
     },
+    allowedTypes: [
+      { label: 'xls', type: 'application/vnd.ms-excel' },
+      {
+        label: 'xlsx',
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      }
+    ],
     listen: (
       key: string,
       source: string,
@@ -64,6 +71,10 @@ export class AkpVerifikasiPelatihanComponent {
     private handlerService: HandlerService
   ) {
     setTimeout(() => {}, 0)
+  }
+
+  isAnyFileMissing (): boolean {
+    return !this.payload.file_dokumen_verifikasi
   }
 
   ngOnInit () {

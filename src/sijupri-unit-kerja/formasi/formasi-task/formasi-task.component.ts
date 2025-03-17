@@ -28,6 +28,7 @@ import { ModalComponent } from '../../../modules/base/components/modal/modal.com
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { UndanganVerifikasiFormasi } from '../../../modules/formasi/models/undangan.model'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
+
 @Component({
   selector: 'app-formasi-task',
   standalone: true,
@@ -79,9 +80,13 @@ export class FormasiTaskComponent {
 
   revisiedFormasiDokumen: any[] = []
   PengaturanFormasiJabatan: PengaturanFormasiJabatan[] = []
+  hadItemsLoading$ = new BehaviorSubject<boolean>(false)
 
   inputs: FIleHandler = {
     files: {},
+    maxSize: 2 * 1024 * 1024,
+    allowedTypes: [{ type: 'application/pdf' }],
+
     listen: (
       key: string,
       source: string,
@@ -388,6 +393,8 @@ export class FormasiTaskComponent {
         if (!response.confirmed) {
           return
         }
+
+        this.hadItemsLoading$.next(true)
         const task = new Task({
           id: this.pendingTask.id,
           taskAction: 'approve',
@@ -405,15 +412,18 @@ export class FormasiTaskComponent {
               setTimeout(() => {
                 window.location.reload()
               }, 1000)
+              this.hadItemsLoading$.next(false)
             },
 
             error: error => {
+              this.hadItemsLoading$.next(false)
               console.error('Error fetching data', error)
               this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
             }
           })
       },
       error: error => {
+        this.hadItemsLoading$.next(false)
         console.error('Error F14', error)
       }
     })

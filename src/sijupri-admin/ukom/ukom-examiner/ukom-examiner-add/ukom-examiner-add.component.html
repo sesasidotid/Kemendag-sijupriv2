@@ -2,7 +2,7 @@
   <form [formGroup]="examinerForm" (ngSubmit)="submit()">
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Nama<span class="text-danger">*</span></label
+        >Nama <span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -11,10 +11,10 @@
           class="form-control"
           name="name"
           formControlName="name"
-          placeholder="Masukan nama tempat UKom"
+          placeholder="Masukan nama examiner"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             examinerForm.get('name').invalid && examinerForm.get('name').touched
           "
@@ -27,7 +27,7 @@
     </div>
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >NIP<span class="text-danger">*</span></label
+        >NIP <span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -39,7 +39,7 @@
           placeholder="Masukan NIP"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             examinerForm.get('nip').invalid && examinerForm.get('nip').touched
           "
@@ -52,7 +52,7 @@
     </div>
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Jenis Kelamin<span class="text-danger">*</span></label
+        >Jenis Kelamin <span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <select
@@ -66,7 +66,7 @@
         </select>
 
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             examinerForm.get('jenis_kelamin_code').invalid &&
             examinerForm.get('jenis_kelamin_code').touched
@@ -82,7 +82,7 @@
 
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label fw-bold"
-        >Password<span class="text-danger">*</span></label
+        >Password <span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input
@@ -94,7 +94,7 @@
           placeholder="Masukan password"
         />
         <div
-          class="feedback"
+          class="text-danger"
           *ngIf="
             examinerForm.get('password').invalid &&
             examinerForm.get('password').touched
@@ -109,7 +109,7 @@
 
     <div class="row mb-3">
       <label for="confirmPassword" class="col-sm-2 col-form-label fw-bold"
-        >Konfirmasi Password<span class="text-danger">*</span></label
+        >Konfirmasi Password <span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <input

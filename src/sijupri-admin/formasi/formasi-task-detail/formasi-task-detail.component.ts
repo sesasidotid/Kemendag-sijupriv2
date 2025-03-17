@@ -80,6 +80,8 @@ export class FormasiTaskDetailComponent {
     files: {
       question_template: { label: 'Surat Undangan' }
     },
+    maxSize: 2 * 1024 * 1024,
+    allowedTypes: [{ type: 'application/pdf' }],
     listen: (
       key: string,
       source: string,
@@ -96,8 +98,10 @@ export class FormasiTaskDetailComponent {
 
   inputsFileRekomendasi: FIleHandler = {
     files: {
-      file_rekomendasi: { label: 'Rekomendasi Formasi' }
+      file_rekomendasi: { label: 'File Rekomendasi Formasi' }
     },
+    maxSize: 2 * 1024 * 1024,
+    allowedTypes: [{ type: 'application/pdf' }],
     listen: (
       key: string,
       source: string,
@@ -143,6 +147,14 @@ export class FormasiTaskDetailComponent {
 
   ngOnInit () {
     this.getPendingTask()
+  }
+
+  isFileRekomendasiMissing (): boolean {
+    return !this.fileRekomendasi
+  }
+
+  isFileUndanganMissing (): boolean {
+    return !this.waktuInput.fileUndangan
   }
 
   hoveredJabatanIndex: number | null = null

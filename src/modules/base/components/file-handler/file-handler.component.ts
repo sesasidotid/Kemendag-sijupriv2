@@ -27,6 +27,12 @@ export class FileHandlerComponent {
     private handlerService: HandlerService
   ) {}
 
+  getAllowedTypes (): string {
+    return (
+      this.inputs.allowedTypes?.map(t => t.label ?? t.type).join(', ') || ''
+    )
+  }
+
   ngOnInit () {
     // Set default file names on load if available
     for (const key in this.inputs.files) {
@@ -90,13 +96,14 @@ export class FileHandlerComponent {
     const file = event.target.files[0]
 
     if (file) {
-      if (
-        this.inputs.allowedTypes?.length &&
-        !this.inputs.allowedTypes.includes(file.type)
-      ) {
+      const allowedTypes = this.inputs.allowedTypes?.map(t => t.type) || []
+      const allowedLabels =
+        this.inputs.allowedTypes?.map(t => t.label ?? t.type) || []
+
+      if (allowedTypes.length && !allowedTypes.includes(file.type)) {
         this.handlerService.handleAlert(
           'Error',
-          `Invalid file type! Allowed types: ${this.inputs.allowedTypes.join(
+          `Gagal mengunggah file! Jenis file yang diperbolehkan: ${allowedLabels.join(
             ', '
           )}`
         )
@@ -106,9 +113,7 @@ export class FileHandlerComponent {
       if (this.inputs.maxSize && file.size > this.inputs.maxSize) {
         this.handlerService.handleAlert(
           'Error',
-          `File size exceeds the limit of ${
-            this.inputs.maxSize / (1024 * 1024)
-          }MB`
+          `Ukuran file melebihi batas ${this.inputs.maxSize / (1024 * 1024)} MB`
         )
         return
       }
@@ -123,6 +128,7 @@ export class FileHandlerComponent {
         this.fileNames[key] = file.name
         this.inputs.listen(key, source, base64Data, label, id)
       }
+      console.log('qq', this.inputs)
 
       reader.readAsDataURL(file)
     }

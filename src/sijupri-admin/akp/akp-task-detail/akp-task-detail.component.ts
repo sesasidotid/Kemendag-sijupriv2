@@ -48,6 +48,7 @@ export class AkpTaskDetailComponent {
     files: {
       ijazah: { label: 'Upload Dokumen Rekomendasi AKP', required: true }
     },
+    maxSize: 2 * 1024 * 1024,
     listen: (key: string, source: string, base64Data: string) => {
       this.form.patchValue({
         rekomendasiFile: base64Data
