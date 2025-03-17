@@ -1,6 +1,12 @@
 import { Instansi } from './../../../modules/maintenance/models/instansi.model'
 import { ApiService } from './../../../modules/base/services/api.service'
-import { Component, AfterViewInit } from '@angular/core'
+import {
+  Component,
+  AfterViewInit,
+  ElementRef,
+  ViewChild,
+  HostListener
+} from '@angular/core'
 import { CommonModule } from '@angular/common'
 import * as L from 'leaflet'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
@@ -8,12 +14,29 @@ import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
 import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { AvailableFormasiInMap } from '../../../modules/formasi/models/map/available-map'
-import { Observable, map } from 'rxjs'
+import { Observable, map, BehaviorSubject, of } from 'rxjs'
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
+import { FormControl, ReactiveFormsModule } from '@angular/forms'
 
+type DaumT = {
+  id: string
+  rekomendasi: string
+  formasiStatus: string
+  unitKerjaId: string
+  updatedBy: any
+  lastUpdated: string
+  version: number
+  deleteFlag: boolean
+  inactiveFlag: boolean
+  createdBy: string
+  dateCreated: string
+  idx: number
+  unitKerjaName: string
+}
 @Component({
   selector: 'app-formasi-pemetaan',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './formasi-pemetaan.component.html',
   styleUrl: './formasi-pemetaan.component.scss'
 })
@@ -24,27 +47,18 @@ export class FormasiPemetaanComponent {
   unitKerjaData: UnitKerja[] = []
   unitKerjaDetail: UnitKerja = new UnitKerja()
   InstansiDetail: Instansi = new Instansi()
+  availableFormation: AvailableFormasiInMap[] = []
+  untuK: string = ''
+  hoveredJabatanIndex: number | null = null
+  searchControl = new FormControl('')
+  results: DaumT[] = []
+  showDropdownSubject = new BehaviorSubject<boolean>(false)
+  showDropdown$: Observable<boolean> = this.showDropdownSubject.asObservable()
+
+  selectedItem: string = ''
 
   private markerIcon = L.icon({
     iconUrl: 'assets/marker-icon.png',
-    shadowUrl: 'assets/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  })
-
-  private provinceMarkerIcon = L.icon({
-    iconUrl: 'assets/blue-marker-icon.png', // Blue marker for provinces
-    shadowUrl: 'assets/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  })
-
-  private kabKotaMarkerIcon = L.icon({
-    iconUrl: 'assets/blue-marker-icon.png', // Blue marker for kabupaten/kota
     shadowUrl: 'assets/marker-shadow.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
@@ -61,10 +75,6 @@ export class FormasiPemetaanComponent {
     shadowSize: [41, 41]
   })
 
-  availableFormation: AvailableFormasiInMap[] = []
-
-  untuK: string = ''
-
   private provinceLayerGroup = L.layerGroup()
   private kabKotaLayerGroup = L.layerGroup()
   private unitKerjaLayerGroup = L.layerGroup()
@@ -72,17 +82,94 @@ export class FormasiPemetaanComponent {
   constructor (
     private apiService: ApiService,
     private handlerService: HandlerService
-  ) {
+  ) {}
+
+  ngOnInit (): void {
     this.getProvince()
     this.getUnitKerjaIT1()
     this.getUnitKerjaIT2()
-  }
-
-  ngOnInit (): void {
     this.initMap()
+    this.handlerSearch()
+
+    this.showDropdownSubject.subscribe(value => {
+      console.log('showDropdownSubject', value)
+    })
   }
 
-  hoveredJabatanIndex: number | null = null
+  onFocusInput () {
+    console.log('onFocusInput')
+    this.showDropdownSubject.next(true)
+  }
+
+  onBlurInput () {
+    setTimeout(() => {
+      this.showDropdownSubject.next(false)
+    }, 200)
+  }
+
+  handlerSearch () {
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap(term => {
+          console.log('term', term)
+          if (!term.trim()) {
+            this.results = []
+            this.showDropdownSubject.next(false)
+            return of([])
+          }
+          return this.search(term)
+        })
+      )
+      .subscribe(response => {
+        this.results = response.data || []
+        if (this.results.length > 0) {
+          this.showDropdownSubject.next(true)
+        }
+      })
+  }
+
+  search (term: string): Observable<any[]> | any[] {
+    return this.apiService.getData(
+      `/api/v1/formasi/search?limit=10&like_unit_kerja|name=${term}`
+    )
+  }
+
+  selectItem (item: DaumT) {
+    this.searchControl.setValue(item.unitKerjaName, { emitEvent: false })
+    this.showDropdownSubject.next(false)
+
+    this.selectItemSearch(item.unitKerjaName)
+    this.getUnitKerjaAvailableFormation(item.unitKerjaId).subscribe(
+      response => {
+        console.log('availableFormation', response)
+        this.availableFormation = response
+      }
+    )
+    this.untuK = item.unitKerjaName
+  }
+
+  selectItemSearch (eq_name?: string) {
+    if (!eq_name) {
+      return
+    }
+
+    this.apiService
+      .getData(`/api/v1/unit_kerja/search?eq_name=${eq_name}`)
+      .subscribe({
+        next: response => {
+          this.unitKerjaData = response.data
+
+          this.removeLayers(
+            this.provinceLayerGroup,
+            this.kabKotaLayerGroup,
+            this.unitKerjaLayerGroup
+          )
+          this.addUnitKerjaMarkers()
+        }
+      })
+  }
 
   hoverJabatan (index: number, isHovering: boolean) {
     this.hoveredJabatanIndex = isHovering ? index : null
@@ -121,6 +208,7 @@ export class FormasiPemetaanComponent {
   getUnitKerjaAvailableFormation (
     unit_kerja_id: string
   ): Observable<AvailableFormasiInMap[]> {
+    console.log('getUnitKerjaAvailableFormation caleed', unit_kerja_id)
     return this.apiService
       .getData(`/api/v1/formasi/calculate/unit_kerja/${unit_kerja_id}`)
       .pipe(
@@ -137,9 +225,7 @@ export class FormasiPemetaanComponent {
     this.apiService.getData(`/api/v1/provinsi/search?limit=1000`).subscribe({
       next: response => {
         this.provinceContainedData = response.data
-        // if (!isReset) {
-        //   this.initMap()
-        // }
+
         this.addProvinceMarkers()
       }
     })
@@ -379,6 +465,7 @@ export class FormasiPemetaanComponent {
       this.unitKerjaLayerGroup
     )
 
+    this.searchControl.setValue('')
     this.provinceContainedData = new Array<Provinsi>()
     this.kabKotaData = new Array<KabKota>()
     this.unitKerjaData = new Array<UnitKerja>()
@@ -387,7 +474,9 @@ export class FormasiPemetaanComponent {
     this.getProvince(true)
     this.getUnitKerjaIT1(true)
     this.getUnitKerjaIT2(true)
+    this.results = []
     this.initMap()
+    this.showDropdownSubject.next(false)
   }
 
   getTotalRekapitulasi (): number {

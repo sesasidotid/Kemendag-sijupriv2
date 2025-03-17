@@ -21,3 +21,41 @@ tr {
 .highlight {
   background-color: rgba(234, 234, 233, 0.5) !important; /* Highlight effect */
 }
+
+// seach bar
+.search-dropdown-container {
+  position: relative;
+  margin: auto;
+}
+
+.search-input {
+  padding-left: 35px; /* Make space for the icon */
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #888;
+  pointer-events: none; /* Prevents click on icon */
+}
+
+.form-control {
+  width: 100%;
+}
+
+.dropdown-menu {
+  position: absolute;
+  width: 100%;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}

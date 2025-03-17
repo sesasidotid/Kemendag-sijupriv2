@@ -1,7 +1,36 @@
 <section>
+  <div class="dropdown search-dropdown-container position-relative mb-3">
+    <input
+      type="text"
+      class="form-control search-input"
+      [formControl]="searchControl"
+      placeholder="Silakan ketik Nama Unit Kerja dengan ejaan yang benar (huruf kapital berpengaruh)"
+      (focus)="onFocusInput()"
+      (blur)="onBlurInput()"
+    />
+    <i class="mdi mdi-magnify search-icon"></i>
+    <ul *ngIf="showDropdown$ | async" class="dropdown-menu show w-100">
+      <ng-container *ngIf="results.length; else noResults">
+        <li
+          *ngFor="let result of results"
+          class="dropdown-item"
+          (click)="selectItem(result)"
+        >
+          {{ result.unitKerjaName }}
+        </li>
+      </ng-container>
+      <ng-template #noResults>
+        <li class="dropdown-item text-muted text-center">
+          Unit Kerja Tidak Ditemukan
+        </li>
+      </ng-template>
+    </ul>
+  </div>
+
   <button class="btn btn-soft-primary mb-3" (click)="resetMap()">
     Reset Map
   </button>
+
   <div id="map"></div>
 </section>
 
