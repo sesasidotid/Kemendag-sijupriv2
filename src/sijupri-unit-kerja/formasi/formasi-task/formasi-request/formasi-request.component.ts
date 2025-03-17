@@ -12,7 +12,8 @@ import {
   UserRoundCog,
   Database
 } from 'lucide-angular'
-
+import { ApiService } from '../../../../modules/base/services/api.service'
+import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 @Component({
   selector: 'app-formasi-request',
   standalone: true,
@@ -24,9 +25,22 @@ export class FormasiRequestComponent {
   @Input() objectTaskId: string
   @Input() PengaturanFormasiJabatan: PengaturanFormasiJabatan[] = []
 
-  constructor () {}
+  jabatanList: Jabatan[] = []
+
+  constructor (private apiService: ApiService) {}
   readonly Icon = BookUser
 
+  ngOnInit () {
+    this.getAvaibleJabatanForFormasi()
+  }
+
+  getAvaibleJabatanForFormasi () {
+    this.apiService.getData(`/api/v1/formasi_detail/jabatan_list`).subscribe({
+      next: res => {
+        this.jabatanList = res
+      }
+    })
+  }
   //jika ketemu, return true, jika tidak ketemu return false
   isSubmitted (jabatanCode: string) {
     return this.PengaturanFormasiJabatan.some(
