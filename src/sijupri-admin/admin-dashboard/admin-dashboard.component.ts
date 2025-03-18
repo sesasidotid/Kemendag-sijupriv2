@@ -5,20 +5,14 @@ import { ApiService } from '../../modules/base/services/api.service'
 import { NgChartsModule, BaseChartDirective } from 'ng2-charts'
 import { FormsModule } from '@angular/forms'
 import { Pagable } from '../../modules/base/commons/pagable/pagable'
-import {
-  ActionColumnBuilder,
-  PagableBuilder,
-  PageFilterBuilder,
-  PrimaryColumnBuilder
-} from '../../modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '../../modules/base/components/pagable/pagable.component'
 import { Router } from '@angular/router'
 import { forkJoin } from 'rxjs'
 import { LoginContext } from '../../modules/base/commons/login-context'
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, NgChartsModule, FormsModule, PagableComponent],
+  imports: [CommonModule, NgChartsModule, FormsModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
 })
@@ -109,36 +103,18 @@ export class AdminDashboardComponent {
   totalUserAdmin: number = 0
   totalUserInstansi: number = 0
 
-  constructor (private apiService: ApiService, private router: Router) {
+  constructor (private apiService: ApiService, private router: Router) {}
+
+  ngOnInit () {
     this.getTotalAKPPending()
     this.getTotalUKOMPending()
     this.getTotalFormasiPending()
     this.getTotalPAKPending()
 
-    // this.pagable = new PagableBuilder('/api/v1/ukom_grade/search?limit=10')
-    //   .addPrimaryColumn(
-    //     new PrimaryColumnBuilder('NIP', 'nip').withSortable(false).build()
-    //   )
-    //   .addPrimaryColumn(
-    //     new PrimaryColumnBuilder('Nama', 'participantName')
-    //       .withSortable(false)
-    //       .build()
-    //   )
-    //   .addPrimaryColumn(
-    //     new PrimaryColumnBuilder('Kelas', 'roomUkomName')
-    //       .withSortable(false)
-    //       .build()
-    //   )
-    //   .addPrimaryColumn(
-    //     new PrimaryColumnBuilder()
-    //       .withDynamicValue('Skor CAT', (item: any) => {
-    //         return this.rounding(item.catGradeScore)
-    //       })
-    //       .withSortable(false)
-    //       .build()
-    //   )
-    //   .setEnablePagination(false)
-    //   .build()
+    this.userRole = LoginContext.getRoleCodes()
+
+    this.fetchData()
+    this.getUserStats()
   }
 
   rounding (value: string): string {
@@ -203,13 +179,6 @@ export class AdminDashboardComponent {
         this.totalUserInstansi = totalUserInstansi.total
       }
     })
-  }
-
-  ngOnInit () {
-    this.userRole = LoginContext.getRoleCodes()
-
-    this.fetchData()
-    this.getUserStats()
   }
 
   navigateTo (path: string) {
@@ -303,10 +272,9 @@ export class AdminDashboardComponent {
       )
     })
 
-    // Update chart data with Indonesian month names
     this.barChartData.labels = this.filteredData.map(item => {
       const monthObj = this.months.find(m => m.eng === item.month)
-      return monthObj ? monthObj.id : item.month // Fallback to English if not found
+      return monthObj ? monthObj.id : item.month
     })
     this.barChartData.datasets[0].data = this.filteredData.map(
       item => item.count
@@ -314,23 +282,4 @@ export class AdminDashboardComponent {
 
     this.chart?.update()
   }
-
-  //   applyFilters () {
-  //     this.filteredData = this.apiData.filter((item: any) => {
-  //       const monthIndex = this.months.indexOf(item.month) + 1
-  //       return (
-  //         monthIndex >= this.startMonth &&
-  //         monthIndex <= this.endMonth &&
-  //         item.year == this.year.toString()
-  //       )
-  //     })
-
-  //     // Update chart data
-  //     this.barChartData.labels = this.filteredData.map(item => item.month)
-  //     this.barChartData.datasets[0].data = this.filteredData.map(
-  //       item => item.count
-  //     )
-
-  //     this.chart?.update()
-  //   }
 }

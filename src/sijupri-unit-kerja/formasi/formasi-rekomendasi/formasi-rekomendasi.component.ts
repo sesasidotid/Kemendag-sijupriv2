@@ -39,7 +39,13 @@ export class FormasiRekomendasiComponent {
     private router: Router
   ) {
     this.unitKerjaId = LoginContext.getUnitKerjaId()
+  }
 
+  ngOnInit () {
+    this.hanldePagable()
+  }
+
+  hanldePagable () {
     this.pagable = new PagableBuilder(`/api/v1/formasi/search`)
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Tanggal Pengajuan', 'dateCreated').build()
@@ -53,15 +59,6 @@ export class FormasiRekomendasiComponent {
           .withDefaultValue(this.unitKerjaId)
           .build()
       )
-      //   .addActionColumn(
-      //     new ActionColumnBuilder()
-      //       .withIcon('detail')
-      //       .setAction((formasi: any) => {
-      //         this.getDetail(formasi.id)
-      //         this.toggleModal()
-      //       }, 'primary')
-      //       .build()
-      //   )
       .addActionColumn(
         new ActionColumnBuilder()
           .withIcon('detail')

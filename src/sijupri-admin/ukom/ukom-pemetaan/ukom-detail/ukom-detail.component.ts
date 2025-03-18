@@ -2,14 +2,12 @@ import { Component } from '@angular/core'
 import {
   ActionColumnBuilder,
   PagableBuilder,
-  PageFilterBuilder,
   PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { LoginContext } from '../../../../modules/base/commons/login-context'
 import { ActivatedRoute, Router } from '@angular/router'
-import { JfService } from '../../../../modules/siap/services/jf.service'
 import { JF } from '../../../../modules/siap/models/jf.model'
 import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
@@ -36,16 +34,23 @@ export class UkomDetailComponent {
 
   constructor (
     private activatedRoute: ActivatedRoute,
-    private jfService: JfService,
     private router: Router,
     private apiService: ApiService,
     private sanitizer: DomSanitizer,
     private filePreviewService: FilePreviewService
-  ) {
+  ) {}
+
+  ngOnInit () {
     this.activatedRoute.paramMap.subscribe(params => {
       this.id = params.get('id')
     })
 
+    this.handlePagable()
+    this.getJF()
+    this.isUserBanned()
+  }
+
+  handlePagable () {
     this.pagable = new PagableBuilder(`/api/v1/participant_ukom/all/${this.id}`)
       .addPrimaryColumn(
         new PrimaryColumnBuilder()
@@ -70,9 +75,6 @@ export class UkomDetailComponent {
           .build()
       )
       .build()
-
-    this.getJF()
-    this.isUserBanned()
   }
 
   preview (fileName: string, fileSource: string) {
@@ -81,12 +83,6 @@ export class UkomDetailComponent {
 
   getJF () {
     this.jfLoading$.next(true)
-    // this.jfService.findByNip(this.id).subscribe({
-    //   next: (jf: JF) => {
-    //     this.jf = jf
-    //     this.jfLoading$.next(false)
-    //   }
-    // })
 
     this.apiService.getData(`/api/v1/jf/${this.id}`).subscribe({
       next: (response: any) => {

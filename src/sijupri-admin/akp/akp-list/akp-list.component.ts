@@ -19,7 +19,9 @@ import { Router } from '@angular/router'
 export class AkpListComponent {
   pagable: Pagable
 
-  constructor (private router: Router) {
+  constructor (private router: Router) {}
+
+  ngOnInit () {
     this.pagable = new PagableBuilder('/api/v1/jf/search')
       // this.pagable = new PagableBuilder('/api/v1/akp/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())

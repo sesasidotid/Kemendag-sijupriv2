@@ -36,15 +36,15 @@ export class AkpPelatihanAddComponent {
     private alertService: AlertService,
     private router: Router,
     private confirmationService: ConfirmationService
-  ) {
+  ) {}
+
+  ngOnInit () {
     this.pelatihanTeknisForm = new FormGroup({
       code: new FormControl('', [Validators.required]),
       name: new FormControl('', [Validators.required]),
       jabatanCode: new FormControl('', [Validators.required])
     })
-  }
 
-  ngOnInit () {
     this.getJabatanList()
   }
 

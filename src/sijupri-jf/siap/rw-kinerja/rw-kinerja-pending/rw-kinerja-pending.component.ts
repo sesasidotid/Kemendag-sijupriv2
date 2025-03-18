@@ -152,6 +152,8 @@ export class RwKinerjaPendingComponent {
           required: true
         }
       },
+      maxSize: 2 * 1024 * 1024,
+      allowedTypes: [{ type: 'application/pdf' }],
       listen: (key: string, source: string, base64Data: string) => {
         if (key == 'docEvaluas')
           this.rwKinerjaForm.patchValue({ fileDocEvaluasi: base64Data })

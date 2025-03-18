@@ -1,9 +1,8 @@
-import { FormBuilder, FormGroup } from '@angular/forms'
 import { HandlerService } from './../../../../modules/base/services/handler.service'
 import { RoomUkomDetail } from './../../../../modules/ukom/models/room-ukom-detail'
 import { Component } from '@angular/core'
 import { ApiService } from '../../../../modules/base/services/api.service'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 import { ExamDetail } from '../../../../modules/ukom/models/exam_detail'
 import { UkomRoomKompetensi } from '../../../../modules/ukom/models/ukom-room-kompetensi'
 import { UkomQuestion } from '../../../../modules/ukom/models/ukom-question'
@@ -19,6 +18,7 @@ import { ModalComponent } from '../../../../modules/base/components/modal/modal.
 import { BehaviorSubject } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+
 @Component({
   selector: 'app-ukom-exam-choose-comp-questions',
   standalone: true,
@@ -37,6 +37,7 @@ export class UkomExamChooseCompQuestionsComponent {
   listQuestion$: Observable<UkomQuestion[]>
   filteredQuestions$: Observable<UkomQuestion[]>
   questCheckedList: UkomQuestion[] = []
+  submitLoadng$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
 
   filterText: string = ''
   private searchSubject = new BehaviorSubject<string>('')
@@ -53,9 +54,10 @@ export class UkomExamChooseCompQuestionsComponent {
     private apiService: ApiService,
     private activatedRoute: ActivatedRoute,
     private handlerService: HandlerService,
-    private confirmationService: ConfirmationService,
-    private router: Router
-  ) {
+    private confirmationService: ConfirmationService
+  ) {}
+
+  ngOnInit () {
     this.activatedRoute.paramMap.subscribe(params => {
       this.room_ukom_id = params.get('roomid')
     })
@@ -70,12 +72,8 @@ export class UkomExamChooseCompQuestionsComponent {
 
     this.getExamDetail()
     this.getListPertanyaan()
-  }
-
-  ngOnInit () {
     this.getUkomTypeFromParams()
     this.getRoomUkomDetail()
-    console.log('q', this.listSavedQuestion)
   }
 
   back () {
@@ -124,7 +122,7 @@ export class UkomExamChooseCompQuestionsComponent {
         },
         error: (err: any) => {
           console.error('Error fetching exam details:', err)
-          this.ExamDetail = null // Clear stale data on error
+          this.ExamDetail = null
         }
       })
   }
@@ -161,7 +159,6 @@ export class UkomExamChooseCompQuestionsComponent {
         )
       )
 
-    // this.filteredQuestions$ = this.listQuestion$
     this.filteredQuestions$ = this.searchSubject.pipe(
       debounceTime(300), // Delays input processing by 1 second
       distinctUntilChanged(), // Only emit if value changed
@@ -177,34 +174,20 @@ export class UkomExamChooseCompQuestionsComponent {
     )
   }
 
-  //   onSearchChange (search: string) {
-  //     this.filteredQuestions$ = this.listQuestion$.pipe(
-  //       debounceTime(1000), //
-  //       distinctUntilChanged(), // Only emit if the current value is different from the last
-  //       map(questions =>
-  //         questions.filter(q =>
-  //           q.question.toLowerCase().includes(search.toLowerCase())
-  //         )
-  //       )
-  //     )
-  //   }
-
   onSearchChange (search: string) {
     this.searchSubject.next(search)
   }
 
   toggleModal (kompetensi_id?: string) {
-    // If kompetensi_id is provided, we open the modal and update question list.
     if (kompetensi_id) {
       this.openModal(kompetensi_id)
     } else {
-      this.isModalOpen$.next(!this.isModalOpen$.value) // Just toggle modal if no kompetensi_id
+      this.isModalOpen$.next(!this.isModalOpen$.value)
     }
   }
 
   onQuestionSelect (question: UkomQuestion) {
     if (question.checked) {
-      // Add to questCheckedList if checked
       if (!this.questCheckedList.some(q => q.id === question.id)) {
         this.questCheckedList.push(question)
         this.listQuestion$ = this.listQuestion$.pipe(
@@ -219,7 +202,6 @@ export class UkomExamChooseCompQuestionsComponent {
         )
       }
     } else {
-      // Remove from questCheckedList if unchecked
       const index = this.questCheckedList.findIndex(q => q.id === question.id)
       if (index > -1) {
         this.questCheckedList.splice(index, 1)
@@ -255,7 +237,6 @@ export class UkomExamChooseCompQuestionsComponent {
   getListPertanyaan () {
     const module_id = 'CAT'
 
-    // listSavedQuestion
     this.apiService
       .postData(
         `/api/v1/room_ukom/search/${module_id}/${this.room_ukom_id}?limit=1000`,
@@ -278,11 +259,12 @@ export class UkomExamChooseCompQuestionsComponent {
     this.payload.id = this.room_ukom_id
     this.payload.exam_type_code = this.ExamDetail.examTypeCode
     this.payload.question_id_list = this.questCheckedList.map(q => q.id)
-    console.log('questCheckedList:', this.questCheckedList)
 
     this.confirmationService.open(false).subscribe({
       next: (res: any) => {
         if (!res.confirmed) return
+
+        this.submitLoadng$.next(true)
 
         this.apiService
           .postData('/api/v1/room_ukom/question', this.payload)
@@ -293,6 +275,7 @@ export class UkomExamChooseCompQuestionsComponent {
                 'Berhasil menambahkan pertanyaan'
               )
               this.getListPertanyaan()
+              this.submitLoadng$.next(false)
             },
             error: (err: any) => {
               console.error('Error:', err)
@@ -300,13 +283,14 @@ export class UkomExamChooseCompQuestionsComponent {
                 'Error',
                 'Gagal menambahkan pertanyaan'
               )
+              this.submitLoadng$.next(false)
             }
           })
-        console.log('Payload:', this.payload)
       },
       error: (err: any) => {
         console.error('Error:', err)
         this.handlerService.handleAlert('Error', 'Gagal menambahkan pertanyaan')
+        this.submitLoadng$.next(false)
       }
     })
   }

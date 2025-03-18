@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 
 @Component({
   selector: 'app-formasi-task-process',
@@ -7,6 +7,4 @@ import { Component } from '@angular/core';
   templateUrl: './formasi-task-process.component.html',
   styleUrl: './formasi-task-process.component.scss'
 })
-export class FormasiTaskProcessComponent {
-
-}
+export class FormasiTaskProcessComponent {}

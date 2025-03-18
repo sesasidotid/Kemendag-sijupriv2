@@ -32,7 +32,14 @@ export class FormasiDocumentListComponent {
     private alertService: AlertService,
     private confirmationService: ConfirmationService,
     private handlerService: HandlerService
-  ) {
+  ) {}
+
+  ngOnInit () {
+    this.handlePagable()
+    this.getDokumentPersyaratanList()
+  }
+
+  handlePagable () {
     this.pagable = new PagableBuilder(
       '/api/v1/doc_persyaratan/association/for_formasi'
     )
@@ -47,11 +54,6 @@ export class FormasiDocumentListComponent {
       )
       .build()
   }
-
-  ngOnInit () {
-    this.getDokumentPersyaratanList()
-  }
-
   getDokumentPersyaratanList () {
     this.apiService
       .getData(`/api/v1/doc_persyaratan/association/for_formasi`)

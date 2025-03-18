@@ -1,6 +1,4 @@
-import { ConfirmationDialogComponent } from './../../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
 import { LoginContext } from './../../../modules/base/commons/login-context'
-import { JenisUkom } from '../../../modules/ukom/models/jenis-ukom'
 import { Component } from '@angular/core'
 import {
   ActionColumnBuilder,
@@ -14,11 +12,9 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 import { CommonModule } from '@angular/common'
 import { ApiService } from '../../../modules/base/services/api.service'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
 import { UkomExamScheduleJF } from '../../../modules/ukom/models/ukom-exam-schedule-jf'
 import { HandlerService } from '../../../modules/base/services/handler.service'
-import { map } from 'rxjs/operators'
-import { RoomUkom } from '../../../modules/ukom/models/room-ukom.model'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 @Component({
   selector: 'app-ukom-list',
@@ -31,18 +27,26 @@ export class UkomListComponent {
   pagable: Pagable
   schedulePagable$: Observable<Pagable>
   id: string = LoginContext.getUserId()
-  //   ukomSchedule$: Observable<UkomExamScheduleJF>
   ukomSchedule: UkomExamScheduleJF
 
   jadwalPagable: Pagable
-  //   ukomSchedule$: UkomExamScheduleJF
 
   constructor (
     private router: Router,
     private apiService: ApiService,
     private handlerService: HandlerService,
     private confirmationService: ConfirmationService
-  ) {
+  ) {}
+
+  ngOnInit () {
+    this.handlePagable()
+    this.getUkomSchedule()
+
+    // this.getUkomSchedule()
+    // this.ukomSchedule$.subscribe(jabatanList => {})
+  }
+
+  handlePagable () {
     this.pagable = new PagableBuilder(
       `/api/v1/participant_ukom/search/${this.id}`
       //   `/api/v1/participant_ukom/all/${this.id}`
@@ -104,15 +108,7 @@ export class UkomListComponent {
           .build()
       )
       .build()
-
-    this.getUkomSchedule()
   }
-
-  ngOnInit () {
-    // this.getUkomSchedule()
-    // this.ukomSchedule$.subscribe(jabatanList => {})
-  }
-
   getUkomSchedule () {
     // this.ukomSchedule$ = this.apiService
     //   .getData(`/api/v1/participant_ukom/nip/${this.id}`)

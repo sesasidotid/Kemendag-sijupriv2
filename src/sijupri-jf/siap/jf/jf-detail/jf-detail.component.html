@@ -281,6 +281,11 @@
               <small *ngIf="jfDetailForm.get('nik').errors?.['pattern']"
                 >NIK harus angka.</small
               >
+              <small
+                *ngIf="jfDetailForm.get('nik').errors?.['minlength'] || jfDetailForm.get('nik').errors?.['maxlength']"
+              >
+                NIK harus 16 digit.
+              </small>
             </div>
           </div>
         </div>

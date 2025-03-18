@@ -11,7 +11,7 @@ import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
 import { ModalComponent } from '../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../modules/base/components/empty-state/empty-state.component'
-declare var bootstrap: any // Ensure Bootstrap JS is accessible
+declare var bootstrap: any
 
 @Component({
   selector: 'app-dashboard',
@@ -36,19 +36,18 @@ export class DashboardComponent implements AfterViewInit {
     private handler: HandlerService,
     private confirmationService: ConfirmationService,
     private elRef: ElementRef
-  ) {
-    this.getRoomUkom()
-    this.updateCurrentTime()
-    // this.checkCAT()
-  }
+  ) {}
 
   ngOnInit () {
+    this.getRoomUkom()
+    this.updateCurrentTime()
     this.exitFullScreen()
   }
 
   ngAfterViewInit () {
     this.initializeTooltips()
   }
+
   initializeTooltips () {
     const tooltipTriggerList = this.elRef.nativeElement.querySelectorAll(
       '[data-bs-toggle="tooltip"]'
@@ -57,6 +56,7 @@ export class DashboardComponent implements AfterViewInit {
       new bootstrap.Tooltip(tooltipTriggerEl)
     })
   }
+
   updateCurrentTime () {
     interval(1000).subscribe(() => {
       this.now = Date.now()

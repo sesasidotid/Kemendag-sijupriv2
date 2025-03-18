@@ -3,7 +3,7 @@ import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { Pangkat } from '../../../../modules/maintenance/models/pangkat.model'
 import { CommonModule } from '@angular/common'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 import { BehaviorSubject } from 'rxjs'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
@@ -40,6 +40,14 @@ export class UkomTaskDetailComponent {
     private activatedRoute: ActivatedRoute,
     private apiService: ApiService
   ) {}
+
+  ngOnInit () {
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.participant_ukom_id = params.get('id')
+      this.getParticipantUkomDetail()
+      this.getDokumenUkomList()
+    })
+  }
 
   toggleModal () {
     this.isModalOpen$.next(!this.isModalOpen$.value)
@@ -112,13 +120,5 @@ export class UkomTaskDetailComponent {
       (choice: any) => choice.correct
     )
     return correctChoice ? correctChoice.choiceId : ''
-  }
-
-  ngOnInit () {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.participant_ukom_id = params.get('id')
-      this.getParticipantUkomDetail()
-      this.getDokumenUkomList()
-    })
   }
 }

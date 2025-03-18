@@ -7,13 +7,11 @@ import { LoginContext } from '../../../modules/base/commons/login-context'
 import { CommonModule } from '@angular/common'
 import { UkomTaskFormComponent } from '../ukom-task-form/ukom-task-form.component'
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
-import { PendingTask } from '../../../modules/workflow/models/pending-task.model'
 import { PesertaUkom } from '../../../modules/ukom/models/peserta-ukom.model'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
-import { Task } from '../../../modules/workflow/models/task.model'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.modal'
 import { ConverterService } from '../../../modules/base/services/converter.service'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
@@ -28,9 +26,7 @@ import { SafeUrl } from '@angular/platform-browser'
   imports: [
     CommonModule,
     UkomTaskFormComponent,
-    FileHandlerComponent,
     EmptyStateComponent,
-    RekapButtonComponent,
     ModalComponent,
     UkomRevisionComponent
   ],

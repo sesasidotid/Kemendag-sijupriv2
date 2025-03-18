@@ -73,11 +73,15 @@ export class AkpVerifikasiPelatihanComponent {
     setTimeout(() => {}, 0)
   }
 
+  ngOnInit () {
+    this.handleTabService()
+  }
+
   isAnyFileMissing (): boolean {
     return !this.payload.file_dokumen_verifikasi
   }
 
-  ngOnInit () {
+  handleTabService () {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()
     }

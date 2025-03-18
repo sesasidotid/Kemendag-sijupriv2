@@ -33,13 +33,12 @@ export class UkomTaskDetailComponent {
     private confirmationService: ConfirmationService,
     private activatedRoute: ActivatedRoute,
     private filePreviewService: FilePreviewService
-  ) {
+  ) {}
+
+  ngOnInit () {
     this.activatedRoute.params.subscribe(params => {
       this.id = params['id']
     })
-  }
-
-  ngOnInit () {
     this.getPendingTask()
   }
 

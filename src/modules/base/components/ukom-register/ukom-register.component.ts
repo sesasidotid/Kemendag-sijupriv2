@@ -11,7 +11,7 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms'
-import { Observable, of, Subject } from 'rxjs'
+import { Observable } from 'rxjs'
 import { DokumenUkomPersyaratan } from '../../../maintenance/models/dokumen-persyaratan-ukom'
 import { FIleHandler } from '../../commons/file-handler/file-handler'
 import { ApiService } from '../../services/api.service'
@@ -19,8 +19,6 @@ import { HandlerService } from '../../services/handler.service'
 import { ConfirmationService } from '../../services/confirmation.service'
 import { CommonModule } from '@angular/common'
 import { map } from 'rxjs/operators'
-import { Instansi } from '../../../maintenance/models/instansi.model'
-import { UnitKerja } from '../../../maintenance/models/unit-kerja.model'
 import { QRCodeModule } from 'angularx-qrcode'
 import { SafeUrl } from '@angular/platform-browser'
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'

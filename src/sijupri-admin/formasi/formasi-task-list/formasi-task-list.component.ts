@@ -20,7 +20,9 @@ import { LoginContext } from '../../../modules/base/commons/login-context'
 export class FormasiTaskListComponent {
   pagable: Pagable
 
-  constructor (private router: Router) {
+  constructor (private router: Router) {}
+
+  ngOnInit () {
     this.pagable = new PagableBuilder('/api/v1/formasi/task/search')
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()

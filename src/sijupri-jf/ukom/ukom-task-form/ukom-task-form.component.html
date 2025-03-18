@@ -13,7 +13,7 @@
               (change)="onJenisUkomSwitch($event)"
               name="jabatanCode"
             >
-              <option [value]="undefined">Pilih</option>
+              <option [value]="">Pilih</option>
               <option [value]="'KENAIKAN_JENJANG'">Kenaikan Jenjang</option>
               <option [value]="'PERPINDAHAN_JABATAN'">
                 Perpindahan Jabatan
@@ -64,7 +64,7 @@
           </div>
         </div>
 
-        <div *ngIf="pesertaUkom.jenis_ukom !== undefined" class="col-lg-12">
+        <div *ngIf="pesertaUkom.jenis_ukom" class="col-lg-12">
           <div class="mb-3 col-lg-6">
             <label for="password" class="form-label"
               >Password <span class="text-danger">*</span></label
@@ -108,12 +108,6 @@
               required
               formControlName="confirmPassword"
             />
-            <!-- <div
-              *ngIf="passwordForm.get('confirmPassword')?.hasError('mismatch')"
-              class="text-danger"
-            >
-              Password dan Konfirmasi Password tidak cocok.
-            </div> -->
             <div
               *ngIf="
                 passwordForm.get('confirmPassword')?.hasError('required') &&

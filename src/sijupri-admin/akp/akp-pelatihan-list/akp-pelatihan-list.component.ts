@@ -51,7 +51,23 @@ export class AkpPelatihanListComponent {
     private confirmationService: ConfirmationService,
     private apiService: ApiService,
     private alertService: AlertService
-  ) {
+  ) {}
+
+  ngOnInit () {
+    this.hanldePagable()
+    this.handleForm()
+    this.handleTabService()
+  }
+
+  handleForm () {
+    this.form = new FormGroup({
+      id: new FormControl('', [Validators.required]),
+      name: new FormControl('', [Validators.required]),
+      code: new FormControl('', [Validators.required])
+    })
+  }
+
+  hanldePagable () {
     this.pagable = new PagableBuilder('/api/v1/akp_pelatihan_teknis/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('Kode', 'code').build())
       .addPrimaryColumn(
@@ -95,15 +111,9 @@ export class AkpPelatihanListComponent {
       )
 
       .build()
-
-    this.form = new FormGroup({
-      id: new FormControl('', [Validators.required]),
-      name: new FormControl('', [Validators.required]),
-      code: new FormControl('', [Validators.required])
-    })
   }
 
-  ngOnInit () {
+  handleTabService () {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()
     }
@@ -121,7 +131,6 @@ export class AkpPelatihanListComponent {
         onClick: () => this.handleTabChange(1)
       })
   }
-
   toggleModal () {
     this.isModalOpen$.next(!this.isModalOpen$.value)
   }

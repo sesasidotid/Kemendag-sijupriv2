@@ -55,7 +55,15 @@ export class AKPTaskComponent {
     private alertService: AlertService,
     private router: Router,
     private confirmationService: ConfirmationService
-  ) {
+  ) {}
+
+  ngOnInit () {
+    this.handlePagable()
+    this.handleForm()
+    this.handleTabService()
+  }
+
+  handlePagable () {
     this.pagable$.next(
       new PagableBuilder('/api/v1/akp/task/search')
         .addPrimaryColumn(
@@ -109,7 +117,9 @@ export class AKPTaskComponent {
         )
         .build()
     )
+  }
 
+  handleForm () {
     this.form = new FormGroup({
       nama_atasan: new FormControl('', [Validators.required]),
       email_atasan: new FormControl('', [
@@ -120,7 +130,7 @@ export class AKPTaskComponent {
     })
   }
 
-  ngOnInit () {
+  handleTabService () {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()
     }
@@ -143,7 +153,6 @@ export class AKPTaskComponent {
         onClick: () => this.handlePagableTabChange('akp_flow_3', 2)
       })
   }
-
   handlePagableTabChange (tab: string, tabIndex: number) {
     const currentPagable = this.pagable$.value
 

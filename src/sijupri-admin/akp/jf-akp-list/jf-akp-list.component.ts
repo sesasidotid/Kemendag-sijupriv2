@@ -11,7 +11,7 @@ import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
 import { JF } from '../../../modules/siap/models/jf.model'
 import { JfService } from '../../../modules/siap/services/jf.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, take } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
@@ -39,15 +39,20 @@ export class JfAkpListComponent {
     private activatedRoute: ActivatedRoute,
     private jfService: JfService,
     private apiService: ApiService,
-    private confirmationService: ConfirmationService,
-    private handlerService: HandlerService,
     private sanitizer: DomSanitizer,
     private filePreviewService: FilePreviewService
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
+  ) {}
+
+  ngOnInit () {
+    this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
       this.jfNip = params.get('id')
     })
 
+    this.handlePagable()
+    this.getJF()
+  }
+
+  handlePagable () {
     this.pagable$.next(
       new PagableBuilder('/api/v1/akp/search')
         .addPrimaryColumn(
@@ -132,8 +137,6 @@ export class JfAkpListComponent {
         )
         .build()
     )
-
-    this.getJF()
   }
 
   refreshPagableData () {

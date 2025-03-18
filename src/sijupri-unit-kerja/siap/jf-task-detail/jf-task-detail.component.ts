@@ -22,6 +22,7 @@ import { LoginContext } from '../../../modules/base/commons/login-context'
 import { ConverterService } from '../../../modules/base/services/converter.service'
 import { BehaviorSubject } from 'rxjs'
 import { SafeUrl } from '@angular/platform-browser'
+import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 @Component({
   selector: 'app-jf-task-detail',
   standalone: true,
@@ -48,7 +49,8 @@ export class JfTaskDetailComponent {
     private activatedRoute: ActivatedRoute,
     private converterService: ConverterService,
     private jfService: JfService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private filePreviewService: FilePreviewService
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.nip = params.get('id')
@@ -59,6 +61,10 @@ export class JfTaskDetailComponent {
     this.getJF()
     this.getTaskDetail()
     this.fetchPhotoProfile()
+  }
+
+  preview (filename: string, filesource: string) {
+    this.filePreviewService.open(filename, filesource)
   }
 
   fetchPhotoProfile () {
@@ -95,7 +101,6 @@ export class JfTaskDetailComponent {
         )
 
         this.pendingTaskloading$.next(false)
-        // this.getTaskDetail();
       }
     })
   }
@@ -109,11 +114,8 @@ export class JfTaskDetailComponent {
     ) {
       this.detailTaskloading$.next(true)
       if (pendingTask['isOpen']) {
-        // this.openedAccordion.push(pendingTask.id);
         this.openedAccordion = [pendingTask.id]
-        // console.log(this.openedAccordion);
       }
-      // console.log(this.openedAccordion.includes(pendingTask.id))
 
       this.apiService
         .getData(`/api/v1/object_task/${pendingTask.objectTaskId}`)

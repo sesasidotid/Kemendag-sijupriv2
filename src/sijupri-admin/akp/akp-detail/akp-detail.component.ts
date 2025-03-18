@@ -42,6 +42,9 @@ export class AkpDetailComponent {
     this.activatedRoute.paramMap.subscribe(params => {
       this.akpId = params.get('id')
     })
+  }
+
+  ngOnInit () {
     this.getAKPDetail()
   }
 

@@ -55,20 +55,20 @@
                   <label for="firstnameInput" class="form-label">
                     First Name
                   </label>
-                  <p class="border-bottom">{{ jf.name }}</p>
+                  <p class="border-bottom">{{ jf.name ?? '-' }}</p>
                 </div>
               </div>
               <!--end col-->
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label for="lastnameInput" class="form-label"> No. HP </label>
-                  <p class="border-bottom">{{ jf.phone }}</p>
+                  <p class="border-bottom">{{ jf.phone ?? '-' }}</p>
                 </div>
               </div>
               <div class="col-lg-6">
                 <div class="mb-3">
                   <label for="emailInput" class="form-label"> Email </label>
-                  <p class="border-bottom">{{ jf.email }}</p>
+                  <p class="border-bottom">{{ jf.email ?? '-' }}</p>
                 </div>
               </div>
               <!--end col-->
@@ -77,7 +77,7 @@
                   <label for="emailInput" class="form-label">
                     Tempat Lahir
                   </label>
-                  <p class="border-bottom">{{ jf.tempatLahir }}</p>
+                  <p class="border-bottom">{{ jf.tempatLahir ?? '-' }}</p>
                 </div>
               </div>
               <div class="col-lg-6">
@@ -85,7 +85,7 @@
                   <label for="emailInput" class="form-label">
                     Tanggal Lahir
                   </label>
-                  <p class="border-bottom">{{ jf.tanggalLahir }}</p>
+                  <p class="border-bottom">{{ jf.tanggalLahir ?? '-' }}</p>
                 </div>
               </div>
               <div class="col-lg-6">
@@ -93,37 +93,36 @@
                   <label for="emailInput" class="form-label">
                     Jenis Kelamin
                   </label>
-                  <p class="border-bottom">{{ jf.jenisKelaminName }}</p>
+                  <p class="border-bottom">{{ jf.jenisKelaminName ?? '-' }}</p>
                 </div>
               </div>
               <div class="col-lg-12">
                 <div class="mb-3">
                   <label for="emailInput" class="form-label"> NIK </label>
-                  <p class="border-bottom">{{ jf.nik }}</p>
+                  <p class="border-bottom">{{ jf.nik ?? '-' }}</p>
                 </div>
               </div>
               <hr />
               <div class="col-lg-4">
                 <div class="mb-3">
                   <label for="emailInput" class="form-label"> Jabatan </label>
-                  <p class="border-bottom">{{ jf.jabatanName }}</p>
+                  <p class="border-bottom">{{ jf.jabatanName ?? '-' }}</p>
                 </div>
               </div>
               <div class="col-lg-4">
                 <div class="mb-3">
                   <label for="emailInput" class="form-label"> Jenjang </label>
-                  <p class="border-bottom">{{ jf.jenjangName }}</p>
+                  <p class="border-bottom">{{ jf.jenjangName ?? '-' }}</p>
                 </div>
               </div>
               <div class="col-lg-4">
                 <div class="mb-3">
                   <label for="emailInput" class="form-label"> Pangkat </label>
-                  <p class="border-bottom">{{ jf.pangkatName }}</p>
+                  <p class="border-bottom">{{ jf.pangkatName ?? '-' }}</p>
                 </div>
               </div>
             </div>
             <div class="col-lg-12">
-              <!-- <div *ngIf="ukom" class="hstack gap-2 justify-content-end"> -->
               <div class="hstack gap-2 justify-content-end">
                 Apakan data anda sudah lengkap ?
                 <button

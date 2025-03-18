@@ -75,7 +75,8 @@ export class JfDetailComponent {
       nik: new FormControl(this.jf.nik, [
         Validators.required,
         Validators.pattern('^[0-9]+$'),
-        Validators.minLength(13)
+        Validators.minLength(16),
+        Validators.maxLength(16)
       ]),
       fileKtp: new FormControl('', [
         Validators.required,
@@ -122,6 +123,8 @@ export class JfDetailComponent {
           required: true
         }
       },
+      maxSize: 2 * 1024 * 1024,
+      allowedTypes: [{ type: 'application/pdf' }],
       viewOnly: true,
       listen: (key: string, source: string, base64Data: string) => {
         this.jfDetailForm.patchValue({ fileKtp: base64Data })

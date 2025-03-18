@@ -1,12 +1,5 @@
-import { DokumenPersyaratan } from '../../../modules/maintenance/models/dokumen-persyaratan.model'
 import { CommonModule } from '@angular/common'
-import {
-  Component,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core'
+import { Component, Input, SimpleChanges, ViewChild } from '@angular/core'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { Jabatan } from '../../../modules/maintenance/models/jabatan.model'
@@ -17,7 +10,6 @@ import { FIleHandler } from '../../../modules/base/commons/file-handler/file-han
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { JF } from '../../../modules/siap/models/jf.model'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { DokumenUkomPersyaratan } from '../../../modules/maintenance/models/dokumen-persyaratan-ukom'
 import {
   FormControl,
@@ -80,6 +72,19 @@ export class UkomTaskFormComponent {
     private confirmationService: ConfirmationService
   ) {}
 
+  ngOnInit () {
+    this.passwordForm = new FormGroup({
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(8)
+      ]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        this.passwordMatchValidator.bind(this)
+      ])
+    })
+  }
+
   passwordMatchValidator (
     control: FormControl
   ): { [key: string]: boolean } | null {
@@ -106,19 +111,6 @@ export class UkomTaskFormComponent {
     if (changes['jf']) {
       console.log('JF changed:', changes['jf'].currentValue)
     }
-  }
-
-  ngOnInit () {
-    this.passwordForm = new FormGroup({
-      password: new FormControl('', [
-        Validators.required,
-        Validators.minLength(8)
-      ]),
-      confirmPassword: new FormControl('', [
-        Validators.required,
-        this.passwordMatchValidator.bind(this)
-      ])
-    })
   }
 
   getDokumenPersyaratan () {
@@ -196,7 +188,10 @@ export class UkomTaskFormComponent {
     this.pesertaUkom.nextJabatanCode = null
     this.pesertaUkom.nextJenjangCode = null
 
-    if (jenis_ukom) {
+    if (
+      jenis_ukom == 'PERPINDAHAN_JABATAN' ||
+      jenis_ukom == 'KENAIKAN_JENJANG'
+    ) {
       this.pesertaUkom.jenis_ukom = jenis_ukom
 
       if (jenis_ukom == 'PERPINDAHAN_JABATAN') {
@@ -208,7 +203,12 @@ export class UkomTaskFormComponent {
         this.getNextJenjang()
         this.getDokumenPersyaratan()
       }
+    } else {
+      this.pesertaUkom.jenis_ukom = null
+      this.detectedDokumen = {}
+      this.inputs.files = {}
     }
+    console.log('jenis_ukom', this.pesertaUkom.jenis_ukom)
   }
 
   onNextJabatanSwitch (event: Event) {

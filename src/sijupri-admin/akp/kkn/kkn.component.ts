@@ -38,7 +38,15 @@ export class KknComponent {
     private alertService: AlertService,
     private router: Router,
     private confirmationService: ConfirmationService
-  ) {
+  ) {}
+
+  ngOnInit () {
+    this.handlePagable()
+    this.handleTabService()
+    this.getInstrumenList()
+  }
+
+  handlePagable () {
     this.pagable = new PagableBuilder('/api/v1/kategori_instrument/search')
       .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
       .addPrimaryColumn(
@@ -71,7 +79,7 @@ export class KknComponent {
       .build()
   }
 
-  ngOnInit () {
+  handleTabService () {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()
     }
@@ -88,8 +96,6 @@ export class KknComponent {
         icon: 'mdi-plus-circle',
         onClick: () => this.handleTabChange(1)
       })
-
-    this.getInstrumenList()
   }
 
   handleTabChange (tab?: number) {

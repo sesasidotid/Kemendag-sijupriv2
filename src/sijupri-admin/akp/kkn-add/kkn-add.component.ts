@@ -51,26 +51,28 @@ export class KknAddComponent {
     private alertService: AlertService,
     private router: Router,
     private confirmationService: ConfirmationService
-  ) {
-    this.kknForm = new FormGroup({
-      instrumentId: new FormControl('', [Validators.required]),
-      name: new FormControl('', [Validators.required]),
-      pelatihanTeknisId: new FormControl('', [Validators.required])
-    })
-  }
+  ) {}
 
   ngOnInit () {
+    this.handleForm()
     this.getInstrumenList()
 
     this.kknForm.get('instrumentId').valueChanges.subscribe(instrumentId => {
       if (instrumentId) {
         this.getPelatihanList(instrumentId)
       } else {
-        this.pelatihanList = [] // Clear jenjang list if no jabatan selected
+        this.pelatihanList = []
         this.kknForm.get('pelatihanTeknisId').setValue('')
       }
     })
-    console.log('as', this.kategoriInstrument.pertanyaanList)
+  }
+
+  handleForm () {
+    this.kknForm = new FormGroup({
+      instrumentId: new FormControl('', [Validators.required]),
+      name: new FormControl('', [Validators.required]),
+      pelatihanTeknisId: new FormControl('', [Validators.required])
+    })
   }
 
   getPelatihanList (instrumentId: string) {

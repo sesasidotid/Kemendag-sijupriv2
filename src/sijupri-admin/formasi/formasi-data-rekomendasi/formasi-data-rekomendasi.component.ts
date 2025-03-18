@@ -29,7 +29,9 @@ export class FormasiDataRekomendasiComponent {
     private handlerService: HandlerService,
     private converterService: ConverterService,
     private router: Router
-  ) {
+  ) {}
+
+  ngOnInit () {
     this.pagable = new PagableBuilder(`/api/v1/formasi/search`)
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Tanggal Pengajuan', 'dateCreated').build()

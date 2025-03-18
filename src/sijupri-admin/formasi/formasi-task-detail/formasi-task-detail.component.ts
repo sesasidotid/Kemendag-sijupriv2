@@ -135,7 +135,9 @@ export class FormasiTaskDetailComponent {
     this.activatedRoute.paramMap.subscribe(params => {
       this.unit_kerja_id = params.get('id')
     })
+  }
 
+  ngOnInit () {
     this.waktuPelaksanaanForm = new FormGroup({
       waktuPelaksanaan: new FormControl('')
     })
@@ -143,9 +145,6 @@ export class FormasiTaskDetailComponent {
     this.flow3Form = this.fb.group({})
 
     this.getListJenjang()
-  }
-
-  ngOnInit () {
     this.getPendingTask()
   }
 

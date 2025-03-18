@@ -9,15 +9,8 @@ import {
   PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { LoginContext } from '../../../../modules/base/commons/login-context'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { BehaviorSubject } from 'rxjs'
-import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms'
 
 @Component({
   selector: 'app-ukom-task-list',
@@ -30,10 +23,16 @@ export class UkomTaskListComponent {
   pagable: Pagable
   pagable$ = new BehaviorSubject<Pagable | null>(null)
 
-  constructor (private router: Router, private tabService: TabService) {
+  constructor (private router: Router, private tabService: TabService) {}
+
+  ngOnInit () {
+    this.handlePagable()
+    this.handleTabService()
+  }
+
+  handlePagable () {
     this.pagable$.next(
       new PagableBuilder('/api/v1/participant_ukom/task/search')
-
         .addPrimaryColumn(
           new PrimaryColumnBuilder('NIP', 'objectGroup').build()
         )
@@ -80,7 +79,7 @@ export class UkomTaskListComponent {
     )
   }
 
-  ngOnInit () {
+  handleTabService () {
     if (this.tabService.getTabsLength() > 0) {
       this.tabService.clearTabs()
     }

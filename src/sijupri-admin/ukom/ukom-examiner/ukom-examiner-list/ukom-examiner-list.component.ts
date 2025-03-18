@@ -64,9 +64,9 @@ export class UkomExaminerListComponent {
         new PrimaryColumnBuilder()
           .withDynamicValue('Jenis Kelamin', (data: any) =>
             data.jenisKelaminCode === 'M'
-              ? 'Laki Laki'
+              ? 'Pria'
               : data.jenisKelaminCode === 'F'
-              ? 'Perempuan'
+              ? 'Wanita'
               : data.jenisKelaminCode
           )
           .build()

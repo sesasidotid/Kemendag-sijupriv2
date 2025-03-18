@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AkpTaskService } from '../../../modules/akp/services/akp-task.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, take } from 'rxjs'
 import { AKPTaskDetail } from '../../../modules/akp/models/akp-task-detail.modal'
 import { CommonModule } from '@angular/common'
 import { MatrixOneTableComponent } from '../../../modules/base/components/matrix-one-table/matrix-one-table.component'
@@ -61,13 +61,13 @@ export class AkpTaskDetailComponent {
     private akpTaskService: AkpTaskService,
     private alertService: AlertService,
     private router: Router
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.akpId = params.get('id')
-    })
-  }
+  ) {}
 
   ngOnInit (): void {
+    this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
+      this.akpId = params.get('id')
+    })
+
     this.getAKPDetail()
 
     this.form = new FormGroup({

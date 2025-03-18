@@ -16,7 +16,7 @@ import { ConfirmationService } from '../../../modules/base/services/confirmation
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { LucideAngularModule, FilePlus } from 'lucide-angular'
 import { PelatihanTeknis } from '../../../modules/akp/models/pelatihan-teknis.model'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, take } from 'rxjs'
 
 @Component({
   selector: 'app-kkn-detail',
@@ -49,8 +49,10 @@ export class KknDetailComponent {
     private router: Router,
     private confirmationService: ConfirmationService,
     private activatedRoute: ActivatedRoute
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
+  ) {}
+
+  ngOnInit () {
+    this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
       this.id = params.get('id')
     })
 
@@ -58,9 +60,7 @@ export class KknDetailComponent {
       name: new FormControl('', [Validators.required]),
       pelatihanTeknisId: new FormControl('', [Validators.required])
     })
-  }
 
-  ngOnInit () {
     this.getKategoriInstrument()
   }
 
