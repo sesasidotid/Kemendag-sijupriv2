@@ -1,0 +1,21 @@
+.nav-tabs-custom .nav-link {
+  color: #fd7e14;
+  position: relative;
+
+  &.active {
+    color: #fd7e14 !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: #fd7e14;
+    }
+  }
+
+  &:hover {
+    color: darken(#fd7e14, 10%);
+  }
+}

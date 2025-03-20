@@ -418,6 +418,17 @@ section {
     }
   }
 
+  .footer-a {
+    color: #fff;
+    opacity: 0.8;
+    text-decoration: none;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #2967be;
+    }
+  }
+
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .footer-content {

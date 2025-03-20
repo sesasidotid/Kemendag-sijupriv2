@@ -2,10 +2,10 @@ import { ConfirmationService } from './../../../../modules/base/services/confirm
 import { Component } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
-  ActionColumnBuilder,
-  PagableBuilder,
-  PageFilterBuilder,
-  PrimaryColumnBuilder
+    ActionColumnBuilder,
+    PagableBuilder,
+    PageFilterBuilder,
+    PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
@@ -16,97 +16,103 @@ import { UkomDocumentAddComponent } from '../ukom-document-add/ukom-document-add
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 @Component({
-  selector: 'app-ukom-document-list',
-  standalone: true,
-  imports: [PagableComponent, CommonModule, UkomDocumentAddComponent],
-  templateUrl: './ukom-document-list.component.html',
-  styleUrl: './ukom-document-list.component.scss'
+    selector: 'app-ukom-document-list',
+    standalone: true,
+    imports: [PagableComponent, CommonModule, UkomDocumentAddComponent],
+    templateUrl: './ukom-document-list.component.html',
+    styleUrl: './ukom-document-list.component.scss'
 })
 export class UkomDocumentListComponent {
-  tab$ = new BehaviorSubject<number | null>(0)
-  pagable: Pagable
+    tab$ = new BehaviorSubject<number | null>(0)
+    pagable: Pagable
 
-  refresh: boolean = false
+    refresh: boolean = false
 
-  constructor (
-    private tabService: TabService,
-    private router: Router,
-    private confirmationService: ConfirmationService,
-    private apiService: ApiService,
-    private handlerService: HandlerService
-  ) {
-    this.pagable = new PagableBuilder('/api/v1/document_ukom/all')
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Nama', 'dokumenPersyaratanName').build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder()
-          .withDynamicValue('Jenis Ukom', (data: any) =>
-            data.jenisUkom === 'KENAIKAN_JENJANG'
-              ? 'Kenaikan Jenjang'
-              : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-              ? 'Perpindahan Jabatan'
-              : data.jenisUkom === 'PROMOSI'
-              ? 'Promosi'
-              : data.jenisUkom
-          )
-          .build()
-      )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((item: any) => {
-            this.delete(item.dokumenPersyaratanId)
-          }, 'danger')
-          .withIcon('danger')
-          .build()
-      )
-      .build()
-  }
-
-  ngOnInit () {
-    if (this.tabService.getTabsLength() > 0) {
-      this.tabService.clearTabs()
+    constructor(
+        private tabService: TabService,
+        private router: Router,
+        private confirmationService: ConfirmationService,
+        private apiService: ApiService,
+        private handlerService: HandlerService
+    ) {
+        this.pagable = new PagableBuilder('/api/v1/document_ukom/all')
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Nama', 'dokumenPersyaratanName').build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Jenis Ukom', (data: any) =>
+                        data.jenisUkom === 'KENAIKAN_JENJANG'
+                            ? 'Kenaikan Jenjang'
+                            : data.jenisUkom === 'PERPINDAHAN_JABATAN'
+                                ? 'Perpindahan Jabatan'
+                                : data.jenisUkom === 'PROMOSI'
+                                    ? 'Promosi'
+                                    : data.jenisUkom
+                    )
+                    .build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Jabatan', 'jabatanName').build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Jenjang', 'jenjangName').build()
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((item: any) => {
+                        this.delete(item.dokumenPersyaratanId)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build()
+            )
+            .build()
     }
 
-    this.tabService
-      .addTab({
-        label: 'Daftar Dokumen Ukom',
-        isActive: true,
-        icon: 'mdi-list-box',
-        onClick: () => this.handleTabChange(0)
-      })
-      .addTab({
-        label: 'Tambah Dokumen Ukom',
-        icon: 'mdi-plus-circle',
-        onClick: () => this.handleTabChange(1)
-      })
-  }
+    ngOnInit() {
+        if (this.tabService.getTabsLength() > 0) {
+            this.tabService.clearTabs()
+        }
 
-  delete (id: string) {
-    this.confirmationService.open(false).subscribe({
-      next: result => {
-        if (!result.confirmed) return
+        this.tabService
+            .addTab({
+                label: 'Daftar Dokumen Ukom',
+                isActive: true,
+                icon: 'mdi-list-box',
+                onClick: () => this.handleTabChange(0)
+            })
+            .addTab({
+                label: 'Tambah Dokumen Ukom',
+                icon: 'mdi-plus-circle',
+                onClick: () => this.handleTabChange(1)
+            })
+    }
 
-        this.apiService.deleteData(`/api/v1/doc_persyaratan/${id}`).subscribe({
-          next: () => {
-            this.refresh = !this.refresh
-            this.handlerService.handleAlert(
-              'Success',
-              'Dokumen berhasil di hapus'
-            )
-          },
-          error: error => {
-            console.error('Error fetching data', error)
-            this.handlerService.handleAlert('Error', 'Gagal menghapus dokumen')
-          }
+    delete(id: string) {
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
+
+                this.apiService.deleteData(`/api/v1/doc_persyaratan/${id}`).subscribe({
+                    next: () => {
+                        this.refresh = !this.refresh
+                        this.handlerService.handleAlert(
+                            'Success',
+                            'Dokumen berhasil di hapus'
+                        )
+                    },
+                    error: error => {
+                        console.error('Error fetching data', error)
+                        this.handlerService.handleAlert('Error', 'Gagal menghapus dokumen')
+                    }
+                })
+            }
         })
-      }
-    })
-  }
+    }
 
-  handleTabChange (tab?: number) {
-    console.log('tab', tab)
-    this.tab$.next(tab)
-    this.tabService.changeTabActive(tab)
-  }
+    handleTabChange(tab?: number) {
+        console.log('tab', tab)
+        this.tab$.next(tab)
+        this.tabService.changeTabActive(tab)
+    }
 }

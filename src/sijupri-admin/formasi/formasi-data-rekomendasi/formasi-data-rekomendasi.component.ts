@@ -42,8 +42,7 @@ export class FormasiDataRekomendasiComponent {
       .addPrimaryColumn(
         new PrimaryColumnBuilder('Status', 'formasiStatus').build()
       )
-
-      .addFilter(
+    .addFilter(
         new PageFilterBuilder('like')
           .setProperty('unit_kerja|name')
           .withField('Unit Kerja', 'text')

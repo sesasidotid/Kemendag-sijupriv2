@@ -232,21 +232,30 @@
             )
           "
         >
+          <!-- Button: Lolos Verifikasi (Only shown when approve is enabled & not loading) -->
           <button
-            *ngIf="isApproveEnable && !(hadItemsLoading$ | async)"
+            *ngIf="isApproveEnable && (hadItemsLoading$ | async) === false"
             class="btn btn-success me-1"
-            (click)="submit(false)"
+            (click)="submitApprove()"
           >
-            Submit
+            Lolos Verifikasi
+          </button>
+
+          <!-- Button: Perbaikan (Only shown when approve is NOT enabled & not loading) -->
+          <button
+            *ngIf="!isApproveEnable && (hadItemsLoading$ | async) === false"
+            class="btn btn-warning"
+            (click)="submitAmend()"
+          >
+            Perbaikan
           </button>
 
           <button
+            *ngIf="!isApproveEnable && (hadItemsLoading$ | async) === false"
             class="btn btn-danger"
-            [disabled]="isApproveEnable"
-            (click)="submit(true)"
-            *ngIf="!(hadItemsLoading$ | async) && !isApproveEnable"
+            (click)="submitReject()"
           >
-            Submit
+            Tidak Lolos Verifikasi
           </button>
 
           <button

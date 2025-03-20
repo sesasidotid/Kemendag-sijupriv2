@@ -38,6 +38,9 @@
           name="jenisUkom"
           formControlName="jenisUkom"
         >
+          <option selected value="" disabled selected style="display: none">
+            Pilih Jenis UKom
+          </option>
           <option value="KENAIKAN_JENJANG">Kenaikan Jenjang</option>
           <option value="PERPINDAHAN_JABATAN">Perpindahan Jabatan</option>
           <option value="PROMOSI">Promosi</option>
@@ -53,6 +56,73 @@
             >Jenis ukom perlu diisi.</small
           >
         </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold"
+        >Jabatan</label
+      >
+      <div class="col-sm-10">
+        <select
+          id="jabatanCode"
+          class="form-select"
+          name="jabatanCode"
+          formControlName="jabatanCode"
+        >
+          <option selected value="" style="display: none">
+            Untuk Jabatan ...
+          </option>
+          <ng-container
+            *ngIf="(jabatanList$ | async)?.length; else NextJenjangNotFound"
+          >
+            <option
+              *ngFor="let jabatan of jabatanList$ | async"
+              [value]="jabatan.code"
+            >
+              {{ jabatan.name }}
+            </option>
+          </ng-container>
+          <ng-template #NextJenjangNotFound>
+            <option disabled>Jabatan yang dituju tidak ditemukan</option>
+          </ng-template>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="jenjangCode" class="col-sm-2 col-form-label fw-bold"
+        >Jenjang</label
+      >
+      <div class="col-sm-10">
+        <select
+          id="jenjangCode"
+          class="form-select"
+          name="jenjangCode"
+          formControlName="jenjangCode"
+        >
+          <option selected value="" style="display: none">
+            Untuk Jenjang ...
+          </option>
+          <ng-container
+            *ngIf="(jenjangList$ | async)?.length; else JenjangNotFound"
+          >
+            <option
+              *ngFor="let jenjang of jenjangList$ | async"
+              [value]="jenjang.code"
+            >
+              {{ jenjang.name }}
+            </option>
+          </ng-container>
+          <ng-template #JenjangNotFound>
+            <option disabled>Jabatan yang dituju tidak ditemukan</option>
+          </ng-template>
+        </select>
+        <small class="form-text text-muted">
+          Isi jika diperlukan. Jika dokumen untuk jenjang tertentu, cukup isi
+          jenjang. Jika untuk jabatan tertentu dan jenjang tertentu, isi
+          keduanya.
+        </small>
       </div>
     </div>
 
