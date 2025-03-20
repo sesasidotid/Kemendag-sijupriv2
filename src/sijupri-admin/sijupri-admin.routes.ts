@@ -198,7 +198,7 @@ export const routes: Routes = [
                                 './ukom/ukom-document/ukom-document-list/ukom-document-list.component'
                             ).then(m => m.UkomDocumentListComponent)
                     },
-                    'Pemetaan Ukom': {
+                    'Rekapitulasi Hasil Verifikasi Ukom': {
                         components: () =>
                             import('./ukom/ukom-pemetaan/ukom-list/ukom-list.component').then(
                                 m => m.UkomListComponent

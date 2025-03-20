@@ -1,4 +1,5 @@
 <app-landing-page [imported]="true"></app-landing-page>
+
 <div *ngIf="registerOpened$ | async; else registerClosed">
   <div class="row card px-4 parent">
     <div class="gradient-line"></div>
@@ -51,14 +52,62 @@
             required
             formControlName="name"
           />
+          <div *ngIf="getErrorMessage('name', 'Nama')" class="text-danger">
+            {{ getErrorMessage('name', 'Nama') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="nip" class="form-label"
+            >NIP <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="nip"
+            required
+            formControlName="nip"
+          />
+          <div *ngIf="getErrorMessage('nip', 'NIP')" class="text-danger">
+            {{ getErrorMessage('nip', 'NIP') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="tanggalLahir" class="form-label">
+            Tanggal Lahir <span class="text-danger">*</span>
+          </label>
+          <input
+            type="date"
+            class="form-control"
+            id="tanggalLahir"
+            required
+            formControlName="tanggalLahir"
+          />
           <div
-            *ngIf="
-              nonJFForm.get('name')?.invalid &&
-              (nonJFForm.get('name')?.touched || nonJFForm.get('name')?.dirty)
-            "
+            *ngIf="getErrorMessage('tanggalLahir', 'Tanggal Lahir')"
             class="text-danger"
           >
-            Nama tidak boleh kosong.
+            {{ getErrorMessage('tanggalLahir', 'Tanggal Lahir') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="phone" class="form-label"
+            >Nomor whatsapp <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="phone"
+            required
+            formControlName="phone"
+          />
+          <div
+            *ngIf="getErrorMessage('phone', 'Nomor whatsapp')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('phone', 'Nomor whatsapp') }}
           </div>
         </div>
 
@@ -73,24 +122,8 @@
             required
             formControlName="email"
           />
-          <div
-            *ngIf="
-              nonJFForm.get('email')?.hasError('required') &&
-              (nonJFForm.get('email')?.touched || nonJFForm.get('email')?.dirty)
-            "
-            class="text-danger"
-          >
-            Email tidak boleh kosong.
-          </div>
-
-          <div
-            *ngIf="
-              nonJFForm.get('email')?.hasError('email') &&
-              (nonJFForm.get('email')?.touched || nonJFForm.get('email')?.dirty)
-            "
-            class="text-danger"
-          >
-            Format email tidak valid.
+          <div *ngIf="getErrorMessage('email', 'Email')" class="text-danger">
+            {{ getErrorMessage('email', 'Email') }}
           </div>
         </div>
 
@@ -106,23 +139,10 @@
             formControlName="password"
           />
           <div
-            *ngIf="
-              nonJFForm.get('password')?.invalid &&
-              (nonJFForm.get('password')?.touched ||
-                nonJFForm.get('password')?.dirty)
-            "
+            *ngIf="getErrorMessage('password', 'Password')"
             class="text-danger"
           >
-            Password tidak boleh kosong.
-          </div>
-          <div
-            *ngIf="
-    nonJFForm.get('password')?.errors?.['minlength'] &&
-    (nonJFForm.get('password')?.touched || nonJFForm.get('password')?.dirty)
-  "
-            class="text-danger"
-          >
-            Password minimal 8 karakter.
+            {{ getErrorMessage('password', 'Password') }}
           </div>
         </div>
 
@@ -138,103 +158,110 @@
             formControlName="confirmPassword"
           />
           <div
-            *ngIf="
-              nonJFForm.get('confirmPassword')?.hasError('required') &&
-              (nonJFForm.get('confirmPassword')?.touched ||
-                nonJFForm.get('confirmPassword')?.dirty)
-            "
+            *ngIf="getErrorMessage('confirmPassword', 'Konfirmasi Password')"
             class="text-danger"
           >
-            Konfirmasi Password tidak boleh kosong.
-          </div>
-          <div
-            *ngIf="
-              nonJFForm.get('confirmPassword')?.hasError('mismatch') &&
-              (nonJFForm.get('confirmPassword')?.touched ||
-                nonJFForm.get('confirmPassword')?.dirty)
-            "
-            class="text-danger"
-          >
-            Password dan Konfirmasi Password tidak cocok.
+            {{ getErrorMessage('confirmPassword', 'Konfirmasi Password') }}
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="nip" class="form-label"
-            >NIP <span class="text-danger">*</span></label
-          >
-          <input
-            type="text"
-            class="form-control"
-            id="nip"
-            required
-            formControlName="nip"
-          />
-          <div
-            *ngIf="
-              nonJFForm.get('nip')?.invalid &&
-              (nonJFForm.get('nip')?.touched || nonJFForm.get('nip')?.dirty)
-            "
-            class="text-danger"
-          >
-            NIP tidak boleh kosong.
-          </div>
-          <div
-            *ngIf="
-           nonJFForm.get('nip')?.errors?.['pattern'] &&
-           (nonJFForm.get('nip')?.touched || nonJFForm.get('nip')?.dirty)
-          "
-            class="text-danger"
-          >
-            NIP harus 18 digit.
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label for="unitKerjaName" class="form-label"
-            >Unit Kerja <span class="text-danger">*</span></label
-          >
-          <input
-            type="text"
-            class="form-control"
-            id="unitKerjaName"
-            required
-            formControlName="unitKerjaName"
-          />
-          <div
-            *ngIf="
-              nonJFForm.get('unitKerjaName')?.invalid &&
-              (nonJFForm.get('unitKerjaName')?.touched ||
-                nonJFForm.get('unitKerjaName')?.dirty)
-            "
-            class="text-danger"
-          >
-            Unit Kerja tidak boleh kosong.
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label for="jenis_ukom" class="form-label"
-            >Jenis UKom <span class="text-danger">*</span></label
-          >
+          <label for="jenis_instansi" class="form-label">
+            Instansi <span class="text-danger">*</span>
+          </label>
           <select
             class="form-select"
-            id="jenis_ukom"
-            formControlName="jenis_ukom"
-            (change)="onJenisUkomSwitch($event)"
+            id="jenis_instansi"
+            formControlName="jenis_instansi"
           >
-            <option value="" disabled selected>Pilih Jenis UKom</option>
-            <option value="PERPINDAHAN_JABATAN">Perpindahan Jabatan</option>
-            <option value="PROMOSI">Promosi</option>
+            <option value="" disabled selected style="display: none">
+              Pilih Instansi
+            </option>
+            <option value="KEMENTERIAN_PERDAGANGAN">
+              Kementerian Perdagangan
+            </option>
+            <option value="KEMENTERIAN_PERINDUSTRIAN">
+              Kementerian Perindustrian
+            </option>
+            <option value="KEMENTERIAN_ESDM">Kementerian ESDM</option>
+            <option value="BADAN_STANDARISASI_NASIONAL">
+              Badan Standarisasi Nasional
+            </option>
+            <option value="PEMERINTAH_PROVINSI">Pemerintah Provinsi</option>
+            <option value="PEMERINTAH_KABUPATEN_KOTA">
+              Pemerintah Kabupaten/Kota
+            </option>
           </select>
+
           <div
-            *ngIf="
-              nonJFForm.get('jenis_ukom')?.invalid &&
-              nonJFForm.get('jenis_ukom')?.touched
-            "
+            *ngIf="getErrorMessage('jenis_instansi', 'Instansi')"
             class="text-danger"
           >
-            Jenis UKom tidak boleh kosong.
+            {{ getErrorMessage('jenis_instansi', 'Instansi') }}
+          </div>
+        </div>
+
+        <div *ngIf="instansi$ | async as instansi">
+          <div
+            class="mb-3"
+            *ngIf="
+              instansi === 'PEMERINTAH_PROVINSI' ||
+              instansi === 'PEMERINTAH_KABUPATEN_KOTA'
+            "
+          >
+            <label for="provinsi" class="form-label"
+              >Pilih Provinsi <span class="text-danger">*</span></label
+            >
+            <select
+              class="form-select"
+              id="provinsi"
+              formControlName="provinsi"
+            >
+              <option value="" disabled selected style="display: none">
+                Pilih Provinsi
+              </option>
+              <option *ngFor="let prov of provinsiList" [value]="prov.id">
+                {{ prov.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3" *ngIf="instansi === 'PEMERINTAH_KABUPATEN_KOTA'">
+            <label for="kabupatenkota" class="form-label"
+              >Pilih Kabupaten/Kota <span class="text-danger">*</span></label
+            >
+            <select
+              class="form-select"
+              id="kabupatenkota"
+              formControlName="kabupatenkota"
+            >
+              <option value="" disabled selected style="display: none">
+                Pilih Kabupaten/Kota
+              </option>
+              <option *ngFor="let kabkot of kabKotaList" [value]="kabkot.id">
+                {{ kabkot.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Input Unit Kerja (always shown if any instansi is selected) -->
+          <div class="mb-3" *ngIf="instansi !== ''">
+            <label for="unitKerjaName" class="form-label">
+              Unit Kerja <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="unitKerjaName"
+              required
+              formControlName="unitKerjaName"
+            />
+            <div
+              *ngIf="getErrorMessage('unitKerjaName', 'Unit Kerja')"
+              class="text-danger"
+            >
+              {{ getErrorMessage('unitKerjaName', 'Unit Kerja') }}
+            </div>
           </div>
         </div>
 
@@ -250,14 +277,10 @@
             formControlName="jabatanName"
           />
           <div
-            *ngIf="
-              nonJFForm.get('jabatanName')?.invalid &&
-              (nonJFForm.get('jabatanName')?.touched ||
-                nonJFForm.get('jabatanName')?.dirty)
-            "
+            *ngIf="getErrorMessage('jabatanName', 'Jabatan Saat Ini')"
             class="text-danger"
           >
-            Jabatan saat ini tidak boleh kosong.
+            {{ getErrorMessage('jabatanName', 'Jabatan Saat Ini') }}
           </div>
         </div>
 
@@ -285,9 +308,8 @@
             formControlName="pangkatCode"
           >
             <option selected value="" style="display: none">
-              Pilih Pangkat Saat Ini
+              Pilih Pangkat/Golongan Saat Ini
             </option>
-
             <ng-container
               *ngIf="(pangkatList$ | async)?.length; else pangkatNotFound"
             >
@@ -303,13 +325,33 @@
             <option disabled>Pangkat/Golongan saat ini tidak ditemukan</option>
           </ng-template>
           <div
-            *ngIf="
-              nonJFForm.get('pangkatCode')?.invalid &&
-              nonJFForm.get('pangkatCode')?.touched
-            "
+            *ngIf="getErrorMessage('pangkatCode', 'Pangkat/Golongan')"
             class="text-danger"
           >
-            Pangkat/Golongan yang dituju tidak boleh kosong.
+            {{ getErrorMessage('pangkatCode', 'Pangkat/Golongan') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="jenis_ukom" class="form-label"
+            >Jenis UKom <span class="text-danger">*</span></label
+          >
+          <select
+            class="form-select"
+            id="jenis_ukom"
+            formControlName="jenis_ukom"
+          >
+            <option value="" disabled selected style="display: none">
+              Pilih Jenis UKom
+            </option>
+            <option value="PERPINDAHAN_JABATAN">Perpindahan Jabatan</option>
+            <option value="PROMOSI">Promosi</option>
+          </select>
+          <div
+            *ngIf="getErrorMessage('jenis_ukom', 'Jenis UKom')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('jenis_ukom', 'Jenis UKom') }}
           </div>
         </div>
 
@@ -341,13 +383,10 @@
             </ng-template>
           </select>
           <div
-            *ngIf="
-              nonJFForm.get('nextJabatanCode')?.invalid &&
-              nonJFForm.get('nextJabatanCode')?.touched
-            "
+            *ngIf="getErrorMessage('nextJabatanCode', 'Jabatan Yang Dituju')"
             class="text-danger"
           >
-            Jabatan yang dituju tidak boleh kosong.
+            {{ getErrorMessage('nextJabatanCode', 'Jabatan Yang Dituju') }}
           </div>
         </div>
 
@@ -380,13 +419,171 @@
             </ng-template>
           </select>
           <div
+            *ngIf="getErrorMessage('nextJenjangCode', 'Jenjang Yang Dituju')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('nextJenjangCode', 'Jenjang Yang Dituju') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="nomorSuratUsulan" class="form-label"
+            >Nomor Surat Usulan <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="nomorSuratUsulan"
+            required
+            formControlName="nomorSuratUsulan"
+          />
+          <div
+            *ngIf="getErrorMessage('nomorSuratUsulan', 'Nomor Surat Usulan')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('nomorSuratUsulan', 'Nomor Surat Usulan') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="tglSuratUsulan" class="form-label"
+            >Tanggal Surat Usulan <span class="text-danger">*</span></label
+          >
+          <input
+            type="date"
+            class="form-control"
+            id="tglSuratUsulan"
+            required
+            formControlName="tglSuratUsulan"
+          />
+          <div
+            *ngIf="getErrorMessage('tglSuratUsulan', 'Nomor Surat Usulan')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('tglSuratUsulan', 'Usulan') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="pendidikanTerakhir" class="form-label">
+            Pendidikan Terakhir<span class="text-danger">*</span>
+          </label>
+          <select
+            class="form-select"
+            id="pendidikanTerakhir"
+            formControlName="pendidikanTerakhir"
+          >
+            <option value="" disabled selected style="display: none">
+              Pilih Pendidikan Terakhir
+            </option>
+            <option value="SLTA">SLTA</option>
+            <option value="D3">D3</option>
+            <option value="S1/D4">S1/D4</option>
+            <option value="S2">S2</option>
+            <option value="S3">S3</option>
+          </select>
+
+          <div
+            *ngIf="getErrorMessage('pendidikanTerakhir', 'Pendidikan Terakhir')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('pendidikanTerakhir', 'Pendidikan Terakhir') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="jurusan" class="form-label"
+            >Jurusan/Program Studi <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="jurusan"
+            required
+            formControlName="jurusan"
+            placeholder="Contoh: Teknik Informatika"
+          />
+          <div
+            *ngIf="getErrorMessage('jurusan', 'Jurusan/Program Studi')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('jurusan', 'Jurusan/Program Studi') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="predikatKinerjaTahunPertama" class="form-label">
+            Predikat Kinerja Pegawai Satu Tahun Terkahir
+            <span class="text-danger">*</span>
+          </label>
+          <select
+            class="form-select"
+            id="predikatKinerjaTahunPertama"
+            formControlName="predikatKinerjaTahunPertama"
+          >
+            <option value="" disabled selected style="display: none">
+              Pilih Predikat
+            </option>
+            <option value="SMA">Sangat Baik</option>
+            <option value="D3">Baik</option>
+            <option value="S1/D4">Butuh Perbaikan</option>
+            <option value="S2">Kurang</option>
+            <option value="S3">Sangat Kurang</option>
+          </select>
+
+          <div
             *ngIf="
-              nonJFForm.get('nextJenjangCode')?.invalid &&
-              nonJFForm.get('nextJenjangCode')?.touched
+              getErrorMessage(
+                'predikatKinerjaTahunPertama',
+                'Predikat Kinerja Pegawai Satu Tahun Terkahi'
+              )
             "
             class="text-danger"
           >
-            Jenjang yang dituju tidak boleh kosong.
+            {{
+              getErrorMessage(
+                'predikatKinerjaTahunPertama',
+                'Predikat Kinerja Pegawai Satu Tahun Terkahi'
+              )
+            }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="predikatKinerjaTahunKedua" class="form-label">
+            Predikat Kinerja Pegawai Dua Tahun Terkahir
+            <span class="text-danger">*</span>
+          </label>
+          <select
+            class="form-select"
+            id="predikatKinerjaTahunKedua"
+            formControlName="predikatKinerjaTahunKedua"
+          >
+            <option value="" disabled selected style="display: none">
+              Pilih Predikat
+            </option>
+            <option value="SMA">Sangat Baik</option>
+            <option value="D3">Baik</option>
+            <option value="S1/D4">Butuh Perbaikan</option>
+            <option value="S2">Kurang</option>
+            <option value="S3">Sangat Kurang</option>
+          </select>
+
+          <div
+            *ngIf="
+              getErrorMessage(
+                'predikatKinerjaTahunPertama',
+                'Predikat Kinerja Pegawai Dua Tahun Terakhir'
+              )
+            "
+            class="text-danger"
+          >
+            {{
+              getErrorMessage(
+                'predikatKinerjaTahunPertama',
+                'Predikat Kinerja Pegawai Dua Tahun Terakhir'
+              )
+            }}
           </div>
         </div>
 

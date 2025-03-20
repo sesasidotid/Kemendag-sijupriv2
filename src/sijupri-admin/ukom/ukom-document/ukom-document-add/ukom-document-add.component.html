@@ -11,6 +11,7 @@
           class="form-control"
           name="dokumenPersyaratanName"
           formControlName="dokumenPersyaratanName"
+          placeholder="Nama Dokumen"
         />
         <div
           class="text-danger"
@@ -118,11 +119,19 @@
             <option disabled>Jabatan yang dituju tidak ditemukan</option>
           </ng-template>
         </select>
-        <small class="form-text text-muted">
-          Isi jika diperlukan. Jika dokumen untuk jenjang tertentu, cukup isi
-          jenjang. Jika untuk jabatan tertentu dan jenjang tertentu, isi
-          keduanya.
-        </small>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="jenjangCode" class="col-sm-2 col-form-label fw-bold"></label>
+      <div class="col-sm-10">
+        <div class="bg-warning rounded border p-1">
+          <small class="text-white">
+            Isi jabatan dan jenjang jika diperlukan. Jika dokumen untuk jenjang
+            tertentu, cukup isi jenjang. Jika untuk jabatan tertentu dan jenjang
+            tertentu, isi keduanya.
+          </small>
+        </div>
       </div>
     </div>
 

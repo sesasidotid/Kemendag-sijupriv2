@@ -24,198 +24,204 @@ import { BehaviorSubject } from 'rxjs'
 import { SafeUrl } from '@angular/platform-browser'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 @Component({
-  selector: 'app-jf-task-detail',
-  standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
-  templateUrl: './jf-task-detail.component.html',
-  styleUrl: './jf-task-detail.component.scss'
+    selector: 'app-jf-task-detail',
+    standalone: true,
+    imports: [CommonModule, FormsModule, FileHandlerComponent],
+    templateUrl: './jf-task-detail.component.html',
+    styleUrl: './jf-task-detail.component.scss'
 })
 export class JfTaskDetailComponent {
-  nip: string
-  pendingTaskList: PendingTask[] = []
-  jf: JF = new JF()
+    nip: string
+    pendingTaskList: PendingTask[] = []
+    jf: JF = new JF()
 
-  openedAccordion: string[] = []
-  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
+    openedAccordion: string[] = []
+    profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
-  pendingTaskloading$ = new BehaviorSubject<boolean>(true)
-  detailTaskloading$ = new BehaviorSubject<boolean>(true)
+    pendingTaskloading$ = new BehaviorSubject<boolean>(true)
+    detailTaskloading$ = new BehaviorSubject<boolean>(true)
 
-  constructor (
-    private apiService: ApiService,
-    private alertService: AlertService,
-    private confirmationService: ConfirmationService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private converterService: ConverterService,
-    private jfService: JfService,
-    private sanitizer: DomSanitizer,
-    private filePreviewService: FilePreviewService
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.nip = params.get('id')
-    })
-  }
-
-  ngOnInit () {
-    this.getJF()
-    this.getTaskDetail()
-    this.fetchPhotoProfile()
-  }
-
-  preview (filename: string, filesource: string) {
-    this.filePreviewService.open(filename, filesource)
-  }
-
-  fetchPhotoProfile () {
-    console.log('Fetching photo profile')
-    this.apiService.getPhotoProfile(this.nip).subscribe({
-      next: blob => {
-        if (blob.size === 0) {
-          this.profileImageSrc = 'assets/no-profile.jpg'
-          return
-        }
-        const objectUrl = URL.createObjectURL(blob)
-        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
-      },
-      error: err => {
-        console.error('Error fetching profile image', err)
-        this.profileImageSrc = 'assets/no-profile.jpg'
-      }
-    })
-  }
-
-  getTaskDetail () {
-    this.apiService.getData(`/api/v1/jf/task/group/${this.nip}`).subscribe({
-      next: (pendingTaskList: PendingTask[]) => {
-        if (pendingTaskList.length == 0)
-          this.router.navigate(['/siap/verify-user-jf'])
-        this.pendingTaskList = pendingTaskList
-        this.pendingTaskloading$.next(false)
-      },
-      error: error => {
-        console.error('Error fetching data', error)
-        this.alertService.showToast(
-          'Error',
-          'Gagal mendapatkan data verifikasi user JF!'
-        )
-
-        this.pendingTaskloading$.next(false)
-      }
-    })
-  }
-
-  toggleExpand (pendingTask: PendingTask) {
-    pendingTask['isOpen'] = !(pendingTask['isOpen'] || false)
-
-    if (
-      (pendingTask['isOpen'] || false) &&
-      !pendingTask.hasOwnProperty('object')
+    constructor(
+        private apiService: ApiService,
+        private alertService: AlertService,
+        private confirmationService: ConfirmationService,
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
+        private converterService: ConverterService,
+        private jfService: JfService,
+        private sanitizer: DomSanitizer,
+        private filePreviewService: FilePreviewService
     ) {
-      this.detailTaskloading$.next(true)
-      if (pendingTask['isOpen']) {
-        this.openedAccordion = [pendingTask.id]
-      }
 
-      this.apiService
-        .getData(`/api/v1/object_task/${pendingTask.objectTaskId}`)
-        .subscribe({
-          next: (objectTask: ObjectTask) => {
-            switch (pendingTask.workflowName) {
-              case 'jf_task':
-                pendingTask['object'] = new JF(objectTask.object)
-                break
-              case 'rw_pendidikan_task':
-                pendingTask['object'] = new RWPendidikan(objectTask.object)
-                break
-              case 'rw_pangkat_task':
-                pendingTask['object'] = new RWPangkat(objectTask.object)
-                break
-              case 'rw_jabatan_task':
-                pendingTask['object'] = new RWJabatan(objectTask.object)
-                break
-              case 'rw_kompetensi_task':
-                pendingTask['object'] = new RWKompetensi(objectTask.object)
-                break
-              case 'rw_sertifikasi_task':
-                pendingTask['object'] = new RWSertifikasi(objectTask.object)
-                break
+    }
+
+    ngOnInit() {
+        this.activatedRoute.paramMap.subscribe(params => {
+            this.nip = params.get('id')
+        })
+
+        this.getJF()
+        this.getTaskDetail()
+        this.fetchPhotoProfile()
+    }
+
+    preview(filename: string, filesource: string) {
+        this.filePreviewService.open(filename, filesource)
+    }
+
+    back() {
+        history.back()
+    }
+
+    fetchPhotoProfile() {
+        console.log('Fetching photo profile')
+        this.apiService.getPhotoProfile(this.nip).subscribe({
+            next: blob => {
+                if (blob.size === 0) {
+                    this.profileImageSrc = 'assets/no-profile.jpg'
+                    return
+                }
+                const objectUrl = URL.createObjectURL(blob)
+                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+            },
+            error: err => {
+                console.error('Error fetching profile image', err)
+                this.profileImageSrc = 'assets/no-profile.jpg'
             }
-            this.detailTaskloading$.next(false)
-          },
-          error: error => {
-            console.error('Error fetching data', error)
-            this.alertService.showToast(
-              'Error',
-              'Gagal mendapatkan data detail task!'
-            )
-            this.detailTaskloading$.next(false)
-          }
         })
     }
-  }
 
-  openConfirmationDialog (
-    pendingTask: PendingTask,
-    taskAction: string,
-    withComment: boolean = false
-  ) {
-    this.confirmationService.open(withComment).subscribe({
-      next: result => {
-        if (!result.confirmed) return
+    getTaskDetail() {
+        this.apiService.getData(`/api/v1/jf/task/group/${this.nip}`).subscribe({
+            next: (pendingTaskList: PendingTask[]) => {
+                if (pendingTaskList.length == 0)
+                    this.router.navigate(['/siap/verify-user-jf'])
+                this.pendingTaskList = pendingTaskList
+                this.pendingTaskloading$.next(false)
+            },
+            error: error => {
+                console.error('Error fetching data', error)
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data verifikasi user JF!'
+                )
 
-        pendingTask['taskAction'] = taskAction
-        if (withComment && result.comment) {
-          pendingTask.remark = result.comment
+                this.pendingTaskloading$.next(false)
+            }
+        })
+    }
+
+    toggleExpand(pendingTask: PendingTask) {
+        pendingTask['isOpen'] = !(pendingTask['isOpen'] || false)
+
+        if (
+            (pendingTask['isOpen'] || false) &&
+            !pendingTask.hasOwnProperty('object')
+        ) {
+            this.detailTaskloading$.next(true)
+            if (pendingTask['isOpen']) {
+                this.openedAccordion = [pendingTask.id]
+            }
+
+            this.apiService
+                .getData(`/api/v1/object_task/${pendingTask.objectTaskId}`)
+                .subscribe({
+                    next: (objectTask: ObjectTask) => {
+                        switch (pendingTask.workflowName) {
+                            case 'jf_task':
+                                pendingTask['object'] = new JF(objectTask.object)
+                                break
+                            case 'rw_pendidikan_task':
+                                pendingTask['object'] = new RWPendidikan(objectTask.object)
+                                break
+                            case 'rw_pangkat_task':
+                                pendingTask['object'] = new RWPangkat(objectTask.object)
+                                break
+                            case 'rw_jabatan_task':
+                                pendingTask['object'] = new RWJabatan(objectTask.object)
+                                break
+                            case 'rw_kompetensi_task':
+                                pendingTask['object'] = new RWKompetensi(objectTask.object)
+                                break
+                            case 'rw_sertifikasi_task':
+                                pendingTask['object'] = new RWSertifikasi(objectTask.object)
+                                break
+                        }
+                        this.detailTaskloading$.next(false)
+                    },
+                    error: error => {
+                        console.error('Error fetching data', error)
+                        this.alertService.showToast(
+                            'Error',
+                            'Gagal mendapatkan data detail task!'
+                        )
+                        this.detailTaskloading$.next(false)
+                    }
+                })
         }
-        this.submit(pendingTask)
-      }
-    })
-  }
+    }
 
-  visibility (rwSertifikasi: any) {
-    return () => rwSertifikasi.kategoriSertifikasiValue == 2
-  }
+    openConfirmationDialog(
+        pendingTask: PendingTask,
+        taskAction: string,
+        withComment: boolean = false
+    ) {
+        this.confirmationService.open(withComment).subscribe({
+            next: result => {
+                if (!result.confirmed) return
 
-  getTaskDate (date: string) {
-    return this.converterService.dateToHumanReadable(date)
-  }
+                pendingTask['taskAction'] = taskAction
+                if (withComment && result.comment) {
+                    pendingTask.remark = result.comment
+                }
+                this.submit(pendingTask)
+            }
+        })
+    }
 
-  getJF () {
-    this.jfService.findByNip(this.nip).subscribe({
-      next: (jf: JF) => (this.jf = jf)
-    })
-  }
+    visibility(rwSertifikasi: any) {
+        return () => rwSertifikasi.kategoriSertifikasiValue == 2
+    }
 
-  submit (pendingTask: PendingTask) {
-    const task = new Task()
-    task.id = pendingTask.id
-    task.taskAction = pendingTask.taskAction
-    task.remark = pendingTask.remark ?? null
-    console.log(task.taskAction)
+    getTaskDate(date: string) {
+        return this.converterService.dateToHumanReadable(date)
+    }
 
-    this.apiService
-      .postData(
-        `/api/v1/${pendingTask.workflowName.replace('_task', '')}/task/submit`,
-        task
-      )
-      .subscribe({
-        next: () => {
-          if (task.taskAction == 'approve') {
-            this.alertService.showToast('Success', 'Berhasil menyetujui!')
-          } else {
-            this.alertService.showToast('Success', 'Berhasil menolak!')
-          }
-          this.getTaskDetail()
-        },
-        error: error => {
-          console.error('Error fetching data', error)
-          if (task.taskAction == 'approve') {
-            this.alertService.showToast('Error', 'Gagal menyetujui!')
-          } else {
-            this.alertService.showToast('Error', 'Gagal menolak!')
-          }
-        }
-      })
-  }
+    getJF() {
+        this.jfService.findByNip(this.nip).subscribe({
+            next: (jf: JF) => (this.jf = jf)
+        })
+    }
+
+    submit(pendingTask: PendingTask) {
+        const task = new Task()
+        task.id = pendingTask.id
+        task.taskAction = pendingTask.taskAction
+        task.remark = pendingTask.remark ?? null
+        console.log(task.taskAction)
+
+        this.apiService
+            .postData(
+                `/api/v1/${pendingTask.workflowName.replace('_task', '')}/task/submit`,
+                task
+            )
+            .subscribe({
+                next: () => {
+                    if (task.taskAction == 'approve') {
+                        this.alertService.showToast('Success', 'Berhasil menyetujui!')
+                    } else {
+                        this.alertService.showToast('Success', 'Berhasil menolak!')
+                    }
+                    this.getTaskDetail()
+                },
+                error: error => {
+                    console.error('Error fetching data', error)
+                    if (task.taskAction == 'approve') {
+                        this.alertService.showToast('Error', 'Gagal menyetujui!')
+                    } else {
+                        this.alertService.showToast('Error', 'Gagal menolak!')
+                    }
+                }
+            })
+    }
 }
