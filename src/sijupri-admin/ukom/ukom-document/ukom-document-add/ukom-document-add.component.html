@@ -39,7 +39,7 @@
           name="jenisUkom"
           formControlName="jenisUkom"
         >
-          <option selected value="" disabled selected style="display: none">
+          <option selected value="" disabled style="display: none">
             Pilih Jenis UKom
           </option>
           <option value="KENAIKAN_JENJANG">Kenaikan Jenjang</option>
@@ -60,6 +60,23 @@
       </div>
     </div>
 
+    <!-- <div class="row mb-3">
+      <label for="isMengulang" class="col-sm-2 col-form-label fw-bold">
+        Jenis Pendaftaran <span class="text-danger">*</span>
+      </label>
+      <div class="col-sm-10">
+        <select
+          id="isMengulang"
+          class="form-select"
+          name="isMengulang"
+          formControlName="isMengulang"
+        >
+          <option value="false">Baru</option>
+          <option value="true">Mengulang</option>
+        </select>
+      </div>
+    </div> -->
+
     <div class="row mb-3">
       <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold"
         >Jabatan</label
@@ -71,9 +88,7 @@
           name="jabatanCode"
           formControlName="jabatanCode"
         >
-          <option selected value="" style="display: none">
-            Untuk Jabatan ...
-          </option>
+          <option selected value="">Untuk Jabatan ...</option>
           <ng-container
             *ngIf="(jabatanList$ | async)?.length; else NextJenjangNotFound"
           >
@@ -102,9 +117,7 @@
           name="jenjangCode"
           formControlName="jenjangCode"
         >
-          <option selected value="" style="display: none">
-            Untuk Jenjang ...
-          </option>
+          <option selected value="">Untuk Jenjang ...</option>
           <ng-container
             *ngIf="(jenjangList$ | async)?.length; else JenjangNotFound"
           >
@@ -119,6 +132,39 @@
             <option disabled>Jabatan yang dituju tidak ditemukan</option>
           </ng-template>
         </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="isMengulang" class="col-sm-2 col-form-label fw-bold">
+        Dokumen Khusus Mengulang?
+      </label>
+      <div class="col-sm-10 d-flex align-items-center">
+        <input
+          type="checkbox"
+          class="btn-check"
+          id="isMengulang"
+          autocomplete="off"
+          formControlName="isMengulang"
+        />
+        <label
+          [ngClass]="
+            documentForm.get('isMengulang')?.value
+              ? 'btn btn-primary'
+              : 'btn btn-outline-primary'
+          "
+          for="isMengulang"
+        >
+          {{
+            documentForm.get('isMengulang')?.value
+              ? 'Mengulang'
+              : 'Bukan Dokumen Mengulang'
+          }}
+          <span
+            *ngIf="documentForm.get('isMengulang')?.value"
+            class="mdi mdi-check-bold"
+          ></span>
+        </label>
       </div>
     </div>
 
@@ -138,7 +184,7 @@
     <div class="row text-center">
       <div class="col-12">
         <ng-container *ngIf="submitLoading$ | async; else noLoading">
-          <button class="btn btn-primary float-end" disabled>
+          <button class="btn btn-success float-end" disabled>
             <div
               class="spinner-border"
               style="width: 19px; height: 19px"
@@ -152,7 +198,7 @@
         <ng-template #noLoading>
           <button
             type="submit"
-            class="btn btn-primary float-end"
+            class="btn btn-success float-end"
             [disabled]="documentForm.invalid || (submitLoading$ | async)"
           >
             Simpan

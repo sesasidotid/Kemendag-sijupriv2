@@ -58,6 +58,9 @@ export class UkomDocumentListComponent {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Jenjang', 'jenjangName').build()
             )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder().withDynamicValue('Khusus Mengulang?', (data: any) => data.isMengulang ? 'Ya' : 'Tidak').build()
+            )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((item: any) => {

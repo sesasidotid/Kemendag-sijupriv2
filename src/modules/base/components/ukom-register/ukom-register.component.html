@@ -209,13 +209,13 @@
               instansi === 'PEMERINTAH_KABUPATEN_KOTA'
             "
           >
-            <label for="provinsi" class="form-label"
+            <label for="provinsi_id" class="form-label"
               >Pilih Provinsi <span class="text-danger">*</span></label
             >
             <select
               class="form-select"
-              id="provinsi"
-              formControlName="provinsi"
+              id="provinsi_id"
+              formControlName="provinsi_id"
             >
               <option value="" disabled selected style="display: none">
                 Pilih Provinsi
@@ -227,19 +227,19 @@
           </div>
 
           <div class="mb-3" *ngIf="instansi === 'PEMERINTAH_KABUPATEN_KOTA'">
-            <label for="kabupatenkota" class="form-label"
+            <label for="kabupaten_kota_id" class="form-label"
               >Pilih Kabupaten/Kota <span class="text-danger">*</span></label
             >
             <select
               class="form-select"
-              id="kabupatenkota"
-              formControlName="kabupatenkota"
+              id="kabupaten_kota_id"
+              formControlName="kabupaten_kota_id"
             >
               <option value="" disabled selected style="display: none">
                 Pilih Kabupaten/Kota
               </option>
               <option *ngFor="let kabkot of kabKotaList" [value]="kabkot.id">
-                {{ kabkot.name }}
+                {{ kabkot.type + kabkot.name }}
               </option>
             </select>
           </div>
@@ -426,22 +426,62 @@
           </div>
         </div>
 
+        <div class="mb-3" *ngIf="(bidangJabatanList$ | async)?.length > 0">
+          <label for="bidang_jabatan_code" class="form-label"
+            >Bidang Jabatan Yang Dituju
+            <span class="text-danger">*</span></label
+          >
+          <select
+            class="form-select"
+            name="bidang_jabatan_code"
+            id="bidang_jabatan_code"
+            formControlName="bidang_jabatan_code"
+          >
+            <option selected value="" style="display: none">
+              Pilih Bidang Jabatan Yang Dituju
+            </option>
+
+            <option
+              *ngFor="let bidangJabatan of bidangJabatanList$ | async"
+              [value]="bidangJabatan.code"
+            >
+              {{ bidangJabatan.name }}
+            </option>
+          </select>
+          <div
+            *ngIf="
+              getErrorMessage(
+                'bidang_jabatan_code',
+                'Bidang Jabatan Yang Dituju'
+              )
+            "
+            class="text-danger"
+          >
+            {{
+              getErrorMessage(
+                'bidang_jabatan_code',
+                'Bidang Jabatan Yang Dituju'
+              )
+            }}
+          </div>
+        </div>
+
         <div class="mb-3">
-          <label for="nomorSuratUsulan" class="form-label"
+          <label for="no_surat_usulan" class="form-label"
             >Nomor Surat Usulan <span class="text-danger">*</span></label
           >
           <input
             type="text"
             class="form-control"
-            id="nomorSuratUsulan"
+            id="no_surat_usulan"
             required
-            formControlName="nomorSuratUsulan"
+            formControlName="no_surat_usulan"
           />
           <div
-            *ngIf="getErrorMessage('nomorSuratUsulan', 'Nomor Surat Usulan')"
+            *ngIf="getErrorMessage('no_surat_usulan', 'Nomor Surat Usulan')"
             class="text-danger"
           >
-            {{ getErrorMessage('nomorSuratUsulan', 'Nomor Surat Usulan') }}
+            {{ getErrorMessage('no_surat_usulan', 'Nomor Surat Usulan') }}
           </div>
         </div>
 
@@ -457,37 +497,42 @@
             formControlName="tglSuratUsulan"
           />
           <div
-            *ngIf="getErrorMessage('tglSuratUsulan', 'Nomor Surat Usulan')"
+            *ngIf="getErrorMessage('tglSuratUsulan', 'Tanggal Surat Usulan')"
             class="text-danger"
           >
-            {{ getErrorMessage('tglSuratUsulan', 'Usulan') }}
+            {{ getErrorMessage('tglSuratUsulan', 'Tanggal Surat Usulan') }}
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="pendidikanTerakhir" class="form-label">
+          <label for="pendidikan_terakhir_code" class="form-label">
             Pendidikan Terakhir<span class="text-danger">*</span>
           </label>
           <select
             class="form-select"
-            id="pendidikanTerakhir"
-            formControlName="pendidikanTerakhir"
+            id="pendidikan_terakhir_code"
+            formControlName="pendidikan_terakhir_code"
           >
             <option value="" disabled selected style="display: none">
               Pilih Pendidikan Terakhir
             </option>
-            <option value="SLTA">SLTA</option>
-            <option value="D3">D3</option>
-            <option value="S1/D4">S1/D4</option>
-            <option value="S2">S2</option>
-            <option value="S3">S3</option>
+            <option
+              *ngFor="let pendidikan of pendidikanList"
+              [value]="pendidikan.code"
+            >
+              {{ pendidikan.name }}
+            </option>
           </select>
 
           <div
-            *ngIf="getErrorMessage('pendidikanTerakhir', 'Pendidikan Terakhir')"
+            *ngIf="
+              getErrorMessage('pendidikan_terakhir_code', 'Pendidikan Terakhir')
+            "
             class="text-danger"
           >
-            {{ getErrorMessage('pendidikanTerakhir', 'Pendidikan Terakhir') }}
+            {{
+              getErrorMessage('pendidikan_terakhir_code', 'Pendidikan Terakhir')
+            }}
           </div>
         </div>
 
@@ -512,67 +557,69 @@
         </div>
 
         <div class="mb-3">
-          <label for="predikatKinerjaTahunPertama" class="form-label">
-            Predikat Kinerja Pegawai Satu Tahun Terkahir
+          <label for="predikat_kinerja_1_id" class="form-label">
+            Predikat Kinerja Pegawai Satu Tahun Terakhir
             <span class="text-danger">*</span>
           </label>
           <select
             class="form-select"
-            id="predikatKinerjaTahunPertama"
-            formControlName="predikatKinerjaTahunPertama"
+            id="predikat_kinerja_1_id"
+            formControlName="predikat_kinerja_1_id"
           >
             <option value="" disabled selected style="display: none">
               Pilih Predikat
             </option>
-            <option value="SMA">Sangat Baik</option>
-            <option value="D3">Baik</option>
-            <option value="S1/D4">Butuh Perbaikan</option>
-            <option value="S2">Kurang</option>
-            <option value="S3">Sangat Kurang</option>
+            <option
+              *ngFor="let predikat of predikatKinerjaList"
+              [value]="predikat.id"
+            >
+              {{ predikat.name }}
+            </option>
           </select>
 
           <div
             *ngIf="
               getErrorMessage(
-                'predikatKinerjaTahunPertama',
-                'Predikat Kinerja Pegawai Satu Tahun Terkahi'
+                'predikat_kinerja_1_id',
+                'Predikat Kinerja Pegawai Satu Tahun Terakhir'
               )
             "
             class="text-danger"
           >
             {{
               getErrorMessage(
-                'predikatKinerjaTahunPertama',
-                'Predikat Kinerja Pegawai Satu Tahun Terkahi'
+                'predikat_kinerja_1_id',
+                'Predikat Kinerja Pegawai Satu Tahun Terakhir'
               )
             }}
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="predikatKinerjaTahunKedua" class="form-label">
-            Predikat Kinerja Pegawai Dua Tahun Terkahir
+          <label for="predikat_kinerja_2_id" class="form-label">
+            Predikat Kinerja Pegawai Dua Tahun Terakhir
             <span class="text-danger">*</span>
           </label>
           <select
             class="form-select"
-            id="predikatKinerjaTahunKedua"
-            formControlName="predikatKinerjaTahunKedua"
+            id="predikat_kinerja_2_id"
+            formControlName="predikat_kinerja_2_id"
           >
             <option value="" disabled selected style="display: none">
               Pilih Predikat
             </option>
-            <option value="SMA">Sangat Baik</option>
-            <option value="D3">Baik</option>
-            <option value="S1/D4">Butuh Perbaikan</option>
-            <option value="S2">Kurang</option>
-            <option value="S3">Sangat Kurang</option>
+            <option
+              *ngFor="let predikat of predikatKinerjaList"
+              [value]="predikat.id"
+            >
+              {{ predikat.name }}
+            </option>
           </select>
 
           <div
             *ngIf="
               getErrorMessage(
-                'predikatKinerjaTahunPertama',
+                'predikat_kinerja_2_id',
                 'Predikat Kinerja Pegawai Dua Tahun Terakhir'
               )
             "
@@ -580,10 +627,34 @@
           >
             {{
               getErrorMessage(
-                'predikatKinerjaTahunPertama',
+                'predikat_kinerja_2_id',
                 'Predikat Kinerja Pegawai Dua Tahun Terakhir'
               )
             }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="isMengulang" class="form-label">
+            Status Pendaftaran <span class="text-danger">*</span>
+          </label>
+          <select
+            class="form-select"
+            id="isMengulang"
+            formControlName="isMengulang"
+          >
+            <option value="" disabled selected style="display: none">
+              Pilih Status Pendaftaran
+            </option>
+            <option value="false">Baru</option>
+            <option value="true">Mengulang</option>
+          </select>
+
+          <div
+            *ngIf="getErrorMessage('isMengulang', 'Status Pendaftaran')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('isMengulang', 'Status Pendaftaran') }}
           </div>
         </div>
 

@@ -7,18 +7,45 @@
           <div class="col-lg-6 mb-3">
             <label for="firstnameInput" class="form-label">
               Mengikuti Uji Kompetensi Jenis ?
+              <span class="text-danger">*</span>
             </label>
             <select
               class="form-select"
               (change)="onJenisUkomSwitch($event)"
               name="jabatanCode"
             >
-              <option [value]="">Pilih</option>
+              <option [value]="" selected disabled style="display: none">
+                Pilih Jenis UKom
+              </option>
               <option [value]="'KENAIKAN_JENJANG'">Kenaikan Jenjang</option>
               <option [value]="'PERPINDAHAN_JABATAN'">
                 Perpindahan Jabatan
               </option>
             </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="statusPendaftaran" class="form-label">
+            Status Pendaftaran <span class="text-danger">*</span>
+          </label>
+          <select
+            class="form-select"
+            id="statusPendaftaran"
+            formControlName="statusPendaftaran"
+          >
+            <option value="" disabled selected style="display: none">
+              Pilih Status Pendaftaran
+            </option>
+            <option value="baru">Baru</option>
+            <option value="mengulang">Mengulang</option>
+          </select>
+
+          <div
+            *ngIf="getErrorMessage('statusPendaftaran', 'Status Pendaftaran')"
+            class="text-danger"
+          >
+            {{ getErrorMessage('statusPendaftaran', 'Status Pendaftaran') }}
           </div>
         </div>
 
@@ -28,7 +55,7 @@
         >
           <div class="col-lg-6 mb-3">
             <label for="firstnameInput" class="form-label">
-              Jenjang Yang Di Tuju
+              Jenjang Yang Di Tuju <span class="text-danger">*</span>
             </label>
             <p>{{ nextJenjang.name }}</p>
           </div>
@@ -40,14 +67,16 @@
         >
           <div class="col-lg-6 mb-3">
             <label for="nextjabatan" class="form-label">
-              Jabatan Yang Di Tuju
+              Jabatan Yang Di Tuju <span class="text-danger">*</span>
             </label>
             <select
               class="form-select"
               name="nextJabatanCode"
               (change)="onNextJabatanSwitch($event)"
             >
-              <option [value]="undefined">Pilih</option>
+              <option [value]="" selected disabled style="display: none">
+                Pilih Jabatan Yang Di Tuju
+              </option>
               <option
                 *ngFor="let jabatan of jabatanList"
                 [value]="jabatan.code"

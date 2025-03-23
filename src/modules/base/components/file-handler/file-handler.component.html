@@ -83,6 +83,15 @@
             Preview
           </a>
         </div>
+        <!-- <p class="text-danger mt-1" *ngIf="obj.value.remark">
+          <strong>Remark:</strong> {{ obj.value.remark }}
+        </p> -->
+        <ng-container *ngIf="obj.value.remark">
+          <div class="alert alert-warning mt-1">
+            <strong>Catatan Revisi : </strong>
+            {{ obj.value.remark }}
+          </div>
+        </ng-container>
       </ng-template>
     </div>
   </ng-container>

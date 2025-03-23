@@ -9,7 +9,7 @@
 
 <app-modal
   *ngIf="isModalOpen$ | async"
-  [title]="'Perbaiki Dokumen Persyaratan Ukom'"
+  [title]="'Perbaiki Dokumen Persyaratan UKom'"
   (toggle)="toggleModal()"
   [enableFooter]="false"
 >
@@ -29,7 +29,9 @@
           [title]="
             'Anda belum bisa mendaftar UKom. Masih ada proses UKom yang berjalan'
           "
-          [description]="'Cek status proses UKom anda pada menu riwayat UKom.'"
+          [description]="
+            'Silahkan tunggu proses UKom yang sedang berjalan selesai terlebih dahulu.'
+          "
         ></app-empty-state>
 
         <app-empty-state

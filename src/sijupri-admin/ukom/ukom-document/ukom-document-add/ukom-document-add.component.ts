@@ -55,11 +55,16 @@ export class UkomDocumentAddComponent {
             dokumenPersyaratanName: new FormControl('', Validators.required),
             jenisUkom: new FormControl('', Validators.required),
             jabatanCode: new FormControl(''),
-            jenjangCode: new FormControl('')
+            jenjangCode: new FormControl(''),
+            isMengulang: new FormControl(false, Validators.required)
         })
 
         this.getJenjangList()
         this.getJabatanList()
+
+        this.documentForm.valueChanges.subscribe(value => {
+            console.log(value)
+        })
     }
 
     getJenjangList() {
@@ -93,8 +98,9 @@ export class UkomDocumentAddComponent {
 
                 this.submitLoading$.next(true);
 
-                const { dokumenPersyaratanName, jenisUkom, jabatanCode, jenjangCode } = this.documentForm.value;
-                Object.assign(this.documentData, { dokumenPersyaratanName, jenisUkom, jabatanCode, jenjangCode });
+                let { dokumenPersyaratanName, jenisUkom, jabatanCode, jenjangCode, isMengulang } = this.documentForm.value;
+
+                Object.assign(this.documentData, { dokumenPersyaratanName, jenisUkom, jabatanCode, jenjangCode, isMengulang });
 
                 console.log(this.documentData);
 
