@@ -78,13 +78,12 @@ export class StatusPendaftaranUkomComponent {
     ) { }
 
     ngOnInit() {
-        this.loadPredikatKinerja()
         this.activatedRoute.queryParams.subscribe(params => {
             const key = params['key']
 
             if (key) {
                 this.key = key
-                this.getPendingTask(key)
+                this.loadPredikatKinerja()
             }
         })
     }
@@ -98,6 +97,8 @@ export class StatusPendaftaranUkomComponent {
                 console.error('Failed to fetch predikat kinerja:', err);
             }
         });
+
+        this.getPendingTask(this.key)
     }
 
     getPendidikanList(pendidikanTerakhirCode: string) {
@@ -249,6 +250,7 @@ export class StatusPendaftaranUkomComponent {
     calculateAge(tanggalLahir: string | Date, tglSuratUsulan: string | Date): string {
         console.log('calculateAge', tanggalLahir, tglSuratUsulan);
 
+
         if (!tanggalLahir || !tglSuratUsulan) {
             return '-';
         }
@@ -256,7 +258,9 @@ export class StatusPendaftaranUkomComponent {
         const birthDate = new Date(tanggalLahir);
         const suratDate = new Date(tglSuratUsulan);
 
-        console.log(typeof birthDate, typeof suratDate);
+        if (suratDate < birthDate) {
+            return "Tanggal surat usulan tidak boleh sebelum tanggal lahir";
+        }
 
         if (isNaN(birthDate.getTime()) || isNaN(suratDate.getTime())) {
             return '-'; // Return '-' jika format tanggal salah

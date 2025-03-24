@@ -43,6 +43,22 @@ export class UkomTaskListComponent {
                     new PrimaryColumnBuilder('Proses', 'flowName').build()
                 )
                 .addPrimaryColumn(
+                    new PrimaryColumnBuilder('Jabatan', 'jabatanName').build()
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder()
+                        .withDynamicValue('Jenis UKom', (data: any) =>
+                            data.jenisUkom === 'KENAIKAN_JENJANG'
+                                ? 'Kenaikan Jenjang'
+                                : data.jenisUkom === 'PERPINDAHAN_JABATAN'
+                                    ? 'Perpindahan Jabatan'
+                                    : data.jenisUkom === 'PROMOSI'
+                                        ? 'Promosi'
+                                        : data.jenisUkom
+                        )
+                        .build()
+                )
+                .addPrimaryColumn(
                     new PrimaryColumnBuilder('Tanggal Terakhir Update', 'lastUpdated').build()
                 )
                 .addPrimaryColumn(
@@ -73,6 +89,23 @@ export class UkomTaskListComponent {
                     new PageFilterBuilder('like')
                         .setProperty('objectName')
                         .withField('Nama', 'text')
+                        .build()
+                )
+                .addFilter(
+                    new PageFilterBuilder('like')
+                        .setProperty('jabatanName')
+                        .withField('Jabatan', 'text')
+                        .build()
+                )
+                .addFilter(
+                    new PageFilterBuilder('equal')
+                        .setProperty('jenisUkom')
+                        .withField('Jenis UKom', 'select').withDefaultValue("")
+                        .setOptionList([
+                            { label: 'Promosi', value: 'PROMOSI' },
+                            { label: 'Kenaikan Jenjang', value: 'KENAIKAN_JENJANG' },
+                            { label: 'Perpindahan Jabatan', value: 'PERPINDAHAN_JABATAN' }
+                        ])
                         .build()
                 )
                 .build()

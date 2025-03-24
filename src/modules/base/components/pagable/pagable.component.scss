@@ -1,93 +1,94 @@
 .scroll-container .col-sm-4 {
-    flex: 0 0 auto;
+  flex: 0 0 auto;
 }
 
 th {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .scroll-container {
-    /* Custom scrollbar styles */
-    scrollbar-width: thin;
-    /* For Firefox */
-    scrollbar-color: #6f6f6f1d #ffffff;
-    /* For Firefox */
+  /* Custom scrollbar styles */
+  scrollbar-width: thin;
+  /* For Firefox */
+  scrollbar-color: #6f6f6f1d #ffffff;
+  /* For Firefox */
 }
 
 .scroll-container::-webkit-scrollbar {
-    width: 8px;
-    /* Width of the scrollbar */
+  width: 8px;
+  /* Width of the scrollbar */
 }
 
 .scroll-container::-webkit-scrollbar-track {
-    background: #f0f0f0;
-    /* Track color */
-    border-radius: 10px;
+  background: #f0f0f0;
+  /* Track color */
+  border-radius: 10px;
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
-    background: #888;
-    /* Thumb color */
-    border-radius: 10px;
+  background: #888;
+  /* Thumb color */
+  border-radius: 10px;
 }
 
 .scroll-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
-    /* Thumb color on hover */
+  background: #555;
+  /* Thumb color on hover */
 }
 
-.cursor-pointer{
-    cursor: pointer;
-  }
+.cursor-pointer {
+  cursor: pointer;
+}
 
 .filter-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: start;
-    gap: 16px;
-    align-items: end;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  gap: 16px;
+  align-items: end;
 
-    @media (max-width: 640px) {
-        flex-direction: column;
-        gap: 8px;
-        align-items: start;
-        width: 100%;
-    }
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 8px;
+    align-items: start;
+    width: 100%;
+  }
 }
 
 .btn-sm {
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
 }
 
 .btn-grey {
-    background-color: #b5b5b5;
-    color: #000;
-    border: 1px solid #b5b5b5;
+  background-color: #b5b5b5;
+  color: #000;
+  border: 1px solid #b5b5b5;
 }
 
 table {
-    width: 100%;               
-    border-collapse: collapse; 
-  }
-  
-  td, th {
-    padding: 10px;            
-    // text-align: center;       
-    vertical-align: middle;   
-  }
-  
-  tr {
-    height: auto;            
-  }
+  width: 100%;
+  border-collapse: collapse;
+}
 
-  .custom-checkbox {
-    width: 1.25rem; 
-    height: 1.25rem; 
-    border-radius: 4px; 
-  }
+td,
+th {
+  padding: 10px;
+  // text-align: center;
+  vertical-align: middle;
+}
 
-  .form-check-inline {
-    display: flex;
-    align-items: center;
-  }
+tr {
+  height: auto;
+}
+
+.custom-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 4px;
+}
+
+.form-check-inline {
+  display: flex;
+  align-items: center;
+}

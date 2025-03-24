@@ -143,6 +143,7 @@ export class UkomTaskFormComponent {
                     console.log('fetching dokumen persyaratan', jenisUkom, jabatanCode, JenjangCode, isMengulang)
                 }),
                 filter(([jenisUkom, jabatanCode, JenjangCode, isMengulang]) => !!jenisUkom && !!jabatanCode && !!JenjangCode && isMengulang !== null),
+                tap(() => { this.clearFilesName() })
                 // distinctUntilChanged(([prevJenis, prevJabatan, prevJenjang, prevIsMengulang], [currJenis, currJabatan, currJenjang, currIsMengulang]) =>
                 //     prevJenis === currJenis && prevJabatan === currJabatan && prevJenjang === currJenjang && prevIsMengulang === currIsMengulang
                 // )

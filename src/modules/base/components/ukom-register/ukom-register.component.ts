@@ -18,7 +18,7 @@ import { ApiService } from '../../services/api.service'
 import { HandlerService } from '../../services/handler.service'
 import { ConfirmationService } from '../../services/confirmation.service'
 import { CommonModule } from '@angular/common'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
 import { QRCodeModule } from 'angularx-qrcode'
 import { SafeUrl } from '@angular/platform-browser'
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
@@ -172,6 +172,9 @@ export class UkomRegisterComponent {
         ])
             .pipe(
                 filter(([jenis_ukom, jabatan, jenjang, isMengulang]) => !!jenis_ukom && !!jabatan && !!jenjang && isMengulang !== null),
+                tap(() => {
+                    this.clearFilesName()
+                })
                 // distinctUntilChanged(([prevJenis, prevJabatan, prevJenjang, prevIsMengulang], [currJenis, currJabatan, currJenjang, currIsMengulang]) =>
                 //     prevJenis === currJenis && prevJabatan === currJabatan && prevJenjang === currJenjang && prevIsMengulang === currIsMengulang
                 // )
