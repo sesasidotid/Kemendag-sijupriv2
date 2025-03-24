@@ -11,6 +11,8 @@ import {
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { BehaviorSubject } from 'rxjs'
+import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
+import { ApiService } from '../../../../modules/base/services/api.service'
 
 @Component({
     selector: 'app-ukom-task-list',
@@ -22,12 +24,14 @@ import { BehaviorSubject } from 'rxjs'
 export class UkomTaskListComponent {
     pagable: Pagable
     pagable$ = new BehaviorSubject<Pagable | null>(null)
+    jabatanList$ = new BehaviorSubject<{ label: string; value: string }[]>([]);
 
-    constructor(private router: Router, private tabService: TabService) { }
+    constructor(private router: Router, private tabService: TabService, private apiService: ApiService) { }
 
     ngOnInit() {
-        this.handlePagable()
+        this.getJabatanList()
         this.handleTabService()
+        this.handlePagable()
     }
 
     handlePagable() {
@@ -43,7 +47,7 @@ export class UkomTaskListComponent {
                     new PrimaryColumnBuilder('Proses', 'flowName').build()
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Jabatan', 'jabatanName').build()
+                    new PrimaryColumnBuilder('Jabatan Yang Dituju', 'nextJabatanName').build()
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
@@ -93,8 +97,34 @@ export class UkomTaskListComponent {
                 )
                 .addFilter(
                     new PageFilterBuilder('like')
-                        .setProperty('jabatanName')
-                        .withField('Jabatan', 'text')
+                        .setProperty('nextJabatanName')
+                        .withField('Jabatan Yang Dituju', 'select').withDefaultValue("")
+                        .setOptionList([
+                            {
+                                label: "Analis Perdagangan",
+                                value: "Analis Perdagangan"
+                            },
+                            {
+                                label: "Pengawas Perdagangan",
+                                value: "Pengawas Perdagangan"
+                            },
+                            {
+                                label: "Penguji Mutu Barang",
+                                value: "Penguji Mutu Barang"
+                            },
+                            {
+                                label: "Pengamat Tera",
+                                value: "Pengamat Tera"
+                            },
+                            {
+                                label: "Penera",
+                                value: "Penera"
+                            },
+                            {
+                                label: "Negosiator Perdagangan",
+                                value: "Negosiator Perdagangan"
+                            }
+                        ])
                         .build()
                 )
                 .addFilter(
@@ -111,6 +141,23 @@ export class UkomTaskListComponent {
                 .build()
         )
     }
+
+    getJabatanList() {
+        this.apiService.getData('/api/v1/jabatan').subscribe({
+            next: (response) => {
+                const mappedData = response.map((item: any) => ({
+                    label: item.name,
+                    value: item.code
+                }));
+                this.jabatanList$.next(mappedData);
+            }
+        });
+
+        this.jabatanList$.subscribe(value => {
+            console.log(value);
+        })
+    }
+
 
     handleTabService() {
         if (this.tabService.getTabsLength() > 0) {

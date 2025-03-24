@@ -8,6 +8,7 @@ import {
     PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+import { ApiService } from '../../../../modules/base/services/api.service'
 
 @Component({
     selector: 'app-ukom-list',
@@ -20,18 +21,27 @@ export class UkomListComponent {
     pagable: Pagable
 
     jenisUkomMap: Record<string, string> = {}
+    jabatanNameCache: { [key: string]: string } = {}; // Cache for Jabatan names
+    refresh: boolean = false
 
-    constructor(private router: Router) { }
+    constructor(private router: Router, private apiService: ApiService) { }
 
     ngOnInit() {
         this.handlerPagable()
+        this.getJabatanList();
     }
 
     handlerPagable() {
         this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
-            .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'email').build())
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Jabatan Yang Dituju', (data: any) => {
+                        return this.jabatanNameCache[data.nextJabatanCode] || '-';
+                    })
+                    .build()
+            )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jenis UKom', (data: any) =>
@@ -72,27 +82,63 @@ export class UkomListComponent {
                     .withField('Nama', 'text')
                     .build()
             )
-            // .addFilter(
-            //     new PageFilterBuilder('like')
-            //         .setProperty('fileType')
-            //         .withField('Status', 'select')
-            //         .setOptionList([
-            //             { label: 'Lolos', value: 'lolos' },
-            //             { label: 'Tidak Lolos', value: 'tidak_lolos' }
-            //         ])
-            //         .build()
-            // )
-            // .addFilter(
-            //     new PageFilterBuilder('like')
-            //         .setProperty('fileType')
-            //         .withField('Jenis Ukom', 'select')
-            //         .setOptionList([
-            //             { label: 'Promosi', value: 'PROMOSI' },
-            //             { label: 'Perpindahan Jabatan', value: 'PERPINDAHAN_JABATAN' },
-            //             { label: 'Kenaikan Jenjang', value: 'KENAIKAN_JENJANG' }
-            //         ])
-            //         .build()
-            // )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('nextJabatanCode')
+                    .withField('Jabatan Yang Dituju', 'select').withDefaultValue("")
+                    .setOptionList([
+                        {
+                            label: "Analis Perdagangan",
+                            value: "JB1"
+                        },
+                        {
+                            label: "Pengawas Perdagangan",
+                            value: "JB4"
+                        },
+                        {
+                            label: "Penguji Mutu Barang",
+                            value: "JB7"
+                        },
+                        {
+                            label: "Pengamat Tera",
+                            value: "JB10"
+                        },
+                        {
+                            label: "Penera",
+                            value: "JB11"
+                        },
+                        {
+                            label: "Negosiator Perdagangan",
+                            value: "JB5"
+                        }
+                    ])
+                    .build()
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('jenisUkom')
+                    .withField('Jenis UKom', 'select').withDefaultValue("")
+                    .setOptionList([
+                        { label: 'Promosi', value: 'PROMOSI' },
+                        { label: 'Kenaikan Jenjang', value: 'KENAIKAN_JENJANG' },
+                        { label: 'Perpindahan Jabatan', value: 'PERPINDAHAN_JABATAN' }
+                    ])
+                    .build()
+            )
             .build()
+    }
+
+    getJabatanList() {
+        this.apiService.getData('/api/v1/jabatan').subscribe({
+            next: (response) => {
+                response.forEach((item: any) => {
+                    this.jabatanNameCache[item.code] = item.name;
+                });
+
+                console.log('q', this.jabatanNameCache)
+
+                this.refresh = !this.refresh
+            }
+        });
     }
 }
