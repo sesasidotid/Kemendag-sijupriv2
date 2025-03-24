@@ -20,6 +20,19 @@
 
           <div class="col-lg-6">
             <div class="mb-3">
+              <label class="form-label">Status Pendaftar</label>
+              <p class="border-bottom">
+                {{
+                  pesertaUkom.participantStatus == 'jf'
+                    ? 'JF Perdagangan'
+                    : 'Non-JF Perdagangan'
+                }}
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="mb-3">
               <label class="form-label">Nama Lengkap</label>
               <p class="border-bottom">{{ pesertaUkom.name ?? '-' }}</p>
             </div>
@@ -46,10 +59,13 @@
             </div>
           </div>
 
+          <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
           <div class="col-lg-6">
             <div class="mb-3">
               <label class="form-label">Tanggal Lahir</label>
-              <p class="border-bottom">{{ pesertaUkom.tanggalLahir ?? '-' }}</p>
+              <p class="border-bottom">
+                {{ pesertaUkom.tanggalLahir ?? '-' }}
+              </p>
             </div>
           </div>
 
@@ -61,7 +77,7 @@
                   calculateAge(
                     pesertaUkom.tanggalLahir,
                     pesertaUkom.tglSuratUsulan
-                  ) + ' Tahun'
+                  )
                 }}
               </p>
             </div>
@@ -72,6 +88,7 @@
             <hr />
           </div>
 
+          <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
           <div class="col-lg-6">
             <div class="mb-3">
               <label class="form-label">Jenjang Pendidikan</label>
@@ -81,6 +98,7 @@
             </div>
           </div>
 
+          <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
           <div class="col-lg-6">
             <div class="mb-3">
               <label class="form-label">Program Studi/Jurusan</label>
@@ -88,6 +106,7 @@
             </div>
           </div>
 
+          <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
           <div class="col-lg-6">
             <div class="mb-3">
               <label class="form-label">Instansi</label>
@@ -110,7 +129,7 @@
             <div class="mb-3">
               <label class="form-label">Kabupaten/Kota</label>
               <p class="border-bottom">
-                {{ kabupatenName ?? '-' }}
+                {{ kabupatenName ? typeKabKota + ' ' + kabupatenName : '-' }}
               </p>
             </div>
           </div>
@@ -169,20 +188,20 @@
             </div>
           </div>
 
-          <div class="col-lg-6">
+          <!-- <div class="col-lg-6">
             <div class="mb-3">
               <label class="form-label">Pangkat Yang Dituju</label>
               <p class="border-bottom">
                 {{ pesertaUkom.nextPangkatName ?? '-' }}
               </p>
             </div>
-          </div>
+          </div> -->
 
-          <div class="col-lg-6" *ngIf="bidangJabatanName">
+          <div class="col-lg-6">
             <div class="mb-3">
-              <label class="form-label">Bidang Jabatan yang Dituju</label>
+              <label class="form-label">Bidang Jabatan Yang Dituju</label>
               <p class="border-bottom">
-                {{ bidangJabatanName }}
+                {{ bidangJabatanName ?? '-' }}
               </p>
             </div>
           </div>
@@ -193,33 +212,6 @@
           </div>
 
           <div class="col-lg-6">
-            <div class="mb-3">
-              <label class="form-label">Nomor Surat Usulan</label>
-              <p class="border-bottom">
-                {{ pesertaUkom.no_surat_usulan ?? '-' }}
-              </p>
-            </div>
-          </div>
-
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label class="form-label">Tanggal Surat Usulan</label>
-              <p class="border-bottom">
-                {{ pesertaUkom.tglSuratUsulan ?? '-' }}
-              </p>
-            </div>
-          </div>
-
-          <div class="col-lg-6">
-            <div class="mb-3">
-              <label class="form-label">Status Pendaftaran</label>
-              <p class="border-bottom">
-                {{ pesertaUkom.isMengulang ? 'Mengulang' : 'Baru' }}
-              </p>
-            </div>
-          </div>
-
-          <div class="col-lg-12">
             <div class="mb-3">
               <label class="form-label">Jenis UKom</label>
               <p class="border-bottom">
@@ -238,6 +230,36 @@
 
           <div class="col-lg-6">
             <div class="mb-3">
+              <label class="form-label">Status Pendaftaran</label>
+              <p class="border-bottom">
+                {{ pesertaUkom.isMengulang ? 'Mengulang' : 'Baru' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label class="form-label">Nomor Surat Usulan</label>
+              <p class="border-bottom">
+                {{ pesertaUkom.noSuratUsulan ?? '-' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
+          <div class="col-lg-6">
+            <div class="mb-3">
+              <label class="form-label">Tanggal Surat Usulan</label>
+              <p class="border-bottom">
+                {{ pesertaUkom.tglSuratUsulan ?? '-' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
+          <div class="col-lg-6">
+            <div class="mb-3">
               <label class="form-label"
                 >Predikat Kinerja Pegawai Satu Tahun Terakhir</label
               >
@@ -247,13 +269,14 @@
             </div>
           </div>
 
+          <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
           <div class="col-lg-6">
             <div class="mb-3">
               <label class="form-label"
                 >Predikat Kinerja Pegawai Satu Dua Terakhir</label
               >
               <p class="border-bottom">
-                {{ predikat1Name }}
+                {{ predikat2Name }}
               </p>
             </div>
           </div>

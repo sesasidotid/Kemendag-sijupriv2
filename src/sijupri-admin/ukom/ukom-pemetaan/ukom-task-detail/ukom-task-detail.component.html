@@ -30,6 +30,19 @@
 
             <div class="col-lg-6">
               <div class="mb-3">
+                <label class="form-label">Status Pendaftar</label>
+                <p class="border-bottom">
+                  {{
+                    ukomDetail.participantStatus == 'jf'
+                      ? 'JF Perdagangan'
+                      : 'Non-JF Perdagangan'
+                  }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
                 <label class="form-label">Nama Lengkap</label>
                 <p class="border-bottom">{{ ukomDetail.name ?? '-' }}</p>
               </div>
@@ -65,30 +78,87 @@
               </div>
             </div>
 
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label">Usia Menurut Surat Usulan</label>
+                <p class="border-bottom">
+                  {{
+                    calculateAge(
+                      ukomDetail.tanggalLahir,
+                      ukomDetail.tglSuratUsulan
+                    )
+                  }}
+                </p>
+              </div>
+            </div>
+
             <div class="col-lg-12">
               <h5 class="fw-bold mt-3">Pendidikan & Pekerjaan</h5>
               <hr />
             </div>
 
-            <div class="col-lg-12">
-              <label class="form-label">Unit Kerja</label>
-              <p class="border-bottom">
-                {{ ukomDetail.unitKerjaName || unitKerjaName || '-' }}
-              </p>
-            </div>
-
             <div class="col-lg-6">
               <div class="mb-3">
-                <label class="form-label">Jabatan</label>
-                <p class="border-bottom">{{ ukomDetail.jabatanName ?? '-' }}</p>
+                <label class="form-label">Jenjang Pendidikan</label>
+                <p class="border-bottom">
+                  {{ pendidikanName ?? '-' }}
+                </p>
               </div>
             </div>
 
             <div class="col-lg-6">
               <div class="mb-3">
-                <label class="form-label">Jabatan Yang Dituju</label>
+                <label class="form-label">Program Studi/Jurusan</label>
+                <p class="border-bottom">{{ ukomDetail.jurusan ?? '-' }}</p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label">Instansi</label>
                 <p class="border-bottom">
-                  {{ ukomDetail.nextJabatanName ?? '-' }}
+                  {{ transformInstansiName(ukomDetail.jenisInstansi) ?? '-' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6" *ngIf="provinsiName">
+              <div class="mb-3">
+                <label class="form-label">Provinsi</label>
+                <p class="border-bottom">
+                  {{ provinsiName ?? '-' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6" *ngIf="kabupatenName">
+              <div class="mb-3">
+                <label class="form-label">Kabupaten/Kota</label>
+                <p class="border-bottom">
+                  {{ kabupatenName ? typeKabKota + ' ' + kabupatenName : '-' }}
+                </p>
+              </div>
+            </div>
+
+            <div
+              [ngClass]="{
+                'col-lg-6': ukomDetail.jenisInstansi != 'PEMERINTAH_PROVINSI',
+                'col-lg-12': ukomDetail.jenisInstansi == 'PEMERINTAH_PROVINSI'
+              }"
+            >
+              <div class="mb-3">
+                <label class="form-label">Unit Kerja</label>
+                <p class="border-bottom">
+                  {{ ukomDetail.unitKerjaName ?? '-' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label">Jabatan</label>
+                <p class="border-bottom">
+                  {{ ukomDetail.jabatanName ?? '-' }}
                 </p>
               </div>
             </div>
@@ -96,22 +166,42 @@
             <div class="col-lg-6">
               <div class="mb-3">
                 <label class="form-label">Jenjang</label>
-                <p class="border-bottom">{{ ukomDetail.jenjangName ?? '-' }}</p>
+                <p class="border-bottom">
+                  {{ ukomDetail.jenjangName ?? '-' }}
+                </p>
               </div>
             </div>
 
             <div class="col-lg-6">
               <div class="mb-3">
                 <label class="form-label">Jenjang Yang Dituju</label>
-                <p>{{ ukomDetail.nextJenjangName ?? '-' }}</p>
+                <p class="border-bottom">
+                  {{ ukomDetail.nextJenjangName ?? '-' }}
+                </p>
               </div>
             </div>
 
             <div class="col-lg-6">
               <div class="mb-3">
                 <label class="form-label">Pangkat</label>
-                <p class="border-bottom">{{ ukomDetail.pangkatName ?? '-' }}</p>
+                <p class="border-bottom">
+                  {{ ukomDetail.pangkatName ?? '-' }}
+                </p>
               </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label">Bidang Jabatan Yang Dituju</label>
+                <p class="border-bottom">
+                  {{ bidangJabatanName ?? '-' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-12">
+              <h5 class="fw-bold mt-3">Informasi Pengajuan</h5>
+              <hr />
             </div>
 
             <div class="col-lg-6">
@@ -127,6 +217,55 @@
                       ? 'Promosi'
                       : ukomDetail.jenisUkom
                   }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label">Status Pendaftaran</label>
+                <p class="border-bottom">
+                  {{ ukomDetail.isMengulang ? 'Mengulang' : 'Baru' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label">Nomor Surat Usulan</label>
+                <p class="border-bottom">
+                  {{ ukomDetail.noSuratUsulan ?? '-' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label">Tanggal Surat Usulan</label>
+                <p class="border-bottom">
+                  {{ ukomDetail.tglSuratUsulan ?? '-' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label"
+                  >Predikat Kinerja Pegawai Satu Tahun Terakhir</label
+                >
+                <p class="border-bottom">
+                  {{ predikat1Name }}
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="mb-3">
+                <label class="form-label"
+                  >Predikat Kinerja Pegawai Satu Dua Terakhir</label
+                >
+                <p class="border-bottom">
+                  {{ predikat2Name }}
                 </p>
               </div>
             </div>

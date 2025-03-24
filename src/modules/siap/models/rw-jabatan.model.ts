@@ -2,7 +2,7 @@ import { Serializable } from "../../base/commons/serializable";
 
 export class RWJabatan extends Serializable {
     id: string = undefined;
-    tmt: Date = undefined;
+    tmt: Date | string = undefined;
     skJabatan: string = undefined;
     skJabatanUrl: string = undefined;
     fileSkJabatan: string = undefined;

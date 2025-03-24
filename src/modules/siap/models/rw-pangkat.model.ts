@@ -2,7 +2,7 @@ import { Serializable } from "../../base/commons/serializable";
 
 export class RWPangkat extends Serializable {
     id: string = undefined;
-    tmt: Date = undefined;
+    tmt: Date | string = undefined;
     skPangkat: string = undefined;
     skPangkatUrl: string = undefined;
     fileSkPangkat: string = undefined;

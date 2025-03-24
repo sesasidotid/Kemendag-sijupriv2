@@ -3,9 +3,9 @@ import { Serializable } from "../../base/commons/serializable";
 export class RWKompetensi extends Serializable {
     id: string = undefined;
     name: string = undefined;
-    tglSertifikat: Date = undefined;
-    dateStart: Date = undefined;
-    dateEnd: Date = undefined;
+    tglSertifikat: Date | string = undefined;
+    dateStart: Date | string = undefined;
+    dateEnd: Date | string = undefined;
     sertifikat: string = undefined;
     sertifikatUrl: string = undefined;
     fileSertifikat: string = undefined;

@@ -46,14 +46,12 @@
                 <h6 class="text-muted fs-14">
                   Email : {{ pendingTask.email }}
                 </h6>
-                <h6 class="text-muted fs-14">
-                  Unit Kerja : {{ pendingTask.unitKerjaName }}
-                </h6>
               </div>
             </div>
             <span class="badge rounded-pill text-bg-success">Aktif</span>
           </div>
           <hr class="text-white" />
+
           <div class="row text-white">
             <div class="col-md-4 mb-3">
               <label for="firstnameInput" class="form-label">
@@ -70,7 +68,57 @@
 
             <div class="col-md-4 mb-3">
               <label for="firstnameInput" class="form-label">
-                Jataban Yang Dituju
+                Status Pendaftaran
+              </label>
+              <p class="text-muted">
+                {{ pendingTask.isMengulang ? 'Mengulang' : 'Baru' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Usia Menurut Surat Usulan
+              </label>
+              <p class="text-muted">
+                {{
+                  calculateAge(
+                    pendingTask.tanggalLahir,
+                    pendingTask.tglSuratUsulan
+                  )
+                }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Jabatan Saat Ini
+              </label>
+              <p class="text-muted">
+                {{ pendingTask.jabatanName ? pendingTask.jabatanName : '-' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Jenjang Saat Ini
+              </label>
+              <p class="text-muted">
+                {{ pendingTask.jenjangName ? pendingTask.jenjangName : '-' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Pangkat Saat Ini</label
+              >
+              <p class="text-muted">
+                {{ pendingTask.pangkatName ? pendingTask.pangkatName : '-' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Jabatan Yang Dituju
               </label>
               <p class="text-muted">
                 {{
@@ -96,28 +144,83 @@
 
             <div class="col-md-4 mb-3">
               <label for="firstnameInput" class="form-label">
-                Jataban Saat Ini
+                Bidang Jabatan Yang Dituju
               </label>
               <p class="text-muted">
-                {{ pendingTask.jabatanName ? pendingTask.jabatanName : '-' }}
+                {{ bidangJabatanName ?? '-' }}
+              </p>
+            </div>
+          </div>
+
+          <hr class="text-white" />
+          <div class="row text-white">
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Jenjang Pendidikan
+              </label>
+              <p class="text-muted">
+                {{ pendidikanName ?? '-' }}
               </p>
             </div>
 
             <div class="col-md-4 mb-3">
               <label for="firstnameInput" class="form-label">
-                Jenjang Saat Ini
+                Program Studi/Jurusan
               </label>
               <p class="text-muted">
-                {{ pendingTask.jenjangName ? pendingTask.jenjangName : '-' }}
+                {{ pendingTask.jurusan ?? '-' }}
               </p>
             </div>
 
             <div class="col-md-4 mb-3">
-              <label for="firstnameInput" class="form-label"
-                >Pangkat Saat Ini</label
-              >
+              <label for="firstnameInput" class="form-label">Instansi </label>
               <p class="text-muted">
-                {{ pendingTask.pangkatName ? pendingTask.pangkatName : '-' }}
+                {{ transformInstansiName(pendingTask.jenisInstansi) ?? '-' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3" *ngIf="provinsiName">
+              <label for="firstnameInput" class="form-label"> Provinsi </label>
+              <p class="text-muted">
+                {{ provinsiName ?? '-' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3" *ngIf="kabupatenName">
+              <label for="firstnameInput" class="form-label">
+                Kabupaten/Kota
+              </label>
+              <p class="text-muted">
+                {{ kabupatenName ? typeKabKota + ' ' + kabupatenName : '-' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Unit Kerja
+              </label>
+              <p class="text-muted">
+                {{ pendingTask.unitKerjaName }}
+              </p>
+            </div>
+          </div>
+          <hr class="text-white" />
+          <div class="row text-white">
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Predikat Kinerja Pegawai Satu Tahun Terakhir
+              </label>
+              <p class="text-muted">
+                {{ predikat1Name }}
+              </p>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label">
+                Predikat Kinerja Pegawai Dua Tahun Terakhir
+              </label>
+              <p class="text-muted">
+                {{ predikat2Name }}
               </p>
             </div>
           </div>
@@ -209,7 +312,7 @@
                     <ng-container *ngIf="history.taskStatus === 'COMPLETED'">
                       <h5 class="">
                         {{ history.flowName }}
-                        <span class="badge rounded-pill text-bg-success ms-2">
+                        <span class="badge rounded-pill text-bg-success">
                           {{
                             history.flowId === 'ukom_flow_1'
                               ? 'Sudah Diverifikasi'
@@ -226,7 +329,7 @@
                     <ng-container *ngIf="history.taskStatus === 'PENDING'">
                       <h5 class="">
                         {{ history.flowName }}
-                        <span class="badge rounded-pill text-bg-info ms-2"
+                        <span class="badge rounded-pill text-bg-info"
                           >{{
                             history.flowId === 'ukom_flow_2'
                               ? 'Dokumen Perlu Diperbaiki'
@@ -242,7 +345,7 @@
                     <ng-container *ngIf="history.taskStatus === 'REJECTED'">
                       <h5 class="">
                         {{ history.flowName }}
-                        <span class="badge rounded-pill text-bg-danger ms-2"
+                        <span class="badge rounded-pill text-bg-danger"
                           >Ditolak</span
                         >
                       </h5>
@@ -315,19 +418,15 @@
                 <h4 class="text-white fs-18">{{ finishTask.name }}</h4>
                 <h6 class="text-muted fs-14">NIP : {{ finishTask.nip }}</h6>
                 <h6 class="text-muted fs-14">Email : {{ finishTask.email }}</h6>
-                <h6 class="text-muted fs-14">
-                  Unit Kerja : {{ finishTask.unitKerjaName }}
-                </h6>
               </div>
             </div>
             <span class="badge rounded-pill text-bg-success">Aktif</span>
           </div>
           <hr class="text-white" />
+
           <div class="row text-white">
             <div class="col-md-4 mb-3">
-              <label for="firstnameInput" class="form-label">
-                Jenis UKom
-              </label>
+              <label for="firstnameInput" class="form-label">Jenis UKom</label>
               <p class="text-muted">
                 {{
                   finishTask.jenisUkom
@@ -338,40 +437,41 @@
             </div>
 
             <div class="col-md-4 mb-3">
-              <label for="firstnameInput" class="form-label">
-                Jataban Yang Dituju
-              </label>
+              <label for="firstnameInput" class="form-label"
+                >Status Pendaftaran</label
+              >
+              <p class="text-muted">
+                {{ finishTask.isMengulang ? 'Mengulang' : 'Baru' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Usia Menurut Surat Usulan</label
+              >
               <p class="text-muted">
                 {{
-                  finishTask.nextJabatanName ? finishTask.nextJabatanName : '-'
+                  calculateAge(
+                    finishTask.tanggalLahir,
+                    finishTask.tglSuratUsulan
+                  )
                 }}
               </p>
             </div>
 
             <div class="col-md-4 mb-3">
-              <label for="firstnameInput" class="form-label">
-                Jenjang Yang Dituju
-              </label>
-              <p class="text-muted">
-                {{
-                  finishTask.nextJenjangName ? finishTask.nextJenjangName : '-'
-                }}
-              </p>
-            </div>
-
-            <div class="col-md-4 mb-3">
-              <label for="firstnameInput" class="form-label">
-                Jataban Saat Ini
-              </label>
+              <label for="firstnameInput" class="form-label"
+                >Jabatan Saat Ini</label
+              >
               <p class="text-muted">
                 {{ finishTask.jabatanName ? finishTask.jabatanName : '-' }}
               </p>
             </div>
 
             <div class="col-md-4 mb-3">
-              <label for="firstnameInput" class="form-label">
-                Jenjang Saat Ini
-              </label>
+              <label for="firstnameInput" class="form-label"
+                >Jenjang Saat Ini</label
+              >
               <p class="text-muted">
                 {{ finishTask.jenjangName ? finishTask.jenjangName : '-' }}
               </p>
@@ -384,6 +484,94 @@
               <p class="text-muted">
                 {{ finishTask.pangkatName ? finishTask.pangkatName : '-' }}
               </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Jabatan Yang Dituju</label
+              >
+              <p class="text-muted">
+                {{
+                  finishTask.nextJabatanName ? finishTask.nextJabatanName : '-'
+                }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Jenjang Yang Dituju</label
+              >
+              <p class="text-muted">
+                {{
+                  finishTask.nextJenjangName ? finishTask.nextJenjangName : '-'
+                }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Bidang Jabatan Yang Dituju</label
+              >
+              <p class="text-muted">{{ bidangJabatanName ?? '-' }}</p>
+            </div>
+          </div>
+
+          <hr class="text-white" />
+          <div class="row text-white">
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Jenjang Pendidikan</label
+              >
+              <p class="text-muted">{{ pendidikanName ?? '-' }}</p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Program Studi/Jurusan</label
+              >
+              <p class="text-muted">{{ finishTask.jurusan ?? '-' }}</p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label">Instansi</label>
+              <p class="text-muted">
+                {{ transformInstansiName(finishTask.jenisInstansi) ?? '-' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3" *ngIf="provinsiName">
+              <label for="firstnameInput" class="form-label">Provinsi</label>
+              <p class="text-muted">{{ provinsiName ?? '-' }}</p>
+            </div>
+
+            <div class="col-md-4 mb-3" *ngIf="kabupatenName">
+              <label for="firstnameInput" class="form-label"
+                >Kabupaten/Kota</label
+              >
+              <p class="text-muted">
+                {{ kabupatenName ? typeKabKota + ' ' + kabupatenName : '-' }}
+              </p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="firstnameInput" class="form-label">Unit Kerja</label>
+              <p class="text-muted">{{ finishTask.unitKerjaName }}</p>
+            </div>
+          </div>
+          <hr class="text-white" />
+          <div class="row text-white">
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Predikat Kinerja Pegawai Satu Tahun Terakhir</label
+              >
+              <p class="text-muted">{{ predikat1Name }}</p>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="firstnameInput" class="form-label"
+                >Predikat Kinerja Pegawai Dua Tahun Terakhir</label
+              >
+              <p class="text-muted">{{ predikat2Name }}</p>
             </div>
           </div>
         </div>

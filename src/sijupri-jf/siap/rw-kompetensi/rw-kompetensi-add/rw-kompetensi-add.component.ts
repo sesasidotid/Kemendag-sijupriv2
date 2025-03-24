@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
+    FormControl,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators
 } from '@angular/forms'
 import { RWKompetensi } from '../../../../modules/siap/models/rw-kompetensi.model'
 import { AlertService } from '../../../../modules/base/services/alert.service'
@@ -20,128 +20,128 @@ import { fileValidator } from '../../../../modules/base/validators/file-format.v
 import { BehaviorSubject } from 'rxjs'
 
 @Component({
-  selector: 'app-rw-kompetensi-add',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    FileHandlerComponent,
-    ReactiveFormsModule
-  ],
-  templateUrl: './rw-kompetensi-add.component.html',
-  styleUrl: './rw-kompetensi-add.component.scss'
+    selector: 'app-rw-kompetensi-add',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        FileHandlerComponent,
+        ReactiveFormsModule
+    ],
+    templateUrl: './rw-kompetensi-add.component.html',
+    styleUrl: './rw-kompetensi-add.component.scss'
 })
 export class RwKompetensiAddComponent {
-  rwKompetensi: RWKompetensi = new RWKompetensi()
-  kategoriPengembanganList: KategoriPengembangan[] = []
+    rwKompetensi: RWKompetensi = new RWKompetensi()
+    kategoriPengembanganList: KategoriPengembangan[] = []
 
-  rwKompetensiForm!: FormGroup
+    rwKompetensiForm!: FormGroup
 
-  kategoriPengembanganLoading$ = new BehaviorSubject<boolean>(false)
-  submitLoading$ = new BehaviorSubject<boolean>(false)
+    kategoriPengembanganLoading$ = new BehaviorSubject<boolean>(false)
+    submitLoading$ = new BehaviorSubject<boolean>(false)
 
-  inputs: FIleHandler
+    inputs: FIleHandler
 
-  constructor (
-    private apiService: ApiService,
-    private confirmationService: ConfirmationService,
-    private alertService: AlertService,
-    private router: Router
-  ) {
-    this.rwKompetensiForm = new FormGroup({
-      name: new FormControl('', [Validators.required]),
-      kategoriPengembanganId: new FormControl('', [Validators.required]),
-      dateStart: new FormControl('', [Validators.required]),
-      dateEnd: new FormControl('', [Validators.required]),
-      tglSertifikat: new FormControl('', [Validators.required]),
-      fileSertifikat: new FormControl('', [
-        Validators.required,
-        fileValidator(['application/pdf'], 2)
-      ])
-    })
+    constructor(
+        private apiService: ApiService,
+        private confirmationService: ConfirmationService,
+        private alertService: AlertService,
+        private router: Router,
+    ) {
+        this.rwKompetensiForm = new FormGroup({
+            name: new FormControl('', [Validators.required]),
+            kategoriPengembanganId: new FormControl('', [Validators.required]),
+            dateStart: new FormControl('', [Validators.required]),
+            dateEnd: new FormControl('', [Validators.required]),
+            tglSertifikat: new FormControl('', [Validators.required]),
+            fileSertifikat: new FormControl('', [
+                Validators.required,
+                fileValidator(['application/pdf'], 2)
+            ])
+        })
 
-    this.getKategoriPengembanganList()
-    this.fileLoadHandler()
-  }
-
-  fileLoadHandler () {
-    this.inputs = {
-      files: {
-        docEvaluas: {
-          label: 'Upload Dokumen Sertifikat',
-          fileName: this.rwKompetensi.sertifikat,
-          source: this.rwKompetensi.sertifikatUrl,
-          required: true
-        }
-      },
-      maxSize: 2 * 1024 * 1024,
-      allowedTypes: [{ type: 'application/pdf' }],
-      listen: (key: string, source: string, base64Data: string) => {
-        this.rwKompetensiForm.patchValue({ fileSertifikat: base64Data })
-      }
+        this.getKategoriPengembanganList()
+        this.fileLoadHandler()
     }
-  }
 
-  getKategoriPengembanganList () {
-    this.kategoriPengembanganLoading$.next(true)
-    this.apiService.getData(`/api/v1/kategori_pengembangan`).subscribe({
-      next: response => {
-        this.kategoriPengembanganList = response.map(
-          (kategoriPengembangan: { [key: string]: any }) =>
-            new KategoriPengembangan(kategoriPengembangan)
-        )
-        this.kategoriPengembanganLoading$.next(false)
-      },
-      error: error => {
-        console.log('error', error)
-        this.alertService.showToast(
-          'Error',
-          'Gagal mendapatkan data kategori pengembangan!'
-        )
-        this.kategoriPengembanganLoading$.next(false)
-      }
-    })
-  }
+    fileLoadHandler() {
+        this.inputs = {
+            files: {
+                docEvaluas: {
+                    label: 'Upload Dokumen Sertifikat',
+                    fileName: this.rwKompetensi.sertifikat,
+                    source: this.rwKompetensi.sertifikatUrl,
+                    required: true
+                }
+            },
+            maxSize: 2 * 1024 * 1024,
+            allowedTypes: [{ type: 'application/pdf' }],
+            listen: (key: string, source: string, base64Data: string) => {
+                this.rwKompetensiForm.patchValue({ fileSertifikat: base64Data })
+            }
+        }
+    }
 
-  submit () {
-    if (this.rwKompetensiForm.valid) {
-      this.rwKompetensi.name = this.rwKompetensiForm.value.name
-      this.rwKompetensi.kategoriPengembanganId =
-        this.rwKompetensiForm.value.kategoriPengembanganId
-      this.rwKompetensi.dateStart = this.rwKompetensiForm.value.dateStart
-      this.rwKompetensi.dateEnd = this.rwKompetensiForm.value.dateEnd
-      this.rwKompetensi.tglSertifikat =
-        this.rwKompetensiForm.value.tglSertifikat
-      this.rwKompetensi.fileSertifikat =
-        this.rwKompetensiForm.value.fileSertifikat
-
-      this.confirmationService.open(false).subscribe({
-        next: result => {
-          if (!result.confirmed) return
-          this.submitLoading$.next(true)
-
-          this.apiService
-            .postData(`/api/v1/rw_kompetensi/task`, this.rwKompetensi)
-            .subscribe({
-              next: () => {
-                this.alertService.showToast(
-                  'Success',
-                  'Berhasil menambahkan riwayat kompetensi.'
+    getKategoriPengembanganList() {
+        this.kategoriPengembanganLoading$.next(true)
+        this.apiService.getData(`/api/v1/kategori_pengembangan`).subscribe({
+            next: response => {
+                this.kategoriPengembanganList = response.map(
+                    (kategoriPengembangan: { [key: string]: any }) =>
+                        new KategoriPengembangan(kategoriPengembangan)
                 )
-                this.submitLoading$.next(false)
-                this.router.navigate(['/profile/rw-kompetensi/pending'])
-              },
-              error: error => {
+                this.kategoriPengembanganLoading$.next(false)
+            },
+            error: error => {
                 console.log('error', error)
                 this.alertService.showToast(
-                  'Error',
-                  'Gagal menambahkan riwayat kompetensi!'
+                    'Error',
+                    'Gagal mendapatkan data kategori pengembangan!'
                 )
-                this.submitLoading$.next(false)
-              }
+                this.kategoriPengembanganLoading$.next(false)
+            }
+        })
+    }
+
+    submit() {
+        if (this.rwKompetensiForm.valid) {
+            this.rwKompetensi.name = this.rwKompetensiForm.value.name
+            this.rwKompetensi.kategoriPengembanganId =
+                this.rwKompetensiForm.value.kategoriPengembanganId
+            this.rwKompetensi.dateStart = this.rwKompetensiForm.value.dateStart
+            this.rwKompetensi.dateEnd = this.rwKompetensiForm.value.dateEnd
+            this.rwKompetensi.tglSertifikat =
+                this.rwKompetensiForm.value.tglSertifikat
+            this.rwKompetensi.fileSertifikat =
+                this.rwKompetensiForm.value.fileSertifikat
+
+            this.confirmationService.open(false).subscribe({
+                next: result => {
+                    if (!result.confirmed) return
+                    this.submitLoading$.next(true)
+
+                    this.apiService
+                        .postData(`/api/v1/rw_kompetensi/task`, this.rwKompetensi)
+                        .subscribe({
+                            next: () => {
+                                this.alertService.showToast(
+                                    'Success',
+                                    'Berhasil menambahkan riwayat kompetensi.'
+                                )
+                                this.submitLoading$.next(false)
+                                this.router.navigate(['/profile/rw-kompetensi/pending'])
+                            },
+                            error: error => {
+                                console.log('error', error)
+                                this.alertService.showToast(
+                                    'Error',
+                                    'Gagal menambahkan riwayat kompetensi!'
+                                )
+                                this.submitLoading$.next(false)
+                            }
+                        })
+                }
             })
         }
-      })
     }
-  }
 }

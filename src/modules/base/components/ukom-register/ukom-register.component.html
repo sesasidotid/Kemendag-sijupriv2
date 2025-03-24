@@ -14,8 +14,10 @@
       <div class="card parent bg-white shadow-lg rounded-2xl p-4 text-center">
         <h1>{{ stringCode }}</h1>
         <p class="text-success">
-          Silahkan simpan kode di atas untuk memantau status pendaftaran UKom
-          anda atau download QR code di bawah
+          Bagi calon peserta uji kompetensi non JF Perdagangan dapat melihat
+          detail dan memperbaiki dokumen pendaftaran uji kompetensi dengan
+          melakukan scan QR yang telah didownload atau dengan menginputkan kode
+          pendaftaran dibawah ini
         </p>
 
         <div *ngIf="imageUrl">
@@ -28,7 +30,7 @@
               alt="Sample Image"
             />
             <div class="mt-3">
-              <button (click)="downloadImage()" class="btn btn-primary">
+              <button (click)="downloadImage(nonJFNIP)" class="btn btn-primary">
                 Download
               </button>
             </div>
@@ -239,7 +241,11 @@
                 Pilih Kabupaten/Kota
               </option>
               <option *ngFor="let kabkot of kabKotaList" [value]="kabkot.id">
-                {{ kabkot.type + kabkot.name }}
+                {{
+                  kabkot.type +
+                    (kabkot.name.startsWith(' ') ? '' : ' ') +
+                    kabkot.name
+                }}
               </option>
             </select>
           </div>

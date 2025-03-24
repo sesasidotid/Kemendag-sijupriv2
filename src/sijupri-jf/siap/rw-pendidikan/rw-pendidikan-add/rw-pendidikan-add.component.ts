@@ -4,11 +4,11 @@ import { Pendidikan } from '../../../../modules/maintenance/models/pendidikan.mo
 import { Router } from '@angular/router'
 import { CommonModule } from '@angular/common'
 import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
+    FormControl,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators
 } from '@angular/forms'
 import { AlertService } from '../../../../modules/base/services/alert.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
@@ -20,120 +20,120 @@ import { fileValidator } from '../../../../modules/base/validators/file-format.v
 import { BehaviorSubject } from 'rxjs'
 
 @Component({
-  selector: 'app-rw-pendidikan-add',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    FileHandlerComponent,
-    ReactiveFormsModule
-  ],
-  templateUrl: './rw-pendidikan-add.component.html',
-  styleUrl: './rw-pendidikan-add.component.scss'
+    selector: 'app-rw-pendidikan-add',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        FileHandlerComponent,
+        ReactiveFormsModule
+    ],
+    templateUrl: './rw-pendidikan-add.component.html',
+    styleUrl: './rw-pendidikan-add.component.scss'
 })
 export class RwPendidikanAddComponent {
-  rwPendidikan: RWPendidikan = new RWPendidikan()
-  pendidikanList: Pendidikan[]
-  rwPendidikanForm!: FormGroup
+    rwPendidikan: RWPendidikan = new RWPendidikan()
+    pendidikanList: Pendidikan[]
+    rwPendidikanForm!: FormGroup
 
-  submitLoading$ = new BehaviorSubject<boolean>(false)
-  pendidikanListLoading$ = new BehaviorSubject<boolean>(false)
+    submitLoading$ = new BehaviorSubject<boolean>(false)
+    pendidikanListLoading$ = new BehaviorSubject<boolean>(false)
 
-  constructor (
-    private apiService: ApiService,
-    private confirmationService: ConfirmationService,
-    private alertService: AlertService,
-    private router: Router
-  ) {
-    this.rwPendidikanForm = new FormGroup({
-      institusiPendidikan: new FormControl('', [Validators.required]),
-      pendidikanCode: new FormControl('', [Validators.required]),
-      jurusan: new FormControl('', [Validators.required]),
-      tanggalIjazah: new FormControl('', [Validators.required]),
-      fileIjazah: new FormControl('', [
-        Validators.required,
-        fileValidator(['application/pdf'], 2)
-      ])
-    })
-    this.getPendidikanList()
-  }
-
-  inputs: FIleHandler = {
-    files: {
-      ijazah: {
-        label: 'Upload Dokumen Ijazah',
-        source: this.rwPendidikan.ijazahUrl,
-        required: true
-      }
-    },
-    maxSize: 2 * 1024 * 1024,
-    allowedTypes: [{ type: 'application/pdf' }],
-    listen: (key: string, source: string, base64Data: string) => {
-      this.rwPendidikanForm.patchValue({
-        fileIjazah: base64Data
-      })
+    constructor(
+        private apiService: ApiService,
+        private confirmationService: ConfirmationService,
+        private alertService: AlertService,
+        private router: Router,
+    ) {
+        this.rwPendidikanForm = new FormGroup({
+            institusiPendidikan: new FormControl('', [Validators.required]),
+            pendidikanCode: new FormControl('', [Validators.required]),
+            jurusan: new FormControl('', [Validators.required]),
+            tanggalIjazah: new FormControl('', [Validators.required]),
+            fileIjazah: new FormControl('', [
+                Validators.required,
+                fileValidator(['application/pdf'], 2)
+            ])
+        })
+        this.getPendidikanList()
     }
-  }
 
-  getPendidikanList () {
-    this.pendidikanListLoading$.next(true)
-    this.apiService.getData(`/api/v1/pendidikan`).subscribe({
-      next: response => {
-        this.pendidikanList = response.map(
-          (pendidikan: { [key: string]: any }) => new Pendidikan(pendidikan)
-        )
-        this.pendidikanListLoading$.next(false)
-      },
-      error: error => {
-        console.log('error', error)
-        this.alertService.showToast(
-          'Error',
-          'Gagal mendapatkan data pendidikan!'
-        )
-        this.pendidikanListLoading$.next(false)
-      }
-    })
-  }
-
-  submit () {
-    if (this.rwPendidikanForm.valid) {
-      this.rwPendidikan.pendidikanCode =
-        this.rwPendidikanForm.value.pendidikanCode
-      this.rwPendidikan.institusiPendidikan =
-        this.rwPendidikanForm.value.institusiPendidikan
-      this.rwPendidikan.jurusan = this.rwPendidikanForm.value.jurusan
-      this.rwPendidikan.tanggalIjazah =
-        this.rwPendidikanForm.value.tanggalIjazah
-      this.rwPendidikan.fileIjazah = this.rwPendidikanForm.value.fileIjazah
-
-      this.confirmationService.open(false).subscribe({
-        next: result => {
-          if (!result.confirmed) return
-          this.submitLoading$.next(true)
-
-          this.apiService
-            .postData(`/api/v1/rw_pendidikan/task`, this.rwPendidikan)
-            .subscribe({
-              next: () => {
-                this.alertService.showToast(
-                  'Success',
-                  'Berhasil menambahkan riwayat pendidikan.'
-                )
-                this.submitLoading$.next(false)
-                setTimeout(() => {
-                  this.router.navigate(['/profile/rw-pendidikan/pending'])
-                }, 1000) // Adjust the delay as needed
-              },
-              error: error => {
-                console.log('error', error)
-                this.alertService.showToast(
-                  'Error',
-                  'Gagal menambahkan riwayat pendidikan!'
-                )
-              }
+    inputs: FIleHandler = {
+        files: {
+            ijazah: {
+                label: 'Upload Dokumen Ijazah',
+                source: this.rwPendidikan.ijazahUrl,
+                required: true
+            }
+        },
+        maxSize: 2 * 1024 * 1024,
+        allowedTypes: [{ type: 'application/pdf' }],
+        listen: (key: string, source: string, base64Data: string) => {
+            this.rwPendidikanForm.patchValue({
+                fileIjazah: base64Data
             })
         }
-      })
     }
-  }
+
+    getPendidikanList() {
+        this.pendidikanListLoading$.next(true)
+        this.apiService.getData(`/api/v1/pendidikan`).subscribe({
+            next: response => {
+                this.pendidikanList = response.map(
+                    (pendidikan: { [key: string]: any }) => new Pendidikan(pendidikan)
+                )
+                this.pendidikanListLoading$.next(false)
+            },
+            error: error => {
+                console.log('error', error)
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data pendidikan!'
+                )
+                this.pendidikanListLoading$.next(false)
+            }
+        })
+    }
+
+    submit() {
+        if (this.rwPendidikanForm.valid) {
+            this.rwPendidikan.pendidikanCode =
+                this.rwPendidikanForm.value.pendidikanCode
+            this.rwPendidikan.institusiPendidikan =
+                this.rwPendidikanForm.value.institusiPendidikan
+            this.rwPendidikan.jurusan = this.rwPendidikanForm.value.jurusan
+            this.rwPendidikan.tanggalIjazah =
+                this.rwPendidikanForm.value.tanggalIjazah
+            this.rwPendidikan.fileIjazah = this.rwPendidikanForm.value.fileIjazah
+
+            this.confirmationService.open(false).subscribe({
+                next: result => {
+                    if (!result.confirmed) return
+                    this.submitLoading$.next(true)
+
+                    this.apiService
+                        .postData(`/api/v1/rw_pendidikan/task`, this.rwPendidikan)
+                        .subscribe({
+                            next: () => {
+                                this.alertService.showToast(
+                                    'Success',
+                                    'Berhasil menambahkan riwayat pendidikan.'
+                                )
+                                this.submitLoading$.next(false)
+                                setTimeout(() => {
+                                    this.router.navigate(['/profile/rw-pendidikan/pending'])
+                                }, 1000) // Adjust the delay as needed
+                            },
+                            error: error => {
+                                console.log('error', error)
+                                this.alertService.showToast(
+                                    'Error',
+                                    'Gagal menambahkan riwayat pendidikan!'
+                                )
+                            }
+                        })
+                }
+            })
+        }
+    }
 }

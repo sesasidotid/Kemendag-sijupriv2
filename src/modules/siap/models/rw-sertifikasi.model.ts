@@ -3,10 +3,10 @@ import { Serializable } from "../../base/commons/serializable";
 export class RWSertifikasi extends Serializable {
     id: string = undefined;
     noSk: string = undefined;
-    tglSk: Date = undefined;
+    tglSk: Date | string = undefined;
     wilayahKerja: string = undefined;
-    dateStart: Date = undefined;
-    dateEnd: Date = undefined;
+    dateStart: Date | string = undefined;
+    dateEnd: Date | string = undefined;
     uuKawalan: string = undefined;
     skPengangkatan: string = undefined;
     skPengangkatanUrl: string = undefined;

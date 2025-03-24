@@ -4,7 +4,7 @@ export class RWPendidikan extends Serializable {
     id: string = undefined;
     institusiPendidikan: string = undefined;
     jurusan: string = undefined;
-    tanggalIjazah: Date = undefined;
+    tanggalIjazah: Date | string = undefined;
     ijazah: string = undefined;
     ijazahUrl: string = undefined;
     fileIjazah: string = undefined;

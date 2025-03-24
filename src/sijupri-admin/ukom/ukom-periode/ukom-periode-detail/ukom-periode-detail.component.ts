@@ -30,7 +30,7 @@ export class UkomPeriodeDetailComponent {
     private apiService: ApiService,
     private allertService: AlertService,
     private confirmationService: ConfirmationService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
   ) {
     this.activatedRoute.paramMap.subscribe(params => {
       this.id = params.get('id')

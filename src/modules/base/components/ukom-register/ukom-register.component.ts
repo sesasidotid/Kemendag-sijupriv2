@@ -33,6 +33,7 @@ import { filter, } from 'rxjs/operators';
 import { PredikatKinerja } from '../../../maintenance/models/predikat-kinerja.model'
 import { Pendidikan } from '../../../maintenance/models/pendidikan.model'
 import { BidangJabatan } from '../../../maintenance/models/bidang-jabatan.model'
+
 @Component({
     selector: 'app-ukom-register',
     standalone: true,
@@ -99,12 +100,13 @@ export class UkomRegisterComponent {
 
     hadItemsLoading$ = new BehaviorSubject<boolean>(false)
     imageUrl: string = ''
+    nonJFNIP: string
 
     constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private router: Router
+        private router: Router,
     ) {
         setTimeout(() => { }, 0)
     }
@@ -170,9 +172,9 @@ export class UkomRegisterComponent {
         ])
             .pipe(
                 filter(([jenis_ukom, jabatan, jenjang, isMengulang]) => !!jenis_ukom && !!jabatan && !!jenjang && isMengulang !== null),
-                distinctUntilChanged(([prevJenis, prevJabatan, prevJenjang, prevIsMengulang], [currJenis, currJabatan, currJenjang, currIsMengulang]) =>
-                    prevJenis === currJenis && prevJabatan === currJabatan && prevJenjang === currJenjang && prevIsMengulang === currIsMengulang
-                )
+                // distinctUntilChanged(([prevJenis, prevJabatan, prevJenjang, prevIsMengulang], [currJenis, currJabatan, currJenjang, currIsMengulang]) =>
+                //     prevJenis === currJenis && prevJabatan === currJabatan && prevJenjang === currJenjang && prevIsMengulang === currIsMengulang
+                // )
             )
             .subscribe(([jenis_ukom, jabatan, jenjang, isMengulang]) => {
                 this.getDokumenPersyaratan(jenis_ukom, jabatan, jenjang, isMengulang);
@@ -260,8 +262,10 @@ export class UkomRegisterComponent {
             const bidangJabatanControl = this.nonJFForm.get('bidang_jabatan_code');
 
             if (bidangList.length > 0) {
+                this.nonJFForm.get('bidang_jabatan_code').setValue('')
                 bidangJabatanControl?.setValidators(Validators.required);
             } else {
+                this.nonJFForm.get('bidang_jabatan_code').setValue('')
                 bidangJabatanControl?.clearValidators();
             }
 
@@ -553,7 +557,10 @@ export class UkomRegisterComponent {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
+
+
                 this.hadItemsLoading$.next(true)
+
 
                 this.apiService
                     .postData('/api/v1/participant_ukom/task', this.pesertaUkom)
@@ -562,6 +569,7 @@ export class UkomRegisterComponent {
                             this.registerComplete = true
                             this.stringCode = response.key
                             this.imageUrl = response.imageUrl
+                            this.nonJFNIP = this.pesertaUkom.nip
 
                             this.handlerService.handleAlert(
                                 'Success',
@@ -587,14 +595,14 @@ export class UkomRegisterComponent {
         })
     }
 
-    downloadImage() {
+    downloadImage(nip: string) {
         fetch(this.imageUrl)
             .then(response => response.blob()) // Convert to Blob
             .then(blob => {
                 const blobUrl = window.URL.createObjectURL(blob)
                 const a = document.createElement('a')
                 a.href = blobUrl
-                a.download = 'sample-image.jpg' // Set filename
+                a.download = `${nip}-pendaftaran-ukom.jpg` // Set filename
                 document.body.appendChild(a)
                 a.click() // Auto-click to start download
                 document.body.removeChild(a)

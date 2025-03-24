@@ -9,7 +9,7 @@ export class PesertaUkom extends Serializable {
     email: string = undefined
     phone: string = undefined
     tempatLahir: string = undefined
-    tanggalLahir: Date = undefined
+    tanggalLahir: Date | string = undefined
     jenisKelaminCode: string = undefined
     jenisKelaminName: string = undefined
     password: string = undefined
@@ -42,10 +42,13 @@ export class PesertaUkom extends Serializable {
 
     pendidikanTerakhirCode: string = undefined
     jurusan: string = undefined
-    tglSuratUsulan: Date = undefined
+    tglSuratUsulan: Date | string = undefined
     no_surat_usulan: string = undefined
+    noSuratUsulan: string = undefined
     predikat_kinerja_1_id: string = undefined
     predikat_kinerja_2_id: string = undefined
+    predikatKinerja1Id: string = undefined
+    predikatKinerja2Id: string = undefined
     jenisInstansi: string = undefined
     jenisInstasiName: string = undefined
     isMengulang: boolean = undefined
@@ -55,6 +58,8 @@ export class PesertaUkom extends Serializable {
     provinsi_id: string = undefined
     kabupaten_kota_id: string = undefined
     bidang_jabatan_code: string = undefined
+
+    participantStatus: string = undefined
 
     constructor(object?: { [key: string]: any }) {
         super()

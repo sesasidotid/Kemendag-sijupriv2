@@ -11,6 +11,7 @@ import { FilePreviewService } from '../../../../modules/base/services/file-previ
 import { PrevPendingTask } from '../../../../modules/workflow/models/prev-pending-task'
 import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs'
 import { FormsModule } from '@angular/forms';
+import { JF } from '../../../../modules/siap/models/jf.model'
 
 @Component({
     selector: 'app-ukom-task-detail',
@@ -32,11 +33,14 @@ export class UkomTaskDetailComponent {
     pendidikanName: string
     provinsiName: string
     kabupatenName: string
+    typeKabKota: string
     predikat1Name: string
     predikat2Name: string
     bidangJabatanName: string
 
     predikatKinerjaList: any[] = []
+
+    JFDetail: JF = new JF()
 
     constructor(
         private apiService: ApiService,
@@ -85,6 +89,7 @@ export class UkomTaskDetailComponent {
         this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
             next: response => {
                 this.kabupatenName = response.name ?? null;
+                this.typeKabKota = response.type ?? null;
             },
         });
     }
@@ -100,8 +105,10 @@ export class UkomTaskDetailComponent {
         });
     }
 
-    getPredikatKinerja(code: string): string {
-        const predikat = this.predikatKinerjaList.find(predikat => predikat.code === code);
+    getPredikatKinerja(code: string | null): string {
+        console.log('code', code)
+        if (!code || code == null) return '-';
+        const predikat = this.predikatKinerjaList.find(predikat => predikat.id === code);
         return predikat ? predikat.name : '-';
     }
 
@@ -115,8 +122,9 @@ export class UkomTaskDetailComponent {
     }
 
 
-    calculateAge(tanggalLahir: string | Date, tglSuratUsulan: string | Date): number | string {
+    calculateAge(tanggalLahir: string | Date, tglSuratUsulan: string | Date): string {
         console.log('calculateAge', tanggalLahir, tglSuratUsulan);
+
         if (!tanggalLahir || !tglSuratUsulan) {
             return '-';
         }
@@ -130,18 +138,33 @@ export class UkomTaskDetailComponent {
             return '-'; // Return '-' jika format tanggal salah
         }
 
-        let age = suratDate.getFullYear() - birthDate.getFullYear();
-        const monthDiff = suratDate.getMonth() - birthDate.getMonth();
-        const dayDiff = suratDate.getDate() - birthDate.getDate();
+        let ageYears = suratDate.getFullYear() - birthDate.getFullYear();
+        let ageMonths = suratDate.getMonth() - birthDate.getMonth();
+        let ageDays = suratDate.getDate() - birthDate.getDate();
 
         // Jika bulan dalam tgl_surat_usulan kurang dari bulan lahir, atau bulan sama tapi tanggal lebih kecil
-        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-            age--;
+        if (ageMonths < 0 || (ageMonths === 0 && ageDays < 0)) {
+            ageYears--;
+            ageMonths += 12;
         }
 
-        return age;
+        if (ageDays < 0) {
+            const lastMonth = new Date(suratDate.getFullYear(), suratDate.getMonth(), 0);
+            ageDays += lastMonth.getDate();
+            ageMonths--;
+        }
+
+        return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`;
     }
 
+
+    getJFDetail(nip: string) {
+        this.apiService.getData(`/api/v1/jf/${nip}`).subscribe({
+            next: response => {
+                this.JFDetail = new JF(response)
+            }
+        })
+    }
 
     getPendingTask() {
         this.apiService.getData(`/api/v1/pending_task/${this.id}`).subscribe({
@@ -151,6 +174,7 @@ export class UkomTaskDetailComponent {
                 this.prevPendingTask = new PrevPendingTask(
                     this.pendingTask.objectTask.prevObject
                 )
+
 
                 this.getPendidikanList(this.pendingTask.objectTask.object.pendidikanTerakhirCode)
                 if (this.pendingTask.objectTask.object.provinsiId) {
@@ -165,9 +189,8 @@ export class UkomTaskDetailComponent {
                     this.getBidangjabatanNameByCode(this.pendingTask.objectTask.object.bidangJabatanCode)
                 }
 
-                this.predikat1Name = this.getPredikatKinerja(this.pendingTask.objectTask.object.predikatKinerja1);
-                this.predikat2Name = this.getPredikatKinerja(this.pendingTask.objectTask.object.predikatKinerja2);
-
+                this.predikat1Name = this.getPredikatKinerja(this.pendingTask.objectTask.object.predikatKinerja1Id);
+                this.predikat2Name = this.getPredikatKinerja(this.pendingTask.objectTask.object.predikatKinerja2Id);
 
                 this.findApproveDokumen(this.prevPendingTask.dokumenUkomList)
             },
