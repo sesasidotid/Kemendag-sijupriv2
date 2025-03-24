@@ -54,12 +54,6 @@ export class UkomTaskDetailComponent {
 
     ngOnInit() {
         this.loadPredikatKinerja()
-
-        this.activatedRoute.paramMap.subscribe(params => {
-            this.participant_ukom_id = params.get('id')
-            this.getParticipantUkomDetail()
-            this.getDokumenUkomList()
-        })
     }
 
     getPendidikanList(pendidikanTerakhirCode: string) {
@@ -107,6 +101,12 @@ export class UkomTaskDetailComponent {
                 console.error('Failed to fetch predikat kinerja:', err);
             }
         });
+
+        this.activatedRoute.paramMap.subscribe(params => {
+            this.participant_ukom_id = params.get('id')
+            this.getParticipantUkomDetail()
+            this.getDokumenUkomList()
+        })
     }
 
     transformInstansiName(value: string): string {

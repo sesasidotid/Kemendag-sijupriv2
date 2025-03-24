@@ -454,10 +454,9 @@ export class UkomTaskFormComponent {
                 this.pesertaUkom.tanggalLahir = this.jf.tanggalLahir
                 this.pesertaUkom.pendidikanTerakhirCode = this.pendidikanJF
                 this.pesertaUkom.jurusan = this.jurusanJF
+                this.pesertaUkom.JenjangName = this.jf.jenjangName
 
                 console.log('body', this.pesertaUkom)
-
-                // return
 
                 this.apiService
                     .postData(`/api/v1/participant_ukom/task/jf`, this.pesertaUkom)
