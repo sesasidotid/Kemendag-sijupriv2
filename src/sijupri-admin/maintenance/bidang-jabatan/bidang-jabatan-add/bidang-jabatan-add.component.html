@@ -1,0 +1,86 @@
+<section>
+  <form [formGroup]="jabatanForm">
+    <div class="row mb-3">
+      <label for="name" class="col-sm-3 col-md-2 col-form-label fw-bold"
+        >Nama Bidang Jabatan <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-9 col-md-10">
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          name="name"
+          formControlName="name"
+          placeholder="Masukan bidang jabatan"
+        />
+        <div
+          *ngIf="getErrorMessage('name', 'Nama Bidang Jabatan')"
+          class="text-danger"
+        >
+          {{ getErrorMessage('name', 'Nama Bidang Jabatan') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="jabatanCode" class="col-sm-3 col-md-2 col-form-label fw-bold"
+        >Jabatan <span class="text-danger">*</span></label
+      >
+      <div class="col-sm-9 col-md-10">
+        <select
+          class="form-select"
+          name="jabatanCode"
+          id="jabatanCode"
+          formControlName="jabatanCode"
+        >
+          <option selected value="" style="display: none">Pilih Jabatan</option>
+          <ng-container
+            *ngIf="(jabatanList$ | async)?.length; else jabatanNotFound"
+          >
+            <option
+              *ngFor="let jabatan of jabatanList$ | async"
+              [value]="jabatan.code"
+            >
+              {{ jabatan.name }}
+            </option>
+          </ng-container>
+          <ng-template #jabatanNotFound>
+            <option disabled>Jabatan tidak ditemukan</option>
+          </ng-template>
+        </select>
+        <div
+          *ngIf="getErrorMessage('jabatanCode', 'Jabatan')"
+          class="text-danger"
+        >
+          {{ getErrorMessage('jabatanCode', 'Jabatan') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="row text-center">
+      <div class="col-12">
+        <ng-container *ngIf="submitLoading$ | async; else noLoading">
+          <button class="btn btn-success float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="button"
+            class="btn btn-success float-end"
+            [disabled]="jabatanForm.invalid || (submitLoading$ | async)"
+            (click)="onSubmit()"
+          >
+            Simpan
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </form>
+</section>

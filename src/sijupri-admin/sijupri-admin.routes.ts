@@ -395,8 +395,17 @@ export const routes: Routes = [
                             import(
                                 '../sijupri-admin/maintenance/sys-conf-list/sys-conf-list.component'
                             ).then(m => m.SysConfListComponent)
+                    },
+                    "Bidang": {
+                        components: () => import('../sijupri-admin/maintenance/bidang-jabatan/bidang-jabatan-list/bidang-jabatan-list.component').then(m => m.BidangJabatanListComponent),
+                        routes: [
+                            {
+                                path: 'add',
+                                loadComponent: () => import('../sijupri-admin/maintenance/bidang-jabatan/bidang-jabatan-add/bidang-jabatan-add.component').then(m => m.BidangJabatanAddComponent)
+                            }
+                        ]
                     }
-                },
+                },  
                 SIAP: {
                     'User JF': {
                         components: () =>

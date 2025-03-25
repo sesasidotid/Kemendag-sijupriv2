@@ -128,10 +128,12 @@ export class NonjfRevisiUkomComponent {
                 )
             )
     }
+
     handleRejectedDokumen() {
         this.inputs.files = {}
         this.rejectedDokumen.forEach((dokumen, index) => {
-            const key = `rejectedDokumen_${index + 1}`
+            // const key = `rejectedDokumen_${index + 1}`
+            const key = dokumen.dokumenPersyaratanId
             this.inputs.files[key] = {
                 label: dokumen.dokumenPersyaratanName || 'Unknown Document',
                 remark: dokumen.remark,
@@ -159,14 +161,15 @@ export class NonjfRevisiUkomComponent {
                 const detected = this.detectedDokumen[key]
 
                 const existingDokumen = this.pendingTask.dokumenUkomList.find(
-                    dokumen => dokumen.dokumenPersyaratanName === detected.label
+                    // dokumen => dokumen.dokumenPersyaratanName === detected.label
+                    dokumen => dokumen.dokumenPersyaratanId === key
                 )
 
                 if (existingDokumen) {
                     const newDoc = {
                         dokumenFile: detected.base64,
                         dokumenPersyaratanName: `${this.pendingTask.nip
-                            }_dokumenPersyaratanUkom_${Date.now()}`,
+                            }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName}`,
                         dokumenPersyaratanId: existingDokumen.dokumenPersyaratanId
                     }
 

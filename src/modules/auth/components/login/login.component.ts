@@ -18,7 +18,7 @@ import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
 import { BehaviorSubject } from 'rxjs'
 import { RecaptchaModule, RecaptchaComponent } from 'ng-recaptcha'
 import { environment } from '../../../../environments/environment'
-
+import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component'
 @Component({
     selector: 'app-login',
     standalone: true,
@@ -27,7 +27,8 @@ import { environment } from '../../../../environments/environment'
         FormsModule,
         ReactiveFormsModule,
         LucideAngularModule,
-        RecaptchaModule
+        RecaptchaModule,
+        ForgotPasswordComponent
     ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
@@ -47,6 +48,7 @@ export class LoginComponent {
         message: ''
     })
     recaptchaSiteKey = environment.recaptcha.siteKey
+    isForgotPassword = false;
 
     readonly Eye = Eye
     readonly EyeOff = EyeOff
@@ -66,6 +68,10 @@ export class LoginComponent {
     ngOnInit() {
         this.isLoginLoading$.next(false)
         this.getApplicationList()
+        this.handleFormInit()
+    }
+
+    handleFormInit() {
         this.loginForm = new FormGroup({
             nip: new FormControl('', [
                 Validators.required,
@@ -75,7 +81,56 @@ export class LoginComponent {
             ]),
             password: new FormControl('', [Validators.required]),
             recaptcha: new FormControl(null, [Validators.required])
-        })
+        });
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        const control = this.loginForm.get(controlName);
+
+        if (!control || !control.errors || (!control.touched && !control.dirty)) {
+            return null; // No error or untouched field
+        }
+
+        const errors = control.errors;
+
+        if (errors['required']) {
+            return `${label} tidak boleh kosong.`;
+        }
+        if (errors['email']) {
+            return `Format ${label} tidak valid.`;
+        }
+        if (errors['minlength']) {
+            return `${label} minimal ${errors['minlength'].requiredLength} karakter.`;
+        }
+        if (errors['pattern']) {
+            if (controlName == 'nip') {
+                return `${label} harus terdiri dari 18 digit angka.`;
+            }
+
+            if (controlName == 'nik') {
+                return `${label} harus terdiri dari 16 digit angka.`;
+            }
+
+            if (controlName === 'phone') {
+                return `${label} harus terdiri dari 10 hingga 15 digit angka.`;
+            }
+
+            return `Format ${label} tidak valid.`;
+        }
+        if (errors['mismatch']) {
+            return `Password dan Konfirmasi Password tidak cocok.`;
+        }
+
+        return null; // Default case
+    }
+
+    showForgotPassword() {
+        this.isForgotPassword = true;
+    }
+
+    showLoginForm() {
+        this.handleFormInit()
+        this.isForgotPassword = false;
     }
 
     navigateTo(path: string) {
@@ -86,7 +141,6 @@ export class LoginComponent {
         this.applicationServce.findAll().subscribe({
             next: (applicationList: Application[]) => {
                 this.applicationList = applicationList
-                // this.auth.applicationCode = this.applicationList[0].code;
             }
         })
     }
@@ -96,13 +150,12 @@ export class LoginComponent {
     }
 
     togglePasswordVisibility(): void {
-        this.isPasswordVisible = !this.isPasswordVisible // Toggle the visibility
+        this.isPasswordVisible = !this.isPasswordVisible
     }
 
     backToLandingPage() {
         this.isLoginLoading$.next(false)
         this.router.navigate([''])
-        // this.router.navigateByUrl('/')
     }
 
     onSubmit() {
@@ -149,16 +202,4 @@ export class LoginComponent {
         }
     }
 
-    // submit() {
-    //   console.log(this.auth);
-    //   this.authService.login(this.auth).subscribe({
-    //     next: (authResponse: AuthResponse) => {
-    //       this.authResponse = authResponse;
-    //       LoginContext.storeContextLocalStorage(this.authResponse);
-    //       this.router.navigate(['']).then(() => {
-    //         window.location.reload();
-    //       });
-    //     }
-    //   });
-    // }
 }

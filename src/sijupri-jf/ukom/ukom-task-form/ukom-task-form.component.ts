@@ -266,7 +266,8 @@ export class UkomTaskFormComponent {
                     this.inputs.files = {}
 
                     this.dokumenPersyaratanList.forEach((dokumen, index) => {
-                        const key = `dokumenPersyaratan_${index + 1}`
+                        // const key = `dokumenPersyaratan_${index + 1}`
+                        const key = dokumen.dokumenPersyaratanId
                         this.inputs.files[key] = {
                             label: dokumen.dokumenPersyaratanName,
                             id: dokumen.dokumenPersyaratanId
@@ -412,7 +413,8 @@ export class UkomTaskFormComponent {
                 const detected = this.detectedDokumen[key]
 
                 const dokumenPersyaratan = this.dokumenPersyaratanList.find(
-                    dokumen => dokumen.dokumenPersyaratanName === detected.label
+                    // dokumen => dokumen.dokumenPersyaratanName === detected.label
+                    dokumen => dokumen.dokumenPersyaratanId === key
                 )
 
                 if (dokumenPersyaratan) {

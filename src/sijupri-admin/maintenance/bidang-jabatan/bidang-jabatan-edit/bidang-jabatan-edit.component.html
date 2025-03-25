@@ -1,0 +1,55 @@
+<div class="row">
+  <div class="col-12">
+    <form [formGroup]="updateBidangJabatanForm">
+      <div class="mb-3">
+        <label for="name" class="form-label">
+          Nama <span class="text-danger">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          name="name"
+          id="name"
+          formControlName="name"
+        />
+        <div
+          class="feedback"
+          *ngIf="
+            updateBidangJabatanForm.get('name').invalid &&
+            updateBidangJabatanForm.get('name').touched
+          "
+        >
+          <small
+            *ngIf="updateBidangJabatanForm.get('name').errors?.['required']"
+          >
+            Nama perlu diisi.
+          </small>
+        </div>
+      </div>
+
+      <ng-container *ngIf="submitLoading$ | async; else noLoading">
+        <button class="btn btn-primary w-100" disabled>
+          <div
+            class="spinner-border"
+            style="width: 19px; height: 19px"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </button>
+      </ng-container>
+      <ng-template #noLoading>
+        <button
+          type="button"
+          class="btn btn-primary w-100"
+          [disabled]="
+            updateBidangJabatanForm.invalid || (submitLoading$ | async)
+          "
+          (click)="onSubmit()"
+        >
+          Simpan
+        </button>
+      </ng-template>
+    </form>
+  </div>
+</div>

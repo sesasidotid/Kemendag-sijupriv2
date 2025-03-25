@@ -1,0 +1,21 @@
+<ng-container *ngIf="(tab$ | async) === 0">
+  <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+</ng-container>
+
+<ng-container *ngIf="(tab$ | async) === 1">
+  <app-bidang-jabatan-add
+    (changeTabActive)="handleTabChange(0)"
+  ></app-bidang-jabatan-add>
+</ng-container>
+
+<app-modal
+  *ngIf="isModalOpen$ | async"
+  [title]="'Update Bidang Jabatan'"
+  (toggle)="toggleModal()"
+  [enableFooter]="false"
+>
+  <app-bidang-jabatan-edit
+    [bidangJabatan]="updateBidangJabatanData"
+    (refreshList)="toggleRefresh()"
+  ></app-bidang-jabatan-edit>
+</app-modal>

@@ -41,7 +41,9 @@
                   class="row g-3 needs-validation"
                 >
                   <div class="col-12">
-                    <label for="nip" class="form-label">NIP</label>
+                    <label for="nip" class="form-label"
+                      >NIP <span class="text-danger">*</span></label
+                    >
                     <div class="input-group has-validation">
                       <input
                         type="text"
@@ -71,7 +73,9 @@
                   </div>
 
                   <div class="col-12">
-                    <label for="password" class="form-label">Kata Sandi</label>
+                    <label for="password" class="form-label"
+                      >Kata Sandi <span class="text-danger">*</span></label
+                    >
                     <div class="input-group has-validation">
                       <input
                         [type]="isPasswordVisible ? 'text' : 'password'"

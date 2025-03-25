@@ -78,7 +78,8 @@ export class UkomRevisionComponent {
     handleRejectedDokumen() {
         this.inputs.files = {}
         this.rejectedDokumen.forEach((dokumen, index) => {
-            const key = `rejectedDokumen_${index + 1}`
+            // const key = `rejectedDokumen_${index + 1}`
+            const key = dokumen.dokumenPersyaratanId
             this.inputs.files[key] = {
                 label: dokumen.dokumenPersyaratanName || 'Unknown Document',
                 remark: dokumen.remark
@@ -97,21 +98,6 @@ export class UkomRevisionComponent {
             this.pesertaUkom.dokumenUkomList = []
         }
 
-        // for (const key in this.detectedDokumen) {
-        //   if (this.detectedDokumen.hasOwnProperty(key)) {
-        //     const detected = this.detectedDokumen[key]
-
-        //     this.pesertaUkom.dokumenUkomList.push({
-        //       dokumenFile: detected.base64,
-        //       dokumenPersyaratanName:
-        //         this.jf.nip + '_' + 'dokumenPersyaratanUkom' + '_' + Date.now(),
-        //       dokumenPersyaratanId: this.pendingTask.dokumenUkomList.find(
-        //         dokumen => dokumen.dokumenPersyaratanName === detected.label
-        //       )?.dokumenPersyaratanId
-        //     })
-        //   }
-        // }
-
         const documentMap = new Map()
 
         for (const key in this.detectedDokumen) {
@@ -119,18 +105,18 @@ export class UkomRevisionComponent {
                 const detected = this.detectedDokumen[key]
 
                 const existingDokumen = this.pendingTask.dokumenUkomList.find(
-                    dokumen => dokumen.dokumenPersyaratanName === detected.label
+                    // dokumen => dokumen.dokumenPersyaratanName === detected.label
+                    dokumen => dokumen.dokumenPersyaratanId === key
                 )
 
                 if (existingDokumen) {
                     const newDoc = {
                         dokumenFile: detected.base64,
                         dokumenPersyaratanName: `${this.jf.nip
-                            }_dokumenPersyaratanUkom_${Date.now()}`,
+                            }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName}`,
                         dokumenPersyaratanId: existingDokumen.dokumenPersyaratanId
                     }
 
-                    // Store only the latest document for each dokumenPersyaratanId
                     documentMap.set(existingDokumen.dokumenPersyaratanId, newDoc)
                 }
             }
@@ -142,22 +128,6 @@ export class UkomRevisionComponent {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
-
-                // this.pesertaUkom.nip = this.jf.nip
-
-                // if (this.pendingTask.jenisUkom == 'PERPINDAHAN_JABATAN') {
-                //   this.pesertaUkom.jenis_ukom = this.pendingTask.jenisUkom
-                //   this.pesertaUkom.nextJabatanCode = this.pendingTask.nextJabatanCode
-                //   this.pesertaUkom.nextJenjangCode = this.pendingTask.jenjangCode
-                // }
-
-                // if (this.pendingTask.jenisUkom == 'KENAIKAN_JENJANG') {
-                //   this.pesertaUkom.jenis_ukom = this.pendingTask.jenisUkom
-                //   this.pesertaUkom.nextJenjangCode = this.pendingTask.nextJenjangCode
-                // }
-
-                // this.pesertaUkom.nextPangkatCode = this.pendingTask.nextPangkatCode
-                // this.pesertaUkom.password = 'password'
 
                 this.revisedDokumen.id = this.pendingTask.id
                 this.revisedDokumen.taskAction = 'approve'

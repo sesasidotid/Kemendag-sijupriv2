@@ -213,7 +213,7 @@
     <div class="row text-center">
       <div class="col-12">
         <ng-container *ngIf="submitLoading$ | async; else noLoading">
-          <button class="btn btn-primary float-end" disabled>
+          <button class="btn btn-success float-end" disabled>
             <div
               class="spinner-border"
               style="width: 19px; height: 19px"
@@ -226,7 +226,7 @@
         <ng-template #noLoading>
           <button
             type="button"
-            class="btn btn-primary float-end"
+            class="btn btn-success float-end"
             [disabled]="kelasForm.invalid || (submitLoading$ | async)"
             (click)="submit()"
           >

@@ -156,6 +156,9 @@ export class UkomRegisterComponent {
         });
 
         this.nonJFForm.get('nextJabatanCode')?.valueChanges.subscribe(value => {
+            this.nonJFForm.patchValue({
+                bidang_jabatan_code: ''
+            })
             this.getBidangJabatanByJabatanCode(value)
         })
     }
@@ -262,6 +265,7 @@ export class UkomRegisterComponent {
         });
 
         this.bidangJabatanList$.subscribe(bidangList => {
+            console.log('bidangList', bidangList)
             const bidangJabatanControl = this.nonJFForm.get('bidang_jabatan_code');
 
             if (bidangList.length > 0) {
@@ -419,7 +423,8 @@ export class UkomRegisterComponent {
                     this.inputs.files = {};
 
                     this.dokumenPersyaratanList.forEach((dokumen, index) => {
-                        const key = `dokumenPersyaratan_${index + 1}`;
+                        // const key = `dokumenPersyaratan_${index + 1}`;
+                        const key = dokumen.dokumenPersyaratanId
                         this.inputs.files[key] = {
                             label: dokumen.dokumenPersyaratanName,
                             id: dokumen.dokumenPersyaratanId
@@ -539,14 +544,15 @@ export class UkomRegisterComponent {
                 const detected = this.detectedDokumen[key]
 
                 const dokumenPersyaratan = this.dokumenPersyaratanList.find(
-                    dokumen => dokumen.dokumenPersyaratanName === detected.label
+                    // dokumen => dokumen.dokumenPersyaratanName === detected.label
+                    dokumen => dokumen.dokumenPersyaratanId === key
                 )
 
                 if (dokumenPersyaratan) {
                     const newDoc = {
                         dokumenFile: detected.base64,
                         dokumenPersyaratanName: `${dokumenPersyaratan.dokumenPersyaratanName
-                            }_${this.pesertaUkom.nip}_${Date.now()}`,
+                            }_${this.pesertaUkom.nip}_${Date.now()}_${dokumenPersyaratan.dokumenPersyaratanName}`,
                         dokumenPersyaratanId: detected.id
                     }
 
