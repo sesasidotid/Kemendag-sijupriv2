@@ -14,6 +14,8 @@ export class DataDokumenUkom extends Serializable {
     participantUkomId: any = undefined
     jabatanCode: any = undefined
     jenjangCode: any = undefined
+    jabatanName: any = undefined
+    jenjangName: any = undefined
 
     constructor(object?: { [key: string]: any }) {
         super()

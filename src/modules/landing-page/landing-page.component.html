@@ -86,6 +86,26 @@
             </ng-template>
           </div>
         </div>
+
+        <div class="req-parent" *ngIf="dokumenKenaikanDanPindah.length > 0">
+          <h6 class="req-title">Syarat Khusus Untuk Jenjang Madya</h6>
+          <div class="req-items">
+            <div>
+              <div
+                class="req-item"
+                *ngFor="let item of dokumenKenaikanDanPindah"
+              >
+                <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
+                <p class="capitalize">
+                  {{
+                    item.dokumenPersyaratanName +
+                      (item.jabatanName ? ' (' + item.jabatanName + ')' : '')
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
         <a routerLink="login" class="btn btn-secondary grad-button"
           >Daftar Sekarang</a
         >
@@ -133,6 +153,26 @@
             <ng-template #noDokumenPindahJabatanExternal>
               <p class="text-gray-500">-</p>
             </ng-template>
+          </div>
+        </div>
+
+        <div class="req-parent" *ngIf="dokumenPromosiDanPindah.length > 0">
+          <h6 class="req-title">Syarat Khusus Untuk Jenjang Madya</h6>
+          <div class="req-items">
+            <div>
+              <div
+                class="req-item"
+                *ngFor="let item of dokumenPromosiDanPindah"
+              >
+                <i-lucide [img]="SquareCheck" [color]="'#49AB49'"></i-lucide>
+                <p class="capitalize">
+                  {{
+                    item.dokumenPersyaratanName +
+                      (item.jabatanName ? ' (' + item.jabatanName + ')' : '')
+                  }}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         <a routerLink="ukom/external" class="btn btn-secondary grad-button"

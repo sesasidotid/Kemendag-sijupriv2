@@ -51,6 +51,8 @@ export class LandingPageComponent {
     dokumenPromosi: DataDokumenUkom[] = []
     dokumenPindahJabatan: DataDokumenUkom[] = []
     dokumenKenaikanJenjang: DataDokumenUkom[] = []
+    dokumenKenaikanDanPindah: DataDokumenUkom[] = []
+    dokumenPromosiDanPindah: DataDokumenUkom[] = []
 
     constructor(private router: Router, private service: ApiService) { }
 
@@ -58,15 +60,31 @@ export class LandingPageComponent {
         this.ukomForm = new FormGroup({
             ukomCode: new FormControl('', [
                 Validators.required,
-                // Validators.pattern('^[0-9]+$'),
                 Validators.minLength(5)
             ])
         })
-        // this.initMap();
         this.fetchDokumenUkom()
 
         this.dokumenKenaikanJenjang
     }
+
+    // fetchDokumenUkom() {
+    //     forkJoin({
+    //         kenaikanJenjang: this.service.getData('/api/v1/document_ukom/jenis_ukom/KENAIKAN_JENJANG'),
+    //         pindahJabatan: this.service.getData('/api/v1/document_ukom/jenis_ukom/PERPINDAHAN_JABATAN'),
+    //         promosi: this.service.getData('/api/v1/document_ukom/jenis_ukom/PROMOSI')
+    //     }).pipe(
+    //         map(({ kenaikanJenjang, pindahJabatan, promosi }) => ({
+    //             kenaikanJenjang: this.filterUniqueByName(kenaikanJenjang),
+    //             pindahJabatan: this.filterUniqueByName(pindahJabatan),
+    //             promosi: this.filterUniqueByName(promosi)
+    //         }))
+    //     ).subscribe(({ kenaikanJenjang, pindahJabatan, promosi }) => {
+    //         this.dokumenKenaikanJenjang = kenaikanJenjang;
+    //         this.dokumenPindahJabatan = pindahJabatan;
+    //         this.dokumenPromosi = promosi;
+    //     });
+    // }
 
     fetchDokumenUkom() {
         forkJoin({
@@ -74,62 +92,68 @@ export class LandingPageComponent {
             pindahJabatan: this.service.getData('/api/v1/document_ukom/jenis_ukom/PERPINDAHAN_JABATAN'),
             promosi: this.service.getData('/api/v1/document_ukom/jenis_ukom/PROMOSI')
         }).pipe(
-            map(({ kenaikanJenjang, pindahJabatan, promosi }) => ({
-                kenaikanJenjang: this.filterUniqueByName(kenaikanJenjang),
-                pindahJabatan: this.filterUniqueByName(pindahJabatan),
-                promosi: this.filterUniqueByName(promosi)
-            }))
-        ).subscribe(({ kenaikanJenjang, pindahJabatan, promosi }) => {
+            map(({ kenaikanJenjang, pindahJabatan, promosi }) => {
+                const jenjangCode = 'JJ7'; // ahli madya
+
+                const filteredKenaikan = this.filterUniqueByName(kenaikanJenjang);
+                const filteredPindah = this.filterUniqueByName(pindahJabatan);
+                const filteredPromosi = this.filterUniqueByName(promosi);
+
+
+
+                const uniqueByNameAndJenjang = (data: DataDokumenUkom[]) => {
+                    const seen = new Set<string>();
+                    return data.filter(doc => {
+                        const key = `${doc.dokumenPersyaratanName}-${doc.jabatanCode}`;
+                        if (seen.has(key)) {
+                            return false;
+                        }
+                        seen.add(key);
+                        return true;
+                    });
+                };
+
+                const sortByName = (a: DataDokumenUkom, b: DataDokumenUkom) => {
+                    // First, compare by dokumenPersyaratanName
+                    const nameComparison = a.dokumenPersyaratanName.localeCompare(b.dokumenPersyaratanName);
+
+                    // If dokumenPersyaratanName is the same, compare by jabatanName
+                    return nameComparison !== 0 ? nameComparison : a.jabatanName.localeCompare(b.jabatanName);
+                };
+
+
+                return {
+                    kenaikanJenjang: filteredKenaikan,
+                    pindahJabatan: filteredPindah,
+                    promosi: filteredPromosi,
+                    dokumenKenaikanDanPindah: uniqueByNameAndJenjang([...kenaikanJenjang, ...pindahJabatan]
+                        .filter(doc => doc.jenjangCode === jenjangCode))
+                        .sort(sortByName),
+                    dokumenPromosiDanPindah: uniqueByNameAndJenjang([...promosi, ...pindahJabatan]
+                        .filter(doc => doc.jenjangCode === jenjangCode))
+                        .sort(sortByName)
+                };
+            })
+        ).subscribe(({ kenaikanJenjang, pindahJabatan, promosi, dokumenKenaikanDanPindah, dokumenPromosiDanPindah }) => {
             this.dokumenKenaikanJenjang = kenaikanJenjang;
             this.dokumenPindahJabatan = pindahJabatan;
             this.dokumenPromosi = promosi;
+            this.dokumenKenaikanDanPindah = dokumenKenaikanDanPindah;
+            this.dokumenPromosiDanPindah = dokumenPromosiDanPindah;
         });
     }
 
     private filterUniqueByName(data: DataDokumenUkom[]): DataDokumenUkom[] {
         const seen = new Set<string>();
         return data.filter(item => {
-            if (!item.dokumenPersyaratanName || seen.has(item.dokumenPersyaratanName)) {
-                return false; // Ignore duplicates
+            if (!item.dokumenPersyaratanName || seen.has(item.dokumenPersyaratanName) || item.jenjangCode === 'JJ7') {
+                return false;
             }
             seen.add(item.dokumenPersyaratanName);
             return true;
         });
     }
 
-    // private initMap(): void {
-    //   // Initialize the map centered on a specific location
-    //   this.map = L.map('map').setView([-6.181208158854943, 106.83293511707309], 14); // Coordinates for London, you can change these
-
-    //   // Add OpenStreetMap tiles to the map
-    //   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //     maxZoom: 19,
-    //     // attribution: '&copy; OpenStreetMap contributors'
-    //   }).addTo(this.map);
-
-    //   // Define marker coordinates
-    //   const markerCoords: [number, number] = [-6.181208158854943, 106.83293511707309]; // Change this to your desired coordinates
-    //   const locationName = 'Kementerian Perdagangan Republik Indonesia'; // Custom name for the location
-
-    //   // Create a marker and add it to the map
-    //   const marker = L.marker(markerCoords).addTo(this.map)
-
-    //   // HTML content for the popup
-    //   const popupContent = `
-    //     <div style="">
-    //       <p style="font-size: 18px">${locationName}</p>
-    //       <p>Jl. M.I. Ridwan Rais, No. 5 Daerah Khusus Ibukota Jakarta 10110, Indonesia</p>
-    //       <button
-    //         onclick="window.open('https://maps.app.goo.gl/sfw8grHrxJA9nxtV8', '_blank')"
-    //         style="margin-top: 5px; padding: 5px 10px; border: none; background-color: #007BFF; color: white; cursor: pointer; border-radius: 5px;">
-    //         Buka Google Maps
-    //       </button>
-    //     </div>
-    //   `;
-
-    //   // Set the popup content for the marker
-    //   marker.bindPopup(popupContent).openPopup();
-    // }
 
     toggleMenu() {
         this.isMenuOpen = !this.isMenuOpen
@@ -143,22 +167,9 @@ export class LandingPageComponent {
         if (this.ukomForm.valid) {
             console.log(this.ukomForm.value)
 
-            //   this.router.navigate(['/page/ukom/' + this.ukomForm.value.ukomCode])
             this.router.navigate(['/ukom/external/status'], {
                 queryParams: { key: this.ukomForm.value.ukomCode }
             })
-
-            // this.authService.login(this.auth).subscribe({
-            //   next: (authResponse: AuthResponse) => {
-            //     this.authResponse = authResponse;
-            //     LoginContext.storeContextLocalStorage(this.authResponse);
-            //   },
-            //   complete: () => {
-            //     this.router.navigate(['']).then(() => {
-            //       window.location.reload();
-            //     });
-            //   }
-            // });
         }
     }
 }
