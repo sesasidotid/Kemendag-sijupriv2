@@ -83,8 +83,8 @@ export class StatusPendaftaranUkomComponent {
 
             if (key) {
                 this.key = key
-                this.loadPredikatKinerja()
             }
+            this.loadPredikatKinerja()
         })
     }
 
@@ -92,13 +92,14 @@ export class StatusPendaftaranUkomComponent {
         this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
             next: res => {
                 this.predikatKinerjaList = res;
+                this.getPendingTask(this.key)
             },
             error: err => {
                 console.error('Failed to fetch predikat kinerja:', err);
+                this.getPendingTask(this.key)
             }
         });
 
-        this.getPendingTask(this.key)
     }
 
     getPendidikanList(pendidikanTerakhirCode: string) {

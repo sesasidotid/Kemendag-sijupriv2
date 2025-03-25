@@ -129,8 +129,9 @@ export class LoginComponent {
     }
 
     showLoginForm() {
-        this.handleFormInit()
-        this.isForgotPassword = false;
+        location.reload()
+        // this.handleFormInit()
+        // this.isForgotPassword = false;
     }
 
     navigateTo(path: string) {

@@ -109,15 +109,19 @@ export class UkomTaskComponent {
             next: res => {
                 this.predikatKinerjaList = res;
                 console.log('predikat kinerja:', this.predikatKinerjaList);
+                this.getPendingTask()
+                this.getJF()
+                this.getJFRegisterStatus()
             },
             error: err => {
                 console.error('Failed to fetch predikat kinerja:', err);
+                this.getPendingTask()
+                this.getJF()
+                this.getJFRegisterStatus()
             }
         });
 
-        this.getPendingTask()
-        this.getJF()
-        this.getJFRegisterStatus()
+
     }
 
     calculateAge(tanggalLahir: string | Date, tglSuratUsulan: string | Date): string {

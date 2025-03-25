@@ -97,13 +97,14 @@ export class UkomTaskDetailComponent {
         this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
             next: res => {
                 this.predikatKinerjaList = res;
+                this.getPendingTask()
             },
             error: err => {
+                this.getPendingTask()
                 console.error('Failed to fetch predikat kinerja:', err);
             }
         });
 
-        this.getPendingTask()
     }
 
     getPredikatKinerja(code: string | null): string {
