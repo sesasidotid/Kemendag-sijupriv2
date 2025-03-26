@@ -140,7 +140,7 @@ export class KknComponent {
           (instrument: { [key: string]: any }) => new Instrument(instrument)
         )
 
-        this.pagable.filterLIst.push(
+        this.pagable.filterList.push(
           new PageFilterBuilder('equal')
             .setProperty('instrumentId')
             .withField('Instrumen', 'select')

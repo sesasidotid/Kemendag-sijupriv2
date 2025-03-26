@@ -6,14 +6,15 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
+
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { BehaviorSubject } from 'rxjs'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
-
+import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
 @Component({
     selector: 'app-ukom-task-list',
     standalone: true,
@@ -158,7 +159,6 @@ export class UkomTaskListComponent {
         })
     }
 
-
     handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
@@ -176,19 +176,69 @@ export class UkomTaskListComponent {
                 icon: 'mdi-account-supervisor',
                 onClick: () => this.handlePagableTabChange('ukom_flow_2', 1)
             })
+            .addTab({
+                label: 'Tidak Lolos Verifikasi',
+                icon: 'mdi-account-supervisor',
+                onClick: () => this.handlePagableTabChange('rejected', 2)
+            })
     }
 
-    handlePagableTabChange(tab: string, tabIndex: number) {
-        const currentPagable = this.pagable$.value
+    // handlePagableTabChange(tab: string, tabIndex: number) {
+    //     const currentPagable = this.pagable$.value
 
-        const updatedPagable = {
-            ...currentPagable,
-            filterLIst: currentPagable.filterLIst.map((item, index) =>
+    //     const updatedPagable = {
+    //         ...currentPagable,
+    //         filterLIst: currentPagable.filterLIst.map((item, index) =>
+    //             item.key === 'eq_flowId' ? { ...item, value: tab } : item
+    //         )
+    //     }
+
+    //     this.tabService.changeTabActive(tabIndex)
+    //     this.pagable$.next(updatedPagable)
+    // }
+    handlePagableTabChange(tab: string, tabIndex: number) {
+        const currentPagable = this.pagable$.value;
+
+        let updatedPagable;
+
+        if (tab === 'rejected') {
+            // Remove 'eq_flowId' from filterList and update the endpoint
+            updatedPagable = {
+                ...currentPagable,
+                filterList: currentPagable.filterList.filter(item => item.key !== 'eq_flowId'),
+                endpoint: '/api/v1/participant_ukom/task/failed/search'
+            };
+        } else {
+            // Ensure 'eq_flowId' exists when switching from 'rejected' to another tab
+            const existingFilterList = currentPagable.filterList.map(item =>
                 item.key === 'eq_flowId' ? { ...item, value: tab } : item
-            )
+            );
+
+            // If 'eq_flowId' does not exist, add a valid PageFilter
+            const filterList = currentPagable.filterList.some(item => item.key === 'eq_flowId')
+                ? existingFilterList
+                : [
+                    ...existingFilterList,
+                    new PageFilter({
+                        // label: 'Flow ID',
+                        // fieldType: 'text',
+                        key: 'eq_flowId',
+                        value: tab,
+                        // optionList: []
+                    })
+                ];
+
+            updatedPagable = {
+                ...currentPagable,
+                filterList,
+                endpoint: '/api/v1/participant_ukom/task/search'
+            };
         }
 
-        this.tabService.changeTabActive(tabIndex)
-        this.pagable$.next(updatedPagable)
+        this.tabService.changeTabActive(tabIndex);
+        this.pagable$.next(updatedPagable);
     }
+
+
+
 }

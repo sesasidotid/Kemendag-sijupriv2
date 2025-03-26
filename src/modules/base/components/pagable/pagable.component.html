@@ -1,7 +1,7 @@
-<div class="row mb-3" *ngIf="pagable.filterLIst">
+<div class="row mb-3" *ngIf="pagable.filterList">
   <form (submit)="fetchData()">
     <div class="filter-container">
-      <ng-container *ngFor="let fillter of pagable.filterLIst">
+      <ng-container *ngFor="let fillter of pagable.filterList">
         <ng-container *ngIf="fillter.fieldType">
           <div>
             <div

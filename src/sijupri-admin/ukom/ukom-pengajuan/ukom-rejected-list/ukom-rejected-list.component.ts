@@ -1,4 +1,5 @@
-import { Component } from '@angular/core'
+import { Component } from '@angular/core';
+import { Pagable } from '../../../../modules/base/commons/pagable/pagable';
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { Router } from '@angular/router'
 import {
@@ -7,61 +8,41 @@ import {
     PageFilterBuilder,
     PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { ApiService } from '../../../../modules/base/services/api.service'
-import { UkomRejectedListComponent } from '../ukom-rejected-list/ukom-rejected-list.component'
-import { TabService } from '../../../../modules/base/services/tab.service'
-import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
+
 @Component({
-    selector: 'app-ukom-list',
+    selector: 'app-ukom-rejected-list',
     standalone: true,
-    imports: [PagableComponent, UkomRejectedListComponent, CommonModule],
-    templateUrl: './ukom-list.component.html',
-    styleUrl: './ukom-list.component.scss'
+    imports: [PagableComponent, CommonModule],
+    templateUrl: './ukom-rejected-list.component.html',
+    styleUrl: './ukom-rejected-list.component.scss'
 })
-export class UkomListComponent {
+export class UkomRejectedListComponent {
     pagable: Pagable
-
-    jenisUkomMap: Record<string, string> = {}
-    jabatanNameCache: { [key: string]: string } = {}; // Cache for Jabatan names
+    jabatanNameCache: { [key: string]: string } = {}
     refresh: boolean = false
-    tab$ = new BehaviorSubject<number | null>(0)
 
-    constructor(private router: Router, private apiService: ApiService, private tabService: TabService) { }
+    constructor(private router: Router, private apiService: ApiService) { }
 
     ngOnInit() {
-        // this.handleTabService()
-        this.handlerPagable()
-        this.getJabatanList();
+        this.handlePagable()
+        this.getJabatanList()
     }
 
-    handleTabService() {
-        if (this.tabService.getTabsLength() > 0) {
-            this.tabService.clearTabs()
-        }
-
-        this.tabService
-            .addTab({
-                label: 'Lolos Verifikasi',
-                icon: 'mdi-list-box',
-                isActive: true,
-                onClick: () => this.handleTabChange(0)
-            })
-            .addTab({
-                label: 'Tidak Lolos Verifikasi',
-                icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1)
-            })
+    getJabatanList() {
+        this.apiService.getData('/api/v1/jabatan').subscribe({
+            next: (response) => {
+                response.forEach((item: any) => {
+                    this.jabatanNameCache[item.code] = item.name;
+                });
+                this.refresh = !this.refresh
+            }
+        });
     }
 
-    handleTabChange(tab?: number) {
-        this.tab$.next(tab)
-        this.tabService.changeTabActive(tab)
-    }
-
-    handlerPagable() {
-        this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
+    handlePagable() {
+        this.pagable = new PagableBuilder('/api/v1/participant_ukom/task/failed/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(
@@ -155,19 +136,5 @@ export class UkomListComponent {
                     .build()
             )
             .build()
-    }
-
-    getJabatanList() {
-        this.apiService.getData('/api/v1/jabatan').subscribe({
-            next: (response) => {
-                response.forEach((item: any) => {
-                    this.jabatanNameCache[item.code] = item.name;
-                });
-
-                console.log('q', this.jabatanNameCache)
-
-                this.refresh = !this.refresh
-            }
-        });
     }
 }

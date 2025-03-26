@@ -40,7 +40,7 @@ export class PagableComponent implements OnChanges {
     }
 
     isSearchExist() {
-        for (const filter of this.pagable.filterLIst) {
+        for (const filter of this.pagable.filterList) {
             if (filter.label) {
                 return true
             }
@@ -92,8 +92,8 @@ export class PagableComponent implements OnChanges {
             }
         }
 
-        if (this.pagable.filterLIst) {
-            this.pagable.filterLIst.forEach(filter => {
+        if (this.pagable.filterList) {
+            this.pagable.filterList.forEach(filter => {
                 if (filter.value) {
                     query += `&${filter.key}=${filter.value}`
                 }
