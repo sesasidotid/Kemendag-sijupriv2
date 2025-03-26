@@ -1,3 +1,4 @@
+import { ConfirmationService } from './../../../../modules/base/services/confirmation.service';
 import { Component } from '@angular/core'
 import {
     ActionColumnBuilder,
@@ -15,6 +16,7 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
+import { HandlerService } from '../../../../modules/base/services/handler.service'
 @Component({
     selector: 'app-ukom-detail',
     standalone: true,
@@ -41,13 +43,16 @@ export class UkomDetailComponent {
     bidangJabatanName: string
 
     predikatKinerjaList: any[] = []
+    refresh: boolean
 
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private apiService: ApiService,
         private sanitizer: DomSanitizer,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService
     ) { }
 
     ngOnInit() {
@@ -60,7 +65,7 @@ export class UkomDetailComponent {
         this.isUserBanned()
     }
 
-    
+
 
     handlePagable() {
         this.pagable = new PagableBuilder(`/api/v1/participant_ukom/all/${this.id}`)
@@ -86,7 +91,36 @@ export class UkomDetailComponent {
                     .withIcon('detail')
                     .build()
             )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((ukom: any) => {
+                        this.handleDeleteTask(ukom.id)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build()
+            )
             .build()
+    }
+
+    handleDeleteTask(id: string) {
+        this.confirmationService.open(false).subscribe({
+            next: res => {
+                if (!res.confirmed) {
+                    return
+                }
+
+                this.apiService.deleteData(`/api/v1/participant_ukom/${id} `).subscribe({
+                    next: res => {
+                        this.handlerService.handleAlert('Success', 'Data berhasil dihapus')
+                        this.refresh = !this.refresh
+                    },
+                    error: err => {
+                        this.handlerService.handleAlert('Error', 'Data gagal dihapus')
+                        this.refresh = !this.refresh
+                    }
+                })
+            }
+        })
     }
 
     preview(fileName: string, fileSource: string) {

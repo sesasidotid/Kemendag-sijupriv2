@@ -12,6 +12,7 @@ import { PrevPendingTask } from '../../../../modules/workflow/models/prev-pendin
 import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs'
 import { FormsModule } from '@angular/forms';
 import { JF } from '../../../../modules/siap/models/jf.model'
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-ukom-task-detail',
@@ -41,13 +42,15 @@ export class UkomTaskDetailComponent {
     predikatKinerjaList: any[] = []
 
     JFDetail: JF = new JF()
+    tabIndex: string
 
     constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         private activatedRoute: ActivatedRoute,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
+        private router: Router
     ) { }
 
     ngOnInit() {
@@ -195,9 +198,23 @@ export class UkomTaskDetailComponent {
                 this.predikat2Name = this.getPredikatKinerja(this.pendingTask.objectTask.object.predikatKinerja2Id);
 
                 this.findApproveDokumen(this.prevPendingTask.dokumenUkomList)
+                this.handlerTabIndex()
+
             },
             error: error => this.handlerService.handleException(error)
         })
+    }
+
+    handlerTabIndex() {
+        if (this.pendingTask.workflowId == "ukom_flow_1") {
+            this.tabIndex = "0"
+        }
+        if (this.pendingTask.workflowId == "ukom_flow_2") {
+            this.tabIndex = "1"
+        }
+        if (this.pendingTask.taskStatus == "FAILED") {
+            this.tabIndex = "2"
+        }
     }
 
     findApproveDokumen(dokumenUkomList: any[]) {
@@ -234,8 +251,11 @@ export class UkomTaskDetailComponent {
         }
     }
 
-    back() {
-        history.back()
+    back(tabIndex: string) {
+        // history.back()
+        this.router.navigate(['/ukom/ukom-task-list'], {
+            state: { tabIndex: tabIndex }
+        });
     }
 
     sendSubmission() {

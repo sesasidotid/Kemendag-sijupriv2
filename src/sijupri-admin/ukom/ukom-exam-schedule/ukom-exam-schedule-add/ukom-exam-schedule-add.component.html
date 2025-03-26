@@ -27,6 +27,12 @@
                 formControlName="start_time"
                 class="form-control"
               />
+              <div
+                class="text-danger"
+                *ngIf="getScheduleError(i, 'start_time', 'Waktu Mulai')"
+              >
+                {{ getScheduleError(i, 'start_time', 'Waktu Mulai') }}
+              </div>
             </div>
           </div>
           <div class="row mb-3">
@@ -39,6 +45,12 @@
                 formControlName="end_time"
                 class="form-control"
               />
+              <div
+                class="text-danger"
+                *ngIf="getScheduleError(i, 'end_time', 'Waktu Selesai')"
+              >
+                {{ getScheduleError(i, 'end_time', 'Waktu Selesai') }}
+              </div>
             </div>
           </div>
           <div class="row mb-3">
@@ -54,6 +66,12 @@
                   {{ jenisUkom.name }}
                 </option>
               </select>
+              <div
+                class="text-danger"
+                *ngIf="getScheduleError(i, 'exam_type_code', 'Jenis UKom')"
+              >
+                {{ getScheduleError(i, 'exam_type_code', 'Jenis UKom') }}
+              </div>
             </div>
           </div>
         </div>

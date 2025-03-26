@@ -181,6 +181,14 @@ export class UserInstansiAddComponent {
         this.getInstansiList()
     }
 
+    validateNumber(event: KeyboardEvent) {
+        const charCode = event.which ? event.which : event.keyCode;
+        if (charCode < 48 || charCode > 57) {
+            event.preventDefault();
+        }
+    }
+
+
     submit() {
         this.confirmationService.open().subscribe({
             next: result => {

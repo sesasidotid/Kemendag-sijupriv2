@@ -12,11 +12,18 @@
         required
         minlength="18"
         maxlength="18"
+        pattern="^[0-9]{18}$"
         #nip="ngModel"
         id="nip"
+        (keypress)="validateNumber($event)"
       />
-      <div class="feedback" *ngIf="nip.touched && nip.invalid">
-        <small class="text-danger">NIP harus terdiri dari 18 karakter. </small>
+      <div class="text-danger" *ngIf="nip.touched && nip.invalid">
+        <small class="text-danger" *ngIf="nip.errors?.['required']">
+          NIP tidak boleh kosong.
+        </small>
+        <small class="text-danger" *ngIf="nip.errors?.['pattern']">
+          NIP harus terdiri dari 18 digit angka.
+        </small>
       </div>
     </div>
   </div>
@@ -35,16 +42,16 @@
         #name="ngModel"
         required
       />
-      <div class="feedback" *ngIf="name.touched && name.invalid">
+      <div class="" *ngIf="name.touched && name.invalid">
         <small class="text-danger">Nama harus diisi. </small>
       </div>
     </div>
   </div>
 
   <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Email <span class="text-danger">*</span></label
-    >
+    <label for="email" class="col-sm-2 col-form-label fw-bold">
+      Email <span class="text-danger">*</span>
+    </label>
     <div class="col-sm-10">
       <input
         type="email"
@@ -52,65 +59,20 @@
         [(ngModel)]="userInstansi.email"
         name="email"
         required
+        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         #email="ngModel"
         id="email"
       />
-      <div class="feedback" *ngIf="email.touched && email.invalid">
-        <small class="text-danger">Email harus diisi dan valid.</small>
-      </div>
-    </div>
-  </div>
-  <!-- <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Password <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="password"
-        class="form-control"
-        [(ngModel)]="userInstansi.password"
-        name="password"
-        required
-        #password="ngModel"
-        id="password"
-      />
-      <div class="feedback" *ngIf="password.touched && password.invalid">
-        <small class="text-danger">Password harus diisi. </small>
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-3">
-    <label class="col-sm-2 col-form-label fw-bold"
-      >Konfirmasi Password <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="password"
-        class="form-control"
-        [(ngModel)]="confirmPassword"
-        name="confirmPassword"
-        required
-        #confirmPass="ngModel"
-      />
-      <div class="feedback">
-        <small
-          class="text-danger"
-          *ngIf="confirmPass.touched && confirmPass.invalid"
-        >
-          Konfirmasi password harus diisi.
+      <div class="text-danger" *ngIf="email.touched && email.invalid">
+        <small class="text-danger" *ngIf="email.errors?.['required']">
+          Email tidak boleh kosong.
         </small>
-        <small
-          class="text-danger"
-          *ngIf="
-            confirmPass.touched && confirmPassword !== userInstansi.password
-          "
-        >
-          Konfirmasi password tidak cocok.
+        <small class="text-danger" *ngIf="email.errors?.['pattern']">
+          Format email tidak valid.
         </small>
       </div>
     </div>
-  </div> -->
+  </div>
 
   <div class="row mb-3">
     <label for="" class="col-sm-2 col-form-label fw-bold"

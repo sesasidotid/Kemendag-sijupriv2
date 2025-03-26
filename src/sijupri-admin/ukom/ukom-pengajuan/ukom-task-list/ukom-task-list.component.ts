@@ -15,6 +15,8 @@ import { BehaviorSubject } from 'rxjs'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
+import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { HandlerService } from '../../../../modules/base/services/handler.service'
 @Component({
     selector: 'app-ukom-task-list',
     standalone: true,
@@ -26,13 +28,55 @@ export class UkomTaskListComponent {
     pagable: Pagable
     pagable$ = new BehaviorSubject<Pagable | null>(null)
     jabatanList$ = new BehaviorSubject<{ label: string; value: string }[]>([]);
+    refresh: boolean
 
-    constructor(private router: Router, private tabService: TabService, private apiService: ApiService) { }
+    constructor(private router: Router, private tabService: TabService, private apiService: ApiService, private confirmationService: ConfirmationService, private handlerService: HandlerService) { }
 
     ngOnInit() {
+        const navigation = history.state
         this.getJabatanList()
         this.handleTabService()
         this.handlePagable()
+
+        // if (navigation.tabIndex) {
+        //     this.handleBackFromDetail(navigation.tabIndex)
+        // }
+    }
+
+    handleBackFromDetail(tabIndex: string) {
+        if (tabIndex == '0') {
+            this.handlePagableTabChange('ukom_flow_1', 0)
+        }
+
+        if (tabIndex == '1') {
+            this.handlePagableTabChange('ukom_flow_2', 1)
+        }
+
+        if (tabIndex == '2') {
+            this.handlePagableTabChange('rejected', 2)
+        }
+
+    }
+
+    handleDeleteTask(instanceId: string) {
+        this.confirmationService.open(false).subscribe({
+            next: res => {
+                if (!res.confirmed) {
+                    return
+                }
+
+                this.apiService.deleteData(`/api/v1/pending_task/delete/${instanceId}`).subscribe({
+                    next: res => {
+                        this.handlerService.handleAlert('Success', 'Data berhasil dihapus')
+                        this.refresh = !this.refresh
+                    },
+                    error: err => {
+                        this.handlerService.handleAlert('Error', 'Data gagal dihapus')
+                        this.refresh = !this.refresh
+                    }
+                })
+            }
+        })
     }
 
     handlePagable() {
@@ -75,6 +119,14 @@ export class UkomTaskListComponent {
                             this.router.navigate([`/ukom/ukom-task-list/${pendingTask.id}`])
                         }, 'info')
                         .withIcon('detail')
+                        .build()
+                )
+                .addActionColumn(
+                    new ActionColumnBuilder()
+                        .setAction((pendingTask: any) => {
+                            this.handleDeleteTask(pendingTask.instanceId)
+                        }, 'danger')
+                        .withIcon('danger')
                         .build()
                 )
                 .addFilter(
@@ -183,20 +235,9 @@ export class UkomTaskListComponent {
             })
     }
 
-    // handlePagableTabChange(tab: string, tabIndex: number) {
-    //     const currentPagable = this.pagable$.value
 
-    //     const updatedPagable = {
-    //         ...currentPagable,
-    //         filterLIst: currentPagable.filterLIst.map((item, index) =>
-    //             item.key === 'eq_flowId' ? { ...item, value: tab } : item
-    //         )
-    //     }
-
-    //     this.tabService.changeTabActive(tabIndex)
-    //     this.pagable$.next(updatedPagable)
-    // }
     handlePagableTabChange(tab: string, tabIndex: number) {
+        console.log('tab', tab)
         const currentPagable = this.pagable$.value;
 
         let updatedPagable;

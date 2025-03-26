@@ -1,4 +1,4 @@
-<button class="btn btn-sm btn-outline-secondary mb-3" (click)="back()">
+<button class="btn btn-sm btn-outline-secondary mb-3" (click)="back(tabIndex)">
   <i class="mdi mdi-chevron-left"></i> Kembali
 </button>
 
@@ -314,7 +314,7 @@
                 >
               </div>
 
-              <div class="col">
+              <div class="col" *ngIf="pendingTask.taskStatus !== 'FAILED'">
                 <div
                   class=""
                   *ngIf="
@@ -401,7 +401,11 @@
           >
             <!-- Button: Lolos Verifikasi (Only shown when approve is enabled & not loading) -->
             <button
-              *ngIf="isApproveEnable && (hadItemsLoading$ | async) === false"
+              *ngIf="
+                isApproveEnable &&
+                (hadItemsLoading$ | async) === false &&
+                pendingTask.taskStatus !== 'FAILED'
+              "
               class="btn btn-success me-1"
               (click)="submitApprove()"
             >

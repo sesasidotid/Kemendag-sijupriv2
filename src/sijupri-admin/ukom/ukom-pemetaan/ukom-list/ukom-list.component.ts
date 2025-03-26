@@ -13,6 +13,8 @@ import { UkomRejectedListComponent } from '../ukom-rejected-list/ukom-rejected-l
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
+import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { HandlerService } from '../../../../modules/base/services/handler.service'
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
@@ -28,13 +30,14 @@ export class UkomListComponent {
     refresh: boolean = false
     tab$ = new BehaviorSubject<number | null>(0)
 
-    constructor(private router: Router, private apiService: ApiService, private tabService: TabService) { }
+    constructor(private router: Router, private apiService: ApiService, private tabService: TabService, private confirmationService: ConfirmationService, private handlerService: HandlerService) { }
 
     ngOnInit() {
         // this.handleTabService()
         this.handlerPagable()
         this.getJabatanList();
     }
+
 
     handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
@@ -99,6 +102,14 @@ export class UkomListComponent {
                     .withIcon('detail')
                     .build()
             )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((ukom: any) => {
+                        this.handleDeleteTask(ukom.nip)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build()
+            )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('nip')
@@ -155,6 +166,27 @@ export class UkomListComponent {
                     .build()
             )
             .build()
+    }
+    
+    handleDeleteTask(nip: string) {
+        this.confirmationService.open(false).subscribe({
+            next: res => {
+                if (!res.confirmed) {
+                    return
+                }
+
+                this.apiService.deleteData(`/api/v1/participant_ukom/delete/${nip}`).subscribe({
+                    next: res => {
+                        this.handlerService.handleAlert('Success', 'Data berhasil dihapus')
+                        this.refresh = !this.refresh
+                    },
+                    error: err => {
+                        this.handlerService.handleAlert('Error', 'Data gagal dihapus')
+                        this.refresh = !this.refresh
+                    }
+                })
+            }
+        })
     }
 
     getJabatanList() {
