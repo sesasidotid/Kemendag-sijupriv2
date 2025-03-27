@@ -1,8 +1,8 @@
 <div class="row">
-  <form [formGroup]="addUKomReportForm" (submit)="onSubmit()">
+  <form [formGroup]="hasilVerifikasiForm" (submit)="onSubmit()">
     <div class="row mb-3">
       <label for="inputDate" class="col-sm-2 col-form-label fw-bold"
-        >Tanggal <span class="text-danger">*</span></label
+        >Tanggal</label
       >
       <div class="col-sm-5">
         <input
@@ -12,17 +12,6 @@
           id="inputDateFrom"
           formControlName="dateFrom"
         />
-        <div
-          class="feedback"
-          *ngIf="
-            addUKomReportForm.get('dateFrom').invalid &&
-            addUKomReportForm.get('dateFrom').touched
-          "
-        >
-          <small *ngIf="addUKomReportForm.get('dateFrom').errors?.['required']">
-            Tanggal mulai perlu diisi.
-          </small>
-        </div>
       </div>
 
       <div class="col-sm-5">
@@ -33,17 +22,43 @@
           id="inputDateTo"
           formControlName="dateTo"
         />
-        <div
-          class="feedback"
-          *ngIf="
-            addUKomReportForm.get('dateTo').invalid &&
-            addUKomReportForm.get('dateTo').touched
-          "
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold"
+        >Jabatan</label
+      >
+      <div class="col-sm-10">
+        <select
+          id="jabatanCode"
+          class="form-select"
+          formControlName="jabatanCode"
+          name="jabatanCode"
         >
-          <small *ngIf="addUKomReportForm.get('dateTo').errors?.['required']">
-            Tanggal tujuan perlu diisi.
-          </small>
-        </div>
+          <option value="" selected>Pilih Jabatan</option>
+          <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
+            {{ jabatan.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label for="taskStatus" class="col-sm-2 col-form-label fw-bold"
+        >Status Verifikasi</label
+      >
+      <div class="col-sm-10">
+        <select
+          id="taskStatus"
+          class="form-select"
+          formControlName="taskStatus"
+          name="taskStatus"
+        >
+          <option value="" selected>Pilih Status Verifikasi</option>
+          <option value="COMPLETED" selected>Lolos</option>
+          <option value="FAILED" selected>Tidak Lolos</option>
+        </select>
       </div>
     </div>
 
@@ -63,17 +78,6 @@
           <option [value]="'xls'">Excel</option>
           <option [value]="'csv'">CSV</option>
         </select>
-        <div
-          class="feedback"
-          *ngIf="
-            addUKomReportForm.get('fileType').invalid &&
-            addUKomReportForm.get('fileType').touched
-          "
-        >
-          <small *ngIf="addUKomReportForm.get('fileType').errors?.['required']">
-            File type perlu diisi.
-          </small>
-        </div>
       </div>
     </div>
 
@@ -95,7 +99,7 @@
           <button
             type="submit"
             class="btn btn-success float-end"
-            [disabled]="addUKomReportForm.invalid || (isLoading$ | async)"
+            [disabled]="hasilVerifikasiForm.invalid || (isLoading$ | async)"
           >
             Generate Report
           </button>
@@ -106,5 +110,5 @@
 </div>
 <hr />
 <div class="row">
-  <app-pagable [pagable]="pagable"></app-pagable>
+  <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 </div>

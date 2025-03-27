@@ -68,24 +68,6 @@ export class LandingPageComponent {
         this.dokumenKenaikanJenjang
     }
 
-    // fetchDokumenUkom() {
-    //     forkJoin({
-    //         kenaikanJenjang: this.service.getData('/api/v1/document_ukom/jenis_ukom/KENAIKAN_JENJANG'),
-    //         pindahJabatan: this.service.getData('/api/v1/document_ukom/jenis_ukom/PERPINDAHAN_JABATAN'),
-    //         promosi: this.service.getData('/api/v1/document_ukom/jenis_ukom/PROMOSI')
-    //     }).pipe(
-    //         map(({ kenaikanJenjang, pindahJabatan, promosi }) => ({
-    //             kenaikanJenjang: this.filterUniqueByName(kenaikanJenjang),
-    //             pindahJabatan: this.filterUniqueByName(pindahJabatan),
-    //             promosi: this.filterUniqueByName(promosi)
-    //         }))
-    //     ).subscribe(({ kenaikanJenjang, pindahJabatan, promosi }) => {
-    //         this.dokumenKenaikanJenjang = kenaikanJenjang;
-    //         this.dokumenPindahJabatan = pindahJabatan;
-    //         this.dokumenPromosi = promosi;
-    //     });
-    // }
-
     fetchDokumenUkom() {
         forkJoin({
             kenaikanJenjang: this.service.getData('/api/v1/document_ukom/jenis_ukom/KENAIKAN_JENJANG'),
@@ -93,7 +75,8 @@ export class LandingPageComponent {
             promosi: this.service.getData('/api/v1/document_ukom/jenis_ukom/PROMOSI')
         }).pipe(
             map(({ kenaikanJenjang, pindahJabatan, promosi }) => {
-                const jenjangCode = 'JJ7'; // ahli madya
+                // const jenjangCode = 'JJ7'; // ahli madya
+                const jenjangCodes = ['JJ7', 'JJ8']; //ahli madya dan ahli utama
 
                 const filteredKenaikan = this.filterUniqueByName(kenaikanJenjang);
                 const filteredPindah = this.filterUniqueByName(pindahJabatan);
@@ -114,10 +97,7 @@ export class LandingPageComponent {
                 };
 
                 const sortByName = (a: DataDokumenUkom, b: DataDokumenUkom) => {
-                    // First, compare by dokumenPersyaratanName
                     const nameComparison = a.dokumenPersyaratanName.localeCompare(b.dokumenPersyaratanName);
-
-                    // If dokumenPersyaratanName is the same, compare by jabatanName
                     return nameComparison !== 0 ? nameComparison : a.jabatanName.localeCompare(b.jabatanName);
                 };
 
@@ -127,10 +107,10 @@ export class LandingPageComponent {
                     pindahJabatan: filteredPindah,
                     promosi: filteredPromosi,
                     dokumenKenaikanDanPindah: uniqueByNameAndJenjang([...kenaikanJenjang, ...pindahJabatan]
-                        .filter(doc => doc.jenjangCode === jenjangCode))
+                        .filter(doc => jenjangCodes.includes(doc.jenjangCode)))
                         .sort(sortByName),
                     dokumenPromosiDanPindah: uniqueByNameAndJenjang([...promosi, ...pindahJabatan]
-                        .filter(doc => doc.jenjangCode === jenjangCode))
+                        .filter(doc => jenjangCodes.includes(doc.jenjangCode)))
                         .sort(sortByName)
                 };
             })
@@ -154,6 +134,10 @@ export class LandingPageComponent {
         });
     }
 
+    formatJabatanJenjang(item: any): string {
+        const names = [item.jabatanName, item.jenjangName].filter(Boolean).join(' - ');
+        return names ? ` (${names})` : '';
+    }
 
     toggleMenu() {
         this.isMenuOpen = !this.isMenuOpen

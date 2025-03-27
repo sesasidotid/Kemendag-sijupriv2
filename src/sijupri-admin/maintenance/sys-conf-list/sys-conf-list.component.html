@@ -1,4 +1,4 @@
-<div class="row">
+<!-- <div class="row">
   <form [formGroup]="sysConfForm" (submit)="submit()">
     <div class="col-12">
       <table class="table table-hover">
@@ -57,6 +57,93 @@
       <button
         type="submit"
         class="float-end btn btn-sm btn-success"
+        [disabled]="!sysConfForm.valid"
+      >
+        Simpan
+      </button>
+    </div>
+  </form>
+</div> -->
+
+<div class="row">
+  <form [formGroup]="sysConfForm" (submit)="submit()">
+    <div class="col-12">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>
+              Nilai
+              <a
+                class="float-end btn btn-sm"
+                [ngClass]="
+                  isUpdate
+                    ? 'btn-soft-warning ri-arrow-go-back-line'
+                    : 'btn-soft-info ri-pencil-line'
+                "
+                (click)="isUpdate = !isUpdate"
+              >
+              </a>
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="sysConfList.length > 0">
+          <tr *ngFor="let sysConf of sysConfList">
+            <td>{{ sysConf.name }}</td>
+            <td>
+              <ng-container *ngIf="!isUpdate">
+                {{ sysConf.value }}
+              </ng-container>
+
+              <ng-container *ngIf="isUpdate">
+                <ng-container
+                  *ngIf="sysConf.code === 'UKM_REGISTRATION'; else normalInput"
+                >
+                  <button
+                    type="button"
+                    class="btn"
+                    [ngClass]="
+                      sysConfForm.get(sysConf.code + '_value').value === 'ya'
+                        ? 'btn-success'
+                        : 'btn-danger'
+                    "
+                    (click)="toggleUkomStatus(sysConf.code)"
+                  >
+                    {{ sysConfForm.get(sysConf.code + '_value').value }}
+                  </button>
+                </ng-container>
+
+                <ng-template #normalInput>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="{{ sysConf.code }}_value"
+                  />
+                  <div
+                    class="feedback"
+                    *ngIf="
+                      sysConfForm.get(sysConf.code + '_value').invalid &&
+                      sysConfForm.get(sysConf.code + '_value').touched
+                    "
+                  >
+                    <small
+                      *ngIf="sysConfForm.get(sysConf.code + '_value').errors?.['required']"
+                    >
+                      nilai perlu diisi.
+                    </small>
+                  </div>
+                </ng-template>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="isUpdate" class="col-12">
+      <button
+        type="submit"
+        class="float-end btn btn-success"
         [disabled]="!sysConfForm.valid"
       >
         Simpan

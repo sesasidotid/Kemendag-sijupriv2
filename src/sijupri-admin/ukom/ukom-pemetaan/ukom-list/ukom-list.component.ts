@@ -11,16 +11,17 @@ import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { UkomRejectedListComponent } from '../ukom-rejected-list/ukom-rejected-list.component'
 import { TabService } from '../../../../modules/base/services/tab.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, catchError, of, tap } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
+import { UkomExportVerifikasiComponent } from '../ukom-export-verifikasi/ukom-export-verifikasi.component'
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
-    imports: [PagableComponent, UkomRejectedListComponent, CommonModule],
+    imports: [PagableComponent, UkomRejectedListComponent, CommonModule, UkomExportVerifikasiComponent],
     templateUrl: './ukom-list.component.html',
     styleUrl: './ukom-list.component.scss'
 })
@@ -28,47 +29,44 @@ export class UkomListComponent {
     pagable: Pagable
     pagable$ = new BehaviorSubject<Pagable | null>(null)
 
-    jenisUkomMap: Record<string, string> = {}
     jabatanList: Jabatan[] = []
     refresh: boolean = false
     tab$ = new BehaviorSubject<number | null>(0)
 
     constructor(private router: Router, private apiService: ApiService, private tabService: TabService, private confirmationService: ConfirmationService, private handlerService: HandlerService) { }
 
-    dummy = [{ name: 'haha', value: "haha" }]
-
     ngOnInit() {
-        // this.handleTabService()
+        this.handleTabService()
         this.getJabatanList();
-        this.handlerPagable()
+        this.handlePagable()
     }
 
-    // handleTabService() {
-    //     if (this.tabService.getTabsLength() > 0) {
-    //         this.tabService.clearTabs()
-    //     }
+    handleTabService() {
+        if (this.tabService.getTabsLength() > 0) {
+            this.tabService.clearTabs()
+        }
 
-    //     this.tabService
-    //         .addTab({
-    //             label: 'Lolos Verifikasi',
-    //             icon: 'mdi-list-box',
-    //             isActive: true,
-    //             onClick: () => this.handleTabChange(0)
-    //         })
-    //         .addTab({
-    //             label: 'Tidak Lolos Verifikasi',
-    //             icon: 'mdi-plus-circle',
-    //             onClick: () => this.handleTabChange(1)
-    //         })
-    // }
+        this.tabService
+            .addTab({
+                label: 'Rekapitulasi Lolos Verifikasi',
+                icon: 'mdi-list-box',
+                isActive: true,
+                onClick: () => this.handleTabChange(0)
+            })
+            .addTab({
+                label: 'Export Rekapitulasi Verifikasi',
+                icon: 'mdi-export',
+                onClick: () => this.handleTabChange(1)
+            })
+    }
 
-    // handleTabChange(tab?: number) {
-    //     this.tab$.next(tab)
-    //     this.tabService.changeTabActive(tab)
-    // }
+    handleTabChange(tab: number) {
+        this.tab$.next(tab)
+        this.tabService.changeTabActive(tab)
+    }
 
-    handlerPagable() {
-        this.pagable$.next(new PagableBuilder('/api/v1/participant_ukom/search')
+    handlePagable() {
+        const pagable = new PagableBuilder('/api/v1/participant_ukom/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(
@@ -137,7 +135,9 @@ export class UkomListComponent {
                     ])
                     .build()
             )
-            .build())
+            .build()
+
+        this.pagable$.next(pagable)
     }
 
     handleDeleteTask(nip: string) {
@@ -202,7 +202,6 @@ export class UkomListComponent {
         };
         this.pagable$.next(updatedPagable);
     }
-
 
     getJabatanList() {
         this.apiService.getData('/api/v1/jabatan').subscribe({

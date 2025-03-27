@@ -144,7 +144,6 @@ export class ReportUkomComponent {
                         dateTo: this.addUKomReportForm.value.dateTo
                     }
 
-                    console.log('r', reportGenerate)
                     this.apiService
                         .postData('/api/v1/report_generate', reportGenerate)
                         .subscribe({
