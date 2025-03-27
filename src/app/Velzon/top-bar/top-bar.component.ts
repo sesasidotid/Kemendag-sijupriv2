@@ -14,366 +14,373 @@ import { ModalComponent } from '../../../modules/base/components/modal/modal.com
 import { FormsModule } from '@angular/forms'
 
 @Component({
-  selector: 'app-top-bar',
-  standalone: true,
-  imports: [CommonModule, EmptyStateComponent, ModalComponent, FormsModule],
-  templateUrl: './top-bar.component.html',
-  styleUrl: './top-bar.component.scss'
+    selector: 'app-top-bar',
+    standalone: true,
+    imports: [CommonModule, EmptyStateComponent, ModalComponent, FormsModule],
+    templateUrl: './top-bar.component.html',
+    styleUrl: './top-bar.component.scss'
 })
 export class TopBarComponent {
-  id: string
-  name: string
-  role: string[]
-  isOpen: boolean = false
+    id: string
+    name: string
+    role: string[]
+    isOpen: boolean = false
 
-  selectedTab: string = ''
-  isExpanded: boolean = false
-  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
+    selectedTab: string = ''
+    isExpanded: boolean = false
+    profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
-  notificationsDeleteId$ = new BehaviorSubject<string[]>([])
+    notificationsDeleteId$ = new BehaviorSubject<string[]>([])
 
-  notificationMessagePersonalList: NotificationMessage[] = []
-  notificationMessageGroupList: NotificationMessage[] = []
-  isModalOpen$ = new BehaviorSubject<boolean>(false)
-  submitLoading$ = new BehaviorSubject<boolean>(false)
+    notificationMessagePersonalList: NotificationMessage[] = []
+    notificationMessageGroupList: NotificationMessage[] = []
+    isModalOpen$ = new BehaviorSubject<boolean>(false)
+    submitLoading$ = new BehaviorSubject<boolean>(false)
+    passwordsMatch = true;
 
-  formData = {
-    userId: '',
-    oldPassword: '',
-    password: ''
-  }
+    formData = {
+        userId: '',
+        oldPassword: '',
+        password: '',
+        confirmPassword: ''
+    }
 
-  constructor (
-    @Inject(DOCUMENT) private document: Document,
-    private router: Router,
-    private apiService: ApiService,
-    private el: ElementRef,
-    private sanitizer: DomSanitizer,
-    private confirmationService: ConfirmationService,
-    private handlerService: HandlerService
-  ) {
-    this.id = LoginContext.getUserId()
-    this.name = LoginContext.getName()
-    this.role = LoginContext.getRoleCodes()
-    this.getNotificationPersonal()
-
-    this.formData.userId = this.id
-  }
-
-  ngOnInit () {
-    this.fetchPhotoProfile()
-  }
-
-  toggleModal () {
-    this.isModalOpen$.next(!this.isModalOpen$.value)
-  }
-
-  fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(this.id).subscribe({
-      next: blob => {
-        if (blob.size === 0) {
-          this.profileImageSrc = 'assets/no-profile.jpg'
-          return
-        }
-
-        const objectUrl = URL.createObjectURL(blob)
-        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
-      },
-      error: err => {
-        console.error('Error fetching profile image', err)
-        this.profileImageSrc = 'assets/no-profile.jpg'
-      }
-    })
-  }
-
-  ngAfterViewInit () {
-    const tabElement = this.el.nativeElement.querySelector(
-      '#notificationItemsTab'
-    )
-    const dropdownButton = this.el.nativeElement.querySelector(
-      '#page-header-notifications-dropdown'
-    )
-
-    dropdownButton.addEventListener('shown.bs.dropdown', () => {
-      this.getNotificationPersonal()
-    })
-
-    tabElement.addEventListener('shown.bs.tab', (event: any) => {
-      this.selectedTab = event.target.getAttribute('href') // Get href of the activated tab
-      if (this.selectedTab == '#all-noti-tab') {
+    constructor(
+        @Inject(DOCUMENT) private document: Document,
+        private router: Router,
+        private apiService: ApiService,
+        private el: ElementRef,
+        private sanitizer: DomSanitizer,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService
+    ) {
+        this.id = LoginContext.getUserId()
+        this.name = LoginContext.getName()
+        this.role = LoginContext.getRoleCodes()
         this.getNotificationPersonal()
-      } else if (this.selectedTab == '#messages-tab') {
-        this.getNotificationGroup()
-      }
-    })
-  }
 
-  getNotificationPersonal () {
-    this.apiService.getData(`/api/v1/notification_message/personal`).subscribe({
-      next: (response: any) => {
-        this.notificationMessagePersonalList = response.map(
-          (notificationMessage: { [key: string]: any }) => {
-            const notificationMessagePersonal = new NotificationMessage(
-              notificationMessage
-            )
-            notificationMessagePersonal.age = this.calculateAge(
-              notificationMessagePersonal.dateCreated
-            )
-            return notificationMessagePersonal
-          }
-        )
-      }
-    })
-  }
-
-  getNotificationGroup () {
-    this.apiService.getData(`/api/v1/notification_message/group`).subscribe({
-      next: (response: any) => {
-        this.notificationMessageGroupList = response.map(
-          (notificationMessage: { [key: string]: any }) => {
-            const notificationMessageGroup = new NotificationMessage(
-              notificationMessage
-            )
-            notificationMessageGroup.age = this.calculateAge(
-              notificationMessageGroup.dateCreated
-            )
-            return notificationMessageGroup
-          }
-        )
-      }
-    })
-  }
-
-  toggelSidebar () {
-    const windowSize = this.document.documentElement.clientWidth
-
-    if (windowSize > 767) {
-      this.document.querySelector('.hamburger-icon')?.classList.toggle('open')
+        this.formData.userId = this.id
     }
 
-    // For collapse horizontal menu
-    if (
-      this.document.documentElement.getAttribute('data-layout') === 'horizontal'
-    ) {
-      this.document.body.classList.toggle('menu')
+    ngOnInit() {
+        this.fetchPhotoProfile()
     }
 
-    // For collapse vertical menu
-    if (
-      this.document.documentElement.getAttribute('data-layout') === 'vertical'
-    ) {
-      if (windowSize <= 1025 && windowSize > 767) {
-        this.document.body.classList.remove('vertical-sidebar-enable')
-        this.document.documentElement.getAttribute('data-sidebar-size') === 'sm'
-          ? this.document.documentElement.setAttribute('data-sidebar-size', '')
-          : this.document.documentElement.setAttribute(
-              'data-sidebar-size',
-              'sm'
-            )
-      } else if (windowSize > 1025) {
-        this.document.body.classList.remove('vertical-sidebar-enable')
-        this.document.documentElement.getAttribute('data-sidebar-size') === 'lg'
-          ? this.document.documentElement.setAttribute(
-              'data-sidebar-size',
-              'sm'
-            )
-          : this.document.documentElement.setAttribute(
-              'data-sidebar-size',
-              'lg'
-            )
-      } else if (windowSize <= 767) {
-        this.document.body.classList.add('vertical-sidebar-enable')
-        this.document.documentElement.setAttribute('data-sidebar-size', 'lg')
-      }
+    checkPasswordMatch() {
+        this.passwordsMatch = this.formData.password === this.formData.confirmPassword;
     }
 
-    // Semibox menu
-    if (
-      this.document.documentElement.getAttribute('data-layout') === 'semibox'
-    ) {
-      if (windowSize > 767) {
-        if (
-          this.document.documentElement.getAttribute(
-            'data-sidebar-visibility'
-          ) === 'show'
-        ) {
-          this.document.documentElement.getAttribute('data-sidebar-size') ===
-          'lg'
-            ? this.document.documentElement.setAttribute(
-                'data-sidebar-size',
-                'sm'
-              )
-            : this.document.documentElement.setAttribute(
-                'data-sidebar-size',
-                'lg'
-              )
-        } else {
-          ;(
-            this.document.getElementById(
-              'sidebar-visibility-show'
-            ) as HTMLElement
-          )?.click()
-          this.document.documentElement.setAttribute(
-            'data-sidebar-size',
-            this.document.documentElement.getAttribute('data-sidebar-size') ||
-              ''
-          )
-        }
-      } else if (windowSize <= 767) {
-        this.document.body.classList.add('vertical-sidebar-enable')
-        this.document.documentElement.setAttribute('data-sidebar-size', 'lg')
-      }
+    toggleModal() {
+        this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    // Two column menu
-    if (
-      this.document.documentElement.getAttribute('data-layout') === 'twocolumn'
-    ) {
-      this.document.body.classList.toggle('twocolumn-panel')
-    }
-  }
-  logOut () {
-    if (LoginContext.getApplicationCode() === 'siukom-participant') {
-      this.router.navigate(['/login-cat']).then(() => {
-        console.log('reload')
-        window.location.reload()
-      })
-    } else {
-      this.router.navigate(['/login']).then(() => {
-        console.log('reload')
-        window.location.reload()
-      })
-    }
+    fetchPhotoProfile() {
+        this.apiService.getPhotoProfile(this.id).subscribe({
+            next: blob => {
+                if (blob.size === 0) {
+                    this.profileImageSrc = 'assets/no-profile.jpg'
+                    return
+                }
 
-    LoginContext.release()
-  }
-
-  profile () {
-    this.router.navigate(['/profile'])
-  }
-
-  private calculateAge (dateCreated: string): string {
-    const now = new Date()
-    const diffInSeconds = Math.floor(
-      (now.getTime() - new Date(dateCreated).getTime()) / 1000
-    )
-
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds} seconds ago`
-    } else if (diffInSeconds < 3600) {
-      const minutes = Math.floor(diffInSeconds / 60)
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
-    } else if (diffInSeconds < 86400) {
-      const hours = Math.floor(diffInSeconds / 3600)
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`
-    } else if (diffInSeconds < 604800) {
-      const days = Math.floor(diffInSeconds / 86400)
-      return `${days} day${days > 1 ? 's' : ''} ago`
-    } else if (diffInSeconds < 2629746) {
-      const weeks = Math.floor(diffInSeconds / 604800)
-      return `${weeks} week${weeks > 1 ? 's' : ''} ago`
-    } else if (diffInSeconds < 31556952) {
-      const months = Math.floor(diffInSeconds / 2629746)
-      return `${months} month${months > 1 ? 's' : ''} ago`
-    } else {
-      const years = Math.floor(diffInSeconds / 31556952)
-      return `${years} year${years > 1 ? 's' : ''} ago`
-    }
-  }
-
-  checkNotificationsDeleteId (notificationId: string) {
-    return this.notificationsDeleteId$.value.includes(notificationId)
-  }
-
-  handleCheckClicked (notificationId: string) {
-    if (!this.checkNotificationsDeleteId(notificationId)) {
-      this.notificationsDeleteId$.next([
-        ...this.notificationsDeleteId$.value,
-        notificationId
-      ])
-    } else {
-      this.notificationsDeleteId$.next(
-        this.notificationsDeleteId$.value.filter(id => id !== notificationId)
-      )
-    }
-    // console.log(this.notificationsDeleteId$.value.length);
-  }
-
-  handleCheckAllClicked () {
-    if (
-      this.notificationsDeleteId$.value.length ===
-      this.notificationMessagePersonalList.length
-    ) {
-      this.notificationsDeleteId$.next([])
-    } else {
-      this.notificationsDeleteId$.next(
-        this.notificationMessagePersonalList.map(
-          notification => notification.id
-        )
-      )
-    }
-  }
-
-  handleDeleteClicked () {
-    if (this.notificationsDeleteId$.value.length === 1) {
-      this.apiService
-        .deleteData(
-          `/api/v1/notification_message/${this.notificationsDeleteId$.value[0]}`
-        )
-        .subscribe({
-          next: (response: any) => {
-            this.notificationsDeleteId$.next([])
-            this.getNotificationPersonal()
-          }
-        })
-    } else {
-      this.apiService
-        .postData('/api/v1/notification_message/delete', {
-          idList: this.notificationsDeleteId$.value
-        })
-        .subscribe({
-          next: (response: any) => {
-            this.notificationsDeleteId$.next([])
-            this.getNotificationPersonal()
-          }
-        })
-    }
-  }
-
-  onSubmit () {
-    this.confirmationService.open(false).subscribe({
-      next: result => {
-        if (!result.confirmed) {
-          return
-        }
-        console.log(this.formData)
-
-        this.submitLoading$.next(true)
-        this.apiService.putData(`/api/v1/password`, this.formData).subscribe({
-          next: result => {
-            this.submitLoading$.next(false)
-            this.toggleModal()
-            this.handlerService.handleAlert(
-              'Success',
-              'Password berhasil diubah'
-            )
-          },
-          error: err => {
-            this.submitLoading$.next(false)
-            if (err.error.code === 'PSS-00001') {
-              this.handlerService.handleAlert(
-                'Error',
-                'Gagal mengubah password, paassword lama salah'
-              )
-            } else {
-              this.handlerService.handleAlert(
-                'Error',
-                'Gagal mengubah password'
-              )
+                const objectUrl = URL.createObjectURL(blob)
+                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+            },
+            error: err => {
+                console.error('Error fetching profile image', err)
+                this.profileImageSrc = 'assets/no-profile.jpg'
             }
-          }
         })
-      }
-    })
-  }
+    }
+
+    ngAfterViewInit() {
+        const tabElement = this.el.nativeElement.querySelector(
+            '#notificationItemsTab'
+        )
+        const dropdownButton = this.el.nativeElement.querySelector(
+            '#page-header-notifications-dropdown'
+        )
+
+        dropdownButton.addEventListener('shown.bs.dropdown', () => {
+            this.getNotificationPersonal()
+        })
+
+        tabElement.addEventListener('shown.bs.tab', (event: any) => {
+            this.selectedTab = event.target.getAttribute('href') // Get href of the activated tab
+            if (this.selectedTab == '#all-noti-tab') {
+                this.getNotificationPersonal()
+            } else if (this.selectedTab == '#messages-tab') {
+                this.getNotificationGroup()
+            }
+        })
+    }
+
+    getNotificationPersonal() {
+        this.apiService.getData(`/api/v1/notification_message/personal`).subscribe({
+            next: (response: any) => {
+                this.notificationMessagePersonalList = response.map(
+                    (notificationMessage: { [key: string]: any }) => {
+                        const notificationMessagePersonal = new NotificationMessage(
+                            notificationMessage
+                        )
+                        notificationMessagePersonal.age = this.calculateAge(
+                            notificationMessagePersonal.dateCreated
+                        )
+                        return notificationMessagePersonal
+                    }
+                )
+            }
+        })
+    }
+
+    getNotificationGroup() {
+        this.apiService.getData(`/api/v1/notification_message/group`).subscribe({
+            next: (response: any) => {
+                this.notificationMessageGroupList = response.map(
+                    (notificationMessage: { [key: string]: any }) => {
+                        const notificationMessageGroup = new NotificationMessage(
+                            notificationMessage
+                        )
+                        notificationMessageGroup.age = this.calculateAge(
+                            notificationMessageGroup.dateCreated
+                        )
+                        return notificationMessageGroup
+                    }
+                )
+            }
+        })
+    }
+
+    toggelSidebar() {
+        const windowSize = this.document.documentElement.clientWidth
+
+        if (windowSize > 767) {
+            this.document.querySelector('.hamburger-icon')?.classList.toggle('open')
+        }
+
+        // For collapse horizontal menu
+        if (
+            this.document.documentElement.getAttribute('data-layout') === 'horizontal'
+        ) {
+            this.document.body.classList.toggle('menu')
+        }
+
+        // For collapse vertical menu
+        if (
+            this.document.documentElement.getAttribute('data-layout') === 'vertical'
+        ) {
+            if (windowSize <= 1025 && windowSize > 767) {
+                this.document.body.classList.remove('vertical-sidebar-enable')
+                this.document.documentElement.getAttribute('data-sidebar-size') === 'sm'
+                    ? this.document.documentElement.setAttribute('data-sidebar-size', '')
+                    : this.document.documentElement.setAttribute(
+                        'data-sidebar-size',
+                        'sm'
+                    )
+            } else if (windowSize > 1025) {
+                this.document.body.classList.remove('vertical-sidebar-enable')
+                this.document.documentElement.getAttribute('data-sidebar-size') === 'lg'
+                    ? this.document.documentElement.setAttribute(
+                        'data-sidebar-size',
+                        'sm'
+                    )
+                    : this.document.documentElement.setAttribute(
+                        'data-sidebar-size',
+                        'lg'
+                    )
+            } else if (windowSize <= 767) {
+                this.document.body.classList.add('vertical-sidebar-enable')
+                this.document.documentElement.setAttribute('data-sidebar-size', 'lg')
+            }
+        }
+
+        // Semibox menu
+        if (
+            this.document.documentElement.getAttribute('data-layout') === 'semibox'
+        ) {
+            if (windowSize > 767) {
+                if (
+                    this.document.documentElement.getAttribute(
+                        'data-sidebar-visibility'
+                    ) === 'show'
+                ) {
+                    this.document.documentElement.getAttribute('data-sidebar-size') ===
+                        'lg'
+                        ? this.document.documentElement.setAttribute(
+                            'data-sidebar-size',
+                            'sm'
+                        )
+                        : this.document.documentElement.setAttribute(
+                            'data-sidebar-size',
+                            'lg'
+                        )
+                } else {
+                    ; (
+                        this.document.getElementById(
+                            'sidebar-visibility-show'
+                        ) as HTMLElement
+                    )?.click()
+                    this.document.documentElement.setAttribute(
+                        'data-sidebar-size',
+                        this.document.documentElement.getAttribute('data-sidebar-size') ||
+                        ''
+                    )
+                }
+            } else if (windowSize <= 767) {
+                this.document.body.classList.add('vertical-sidebar-enable')
+                this.document.documentElement.setAttribute('data-sidebar-size', 'lg')
+            }
+        }
+
+        // Two column menu
+        if (
+            this.document.documentElement.getAttribute('data-layout') === 'twocolumn'
+        ) {
+            this.document.body.classList.toggle('twocolumn-panel')
+        }
+    }
+    logOut() {
+        if (LoginContext.getApplicationCode() === 'siukom-participant') {
+            this.router.navigate(['/login-cat']).then(() => {
+                console.log('reload')
+                window.location.reload()
+            })
+        } else {
+            this.router.navigate(['/login']).then(() => {
+                console.log('reload')
+                window.location.reload()
+            })
+        }
+
+        LoginContext.release()
+    }
+
+    profile() {
+        this.router.navigate(['/profile'])
+    }
+
+    private calculateAge(dateCreated: string): string {
+        const now = new Date()
+        const diffInSeconds = Math.floor(
+            (now.getTime() - new Date(dateCreated).getTime()) / 1000
+        )
+
+        if (diffInSeconds < 60) {
+            return `${diffInSeconds} seconds ago`
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60)
+            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600)
+            return `${hours} hour${hours > 1 ? 's' : ''} ago`
+        } else if (diffInSeconds < 604800) {
+            const days = Math.floor(diffInSeconds / 86400)
+            return `${days} day${days > 1 ? 's' : ''} ago`
+        } else if (diffInSeconds < 2629746) {
+            const weeks = Math.floor(diffInSeconds / 604800)
+            return `${weeks} week${weeks > 1 ? 's' : ''} ago`
+        } else if (diffInSeconds < 31556952) {
+            const months = Math.floor(diffInSeconds / 2629746)
+            return `${months} month${months > 1 ? 's' : ''} ago`
+        } else {
+            const years = Math.floor(diffInSeconds / 31556952)
+            return `${years} year${years > 1 ? 's' : ''} ago`
+        }
+    }
+
+    checkNotificationsDeleteId(notificationId: string) {
+        return this.notificationsDeleteId$.value.includes(notificationId)
+    }
+
+    handleCheckClicked(notificationId: string) {
+        if (!this.checkNotificationsDeleteId(notificationId)) {
+            this.notificationsDeleteId$.next([
+                ...this.notificationsDeleteId$.value,
+                notificationId
+            ])
+        } else {
+            this.notificationsDeleteId$.next(
+                this.notificationsDeleteId$.value.filter(id => id !== notificationId)
+            )
+        }
+        // console.log(this.notificationsDeleteId$.value.length);
+    }
+
+    handleCheckAllClicked() {
+        if (
+            this.notificationsDeleteId$.value.length ===
+            this.notificationMessagePersonalList.length
+        ) {
+            this.notificationsDeleteId$.next([])
+        } else {
+            this.notificationsDeleteId$.next(
+                this.notificationMessagePersonalList.map(
+                    notification => notification.id
+                )
+            )
+        }
+    }
+
+    handleDeleteClicked() {
+        if (this.notificationsDeleteId$.value.length === 1) {
+            this.apiService
+                .deleteData(
+                    `/api/v1/notification_message/${this.notificationsDeleteId$.value[0]}`
+                )
+                .subscribe({
+                    next: (response: any) => {
+                        this.notificationsDeleteId$.next([])
+                        this.getNotificationPersonal()
+                    }
+                })
+        } else {
+            this.apiService
+                .postData('/api/v1/notification_message/delete', {
+                    idList: this.notificationsDeleteId$.value
+                })
+                .subscribe({
+                    next: (response: any) => {
+                        this.notificationsDeleteId$.next([])
+                        this.getNotificationPersonal()
+                    }
+                })
+        }
+    }
+
+    onSubmit() {
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) {
+                    return
+                }
+                console.log(this.formData)
+
+                this.submitLoading$.next(true)
+                this.apiService.putData(`/api/v1/password`, this.formData).subscribe({
+                    next: result => {
+                        this.submitLoading$.next(false)
+                        this.toggleModal()
+                        this.handlerService.handleAlert(
+                            'Success',
+                            'Password berhasil diubah'
+                        )
+                        setTimeout(() => { this.logOut() }, 2000)
+                    },
+                    error: err => {
+                        this.submitLoading$.next(false)
+                        if (err.error.code === 'PSS-00001') {
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengubah password, paassword lama salah'
+                            )
+                        } else {
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengubah password'
+                            )
+                        }
+                    }
+                })
+            }
+        })
+    }
 }

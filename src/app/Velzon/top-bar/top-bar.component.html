@@ -448,7 +448,14 @@
           [(ngModel)]="formData.oldPassword"
           required
           class="form-control"
+          #oldPassword="ngModel"
         />
+        <div
+          *ngIf="oldPassword.invalid && oldPassword.touched"
+          class="text-danger"
+        >
+          Password lama wajib diisi
+        </div>
       </div>
 
       <div class="mb-3">
@@ -462,7 +469,39 @@
           [(ngModel)]="formData.password"
           required
           class="form-control"
+          #password="ngModel"
         />
+        <div *ngIf="password.invalid && password.touched" class="text-danger">
+          Password baru wajib diisi
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label">
+          Konfirmasi Password Baru: <span class="text-danger">*</span>
+        </label>
+        <input
+          id="confirmPassword"
+          type="password"
+          name="confirmPassword"
+          [(ngModel)]="formData.confirmPassword"
+          required
+          class="form-control"
+          #confirmPassword="ngModel"
+          (input)="checkPasswordMatch()"
+        />
+        <div
+          *ngIf="confirmPassword.invalid && confirmPassword.touched"
+          class="text-danger"
+        >
+          Konfirmasi password wajib diisi
+        </div>
+        <div
+          *ngIf="!passwordsMatch && confirmPassword.touched"
+          class="text-danger"
+        >
+          Password baru dan konfirmasi password harus sama
+        </div>
       </div>
 
       <ng-container *ngIf="submitLoading$ | async; else noLoading">
@@ -481,7 +520,9 @@
         <button
           type="submit"
           class="btn btn-primary w-100"
-          [disabled]="!passwordForm.valid || (submitLoading$ | async)"
+          [disabled]="
+            !passwordForm.valid || !passwordsMatch || (submitLoading$ | async)
+          "
         >
           Simpan
         </button>

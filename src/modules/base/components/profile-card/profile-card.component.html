@@ -67,6 +67,9 @@
 
       <h5 class="fs-16 mb-1 text-white">{{ name }}</h5>
       <h5 class="text-muted fs-10 mb-1">NIP : {{ nip }}</h5>
+      <h5 class="text-muted fs-10 mb-1" *ngIf="userDetail.email">
+        Email : {{ userDetail.email }}
+      </h5>
       <button
         *ngIf="file"
         class="btn btn-primary mt-3"
