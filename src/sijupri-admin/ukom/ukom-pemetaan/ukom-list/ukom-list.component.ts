@@ -15,6 +15,8 @@ import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
+import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
@@ -24,53 +26,55 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
 })
 export class UkomListComponent {
     pagable: Pagable
+    pagable$ = new BehaviorSubject<Pagable | null>(null)
 
     jenisUkomMap: Record<string, string> = {}
-    jabatanNameCache: { [key: string]: string } = {}; // Cache for Jabatan names
+    jabatanList: Jabatan[] = []
     refresh: boolean = false
     tab$ = new BehaviorSubject<number | null>(0)
 
     constructor(private router: Router, private apiService: ApiService, private tabService: TabService, private confirmationService: ConfirmationService, private handlerService: HandlerService) { }
 
+    dummy = [{ name: 'haha', value: "haha" }]
+
     ngOnInit() {
         // this.handleTabService()
-        this.handlerPagable()
         this.getJabatanList();
+        this.handlerPagable()
     }
 
+    // handleTabService() {
+    //     if (this.tabService.getTabsLength() > 0) {
+    //         this.tabService.clearTabs()
+    //     }
 
-    handleTabService() {
-        if (this.tabService.getTabsLength() > 0) {
-            this.tabService.clearTabs()
-        }
+    //     this.tabService
+    //         .addTab({
+    //             label: 'Lolos Verifikasi',
+    //             icon: 'mdi-list-box',
+    //             isActive: true,
+    //             onClick: () => this.handleTabChange(0)
+    //         })
+    //         .addTab({
+    //             label: 'Tidak Lolos Verifikasi',
+    //             icon: 'mdi-plus-circle',
+    //             onClick: () => this.handleTabChange(1)
+    //         })
+    // }
 
-        this.tabService
-            .addTab({
-                label: 'Lolos Verifikasi',
-                icon: 'mdi-list-box',
-                isActive: true,
-                onClick: () => this.handleTabChange(0)
-            })
-            .addTab({
-                label: 'Tidak Lolos Verifikasi',
-                icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1)
-            })
-    }
-
-    handleTabChange(tab?: number) {
-        this.tab$.next(tab)
-        this.tabService.changeTabActive(tab)
-    }
+    // handleTabChange(tab?: number) {
+    //     this.tab$.next(tab)
+    //     this.tabService.changeTabActive(tab)
+    // }
 
     handlerPagable() {
-        this.pagable = new PagableBuilder('/api/v1/participant_ukom/search')
+        this.pagable$.next(new PagableBuilder('/api/v1/participant_ukom/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jabatan Yang Dituju', (data: any) => {
-                        return this.jabatanNameCache[data.nextJabatanCode] || '-';
+                        return this.jabatanList.find(jabatan => jabatan.code === data.nextJabatanCode)?.name || '-';
                     })
                     .build()
             )
@@ -124,38 +128,6 @@ export class UkomListComponent {
             )
             .addFilter(
                 new PageFilterBuilder('equal')
-                    .setProperty('nextJabatanCode')
-                    .withField('Jabatan Yang Dituju', 'select').withDefaultValue("")
-                    .setOptionList([
-                        {
-                            label: "Analis Perdagangan",
-                            value: "JB1"
-                        },
-                        {
-                            label: "Pengawas Perdagangan",
-                            value: "JB4"
-                        },
-                        {
-                            label: "Penguji Mutu Barang",
-                            value: "JB7"
-                        },
-                        {
-                            label: "Pengamat Tera",
-                            value: "JB10"
-                        },
-                        {
-                            label: "Penera",
-                            value: "JB11"
-                        },
-                        {
-                            label: "Negosiator Perdagangan",
-                            value: "JB5"
-                        }
-                    ])
-                    .build()
-            )
-            .addFilter(
-                new PageFilterBuilder('equal')
                     .setProperty('jenisUkom')
                     .withField('Jenis UKom', 'select').withDefaultValue("")
                     .setOptionList([
@@ -165,9 +137,9 @@ export class UkomListComponent {
                     ])
                     .build()
             )
-            .build()
+            .build())
     }
-    
+
     handleDeleteTask(nip: string) {
         this.confirmationService.open(false).subscribe({
             next: res => {
@@ -189,16 +161,61 @@ export class UkomListComponent {
         })
     }
 
+
+
+    updateFilterOptions() {
+        let updatedPagable
+        const currentPagable = this.pagable$.value;
+
+        const existingFilterList = currentPagable.filterList.map(item =>
+            item.key === 'eq_nextJabatanCode'
+                ? {
+                    ...item, optionList: this.jabatanList.map(jabatan => ({
+                        label: jabatan.name,
+                        value: jabatan.code
+                    }))
+                }
+                : item
+        );
+
+
+        const filterList = existingFilterList.some(item => item.key === 'eq_nextJabatanCode')
+            ? existingFilterList
+            : [
+                ...existingFilterList,
+                new PageFilter({
+                    label: 'Jabatan Yang Dituju',
+                    fieldType: 'select',
+                    key: 'eq_nextJabatanCode',
+                    value: '',
+                    optionList: this.jabatanList.map(jabatan => ({
+                        label: jabatan.name,
+                        value: jabatan.code
+                    })),
+                })
+            ];
+
+
+        updatedPagable = {
+            ...currentPagable,
+            filterList,
+        };
+        this.pagable$.next(updatedPagable);
+    }
+
+
     getJabatanList() {
         this.apiService.getData('/api/v1/jabatan').subscribe({
             next: (response) => {
-                response.forEach((item: any) => {
-                    this.jabatanNameCache[item.code] = item.name;
-                });
-
-                console.log('q', this.jabatanNameCache)
-
-                this.refresh = !this.refresh
+                this.jabatanList = response;
+            },
+            error: (error) => {
+                this.handlerService.handleAlert('Error', 'Gagal mengambil list jabatan')
+                this.jabatanList = []
+            },
+            complete: () => {
+                console.log('complete', this.jabatanList)
+                this.updateFilterOptions()
             }
         });
     }

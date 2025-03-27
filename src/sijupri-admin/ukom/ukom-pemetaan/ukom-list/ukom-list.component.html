@@ -5,4 +5,6 @@
   <app-ukom-rejected-list></app-ukom-rejected-list>
 </ng-container> -->
 
-<app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+<!-- <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable> -->
+
+<app-pagable [pagable]="pagable$ | async" [refresh]="refresh"></app-pagable>

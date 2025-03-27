@@ -42,7 +42,7 @@ export class UkomTaskDetailComponent {
     predikatKinerjaList: any[] = []
 
     JFDetail: JF = new JF()
-    tabIndex: string
+    tabIndex: number
 
     constructor(
         private apiService: ApiService,
@@ -206,14 +206,14 @@ export class UkomTaskDetailComponent {
     }
 
     handlerTabIndex() {
-        if (this.pendingTask.workflowId == "ukom_flow_1") {
-            this.tabIndex = "0"
+        if (this.pendingTask.flowId == "ukom_flow_1") {
+            this.tabIndex = 0
         }
-        if (this.pendingTask.workflowId == "ukom_flow_2") {
-            this.tabIndex = "1"
+        if (this.pendingTask.flowId == "ukom_flow_2") {
+            this.tabIndex = 1
         }
         if (this.pendingTask.taskStatus == "FAILED") {
-            this.tabIndex = "2"
+            this.tabIndex = 2
         }
     }
 
@@ -221,7 +221,6 @@ export class UkomTaskDetailComponent {
         this.prevApprovedTask = dokumenUkomList.filter(
             dokumen => dokumen.dokumenStatus === 'APPROVE'
         )
-        console.log('prevApprovedTask', this.prevApprovedTask)
     }
 
     preview(fileName: string, source: string) {
@@ -251,10 +250,10 @@ export class UkomTaskDetailComponent {
         }
     }
 
-    back(tabIndex: string) {
+    back(tabIndex: number, menu: string) {
         // history.back()
         this.router.navigate(['/ukom/ukom-task-list'], {
-            state: { tabIndex: tabIndex }
+            state: { tabIndex: tabIndex, menu: menu }
         });
     }
 

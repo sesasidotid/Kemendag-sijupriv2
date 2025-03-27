@@ -9,7 +9,7 @@
         Silahkan untuk dapat join Zoom melalui link berikut:
         <a
           *ngIf="roomUkom.vidCallLink; else noLink"
-          href="{{ roomUkom.vidCallLink }}"
+          [href]="getAbsoluteUrl(roomUkom.vidCallLink)"
           target="_blank"
           class="text-primary"
           data-bs-toggle="tooltip"

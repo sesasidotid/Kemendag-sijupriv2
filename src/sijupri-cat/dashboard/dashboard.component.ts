@@ -14,146 +14,153 @@ import { EmptyStateComponent } from '../../modules/base/components/empty-state/e
 declare var bootstrap: any
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, ModalComponent, EmptyStateComponent],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+    selector: 'app-dashboard',
+    standalone: true,
+    imports: [CommonModule, ModalComponent, EmptyStateComponent],
+    templateUrl: './dashboard.component.html',
+    styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements AfterViewInit {
-  roomUkom: RoomUkom = new RoomUkom()
-  now: number = Date.now()
-  currentDate = new Date()
-  CATSchore: CATSchore = new CATSchore()
-  participant_id: string = ''
-  isModalOpen$ = new BehaviorSubject<boolean>(false)
+    roomUkom: RoomUkom = new RoomUkom()
+    now: number = Date.now()
+    currentDate = new Date()
+    CATSchore: CATSchore = new CATSchore()
+    participant_id: string = ''
+    isModalOpen$ = new BehaviorSubject<boolean>(false)
 
-  t: string = LoginContext.getApplicationCode()
+    t: string = LoginContext.getApplicationCode()
 
-  constructor (
-    private api: ApiService,
-    private router: Router,
-    private handler: HandlerService,
-    private confirmationService: ConfirmationService,
-    private elRef: ElementRef
-  ) {}
+    constructor(
+        private api: ApiService,
+        private router: Router,
+        private handler: HandlerService,
+        private confirmationService: ConfirmationService,
+        private elRef: ElementRef
+    ) { }
 
-  ngOnInit () {
-    this.getRoomUkom()
-    this.updateCurrentTime()
-    this.exitFullScreen()
-  }
-
-  ngAfterViewInit () {
-    this.initializeTooltips()
-  }
-
-  initializeTooltips () {
-    const tooltipTriggerList = this.elRef.nativeElement.querySelectorAll(
-      '[data-bs-toggle="tooltip"]'
-    )
-    tooltipTriggerList.forEach((tooltipTriggerEl: any) => {
-      new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-  }
-
-  updateCurrentTime () {
-    interval(1000).subscribe(() => {
-      this.now = Date.now()
-    })
-  }
-
-  exitFullScreen () {
-    if (document.exitFullscreen) {
-      document.exitFullscreen()
-    } else if ((document as any).mozCancelFullScreen) {
-      /* Firefox */
-      ;(document as any).mozCancelFullScreen()
-    } else if ((document as any).webkitExitFullscreen) {
-      /* Chrome, Safari, and Opera */
-      ;(document as any).webkitExitFullscreen()
-    } else if ((document as any).msExitFullscreen) {
-      /* IE/Edge */
-      ;(document as any).msExitFullscreen()
+    ngOnInit() {
+        this.getRoomUkom()
+        this.updateCurrentTime()
+        this.exitFullScreen()
     }
-  }
 
-  canStartExam (examStartTime: string): boolean {
-    return new Date(examStartTime) <= this.currentDate
-  }
+    ngAfterViewInit() {
+        this.initializeTooltips()
+    }
 
-  getRoomUkom () {
-    this.api
-      .getData(
-        `/api/v1/participant_ukom/nip/${LoginContext.getUserId().replace(
-          'PU-',
-          ''
-        )}`
-      )
-      .subscribe({
-        next: (response: any) => {
-          this.roomUkom = new RoomUkom(response.roomUkomDto)
-          //   this.roomUkom = new RoomUkom()
-          console.log('roomUkom', this.roomUkom)
-          this.participant_id = response.id
-          this.getCATScore()
-        },
-        error: err => {
-          console.error('Error fetching RoomUkom:', err)
+    initializeTooltips() {
+        const tooltipTriggerList = this.elRef.nativeElement.querySelectorAll(
+            '[data-bs-toggle="tooltip"]'
+        )
+        tooltipTriggerList.forEach((tooltipTriggerEl: any) => {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    }
+
+    updateCurrentTime() {
+        interval(1000).subscribe(() => {
+            this.now = Date.now()
+        })
+    }
+
+    getAbsoluteUrl(url: string): string {
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            return `https://${url}`;
         }
-      })
-  }
+        return url;
+    }
 
-  startExam (room_ukom_id: string) {
-    this.confirmationService.open(false).subscribe({
-      next: response => {
-        if (!response.confirmed) {
-          return
+    exitFullScreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen()
+        } else if ((document as any).mozCancelFullScreen) {
+            /* Firefox */
+            ; (document as any).mozCancelFullScreen()
+        } else if ((document as any).webkitExitFullscreen) {
+            /* Chrome, Safari, and Opera */
+            ; (document as any).webkitExitFullscreen()
+        } else if ((document as any).msExitFullscreen) {
+            /* IE/Edge */
+            ; (document as any).msExitFullscreen()
         }
+    }
 
+    canStartExam(examStartTime: string): boolean {
+        return new Date(examStartTime) <= this.currentDate
+    }
+
+    getRoomUkom() {
         this.api
-          .postData('/api/v1/exam/start', {
-            examTypeCode: 'CAT',
-            roomUkomId: room_ukom_id
-          })
-          .subscribe({
-            next: (response: any) => {
-              console.log('test e', response)
+            .getData(
+                `/api/v1/participant_ukom/nip/${LoginContext.getUserId().replace(
+                    'PU-',
+                    ''
+                )}`
+            )
+            .subscribe({
+                next: (response: any) => {
+                    this.roomUkom = new RoomUkom(response.roomUkomDto)
+                    //   this.roomUkom = new RoomUkom()
+                    console.log('roomUkom', this.roomUkom)
+                    this.participant_id = response.id
+                    this.getCATScore()
+                },
+                error: err => {
+                    console.error('Error fetching RoomUkom:', err)
+                }
+            })
+    }
 
-              this.router.navigate(['/cat'])
-            },
-            error: err => {
-              this.handler.handleAlert(
-                'Error',
-                'Gagal memulai ujian, silahkan coba lagi'
-              )
-              console.error('Error fetching RoomUkom:', err)
+    startExam(room_ukom_id: string) {
+        this.confirmationService.open(false).subscribe({
+            next: response => {
+                if (!response.confirmed) {
+                    return
+                }
+
+                this.api
+                    .postData('/api/v1/exam/start', {
+                        examTypeCode: 'CAT',
+                        roomUkomId: room_ukom_id
+                    })
+                    .subscribe({
+                        next: (response: any) => {
+                            console.log('test e', response)
+
+                            this.router.navigate(['/cat'])
+                        },
+                        error: err => {
+                            this.handler.handleAlert(
+                                'Error',
+                                'Gagal memulai ujian, silahkan coba lagi'
+                            )
+                            console.error('Error fetching RoomUkom:', err)
+                        }
+                    })
             }
-          })
-      }
-    })
-  }
+        })
+    }
 
-  getCATScore () {
-    const exam_type_code = 'CAT'
-    const room_ukom_id = this.roomUkom.id
-    this.api
-      .getData(`/api/v1/exam_grade/${exam_type_code}/${this.participant_id}`)
-      .subscribe({
-        next: (response: any) => {
-          this.CATSchore = new CATSchore(response)
-        }
-      })
-  }
+    getCATScore() {
+        const exam_type_code = 'CAT'
+        const room_ukom_id = this.roomUkom.id
+        this.api
+            .getData(`/api/v1/exam_grade/${exam_type_code}/${this.participant_id}`)
+            .subscribe({
+                next: (response: any) => {
+                    this.CATSchore = new CATSchore(response)
+                }
+            })
+    }
 
-  toggleModal () {
-    this.isModalOpen$.next(!this.isModalOpen$.value)
-  }
+    toggleModal() {
+        this.isModalOpen$.next(!this.isModalOpen$.value)
+    }
 
-  getCorrectAnswer (question: any): string {
-    const correctChoice = question.multipleChoiceDtoList.find(
-      (choice: any) => choice.correct
-    )
-    return correctChoice ? correctChoice.choiceId : ''
-  }
+    getCorrectAnswer(question: any): string {
+        const correctChoice = question.multipleChoiceDtoList.find(
+            (choice: any) => choice.correct
+        )
+        return correctChoice ? correctChoice.choiceId : ''
+    }
 }

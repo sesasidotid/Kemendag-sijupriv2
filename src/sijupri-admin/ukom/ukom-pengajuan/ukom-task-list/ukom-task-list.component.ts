@@ -25,34 +25,35 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
     styleUrl: './ukom-task-list.component.scss'
 })
 export class UkomTaskListComponent {
-    pagable: Pagable
     pagable$ = new BehaviorSubject<Pagable | null>(null)
-    jabatanList$ = new BehaviorSubject<{ label: string; value: string }[]>([]);
+    jabatanList: Jabatan[] = []
     refresh: boolean
+    tabIndex: BehaviorSubject<number> = new BehaviorSubject<number>(0)
 
     constructor(private router: Router, private tabService: TabService, private apiService: ApiService, private confirmationService: ConfirmationService, private handlerService: HandlerService) { }
 
     ngOnInit() {
         const navigation = history.state
         this.getJabatanList()
-        this.handleTabService()
         this.handlePagable()
 
-        // if (navigation.tabIndex) {
-        //     this.handleBackFromDetail(navigation.tabIndex)
-        // }
+        if (navigation.tabIndex && navigation.menu == 'pengajuan-ukom') {
+            this.tabIndex.next(parseInt(navigation.tabIndex))
+            this.handleBackFromDetail(this.tabIndex.value)
+        }
+        this.handleTabService()
     }
 
-    handleBackFromDetail(tabIndex: string) {
-        if (tabIndex == '0') {
+    handleBackFromDetail(tabIndex: number) {
+        if (tabIndex == 0) {
             this.handlePagableTabChange('ukom_flow_1', 0)
         }
 
-        if (tabIndex == '1') {
+        if (tabIndex == 1) {
             this.handlePagableTabChange('ukom_flow_2', 1)
         }
 
-        if (tabIndex == '2') {
+        if (tabIndex == 2) {
             this.handlePagableTabChange('rejected', 2)
         }
 
@@ -149,38 +150,6 @@ export class UkomTaskListComponent {
                         .build()
                 )
                 .addFilter(
-                    new PageFilterBuilder('like')
-                        .setProperty('nextJabatanName')
-                        .withField('Jabatan Yang Dituju', 'select').withDefaultValue("")
-                        .setOptionList([
-                            {
-                                label: "Analis Perdagangan",
-                                value: "Analis Perdagangan"
-                            },
-                            {
-                                label: "Pengawas Perdagangan",
-                                value: "Pengawas Perdagangan"
-                            },
-                            {
-                                label: "Penguji Mutu Barang",
-                                value: "Penguji Mutu Barang"
-                            },
-                            {
-                                label: "Pengamat Tera",
-                                value: "Pengamat Tera"
-                            },
-                            {
-                                label: "Penera",
-                                value: "Penera"
-                            },
-                            {
-                                label: "Negosiator Perdagangan",
-                                value: "Negosiator Perdagangan"
-                            }
-                        ])
-                        .build()
-                )
-                .addFilter(
                     new PageFilterBuilder('equal')
                         .setProperty('jenisUkom')
                         .withField('Jenis UKom', 'select').withDefaultValue("")
@@ -195,20 +164,60 @@ export class UkomTaskListComponent {
         )
     }
 
+    updateFilterOptions() {
+        let updatedPagable
+        const currentPagable = this.pagable$.value;
+
+        const existingFilterList = currentPagable.filterList.map(item =>
+            item.key === 'like_nextJabatanName'
+                ? {
+                    ...item, optionList: this.jabatanList.map(jabatan => ({
+                        label: jabatan.name,
+                        value: jabatan.name
+                    }))
+                }
+                : item
+        );
+
+
+        const filterList = existingFilterList.some(item => item.key === 'like_nextJabatanName')
+            ? existingFilterList
+            : [
+                ...existingFilterList,
+                new PageFilter({
+                    label: 'Jabatan Yang Dituju',
+                    fieldType: 'select',
+                    key: 'like_nextJabatanName',
+                    value: '',
+                    optionList: this.jabatanList.map(jabatan => ({
+                        label: jabatan.name,
+                        value: jabatan.name
+                    })),
+                })
+            ];
+
+
+        updatedPagable = {
+            ...currentPagable,
+            filterList,
+        };
+        this.pagable$.next(updatedPagable);
+    }
+
     getJabatanList() {
         this.apiService.getData('/api/v1/jabatan').subscribe({
             next: (response) => {
-                const mappedData = response.map((item: any) => ({
-                    label: item.name,
-                    value: item.code
-                }));
-                this.jabatanList$.next(mappedData);
+                this.jabatanList = response;
+            },
+            error: (error) => {
+                this.handlerService.handleAlert('Error', 'Gagal mengambil list jabatan')
+                this.jabatanList = []
+            },
+            complete: () => {
+                console.log('complete', this.jabatanList)
+                this.updateFilterOptions()
             }
         });
-
-        this.jabatanList$.subscribe(value => {
-            console.log(value);
-        })
     }
 
     handleTabService() {
@@ -220,17 +229,20 @@ export class UkomTaskListComponent {
             .addTab({
                 label: 'Verifikasi Pengajuan',
                 icon: 'mdi-list-box',
-                isActive: true,
+                // isActive: true,
+                isActive: this.tabIndex.value == 0,
                 onClick: () => this.handlePagableTabChange('ukom_flow_1', 0)
             })
             .addTab({
                 label: 'Perbaikan Dokumen',
                 icon: 'mdi-account-supervisor',
+                isActive: this.tabIndex.value == 1,
                 onClick: () => this.handlePagableTabChange('ukom_flow_2', 1)
             })
             .addTab({
                 label: 'Tidak Lolos Verifikasi',
-                icon: 'mdi-account-supervisor',
+                icon: 'mdi-close',
+                isActive: this.tabIndex.value == 2,
                 onClick: () => this.handlePagableTabChange('rejected', 2)
             })
     }
@@ -243,29 +255,23 @@ export class UkomTaskListComponent {
         let updatedPagable;
 
         if (tab === 'rejected') {
-            // Remove 'eq_flowId' from filterList and update the endpoint
             updatedPagable = {
                 ...currentPagable,
                 filterList: currentPagable.filterList.filter(item => item.key !== 'eq_flowId'),
                 endpoint: '/api/v1/participant_ukom/task/failed/search'
             };
         } else {
-            // Ensure 'eq_flowId' exists when switching from 'rejected' to another tab
             const existingFilterList = currentPagable.filterList.map(item =>
                 item.key === 'eq_flowId' ? { ...item, value: tab } : item
             );
 
-            // If 'eq_flowId' does not exist, add a valid PageFilter
             const filterList = currentPagable.filterList.some(item => item.key === 'eq_flowId')
                 ? existingFilterList
                 : [
                     ...existingFilterList,
                     new PageFilter({
-                        // label: 'Flow ID',
-                        // fieldType: 'text',
                         key: 'eq_flowId',
                         value: tab,
-                        // optionList: []
                     })
                 ];
 
