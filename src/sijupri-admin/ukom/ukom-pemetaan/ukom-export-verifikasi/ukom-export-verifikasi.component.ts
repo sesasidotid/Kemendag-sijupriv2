@@ -153,12 +153,19 @@ export class UkomExportVerifikasiComponent {
                 this.isLoading$.next(true)
                 this.payload.reportId = this.reportId
                 this.payload.fileType = this.hasilVerifikasiForm.get('fileType')?.value
-                this.payload.parameter = {
-                    taskStatus: this.hasilVerifikasiForm.get('taskStatus')?.value,
-                    jabatanCode: this.hasilVerifikasiForm.get('jabatanCode')?.value,
-                    dateFrom: this.hasilVerifikasiForm.get('dateFrom')?.value,
-                    dateTo: this.hasilVerifikasiForm.get('dateTo')?.value
-                }
+                this.payload.parameter = {};
+
+                const addIfTruthy = (key: string, value: any) => {
+                    if (value) {
+                        this.payload.parameter[key] = value;
+                    }
+                };
+
+                addIfTruthy("taskStatus", this.hasilVerifikasiForm.get("taskStatus")?.value);
+                addIfTruthy("jabatanCode", this.hasilVerifikasiForm.get("jabatanCode")?.value);
+                addIfTruthy("jabatanName", this.jabatanList.find(jabatan => jabatan.code == this.hasilVerifikasiForm.get("jabatanCode")?.value)?.name);
+                addIfTruthy("dateFrom", this.hasilVerifikasiForm.get("dateFrom")?.value || "2024-01-01");
+                addIfTruthy("dateTo", this.hasilVerifikasiForm.get("dateTo")?.value || new Date().toISOString().split("T")[0]);
 
                 this.apiService.postData('/api/v1/report_generate', this.payload).subscribe({
                     next: () => {
