@@ -1,0 +1,11 @@
+# Ignore node_modules and dependencies
+node_modules
+dist
+.git
+.gitignore
+Dockerfile
+.dockerignore
+.env
+*.log
+*.rar
+*.zip
