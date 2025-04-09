@@ -39,22 +39,29 @@
 
 <section class="mt-5">
   <h4>List Kompetensi</h4>
-  <div class="row mb-3" *ngFor="let kompetensi of UkomRoomKompetensi">
-    <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label fw-bold">
-        Kompetensi
-      </label>
-      <div class="col-sm-10 pt-2">
-        <p>: {{ kompetensi.name }}</p>
-        <button
-          class="btn btn-sm btn-secondary"
-          (click)="openModal(kompetensi.id)"
-        >
-          Pilih Pertanyaan
-        </button>
+
+  <div *ngIf="UkomRoomKompetensi?.length > 0; else noKompetensi">
+    <div class="row mb-3" *ngFor="let kompetensi of UkomRoomKompetensi">
+      <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold">
+          Kompetensi
+        </label>
+        <div class="col-sm-10 pt-2">
+          <p>: {{ kompetensi.name }}</p>
+          <button
+            class="btn btn-sm btn-secondary"
+            (click)="openModal(kompetensi.id)"
+          >
+            Pilih Pertanyaan
+          </button>
+        </div>
       </div>
     </div>
   </div>
+
+  <ng-template #noKompetensi>
+    <p class="text-muted">Tidak ada kompetensi tersedia.</p>
+  </ng-template>
 </section>
 
 <section>

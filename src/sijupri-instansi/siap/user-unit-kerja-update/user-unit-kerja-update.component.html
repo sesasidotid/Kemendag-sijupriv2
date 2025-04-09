@@ -12,16 +12,8 @@
         id="name"
         formControlName="name"
       />
-      <div
-        class="feedback"
-        *ngIf="
-          updateUserUnitKerja.get('name').invalid &&
-          updateUserUnitKerja.get('name').touched
-        "
-      >
-        <small *ngIf="updateUserUnitKerja.get('name').errors?.['required']"
-          >Nama perlu diisi.</small
-        >
+      <div *ngIf="getErrorMessage('name', 'Name') as error" class="text-danger">
+        {{ error }}
       </div>
     </div>
   </div>
@@ -40,18 +32,10 @@
         formControlName="email"
       />
       <div
-        class="feedback"
-        *ngIf="
-          updateUserUnitKerja.get('email').invalid &&
-          updateUserUnitKerja.get('email').touched
-        "
+        *ngIf="getErrorMessage('email', 'Email') as error"
+        class="text-danger"
       >
-        <small *ngIf="updateUserUnitKerja.get('email').errors?.['required']"
-          >Email perlu diisi.</small
-        >
-        <small *ngIf="updateUserUnitKerja.get('email').errors?.['email']"
-          >Email harus berupa email.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -77,29 +61,43 @@
         </option>
       </select>
       <div
-        class="feedback"
-        *ngIf="
-          updateUserUnitKerja.get('unit_kerja_id').invalid &&
-          updateUserUnitKerja.get('unit_kerja_id').touched
-        "
+        *ngIf="getErrorMessage('unit_kerja_id', 'Unit Kerja') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="updateUserUnitKerja.get('unit_kerja_id').errors?.['required']"
-          >Unit Kerja perlu dipilih.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
 
   <div class="row">
     <div class="text-center col">
-      <button
+      <ng-container *ngIf="submitLoading$ | async; else noLoading">
+        <button class="btn btn-success float-end" disabled>
+          <div
+            class="spinner-border"
+            style="width: 19px; height: 19px"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </button>
+      </ng-container>
+      <ng-template #noLoading>
+        <button
+          type="submit"
+          class="btn btn-success float-end"
+          [disabled]="updateUserUnitKerja.invalid || (submitLoading$ | async)"
+        >
+          Simpan
+        </button>
+      </ng-template>
+      <!-- <button
         type="submit"
         class="btn btn-primary float-end"
         [disabled]="updateUserUnitKerja.invalid"
       >
         Simpan
-      </button>
+      </button> -->
     </div>
   </div>
 </form>

@@ -183,7 +183,7 @@
         name="instansiId"
         required
       >
-        <option [value]="" disabled selected>Pilih</option>
+        <option [value]="null" disabled selected>Pilih</option>
         <option *ngFor="let instansi of instansiList" [value]="instansi.id">
           {{ instansi.name }}
         </option>

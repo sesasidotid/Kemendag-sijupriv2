@@ -14,12 +14,10 @@
           placeholder="Masukan nama kelas UKom"
         />
         <div
+          *ngIf="getErrorMessage('name', 'Nama') as error"
           class="text-danger"
-          *ngIf="kelasForm.get('name').invalid && kelasForm.get('name').touched"
         >
-          <small *ngIf="kelasForm.get('name').errors?.['required']"
-            >Nama kelas UKom perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -51,14 +49,10 @@
           </ng-template>
         </select>
         <div
+          *ngIf="getErrorMessage('jabatan', 'Jabatan') as error"
           class="text-danger"
-          *ngIf="
-            kelasForm.get('jabatan').invalid && kelasForm.get('jabatan').touched
-          "
         >
-          <small *ngIf="kelasForm.get('jabatan').errors?.['required']"
-            >Jabatan perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -92,14 +86,10 @@
         </select>
 
         <div
+          *ngIf="getErrorMessage('jenjang', 'Jenjang') as error"
           class="text-danger"
-          *ngIf="
-            kelasForm.get('jenjang').invalid && kelasForm.get('jenjang').touched
-          "
         >
-          <small *ngIf="kelasForm.get('jenjang').errors?.['required']"
-            >Jenjang perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -118,15 +108,10 @@
           placeholder="Masukan kuota peserta"
         />
         <div
+          *ngIf="getErrorMessage('participant_quota', 'Kuota peserta') as error"
           class="text-danger"
-          *ngIf="
-            kelasForm.get('participant_quota').invalid &&
-            kelasForm.get('participant_quota').touched
-          "
         >
-          <small *ngIf="kelasForm.get('participant_quota').errors?.['required']"
-            >Kuota peserta perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -145,15 +130,10 @@
           placeholder="Masukan Link Zoom, contoh: https://zoom.us/j/1111"
         />
         <div
+          *ngIf="getErrorMessage('vid_call_link', 'Link Zoom') as error"
           class="text-danger"
-          *ngIf="
-            kelasForm.get('vid_call_link').invalid &&
-            kelasForm.get('vid_call_link').touched
-          "
         >
-          <small *ngIf="kelasForm.get('vid_call_link').errors?.['required']"
-            >Link Zoom perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -171,15 +151,10 @@
           formControlName="exam_start_at"
         />
         <div
+          *ngIf="getErrorMessage('exam_start_at', 'Waktu mulai') as error"
           class="text-danger"
-          *ngIf="
-            kelasForm.get('exam_start_at').invalid &&
-            kelasForm.get('exam_start_at').touched
-          "
         >
-          <small *ngIf="kelasForm.get('exam_start_at').errors?.['required']"
-            >Waktu mulai perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -197,15 +172,10 @@
           formControlName="exam_end_at"
         />
         <div
+          *ngIf="getErrorMessage('exam_end_at', 'Waktu selesai') as error"
           class="text-danger"
-          *ngIf="
-            kelasForm.get('exam_end_at').invalid &&
-            kelasForm.get('exam_end_at').touched
-          "
         >
-          <small *ngIf="kelasForm.get('exam_end_at').errors?.['required']"
-            >Waktu selesai perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>

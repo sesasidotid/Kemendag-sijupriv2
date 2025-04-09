@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Output } from '@angular/core'
 import { LucideAngularModule } from 'lucide-angular'
 import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
+    FormControl,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
@@ -17,118 +17,128 @@ import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
-  selector: 'app-ukom-class-add',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    LucideAngularModule,
-    ReactiveFormsModule
-  ],
-  templateUrl: './ukom-class-add.component.html',
-  styleUrl: './ukom-class-add.component.scss'
+    selector: 'app-ukom-class-add',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        LucideAngularModule,
+        ReactiveFormsModule
+    ],
+    templateUrl: './ukom-class-add.component.html',
+    styleUrl: './ukom-class-add.component.scss'
 })
 export class UkomClassAddComponent {
-  @Output() changeTabActive: EventEmitter<any> = new EventEmitter()
+    @Output() changeTabActive: EventEmitter<any> = new EventEmitter()
 
-  tab$ = new BehaviorSubject<number | null>(0)
+    tab$ = new BehaviorSubject<number | null>(0)
 
-  kelasForm: FormGroup
-  submitLoading$ = new BehaviorSubject<boolean>(false)
+    kelasForm: FormGroup
+    submitLoading$ = new BehaviorSubject<boolean>(false)
 
-  kelasData: RoomUkom = new RoomUkom()
-  jabatanList$: Observable<Jabatan[]>
-  jenjangList$: Observable<Jenjang[]>
+    kelasData: RoomUkom = new RoomUkom()
+    jabatanList$: Observable<Jabatan[]>
+    jenjangList$: Observable<Jenjang[]>
 
-  constructor (
-    private confirmationService: ConfirmationService,
-    private apiService: ApiService,
-    private handlerService: HandlerService
-  ) {}
+    constructor(
+        private confirmationService: ConfirmationService,
+        private apiService: ApiService,
+        private handlerService: HandlerService,
+        private formValidationService: FormValidationService
+    ) { }
 
-  ngOnInit () {
-    this.kelasForm = new FormGroup({
-      name: new FormControl('', Validators.required),
-      jabatan: new FormControl('', Validators.required),
-      jenjang: new FormControl('', Validators.required),
-      participant_quota: new FormControl('', Validators.required),
-      vid_call_link: new FormControl('', Validators.required),
-      exam_start_at: new FormControl('', Validators.required),
-      exam_end_at: new FormControl('', Validators.required)
-    })
+    ngOnInit() {
+        this.handleFormInit()
+        this.getJabatanList()
+        this.getListJenjang()
+    }
 
-    this.getJabatanList()
-    this.getListJenjang()
-  }
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.kelasForm.get(controlName), controlName, label);
+    }
 
-  getJabatanList () {
-    this.jabatanList$ = this.apiService
-      .getData(`/api/v1/jabatan`)
-      .pipe(
-        map(response =>
-          response.map(
-            (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
-          )
-        )
-      )
-  }
+    handleFormInit() {
+        this.kelasForm = new FormGroup({
+            name: new FormControl('', Validators.required),
+            jabatan: new FormControl('', Validators.required),
+            jenjang: new FormControl('', Validators.required),
+            participant_quota: new FormControl('', [Validators.required, Validators.pattern(/^\d+$/)
+            ]),
+            vid_call_link: new FormControl('', Validators.required),
+            exam_start_at: new FormControl('', Validators.required),
+            exam_end_at: new FormControl('', Validators.required)
+        })
+    }
 
-  getListJenjang () {
-    this.jenjangList$ = this.apiService
-      .getData(`/api/v1/jenjang`)
-      .pipe(
-        map(response =>
-          response.map(
-            (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
-          )
-        )
-      )
-  }
+    getJabatanList() {
+        this.jabatanList$ = this.apiService
+            .getData(`/api/v1/jabatan`)
+            .pipe(
+                map(response =>
+                    response.map(
+                        (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+                    )
+                )
+            )
+    }
 
-  submit () {
-    this.confirmationService.open(false).subscribe({
-      next: result => {
-        if (!result.confirmed) return
+    getListJenjang() {
+        this.jenjangList$ = this.apiService
+            .getData(`/api/v1/jenjang`)
+            .pipe(
+                map(response =>
+                    response.map(
+                        (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                    )
+                )
+            )
+    }
 
-        this.submitLoading$.next(true)
+    submit() {
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
 
-        this.kelasData.name = this.kelasForm.get('name')?.value
-        this.kelasData.jabatan_code = this.kelasForm.get('jabatan')?.value
-        this.kelasData.jenjang_code = this.kelasForm.get('jenjang')?.value
-        this.kelasData.participant_quota =
-          this.kelasForm.get('participant_quota')?.value
-        this.kelasData.vid_call_link =
-          this.kelasForm.get('vid_call_link')?.value
-        this.kelasData.exam_start_at =
-          this.kelasForm.get('exam_start_at')?.value
-        this.kelasData.exam_end_at = this.kelasForm.get('exam_end_at')?.value
+                this.submitLoading$.next(true)
 
-        this.apiService
-          .postData(`/api/v1/room_ukom`, this.kelasData)
-          .subscribe({
-            next: (response: any) => {
-              this.submitLoading$.next(false)
-              this.handlerService.handleAlert(
-                'Success',
-                'Berhasil menambahkan data kelas'
-              )
-              this.changeTabActive.emit(0)
-            },
-            error: error => {
-              this.submitLoading$.next(false)
-              console.log(error)
-              this.handlerService.handleAlert(
-                'Info',
-                'Gagal menambahkan data kelas'
-              )
-            },
-            complete: () => {
-              this.submitLoading$.next(false)
+                this.kelasData.name = this.kelasForm.get('name')?.value
+                this.kelasData.jabatan_code = this.kelasForm.get('jabatan')?.value
+                this.kelasData.jenjang_code = this.kelasForm.get('jenjang')?.value
+                this.kelasData.participant_quota =
+                    this.kelasForm.get('participant_quota')?.value
+                this.kelasData.vid_call_link =
+                    this.kelasForm.get('vid_call_link')?.value
+                this.kelasData.exam_start_at =
+                    this.kelasForm.get('exam_start_at')?.value
+                this.kelasData.exam_end_at = this.kelasForm.get('exam_end_at')?.value
+
+                this.apiService
+                    .postData(`/api/v1/room_ukom`, this.kelasData)
+                    .subscribe({
+                        next: (response: any) => {
+                            this.submitLoading$.next(false)
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil menambahkan data kelas'
+                            )
+                            this.changeTabActive.emit(0)
+                        },
+                        error: error => {
+                            this.submitLoading$.next(false)
+                            console.log(error)
+                            this.handlerService.handleAlert(
+                                'Info',
+                                'Gagal menambahkan data kelas'
+                            )
+                        },
+                        complete: () => {
+                            this.submitLoading$.next(false)
+                        }
+                    })
             }
-          })
-      }
-    })
-  }
+        })
+    }
 }

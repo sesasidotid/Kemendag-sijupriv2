@@ -11,18 +11,8 @@
         id="nip"
         formControlName="nip"
       />
-      <div
-        class="feedback"
-        *ngIf="
-          unitKerjaForm.get('nip').invalid && unitKerjaForm.get('nip').touched
-        "
-      >
-        <small *ngIf="unitKerjaForm.get('nip').errors?.['required']"
-          >NIP perlu diisi.</small
-        >
-        <small *ngIf="unitKerjaForm.get('nip').errors?.['pattern']"
-          >NIP harus berupa angka.</small
-        >
+      <div *ngIf="getErrorMessage('nip', 'NIP') as error" class="text-danger">
+        {{ error }}
       </div>
     </div>
   </div>
@@ -39,15 +29,8 @@
         id="name"
         formControlName="name"
       />
-      <div
-        class="feedback"
-        *ngIf="
-          unitKerjaForm.get('name').invalid && unitKerjaForm.get('name').touched
-        "
-      >
-        <small *ngIf="unitKerjaForm.get('name').errors?.['required']"
-          >Nama perlu diisi.</small
-        >
+      <div *ngIf="getErrorMessage('name', 'Nama') as error" class="text-danger">
+        {{ error }}
       </div>
     </div>
   </div>
@@ -65,75 +48,13 @@
         formControlName="email"
       />
       <div
-        class="feedback"
-        *ngIf="
-          unitKerjaForm.get('email').invalid &&
-          unitKerjaForm.get('email').touched
-        "
+        *ngIf="getErrorMessage('email', 'Email') as error"
+        class="text-danger"
       >
-        <small *ngIf="unitKerjaForm.get('email').errors?.['required']"
-          >Email perlu diisi.</small
-        >
-        <small *ngIf="unitKerjaForm.get('email').errors?.['email']"
-          >Email harus berupa email.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
-
-  <!-- <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Password <span class="text-danger">*</span>
-    </label>
-    <div class="col-sm-10">
-      <input
-        type="password"
-        class="form-control"
-        name="password"
-        id="password"
-        formControlName="password"
-      />
-      <div
-        class="feedback"
-        *ngIf="
-          unitKerjaForm.get('password').invalid &&
-          unitKerjaForm.get('password').touched
-        "
-      >
-        <small *ngIf="unitKerjaForm.get('password').errors?.['required']"
-          >Password perlu diisi.</small
-        >
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-3">
-    <label for="confirmPassword" class="col-sm-2 col-form-label fw-bold"
-      >Konfirmasi Password <span class="text-danger">*</span>
-    </label>
-    <div class="col-sm-10">
-      <input
-        type="password"
-        class="form-control"
-        name="confirmPassword"
-        id="confirmPassword"
-        formControlName="confirmPassword"
-      />
-      <div
-        class="feedback"
-        *ngIf="
-          (unitKerjaForm.get('confirmPassword').invalid &&
-            unitKerjaForm.get('confirmPassword').touched) ||
-          (unitKerjaForm.get('confirmPassword').touched &&
-            unitKerjaForm.get('confirmPassword')?.hasError('mismatch'))
-        "
-      >
-        <small class="text-danger">
-          Password dan Konfirmasi Password tidak cocok.</small
-        >
-      </div>
-    </div>
-  </div> -->
 
   <div class="row mb-3">
     <label for="" class="col-sm-2 col-form-label fw-bold"
@@ -141,7 +62,6 @@
     </label>
     <div class="col-sm-10">
       <select
-        id="inputState"
         class="form-select"
         name="unitKerja"
         id="unitKerja"
@@ -155,15 +75,10 @@
         </option>
       </select>
       <div
-        class="feedback"
-        *ngIf="
-          unitKerjaForm.get('unitKerja').invalid &&
-          unitKerjaForm.get('unitKerja').touched
-        "
+        *ngIf="getErrorMessage('unitKerja', 'Unit Kerja') as error"
+        class="text-danger"
       >
-        <small *ngIf="unitKerjaForm.get('unitKerja').errors?.['required']"
-          >Unit Kerja perlu dipilih.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -171,7 +86,7 @@
     <div class="text-center col">
       <button
         type="submit"
-        class="btn btn-primary float-end"
+        class="btn btn-success float-end"
         [disabled]="unitKerjaForm.invalid || (createLoading$ | async)"
       >
         {{ (createLoading$ | async) ? 'Menyimpan...' : 'Simpan' }}

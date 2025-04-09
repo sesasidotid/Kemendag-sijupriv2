@@ -11,110 +11,114 @@ import { TabService } from '../../../modules/base/services/tab.service'
 import { Router } from '@angular/router'
 
 @Component({
-  selector: 'app-ukom-grade-import',
-  standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
-  templateUrl: './ukom-grade-import.component.html',
-  styleUrl: './ukom-grade-import.component.scss'
+    selector: 'app-ukom-grade-import',
+    standalone: true,
+    imports: [CommonModule, FormsModule, FileHandlerComponent],
+    templateUrl: './ukom-grade-import.component.html',
+    styleUrl: './ukom-grade-import.component.scss'
 })
 export class UkomGradeImportComponent {
-  ukomList: Ukom[] = []
-  file_grade: string = ''
+    ukomList: Ukom[] = []
+    file_grade: string = ''
 
-  inputs: FIleHandler = {
-    files: {
-      file_grade: { label: 'File Nilai Ukom' }
-    },
-    allowedTypes: [
-      { label: 'xls', type: 'application/vnd.ms-excel' },
-      {
-        label: 'xlsx',
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      }
-    ],
-
-    listen: (
-      key: string,
-      source: string,
-      base64Data: string,
-      label: string
-    ) => {
-      switch (key) {
-        case 'file_grade':
-          this.file_grade = base64Data
-          break
-      }
-    }
-  }
-
-  constructor (
-    private router: Router,
-    private apiService: ApiService,
-    private handlerService: HandlerService,
-    private confirmationService: ConfirmationService,
-    private tabService: TabService
-  ) {}
-
-  ngOnInit () {
-    if (this.tabService.getTabsLength() > 0) {
-      this.tabService.clearTabs()
-    }
-
-    this.tabService
-      .addTab({
-        label: 'List Nilai Ukom',
-        isActive: false,
-        icon: 'mdi-list-box',
-        onClick: () => this.router.navigate([`/ukom/ukom-grade-list`])
-      })
-      .addTab({
-        label: 'Import Nilai',
-        isActive: true,
-        icon: 'mdi-plus-circle',
-        onClick: () => this.router.navigate([`/ukom/ukom-grade-list/import`])
-      })
-      .addTab({
-        label: 'Template Nilai',
-        isActive: true,
-        icon: 'mdi-file-download',
-        onClick: () => this.downloadTemplate()
-      })
-      .addTab({
-        label: 'Export Nilai',
-        isActive: false,
-        icon: 'mdi-export',
-        onClick: () => this.router.navigate([`/ukom/ukom-grade-list/export`])
-      })
-  }
-
-  downloadTemplate () {
-    this.apiService
-      .getDownload(`/api/v1/exam_grade/download`, 'template_grade.xlsx')
-      .subscribe({
-        error: error => this.handlerService.handleException(error)
-      })
-  }
-
-  submit () {
-    this.confirmationService.open(false).subscribe({
-      next: result => {
-        if (!result.confirmed) return
-
-        this.apiService
-          .postData('/api/v1/exam_grade/upload', {
-            file_grade: this.file_grade
-          })
-          .subscribe({
-            next: () => {
-              this.router.navigate([`/ukom/ukom-grade-list`])
-              this.handlerService.handleAlert('Info', 'Data berhasil diimport')
-            },
-            error: error => {
-              console.log(error)
-              this.handlerService.handleAlert('Error', 'Gagal mengimport data')
+    inputs: FIleHandler = {
+        files: {
+            file_grade: { label: 'File Nilai Ukom' }
+        },
+        allowedTypes: [
+            { label: 'xls', type: 'application/vnd.ms-excel' },
+            {
+                label: 'xlsx',
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             }
-          })
-      }
-    })
-  }
+        ],
+
+        listen: (
+            key: string,
+            source: string,
+            base64Data: string,
+            label: string
+        ) => {
+            switch (key) {
+                case 'file_grade':
+                    this.file_grade = base64Data
+                    break
+            }
+        }
+    }
+
+    constructor(
+        private router: Router,
+        private apiService: ApiService,
+        private handlerService: HandlerService,
+        private confirmationService: ConfirmationService,
+        private tabService: TabService
+    ) { }
+
+    ngOnInit() {
+        this.handleTabService()
+    }
+
+    handleTabService() {
+        if (this.tabService.getTabsLength() > 0) {
+            this.tabService.clearTabs()
+        }
+
+        this.tabService
+            .addTab({
+                label: 'List Nilai Ukom',
+                isActive: false,
+                icon: 'mdi-list-box',
+                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`])
+            })
+            .addTab({
+                label: 'Import Nilai',
+                isActive: true,
+                icon: 'mdi-plus-circle',
+                onClick: () => this.router.navigate([`/ukom/ukom-grade-list/import`])
+            })
+            .addTab({
+                label: 'Template Nilai',
+                isActive: true,
+                icon: 'mdi-file-download',
+                onClick: () => this.downloadTemplate()
+            })
+            .addTab({
+                label: 'Export Nilai',
+                isActive: false,
+                icon: 'mdi-export',
+                onClick: () => this.router.navigate([`/ukom/ukom-grade-list/export`])
+            })
+    }
+
+    downloadTemplate() {
+        this.apiService
+            .getDownload(`/api/v1/exam_grade/download`, 'template_grade.xlsx')
+            .subscribe({
+                error: error => this.handlerService.handleException(error)
+            })
+    }
+
+    submit() {
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
+
+                this.apiService
+                    .postData('/api/v1/exam_grade/upload', {
+                        file_grade: this.file_grade
+                    })
+                    .subscribe({
+                        next: () => {
+                            this.router.navigate([`/ukom/ukom-grade-list`])
+                            this.handlerService.handleAlert('Info', 'Data berhasil diimport')
+                        },
+                        error: error => {
+                            console.log(error)
+                            this.handlerService.handleAlert('Error', 'Gagal mengimport data')
+                        }
+                    })
+            }
+        })
+    }
 }

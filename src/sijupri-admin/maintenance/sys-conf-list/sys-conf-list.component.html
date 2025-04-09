@@ -120,7 +120,7 @@
                     formControlName="{{ sysConf.code }}_value"
                   />
                   <div
-                    class="feedback"
+                    class="text-danger"
                     *ngIf="
                       sysConfForm.get(sysConf.code + '_value').invalid &&
                       sysConfForm.get(sysConf.code + '_value').touched

@@ -10,6 +10,7 @@
         type="submit"
         class="btn btn-success float-end"
         (click)="submit()"
+        [disabled]="file_grade === '' || file_grade === undefined"
       >
         Import
       </button>

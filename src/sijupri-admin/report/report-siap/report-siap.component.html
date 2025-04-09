@@ -23,9 +23,7 @@
             name="exportType"
             formControlName="exportType"
           >
-            <option selected value="" style="display: none">
-              Pilih Tipe Report
-            </option>
+            <option selected value="">Pilih Tipe Report</option>
             <option [value]="'instansi'">Instansi</option>
             <option [value]="'unitKerja'">Unit Kerja</option>
             <option [value]="'provinsi'">Provinsi</option>
@@ -41,7 +39,7 @@
         *ngIf="addSiapReportForm.get('exportType').value === 'instansi'"
       >
         <label for="inputInstansiId" class="col-sm-2 col-form-label fw-bold"
-          >Instansi</label
+          >Instansi <span class="text-danger">*</span></label
         >
         <div class="col-sm-10">
           <select
@@ -79,7 +77,7 @@
         *ngIf="addSiapReportForm.get('exportType').value === 'unitKerja'"
       >
         <label for="inputUnitKerjaId" class="col-sm-2 col-form-label fw-bold"
-          >Unit Kerja</label
+          >Unit Kerja <span class="text-danger">*</span></label
         >
         <div class="col-sm-10">
           <select
@@ -120,7 +118,7 @@
         *ngIf="addSiapReportForm.get('exportType').value === 'provinsi'"
       >
         <label for="inputProvinsiId" class="col-sm-2 col-form-label fw-bold"
-          >Provinsi</label
+          >Provinsi <span class="text-danger">*</span></label
         >
         <div class="col-sm-10">
           <select
@@ -158,7 +156,7 @@
         *ngIf="addSiapReportForm.get('exportType').value === 'kabKota'"
       >
         <label for="inputKabKotaId" class="col-sm-2 col-form-label fw-bold"
-          >Kabupaten/Kota</label
+          >Kabupaten/Kota <span class="text-danger">*</span></label
         >
         <div class="col-sm-10">
           <select

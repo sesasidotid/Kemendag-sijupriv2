@@ -13,6 +13,7 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-user-instansi-add',
     standalone: true,
@@ -38,10 +39,16 @@ export class UserInstansiAddComponent {
         private userInstansiService: UserInstansiService,
         private tabService: TabService,
         private handlerService: HandlerService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
+        this.handleTabService()
+        this.getInstansiTypeList()
+    }
+
+    handleTabService() {
         this.tabService
             .addTab({
                 label: 'Daftar User Instansi',
@@ -55,10 +62,7 @@ export class UserInstansiAddComponent {
                 onClick: () =>
                     this.handlerService.handleNavigate('/siap/user-instansi/add')
             })
-
-        this.getInstansiTypeList()
     }
-
     getInstansiTypeList() {
         this.apiService.getData(`/api/v1/instansi_type`).subscribe({
             next: response =>

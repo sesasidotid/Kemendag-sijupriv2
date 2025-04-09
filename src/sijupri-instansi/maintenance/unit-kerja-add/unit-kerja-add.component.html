@@ -1,11 +1,4 @@
 <div class="row">
-  <!-- <div
-    [ngClass]="
-      this.instansi?.provinsiId || this.instansi?.kabupatenId
-        ? 'col-lg-8'
-        : 'col-lg-12'
-    "
-  > -->
   <div class="col-lg-8">
     <form [formGroup]="unitKerjaForm" (ngSubmit)="submit()">
       <div class="row mb-3">
@@ -71,7 +64,7 @@
       <hr />
       <div class="row mb-3">
         <label for="" class="col-sm-2 col-form-label fw-bold"
-          >Unit Kerja
+          >Nama
           <span class="text-danger">*</span>
         </label>
         <div class="col-sm-10">
@@ -83,18 +76,14 @@
             formControlName="name"
           />
           <div
-            class="feedback"
-            *ngIf="
-              unitKerjaForm.get('name').invalid &&
-              unitKerjaForm.get('name').touched
-            "
+            *ngIf="getErrorMessage('name', 'Nama') as error"
+            class="text-danger"
           >
-            <small *ngIf="unitKerjaForm.get('name').errors?.['required']"
-              >Unit kerja perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
+
       <div class="row mb-3">
         <label for="" class="col-sm-2 col-form-label fw-bold"
           >Email
@@ -109,21 +98,14 @@
             formControlName="email"
           />
           <div
-            class="feedback"
-            *ngIf="
-              unitKerjaForm.get('email').invalid &&
-              unitKerjaForm.get('email').touched
-            "
+            *ngIf="getErrorMessage('email', 'Email') as error"
+            class="text-danger"
           >
-            <small *ngIf="unitKerjaForm.get('email').errors?.['required']"
-              >Email perlu diisi.</small
-            >
-            <small *ngIf="unitKerjaForm.get('email').errors?.['email']"
-              >Email tidak valid.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
+
       <div class="row mb-3">
         <label for="" class="col-sm-2 col-form-label fw-bold"
           >Telp
@@ -138,18 +120,10 @@
             formControlName="phone"
           />
           <div
-            class="feedback"
-            *ngIf="
-              unitKerjaForm.get('phone').invalid &&
-              unitKerjaForm.get('phone').touched
-            "
+            *ngIf="getErrorMessage('phone', 'Telp') as error"
+            class="text-danger"
           >
-            <small *ngIf="unitKerjaForm.get('phone').errors?.['required']"
-              >Telp perlu diisi.</small
-            >
-            <small *ngIf="unitKerjaForm.get('phone').errors?.['pattern']"
-              >Telp tidak valid.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -167,18 +141,14 @@
             formControlName="alamat"
           />
           <div
-            class="feedback"
-            *ngIf="
-              unitKerjaForm.get('alamat').invalid &&
-              unitKerjaForm.get('alamat').touched
-            "
+            *ngIf="getErrorMessage('alamat', 'Alamat') as error"
+            class="text-danger"
           >
-            <small *ngIf="unitKerjaForm.get('alamat').errors?.['required']"
-              >Alamat perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
+
       <div class="row mb-3">
         <label for="" class="col-sm-2 col-form-label fw-bold"
           >Wilayah
@@ -203,15 +173,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              unitKerjaForm.get('wilayahCode').invalid &&
-              unitKerjaForm.get('wilayahCode').touched
-            "
+            *ngIf="getErrorMessage('wilayahCode', 'Wilayah') as error"
+            class="text-danger"
           >
-            <small *ngIf="unitKerjaForm.get('wilayahCode').errors?.['required']"
-              >Wilayah perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -230,7 +195,7 @@
       <div class="text-center float-end">
         <button
           type="submit"
-          class="btn btn-primary"
+          class="btn btn-success"
           [disabled]="unitKerjaForm.invalid"
         >
           Simpan
@@ -266,28 +231,4 @@
     >
     </app-map>
   </div>
-
-  <!-- <div
-    class="col-lg-4 mt-3 mt-lg-0"
-    *ngIf="
-      (!(loadingKabKota$ | async) &&
-        ((kabKotaName$ | async) ||
-          (provinceName$ | async) ||
-          instansi?.kotaId)) ||
-      instansi
-    "
-  >
-    <app-map
-      (coordinates)="onCoordinatesReceived($event)"
-      [name]="
-        instansi?.kabupatenId || instansi?.kotaId
-          ? (kabKotaName$ | async)
-          : (provinceName$ | async)
-      "
-      [type]="
-        instansi?.kabupatenId || instansi?.kotaId ? 'kabupaten' : 'provinsi'
-      "
-    >
-    </app-map>
-  </div> -->
 </div>

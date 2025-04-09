@@ -1,4 +1,4 @@
-<app-pagable [pagable]="pagable"></app-pagable>
+<app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 
 <app-modal
   *ngIf="isModalOpen$ | async"
@@ -7,5 +7,8 @@
   [enableFooter]="false"
   [size]="'lg'"
 >
-  <app-unit-kerja-update [id]="unitKerja.id"></app-unit-kerja-update>
+  <app-unit-kerja-update
+    [id]="unitKerja.id"
+    (submitComplete)="handleModalClose()"
+  ></app-unit-kerja-update>
 </app-modal>

@@ -17,6 +17,7 @@ import { TabService } from '../../../modules/base/services/tab.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { AlertService } from '../../../modules/base/services/alert.service'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-user-unit-kerja-add',
     standalone: true,
@@ -37,38 +38,34 @@ export class UserUnitKerjaAddComponent {
         private handlerService: HandlerService,
         private tabService: TabService,
         private alertService: AlertService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) {
+    }
+
+    ngOnInit() {
+        this.handleFormInit()
+        this.handleTabService()
+        this.getUnitKerjaList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.unitKerjaForm.get(controlName), controlName, label);
+    }
+
+    handleFormInit() {
         this.unitKerjaForm = new FormGroup({
             unitKerja: new FormControl('', [Validators.required]),
             nip: new FormControl('', [
                 Validators.required,
-                Validators.pattern('^[0-9]*$')
+                Validators.pattern(/^\d{18}$/)
             ]),
             name: new FormControl('', [Validators.required]),
             email: new FormControl('', [Validators.required, Validators.email])
-            //   password: new FormControl('', [Validators.required]),
-            //   confirmPassword: new FormControl('', [
-            //     Validators.required,
-            //     this.passwordMatchValidator.bind(this)
-            //   ])
         })
     }
 
-    //   passwordMatchValidator (
-    //     control: FormControl
-    //   ): { [key: string]: boolean } | null {
-    //     if (this.unitKerjaForm) {
-    //       const password = this.unitKerjaForm.get('password')?.value
-    //       const confirmPassword = control.value
-    //       if (password !== confirmPassword) {
-    //         return { mismatch: true }
-    //       }
-    //     }
-    //     return null
-    //   }
-
-    ngOnInit() {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -87,8 +84,6 @@ export class UserUnitKerjaAddComponent {
                 onClick: () =>
                     this.handlerService.handleNavigate(`/siap/user-unit-kerja/add`)
             })
-
-        this.getUnitKerjaList()
     }
 
     getUnitKerjaList() {

@@ -3,12 +3,12 @@ import { Component } from '@angular/core'
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component'
 import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
 import {
-  Form,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
+    Form,
+    FormControl,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators
 } from '@angular/forms'
 import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 import { LoginContext } from '../../../modules/base/commons/login-context'
@@ -21,196 +21,208 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AlertService } from '../../../modules/base/services/alert.service'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 @Component({
-  selector: 'app-unit-kerja-add',
-  standalone: true,
-  imports: [MapComponent, FormsModule, CommonModule, ReactiveFormsModule],
-  templateUrl: './unit-kerja-add.component.html',
-  styleUrl: './unit-kerja-add.component.scss'
+    selector: 'app-unit-kerja-add',
+    standalone: true,
+    imports: [MapComponent, FormsModule, CommonModule, ReactiveFormsModule],
+    templateUrl: './unit-kerja-add.component.html',
+    styleUrl: './unit-kerja-add.component.scss'
 })
 export class UnitKerjaAddComponent {
-  instansiId: string = LoginContext.getInstansiId()
-  unitKerja: UnitKerja = new UnitKerja()
-  wilayahList: Wilayah[] = []
-  instansi: Instansi
-  provinsi: Provinsi
-  kabKota: KabKota
+    instansiId: string = LoginContext.getInstansiId()
+    unitKerja: UnitKerja = new UnitKerja()
+    wilayahList: Wilayah[] = []
+    instansi: Instansi
+    provinsi: Provinsi
+    kabKota: KabKota
 
-  loadingInstansi$ = new BehaviorSubject<boolean>(true)
-  loadingProvinsi$ = new BehaviorSubject<boolean>(false)
-  loadingKabKota$ = new BehaviorSubject<boolean>(false)
+    loadingInstansi$ = new BehaviorSubject<boolean>(true)
+    loadingProvinsi$ = new BehaviorSubject<boolean>(false)
+    loadingKabKota$ = new BehaviorSubject<boolean>(false)
 
-  provinceName$ = new BehaviorSubject<string>('')
-  kabKotaName$ = new BehaviorSubject<string>('')
+    provinceName$ = new BehaviorSubject<string>('')
+    kabKotaName$ = new BehaviorSubject<string>('')
 
-  unitKerjaForm!: FormGroup
+    unitKerjaForm!: FormGroup
 
-  constructor (
-    private apiService: ApiService,
-    private tabService: TabService,
-    private handlerService: HandlerService,
-    private alertService: AlertService,
-    private confirmationService: ConfirmationService
-  ) {
-    this.unitKerjaForm = new FormGroup({
-      name: new FormControl('', Validators.required),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      phone: new FormControl('', [
-        Validators.required,
-        Validators.pattern('^[0-9]*$')
-      ]),
-      alamat: new FormControl('', Validators.required),
-      wilayahCode: new FormControl('', Validators.required)
-    })
-  }
+    constructor(
+        private apiService: ApiService,
+        private tabService: TabService,
+        private handlerService: HandlerService,
+        private alertService: AlertService,
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
+    ) { }
 
-  ngOnInit () {
-    if (this.tabService.getTabsLength() > 0) {
-      this.tabService.clearTabs()
+    ngOnInit() {
+        this.handleFormInit()
+        this.handleTabService()
+        this.getInstansi()
     }
 
-    this.tabService
-      .addTab({
-        label: 'Daftar Unit Kerja',
-        icon: 'mdi-list-box',
-        onClick: () =>
-          this.handlerService.handleNavigate(`/maintenance/unit-kerja`)
-      })
-      .addTab({
-        label: 'Tambah Unit Kerja',
-        isActive: true,
-        icon: 'mdi-plus-circle',
-        onClick: () =>
-          this.handlerService.handleNavigate(`/maintenance/unit-kerja/add`)
-      })
+    handleFormInit() {
+        this.unitKerjaForm = new FormGroup({
+            name: new FormControl('', Validators.required),
+            email: new FormControl('', [Validators.required, Validators.email]),
+            phone: new FormControl('', [
+                Validators.required,
+                Validators.pattern('^[0-9]*$')
+            ]),
+            alamat: new FormControl('', Validators.required),
+            wilayahCode: new FormControl('', Validators.required)
+        })
+    }
 
-    this.getInstansi()
-  }
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.unitKerjaForm.get(controlName), controlName, label);
+    }
 
-  onCoordinatesReceived (coordinates: { lat: number; lng: number }): void {
-    this.unitKerja.latitude = coordinates.lat
-    this.unitKerja.longitude = coordinates.lng
-  }
+    handleTabService() {
+        if (this.tabService.getTabsLength() > 0) {
+            this.tabService.clearTabs()
+        }
 
-  getWilayahList () {
-    this.apiService.getData(`/api/v1/wilayah`).subscribe({
-      next: (wilayahList: Wilayah[]) => {
-        if (this.provinsi) {
-          wilayahList.forEach(wilayah => {
-            if (
-              ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
-              wilayah.code == this.provinsi.wilayahCode
-            ) {
-              this.wilayahList.push(wilayah)
+        this.tabService
+            .addTab({
+                label: 'Daftar Unit Kerja',
+                icon: 'mdi-list-box',
+                onClick: () =>
+                    this.handlerService.handleNavigate(`/maintenance/unit-kerja`)
+            })
+            .addTab({
+                label: 'Tambah Unit Kerja',
+                isActive: true,
+                icon: 'mdi-plus-circle',
+                onClick: () =>
+                    this.handlerService.handleNavigate(`/maintenance/unit-kerja/add`)
+            })
+    }
+
+    onCoordinatesReceived(coordinates: { lat: number; lng: number }): void {
+        this.unitKerja.latitude = coordinates.lat
+        this.unitKerja.longitude = coordinates.lng
+    }
+
+    getWilayahList() {
+        this.apiService.getData(`/api/v1/wilayah`).subscribe({
+            next: (wilayahList: Wilayah[]) => {
+                if (this.provinsi) {
+                    wilayahList.forEach(wilayah => {
+                        if (
+                            ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
+                            wilayah.code == this.provinsi.wilayahCode
+                        ) {
+                            this.wilayahList.push(wilayah)
+                        }
+                    })
+                } else {
+                    this.wilayahList = wilayahList
+                }
             }
-          })
-        } else {
-          this.wilayahList = wilayahList
-        }
-      }
-    })
-  }
-
-  getInstansi () {
-    this.loadingInstansi$.next(true)
-    this.apiService.getData(`/api/v1/instansi/${this.instansiId}`).subscribe({
-      next: (instansi: Instansi) => {
-        this.instansi = instansi
-        this.unitKerja.instansiId = this.instansi.id
-        console.log(this.instansi)
-        if (!this.instansi.provinsiId) {
-          console.log('getWilayahList')
-          this.getWilayahList()
-        }
-
-        if (this.instansi.provinsiId) {
-          if (this.instansi.provinsiId) {
-            this.getProvinsi()
-            console.log('getProvinsi')
-          }
-          if (this.instansi.kabupatenId || this.instansi.kotaId) {
-            this.getKabKota()
-          }
-        } else {
-          this.loadingProvinsi$.next(false)
-          this.loadingKabKota$.next(false)
-        }
-        this.loadingInstansi$.next(false)
-      }
-    })
-  }
-
-  getProvinsi () {
-    this.loadingProvinsi$.next(true)
-    this.apiService
-      .getData(`/api/v1/provinsi/${this.instansi.provinsiId}`)
-      .subscribe({
-        next: (provinsi: Provinsi) => {
-          this.provinsi = provinsi
-          this.unitKerja.wilayahCode = this.provinsi.wilayahCode
-          this.provinceName$.next(provinsi.name)
-          this.loadingProvinsi$.next(false)
-          this.getWilayahList()
-        }
-      })
-  }
-
-  getKabKota () {
-    this.loadingKabKota$.next(true)
-    let kabKotaId = this.instansi.kabupatenId ?? this.instansi.kotaId
-    this.apiService.getData(`/api/v1/kab_kota/${kabKotaId}`).subscribe({
-      next: (kabKota: KabKota) => {
-        this.kabKota = kabKota
-        this.kabKotaName$.next(kabKota.type + kabKota.name)
-        this.loadingKabKota$.next(false)
-      }
-    })
-  }
-
-  submit () {
-    console.log(this.unitKerja)
-    if (!this.unitKerja.latitude || !this.unitKerja.longitude) {
-      this.handlerService.handleAlert(
-        'Error',
-        'Silahkan pilih lokasi unit kerja pada peta'
-      )
-      return
+        })
     }
 
-    if (this.unitKerjaForm.valid) {
-      this.unitKerja.name = this.unitKerjaForm.value.name
-      this.unitKerja.email = this.unitKerjaForm.value.email
-      this.unitKerja.phone = this.unitKerjaForm.value.phone
-      this.unitKerja.alamat = this.unitKerjaForm.value.alamat
-      this.unitKerja.wilayahCode = this.unitKerjaForm.value.wilayahCode
+    getInstansi() {
+        this.loadingInstansi$.next(true)
+        this.apiService.getData(`/api/v1/instansi/${this.instansiId}`).subscribe({
+            next: (instansi: Instansi) => {
+                this.instansi = instansi
+                this.unitKerja.instansiId = this.instansi.id
+                console.log(this.instansi)
+                if (!this.instansi.provinsiId) {
+                    console.log('getWilayahList')
+                    this.getWilayahList()
+                }
 
-      this.confirmationService.open(false).subscribe({
-        next: result => {
-          if (!result.confirmed) {
-            return
-          }
+                if (this.instansi.provinsiId) {
+                    if (this.instansi.provinsiId) {
+                        this.getProvinsi()
+                        console.log('getProvinsi')
+                    }
+                    if (this.instansi.kabupatenId || this.instansi.kotaId) {
+                        this.getKabKota()
+                    }
+                } else {
+                    this.loadingProvinsi$.next(false)
+                    this.loadingKabKota$.next(false)
+                }
+                this.loadingInstansi$.next(false)
+            }
+        })
+    }
 
-          this.apiService
-            .postData(`/api/v1/unit_kerja`, this.unitKerja)
+    getProvinsi() {
+        this.loadingProvinsi$.next(true)
+        this.apiService
+            .getData(`/api/v1/provinsi/${this.instansi.provinsiId}`)
             .subscribe({
-              next: () => {
-                this.alertService.showToast(
-                  'Success',
-                  'Unit Kerja berhasil ditambahkan'
-                )
-                this.handlerService.handleNavigate('/maintenance/unit-kerja')
-              },
-              error: error => {
-                // this.alertService.showToast('Error', error.error.message)
-                this.handlerService.handleAlert(
-                  'Error',
-                  'Gagal menambahkan unit kerja'
-                )
-                console.log(error)
-              }
+                next: (provinsi: Provinsi) => {
+                    this.provinsi = provinsi
+                    this.unitKerja.wilayahCode = this.provinsi.wilayahCode
+                    this.provinceName$.next(provinsi.name)
+                    this.loadingProvinsi$.next(false)
+                    this.getWilayahList()
+                }
+            })
+    }
+
+    getKabKota() {
+        this.loadingKabKota$.next(true)
+        let kabKotaId = this.instansi.kabupatenId ?? this.instansi.kotaId
+        this.apiService.getData(`/api/v1/kab_kota/${kabKotaId}`).subscribe({
+            next: (kabKota: KabKota) => {
+                this.kabKota = kabKota
+                this.kabKotaName$.next(kabKota.type + kabKota.name)
+                this.loadingKabKota$.next(false)
+            }
+        })
+    }
+
+    submit() {
+        console.log(this.unitKerja)
+        if (!this.unitKerja.latitude || !this.unitKerja.longitude) {
+            this.handlerService.handleAlert(
+                'Error',
+                'Silahkan pilih lokasi unit kerja pada peta'
+            )
+            return
+        }
+
+        if (this.unitKerjaForm.valid) {
+            this.unitKerja.name = this.unitKerjaForm.value.name
+            this.unitKerja.email = this.unitKerjaForm.value.email
+            this.unitKerja.phone = this.unitKerjaForm.value.phone
+            this.unitKerja.alamat = this.unitKerjaForm.value.alamat
+            this.unitKerja.wilayahCode = this.unitKerjaForm.value.wilayahCode
+
+            this.confirmationService.open(false).subscribe({
+                next: result => {
+                    if (!result.confirmed) {
+                        return
+                    }
+
+                    this.apiService
+                        .postData(`/api/v1/unit_kerja`, this.unitKerja)
+                        .subscribe({
+                            next: () => {
+                                this.alertService.showToast(
+                                    'Success',
+                                    'Unit Kerja berhasil ditambahkan'
+                                )
+                                this.handlerService.handleNavigate('/maintenance/unit-kerja')
+                            },
+                            error: error => {
+                                // this.alertService.showToast('Error', error.error.message)
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal menambahkan unit kerja'
+                                )
+                                console.log(error)
+                            }
+                        })
+                }
             })
         }
-      })
     }
-  }
 }

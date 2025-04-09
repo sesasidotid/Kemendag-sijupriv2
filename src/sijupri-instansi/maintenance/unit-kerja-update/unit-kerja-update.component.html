@@ -15,15 +15,10 @@
             formControlName="name"
           />
           <div
-            class="feedback"
-            *ngIf="
-              updateUnitKerjaForm.get('name').invalid &&
-              updateUnitKerjaForm.get('name').touched
-            "
+            *ngIf="getErrorMessage('name', 'Nama') as error"
+            class="text-danger"
           >
-            <small *ngIf="updateUnitKerjaForm.get('name').errors?.['required']">
-              Nama perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -42,17 +37,10 @@
             formControlName="email"
           />
           <div
-            class="feedback"
-            *ngIf="
-              updateUnitKerjaForm.get('email').invalid &&
-              updateUnitKerjaForm.get('email').touched
-            "
+            *ngIf="getErrorMessage('email', 'Email') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="updateUnitKerjaForm.get('email').errors?.['required']"
-            >
-              Email perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -71,18 +59,10 @@
             formControlName="phone"
           />
           <div
-            class="feedback"
-            *ngIf="
-              updateUnitKerjaForm.get('phone').invalid &&
-              updateUnitKerjaForm.get('phone').touched
-            "
+            *ngIf="getErrorMessage('phone', 'Telp') as error"
+            class="text-danger"
           >
-            <small *ngIf="updateUnitKerjaForm.get('phone').errors?.['required']"
-              >Telp perlu diisi.</small
-            >
-            <small *ngIf="updateUnitKerjaForm.get('phone').errors?.['pattern']"
-              >Telp tidak valid.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -101,16 +81,10 @@
             formControlName="alamat"
           />
           <div
-            class="feedback"
-            *ngIf="
-              updateUnitKerjaForm.get('alamat').invalid &&
-              updateUnitKerjaForm.get('alamat').touched
-            "
+            *ngIf="getErrorMessage('alamat', 'Alamat') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="updateUnitKerjaForm.get('alamat').errors?.['required']"
-              >Alamat perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -134,17 +108,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              updateUnitKerjaForm.get('wilayah_code').invalid &&
-              updateUnitKerjaForm.get('wilayah_code').touched
-            "
+            *ngIf="getErrorMessage('wilayahCode', 'Wilayah') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="updateUnitKerjaForm.get('wilayah_code').errors?.['required']"
-            >
-              Wilayah perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -156,7 +123,7 @@
       <div class="text-center float-end">
         <button
           type="submit"
-          class="btn btn-primary"
+          class="btn btn-success"
           [disabled]="updateUnitKerjaForm.invalid"
         >
           Simpan
