@@ -44,7 +44,15 @@ export class ReportAkpComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+        this.getUnitKerjaList()
+        this.handleFormInit()
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/report/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'fileName').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Tipe', 'fileType').build())
@@ -123,7 +131,7 @@ export class ReportAkpComponent {
             .build()
     }
 
-    ngOnInit() {
+    getUnitKerjaList() {
         this.apiService.getData('/api/v1/unit_kerja').subscribe({
             next: (response: any) => {
                 this.unitKerjaList = response.map(
@@ -131,10 +139,14 @@ export class ReportAkpComponent {
                 )
             },
             error: error => {
-                this.handlerService.handleException(error)
+                this.unitKerjaList = []
+                console.log(error)
+                // this.handlerService.handleException(error)
             }
         })
+    }
 
+    handleFormInit() {
         this.addAkpReportForm = new FormGroup({
             unitKerjaId: new FormControl('', [Validators.required]),
             unitKerjaName: new FormControl('', [Validators.required]),

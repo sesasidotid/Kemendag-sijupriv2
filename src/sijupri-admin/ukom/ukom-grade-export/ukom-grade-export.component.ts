@@ -22,6 +22,7 @@ import {
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-ukom-grade-export',
@@ -31,26 +32,42 @@ import { BehaviorSubject } from 'rxjs'
     styleUrl: './ukom-grade-export.component.scss'
 })
 export class UkomGradeExportComponent {
+    @ViewChild(PagableComponent) pagableComponent!: PagableComponent
+
     exportGradeForm!: FormGroup
     pagable: Pagable
     reportId: string = 'ukomGrade'
     refresh: boolean = false
     isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
 
-    @ViewChild(PagableComponent) pagableComponent!: PagableComponent
     constructor(
         private router: Router,
         private tabService: TabService,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-    ) {
+        private formValidationService: FormValidationService
+    ) { }
+
+    ngOnInit() {
+        this.handleFormInit()
+        this.handlePagable()
+        this.handleTabService()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.exportGradeForm.get(controlName), controlName, label);
+    }
+
+    handleFormInit() {
         this.exportGradeForm = new FormGroup({
             dateFrom: new FormControl('', [Validators.required]),
             dateTo: new FormControl('', [Validators.required]),
             fileType: new FormControl('', [Validators.required])
         })
+    }
 
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/report/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'fileName').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Tipe', 'fileType').build())
@@ -58,20 +75,7 @@ export class UkomGradeExportComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((report: any) => {
-                        this.apiService
-                            .postDownload(
-                                '/api/v1/report/download',
-                                { id: report.id, bucketId: 'report' },
-                                report.fileName
-                            )
-                            .subscribe({
-                                next: () =>
-                                    this.handlerService.handleAlert(
-                                        'Success',
-                                        'File di download'
-                                    ),
-                                error: error => this.handlerService.handleException(error)
-                            })
+                        this.handleDownloadReport(report)
                     }, 'success')
                     .withIcon('download')
                     .addInactiveCondition((report: any) => {
@@ -82,23 +86,7 @@ export class UkomGradeExportComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((report: any) => {
-                        this.confirmationService.open(false).subscribe({
-                            next: result => {
-                                if (!result.confirmed) return
-                                this.apiService
-                                    .deleteData(`/api/v1/report/${report.id}`)
-                                    .subscribe({
-                                        next: () => {
-                                            this.handlerService.handleAlert(
-                                                'Success',
-                                                'File berhasil dihapus'
-                                            )
-                                            this.pagableComponent.fetchData()
-                                        },
-                                        error: error => this.handlerService.handleException(error)
-                                    })
-                            }
-                        })
+                        this.handleDeleteReport(report)
                     }, 'danger')
                     .withIcon('danger')
                     .build()
@@ -129,7 +117,43 @@ export class UkomGradeExportComponent {
             .build()
     }
 
-    ngOnInit() {
+    handleDownloadReport(report: any) {
+        this.apiService
+            .postDownload(
+                '/api/v1/report/download',
+                { id: report.id, bucketId: 'report' },
+                report.fileName
+            )
+            .subscribe({
+                next: () =>
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'File di download'
+                    ),
+                error: error => this.handlerService.handleException(error)
+            })
+    }
+    handleDeleteReport(report: any) {
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
+                this.apiService
+                    .deleteData(`/api/v1/report/${report.id}`)
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'File berhasil dihapus'
+                            )
+                            this.pagableComponent.fetchData()
+                        },
+                        error: error => this.handlerService.handleException(error)
+                    })
+            }
+        })
+    }
+
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }

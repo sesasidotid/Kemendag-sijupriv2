@@ -11,107 +11,106 @@ import { map } from 'rxjs/operators'
 import { startWith } from 'rxjs/operators'
 
 @Component({
-  selector: 'app-ukom-formula-detail',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './ukom-formula-detail.component.html',
-  styleUrl: './ukom-formula-detail.component.scss'
+    selector: 'app-ukom-formula-detail',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './ukom-formula-detail.component.html',
+    styleUrl: './ukom-formula-detail.component.scss'
 })
 export class UkomFormulaDetailComponent {
-  id: string = ''
+    id: string = ''
 
-  FormulaDetail: FormulaDetail = new FormulaDetail()
-  jabatanList$: Observable<Jabatan[]>
-  jenjangList$: Observable<Jenjang[]>
+    FormulaDetail: FormulaDetail = new FormulaDetail()
+    jabatanList$: Observable<Jabatan[]>
+    jenjangList$: Observable<Jenjang[]>
 
-  jenjangMap: Record<string, string> = {}
-  jabatanMap: Record<string, string> = {}
-  FormulaDetailLoading$ = new BehaviorSubject<boolean>(false)
+    jenjangMap: Record<string, string> = {}
+    jabatanMap: Record<string, string> = {}
+    FormulaDetailLoading$ = new BehaviorSubject<boolean>(false)
 
-  filteredJabatan$: Observable<Jabatan | undefined>
-  filteredJenjang$: Observable<Jenjang | undefined>
+    filteredJabatan$: Observable<Jabatan | undefined>
+    filteredJenjang$: Observable<Jenjang | undefined>
 
-  constructor (
-    private route: ActivatedRoute,
-    private apiService: ApiService,
-    private handlerService: HandlerService
-  ) {
-    this.id = this.route.snapshot.paramMap.get('id') || ''
+    constructor(
+        private route: ActivatedRoute,
+        private apiService: ApiService,
+        private handlerService: HandlerService
+    ) { }
 
-    this.getJenjang()
-    this.getJabatan()
-    this.getDetailFormula()
-  }
+    ngOnInit() {
+        this.id = this.route.snapshot.paramMap.get('id') || ''
+        this.getJenjang()
+        this.getJabatan()
+        this.getDetailFormula()
+    }
 
-  ngOnInit () {}
+    getJenjang() {
+        this.apiService.getData(`/api/v1/jenjang`).subscribe({
+            next: (response: any) => {
+                const jenjangs = response.map(
+                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                )
 
-  getJenjang () {
-    this.apiService.getData(`/api/v1/jenjang`).subscribe({
-      next: (response: any) => {
-        const jenjangs = response.map(
-          (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
-        )
+                jenjangs.forEach((jenjang: any) => {
+                    this.jenjangMap[jenjang.code] = jenjang.name
+                })
 
-        jenjangs.forEach((jenjang: any) => {
-          this.jenjangMap[jenjang.code] = jenjang.name
+                this.jenjangList$ = new BehaviorSubject(jenjangs).asObservable()
+            },
+            error: err => {
+                console.error('Error fetching jenjang data:', err)
+            }
         })
+    }
 
-        this.jenjangList$ = new BehaviorSubject(jenjangs).asObservable()
-      },
-      error: err => {
-        console.error('Error fetching jenjang data:', err)
-      }
-    })
-  }
+    getJabatan() {
+        this.apiService.getData(`/api/v1/jabatan`).subscribe({
+            next: (response: any) => {
+                const jabatans = response.map(
+                    (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+                )
 
-  getJabatan () {
-    this.apiService.getData(`/api/v1/jabatan`).subscribe({
-      next: (response: any) => {
-        const jabatans = response.map(
-          (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
-        )
+                jabatans.forEach((jabatan: any) => {
+                    this.jabatanMap[jabatan.code] = jabatan.name
+                })
 
-        jabatans.forEach((jabatan: any) => {
-          this.jabatanMap[jabatan.code] = jabatan.name
+                this.jabatanList$ = new BehaviorSubject(jabatans).asObservable()
+            },
+            error: err => {
+                console.error('Error fetching jabatan data:', err)
+            }
         })
+    }
 
-        this.jabatanList$ = new BehaviorSubject(jabatans).asObservable()
-      },
-      error: err => {
-        console.error('Error fetching jabatan data:', err)
-      }
-    })
-  }
+    back() {
+        history.back()
+    }
 
-  back () {
-    history.back()
-  }
+    getDetailFormula() {
+        this.FormulaDetailLoading$.next(true)
+        this.apiService.getData(`/api/v1/ukom_formula/${this.id}`).subscribe({
+            next: (response: FormulaDetail) => {
+                this.FormulaDetail = new FormulaDetail(response)
 
-  getDetailFormula () {
-    this.FormulaDetailLoading$.next(true)
-    this.apiService.getData(`/api/v1/ukom_formula/${this.id}`).subscribe({
-      next: (response: FormulaDetail) => {
-        this.FormulaDetail = new FormulaDetail(response)
+                this.filteredJabatan$ = this.jabatanList$.pipe(
+                    map(jabatanList =>
+                        jabatanList.find(j => j.code === this.FormulaDetail.jabatanCode)
+                    ),
+                    startWith(undefined)
+                )
 
-        this.filteredJabatan$ = this.jabatanList$.pipe(
-          map(jabatanList =>
-            jabatanList.find(j => j.code === this.FormulaDetail.jabatanCode)
-          ),
-          startWith(undefined)
-        )
-
-        this.filteredJenjang$ = this.jenjangList$.pipe(
-          map(jenjangList =>
-            jenjangList.find(j => j.code === this.FormulaDetail.jenjangCode)
-          ),
-          startWith(undefined)
-        )
-      },
-      error: err => {
-        console.error('Error fetching formula detail:', err)
-        this.handlerService.handleAlert('Error', 'Gagal mengambil data formula')
-      },
-      complete: () => this.FormulaDetailLoading$.next(false)
-    })
-  }
+                this.filteredJenjang$ = this.jenjangList$.pipe(
+                    map(jenjangList =>
+                        jenjangList.find(j => j.code === this.FormulaDetail.jenjangCode)
+                    ),
+                    startWith(undefined)
+                )
+            },
+            error: err => {
+                console.error('Error fetching formula detail:', err)
+                this.handlerService.handleAlert('Error', 'Gagal mengambil data formula')
+            },
+            complete: () => this.FormulaDetailLoading$.next(false)
+        })
+    }
 }

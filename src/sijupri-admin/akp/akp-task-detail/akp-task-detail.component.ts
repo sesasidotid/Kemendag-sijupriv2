@@ -9,10 +9,10 @@ import { MatrixTwoTableComponent } from '../../../modules/base/components/matrix
 import { MatrixThreeTableComponent } from '../../../modules/base/components/matrix-three-table/matrix-three-table.component'
 import { VerifAKPTask } from '../../../modules/akp/models/verif-akp-task.model'
 import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
+    FormControl,
+    FormGroup,
+    ReactiveFormsModule,
+    Validators
 } from '@angular/forms'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
@@ -20,109 +20,110 @@ import { fileValidator } from '../../../modules/base/validators/file-format.vali
 import { AlertService } from '../../../modules/base/services/alert.service'
 
 @Component({
-  selector: 'app-akp-task-detail',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FileHandlerComponent,
-    MatrixOneTableComponent,
-    MatrixTwoTableComponent,
-    MatrixThreeTableComponent
-  ],
-  templateUrl: './akp-task-detail.component.html',
-  styleUrl: './akp-task-detail.component.scss'
+    selector: 'app-akp-task-detail',
+    standalone: true,
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        FileHandlerComponent,
+        MatrixOneTableComponent,
+        MatrixTwoTableComponent,
+        MatrixThreeTableComponent
+    ],
+    templateUrl: './akp-task-detail.component.html',
+    styleUrl: './akp-task-detail.component.scss'
 })
 export class AkpTaskDetailComponent {
-  akpId: string
-  AKPDetail = new AKPTaskDetail()
-  currentTab$ = new BehaviorSubject<number>(1)
+    akpId: string
+    AKPDetail = new AKPTaskDetail()
+    currentTab$ = new BehaviorSubject<number>(1)
 
-  rekomendasiPayload = new VerifAKPTask()
-  form!: FormGroup
+    rekomendasiPayload = new VerifAKPTask()
+    form!: FormGroup
 
-  AKPDetailLoading$ = new BehaviorSubject<boolean>(false)
-  rekomendasiSubmitLoading$ = new BehaviorSubject<boolean>(false)
+    AKPDetailLoading$ = new BehaviorSubject<boolean>(false)
+    rekomendasiSubmitLoading$ = new BehaviorSubject<boolean>(false)
 
-  inputs: FIleHandler = {
-    files: {
-      ijazah: { label: 'Upload Dokumen Rekomendasi AKP', required: true }
-    },
-    maxSize: 2 * 1024 * 1024,
-    listen: (key: string, source: string, base64Data: string) => {
-      this.form.patchValue({
-        rekomendasiFile: base64Data
-      })
-    }
-  }
-
-  constructor (
-    private activatedRoute: ActivatedRoute,
-    private akpTaskService: AkpTaskService,
-    private alertService: AlertService,
-    private router: Router
-  ) {}
-
-  ngOnInit (): void {
-    this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
-      this.akpId = params.get('id')
-    })
-
-    this.getAKPDetail()
-
-    this.form = new FormGroup({
-      rekomendasiFile: new FormControl('', [
-        Validators.required,
-        fileValidator(['application/pdf'], 2)
-      ])
-    })
-  }
-
-  tabChange (tab: number) {
-    this.currentTab$.next(tab)
-  }
-
-  backToList () {
-    this.router.navigate(['/akp/akp-task-list'])
-  }
-
-  getAKPDetail () {
-    this.AKPDetailLoading$.next(true)
-    this.akpTaskService.getAKPTaskDetailById(this.akpId).subscribe({
-      next: response => {
-        this.AKPDetail = response
-        console.log(this.AKPDetail)
-      },
-      complete: () => {
-        this.AKPDetailLoading$.next(false)
-      }
-    })
-  }
-
-  rekomendasiSubmit () {
-    this.rekomendasiSubmitLoading$.next(true)
-    this.rekomendasiPayload.id = this.AKPDetail.id
-    this.rekomendasiPayload.taskAction = 'approve'
-    this.rekomendasiPayload.object = {
-      rekomendasiFile: this.form.get('rekomendasiFile').value
+    inputs: FIleHandler = {
+        files: {
+            ijazah: { label: 'Upload Dokumen Rekomendasi AKP', required: true }
+        },
+        maxSize: 2 * 1024 * 1024,
+        listen: (key: string, source: string, base64Data: string) => {
+            this.form.patchValue({
+                rekomendasiFile: base64Data
+            })
+        }
     }
 
-    this.akpTaskService.verifAKPTask(this.rekomendasiPayload).subscribe({
-      next: () => {
-        this.alertService.showToast(
-          'Success',
-          'Berhasil memberikan rekomendasi AKP.'
-        )
-        this.rekomendasiSubmitLoading$.next(false)
+    constructor(
+        private activatedRoute: ActivatedRoute,
+        private akpTaskService: AkpTaskService,
+        private alertService: AlertService,
+        private router: Router
+    ) { }
+
+    ngOnInit(): void {
+        this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
+            this.akpId = params.get('id')
+        })
+        this.getAKPDetail()
+        this.handleFormInit()
+    }
+
+    handleFormInit() {
+        this.form = new FormGroup({
+            rekomendasiFile: new FormControl('', [
+                Validators.required,
+                fileValidator(['application/pdf'], 2)
+            ])
+        })
+    }
+    tabChange(tab: number) {
+        this.currentTab$.next(tab)
+    }
+
+    backToList() {
         this.router.navigate(['/akp/akp-task-list'])
-      },
-      error: error => {
-        this.alertService.showToast(
-          'Error',
-          'Gagal memberikan rekomendasi AKP.'
-        )
-        this.rekomendasiSubmitLoading$.next(false)
-      }
-    })
-  }
+    }
+
+    getAKPDetail() {
+        this.AKPDetailLoading$.next(true)
+        this.akpTaskService.getAKPTaskDetailById(this.akpId).subscribe({
+            next: response => {
+                this.AKPDetail = response
+                console.log(this.AKPDetail)
+            },
+            complete: () => {
+                this.AKPDetailLoading$.next(false)
+            }
+        })
+    }
+
+    rekomendasiSubmit() {
+        this.rekomendasiSubmitLoading$.next(true)
+        this.rekomendasiPayload.id = this.AKPDetail.id
+        this.rekomendasiPayload.taskAction = 'approve'
+        this.rekomendasiPayload.object = {
+            rekomendasiFile: this.form.get('rekomendasiFile').value
+        }
+
+        this.akpTaskService.verifAKPTask(this.rekomendasiPayload).subscribe({
+            next: () => {
+                this.alertService.showToast(
+                    'Success',
+                    'Berhasil memberikan rekomendasi AKP.'
+                )
+                this.rekomendasiSubmitLoading$.next(false)
+                this.router.navigate(['/akp/akp-task-list'])
+            },
+            error: error => {
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal memberikan rekomendasi AKP.'
+                )
+                this.rekomendasiSubmitLoading$.next(false)
+            }
+        })
+    }
 }

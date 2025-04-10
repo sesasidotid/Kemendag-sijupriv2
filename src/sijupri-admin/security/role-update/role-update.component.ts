@@ -8,79 +8,79 @@ import { MenuTreeComponent } from '../../../modules/security/components/menu-tre
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { LoginContext } from '../../../modules/base/commons/login-context'
+import { first } from 'rxjs/operators'
 
 @Component({
-  selector: 'app-role-update',
-  standalone: true,
-  imports: [MenuTreeComponent, CommonModule, FormsModule],
-  templateUrl: './role-update.component.html',
-  styleUrl: './role-update.component.scss'
+    selector: 'app-role-update',
+    standalone: true,
+    imports: [MenuTreeComponent, CommonModule, FormsModule],
+    templateUrl: './role-update.component.html',
+    styleUrl: './role-update.component.scss'
 })
 export class RoleUpdateComponent {
-  roleCode: string
-  role: Role
-  menuTree: Menu[]
+    roleCode: string
+    role: Role
+    menuTree: Menu[]
 
-  editable: boolean = false
+    editable: boolean = false
 
-  constructor (
-    private roleService: RoleService,
-    private menuService: MenuService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router
-  ) {
-    this.activatedRoute.params.subscribe(params => {
-      this.roleCode = params['code']
-    })
-  }
+    constructor(
+        private roleService: RoleService,
+        private menuService: MenuService,
+        private activatedRoute: ActivatedRoute,
+        private router: Router
+    ) { }
 
-  ngOnInit () {
-    this.getRole()
-    this.getMenuTree()
-  }
-
-  getRole () {
-    this.roleService.findByCode(this.roleCode).subscribe({
-      next: (role: Role) => {
-        this.role = role
-        this.role.menuCodeList = []
-      }
-    })
-  }
-
-  getMenuTree () {
-    this.menuService
-      .findTreeByRoleCodeAndApplicationCode(
-        this.roleCode,
-        LoginContext.getApplicationCode()
-      )
-      .subscribe({
-        next: (menuTree: Menu[]) => {
-          this.menuTree = menuTree
-          console.log(menuTree)
-        }
-      })
-  }
-
-  backToList () {
-    this.router.navigate(['/security/role'])
-  }
-  submit () {
-    this.role.menuCodeList.length = 0
-    for (const menu of this.menuTree) {
-      if (menu.checked) this.role.menuCodeList.push(menu.code)
-      if (menu.child)
-        for (const child of menu.child) {
-          if (child.checked) this.role.menuCodeList.push(child.code)
-        }
+    ngOnInit() {
+        this.activatedRoute.params.pipe(first()).subscribe(params => {
+            this.roleCode = params['code'];
+        });
+        this.getRole()
+        this.getMenuTree()
     }
-    this.role.isCreatable = true
-    this.role.isUpdatable = true
-    this.role.isDeletable = true
-    this.role.applicationCode = 'sijupri-admin'
 
-    this.roleService.update(this.role).subscribe({
-      next: () => this.router.navigate(['/security/role'])
-    })
-  }
+    getRole() {
+        this.roleService.findByCode(this.roleCode).subscribe({
+            next: (role: Role) => {
+                this.role = role
+                this.role.menuCodeList = []
+            }
+        })
+    }
+
+    getMenuTree() {
+        this.menuService
+            .findTreeByRoleCodeAndApplicationCode(
+                this.roleCode,
+                LoginContext.getApplicationCode()
+            )
+            .subscribe({
+                next: (menuTree: Menu[]) => {
+                    this.menuTree = menuTree
+                    console.log(menuTree)
+                }
+            })
+    }
+
+    backToList() {
+        this.router.navigate(['/security/role'])
+    }
+    submit() {
+        this.role.menuCodeList.length = 0
+        for (const menu of this.menuTree) {
+            if (menu.checked) this.role.menuCodeList.push(menu.code)
+            if (menu.child)
+                for (const child of menu.child) {
+                    if (child.checked) this.role.menuCodeList.push(child.code)
+                }
+        }
+        this.role.isCreatable = true
+        this.role.isUpdatable = true
+        this.role.isDeletable = true
+        this.role.applicationCode = 'sijupri-admin'
+
+        this.roleService.update(this.role).subscribe({
+            next: () => this.router.navigate(['/security/role'])
+        })
+    }
 }

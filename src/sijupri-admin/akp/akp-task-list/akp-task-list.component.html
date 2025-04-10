@@ -90,7 +90,7 @@
 
         <div *ngIf="(action$ | async) === 'reject'" class="mb-3">
           <label for="commentTextarea" class="form-label fw-semibold"
-            >Catatan <span class="text-danger">*</span></label
+            >Catatan</label
           >
           <textarea
             class="form-control"
@@ -100,14 +100,6 @@
             name="comment"
             placeholder="Tuliskan catatan atau revisi"
           ></textarea>
-          <div
-            class="feedback"
-            *ngIf="form.get('remark').invalid && form.get('remark').touched"
-          >
-            <small *ngIf="form.get('remark').errors?.['required']"
-              >Catatan perlu diisi.</small
-            >
-          </div>
         </div>
 
         <div class="float-end">

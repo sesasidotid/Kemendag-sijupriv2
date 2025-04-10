@@ -40,7 +40,22 @@ export class ReportUkomComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+        this.handleFormInit()
+    }
+
+    handleFormInit() {
+        this.addUKomReportForm = new FormGroup({
+            dateFrom: new FormControl('', [Validators.required]),
+            dateTo: new FormControl('', [Validators.required]),
+            fileType: new FormControl('', [Validators.required])
+        })
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/report/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'fileName').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Tipe', 'fileType').build())
@@ -117,14 +132,6 @@ export class ReportUkomComponent {
             )
             .setLimit(5)
             .build()
-    }
-
-    ngOnInit() {
-        this.addUKomReportForm = new FormGroup({
-            dateFrom: new FormControl('', [Validators.required]),
-            dateTo: new FormControl('', [Validators.required]),
-            fileType: new FormControl('', [Validators.required])
-        })
     }
 
     onSubmit() {

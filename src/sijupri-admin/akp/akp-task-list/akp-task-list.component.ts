@@ -126,7 +126,7 @@ export class AKPTaskComponent {
                 Validators.required,
                 Validators.email
             ]),
-            remark: new FormControl('', [Validators.required])
+            remark: new FormControl('')
         })
     }
 
@@ -153,6 +153,7 @@ export class AKPTaskComponent {
                 onClick: () => this.handlePagableTabChange('akp_flow_3', 2)
             })
     }
+
     handlePagableTabChange(tab: string, tabIndex: number) {
         const currentPagable = this.pagable$.value
 
@@ -171,86 +172,74 @@ export class AKPTaskComponent {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
+
     handleSave() {
         this.confirmationService.open(false).subscribe({
             next: result => {
-                if (!result.confirmed) {
-                    return
+                if (!result.confirmed) return;
+
+                this.submitButtonLoading$.next(true);
+
+                const action = this.action$.value;
+                const isApprove = action === 'approve';
+                const isReject = action === 'reject';
+
+                const isApproveValid =
+                    isApprove &&
+                    this.form.get('nama_atasan')?.valid &&
+                    this.form.get('email_atasan')?.valid;
+
+                const isRejectValid = isReject && this.form.get('remark')?.valid;
+
+                if ((isApprove && !isApproveValid) || (isReject && !isRejectValid)) {
+                    this.submitButtonLoading$.next(false);
+                    return;
                 }
-                this.submitButtonLoading$.next(true)
 
-                if (this.action$.value === 'approve') {
-                    if (
-                        this.form.get('nama_atasan').valid &&
-                        this.form.get('email_atasan').valid
-                    ) {
-                        this.payload.id = this.taskId$.value
-                        this.payload.taskAction = 'approve'
-                        this.payload.object = {
-                            emailAtasan: this.form.get('email_atasan').value,
-                            namaAtasan: this.form.get('nama_atasan').value
-                        }
+                this.payload.id = this.taskId$.value;
+                this.payload.taskAction = action;
 
-                        console.log(this.payload)
-
-                        this.akpTaskService.verifAKPTask(this.payload).subscribe({
-                            next: () => {
-                                this.alertService.showToast(
-                                    'Success',
-                                    'Berhasil menerima pengajuan AKP.'
-                                )
-                                this.toggleModal()
-                                setTimeout(() => {
-                                    window.location.reload()
-                                }, 1000)
-                            },
-                            error: error => {
-                                this.alertService.showToast(
-                                    'Error',
-                                    'Gagal menerima pengajuan AKP.'
-                                )
-                                this.toggleModal()
-                                this.submitButtonLoading$.next(false)
-                            },
-                            complete: () => {
-                                this.submitButtonLoading$.next(false)
-                            }
-                        })
-                    }
-                } else if (this.action$.value === 'reject') {
-                    if (this.form.get('remark').valid) {
-                        this.payload.id = this.taskId$.value
-                        this.payload.taskAction = 'reject'
-                        this.payload.remark = this.form.get('remark').value
-
-                        console.log(this.payload)
-
-                        this.akpTaskService.verifAKPTask(this.payload).subscribe({
-                            next: () => {
-                                this.alertService.showToast(
-                                    'Success',
-                                    'Berhasil menolak pengajuan AKP.'
-                                )
-                                this.toggleModal()
-                                setTimeout(() => {
-                                    window.location.reload()
-                                }, 1000)
-                            },
-                            error: error => {
-                                this.alertService.showToast(
-                                    'Error',
-                                    'Gagal menolak pengajuan AKP.'
-                                )
-                                this.toggleModal()
-                                this.submitButtonLoading$.next(false)
-                            },
-                            complete: () => {
-                                this.submitButtonLoading$.next(false)
-                            }
-                        })
-                    }
+                if (isApprove) {
+                    this.payload.object = {
+                        emailAtasan: this.form.get('email_atasan')?.value,
+                        namaAtasan: this.form.get('nama_atasan')?.value
+                    };
                 }
+
+                if (isReject) {
+                    const remark = this.form.get('remark')?.value;
+                    if (remark) this.payload.remark = remark;
+                }
+
+                this.akpTaskService.verifAKPTask(this.payload).subscribe({
+                    next: () => {
+                        const message =
+                            action === 'approve'
+                                ? 'Berhasil menerima pengajuan AKP.'
+                                : 'Berhasil menolak pengajuan AKP.';
+
+                        this.alertService.showToast('Success', message);
+                        this.toggleModal();
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+                    error: () => {
+                        const message =
+                            action === 'approve'
+                                ? 'Gagal menerima pengajuan AKP.'
+                                : 'Gagal menolak pengajuan AKP.';
+
+                        this.alertService.showToast('Error', message);
+                        this.toggleModal();
+                    },
+                    complete: () => {
+                        this.submitButtonLoading$.next(false);
+                    }
+                });
             }
-        })
+        });
     }
+
 }

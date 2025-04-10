@@ -43,7 +43,7 @@
   </div>
   <div class="row mb-3">
     <label for="name" class="col-sm-2 col-form-label fw-bold"
-      >Kategori <span class="text-danger">*</span></label
+      >Standar Kompetensi <span class="text-danger">*</span></label
     >
     <div class="col-sm-10">
       <input
@@ -52,14 +52,14 @@
         class="form-control"
         name="name"
         formControlName="name"
-        placeholder="Masukan Nama Kategori Instrumen"
+        placeholder="Masukan Standar Kompetensi"
       />
       <div
         class="feedback"
         *ngIf="kknForm.get('name').invalid && kknForm.get('name').touched"
       >
         <small *ngIf="kknForm.get('name').errors?.['required']"
-          >Nama Kategori instrumen perlu diisi.</small
+          >Standar Kompetensi perlu diisi.</small
         >
       </div>
     </div>

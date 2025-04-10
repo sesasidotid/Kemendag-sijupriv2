@@ -18,6 +18,7 @@ import { map } from 'rxjs/operators'
 import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-ukom-document-add',
@@ -45,25 +46,27 @@ export class UkomDocumentAddComponent {
     constructor(
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
-        private handlerService: HandlerService
-    ) {
-
-    }
+        private handlerService: HandlerService,
+        private formValidationService: FormValidationService
+    ) { }
 
     ngOnInit() {
+        this.handleFormInit()
+        this.getJenjangList()
+        this.getJabatanList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.documentForm.get(controlName), controlName, label);
+    }
+
+    handleFormInit() {
         this.documentForm = new FormGroup({
             dokumenPersyaratanName: new FormControl('', Validators.required),
             jenisUkom: new FormControl('', Validators.required),
             jabatanCode: new FormControl(''),
             jenjangCode: new FormControl(''),
             isMengulang: new FormControl(false, Validators.required)
-        })
-
-        this.getJenjangList()
-        this.getJabatanList()
-
-        this.documentForm.valueChanges.subscribe(value => {
-            console.log(value)
         })
     }
 

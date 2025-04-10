@@ -7,25 +7,31 @@ import { Pagable } from '../../../modules/base/commons/pagable/pagable';
 import { LoginContext } from '../../../modules/base/commons/login-context';
 
 @Component({
-  selector: 'app-role-list',
-  standalone: true,
-  imports: [PagableComponent],
-  templateUrl: './role-list.component.html',
-  styleUrl: './role-list.component.scss'
+    selector: 'app-role-list',
+    standalone: true,
+    imports: [PagableComponent],
+    templateUrl: './role-list.component.html',
+    styleUrl: './role-list.component.scss'
 })
 export class RoleListComponent {
-  pagable: Pagable;
+    pagable!: Pagable;
 
-  constructor(
-    private router: Router
-  ) {
-    this.pagable = new PagableBuilder("/api/v1/role/search")
-      .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
-      .addActionColumn(new ActionColumnBuilder().setAction((role: any) => {
-        this.router.navigate([`/security/role/${role.code}`])
-      }, "info").withIcon("detail").build())
-      .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
-      .addFilter(new PageFilterBuilder("equal").setProperty("application|code").withDefaultValue("sijupri-admin").build())
-      .build();
-  }
+    constructor(
+        private router: Router
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+    }
+
+    handlePagable() {
+        this.pagable = new PagableBuilder("/api/v1/role/search")
+            .addPrimaryColumn(new PrimaryColumnBuilder("Nama", 'name').build())
+            .addActionColumn(new ActionColumnBuilder().setAction((role: any) => {
+                this.router.navigate([`/security/role/${role.code}`])
+            }, "info").withIcon("detail").build())
+            .addFilter(new PageFilterBuilder("like").setProperty("name").withField("Nama", "text").build())
+            .addFilter(new PageFilterBuilder("equal").setProperty("application|code").withDefaultValue("sijupri-admin").build())
+            .build();
+    }
 }

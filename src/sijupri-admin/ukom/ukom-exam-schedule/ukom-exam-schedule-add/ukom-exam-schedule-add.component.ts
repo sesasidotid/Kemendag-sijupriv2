@@ -18,7 +18,7 @@ import { ExamScheduleUkom } from '../../../../modules/ukom/models/schedule.model
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { Observable } from 'rxjs'
 import { RoomUkomDetail } from '../../../../modules/ukom/models/room-ukom-detail'
-import { map } from 'rxjs/operators'
+import { first, map } from 'rxjs/operators'
 import { JenisUkom } from '../../../../modules/ukom/models/jenis-ukom'
 import {
     ActionColumnBuilder,
@@ -28,7 +28,6 @@ import {
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
-import { ExamScheduleUkomList } from '../../../../modules/ukom/models/exam-scheduleDtoList'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-ukom-exam-schedule-add',
@@ -58,7 +57,7 @@ export class UkomExamScheduleAddComponent {
     pagable: Pagable
     readonly filePlus = FilePlus
     refreshToggle: boolean = false
-    ukom_type: string = undefined
+    ukom_type?: string;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -68,15 +67,25 @@ export class UkomExamScheduleAddComponent {
         private activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
         private formValidationService: FormValidationService
-    ) {
-        this.examScheduleForm = this.fb.group({
-            schedules: this.fb.array([], [Validators.required]) // Ensures at least one schedule exists
-        })
+    ) { }
 
-        this.activatedRoute.paramMap.subscribe(params => {
+    ngOnInit() {
+        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
             this.id = params.get('id')
         })
+        this.handleFormInit()
+        this.handlePagable()
+        this.getJenisUkomList()
+        this.addSchedule()
+    }
 
+    handleFormInit() {
+        this.examScheduleForm = this.fb.group({
+            schedules: this.fb.array([], [Validators.required])
+        })
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder(`/api/v1/exam_schedule/room/${this.id}`)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Waktu Mulai', 'startTime').build()
@@ -101,9 +110,7 @@ export class UkomExamScheduleAddComponent {
             .build()
     }
 
-
-
-    ngOnInit() {
+    getJenisUkomList() {
         this.jenisUkomList$ = this.apiService
             .getData(`/api/v1/exam_type`)
             .pipe(
@@ -113,12 +120,6 @@ export class UkomExamScheduleAddComponent {
                     )
                 )
             )
-
-        this.jenisUkomList$.subscribe(roomList => {
-            console.log(roomList)
-        })
-
-        this.addSchedule()
     }
 
     getError(controlName: string, label: string) {

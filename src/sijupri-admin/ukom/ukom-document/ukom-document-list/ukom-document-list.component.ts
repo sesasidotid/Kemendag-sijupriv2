@@ -24,7 +24,7 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
 })
 export class UkomDocumentListComponent {
     tab$ = new BehaviorSubject<number | null>(0)
-    pagable: Pagable
+    pagable!: Pagable
 
     refresh: boolean = false
 
@@ -34,7 +34,14 @@ export class UkomDocumentListComponent {
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+        this.handleTabService()
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/document_ukom/all')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Nama', 'dokumenPersyaratanName').build()
@@ -72,7 +79,7 @@ export class UkomDocumentListComponent {
             .build()
     }
 
-    ngOnInit() {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }

@@ -14,15 +14,10 @@
           placeholder="Masukan nama tempat UKom"
         />
         <div
+          *ngIf="getErrorMessage('code', 'Kode kompetensi') as error"
           class="text-danger"
-          *ngIf="
-            kompetensiForm.get('code').invalid &&
-            kompetensiForm.get('code').touched
-          "
         >
-          <small *ngIf="kompetensiForm.get('code').errors?.['required']"
-            >Kode kompetensi perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -41,15 +36,10 @@
           placeholder="Masukan nama kompetensi"
         />
         <div
+          *ngIf="getErrorMessage('name', 'Nama kompetensi') as error"
           class="text-danger"
-          *ngIf="
-            kompetensiForm.get('name').invalid &&
-            kompetensiForm.get('name').touched
-          "
         >
-          <small *ngIf="kompetensiForm.get('name').errors?.['required']"
-            >Nama kompetensi perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -74,15 +64,10 @@
           </option>
         </select>
         <div
+          *ngIf="getErrorMessage('jabatan_code', 'Jabatan') as error"
           class="text-danger"
-          *ngIf="
-            kompetensiForm.get('jabatan_code').invalid &&
-            kompetensiForm.get('jabatan_code').touched
-          "
         >
-          <small *ngIf="kompetensiForm.get('jabatan_code').errors?.['required']"
-            >Jabatan perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -106,59 +91,19 @@
             {{ jenjang.name }}
           </option>
         </select>
-
         <div
+          *ngIf="getErrorMessage('jenjang_code', 'Jenjang') as error"
           class="text-danger"
-          *ngIf="
-            kompetensiForm.get('jenjang_code').invalid &&
-            kompetensiForm.get('jenjang_code').touched
-          "
         >
-          <small *ngIf="kompetensiForm.get('jenjang_code').errors?.['required']"
-            >Jenjang perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
 
-    <!-- <div class="row mb-3">
-      <label for="bidang_jabatan_code" class="col-sm-2 col-form-label fw-bold"
-        >Pangkat <span class="text-danger">*</span></label
-      >
-      <div class="col-sm-10">
-        <select
-          id="bidang_jabatan_code"
-          class="form-select"
-          name="bidang_jabatan_code"
-          formControlName="bidang_jabatan_code"
-        >
-          <option
-            *ngFor="let pangkat of pangkatList$ | async"
-            [value]="pangkat.code"
-          >
-            {{ pangkat.name }}
-          </option>
-        </select>
-
-        <div
-          class="feedback"
-          *ngIf="
-            kompetensiForm.get('bidang_jabatan_code').invalid &&
-            kompetensiForm.get('bidang_jabatan_code').touched
-          "
-        >
-          <small
-            *ngIf="kompetensiForm.get('bidang_jabatan_code').errors?.['required']"
-            >Jenjang perlu diisi.</small
-          >
-        </div>
-      </div>
-    </div> -->
-
     <div class="row text-center">
       <div class="col-12">
         <ng-container *ngIf="submitLoading$ | async; else noLoading">
-          <button class="btn btn-primary float-end" disabled>
+          <button class="btn btn-success float-end" disabled>
             <div
               class="spinner-border"
               style="width: 19px; height: 19px"
@@ -171,7 +116,7 @@
         <ng-template #noLoading>
           <button
             type="submit"
-            class="btn btn-primary float-end"
+            class="btn btn-success float-end"
             [disabled]="kompetensiForm.invalid || (submitLoading$ | async)"
           >
             Simpan

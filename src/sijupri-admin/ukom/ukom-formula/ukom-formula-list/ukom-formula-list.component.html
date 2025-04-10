@@ -11,42 +11,6 @@
   [size]="'md'"
 >
   <form [formGroup]="editFormulaForm">
-    <!-- <div class="mb-3">
-      <label for="jabatan_code" class="form-label">Jabatan</label>
-      <select
-        class="form-select"
-        name="jabatan_code"
-        id="jabatan_code"
-        formControlName="jabatan_code"
-      >
-        <option selected value="" style="display: none">Pilih Jabatan</option>
-        <option
-          *ngFor="let jabatan of jabatanList$ | async"
-          [value]="jabatan.code"
-        >
-          {{ jabatan.name }}
-        </option>
-      </select>
-    </div> -->
-
-    <!-- <div class="mb-3">
-      <label for="jenjang_code" class="form-label">Jenjang</label>
-      <select
-        class="form-select"
-        name="jenjang_code"
-        id="jenjang_code"
-        formControlName="jenjang_code"
-      >
-        <option selected value="" style="display: none">Pilih Jenjang</option>
-        <option
-          *ngFor="let jenjang of jenjangList$ | async"
-          [value]="jenjang.code"
-        >
-          {{ jenjang.name }}
-        </option>
-      </select>
-    </div> -->
-
     <div class="mb-3">
       <label for="cat_percentage" class="form-label"
         >CAT <span class="text-danger">*</span></label
@@ -60,16 +24,10 @@
         formControlName="cat_percentage"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('cat_percentage').invalid &&
-          editFormulaForm.get('cat_percentage').touched
-        "
+        *ngIf="getErrorMessage('cat_percentage', 'CAT') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="editFormulaForm.get('cat_percentage').errors?.['required']"
-          >CAT perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -86,16 +44,10 @@
         formControlName="wawancara_percentage"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('wawancara_percentage').invalid &&
-          editFormulaForm.get('wawancara_percentage').touched
-        "
+        *ngIf="getErrorMessage('wawancara_percentage', 'Wawancara') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="editFormulaForm.get('wawancara_percentage').errors?.['required']"
-          >Wawancara perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -112,16 +64,10 @@
         formControlName="seminar_percentage"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('seminar_percentage').invalid &&
-          editFormulaForm.get('seminar_percentage').touched
-        "
+        *ngIf="getErrorMessage('seminar_percentage', 'Seminar') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="editFormulaForm.get('seminar_percentage').errors?.['required']"
-          >Seminar perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -138,16 +84,10 @@
         formControlName="praktik_percentage"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('praktik_percentage').invalid &&
-          editFormulaForm.get('praktik_percentage').touched
-        "
+        *ngIf="getErrorMessage('praktik_percentage', 'Praktik') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="editFormulaForm.get('praktik_percentage').errors?.['required']"
-          >Praktik perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -164,16 +104,10 @@
         formControlName="portofolio_percentage"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('portofolio_percentage').invalid &&
-          editFormulaForm.get('portofolio_percentage').touched
-        "
+        *ngIf="getErrorMessage('portofolio_percentage', 'Portofolia') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="editFormulaForm.get('portofolio_percentage').errors?.['required']"
-          >Portofolia perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -190,16 +124,10 @@
         formControlName="ukt_percentage"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('ukt_percentage').invalid &&
-          editFormulaForm.get('ukt_percentage').touched
-        "
+        *ngIf="getErrorMessage('ukt_percentage', 'UKT') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="editFormulaForm.get('ukt_percentage').errors?.['required']"
-          >UKT perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -216,16 +144,10 @@
         formControlName="ukmsk_percentage"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('ukmsk_percentage').invalid &&
-          editFormulaForm.get('ukmsk_percentage').touched
-        "
+        *ngIf="getErrorMessage('ukmsk_percentage', 'UKSMK') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="editFormulaForm.get('ukmsk_percentage').errors?.['required']"
-          >UKSMK perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -242,16 +164,12 @@
         formControlName="grade_threshold"
       />
       <div
-        class="feedback"
         *ngIf="
-          editFormulaForm.get('grade_threshold').invalid &&
-          editFormulaForm.get('grade_threshold').touched
+          getErrorMessage('grade_threshold', 'Ambang Batas Nilai') as error
         "
+        class="text-danger"
       >
-        <small
-          *ngIf="editFormulaForm.get('grade_threshold').errors?.['required']"
-          >Ambang Batas Nilai perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -268,15 +186,10 @@
         formControlName="ukt_threshold"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('ukt_threshold').invalid &&
-          editFormulaForm.get('ukt_threshold').touched
-        "
+        *ngIf="getErrorMessage('ukt_threshold', 'Ambang Batas UKT') as error"
+        class="text-danger"
       >
-        <small *ngIf="editFormulaForm.get('ukt_threshold').errors?.['required']"
-          >Ambang Batas UKT perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -293,25 +206,40 @@
         formControlName="jpm_threshold"
       />
       <div
-        class="feedback"
-        *ngIf="
-          editFormulaForm.get('jpm_threshold').invalid &&
-          editFormulaForm.get('jpm_threshold').touched
-        "
+        *ngIf="getErrorMessage('jpm_threshold', 'Ambang Batas JPM') as error"
+        class="text-danger"
       >
-        <small *ngIf="editFormulaForm.get('jpm_threshold').errors?.['required']"
-          >Ambang Batas JPM perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
-    <button
+    <ng-container *ngIf="isLoading$ | async; else noLoading">
+      <button class="btn btn-primary w-100" disabled>
+        <div
+          class="spinner-border"
+          style="width: 19px; height: 19px"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </button></ng-container
+    >
+    <ng-template #noLoading>
+      <button
+        (click)="submit()"
+        [disabled]="!editFormulaForm.valid"
+        class="btn btn-primary w-100"
+      >
+        Update
+      </button>
+    </ng-template>
+    <!-- <button
       (click)="submit()"
       [disabled]="!editFormulaForm.valid"
       class="btn btn-primary w-100"
     >
       Update
-    </button>
+    </button> -->
   </form>
 </app-modal>
 

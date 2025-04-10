@@ -1,12 +1,3 @@
-<!-- <ng-container *ngIf="(tab$ | async) === 0">
-  <h1>list</h1>
-</ng-container>
-<ng-container *ngIf="(tab$ | async) === 1">
-  <app-ukom-question-add
-    (changeTabActive)="handleTabChange(0)"
-  ></app-ukom-question-add>
-</ng-container> -->
-
 <section>
   <form [formGroup]="templatePertanyaanForm" (ngSubmit)="submit()">
     <div class="col-lg-12 mb-3">
@@ -19,6 +10,7 @@
         class="form-select"
         formControlName="jenis_ukom_code"
       >
+        <option value="" disabled selected hidden>Pilih Jenis UKom</option>
         <option
           *ngFor="let jenisUkom of examTypeList$ | async"
           [value]="jenisUkom.code"
@@ -27,13 +19,10 @@
         </option>
       </select>
       <div
-        *ngIf="
-          templatePertanyaanForm.get('jenis_ukom_code')?.invalid &&
-          templatePertanyaanForm.get('jenis_ukom_code')?.touched
-        "
+        *ngIf="getErrorMessage('jenis_ukom_code', 'Jenis UKom') as error"
         class="text-danger"
       >
-        Jenis UKom tidak boleh kosong.
+        {{ error }}
       </div>
     </div>
 
@@ -45,13 +34,27 @@
 
     <div class="row text-center">
       <div class="col-12">
-        <button
-          type="submit"
-          class="btn btn-success float-end"
-          [disabled]="isAnyFileMissing() || templatePertanyaanForm.invalid"
-        >
-          Import
-        </button>
+        <ng-container *ngIf="isLoading$ | async; else noLoading">
+          <button class="btn btn-success float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-success float-end"
+            [disabled]="isAnyFileMissing() || templatePertanyaanForm.invalid"
+          >
+            Update
+          </button>
+        </ng-template>
       </div>
     </div>
   </form>

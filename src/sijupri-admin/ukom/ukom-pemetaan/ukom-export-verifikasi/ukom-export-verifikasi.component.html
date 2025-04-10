@@ -78,6 +78,12 @@
           <option [value]="'xls'">Excel</option>
           <option [value]="'csv'">CSV</option>
         </select>
+        <div
+          *ngIf="getErrorMessage('fileType', 'Format File') as error"
+          class="text-danger"
+        >
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -101,7 +107,7 @@
             class="btn btn-success float-end"
             [disabled]="hasilVerifikasiForm.invalid || (isLoading$ | async)"
           >
-            Generate Report
+            Export
           </button>
         </ng-template>
       </div>

@@ -21,6 +21,7 @@ import { ReportGenerate } from '../../../../modules/report/models/report-generat
 import { BehaviorSubject } from 'rxjs'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-ukom-export-verifikasi',
@@ -42,6 +43,7 @@ export class UkomExportVerifikasiComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
+        private formValidationService: FormValidationService
     ) {
         this.isLoading$ = new BehaviorSubject<boolean>(false);
         this.reportId = 'ukomVerification';
@@ -54,6 +56,10 @@ export class UkomExportVerifikasiComponent {
         this.getJabatanList()
         this.handleFormInit()
         this.handlePagable()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.hasilVerifikasiForm.get(controlName), controlName, label);
     }
 
     handlePagable() {
@@ -90,8 +96,6 @@ export class UkomExportVerifikasiComponent {
             .build()
 
     }
-
-
 
     handleDownload(reportId: string) {
         this.apiService.getDownload(`/api/v1/report/download/${reportId}`).subscribe({

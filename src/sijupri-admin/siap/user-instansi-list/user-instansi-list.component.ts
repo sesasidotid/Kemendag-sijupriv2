@@ -4,10 +4,10 @@ import { PagableComponent } from '../../../modules/base/components/pagable/pagab
 import { Router, RouterLink } from '@angular/router'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import {
-  ActionColumnBuilder,
-  PagableBuilder,
-  PageFilterBuilder,
-  PrimaryColumnBuilder
+    ActionColumnBuilder,
+    PagableBuilder,
+    PageFilterBuilder,
+    PrimaryColumnBuilder
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
@@ -20,148 +20,157 @@ import { UserInstansiUpdateComponent } from '../user-instansi-update/user-instan
 import { CommonModule } from '@angular/common'
 import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 @Component({
-  selector: 'app-user-instansi-list',
-  standalone: true,
-  imports: [
-    RouterLink,
-    ModalComponent,
-    PagableComponent,
-    UserInstansiUpdateComponent,
-    CommonModule
-  ],
-  templateUrl: './user-instansi-list.component.html',
-  styleUrl: './user-instansi-list.component.scss'
+    selector: 'app-user-instansi-list',
+    standalone: true,
+    imports: [
+        RouterLink,
+        ModalComponent,
+        PagableComponent,
+        UserInstansiUpdateComponent,
+        CommonModule
+    ],
+    templateUrl: './user-instansi-list.component.html',
+    styleUrl: './user-instansi-list.component.scss'
 })
 export class UserInstansiListComponent {
-  pagable: Pagable
-  refresh: boolean = false
-  isModalOpen$ = new BehaviorSubject<boolean>(false)
-  selectedUserInstansi: UserInstansi = new UserInstansi()
-  detailInstansi: Instansi = new Instansi()
-  constructor (
-    private tabService: TabService,
-    private router: Router,
-    private confirmationService: ConfirmationService,
-    private apiService: ApiService,
-    private handlerService: HandlerService
-  ) {
-    this.pagable = new PagableBuilder('/api/v1/user_instansi/search')
-      .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Nama', 'name', ['user']).build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Email', 'email', ['user']).build()
-      )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((data: any) => {
-            this.router.navigate([`/siap/user-instansi/${data.nip}`])
-          }, 'info')
-          .withIcon('detail')
-          .build()
-      )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((data: any) => {
-            this.toggleModal()
-            this.selectedUserInstansi = data
-          }, 'primary')
-          .withIcon('update')
-          .build()
-      )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((data: any) => {
-            this.handleDelete(data.nip)
-          }, 'danger')
-          .withIcon('danger')
-          .build()
-      )
+    pagable: Pagable
+    refresh: boolean = false
+    isModalOpen$ = new BehaviorSubject<boolean>(false)
+    selectedUserInstansi: UserInstansi = new UserInstansi()
+    detailInstansi: Instansi = new Instansi()
+    constructor(
+        private tabService: TabService,
+        private router: Router,
+        private confirmationService: ConfirmationService,
+        private apiService: ApiService,
+        private handlerService: HandlerService
+    ) { }
 
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('nip')
-          .withField('NIP', 'text')
-          .build()
-      )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('name', ['user'])
-          .withField('Nama', 'text')
-          .build()
-      )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('email', ['user'])
-          .withField('Email', 'text')
-          .build()
-      )
-      .build()
-  }
 
-  toggleRefresh () {
-    this.refresh = !this.refresh
-    this.toggleModal()
-  }
-
-  ngOnInit () {
-    if (this.tabService.getTabsLength() > 0) {
-      this.tabService.clearTabs()
+    ngOnInit() {
+        this.handlePagable()
+        this.handleTabService()
     }
 
-    this.tabService
-      .addTab({
-        label: 'Daftar User Instansi',
-        isActive: true,
-        icon: 'mdi-list-box',
-        onClick: () => this.router.navigate(['/siap/user-instansi'])
-      })
-      .addTab({
-        label: 'Tambah User Instansi',
-        icon: 'mdi-plus-circle',
-        onClick: () => this.router.navigate(['/siap/user-instansi/add'])
-      })
-  }
+    toggleRefresh() {
+        this.refresh = !this.refresh
+        this.toggleModal()
+    }
 
-  getDetailInstansi (instansiId: string) {
-    this.apiService.getData(`/api/v1/instansi/${instansiId}`).subscribe({
-      next: (data: any) => {
-        this.detailInstansi = data
-      }
-    })
-  }
+    handleTabService() {
+        if (this.tabService.getTabsLength() > 0) {
+            this.tabService.clearTabs()
+        }
 
-  handleDelete (userNip: string) {
-    this.confirmationService.open(false).subscribe({
-      next: result => {
-        if (!result.confirmed) return
-        this.apiService
-          .deleteData(`/api/v1/user_instansi/${userNip}`)
-          .subscribe({
-            next: () => {
-              this.handlerService.handleAlert(
-                'Success',
-                'Berhasil menghapus user instansi.'
-              )
-              //   setTimeout(() => {
-              //     window.location.reload()
-              //   }, 100)
-              this.refresh = !this.refresh
-            },
-            error: error => {
-              console.log('error', error)
-              this.handlerService.handleAlert(
-                'Error',
-                'Gagal menghapus data user instansi'
-              )
+        this.tabService
+            .addTab({
+                label: 'Daftar User Instansi',
+                isActive: true,
+                icon: 'mdi-list-box',
+                onClick: () => this.router.navigate(['/siap/user-instansi'])
+            })
+            .addTab({
+                label: 'Tambah User Instansi',
+                icon: 'mdi-plus-circle',
+                onClick: () => this.router.navigate(['/siap/user-instansi/add'])
+            })
+    }
+
+    handlePagable() {
+        this.pagable = new PagableBuilder('/api/v1/user_instansi/search')
+            .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Nama', 'name', ['user']).build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Email', 'email', ['user']).build()
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: any) => {
+                        this.router.navigate([`/siap/user-instansi/${data.nip}`])
+                    }, 'info')
+                    .withIcon('detail')
+                    .build()
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: any) => {
+                        this.toggleModal()
+                        this.selectedUserInstansi = data
+                    }, 'primary')
+                    .withIcon('update')
+                    .build()
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: any) => {
+                        this.handleDelete(data.nip)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build()
+            )
+
+            .addFilter(
+                new PageFilterBuilder('like')
+                    .setProperty('nip')
+                    .withField('NIP', 'text')
+                    .build()
+            )
+            .addFilter(
+                new PageFilterBuilder('like')
+                    .setProperty('name', ['user'])
+                    .withField('Nama', 'text')
+                    .build()
+            )
+            .addFilter(
+                new PageFilterBuilder('like')
+                    .setProperty('email', ['user'])
+                    .withField('Email', 'text')
+                    .build()
+            )
+            .build()
+    }
+
+    getDetailInstansi(instansiId: string) {
+        this.apiService.getData(`/api/v1/instansi/${instansiId}`).subscribe({
+            next: (data: any) => {
+                this.detailInstansi = data
             }
-          })
-      }
-    })
-  }
+        })
+    }
 
-  toggleModal () {
-    this.isModalOpen$.next(!this.isModalOpen$.value)
-  }
+    handleDelete(userNip: string) {
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
+                this.apiService
+                    .deleteData(`/api/v1/user_instansi/${userNip}`)
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil menghapus user instansi.'
+                            )
+                            //   setTimeout(() => {
+                            //     window.location.reload()
+                            //   }, 100)
+                            this.refresh = !this.refresh
+                        },
+                        error: error => {
+                            console.log('error', error)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menghapus data user instansi'
+                            )
+                        }
+                    })
+            }
+        })
+    }
+
+    toggleModal() {
+        this.isModalOpen$.next(!this.isModalOpen$.value)
+    }
 }
+

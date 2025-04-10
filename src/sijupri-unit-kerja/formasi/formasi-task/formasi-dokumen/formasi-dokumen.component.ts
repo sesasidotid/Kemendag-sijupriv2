@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, ViewChild } from '@angular/core'
 import { DokumenPersyaratanService } from '../../../../modules/maintenance/services/dokumen-persyaratan.service'
 import { DokumenPersyaratan } from '../../../../modules/maintenance/models/dokumen-persyaratan.model'
 import { CommonModule } from '@angular/common'
@@ -21,177 +21,186 @@ import { ConfirmationDialogComponent } from '../../../../modules/base/components
 import { BehaviorSubject } from 'rxjs'
 
 @Component({
-  selector: 'app-formasi-dokumen',
-  standalone: true,
-  imports: [CommonModule, FormsModule, FileHandlerComponent],
-  templateUrl: './formasi-dokumen.component.html',
-  styleUrl: './formasi-dokumen.component.scss'
+    selector: 'app-formasi-dokumen',
+    standalone: true,
+    imports: [CommonModule, FormsModule, FileHandlerComponent],
+    templateUrl: './formasi-dokumen.component.html',
+    styleUrl: './formasi-dokumen.component.scss'
 })
 export class FormasiDokumenComponent {
-  formasiDokumenList: DokumenUkomPersyaratan[] = []
-  formasiRequest: FormasiRequest = new FormasiRequest()
-  detectedDokumen: any = {}
-  hadItemsLoading$ = new BehaviorSubject<boolean>(false)
+    @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
 
-  payload: {
-    formasiDokumenList: {
-      dokumenFile: string
-      dokumenPersyaratanName: string
-      dokumenPersyaratanId: string
-    }[]
-  } = {
-    formasiDokumenList: []
-  }
+    formasiDokumenList: DokumenUkomPersyaratan[] = []
+    formasiRequest: FormasiRequest = new FormasiRequest()
+    detectedDokumen: any = {}
+    hadItemsLoading$ = new BehaviorSubject<boolean>(false)
 
-  @Input() objectTaskId: string
-
-  inputs: FIleHandler = {
-    files: {},
-    maxSize: 2 * 1024 * 1024,
-    allowedTypes: [{ type: 'application/pdf' }],
-
-    listen: (
-      key: string,
-      source: string,
-      base64Data: string,
-      label: string,
-      id: string
-    ) => {
-      this.detectedDokumen[key] = {
-        base64: base64Data,
-        label: label,
-        id: id
-      }
-    }
-  }
-
-  constructor (
-    private formasiService: FormasiService,
-    private dokumenPersyaratan: DokumenPersyaratanService,
-    private objectTaskService: ObjectTaskService,
-    private confirmationService: ConfirmationService,
-    private apiService: ApiService,
-    private handlerService: HandlerService
-  ) {}
-
-  ngOnInit () {
-    if (this.objectTaskId) {
-      this.getDokumenPersyaratanListFromObjecTask()
-    } else {
-      this.getDokumenPersyaratanList()
-    }
-  }
-
-  getDokumenPersyaratanList () {
-    this.apiService.getData('/api/v1/formasi_dokumen/all').subscribe({
-      next: response => {
-        this.formasiDokumenList = response.map(
-          (dokumen: FormasiDokumenRequirement) => {
-            return new DokumenUkomPersyaratan({
-              dokumenPersyaratanId: dokumen.dokumenPersyaratanId,
-              dokumenPersyaratanName: dokumen.dokumenPersyaratanName
-            })
-          }
-        )
-
-        this.detectedDokumen = {}
-        this.inputs.files = {}
-
-        this.formasiDokumenList.forEach((dokumen, index) => {
-          const key = `dokumenPersyaratan_${index + 1}`
-          this.inputs.files[key] = {
-            label: dokumen.dokumenPersyaratanName,
-            id: dokumen.dokumenPersyaratanId
-          }
-        })
-      },
-      error: error => {
-        console.error(error)
-      }
-    })
-  }
-
-  getDokumenPersyaratanListFromObjecTask () {
-    this.objectTaskService.findById(this.objectTaskId).subscribe({
-      next: (objectTask: ObjectTask) => {
-        this.formasiDokumenList.length = 0
-        const dokumenPersyaratanList = objectTask.object
-        for (const dokumenPersyaratan of dokumenPersyaratanList) {
-          this.formasiDokumenList.push(dokumenPersyaratan)
+    payload: {
+        formasiDokumenList: {
+            dokumenFile: string
+            dokumenPersyaratanName: string
+            dokumenPersyaratanId: string
+        }[]
+    } = {
+            formasiDokumenList: []
         }
-      }
-    })
-  }
 
-  isAnyFileMissing (): boolean {
-    return Object.keys(this.inputs.files).some(key => {
-      return !this.detectedDokumen[key]
-    })
-  }
+    @Input() objectTaskId: string
 
-  submit () {
-    const documentMap = new Map()
+    inputs: FIleHandler = {
+        files: {},
+        maxSize: 2 * 1024 * 1024,
+        allowedTypes: [{ type: 'application/pdf' }],
 
-    for (const key in this.detectedDokumen) {
-      if (this.detectedDokumen.hasOwnProperty(key)) {
-        const detected = this.detectedDokumen[key]
-
-        const dokumenPersyaratan = this.formasiDokumenList.find(
-          dokumen => dokumen.dokumenPersyaratanName == detected.label
-        )
-
-        if (dokumenPersyaratan) {
-          const newDoc = {
-            dokumenFile: detected.base64,
-            dokumenPersyaratanName:
-              dokumenPersyaratan.dokumenPersyaratanName + '__' + Date.now(),
-            dokumenPersyaratanId: detected.id
-          }
-
-          // Always store the latest document by overwriting existing ones
-          documentMap.set(detected.id, newDoc)
-        }
-      }
-    }
-
-    // Convert the Map values to an array and assign it to payload.formasiDokumenList
-    this.payload.formasiDokumenList = Array.from(documentMap.values())
-    console.log('payload', this.payload)
-
-    this.confirmationService.open(false).subscribe({
-      next: result => {
-        if (!result.confirmed) return
-        console.log('payload2', this.payload)
-        this.hadItemsLoading$.next(true)
-
-        this.apiService
-          .postData(`/api/v1/formasi/task`, this.payload)
-          .subscribe({
-            next: () => (
-              this.handlerService.handleAlert(
-                'Success',
-                'Data Berhasil Disimpan'
-              ),
-              setTimeout(() => {
-                window.location.reload()
-              }, 1000),
-              this.hadItemsLoading$.next(false)
-            ),
-            error: error => {
-              this.hadItemsLoading$.next(false)
-
-              console.log(error)
-              this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
-              this.payload = { formasiDokumenList: [] }
-              this.detectedDokumen = {}
+        listen: (
+            key: string,
+            source: string,
+            base64Data: string,
+            label: string,
+            id: string
+        ) => {
+            this.detectedDokumen[key] = {
+                base64: base64Data,
+                label: label,
+                id: id
             }
-          })
-      },
-      error: error => {
-        this.hadItemsLoading$.next(false)
-        console.log('error', error)
-        this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
-      }
-    })
-  }
+        }
+    }
+
+    constructor(
+        private formasiService: FormasiService,
+        private dokumenPersyaratan: DokumenPersyaratanService,
+        private objectTaskService: ObjectTaskService,
+        private confirmationService: ConfirmationService,
+        private apiService: ApiService,
+        private handlerService: HandlerService
+    ) { }
+
+    ngOnInit() {
+        if (this.objectTaskId) {
+            this.getDokumenPersyaratanListFromObjecTask()
+        } else {
+            this.getDokumenPersyaratanList()
+        }
+    }
+
+    getDokumenPersyaratanList() {
+        this.apiService.getData('/api/v1/formasi_dokumen/all').subscribe({
+            next: response => {
+                this.formasiDokumenList = response.map(
+                    (dokumen: FormasiDokumenRequirement) => {
+                        return new DokumenUkomPersyaratan({
+                            dokumenPersyaratanId: dokumen.dokumenPersyaratanId,
+                            dokumenPersyaratanName: dokumen.dokumenPersyaratanName
+                        })
+                    }
+                )
+
+                this.detectedDokumen = {}
+                this.inputs.files = {}
+
+                this.formasiDokumenList.forEach((dokumen, index) => {
+                    const key = `dokumenPersyaratan_${index + 1}`
+                    this.inputs.files[key] = {
+                        label: dokumen.dokumenPersyaratanName,
+                        id: dokumen.dokumenPersyaratanId
+                    }
+                })
+            },
+            error: error => {
+                console.error(error)
+            }
+        })
+    }
+
+    getDokumenPersyaratanListFromObjecTask() {
+        this.objectTaskService.findById(this.objectTaskId).subscribe({
+            next: (objectTask: ObjectTask) => {
+                this.formasiDokumenList.length = 0
+                const dokumenPersyaratanList = objectTask.object
+                for (const dokumenPersyaratan of dokumenPersyaratanList) {
+                    this.formasiDokumenList.push(dokumenPersyaratan)
+                }
+            }
+        })
+    }
+
+    isAnyFileMissing(): boolean {
+        return Object.keys(this.inputs.files).some(key => {
+            return !this.detectedDokumen[key]
+        })
+    }
+
+    clearFilesName() {
+        if (this.fileHandler) {
+            this.fileHandler.clearFileName()
+        }
+    }
+
+    submit() {
+        const documentMap = new Map()
+
+        for (const key in this.detectedDokumen) {
+            if (this.detectedDokumen.hasOwnProperty(key)) {
+                const detected = this.detectedDokumen[key]
+
+                const dokumenPersyaratan = this.formasiDokumenList.find(
+                    dokumen => dokumen.dokumenPersyaratanName == detected.label
+                )
+
+                if (dokumenPersyaratan) {
+                    const newDoc = {
+                        dokumenFile: detected.base64,
+                        dokumenPersyaratanName:
+                            dokumenPersyaratan.dokumenPersyaratanName + '__' + Date.now(),
+                        dokumenPersyaratanId: detected.id
+                    }
+
+                    // Always store the latest document by overwriting existing ones
+                    documentMap.set(detected.id, newDoc)
+                }
+            }
+        }
+
+        // Convert the Map values to an array and assign it to payload.formasiDokumenList
+        this.payload.formasiDokumenList = Array.from(documentMap.values())
+        console.log('payload', this.payload)
+
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
+                console.log('payload2', this.payload)
+                this.hadItemsLoading$.next(true)
+
+                this.apiService
+                    .postData(`/api/v1/formasi/task`, this.payload)
+                    .subscribe({
+                        next: () => (
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Data Berhasil Disimpan'
+                            ),
+                            setTimeout(() => {
+                                window.location.reload()
+                            }, 1000),
+                            this.hadItemsLoading$.next(false)
+                        ),
+                        error: error => {
+                            this.hadItemsLoading$.next(false)
+
+                            console.log(error)
+                            this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
+                            this.payload = { formasiDokumenList: [] }
+                            this.detectedDokumen = {}
+                            this.clearFilesName()
+                        }
+                    })
+            },
+            error: error => {
+                this.hadItemsLoading$.next(false)
+                console.log('error', error)
+                this.handlerService.handleAlert('Error', 'Gagal Menyimpan Data')
+            }
+        })
+    }
 }

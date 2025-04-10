@@ -1,4 +1,4 @@
-import { filter } from 'rxjs/operators'
+import { filter, first } from 'rxjs/operators'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ApiService } from '../../../modules/base/services/api.service'
@@ -12,84 +12,84 @@ import { InstasiDetailComponent } from '../../maintenance/instasi-detail/instasi
 import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 import { InstansiType } from '../../../modules/maintenance/models/instansi-type.model'
 @Component({
-  selector: 'app-user-instasi-detail',
-  standalone: true,
-  imports: [CommonModule, InstasiDetailComponent],
-  templateUrl: './user-instasi-detail.component.html',
-  styleUrl: './user-instasi-detail.component.scss'
+    selector: 'app-user-instasi-detail',
+    standalone: true,
+    imports: [CommonModule, InstasiDetailComponent],
+    templateUrl: './user-instasi-detail.component.html',
+    styleUrl: './user-instasi-detail.component.scss'
 })
 export class UserInstasiDetailComponent {
-  nip: string = ''
-  userInstansiDetail: UserInstansiDetail = new UserInstansiDetail()
-  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
-  instasiDetail: Instansi = new Instansi()
-  instansiType: InstansiType = new InstansiType()
+    nip: string = ''
+    userInstansiDetail: UserInstansiDetail = new UserInstansiDetail()
+    profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
+    instasiDetail: Instansi = new Instansi()
+    instansiType: InstansiType = new InstansiType()
 
-  constructor (
-    private activatedRoute: ActivatedRoute,
-    private apiService: ApiService,
-    private handlerService: HandlerService,
-    private sanitizer: DomSanitizer
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.nip = params.get('id')
-    })
-    this.fetchPhotoProfile()
-  }
+    constructor(
+        private activatedRoute: ActivatedRoute,
+        private apiService: ApiService,
+        private handlerService: HandlerService,
+        private sanitizer: DomSanitizer
+    ) { }
 
-  ngOnInit () {
-    this.getInstansiDetail()
-  }
+    ngOnInit() {
+        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+            this.nip = params.get('id')
+        })
+        this.fetchPhotoProfile()
+        this.getInstansiDetail()
+    }
 
-  getUserInstasiDetail (instasi_id: string) {
-    this.apiService.getData(`/api/v1/instansi/${instasi_id}`).subscribe({
-      next: (data: Instansi) => {
-        this.instasiDetail = data
-        this.getInstasiType(this.instasiDetail.instansiTypeCode)
-      }
-    })
-  }
+    getUserInstasiDetail(instasi_id: string) {
+        this.apiService.getData(`/api/v1/instansi/${instasi_id}`).subscribe({
+            next: (data: Instansi) => {
+                this.instasiDetail = data
+                this.getInstasiType(this.instasiDetail.instansiTypeCode)
+            }
+        })
+    }
 
-  back () {
-    history.back()
-  }
-  fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(this.nip).subscribe({
-      next: blob => {
-        if (blob.size === 0) {
-          this.profileImageSrc = 'assets/no-profile.jpg'
-          return
-        }
-        const objectUrl = URL.createObjectURL(blob)
-        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
-      },
-      error: err => {
-        console.error('Error fetching profile image', err)
-        this.profileImageSrc = 'assets/no-profile.jpg'
-      }
-    })
-  }
+    back() {
+        history.back()
+    }
 
-  getInstansiDetail () {
-    this.apiService.getData(`/api/v1/user_instansi/${this.nip}`).subscribe({
-      next: (data: UserInstansiDetail) => {
-        this.userInstansiDetail = data
-        this.getUserInstasiDetail(this.userInstansiDetail.instansiId)
-      },
-      error: err => {
-        console.error(err)
-        this.handlerService.handleAlert('Error', 'Gagal mengambil data')
-      }
-    })
-  }
+    fetchPhotoProfile() {
+        this.apiService.getPhotoProfile(this.nip).subscribe({
+            next: blob => {
+                if (blob.size === 0) {
+                    this.profileImageSrc = 'assets/no-profile.jpg'
+                    return
+                }
+                const objectUrl = URL.createObjectURL(blob)
+                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+            },
+            error: err => {
+                console.error('Error fetching profile image', err)
+                this.profileImageSrc = 'assets/no-profile.jpg'
+            }
+        })
+    }
 
-  getInstasiType (instasi_code: string) {
-    this.apiService.getData('/api/v1/instansi_type').subscribe({
-      next: res => {
-        this.instansiType = res.filter(
-          (data: InstansiType) => data.code === instasi_code
-        )[0]
-      }
-    })
-  }
+    getInstansiDetail() {
+        this.apiService.getData(`/api/v1/user_instansi/${this.nip}`).subscribe({
+            next: (data: UserInstansiDetail) => {
+                this.userInstansiDetail = data
+                this.getUserInstasiDetail(this.userInstansiDetail.instansiId)
+            },
+            error: err => {
+                console.error(err)
+                this.handlerService.handleAlert('Error', 'Gagal mengambil data')
+            }
+        })
+    }
+
+    getInstasiType(instasi_code: string) {
+        this.apiService.getData('/api/v1/instansi_type').subscribe({
+            next: res => {
+                this.instansiType = res.filter(
+                    (data: InstansiType) => data.code === instasi_code
+                )[0]
+            }
+        })
+    }
 }

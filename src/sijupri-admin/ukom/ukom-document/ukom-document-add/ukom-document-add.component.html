@@ -14,16 +14,12 @@
           placeholder="Nama Dokumen"
         />
         <div
-          class="text-danger"
           *ngIf="
-            documentForm.get('dokumenPersyaratanName').invalid &&
-            documentForm.get('dokumenPersyaratanName').touched
+            getErrorMessage('dokumenPersyaratanName', 'Nama dokumen') as error
           "
+          class="text-danger"
         >
-          <small
-            *ngIf="documentForm.get('dokumenPersyaratanName').errors?.['required']"
-            >Nama dokumen mulai perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -47,35 +43,13 @@
           <option value="PROMOSI">Promosi</option>
         </select>
         <div
+          *ngIf="getErrorMessage('jenisUkom', 'Jenis UKom') as error"
           class="text-danger"
-          *ngIf="
-            documentForm.get('jenisUkom').invalid &&
-            documentForm.get('jenisUkom').touched
-          "
         >
-          <small *ngIf="documentForm.get('jenisUkom').errors?.['required']"
-            >Jenis ukom perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
-
-    <!-- <div class="row mb-3">
-      <label for="isMengulang" class="col-sm-2 col-form-label fw-bold">
-        Jenis Pendaftaran <span class="text-danger">*</span>
-      </label>
-      <div class="col-sm-10">
-        <select
-          id="isMengulang"
-          class="form-select"
-          name="isMengulang"
-          formControlName="isMengulang"
-        >
-          <option value="false">Baru</option>
-          <option value="true">Mengulang</option>
-        </select>
-      </div>
-    </div> -->
 
     <div class="row mb-3">
       <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold"
@@ -103,6 +77,12 @@
             <option disabled>Jabatan yang dituju tidak ditemukan</option>
           </ng-template>
         </select>
+        <div
+          *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error"
+          class="text-danger"
+        >
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -129,9 +109,15 @@
             </option>
           </ng-container>
           <ng-template #JenjangNotFound>
-            <option disabled>Jabatan yang dituju tidak ditemukan</option>
+            <option disabled>Jenjang yang dituju tidak ditemukan</option>
           </ng-template>
         </select>
+        <div
+          *ngIf="getErrorMessage('jenjangCode', 'Jenjang') as error"
+          class="text-danger"
+        >
+          {{ error }}
+        </div>
       </div>
     </div>
 

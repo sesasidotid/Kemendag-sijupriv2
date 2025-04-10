@@ -14,6 +14,7 @@
       </ng-template>
     </div>
   </div>
+
   <div class="row mb-3">
     <label for="" class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
     <div class="col-sm-10">
@@ -30,6 +31,7 @@
     </div>
   </div>
   <hr />
+
   <div class="row mb-3">
     <label for="nip" class="col-sm-2 col-form-label fw-bold"
       >NIP <span class="text-danger">*</span>
@@ -42,19 +44,8 @@
         id="nip"
         formControlName="nip"
       />
-      <div
-        class="feedback"
-        *ngIf="jfAddForm.get('nip').invalid && jfAddForm.get('nip').touched"
-      >
-        <small *ngIf="jfAddForm.get('nip').errors?.['required']"
-          >NIP perlu diisi.</small
-        >
-        <small *ngIf="jfAddForm.get('nip').errors?.['pattern']"
-          >NIP harus berupa angka.</small
-        >
-        <small *ngIf="jfAddForm.get('nip').errors?.['minlength']"
-          >NIP minimal 18 karakter.</small
-        >
+      <div *ngIf="getErrorMessage('nip', 'NIP') as error" class="text-danger">
+        {{ error }}
       </div>
     </div>
   </div>
@@ -71,12 +62,10 @@
         formControlName="name"
       />
       <div
-        class="feedback"
-        *ngIf="jfAddForm.get('name').invalid && jfAddForm.get('name').touched"
+        *ngIf="getErrorMessage('name', 'Nama Lengkap') as error"
+        class="text-danger"
       >
-        <small *ngIf="jfAddForm.get('name').errors?.['required']"
-          >Nama Lengkap perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -93,71 +82,13 @@
         formControlName="email"
       />
       <div
-        class="feedback"
-        *ngIf="jfAddForm.get('email').invalid && jfAddForm.get('email').touched"
+        *ngIf="getErrorMessage('email', 'Email') as error"
+        class="text-danger"
       >
-        <small *ngIf="jfAddForm.get('email').errors?.['required']"
-          >Email perlu diisi.</small
-        >
-        <small *ngIf="jfAddForm.get('email').errors?.['email']"
-          >Email tidak valid.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
-
-  <!-- <div class="row mb-3">
-    <label for="password" class="col-sm-2 col-form-label fw-bold"
-      >Password <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="password"
-        class="form-control"
-        name="password"
-        id="password"
-        formControlName="password"
-      />
-      <div
-        class="feedback"
-        *ngIf="
-          jfAddForm.get('password').invalid && jfAddForm.get('password').touched
-        "
-      >
-        <small *ngIf="jfAddForm.get('password').errors?.['required']"
-          >Password perlu diisi.</small
-        >
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-3">
-    <label for="confirmPassword" class="col-sm-2 col-form-label fw-bold"
-      >Konfirmasi Password <span class="text-danger">*</span>
-    </label>
-    <div class="col-sm-10">
-      <input
-        type="password"
-        class="form-control"
-        name="confirmPassword"
-        id="confirmPassword"
-        formControlName="confirmPassword"
-      />
-      <div
-        class="feedback"
-        *ngIf="
-          (jfAddForm.get('confirmPassword').invalid &&
-            jfAddForm.get('confirmPassword').touched) ||
-          (jfAddForm.get('confirmPassword').touched &&
-            jfAddForm.get('confirmPassword')?.hasError('mismatch'))
-        "
-      >
-        <small class="text-danger">
-          Password dan Konfirmasi Password tidak cocok.</small
-        >
-      </div>
-    </div>
-  </div> -->
 
   <div class="row mb-3">
     <label for="kelamin" class="col-sm-2 col-form-label fw-bold"
@@ -182,15 +113,10 @@
         </option>
       </select>
       <div
-        class="feedback"
-        *ngIf="
-          jfAddForm.get('jenisKelaminCode').invalid &&
-          jfAddForm.get('jenisKelaminCode').touched
-        "
+        *ngIf="getErrorMessage('jenisKelaminCode', 'Jenis Kelamin') as error"
+        class="text-danger"
       >
-        <small *ngIf="jfAddForm.get('jenisKelaminCode').errors?.['required']"
-          >Jenis Kelamin perlu dipilih.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>

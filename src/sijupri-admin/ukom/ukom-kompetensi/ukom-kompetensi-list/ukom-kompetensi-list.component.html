@@ -12,19 +12,50 @@
   [title]="'Update Kompetensi'"
   (toggle)="toggleModal()"
   [enableFooter]="false"
-  [size]="'sm'"
 >
-  <form [formGroup]="editKompetensiForm">
-    <div class="mb-3">
-      <label for="name" class="form-label">Nama</label>
-      <input
-        type="text"
-        class="form-control"
-        id="name"
-        required
-        formControlName="name"
-      />
-    </div>
-    <button (click)="submit()" class="btn btn-primary w-100">Update</button>
-  </form></app-modal
->
+  <div class="col-12">
+    <form [formGroup]="editKompetensiForm">
+      <div class="row mb-3">
+        <label for="name" class="form-label fw-bold">Nama</label>
+        <div>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            required
+            formControlName="name"
+          />
+        </div>
+        <div
+          *ngIf="getErrorMessage('name', 'Nama') as error"
+          class="text-danger"
+        >
+          {{ error }}
+        </div>
+      </div>
+
+      <ng-container *ngIf="loadingButton$ | async; else noLoading">
+        <button class="btn btn-primary w-100" disabled>
+          <div
+            class="spinner-border"
+            style="width: 19px; height: 19px"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </button>
+      </ng-container>
+
+      <ng-template #noLoading>
+        <button
+          type="button"
+          class="btn btn-primary w-100"
+          (click)="submit()"
+          [disabled]="editKompetensiForm.invalid"
+        >
+          Update
+        </button>
+      </ng-template>
+    </form>
+  </div>
+</app-modal>

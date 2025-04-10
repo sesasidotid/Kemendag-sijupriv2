@@ -10,76 +10,79 @@ import { MatrixThreeTableComponent } from '../../../modules/base/components/matr
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { RekapTableComponent } from '../../../modules/base/components/rekap-table/rekap-table.component'
+import { first } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-akp-detail',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FileHandlerComponent,
-    MatrixOneTableComponent,
-    MatrixTwoTableComponent,
-    MatrixThreeTableComponent,
-    RekapTableComponent
-  ],
-  templateUrl: './akp-detail.component.html',
-  styleUrl: './akp-detail.component.scss'
+    selector: 'app-akp-detail',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FileHandlerComponent,
+        MatrixOneTableComponent,
+        MatrixTwoTableComponent,
+        MatrixThreeTableComponent,
+        RekapTableComponent
+    ],
+    templateUrl: './akp-detail.component.html',
+    styleUrl: './akp-detail.component.scss'
 })
 export class AkpDetailComponent {
-  akpId: string
-  inputs: FIleHandler
+    akpId: string
+    inputs: FIleHandler
 
-  AKPDetail = new AKPDetail()
-  currentTab$ = new BehaviorSubject<number>(1)
-  //   currentTab$ = new BehaviorSubject<number>(4)
-  AKPDetailLoading$ = new BehaviorSubject<boolean>(false)
+    AKPDetail = new AKPDetail()
+    currentTab$ = new BehaviorSubject<number>(1)
+    AKPDetailLoading$ = new BehaviorSubject<boolean>(false)
 
-  constructor (
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private akpTaskService: AkpTaskService
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.akpId = params.get('id')
-    })
-  }
+    constructor(
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
+        private akpTaskService: AkpTaskService
+    ) {
+    }
 
-  ngOnInit () {
-    this.getAKPDetail()
-  }
+    ngOnInit() {
+        this.activatedRoute.paramMap
+            .pipe(first())
+            .subscribe(params => {
+                this.akpId = params.get('id');
+            });
 
-  getAKPDetail () {
-    this.AKPDetailLoading$.next(true)
-    this.akpTaskService.getAKPDetailById(this.akpId).subscribe({
-      next: response => {
-        this.AKPDetail = response
+        this.getAKPDetail()
+    }
 
-        this.inputs = {
-          files: {
-            rekomendasi: {
-              label: 'File Rekomendasi AKP',
-              fileName: this.AKPDetail.rekomendasi,
-              source: this.AKPDetail.rekomendasiUrl
+    getAKPDetail() {
+        this.AKPDetailLoading$.next(true)
+        this.akpTaskService.getAKPDetailById(this.akpId).subscribe({
+            next: response => {
+                this.AKPDetail = response
+
+                this.inputs = {
+                    files: {
+                        rekomendasi: {
+                            label: 'File Rekomendasi AKP',
+                            fileName: this.AKPDetail.rekomendasi,
+                            source: this.AKPDetail.rekomendasiUrl
+                        }
+                    },
+                    listen: (key: string, source: string, base64Data: string) => { },
+                    viewOnly: true
+                }
+
+                this.AKPDetailLoading$.next(false)
+            },
+            error: error => {
+                this.AKPDetailLoading$.next(false)
+                console.error('Error fetching data', error)
             }
-          },
-          listen: (key: string, source: string, base64Data: string) => {},
-          viewOnly: true
-        }
+        })
+    }
 
-        this.AKPDetailLoading$.next(false)
-      },
-      error: error => {
-        this.AKPDetailLoading$.next(false)
-        console.error('Error fetching data', error)
-      }
-    })
-  }
+    backToList() {
+        this.router.navigate(['/akp/akp-list/' + this.AKPDetail.nip])
+    }
 
-  backToList () {
-    this.router.navigate(['/akp/akp-list/' + this.AKPDetail.nip])
-  }
-
-  tabChange (tab: number) {
-    this.currentTab$.next(tab)
-  }
+    tabChange(tab: number) {
+        this.currentTab$.next(tab)
+    }
 }

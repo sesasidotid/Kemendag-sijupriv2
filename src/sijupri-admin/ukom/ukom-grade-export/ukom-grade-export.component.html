@@ -2,9 +2,9 @@
   <form [formGroup]="exportGradeForm">
     <div class="row mb-3">
       <label for="inputDate" class="col-sm-2 col-form-label fw-bold"
-        >Tanggal</label
+        >Tanggal <span class="text-danger">*</span></label
       >
-      <div class="col-sm-3">
+      <div class="col-sm-5">
         <input
           type="date"
           name="dateFrom"
@@ -13,18 +13,13 @@
           formControlName="dateFrom"
         />
         <div
-          class="feedback"
-          *ngIf="
-            exportGradeForm.get('dateFrom').invalid &&
-            exportGradeForm.get('dateFrom').touched
-          "
+          *ngIf="getErrorMessage('dateFrom', 'Tanggal awal') as error"
+          class="text-danger"
         >
-          <small *ngIf="exportGradeForm.get('dateFrom').errors?.['required']">
-            Tanggal mulai perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
-      <div class="col-sm-3">
+      <div class="col-sm-5">
         <input
           type="date"
           name="dateTo"
@@ -33,22 +28,17 @@
           formControlName="dateTo"
         />
         <div
-          class="feedback"
-          *ngIf="
-            exportGradeForm.get('dateTo').invalid &&
-            exportGradeForm.get('dateTo').touched
-          "
+          *ngIf="getErrorMessage('dateTo', 'Tanggal akhir') as error"
+          class="text-danger"
         >
-          <small *ngIf="exportGradeForm.get('dateTo').errors?.['required']">
-            Tanggal tujuan perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
     </div>
 
     <div class="row mb-3">
       <label for="inputfileType" class="col-sm-2 col-form-label fw-bold"
-        >Tipe</label
+        >Format File <span class="text-danger">*</span></label
       >
       <div class="col-sm-10">
         <select
@@ -63,15 +53,10 @@
           <option [value]="'csv'">CSV</option>
         </select>
         <div
-          class="feedback"
-          *ngIf="
-            exportGradeForm.get('fileType').invalid &&
-            exportGradeForm.get('fileType').touched
-          "
+          *ngIf="getErrorMessage('fileType', 'Format File') as error"
+          class="text-danger"
         >
-          <small *ngIf="exportGradeForm.get('fileType').errors?.['required']">
-            File type perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
     </div>
@@ -99,15 +84,6 @@
             Export
           </button>
         </ng-template>
-
-        <!-- <button
-          type="button"
-          class="btn btn-success float-end"
-          (click)="submit()"
-          [disabled]="!exportGradeForm.valid"
-        >
-          Export
-        </button> -->
       </div>
     </div>
   </form>

@@ -29,16 +29,8 @@
         required
         formControlName="name"
       />
-      <div
-        class="text-danger"
-        *ngIf="
-          editRoomUkomForm.get('name').invalid &&
-          editRoomUkomForm.get('name').touched
-        "
-      >
-        <small *ngIf="editRoomUkomForm.get('name').errors?.['required']"
-          >Nama kelas UKom perlu diisi.</small
-        >
+      <div *ngIf="getErrorMessage('name', 'Nama') as error" class="text-danger">
+        {{ error }}
       </div>
     </div>
 
@@ -68,15 +60,10 @@
         </ng-template>
       </select>
       <div
+        *ngIf="getErrorMessage('jabatan_code', 'Jabatan') as error"
         class="text-danger"
-        *ngIf="
-          editRoomUkomForm.get('jabatan_code').invalid &&
-          editRoomUkomForm.get('jabatan_code').touched
-        "
       >
-        <small *ngIf="editRoomUkomForm.get('jabatan_code').errors?.['required']"
-          >Jabatan perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -106,15 +93,10 @@
         </ng-template>
       </select>
       <div
+        *ngIf="getErrorMessage('jenjang_code', 'Jenjang') as error"
         class="text-danger"
-        *ngIf="
-          editRoomUkomForm.get('jenjang_code').invalid &&
-          editRoomUkomForm.get('jenjang_code').touched
-        "
       >
-        <small *ngIf="editRoomUkomForm.get('jenjang_code').errors?.['required']"
-          >Jenjang perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -130,16 +112,10 @@
         formControlName="participant_quota"
       />
       <div
+        *ngIf="getErrorMessage('participant_quota', 'Kuota peserta') as error"
         class="text-danger"
-        *ngIf="
-          editRoomUkomForm.get('participant_quota').invalid &&
-          editRoomUkomForm.get('participant_quota').touched
-        "
       >
-        <small
-          *ngIf="editRoomUkomForm.get('participant_quota').errors?.['required']"
-          >Kuota peserta perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -155,16 +131,10 @@
         formControlName="vid_call_link"
       />
       <div
+        *ngIf="getErrorMessage('vid_call_link', 'Link Zoom') as error"
         class="text-danger"
-        *ngIf="
-          editRoomUkomForm.get('vid_call_link').invalid &&
-          editRoomUkomForm.get('vid_call_link').touched
-        "
       >
-        <small
-          *ngIf="editRoomUkomForm.get('vid_call_link').errors?.['required']"
-          >Link Zoom perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -180,16 +150,10 @@
         formControlName="exam_start_at"
       />
       <div
+        *ngIf="getErrorMessage('exam_start_at', 'Waktu mulai') as error"
         class="text-danger"
-        *ngIf="
-          editRoomUkomForm.get('exam_start_at').invalid &&
-          editRoomUkomForm.get('exam_start_at').touched
-        "
       >
-        <small
-          *ngIf="editRoomUkomForm.get('exam_start_at').errors?.['required']"
-          >Waktu mulai perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
@@ -205,19 +169,13 @@
         formControlName="exam_end_at"
       />
       <div
+        *ngIf="getErrorMessage('exam_end_at', 'Waktu selesai') as error"
         class="text-danger"
-        *ngIf="
-          editRoomUkomForm.get('exam_end_at').invalid &&
-          editRoomUkomForm.get('exam_end_at').touched
-        "
       >
-        <small *ngIf="editRoomUkomForm.get('exam_end_at').errors?.['required']"
-          >Waktu selesai perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
 
-    <!-- <button (click)="submit()" class="btn btn-primary w-100">Update</button> -->
     <ng-container *ngIf="submitLoading$ | async; else noLoading">
       <button class="btn btn-primary w-100" disabled>
         <div

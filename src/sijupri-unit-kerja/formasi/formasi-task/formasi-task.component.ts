@@ -1,6 +1,6 @@
 import { ConverterService } from './../../../modules/base/services/converter.service'
 import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
-import { Component } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import { PendingTask } from '../../../modules/workflow/models/pending-task.model'
 import { FormasiDokumenComponent } from './formasi-dokumen/formasi-dokumen.component'
 import { LoginContext } from '../../../modules/base/commons/login-context'
@@ -46,6 +46,8 @@ import { EmptyStateComponent } from '../../../modules/base/components/empty-stat
     styleUrl: './formasi-task.component.scss'
 })
 export class FormasiTaskComponent {
+    @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
+
     pendingTask: PendingTask = null
     objectTask: ObjectTask = null
     isRequestPage: boolean = false
@@ -110,6 +112,13 @@ export class FormasiTaskComponent {
         private converterService: ConverterService,
         private filePreviewService: FilePreviewService
     ) { }
+
+    clearFilesName() {
+        console.log('clearFilesName')
+        if (this.fileHandler) {
+            this.fileHandler.clearFileName()
+        }
+    }
 
     groupAndSortTasksByFlowId(tasks: any[]): { [key: string]: any[] } {
         const grouped = tasks.reduce((acc, task) => {
@@ -318,6 +327,7 @@ export class FormasiTaskComponent {
                             window.location.reload()
                         },
                         error: err => {
+                            this.clearFilesName()
                             console.error('Error fetching data', err)
                             this.handlerService.handleAlert(
                                 'Error',
