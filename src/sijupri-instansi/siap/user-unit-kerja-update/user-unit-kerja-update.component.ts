@@ -17,6 +17,7 @@ import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 import { BehaviorSubject } from 'rxjs'
+import { LoadingButtonComponent } from '../../../modules/base/components/loading-button/loading-button.component'
 
 @Component({
     selector: 'app-user-unit-kerja-update',
@@ -30,7 +31,7 @@ export class UserUnitKerjaUpdateComponent {
     @Output() refresh = new EventEmitter<void>()
 
     unitKerjaList: UnitKerja[] = []
-    instansiId: string = LoginContext.getInstansiId()
+    instansiId: string = '';
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
     unitKerjaUser = new UnitKerja()
@@ -47,6 +48,7 @@ export class UserUnitKerjaUpdateComponent {
     }
 
     ngOnInit(): void {
+        this.instansiId = LoginContext.getInstansiId()
         this.handleFormInit()
         if (this.userUnitKerja.nip) {
             this.patchDefaultFormValue()

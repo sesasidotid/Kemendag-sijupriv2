@@ -9,6 +9,7 @@
   </div>
 </ng-container>
 
+<!-- !FLOW 1 -->
 <div *ngIf="!flowId || flowId == 'for_flow_1'">
   <div class="row">
     <div class="col-lg-12" class="mb-3">
@@ -23,13 +24,14 @@
         [PengaturanFormasiJabatan]="PengaturanFormasiJabatan"
       ></app-formasi-request>
 
-      <button
-        class="btn btn-success float-end"
-        (click)="submitFl1()"
+      <app-loading-button
+        [isLoading]="hadItemsLoading$ | async"
         [disabled]="!isAllFl1Submitted()"
-      >
-        Simpan
-      </button>
+        [type]="'button'"
+        label="Simpan"
+        [className]="'btn btn-success float-end'"
+        (click)="submitFl1()"
+      ></app-loading-button>
     </div>
     <div *ngIf="!isRequestPage">
       <app-formasi-dokumen
@@ -251,6 +253,7 @@
   </div>
 </div>
 
+<!-- !MODAL -->
 <app-modal
   *ngIf="isModalOpen$ | async"
   [title]="'Perbaiki Dokumen Persyaratan Formasi'"

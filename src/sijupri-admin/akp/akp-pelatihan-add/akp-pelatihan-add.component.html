@@ -13,15 +13,10 @@
         placeholder="Masukan Kode Pelatihan"
       />
       <div
-        class="feedback"
-        *ngIf="
-          pelatihanTeknisForm.get('code').invalid &&
-          pelatihanTeknisForm.get('code').touched
-        "
+        *ngIf="getErrorMessage('code', 'Kode Pelatihan') as error"
+        class="text-danger"
       >
-        <small *ngIf="pelatihanTeknisForm.get('code').errors?.['required']"
-          >Kode pelatihan perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -39,15 +34,10 @@
         placeholder="Masukan Nama Pelatihan"
       />
       <div
-        class="feedback"
-        *ngIf="
-          pelatihanTeknisForm.get('name').invalid &&
-          pelatihanTeknisForm.get('name').touched
-        "
+        *ngIf="getErrorMessage('name', 'Nama Pelatihan') as error"
+        class="text-danger"
       >
-        <small *ngIf="pelatihanTeknisForm.get('name').errors?.['required']"
-          >Nama pelatihan perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -68,23 +58,17 @@
         </option>
       </select>
       <div
-        class="feedback"
-        *ngIf="
-          pelatihanTeknisForm.get('jabatanCode').invalid &&
-          pelatihanTeknisForm.get('jabatanCode').touched
-        "
+        *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error"
+        class="text-danger"
       >
-        <small
-          *ngIf="pelatihanTeknisForm.get('jabatanCode').errors?.['required']"
-          >Jabatan perlu dipilih.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
   <div class="row text-center">
     <div class="col-12">
       <ng-container *ngIf="submitLoading$ | async; else noLoading">
-        <button class="btn btn-primary" disabled>
+        <button class="btn btn-success float-end" disabled>
           <div
             class="spinner-border"
             style="width: 19px; height: 19px"
@@ -97,7 +81,7 @@
       <ng-template #noLoading>
         <button
           type="submit"
-          class="btn btn-primary float-end"
+          class="btn btn-success float-end"
           [disabled]="pelatihanTeknisForm.invalid || (submitLoading$ | async)"
         >
           Simpan

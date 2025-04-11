@@ -15,15 +15,10 @@
             formControlName="name"
           />
           <div
-            class="feedback"
-            *ngIf="
-              addProvinsiForm.get('name').invalid &&
-              addProvinsiForm.get('name').touched
-            "
+            *ngIf="getErrorMessage('name', 'Nama') as error"
+            class="text-danger"
           >
-            <small *ngIf="addProvinsiForm.get('name').errors?.['required']"
-              >Nama perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -52,16 +47,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addProvinsiForm.get('wilayah_code').invalid &&
-              addProvinsiForm.get('wilayah_code').touched
-            "
+            *ngIf="getErrorMessage('wilayah_code', 'Wilayah') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addProvinsiForm.get('wilayahCode').errors?.['required']"
-              >Wilayah perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -69,13 +58,33 @@
         Pilih titik lokasi pada peta.
       </div>
       <div class="text-center float-end">
-        <button
+        <!-- <button
           type="submit"
           class="btn btn-primary"
           [disabled]="addProvinsiForm.invalid"
         >
           Simpan
-        </button>
+        </button> -->
+        <ng-container *ngIf="isLoading$ | async; else noLoading">
+          <button class="btn btn-success" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="addProvinsiForm.invalid"
+          >
+            Simpan
+          </button>
+        </ng-template>
       </div>
     </form>
   </div>

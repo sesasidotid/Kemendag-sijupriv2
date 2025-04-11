@@ -29,18 +29,14 @@
         </option>
       </select>
       <div
-        class="feedback"
-        *ngIf="
-          kknForm.get('instrumentId').invalid &&
-          kknForm.get('instrumentId').touched
-        "
+        *ngIf="getErrorMessage('instrumentId', 'Instrumen') as error"
+        class="text-danger"
       >
-        <small *ngIf="kknForm.get('instrumentId').errors?.['required']"
-          >Instrumen perlu dipilih.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
+
   <div class="row mb-3">
     <label for="name" class="col-sm-2 col-form-label fw-bold"
       >Standar Kompetensi <span class="text-danger">*</span></label
@@ -55,15 +51,14 @@
         placeholder="Masukan Standar Kompetensi"
       />
       <div
-        class="feedback"
-        *ngIf="kknForm.get('name').invalid && kknForm.get('name').touched"
+        *ngIf="getErrorMessage('name', 'Standar Kompetensi') as error"
+        class="text-danger"
       >
-        <small *ngIf="kknForm.get('name').errors?.['required']"
-          >Standar Kompetensi perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
+
   <div class="row mb-3">
     <label for="pelatihanTeknisId" class="col-sm-2 col-form-label fw-bold"
       >Pelatihan Teknis <span class="text-danger">*</span></label
@@ -107,15 +102,12 @@
         </option>
       </select>
       <div
-        class="feedback"
         *ngIf="
-          kknForm.get('pelatihanTeknisId').invalid &&
-          kknForm.get('pelatihanTeknisId').touched
+          getErrorMessage('pelatihanTeknisId', 'Pelatihan Teknis') as error
         "
+        class="text-danger"
       >
-        <small *ngIf="kknForm.get('pelatihanTeknisId').errors?.['required']"
-          >Instrumen perlu dipilih.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -146,7 +138,6 @@
         </div>
       </ng-container>
       <div class="row">
-        <!-- <label for="" class="col-sm-2 col-form-label fw-bold">Tambah</label> -->
         <div class="card-add">
           <div
             class="d-flex flex-column align-items-center justify-content-center add-button gap-4"
@@ -159,7 +150,6 @@
             ></i-lucide>
             <p class="fw-medium">Tambah Pertanyaan</p>
           </div>
-          <!-- <a class="btn btn-soft-success p-4" (click)="add()">+</a> -->
         </div>
       </div>
     </div>
@@ -167,7 +157,7 @@
   <div class="row text-center">
     <div class="col-12">
       <ng-container *ngIf="submitLoading$ | async; else noLoading">
-        <button class="btn btn-primary float-end" disabled>
+        <button class="btn btn-success float-end" disabled>
           <div
             class="spinner-border"
             style="width: 19px; height: 19px"
@@ -180,7 +170,7 @@
       <ng-template #noLoading>
         <button
           type="submit"
-          class="btn btn-primary float-end"
+          class="btn btn-success float-end"
           [disabled]="!kategoriInstrument?.pertanyaanList?.[0]?.name || kknForm.invalid || (submitLoading$ | async)"
         >
           Simpan

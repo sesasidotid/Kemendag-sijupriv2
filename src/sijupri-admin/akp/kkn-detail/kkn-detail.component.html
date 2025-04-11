@@ -29,12 +29,10 @@
           placeholder="Masukan Nama Kategori Instrumen"
         />
         <div
-          class="feedback"
-          *ngIf="kknForm.get('name').invalid && kknForm.get('name').touched"
+          *ngIf="getErrorMessage('name', 'Standar Kompetensi') as error"
+          class="text-danger"
         >
-          <small *ngIf="kknForm.get('name').errors?.['required']"
-            >Standar Kompetensi perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -69,15 +67,12 @@
           </select>
         </ng-template>
         <div
-          class="feedback"
           *ngIf="
-            kknForm.get('pelatihanTeknisId').invalid &&
-            kknForm.get('pelatihanTeknisId').touched
+            getErrorMessage('pelatihanTeknisId', 'Pelatihan Teknis') as error
           "
+          class="text-danger"
         >
-          <small *ngIf="kknForm.get('pelatihanTeknisId').errors?.['required']"
-            >Pelatihan teknis perlu dipilih.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>

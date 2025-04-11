@@ -27,6 +27,7 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-provinsi-add',
@@ -50,28 +51,39 @@ export class ProvinsiAddComponent {
     provinsi: Provinsi = new Provinsi()
 
     addProvinsiForm!: FormGroup
+    isLoading$ = new BehaviorSubject<boolean>(false)
     constructor(
         private router: Router,
         private tabService: TabService,
         private handlerService: HandlerService,
         private apiService: ApiService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
+        this.handleFormInit()
         this.getWilayahList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.addProvinsiForm.get(controlName), controlName, label);
     }
 
     handleFormInit() {
         this.addProvinsiForm = new FormGroup({
             name: new FormControl('', Validators.required),
-            wilayah_code: new FormControl('', Validators.required)
+            wilayah_code: new FormControl('', Validators.required),
+            latitude: new FormControl('', Validators.required),
+            longitude: new FormControl('', Validators.required)
         })
     }
 
     onCoordinatesReceived(coordinates: { lat: number; lng: number }): void {
-        this.provinsi.latitude = coordinates.lat.toString()
-        this.provinsi.longitude = coordinates.lng.toString()
+        this.addProvinsiForm.patchValue({
+            latitude: coordinates.lat.toString(),
+            longitude: coordinates.lng.toString()
+        })
     }
 
     getWilayahList() {
@@ -85,10 +97,6 @@ export class ProvinsiAddComponent {
 
     submit() {
         if (this.addProvinsiForm.valid) {
-            this.provinsi.name = this.addProvinsiForm.value.name
-            this.provinsi.wilayah_code = this.addProvinsiForm.value.wilayah_code
-
-            console.log(this.provinsi)
 
             this.confirmationService.open(false).subscribe({
                 next: result => {
@@ -96,10 +104,18 @@ export class ProvinsiAddComponent {
                         return
                     }
 
+                    this.isLoading$.next(true)
+
+                    this.provinsi.name = this.addProvinsiForm.value.name
+                    this.provinsi.wilayah_code = this.addProvinsiForm.value.wilayah_code
+                    this.provinsi.latitude = this.addProvinsiForm.value.latitude
+                    this.provinsi.longitude = this.addProvinsiForm.value.longitude
+
                     this.apiService
                         .postData(`/api/v1/provinsi`, this.provinsi)
                         .subscribe({
                             next: () => {
+                                this.isLoading$.next(false)
                                 this.handlerService.handleAlert(
                                     'Success',
                                     'Provinsi berhasil ditambahkan'
@@ -109,6 +125,7 @@ export class ProvinsiAddComponent {
                                 this.changeTabActive.emit(0)
                             },
                             error: error => {
+                                this.isLoading$.next(false)
                                 this.handlerService.handleAlert(
                                     'Error',
                                     'Gagal menambahkan provinsi'

@@ -18,6 +18,7 @@ import { TabService } from '../../../modules/base/services/tab.service'
 import { LucideAngularModule, FilePlus } from 'lucide-angular'
 import { BehaviorSubject } from 'rxjs'
 import { PelatihanTeknis } from '../../../modules/akp/models/pelatihan-teknis.model'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-kkn-add',
@@ -50,13 +51,18 @@ export class KknAddComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private router: Router,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
         this.handleForm()
         this.getInstrumenList()
         this.handleSubscribe()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.kknForm.get(controlName), controlName, label);
     }
 
     handleSubscribe() {
@@ -69,6 +75,7 @@ export class KknAddComponent {
             }
         })
     }
+
     handleForm() {
         this.kknForm = new FormGroup({
             instrumentId: new FormControl('', [Validators.required]),

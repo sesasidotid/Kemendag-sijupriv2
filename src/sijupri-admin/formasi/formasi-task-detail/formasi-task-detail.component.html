@@ -157,14 +157,34 @@
             </div>
           </div>
           <div class="text-center float-end">
-            <button
-              *ngIf="isApproveEnable && pendingTask.flowId !== 'for_flow_4'"
-              type="submit"
-              class="btn btn-success me-2"
-              (click)="submitFl2(true)"
+            <ng-container
+              *ngIf="pendingTask.flowId !== 'for_flow_4' && isApproveEnable"
             >
-              Terima
-            </button>
+              <ng-container *ngIf="isFl2Loading$ | async; else approveBtn">
+                <button class="btn btn-success me-2" disabled>
+                  <div
+                    class="spinner-border"
+                    style="width: 19px; height: 19px"
+                    role="status"
+                  >
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </button>
+              </ng-container>
+              <ng-template #approveBtn>
+                <button
+                  type="submit"
+                  class="btn btn-success me-2"
+                  [disabled]="
+                    waktuPelaksanaanForm.invalid || isUndanganFileMissing()
+                  "
+                  (click)="submitFl2(true)"
+                >
+                  Terima
+                </button>
+              </ng-template>
+            </ng-container>
+
             <button
               *ngIf="pendingTask.flowId !== 'for_flow_4' && !isApproveEnable"
               type="submit"
@@ -291,9 +311,15 @@
             </tbody>
           </table>
 
-          <button type="submit" class="btn btn-success float-end">
+          <!-- <button type="submit" class="btn btn-success float-end">
             Submit
-          </button>
+          </button> -->
+          <app-loading-button
+            [isLoading]="isFl3Loading$ | async"
+            [type]="'submit'"
+            label="Simpan"
+            [className]="'btn btn-success float-end'"
+          ></app-loading-button>
         </form>
       </div>
     </div>
@@ -315,7 +341,7 @@
             ></app-file-handler>
           </div>
         </div>
-        <div class="text-center float-end">
+        <!-- <div class="text-center float-end">
           <button
             type="submit"
             class="btn btn-success"
@@ -323,7 +349,14 @@
           >
             Simpan
           </button>
-        </div>
+        </div> -->
+        <app-loading-button
+          [isLoading]="isF15Loading$ | async"
+          [disabled]="isFileRekomendasiMissing()"
+          [type]="'submit'"
+          label="Simpan"
+          [className]="'btn btn-success float-end'"
+        ></app-loading-button>
       </form>
     </div>
   </div>

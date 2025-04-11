@@ -7,10 +7,9 @@ import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { AlertService } from '../../../modules/base/services/alert.service'
 import { Formasi } from '../../../modules/formasi/models/formasi.model'
-import { take } from 'rxjs'
+import { BehaviorSubject, take } from 'rxjs'
 import { Task } from '../../../modules/workflow/models/task.model'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { PrevPendingTask } from '../../../modules/formasi/models/prev-pending-task'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
@@ -23,15 +22,13 @@ import {
     ReactiveFormsModule,
     Validators,
     FormBuilder,
-    FormArray
 } from '@angular/forms'
 import { HandlerService } from '../../../modules/base/services/handler.service'
-import { AvailableFormation } from '../../../modules/formasi/models/available-formasi.model'
+
 import { Jenjang } from '../../../modules/maintenance/models/jenjang.modle'
-import { Observable, map } from 'rxjs'
 import { Router } from '@angular/router'
 import { first } from 'rxjs/operators';
-
+import { LoadingButtonComponent } from '../../../modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-formasi-task-detail',
     standalone: true,
@@ -40,7 +37,8 @@ import { first } from 'rxjs/operators';
         FormsModule,
         FileHandlerComponent,
         LucideAngularModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        LoadingButtonComponent
     ],
     templateUrl: './formasi-task-detail.component.html',
     styleUrl: './formasi-task-detail.component.scss'
@@ -50,9 +48,7 @@ export class FormasiTaskDetailComponent {
     formasiRequest: FormasiRequest = new FormasiRequest()
     unitKerja: UnitKerja = new UnitKerja()
     formasiList: Formasi[] = []
-    //   jenjangList$: Observable<Jenjang[]>
     JenjangList: Jenjang[] = []
-    //   formasiList: AvailableFormation[] = []
 
     pendingTaskId: string = ''
     unit_kerja_id: string = ''
@@ -63,7 +59,6 @@ export class FormasiTaskDetailComponent {
     task = new Task()
 
     fileRekomendasi: string = ''
-    //   task = this.object
 
     jabatanMapping: { [key: string]: string } = {
         JB1: 'Analis Perdagangan',
@@ -74,6 +69,9 @@ export class FormasiTaskDetailComponent {
         JB11: 'Penera'
     }
 
+    isFl2Loading$ = new BehaviorSubject<boolean>(false)
+    isFl3Loading$ = new BehaviorSubject<boolean>(false)
+    isF15Loading$ = new BehaviorSubject<boolean>(false)
     waktuInput: {
         fileUndangan?: string
     } = {}
@@ -144,9 +142,13 @@ export class FormasiTaskDetailComponent {
         this.getPendingTask()
     }
 
+    isUndanganFileMissing(): boolean {
+        return !this.waktuInput?.fileUndangan;
+    }
+
     handleFormInit() {
         this.waktuPelaksanaanForm = new FormGroup({
-            waktuPelaksanaan: new FormControl('')
+            waktuPelaksanaan: new FormControl('', Validators.required)
         })
 
         this.flow3Form = this.fb.group({})
@@ -344,27 +346,6 @@ export class FormasiTaskDetailComponent {
         if (isApprove) {
             const waktuPelaksanaan =
                 this.waktuPelaksanaanForm.get('waktuPelaksanaan')?.value
-            console.log('waktuPelaksanaan', waktuPelaksanaan)
-
-            if (waktuPelaksanaan === '') {
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Waktu Pelaksanaan tidak boleh kosong'
-                )
-                return
-            }
-
-            if (
-                this.waktuInput.fileUndangan === undefined ||
-                this.waktuInput.fileUndangan === '' ||
-                this.waktuInput.fileUndangan === null
-            ) {
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Surat Undangan tidak boleh kosong'
-                )
-                return
-            }
             this.task.object.waktuPelaksanaan = waktuPelaksanaan
             this.task.object.fileSuratUndangan = this.waktuInput.fileUndangan
         }
@@ -385,24 +366,25 @@ export class FormasiTaskDetailComponent {
         this.confirmationService.open(!isApprove).subscribe({
             next: result => {
                 if (!result.confirmed) return
+
+                this.isFl2Loading$.next(true)
                 this.task.remark = result.comment || null
 
-                console.log('task', this.task)
-                // return
                 this.apiService
                     .postData(`/api/v1/formasi/task/submit`, this.task)
                     .subscribe({
                         next: () => {
+                            this.isFl2Loading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Data berhasil disimpan'
                             )
-
                             setTimeout(() => {
                                 window.location.reload()
                             }, 1000)
                         },
                         error: error => {
+                            this.isFl2Loading$.next(false)
                             console.error('Error fetching data', error)
                             this.handlerService.handleAlert('Error', 'Gagal mengirim data')
                         }
@@ -429,16 +411,16 @@ export class FormasiTaskDetailComponent {
             }
         }
 
-        console.log('payload', payload)
-
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
-                console.log('Form submitted successfully', payload)
+
+                this.isFl3Loading$.next(true)
                 this.apiService
                     .postData(`/api/v1/formasi/task/submit`, payload)
                     .subscribe({
                         next: () => {
+                            this.isFl3Loading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Data berhasil disimpan'
@@ -448,6 +430,7 @@ export class FormasiTaskDetailComponent {
                             }, 1000)
                         },
                         error: error => {
+                            this.isFl3Loading$.next(false)
                             console.error('Error fetching data', error)
                             this.handlerService.handleAlert('Error', 'Gagal mengirim data')
                         }
@@ -457,23 +440,23 @@ export class FormasiTaskDetailComponent {
     }
 
     submitFl5() {
-        const payload = {
-            id: this.pendingTask.id,
-            task_action: 'approve',
-            object: {
-                fileRekomendasi: this.fileRekomendasi
-            }
-        }
-
-        // console.log('payload', payload)
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
+                this.isF15Loading$.next(true)
 
+                const payload = {
+                    id: this.pendingTask.id,
+                    task_action: 'approve',
+                    object: {
+                        fileRekomendasi: this.fileRekomendasi
+                    }
+                }
                 this.apiService
                     .postData(`/api/v1/formasi/task/submit`, payload)
                     .subscribe({
                         next: () => {
+                            this.isF15Loading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Data berhasil disimpan'
@@ -481,6 +464,7 @@ export class FormasiTaskDetailComponent {
                             this.router.navigate(['/formasi/formasi-task-list'])
                         },
                         error: error => {
+                            this.isF15Loading$.next(false)
                             console.error('Error fetching data', error)
                             this.handlerService.handleAlert('Error', 'Gagal mengirim data')
                         }

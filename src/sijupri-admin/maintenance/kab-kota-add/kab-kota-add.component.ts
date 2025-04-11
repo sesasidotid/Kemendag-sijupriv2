@@ -28,6 +28,7 @@ import { ApiService } from '../../../modules/base/services/api.service'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-kab-kota-add',
     standalone: true,
@@ -55,10 +56,12 @@ export class KabKotaAddComponent {
         private tabService: TabService,
         private handlerService: HandlerService,
         private apiService: ApiService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
+        this.handleFormInit()
         this.getProvinsiList()
     }
 
@@ -66,29 +69,36 @@ export class KabKotaAddComponent {
         this.addKabKotaForm = new FormGroup({
             name: new FormControl('', Validators.required),
             type: new FormControl('', Validators.required),
-            provinsi_id: new FormControl('', Validators.required)
+            provinsi_id: new FormControl('', Validators.required),
+            latitude: new FormControl('', Validators.required),
+            longitude: new FormControl('', Validators.required)
         })
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.addKabKotaForm.get(controlName), controlName, label);
     }
 
     getProvinsiList() {
         this.apiService.getData(`/api/v1/provinsi`).subscribe({
             next: res => {
                 this.provinsiList = res
-                console.log(this.provinsiList)
             }
         })
     }
 
     onCoordinatesReceived(coordinates: { lat: number; lng: number }): void {
-        this.kabkota.latitude = coordinates.lat.toString()
-        this.kabkota.longitude = coordinates.lng.toString()
+        // this.kabkota.latitude = coordinates.lat.toString()
+        // this.kabkota.longitude = coordinates.lng.toString()
+        this.addKabKotaForm.patchValue({
+            latitude: coordinates.lat,
+            longitude: coordinates.lng
+        })
     }
 
     submit() {
         if (this.addKabKotaForm.valid) {
-            this.kabkota.name = this.addKabKotaForm.value.name
-            this.kabkota.type = this.addKabKotaForm.value.type
-            this.kabkota.provinsi_id = this.addKabKotaForm.value.provinsi_id
+
 
             this.confirmationService.open(false).subscribe({
                 next: result => {
@@ -96,19 +106,28 @@ export class KabKotaAddComponent {
                         return
                     }
 
+                    this.submitLoading$.next(true)
+
+                    this.kabkota.name = this.addKabKotaForm.value.name
+                    this.kabkota.type = this.addKabKotaForm.value.type
+                    this.kabkota.provinsi_id = this.addKabKotaForm.value.provinsi_id
+                    this.kabkota.latitude = this.addKabKotaForm.value.latitude
+                    this.kabkota.longitude = this.addKabKotaForm.value.longitude
+
                     this.apiService.postData(`/api/v1/kab_kota`, this.kabkota).subscribe({
                         next: () => {
+                            this.submitLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Kabupaten Kota berhasil ditambahkan'
                             )
                             this.addKabKotaForm.reset()
                             this.kabkota = new KabKota()
-                            //   window.location.reload()
                             this.changeTabActive.emit(0)
                         },
                         error: error => {
-                            this.handlerService.handleAlert('Error', error.error.message)
+                            this.submitLoading$.next(false)
+                            this.handlerService.handleAlert('Error', "Gagal menambahkan kabupaten kota")
                             console.log(error)
                         }
                     })

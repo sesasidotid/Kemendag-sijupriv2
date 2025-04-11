@@ -1,3 +1,4 @@
+import { FormValidationService } from './../../../modules/base/services/form-validation.service';
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import {
@@ -48,7 +49,8 @@ export class KknDetailComponent {
         private alertService: AlertService,
         private router: Router,
         private confirmationService: ConfirmationService,
-        private activatedRoute: ActivatedRoute
+        private activatedRoute: ActivatedRoute,
+        private formValidationService: FormValidationService,
     ) { }
 
     ngOnInit() {
@@ -58,6 +60,10 @@ export class KknDetailComponent {
 
         this.handleFormInit()
         this.getKategoriInstrument()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.kknForm.get(controlName), controlName, label);
     }
 
     handleFormInit() {

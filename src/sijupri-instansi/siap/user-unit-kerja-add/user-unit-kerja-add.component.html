@@ -70,9 +70,22 @@
         <option selected value="" style="display: none">
           Pilih Unit Kerja
         </option>
+
         <option *ngFor="let unitKerja of unitKerjaList" [value]="unitKerja.id">
           {{ unitKerja.name }}
         </option>
+
+        <ng-container *ngIf="unitKerjaList.length != 0; else unitKerjaNotFound">
+          <option
+            *ngFor="let unitKerja of unitKerjaList"
+            [value]="unitKerja.id"
+          >
+            {{ unitKerja.name }}
+          </option>
+        </ng-container>
+        <ng-template #unitKerjaNotFound>
+          <option disabled>Unit Kerja tidak ditemukan</option>
+        </ng-template>
       </select>
       <div
         *ngIf="getErrorMessage('unitKerja', 'Unit Kerja') as error"
@@ -83,14 +96,19 @@
     </div>
   </div>
   <div class="row">
-    <div class="text-center col">
-      <button
+    <!-- <button
         type="submit"
         class="btn btn-success float-end"
         [disabled]="unitKerjaForm.invalid || (createLoading$ | async)"
       >
         {{ (createLoading$ | async) ? 'Menyimpan...' : 'Simpan' }}
-      </button>
-    </div>
+      </button> -->
+    <app-loading-button
+      [isLoading]="createLoading$ | async"
+      [disabled]="unitKerjaForm.invalid"
+      [type]="'submit'"
+      label="Simpan"
+      [className]="'btn btn-success float-end'"
+    ></app-loading-button>
   </div>
 </form>

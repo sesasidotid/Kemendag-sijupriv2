@@ -14,6 +14,8 @@ import {
     Validators
 } from '@angular/forms'
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
+import { BehaviorSubject } from 'rxjs'
 
 @Component({
     selector: 'app-provinsi-update',
@@ -24,17 +26,19 @@ import { MapComponent } from '../../../modules/map-leaflet/components/map/map.co
 })
 export class ProvinsiUpdateComponent {
     @Input() id: string
-    @Output() refreshList = new EventEmitter<void>() // Create an event emitter
+    @Output() refreshList = new EventEmitter<void>()
 
     wilayahList: Wilayah[] = []
     provinsi: Provinsi = new Provinsi()
 
+    isLoading$ = new BehaviorSubject<boolean>(false)
     updateProvinsiForm!: FormGroup
 
     constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit(): void {
@@ -43,6 +47,10 @@ export class ProvinsiUpdateComponent {
             this.fetchProvinsiData(this.id)
         }
         this.getWilayahList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.updateProvinsiForm.get(controlName), controlName, label);
     }
 
     handleFormInit() {
@@ -109,12 +117,15 @@ export class ProvinsiUpdateComponent {
                         return
                     }
 
+                    this.isLoading$.next(true)
+
                     console.log(updatedProvinsi)
 
                     this.apiService
                         .putData(`/api/v1/provinsi`, updatedProvinsi)
                         .subscribe({
                             next: () => {
+                                this.isLoading$.next(false)
                                 this.handlerService.handleAlert(
                                     'Success',
                                     'Provinsi berhasil diperbarui'
@@ -123,7 +134,9 @@ export class ProvinsiUpdateComponent {
                                 this.refreshList.emit()
                             },
                             error: error => {
-                                this.handlerService.handleAlert('Error', error.error.message)
+                                this.isLoading$.next(false)
+                                this.handlerService.handleAlert('Error', "Gagal memperbarui provinsi")
+                                console.error('Error updating provinsi:', error)
                             }
                         })
                 }

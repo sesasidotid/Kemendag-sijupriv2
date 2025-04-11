@@ -13,15 +13,10 @@
           formControlName="name"
         />
         <div
-          class="feedback"
-          *ngIf="
-            updateUserInstasi.get('name').invalid &&
-            updateUserInstasi.get('name').touched
-          "
+          *ngIf="getErrorMessage('name', 'Nama') as error"
+          class="text-danger"
         >
-          <small *ngIf="updateUserInstasi.get('name').errors?.['required']"
-            >Nama perlu diisi.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -39,18 +34,10 @@
           formControlName="email"
         />
         <div
-          class="feedback"
-          *ngIf="
-            updateUserInstasi.get('email').invalid &&
-            updateUserInstasi.get('email').touched
-          "
+          *ngIf="getErrorMessage('email', 'Email') as error"
+          class="text-danger"
         >
-          <small *ngIf="updateUserInstasi.get('email').errors?.['required']"
-            >Email perlu diisi.</small
-          >
-          <small *ngIf="updateUserInstasi.get('email').errors?.['email']"
-            >Email tidak valid.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -74,6 +61,12 @@
             {{ instansiType.name }}
           </option>
         </select>
+        <div
+          *ngIf="getErrorMessage('instansiTypeCode', 'Operasional') as error"
+          class="text-danger"
+        >
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -100,6 +93,12 @@
             {{ provinsi.name }}
           </option>
         </select>
+        <div
+          *ngIf="getErrorMessage('provinsiId', 'Provinsi') as error"
+          class="text-danger small"
+        >
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -125,6 +124,12 @@
             {{ kabupaten.name }}
           </option>
         </select>
+        <div
+          *ngIf="getErrorMessage('kabupatenId', 'Kabupaten') as error"
+          class="text-danger small"
+        >
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -150,6 +155,12 @@
             {{ kota.name }}
           </option>
         </select>
+        <div
+          *ngIf="getErrorMessage('kotaId', 'Kota') as error"
+          class="text-danger small"
+        >
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -185,18 +196,37 @@
             {{ instansi.name }}
           </option>
         </select>
+        <div
+          *ngIf="getErrorMessage('instansi_id', 'Instansi') as error"
+          class="text-danger small"
+        >
+          {{ error }}
+        </div>
       </div>
     </div>
 
     <div class="row text-center">
       <div class="col-12">
-        <button
-          type="submit"
-          class="btn btn-success float-end"
-          [disabled]="!updateUserInstasi.valid"
-        >
-          Simpan
-        </button>
+        <ng-container *ngIf="isLoading$ | async; else noLoading">
+          <button class="btn btn-success float-end" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-success float-end"
+            [disabled]="updateUserInstasi.invalid || (isLoading$ | async)"
+          >
+            Simpan
+          </button>
+        </ng-template>
       </div>
     </div>
   </form>

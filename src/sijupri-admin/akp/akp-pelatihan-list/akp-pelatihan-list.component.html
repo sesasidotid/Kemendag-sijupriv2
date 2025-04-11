@@ -31,12 +31,10 @@
             formControlName="code"
           />
           <div
-            class="feedback"
-            *ngIf="form.get('code').invalid && form.get('code').touched"
+            *ngIf="getErrorMessage('code', 'Kode Pelatihan') as error"
+            class="text-danger"
           >
-            <small *ngIf="form.get('code').errors?.['required']"
-              >Kode pelatihan perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
         <div class="mb-3">
@@ -52,16 +50,38 @@
             formControlName="name"
           />
           <div
-            class="feedback"
-            *ngIf="form.get('name').invalid && form.get('name').touched"
+            *ngIf="getErrorMessage('name', 'Nama Pelatihan') as error"
+            class="text-danger"
           >
-            <small *ngIf="form.get('name').errors?.['required']"
-              >Nama pelatihan perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
         <div class="float-end">
-          <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">
+          <ng-container *ngIf="isLoading$ | async; else noLoading">
+            <button class="btn btn-success" disabled>
+              <div
+                class="spinner-border"
+                style="width: 19px; height: 19px"
+                role="status"
+              >
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </button>
+          </ng-container>
+          <ng-template #noLoading>
+            <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">
+              Batal
+            </button>
+            <button
+              type="button"
+              (click)="updateSumbit()"
+              class="btn btn-success"
+              [disabled]="form.invalid"
+            >
+              Simpan
+            </button>
+          </ng-template>
+          <!-- <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">
             Batal
           </button>
           <button
@@ -70,7 +90,7 @@
             [disabled]="form.invalid"
           >
             Simpan
-          </button>
+          </button> -->
         </div>
       </div>
     </div>

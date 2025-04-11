@@ -15,15 +15,10 @@
             formControlName="name"
           />
           <div
-            class="feedback"
-            *ngIf="
-              updateKabKotaForm.get('name').invalid &&
-              updateKabKotaForm.get('name').touched
-            "
+            *ngIf="getErrorMessage('name', 'Nama') as error"
+            class="text-danger"
           >
-            <small *ngIf="updateKabKotaForm.get('name').errors?.['required']"
-              >Nama perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -45,15 +40,10 @@
             <option value="KABUPATEN">Kabupaten</option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              updateKabKotaForm.get('type').invalid &&
-              updateKabKotaForm.get('type').touched
-            "
+            *ngIf="getErrorMessage('type', 'Tipe') as error"
+            class="text-danger"
           >
-            <small *ngIf="updateKabKotaForm.get('type').errors?.['required']"
-              >Tipe perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -78,18 +68,11 @@
               {{ provinsi.name }}
             </option>
           </select>
-
           <div
-            class="feedback"
-            *ngIf="
-              updateKabKotaForm.get('provinsi_id').invalid &&
-              updateKabKotaForm.get('provinsi_id').touched
-            "
+            *ngIf="getErrorMessage('provinsi_id', 'Provinsi') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="updateKabKotaForm.get('provinsi_id').errors?.['required']"
-              >Provinsi perlu diisi.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -98,13 +81,33 @@
         Pilih titik lokasi pada peta.
       </div>
       <div class="text-center float-end">
-        <button
+        <ng-container *ngIf="isLoading$ | async; else noLoading">
+          <button class="btn btn-success" disabled>
+            <div
+              class="spinner-border"
+              style="width: 19px; height: 19px"
+              role="status"
+            >
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </ng-container>
+        <ng-template #noLoading>
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="updateKabKotaForm.invalid"
+          >
+            Simpan
+          </button>
+        </ng-template>
+        <!-- <button
           type="submit"
           class="btn btn-primary"
           [disabled]="updateKabKotaForm.invalid"
         >
           Simpan
-        </button>
+        </button> -->
       </div>
     </form>
   </div>

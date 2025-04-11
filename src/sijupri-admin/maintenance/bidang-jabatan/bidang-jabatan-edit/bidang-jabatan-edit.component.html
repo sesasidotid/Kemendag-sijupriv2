@@ -13,22 +13,15 @@
           formControlName="name"
         />
         <div
-          class="feedback"
-          *ngIf="
-            updateBidangJabatanForm.get('name').invalid &&
-            updateBidangJabatanForm.get('name').touched
-          "
+          *ngIf="getErrorMessage('name', 'Nama') as error"
+          class="text-danger"
         >
-          <small
-            *ngIf="updateBidangJabatanForm.get('name').errors?.['required']"
-          >
-            Nama perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
 
       <ng-container *ngIf="submitLoading$ | async; else noLoading">
-        <button class="btn btn-primary w-100" disabled>
+        <button class="btn btn-success w-100" disabled>
           <div
             class="spinner-border"
             style="width: 19px; height: 19px"
@@ -41,7 +34,7 @@
       <ng-template #noLoading>
         <button
           type="button"
-          class="btn btn-primary w-100"
+          class="btn btn-success w-100"
           [disabled]="
             updateBidangJabatanForm.invalid || (submitLoading$ | async)
           "

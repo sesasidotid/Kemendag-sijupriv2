@@ -86,29 +86,43 @@
       </div>
       <div class="modal-footer">
         <p *ngIf="!isSubmitted(jabatan.code)">
-          <span class="text-danger">*</span> Jika anda menekan tombol simpan.
+          <span class="text-danger">*</span> Jika anda menekan tombol simpan,
           anda tidak akan dapan mengupdate data ini kembali
         </p>
         <p *ngIf="isSubmitted(jabatan.code)">
           <span class="text-danger">*</span> Anda sudah mengisi data yang
           diperlukan. Anda sudah tidak bisa merubah data yang ada
         </p>
-
-        <button
-          type="button"
-          class="btn btn-success"
-          (click)="submit()"
-          [disabled]="isSubmitted(jabatan.code)"
-        >
-          Simpan
-        </button>
-        <button
-          type=" button"
-          class="btn btn-danger"
-          (click)="isModalOpen = false"
-        >
-          Tutup
-        </button>
+        <ng-container *ngIf="!isSubmitted(jabatan.code)">
+          <ng-container *ngIf="!(isLoading$ | async); else loading">
+            <button
+              type=" button"
+              class="btn btn-danger"
+              (click)="isModalOpen = false"
+            >
+              Tutup
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              (click)="submit()"
+              [disabled]="isSubmitted(jabatan.code)"
+            >
+              Simpan
+            </button>
+          </ng-container>
+          <ng-template #loading>
+            <button class="btn btn-success" [disabled]="true">
+              <div
+                class="spinner-border"
+                style="width: 19px; height: 19px"
+                role="status"
+              >
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </button>
+          </ng-template>
+        </ng-container>
       </div>
     </div>
   </div>

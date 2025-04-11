@@ -389,7 +389,12 @@ export class UkomRegisterComponent {
         return null
     }
 
+    // !important
     isAnyFileMissing(): boolean {
+        if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
+            return true;
+        }
+
         return Object.keys(this.inputs.files).some(key => {
             return !this.detectedDokumen[key]
         })

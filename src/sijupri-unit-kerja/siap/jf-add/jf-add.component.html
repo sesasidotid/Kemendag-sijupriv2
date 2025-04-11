@@ -121,14 +121,12 @@
     </div>
   </div>
   <div class="row">
-    <div class="text-center col">
-      <button
-        type="submit"
-        class="btn btn-primary float-end"
-        [disabled]="jfAddForm.invalid || (createJFLoading$ | async)"
-      >
-        {{ (createJFLoading$ | async) ? 'Menyimpan...' : 'Simpan' }}
-      </button>
-    </div>
+    <app-loading-button
+      [isLoading]="createJFLoading$ | async"
+      [disabled]="jfAddForm.invalid"
+      [type]="'submit'"
+      label="Simpan"
+      [className]="'btn btn-success float-end'"
+    ></app-loading-button>
   </div>
 </form>

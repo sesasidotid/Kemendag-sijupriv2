@@ -59,6 +59,10 @@ export class UnitKerjaAddComponent {
         this.handleFormInit()
         this.handleTabService()
         this.getInstansi()
+
+        this.unitKerjaForm.valueChanges.subscribe((value) => {
+            console.log('form', value)
+        })
     }
 
     handleFormInit() {
@@ -67,10 +71,12 @@ export class UnitKerjaAddComponent {
             email: new FormControl('', [Validators.required, Validators.email]),
             phone: new FormControl('', [
                 Validators.required,
-                Validators.pattern('^[0-9]*$')
+                Validators.pattern('^[0-9]{10,15}$')
             ]),
             alamat: new FormControl('', Validators.required),
-            wilayahCode: new FormControl('', Validators.required)
+            wilayahCode: new FormControl('', Validators.required),
+            latitude: new FormControl('', Validators.required),
+            longitude: new FormControl('', Validators.required)
         })
     }
 
@@ -100,8 +106,12 @@ export class UnitKerjaAddComponent {
     }
 
     onCoordinatesReceived(coordinates: { lat: number; lng: number }): void {
-        this.unitKerja.latitude = coordinates.lat
-        this.unitKerja.longitude = coordinates.lng
+        // this.unitKerja.latitude = coordinates.lat
+        // this.unitKerja.longitude = coordinates.lng
+        this.unitKerjaForm.patchValue({
+            latitude: coordinates.lat,
+            longitude: coordinates.lng
+        })
     }
 
     getWilayahList() {
@@ -181,13 +191,13 @@ export class UnitKerjaAddComponent {
 
     submit() {
         console.log(this.unitKerja)
-        if (!this.unitKerja.latitude || !this.unitKerja.longitude) {
-            this.handlerService.handleAlert(
-                'Error',
-                'Silahkan pilih lokasi unit kerja pada peta'
-            )
-            return
-        }
+        // if (!this.unitKerja.latitude || !this.unitKerja.longitude) {
+        //     this.handlerService.handleAlert(
+        //         'Error',
+        //         'Silahkan pilih lokasi unit kerja pada peta'
+        //     )
+        //     return
+        // }
 
         if (this.unitKerjaForm.valid) {
             this.unitKerja.name = this.unitKerjaForm.value.name
@@ -195,6 +205,8 @@ export class UnitKerjaAddComponent {
             this.unitKerja.phone = this.unitKerjaForm.value.phone
             this.unitKerja.alamat = this.unitKerjaForm.value.alamat
             this.unitKerja.wilayahCode = this.unitKerjaForm.value.wilayahCode
+            this.unitKerja.latitude = this.unitKerjaForm.value.latitude
+            this.unitKerja.longitude = this.unitKerjaForm.value.longitude
 
             this.confirmationService.open(false).subscribe({
                 next: result => {

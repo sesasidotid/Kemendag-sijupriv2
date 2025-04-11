@@ -6,6 +6,7 @@ import { ReactiveFormsModule, FormGroup, Validators, FormsModule, FormControl } 
 import { CommonModule } from '@angular/common';
 import { HandlerService } from '../../../../modules/base/services/handler.service';
 import { BehaviorSubject } from 'rxjs';
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service';
 @Component({
     selector: 'app-bidang-jabatan-edit',
     standalone: true,
@@ -24,12 +25,17 @@ export class BidangJabatanEditComponent {
     }
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
-    constructor(private apiService: ApiService, private confirmationService: ConfirmationService, private handlerService: HandlerService) { }
+    constructor(private apiService: ApiService, private confirmationService: ConfirmationService, private handlerService: HandlerService, private formValidationService: FormValidationService) { }
 
     ngOnInit() {
         this.handleFormInit()
         this.patchFormValue()
     }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.updateBidangJabatanForm.get(controlName), controlName, label);
+    }
+
 
     patchFormValue() {
         this.updateBidangJabatanForm.patchValue({

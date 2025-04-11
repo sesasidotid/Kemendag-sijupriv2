@@ -13,6 +13,7 @@ import { AlertService } from '../../../modules/base/services/alert.service'
 import { BehaviorSubject } from 'rxjs'
 import { Router } from '@angular/router'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-akp-pelatihan-add',
     standalone: true,
@@ -35,12 +36,17 @@ export class AkpPelatihanAddComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private router: Router,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
         this.handleFormInit()
         this.getJabatanList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.pelatihanTeknisForm.get(controlName), controlName, label);
     }
 
     handleFormInit() {
@@ -72,6 +78,7 @@ export class AkpPelatihanAddComponent {
                     return
                 }
 
+                this.submitLoading$.next(true)
                 if (this.pelatihanTeknisForm.valid) {
                     this.apiService
                         .postData(
@@ -80,6 +87,7 @@ export class AkpPelatihanAddComponent {
                         )
                         .subscribe({
                             next: response => {
+                                this.submitLoading$.next(false)
                                 this.alertService.showToast(
                                     'Success',
                                     'Pelatihan Teknis berhasil ditambahkan!'
@@ -89,6 +97,7 @@ export class AkpPelatihanAddComponent {
                                 }, 1000)
                             },
                             error: error => {
+                                this.submitLoading$.next(false)
                                 console.log('error', error)
                                 this.alertService.showToast(
                                     'Error',

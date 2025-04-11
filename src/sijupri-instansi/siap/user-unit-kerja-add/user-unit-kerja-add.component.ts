@@ -1,3 +1,4 @@
+import { LoadingButtonComponent } from './../../../modules/base/components/loading-button/loading-button.component';
 import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
@@ -21,7 +22,7 @@ import { FormValidationService } from '../../../modules/base/services/form-valid
 @Component({
     selector: 'app-user-unit-kerja-add',
     standalone: true,
-    imports: [FormsModule, CommonModule, ReactiveFormsModule],
+    imports: [FormsModule, CommonModule, ReactiveFormsModule, LoadingButtonComponent],
     templateUrl: './user-unit-kerja-add.component.html',
     styleUrl: './user-unit-kerja-add.component.scss'
 })
@@ -90,8 +91,10 @@ export class UserUnitKerjaAddComponent {
         this.apiService
             .getData(`/api/v1/unit_kerja/instansi/${LoginContext.getInstansiId()}`)
             .subscribe({
-                next: (unitKerjaList: UnitKerja[]) =>
-                    (this.unitKerjaList = unitKerjaList),
+                next: (unitKerjaList: UnitKerja[]) => {
+                    this.unitKerjaList = unitKerjaList
+                    // this.unitKerjaList = []
+                },
                 error: error => this.handlerService.handleException(error)
             })
     }
@@ -132,7 +135,6 @@ export class UserUnitKerjaAddComponent {
                                     'Error',
                                     'Gagal menambahkan user unit kerja'
                                 )
-                                // this.handlerService.handleException(error)
                             }
                         })
                 }

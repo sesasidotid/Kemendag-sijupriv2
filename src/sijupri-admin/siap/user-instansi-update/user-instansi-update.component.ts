@@ -1,3 +1,4 @@
+import { FormValidationService } from './../../../modules/base/services/form-validation.service';
 import { Component, Input } from '@angular/core'
 import { UserInstansi } from '../../../modules/siap/models/user-instansi.model'
 import { ApiService } from '../../../modules/base/services/api.service'
@@ -17,6 +18,7 @@ import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
 import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { Output, EventEmitter } from '@angular/core'
+import { BehaviorSubject } from 'rxjs';
 @Component({
     selector: 'app-user-instansi-update',
     standalone: true,
@@ -25,7 +27,7 @@ import { Output, EventEmitter } from '@angular/core'
     styleUrl: './user-instansi-update.component.scss'
 })
 export class UserInstansiUpdateComponent {
-    @Output() refreshList = new EventEmitter<void>() // Create an event emitter
+    @Output() refreshList = new EventEmitter<void>()
 
     @Input() userInstansi: UserInstansi
     instansiTypeList: InstansiType[]
@@ -39,11 +41,13 @@ export class UserInstansiUpdateComponent {
 
     updateUserInstasi!: FormGroup
     userInstansiData: UserInstansi = new UserInstansi()
+    isLoading$ = new BehaviorSubject<boolean>(false)
 
     constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService,
     ) { }
 
     ngOnInit(): void {
@@ -53,6 +57,11 @@ export class UserInstansiUpdateComponent {
             this.patchDefaultFormValue()
         }
         this.getInstansiTypeList()
+        this.handleSubscribe()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.updateUserInstasi.get(controlName), controlName, label);
     }
 
     handleFormInit() {
@@ -60,11 +69,53 @@ export class UserInstansiUpdateComponent {
             name: new FormControl('', Validators.required),
             email: new FormControl('', Validators.required),
             instansi_id: new FormControl('', Validators.required),
-            instansiTypeCode: new FormControl(''),
+            instansiTypeCode: new FormControl('', Validators.required),
             provinsiId: new FormControl(''),
             kabupatenId: new FormControl(''),
             kotaId: new FormControl('')
         })
+
+        this.setConditionalValidators()
+    }
+
+    handleSubscribe() {
+        this.updateUserInstasi.get('instansiTypeCode')?.valueChanges.subscribe(() => {
+            this.setConditionalValidators();
+        });
+
+        this.updateUserInstasi.get('provinsiId')?.valueChanges.subscribe(() => {
+            this.setConditionalValidators();
+        });
+    }
+
+    setConditionalValidators() {
+        const type = this.updateUserInstasi.get('instansiTypeCode')?.value;
+        const provinsiId = this.updateUserInstasi.get('provinsiId')?.value;
+
+        const provinsiControl = this.updateUserInstasi.get('provinsiId');
+        const kabupatenControl = this.updateUserInstasi.get('kabupatenId');
+        const kotaControl = this.updateUserInstasi.get('kotaId');
+
+        provinsiControl?.clearValidators();
+        kabupatenControl?.clearValidators();
+        kotaControl?.clearValidators();
+
+        if (['IT3', 'IT4', 'IT5'].includes(type)) {
+            provinsiControl?.setValidators(Validators.required);
+        }
+
+        if (type === 'IT4' && provinsiId) {
+            kabupatenControl?.setValidators(Validators.required);
+        }
+
+        if (type === 'IT5' && provinsiId) {
+            kotaControl?.setValidators(Validators.required);
+        }
+
+        // Update value and validity
+        provinsiControl?.updateValueAndValidity();
+        kabupatenControl?.updateValueAndValidity();
+        kotaControl?.updateValueAndValidity();
     }
 
     getInstasiDetail() {
@@ -281,11 +332,10 @@ export class UserInstansiUpdateComponent {
                     return
                 }
 
+                this.isLoading$.next(true)
+
                 if (this.updateUserInstasi.valid) {
-                    console.log('submit', this.updateUserInstasi.value)
                     const updatedUserInstansi = {
-                        // ...this.userInstansi,
-                        // ...this.updateUserInstasi.value
                         nip: this.userInstansi.nip,
                         name: this.updateUserInstasi.get('name').value,
                         email: this.updateUserInstasi.get('email').value,
@@ -296,18 +346,20 @@ export class UserInstansiUpdateComponent {
                         .putData(`/api/v1/user_instansi`, updatedUserInstansi)
                         .subscribe({
                             next: () => {
+                                this.isLoading$.next(false)
                                 this.handlerService.handleAlert(
                                     'Success',
                                     'Berhasil mengupdate user instansi'
                                 )
                                 this.refreshList.emit()
-
-                                // this.handlerService.handleNavigate('/siap/user-instansi')
-                                // setTimeout(() => {
-                                //   window.location.reload()
-                                // }, 100)
                             },
-                            error: error => this.handlerService.handleException(error)
+                            error: (error) => {
+                                this.isLoading$.next(false)
+                                this.handlerService.handleAlert(
+                                    'Error', "Gagal mengupdate user instansi"
+                                )
+                                console.log(error)
+                            }
                         })
                 } else {
                     this.handlerService.handleAlert('Error', 'Form tidak valid')

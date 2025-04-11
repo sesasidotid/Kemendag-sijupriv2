@@ -28,7 +28,7 @@ import { ModalComponent } from '../../../modules/base/components/modal/modal.com
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { UndanganVerifikasiFormasi } from '../../../modules/formasi/models/undangan.model'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
-
+import { LoadingButtonComponent } from '../../../modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-formasi-task',
     standalone: true,
@@ -40,7 +40,8 @@ import { EmptyStateComponent } from '../../../modules/base/components/empty-stat
         ModalComponent,
         FileHandlerComponent,
         ReactiveFormsModule,
-        EmptyStateComponent
+        EmptyStateComponent,
+        LoadingButtonComponent
     ],
     templateUrl: './formasi-task.component.html',
     styleUrl: './formasi-task.component.scss'
@@ -278,6 +279,10 @@ export class FormasiTaskComponent {
     }
 
     isAnyFileMissing(): boolean {
+        if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
+            return true;
+        }
+
         return Object.keys(this.inputs.files).some(key => {
             return !this.detectedDokumen[key]
         })
@@ -317,6 +322,8 @@ export class FormasiTaskComponent {
                     return
                 }
 
+                this.hadItemsLoading$.next(true)
+
                 this.apiService
                     .postData('/api/v1/formasi/task/submit', {
                         id: this.pendingTask.id,
@@ -324,9 +331,11 @@ export class FormasiTaskComponent {
                     })
                     .subscribe({
                         next: res => {
+                            this.hadItemsLoading$.next(false)
                             window.location.reload()
                         },
                         error: err => {
+                            this.hadItemsLoading$.next(false)
                             this.clearFilesName()
                             console.error('Error fetching data', err)
                             this.handlerService.handleAlert(

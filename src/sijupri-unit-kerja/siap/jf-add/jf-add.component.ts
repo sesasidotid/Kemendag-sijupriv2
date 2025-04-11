@@ -20,10 +20,11 @@ import { BehaviorSubject } from 'rxjs'
 import { AlertService } from '../../../modules/base/services/alert.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
+import { LoadingButtonComponent } from '../../../modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-jf-add',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, LoadingButtonComponent],
     templateUrl: './jf-add.component.html',
     styleUrl: './jf-add.component.scss'
 })
@@ -50,10 +51,10 @@ export class JfAddComponent {
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService
     ) {
-        this.jf.unitKerjaId = LoginContext.getUnitKerjaId()
     }
 
     ngOnInit() {
+        this.jf.unitKerjaId = LoginContext.getUnitKerjaId()
         this.handleFormInit()
         this.handleTabService()
         this.getJenisKelaminList()

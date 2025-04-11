@@ -28,6 +28,7 @@ import { ApiService } from '../../../modules/base/services/api.service'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-kab-kota-update',
@@ -44,11 +45,13 @@ export class KabKotaUpdateComponent {
     provinsiList: Provinsi[] = []
 
     updateKabKotaForm!: FormGroup
+    isLoading$ = new BehaviorSubject<boolean>(false)
 
     constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) {
 
     }
@@ -58,6 +61,10 @@ export class KabKotaUpdateComponent {
             this.fetchKabKotaData(this.id)
         }
         this.getProvinsiList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.updateKabKotaForm.get(controlName), controlName, label);
     }
 
     handleFormInit() {
@@ -120,20 +127,20 @@ export class KabKotaUpdateComponent {
                         return
                     }
 
-                    console.log(updateKabKota)
+                    this.isLoading$.next(true)
 
                     this.apiService.putData(`/api/v1/kab_kota`, updateKabKota).subscribe({
                         next: () => {
+                            this.isLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Kabupaten Kota berhasil diperbarui'
                             )
                             this.updateKabKotaForm.reset()
-                            //   window.location.reload()
                             this.refreshList.emit()
                         },
                         error: error => {
-                            console.log(error)
+                            this.isLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Error',
                                 'Gagal memperbarui kabupaten kota'

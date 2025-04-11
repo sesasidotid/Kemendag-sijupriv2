@@ -15,160 +15,166 @@ import { AlertService } from '../../../../modules/base/services/alert.service'
 import { PendingFormasiService } from '../../../../modules/formasi/services/pending-formasi.service'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { PengaturanFormasiJabatan } from '../../../../modules/formasi/models/formasi-pengaturan-jabatan.model'
+import { BehaviorSubject } from 'rxjs'
+import { first } from 'rxjs/operators'
 @Component({
-  selector: 'app-formasi-jabatan',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './formasi-jabatan.component.html',
-  styleUrl: './formasi-jabatan.component.scss'
+    selector: 'app-formasi-jabatan',
+    standalone: true,
+    imports: [CommonModule, FormsModule],
+    templateUrl: './formasi-jabatan.component.html',
+    styleUrl: './formasi-jabatan.component.scss'
 })
 export class FormasiJabatanComponent {
-  isModalOpen = false
-  jabatanCode: string
-  unitKerjaId = LoginContext.getUnitKerjaId()
-  jabatan: Jabatan = new Jabatan()
+    isModalOpen = false
+    jabatanCode: string
+    unitKerjaId = LoginContext.getUnitKerjaId()
+    jabatan: Jabatan = new Jabatan()
 
-  formasiUnsurList: FormasiUnsur[] = []
-  formasiResultList: FormasiResult[] = []
-  unsurVolumeData: { [key: string]: { volume: number } } = {}
+    formasiUnsurList: FormasiUnsur[] = []
+    formasiResultList: FormasiResult[] = []
+    unsurVolumeData: { [key: string]: { volume: number } } = {}
 
-  formasiId: string = ''
-  unsurList: any[] = []
-  formasiRequest: FormasiRequest = new FormasiRequest()
-  PengaturanFormasiJabatan: PengaturanFormasiJabatan[] = []
+    formasiId: string = ''
+    unsurList: any[] = []
+    formasiRequest: FormasiRequest = new FormasiRequest()
+    PengaturanFormasiJabatan: PengaturanFormasiJabatan[] = []
 
-  @ViewChild(ConfirmationDialogComponent, { static: false })
-  confirmationDialog!: ConfirmationDialogComponent
+    @ViewChild(ConfirmationDialogComponent, { static: false })
+    confirmationDialog!: ConfirmationDialogComponent
+    isLoading$ = new BehaviorSubject<boolean>(false)
 
-  constructor (
-    private formasiService: FormasiService,
-    private pendingFormasiService: PendingFormasiService,
-    private jabatanService: JabatanService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private alertService: AlertService,
-    private apiService: ApiService,
-    private handlerSerivce: HandlerService
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.jabatanCode = params.get('id')
-    })
-  }
+    constructor(
+        private jabatanService: JabatanService,
+        private activatedRoute: ActivatedRoute,
+        private router: Router,
+        private apiService: ApiService,
+        private handlerSerivce: HandlerService
+    ) { }
 
-  ngOnInit () {
-    this.getFormasiObjectTask()
-    this.getFormasiId()
-  }
+    ngOnInit() {
+        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+            this.jabatanCode = params.get('id')
+        })
 
-  getFormasiObjectTask () {
-    this.getJabatan()
-    this.getFormasiTree()
-  }
-
-  getPengaturanFormasiJabatan (formasi_id: string) {
-    this.apiService
-      .getData(`/api/v1/formasi_detail/formasi/${formasi_id}`)
-      .subscribe({
-        next: response => {
-          this.PengaturanFormasiJabatan = response
-        },
-        error: () => {
-          console.warn('No documents found in pendingTask.dokumenUkomList')
-        }
-      })
-  }
-
-  getFormasiId () {
-    this.apiService
-      .getData(`/api/v1/formasi/task/unit_kerja/${this.unitKerjaId}`)
-      .subscribe({
-        next: (response: any) => {
-          this.formasiId = response.objectId
-          this.getPengaturanFormasiJabatan(response.objectId)
-        }
-      })
-  }
-
-  getFormasiTree () {
-    this.apiService
-      .getData(`/api/v1/unsur/tree/${this.jabatanCode}`)
-      .subscribe({
-        next: (response: FormasiUnsur[]) => (this.formasiUnsurList = response)
-      })
-  }
-
-  getJabatan () {
-    this.jabatanService.findById(this.jabatanCode).subscribe({
-      next: (jabatan: Jabatan) => (this.jabatan = jabatan)
-    })
-  }
-
-  isSubmitted (jabatanCode: string) {
-    return this.PengaturanFormasiJabatan.some(
-      jabatan => jabatan.jabatanCode === jabatanCode
-    )
-  }
-
-  initiate (formasiUnsur: FormasiUnsur) {
-    if (!this.unsurVolumeData[formasiUnsur.id]) {
-      this.unsurVolumeData[formasiUnsur.id] = {
-        volume: formasiUnsur.volume || 0
-      }
+        this.getFormasiObjectTask()
+        this.getFormasiId()
     }
 
-    return true
-  }
-
-  totalPembulatan () {
-    var total = 0
-    this.formasiResultList.forEach(formasiResult => {
-      total = total + formasiResult.pembulatan
-    })
-
-    return total
-  }
-
-  calculate () {
-    this.unsurList.length = 0
-    for (const key in this.unsurVolumeData) {
-      this.unsurList.push({
-        id: key,
-        volume: this.unsurVolumeData[key].volume
-      })
+    getFormasiObjectTask() {
+        this.getJabatan()
+        this.getFormasiTree()
     }
 
-    this.apiService
-      .postData('/api/v1/formasi_detail/calculate', {
-        formasiId: this.formasiId,
-        jabatanCode: this.jabatanCode,
-        unsurDtoList: this.unsurList
-      })
-      .subscribe({
-        next: (response: FormasiResult[]) => {
-          this.formasiResultList = response
-          this.isModalOpen = true
-        },
-        error: error => {
-          if (error.error.code == 'VAL-00001') {
-            this.handlerSerivce.handleAlert('Error', 'Semua volume harus diisi')
-          } else {
-            this.handlerSerivce.handleAlert('Error', 'Gagal menghitung formasi')
-          }
+    getPengaturanFormasiJabatan(formasi_id: string) {
+        this.apiService
+            .getData(`/api/v1/formasi_detail/formasi/${formasi_id}`)
+            .subscribe({
+                next: response => {
+                    this.PengaturanFormasiJabatan = response
+                },
+                error: () => {
+                    console.warn('No documents found in pendingTask.dokumenUkomList')
+                }
+            })
+    }
+
+    getFormasiId() {
+        this.apiService
+            .getData(`/api/v1/formasi/task/unit_kerja/${this.unitKerjaId}`)
+            .subscribe({
+                next: (response: any) => {
+                    this.formasiId = response.objectId
+                    this.getPengaturanFormasiJabatan(response.objectId)
+                }
+            })
+    }
+
+    getFormasiTree() {
+        this.apiService
+            .getData(`/api/v1/unsur/tree/${this.jabatanCode}`)
+            .subscribe({
+                next: (response: FormasiUnsur[]) => (this.formasiUnsurList = response)
+            })
+    }
+
+    getJabatan() {
+        this.jabatanService.findById(this.jabatanCode).subscribe({
+            next: (jabatan: Jabatan) => (this.jabatan = jabatan)
+        })
+    }
+
+    isSubmitted(jabatanCode: string) {
+        return this.PengaturanFormasiJabatan.some(
+            jabatan => jabatan.jabatanCode === jabatanCode
+        )
+    }
+
+    initiate(formasiUnsur: FormasiUnsur) {
+        if (!this.unsurVolumeData[formasiUnsur.id]) {
+            this.unsurVolumeData[formasiUnsur.id] = {
+                volume: formasiUnsur.volume || 0
+            }
         }
-      })
-  }
 
-  submit () {
-    this.formasiRequest.formasiId = this.formasiId
-    this.formasiRequest.jabatanCode = this.jabatanCode
-    this.formasiRequest.unsurDtoList = this.unsurList
+        return true
+    }
 
-    this.apiService
-      .postData('/api/v1/formasi_detail', this.formasiRequest)
-      .subscribe({
-        next: () => this.router.navigate(['/formasi/formasi-task']),
-        error: () =>
-          this.handlerSerivce.handleAlert('Error', 'Gagal menyimpan data')
-      })
-  }
+    totalPembulatan() {
+        var total = 0
+        this.formasiResultList.forEach(formasiResult => {
+            total = total + formasiResult.pembulatan
+        })
+
+        return total
+    }
+
+    calculate() {
+        this.unsurList.length = 0
+        for (const key in this.unsurVolumeData) {
+            this.unsurList.push({
+                id: key,
+                volume: this.unsurVolumeData[key].volume
+            })
+        }
+
+        this.apiService
+            .postData('/api/v1/formasi_detail/calculate', {
+                formasiId: this.formasiId,
+                jabatanCode: this.jabatanCode,
+                unsurDtoList: this.unsurList
+            })
+            .subscribe({
+                next: (response: FormasiResult[]) => {
+                    this.formasiResultList = response
+                    this.isModalOpen = true
+                },
+                error: error => {
+                    if (error.error.code == 'VAL-00001') {
+                        this.handlerSerivce.handleAlert('Error', 'Semua volume harus diisi')
+                    } else {
+                        this.handlerSerivce.handleAlert('Error', 'Gagal menghitung formasi')
+                    }
+                }
+            })
+    }
+
+    submit() {
+        this.isLoading$.next(true)
+        this.formasiRequest.formasiId = this.formasiId
+        this.formasiRequest.jabatanCode = this.jabatanCode
+        this.formasiRequest.unsurDtoList = this.unsurList
+
+        this.apiService
+            .postData('/api/v1/formasi_detail', this.formasiRequest)
+            .subscribe({
+                next: () => {
+                    this.isLoading$.next(false)
+                    this.router.navigate(['/formasi/formasi-task'])
+                },
+                error: () => {
+                    this.isLoading$.next(false)
+                    this.handlerSerivce.handleAlert('Error', 'Gagal menyimpan data')
+                }
+            })
+    }
 }

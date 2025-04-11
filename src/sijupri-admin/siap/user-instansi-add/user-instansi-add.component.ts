@@ -27,12 +27,11 @@ export class UserInstansiAddComponent {
     instansiList: Instansi[]
     provinsiList: Provinsi[]
     kabKotaList: KabKota[]
-    operasional: string = null
+    operasional: string = ''
     provinsiId: number = null
     kabupatenId: number = null
     kotaId: number = null
-    confirmPassword: string = null
-    isLoading: BehaviorSubject<boolean> = new BehaviorSubject(false)
+    isLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
 
     constructor(
         private apiService: ApiService,
@@ -40,7 +39,7 @@ export class UserInstansiAddComponent {
         private tabService: TabService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
+        public formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
@@ -199,13 +198,12 @@ export class UserInstansiAddComponent {
                 if (!result.confirmed) {
                     return
                 }
-                // console.log(this.userInstansi)
-                // return
-                this.isLoading.next(true)
+
+                this.isLoading$.next(true)
 
                 this.userInstansiService.save(this.userInstansi).subscribe({
                     next: () => {
-                        this.isLoading.next(false)
+                        this.isLoading$.next(false)
 
                         this.handlerService.handleAlert(
                             'Success',
@@ -214,7 +212,7 @@ export class UserInstansiAddComponent {
                         this.handlerService.handleNavigate('/siap/user-instansi')
                     },
                     error: error => {
-                        this.isLoading.next(false)
+                        this.isLoading$.next(false)
 
                         this.handlerService.handleAlert(
                             'Error',
