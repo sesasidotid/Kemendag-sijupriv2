@@ -2,10 +2,10 @@ import { ApiService } from '../../../modules/base/services/api.service'
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
-  ActionColumnBuilder,
-  PagableBuilder,
-  PageFilterBuilder,
-  PrimaryColumnBuilder
+    ActionColumnBuilder,
+    PagableBuilder,
+    PageFilterBuilder,
+    PrimaryColumnBuilder
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
@@ -20,168 +20,125 @@ import { SafeUrl } from '@angular/platform-browser'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 @Component({
-  selector: 'app-jf-akp-list',
-  standalone: true,
-  imports: [PagableComponent, CommonModule],
-  templateUrl: './jf-akp-list.component.html',
-  styleUrl: './jf-akp-list.component.scss'
+    selector: 'app-jf-akp-list',
+    standalone: true,
+    imports: [PagableComponent, CommonModule],
+    templateUrl: './jf-akp-list.component.html',
+    styleUrl: './jf-akp-list.component.scss'
 })
 export class JfAkpListComponent {
-  pagable$ = new BehaviorSubject<Pagable | null>(null)
-  jf: JF = new JF()
-  jfNip: string
-  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
+    pagable$ = new BehaviorSubject<Pagable | null>(null)
+    jf: JF = new JF()
+    jfNip: string
+    profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
-  jfLoading$ = new BehaviorSubject<boolean>(false)
+    jfLoading$ = new BehaviorSubject<boolean>(false)
 
-  constructor (
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private jfService: JfService,
-    private apiService: ApiService,
-    private sanitizer: DomSanitizer,
-    private filePreviewService: FilePreviewService
-  ) {}
+    constructor(
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
+        private jfService: JfService,
+        private apiService: ApiService,
+        private sanitizer: DomSanitizer,
+        private filePreviewService: FilePreviewService
+    ) { }
 
-  ngOnInit () {
-    this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
-      this.jfNip = params.get('id')
-    })
+    ngOnInit() {
+        this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
+            this.jfNip = params.get('id')
+        })
 
-    this.handlePagable()
-    this.getJF()
-  }
-
-  handlePagable () {
-    this.pagable$.next(
-      new PagableBuilder('/api/v1/akp/search')
-        .addPrimaryColumn(
-          new PrimaryColumnBuilder('Nama Atasan', 'namaAtasan').build()
-        )
-        .addPrimaryColumn(
-          new PrimaryColumnBuilder('Email Atasan', 'emailAtasan')
-            // .withSortable(false)
-            .build()
-        )
-        // .addPrimaryColumn(
-        //   new PrimaryColumnBuilder('Diajukan Pada', 'dateCreated')
-        //     // .withSortable(false)
-        //     .build()
-        // )
-        .addPrimaryColumn(
-          new PrimaryColumnBuilder('Selesai Pada', 'lastUpdated')
-            // .withSortable(false)
-            .build()
-        )
-        .addActionColumn(
-          new ActionColumnBuilder()
-            .setAction((akp: any) => {
-              this.router.navigate([`/akp/akp-list/detail/${akp.id}`])
-            }, 'info')
-            .withIcon('detail')
-            .build()
-        )
-        // .addActionColumn(
-        //   new ActionColumnBuilder()
-        //     .setAction(
-        //       (akp: any) =>
-        //         this.confirmationService.open(false).subscribe({
-        //           next: (result: any) => {
-        //             if (result) {
-        //               if (!result.confirmed) return
-
-        //               this.apiService
-        //                 .deleteData(`/api/v1/akp/${akp.id}`)
-        //                 .subscribe({
-        //                   next: (response: any) => {
-        //                     this.handlerService.handleAlert(
-        //                       'Success',
-        //                       'Data berhasil dihapus'
-        //                     )
-
-        //                     this.refreshPagableData()
-        //                   },
-        //                   error: (err: any) => {
-        //                     console.log(err)
-        //                     this.handlerService.handleAlert(
-        //                       'Error',
-        //                       'Gagal menghapus data, coba lagi lain kali'
-        //                     )
-        //                   }
-        //                 })
-        //             }
-        //           }
-        //         }),
-        //       'danger'
-        //     )
-        //     .withIcon('danger')
-        //     .build()
-        // )
-        .addFilter(
-          new PageFilterBuilder('equal')
-            .setProperty('nip')
-            .withDefaultValue(this.jfNip)
-            .build()
-        )
-        .addFilter(
-          new PageFilterBuilder('like')
-            .setProperty('namaAtasan')
-            .withField('Nama Atasan', 'text')
-            .build()
-        )
-        .addFilter(
-          new PageFilterBuilder('like')
-            .setProperty('emailAtasan')
-            .withField('Email Atasan', 'text')
-            .build()
-        )
-        .build()
-    )
-  }
-
-  refreshPagableData () {
-    const currentPagable = this.pagable$.value
-
-    const updatedPagable = {
-      ...currentPagable,
-      limit: 10
+        this.handlePagable()
+        this.getJF()
     }
-    this.pagable$.next(updatedPagable)
-  }
 
-  preview (fileName: string, source: string) {
-    this.filePreviewService.open(fileName, source)
-  }
+    handlePagable() {
+        this.pagable$.next(
+            new PagableBuilder('/api/v1/akp/search')
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder('Nama Atasan', 'namaAtasan').build()
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder('Email Atasan', 'emailAtasan')
+                        .build()
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder('Selesai Pada', 'lastUpdated')
+                        .build()
+                )
+                .addActionColumn(
+                    new ActionColumnBuilder()
+                        .setAction((akp: any) => {
+                            this.router.navigate([`/akp/akp-list/detail/${akp.id}`])
+                        }, 'info')
+                        .withIcon('detail')
+                        .build()
+                )
+                .addFilter(
+                    new PageFilterBuilder('equal')
+                        .setProperty('nip')
+                        .withDefaultValue(this.jfNip)
+                        .build()
+                )
+                .addFilter(
+                    new PageFilterBuilder('like')
+                        .setProperty('namaAtasan')
+                        .withField('Nama Atasan', 'text')
+                        .build()
+                )
+                .addFilter(
+                    new PageFilterBuilder('like')
+                        .setProperty('emailAtasan')
+                        .withField('Email Atasan', 'text')
+                        .build()
+                )
+                .build()
+        )
+    }
 
-  fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(this.jf.nip).subscribe({
-      next: blob => {
-        if (blob.size === 0) {
-          this.profileImageSrc = 'assets/no-profile.jpg'
-          return
+    refreshPagableData() {
+        const currentPagable = this.pagable$.value
+
+        const updatedPagable = {
+            ...currentPagable,
+            limit: 10
         }
-        const objectUrl = URL.createObjectURL(blob)
-        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
-      },
-      error: err => {
-        console.error('Error fetching profile image', err)
-        this.profileImageSrc = 'assets/no-profile.jpg'
-      }
-    })
-  }
+        this.pagable$.next(updatedPagable)
+    }
 
-  getJF () {
-    this.jfLoading$.next(true)
-    this.jfService.findByNip(this.jfNip).subscribe({
-      next: (jf: JF) => {
-        this.jf = jf
-        this.jfLoading$.next(false)
-        this.fetchPhotoProfile()
-      }
-    })
-  }
+    preview(fileName: string, source: string) {
+        this.filePreviewService.open(fileName, source)
+    }
 
-  backToList () {
-    this.router.navigate(['/akp/akp-list'])
-  }
+    fetchPhotoProfile() {
+        this.apiService.getPhotoProfile(this.jf.nip).subscribe({
+            next: blob => {
+                if (blob.size === 0) {
+                    this.profileImageSrc = 'assets/no-profile.jpg'
+                    return
+                }
+                const objectUrl = URL.createObjectURL(blob)
+                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+            },
+            error: err => {
+                console.error('Error fetching profile image', err)
+                this.profileImageSrc = 'assets/no-profile.jpg'
+            }
+        })
+    }
+
+    getJF() {
+        this.jfLoading$.next(true)
+        this.jfService.findByNip(this.jfNip).subscribe({
+            next: (jf: JF) => {
+                this.jf = jf
+                this.jfLoading$.next(false)
+                this.fetchPhotoProfile()
+            }
+        })
+    }
+
+    backToList() {
+        this.router.navigate(['/akp/akp-list'])
+    }
 }

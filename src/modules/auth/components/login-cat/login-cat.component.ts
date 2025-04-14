@@ -56,12 +56,13 @@ export class LoginCatComponent {
         private authService: AuthService,
         private router: Router
     ) {
-        if (LoginContext.isLogin()) {
-            this.router.navigate(['/'])
-        }
+
     }
 
     backToLandingPage() {
+        if (LoginContext.isLogin()) {
+            this.router.navigate(['/'])
+        }
         this.router.navigate([''])
     }
 

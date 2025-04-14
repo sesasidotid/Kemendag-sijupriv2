@@ -60,7 +60,14 @@ export class RwPendidikanPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+        this.handleFormInit()
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/rw_pendidikan/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -92,7 +99,9 @@ export class RwPendidikanPendingComponent {
                     .build()
             )
             .build()
+    }
 
+    handleFormInit() {
         this.rwPendidikanForm = new FormGroup({
             institusiPendidikan: new FormControl('', [Validators.required]),
             pendidikanCode: new FormControl('', [Validators.required]),

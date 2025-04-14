@@ -36,11 +36,10 @@ export class UnitKerjaListComponent {
 
     unitKerja: UnitKerja = new UnitKerja()
 
-    constructor(private router: Router, private tabService: TabService) {
-        this.instasiId = LoginContext.getInstansiId()
-    }
+    constructor(private router: Router, private tabService: TabService) { }
 
     ngOnInit() {
+        this.instasiId = LoginContext.getInstansiId()
         this.handlePagable()
         this.handleTabService()
     }

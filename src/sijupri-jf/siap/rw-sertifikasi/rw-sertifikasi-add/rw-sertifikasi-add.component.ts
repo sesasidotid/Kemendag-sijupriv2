@@ -51,7 +51,15 @@ export class RwSertifikasiAddComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handleFormInit()
+        this.getKategoriSertifikasiList()
+        this.fileLoadHandler()
+    }
+
+    handleFormInit() {
         this.rwSertifikasiForm = new FormGroup({
             noSk: new FormControl('', [Validators.required]),
             tglSk: new FormControl('', [Validators.required]),
@@ -60,11 +68,6 @@ export class RwSertifikasiAddComponent {
                 fileValidator(['application/pdf'], 2)
             ])
         })
-        this.getKategoriSertifikasiList()
-    }
-
-    ngOnInit() {
-        this.fileLoadHandler()
     }
 
     fileLoadHandler() {

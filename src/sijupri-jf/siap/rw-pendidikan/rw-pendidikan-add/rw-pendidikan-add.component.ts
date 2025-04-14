@@ -38,26 +38,6 @@ export class RwPendidikanAddComponent {
 
     submitLoading$ = new BehaviorSubject<boolean>(false)
     pendidikanListLoading$ = new BehaviorSubject<boolean>(false)
-
-    constructor(
-        private apiService: ApiService,
-        private confirmationService: ConfirmationService,
-        private alertService: AlertService,
-        private router: Router,
-    ) {
-        this.rwPendidikanForm = new FormGroup({
-            institusiPendidikan: new FormControl('', [Validators.required]),
-            pendidikanCode: new FormControl('', [Validators.required]),
-            jurusan: new FormControl('', [Validators.required]),
-            tanggalIjazah: new FormControl('', [Validators.required]),
-            fileIjazah: new FormControl('', [
-                Validators.required,
-                fileValidator(['application/pdf'], 2)
-            ])
-        })
-        this.getPendidikanList()
-    }
-
     inputs: FIleHandler = {
         files: {
             ijazah: {
@@ -73,6 +53,33 @@ export class RwPendidikanAddComponent {
                 fileIjazah: base64Data
             })
         }
+    }
+
+    constructor(
+        private apiService: ApiService,
+        private confirmationService: ConfirmationService,
+        private alertService: AlertService,
+        private router: Router,
+    ) {
+
+    }
+
+    ngOnInit() {
+        this.handleFormInit()
+        this.getPendidikanList()
+    }
+
+    handleFormInit() {
+        this.rwPendidikanForm = new FormGroup({
+            institusiPendidikan: new FormControl('', [Validators.required]),
+            pendidikanCode: new FormControl('', [Validators.required]),
+            jurusan: new FormControl('', [Validators.required]),
+            tanggalIjazah: new FormControl('', [Validators.required]),
+            fileIjazah: new FormControl('', [
+                Validators.required,
+                fileValidator(['application/pdf'], 2)
+            ])
+        })
     }
 
     getPendidikanList() {

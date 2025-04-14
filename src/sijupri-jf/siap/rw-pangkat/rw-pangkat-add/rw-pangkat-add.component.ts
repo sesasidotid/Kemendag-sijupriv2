@@ -60,7 +60,14 @@ export class RwPangkatAddComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handleFormInit()
+        this.getPangkatList()
+    }
+
+    handleFormInit() {
         this.rwPangkatForm = new FormGroup({
             pangkatCode: new FormControl('', [Validators.required]),
             tmt: new FormControl('', [Validators.required]),
@@ -69,7 +76,6 @@ export class RwPangkatAddComponent {
                 fileValidator(['application/pdf'], 2)
             ])
         })
-        this.getPangkatList()
     }
 
     getPangkatList() {

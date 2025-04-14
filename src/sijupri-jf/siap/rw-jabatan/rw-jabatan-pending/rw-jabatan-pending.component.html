@@ -33,15 +33,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              rwJabatanForm.get('jabatanCode').invalid &&
-              rwJabatanForm.get('jabatanCode').touched
-            "
+            *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error"
+            class="text-danger"
           >
-            <small *ngIf="rwJabatanForm.get('jabatanCode').errors?.['required']"
-              >Jabatan perlu dipilih.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -85,15 +80,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              rwJabatanForm.get('jenjangCode').invalid &&
-              rwJabatanForm.get('jenjangCode').touched
-            "
+            *ngIf="getErrorMessage('jenjangCode', 'Jenjang') as error"
+            class="text-danger"
           >
-            <small *ngIf="rwJabatanForm.get('jenjangCode').errors?.['required']"
-              >Jenjang perlu dipilih.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -109,18 +99,12 @@
               name="tmt"
               id="tmt"
               formControlName="tmt"
-              placeholder="Masukan nama Sekolah/Universitas/Institusi"
             />
             <div
-              class="feedback"
-              *ngIf="
-                rwJabatanForm.get('tmt').invalid &&
-                rwJabatanForm.get('tmt').touched
-              "
+              *ngIf="getErrorMessage('tmt', 'Tanggal mulai') as error"
+              class="text-danger"
             >
-              <small *ngIf="rwJabatanForm.get('tmt').errors?.['required']"
-                >Tanggal mulai perlu diisi.</small
-              >
+              {{ error }}
             </div>
           </div>
         </div>
@@ -128,28 +112,15 @@
           <div class="row">
             <app-file-handler [inputs]="inputs"></app-file-handler>
             <div
-              class="feedback"
-              *ngIf="rwJabatanForm.get('fileSkJabatan').invalid"
+              *ngIf="
+                getErrorMessage(
+                  'fileSkJabatan',
+                  'File dokumen SK jabatan'
+                ) as error
+              "
+              class="text-danger"
             >
-              <small
-                *ngIf="rwJabatanForm.get('fileSkJabatan').errors?.['required']"
-                >File dokumen SK jabatan perlu diunggah.</small
-              >
-              <small
-                *ngIf="
-                  rwJabatanForm
-                    .get('fileSkJabatan')
-                    ?.hasError('invalidFileType')
-                "
-                >File dokumen SK jabatan harus format .pdf</small
-              >
-              <div
-                *ngIf="
-                  rwJabatanForm.get('fileSkJabatan')?.hasError('fileTooLarge')
-                "
-              >
-                File dokumen SK jabatan lebih dari 2MB.
-              </div>
+              {{ error }}
             </div>
           </div>
         </div>

@@ -27,6 +27,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { BehaviorSubject } from 'rxjs'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-kinerja-pending',
@@ -62,7 +63,20 @@ export class RwKinerjaPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-    ) {
+        private formValidationService: FormValidationService,
+
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+        this.handleFormInit()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwKinerjaForm.get(controlName), controlName, label);
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/rw_kinerja/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -90,14 +104,10 @@ export class RwKinerjaPendingComponent {
                     .withIcon('update')
                     .build()
             )
-            //   .addFilter(
-            //     new PageFilterBuilder('like')
-            //       .setProperty('objectName')
-            //       .withField('Kinerja', 'text')
-            //       .build()
-            //   )
             .build()
+    }
 
+    handleFormInit() {
         this.rwKinerjaForm = new FormGroup({
             dateEnd: new FormControl('', [Validators.required]),
             dateStart: new FormControl('', [Validators.required]),

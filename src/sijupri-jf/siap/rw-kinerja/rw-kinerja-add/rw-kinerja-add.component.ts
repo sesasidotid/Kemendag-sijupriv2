@@ -16,9 +16,9 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { LoginContext } from '../../../../modules/base/commons/login-context'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-kinerja-add',
@@ -89,7 +89,20 @@ export class RwKinerjaAddComponent {
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
         private router: Router,
-    ) {
+        private formValidationService: FormValidationService,
+    ) { }
+
+    ngOnInit() {
+        this.handleFormInit()
+        this.getRatingKinerjaList()
+        this.getPredikatKinerjaList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwKinerjaForm.get(controlName), controlName, label);
+    }
+
+    handleFormInit() {
         this.rwKinerjaForm = new FormGroup({
             dateEnd: new FormControl('', [Validators.required]),
             dateStart: new FormControl('', [Validators.required]),
@@ -118,9 +131,6 @@ export class RwKinerjaAddComponent {
                 fileValidator(['application/pdf'], 2)
             ])
         })
-
-        this.getRatingKinerjaList()
-        this.getPredikatKinerjaList()
     }
 
     getRatingKinerjaList() {

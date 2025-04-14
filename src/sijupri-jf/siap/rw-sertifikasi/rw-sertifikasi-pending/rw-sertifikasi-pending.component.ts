@@ -60,7 +60,15 @@ export class RwSertifikasiPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+        this.getKategoriSertifikasiList()
+
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/rw_sertifikasi/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -94,8 +102,6 @@ export class RwSertifikasiPendingComponent {
                     .build()
             )
             .build()
-
-        this.getKategoriSertifikasiList()
     }
 
     fileLoadHandler() {

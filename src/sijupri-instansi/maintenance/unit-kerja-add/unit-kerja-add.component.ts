@@ -59,10 +59,6 @@ export class UnitKerjaAddComponent {
         this.handleFormInit()
         this.handleTabService()
         this.getInstansi()
-
-        this.unitKerjaForm.valueChanges.subscribe((value) => {
-            console.log('form', value)
-        })
     }
 
     handleFormInit() {

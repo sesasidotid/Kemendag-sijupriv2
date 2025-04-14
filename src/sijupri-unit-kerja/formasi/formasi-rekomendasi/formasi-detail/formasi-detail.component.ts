@@ -6,72 +6,72 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
 import { FormasiDetail } from '../../../../modules/formasi/models/formasi-detail.model'
 import { ActivatedRoute } from '@angular/router'
 import { Input } from '@angular/core'
+import { first } from 'rxjs/operators'
 @Component({
-  selector: 'app-formasi-detail',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './formasi-detail.component.html',
-  styleUrl: './formasi-detail.component.scss'
+    selector: 'app-formasi-detail',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './formasi-detail.component.html',
+    styleUrl: './formasi-detail.component.scss'
 })
 export class FormasiDetailComponent {
-  @Input() exformasiId: string = ''
+    @Input() exformasiId: string = ''
 
-  formasiId: string = ''
-  formasiDetail: FormasiDetail = new FormasiDetail()
+    formasiId: string = ''
+    formasiDetail: FormasiDetail = new FormasiDetail()
+    hoveredJabatanIndex: number | null = null
 
-  constructor (
-    private apiService: ApiService,
-    private activatedRoute: ActivatedRoute,
-    private handlerService: HandlerService,
-    private filePreviewService: FilePreviewService
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.formasiId = params.get('formasiId')
-    })
-  }
+    constructor(
+        private apiService: ApiService,
+        private activatedRoute: ActivatedRoute,
+        private handlerService: HandlerService,
+        private filePreviewService: FilePreviewService
+    ) { }
 
-  ngOnInit () {
-    this.getRekomendasiFormasiDetail()
-  }
-
-  hoveredJabatanIndex: number | null = null
-
-  hoverJabatan (index: number, isHovering: boolean) {
-    this.hoveredJabatanIndex = isHovering ? index : null
-  }
-  getTotalRekapitulasi () {
-    let total = 0
-    this.formasiDetail.formasiDetailDtoList.forEach(item => {
-      item.formasiResultDtoList.forEach(formasi => {
-        total += Number(formasi.result) || 0
-      })
-    })
-    return total
-  }
-
-  getRekomendasiFormasiDetail () {
-    console.log('Formasi Detail Ex', this.exformasiId)
-    let id = ''
-
-    if (this.exformasiId) {
-      id = this.exformasiId
-    } else {
-      id = this.formasiId
+    ngOnInit() {
+        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+            this.formasiId = params.get('formasiId')
+        })
+        this.getRekomendasiFormasiDetail()
     }
 
-    this.apiService.getData(`/api/v1/formasi/${id}`).subscribe({
-      next: res => {
-        this.formasiDetail = res
-        console.log('Formasi Detail', this.formasiDetail)
-      },
-      error: err => {
-        console.log('Error', err)
-        this.handlerService.handleAlert('Error', 'Gagal mengambil data formasi')
-      }
-    })
-  }
+    hoverJabatan(index: number, isHovering: boolean) {
+        this.hoveredJabatanIndex = isHovering ? index : null
+    }
 
-  preview (fileName: string, source: string) {
-    this.filePreviewService.open(fileName, source)
-  }
+    getTotalRekapitulasi() {
+        let total = 0
+        this.formasiDetail.formasiDetailDtoList.forEach(item => {
+            item.formasiResultDtoList.forEach(formasi => {
+                total += Number(formasi.result) || 0
+            })
+        })
+        return total
+    }
+
+    getRekomendasiFormasiDetail() {
+        console.log('Formasi Detail Ex', this.exformasiId)
+        let id = ''
+
+        if (this.exformasiId) {
+            id = this.exformasiId
+        } else {
+            id = this.formasiId
+        }
+
+        this.apiService.getData(`/api/v1/formasi/${id}`).subscribe({
+            next: res => {
+                this.formasiDetail = res
+                console.log('Formasi Detail', this.formasiDetail)
+            },
+            error: err => {
+                console.log('Error', err)
+                this.handlerService.handleAlert('Error', 'Gagal mengambil data formasi')
+            }
+        })
+    }
+
+    preview(fileName: string, source: string) {
+        this.filePreviewService.open(fileName, source)
+    }
 }

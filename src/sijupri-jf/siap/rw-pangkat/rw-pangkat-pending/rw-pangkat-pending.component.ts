@@ -58,7 +58,14 @@ export class RwPangkatPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+        this.handleFormInit()
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/rw_pangkat/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -92,7 +99,9 @@ export class RwPangkatPendingComponent {
                     .build()
             )
             .build()
+    }
 
+    handleFormInit() {
         this.rwPangkatForm = new FormGroup({
             pangkatCode: new FormControl('', [Validators.required]),
             tmt: new FormControl('', [Validators.required]),
@@ -102,6 +111,7 @@ export class RwPangkatPendingComponent {
             ])
         })
     }
+
     fileLoadHandler() {
         this.inputs = {
             files: {

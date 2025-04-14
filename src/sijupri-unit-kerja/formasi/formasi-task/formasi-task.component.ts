@@ -114,6 +114,10 @@ export class FormasiTaskComponent {
         private filePreviewService: FilePreviewService
     ) { }
 
+    ngOnInit() {
+        this.getPendingTask()
+    }
+
     clearFilesName() {
         console.log('clearFilesName')
         if (this.fileHandler) {
@@ -155,10 +159,6 @@ export class FormasiTaskComponent {
         })
 
         return sortedGrouped
-    }
-
-    ngOnInit() {
-        this.getPendingTask()
     }
 
     toggleModal() {

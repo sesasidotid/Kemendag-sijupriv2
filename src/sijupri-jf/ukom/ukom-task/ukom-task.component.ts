@@ -72,15 +72,6 @@ export class UkomTaskComponent {
     predikat2Name: string
     bidangJabatanName: string
 
-    constructor(
-        private apiService: ApiService,
-        private handlerService: HandlerService,
-        private confirmationService: ConfirmationService,
-        private ukomTaskService: UkomTaskService,
-        private converterService: ConverterService,
-        private sanitizer: DomSanitizer
-    ) { }
-
     inputs: FIleHandler = {
         files: {},
         maxSize: 2 * 1024 * 1024,
@@ -97,6 +88,15 @@ export class UkomTaskComponent {
             }
         }
     }
+
+    constructor(
+        private apiService: ApiService,
+        private handlerService: HandlerService,
+        private confirmationService: ConfirmationService,
+        private ukomTaskService: UkomTaskService,
+        private converterService: ConverterService,
+        private sanitizer: DomSanitizer
+    ) { }
 
     ngOnInit() {
         this.checkStatusRegister()

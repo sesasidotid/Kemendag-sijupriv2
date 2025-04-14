@@ -90,7 +90,6 @@ export class ProfileCardComponent {
 
     saveProfileImage() {
         if (!this.file) {
-            alert('No file selected')
             return
         }
 

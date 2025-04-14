@@ -1,3 +1,4 @@
+import { FormValidationService } from './../../../../modules/base/services/form-validation.service';
 import { Component } from '@angular/core'
 import { JF } from '../../../../modules/siap/models/jf.model'
 import { AlertService } from '../../../../modules/base/services/alert.service'
@@ -14,7 +15,6 @@ import { Router } from '@angular/router'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { ApiService } from '../../../../modules/base/services/api.service'
-import { PendingTask } from '../../../../modules/workflow/models/pending-task.model'
 import { JenisKelamin } from '../../../../modules/maintenance/models/jenis-kelamin.model'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
@@ -34,14 +34,11 @@ import { fileValidator } from '../../../../modules/base/validators/file-format.v
 export class JfDetailComponent {
     jf: JF = new JF()
     jenisKelaminList: JenisKelamin[] = []
-    nip: string = LoginContext.getUserId()
+    nip: string = ''
     isEditOpen: boolean = false
-
     loading$ = new BehaviorSubject<boolean>(true)
     submitLoading$ = new BehaviorSubject<boolean>(false)
-
     jfDetailForm!: FormGroup
-
     inputs: FIleHandler
 
     constructor(
@@ -49,16 +46,25 @@ export class JfDetailComponent {
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
         private router: Router,
+        private formValidationService: FormValidationService,
     ) { }
 
     ngOnInit() {
+        this.nip = LoginContext.getUserId()
         this.getJf()
+        this.handleFormInit()
+    }
 
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.jfDetailForm.get(controlName), controlName, label);
+    }
+
+    handleFormInit() {
         this.jfDetailForm = new FormGroup({
             name: new FormControl(this.jf.name, [Validators.required]),
             phone: new FormControl(this.jf.phone, [
                 Validators.required,
-                Validators.pattern('^[0-9]+$')
+                Validators.pattern(/^\d{10,15}$/)
             ]),
             email: new FormControl(this.jf.email, [
                 Validators.required,
@@ -73,9 +79,7 @@ export class JfDetailComponent {
             ]),
             nik: new FormControl(this.jf.nik, [
                 Validators.required,
-                Validators.pattern('^[0-9]+$'),
-                Validators.minLength(16),
-                Validators.maxLength(16)
+                Validators.pattern(/^\d{16}$/)
             ]),
             fileKtp: new FormControl('', [
                 Validators.required,

@@ -47,7 +47,15 @@ export class RwKompetensiAddComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
-    ) {
+    ) { }
+
+    ngOnInit() {
+        this.handleFormInit()
+        this.getKategoriPengembanganList()
+        this.fileLoadHandler()
+    }
+
+    handleFormInit() {
         this.rwKompetensiForm = new FormGroup({
             name: new FormControl('', [Validators.required]),
             kategoriPengembanganId: new FormControl('', [Validators.required]),
@@ -59,9 +67,6 @@ export class RwKompetensiAddComponent {
                 fileValidator(['application/pdf'], 2)
             ])
         })
-
-        this.getKategoriPengembanganList()
-        this.fileLoadHandler()
     }
 
     fileLoadHandler() {

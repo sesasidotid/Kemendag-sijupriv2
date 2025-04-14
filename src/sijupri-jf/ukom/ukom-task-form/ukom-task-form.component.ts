@@ -87,10 +87,6 @@ export class UkomTaskFormComponent {
         this.handleFetchDokumenPersyaratan()
         this.getJFPendidikan()
         this.getLast2TahunPredikatJF()
-
-        this.passwordForm.valueChanges.subscribe(value => {
-            console.log(value)
-        })
     }
 
     ngOnDestroy() {

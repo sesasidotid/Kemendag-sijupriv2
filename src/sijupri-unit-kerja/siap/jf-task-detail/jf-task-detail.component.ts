@@ -18,7 +18,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { AlertService } from '../../../modules/base/services/alert.service'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
-import { LoginContext } from '../../../modules/base/commons/login-context'
+import { first } from 'rxjs/operators'
 import { ConverterService } from '../../../modules/base/services/converter.service'
 import { BehaviorSubject } from 'rxjs'
 import { SafeUrl } from '@angular/platform-browser'
@@ -51,15 +51,12 @@ export class JfTaskDetailComponent {
         private jfService: JfService,
         private sanitizer: DomSanitizer,
         private filePreviewService: FilePreviewService
-    ) {
-
-    }
+    ) { }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.subscribe(params => {
+        this.activatedRoute.queryParamMap.pipe(first()).subscribe(params => {
             this.nip = params.get('id')
         })
-
         this.getJF()
         this.getTaskDetail()
         this.fetchPhotoProfile()

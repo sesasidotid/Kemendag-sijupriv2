@@ -18,6 +18,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-jabatan-add',
@@ -40,37 +41,6 @@ export class RwJabatanAddComponent {
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
     rwJabatanForm!: FormGroup
-
-    constructor(
-        private apiService: ApiService,
-        private alertService: AlertService,
-        private confirmationService: ConfirmationService,
-        private router: Router,
-    ) {
-        this.rwJabatanForm = new FormGroup({
-            jabatanCode: new FormControl('', [Validators.required]),
-            jenjangCode: new FormControl('', [Validators.required]),
-            tmt: new FormControl('', [Validators.required]),
-            fileSkJabatan: new FormControl('', [
-                Validators.required,
-                fileValidator(['application/pdf'], 2)
-            ])
-        })
-
-        this.getJabatanList()
-
-        this.rwJabatanForm
-            .get('jabatanCode')
-            .valueChanges.subscribe(jabatanCode => {
-                if (jabatanCode) {
-                    this.getJenjangList(jabatanCode)
-                } else {
-                    this.jenjangList = [] // Clear jenjang list if no jabatan selected
-                    this.rwJabatanForm.get('jenjangCode').setValue('')
-                }
-            })
-    }
-
     inputs: FIleHandler = {
         files: {
             ijazah: {
@@ -86,6 +56,49 @@ export class RwJabatanAddComponent {
                 fileSkJabatan: base64Data
             })
         }
+    }
+
+    constructor(
+        private apiService: ApiService,
+        private alertService: AlertService,
+        private confirmationService: ConfirmationService,
+        private router: Router,
+        private formValidationService: FormValidationService,
+    ) { }
+
+    ngOnInit() {
+        this.handleFormInit()
+        this.getJabatanList()
+        this.handleSubscribe()
+    }
+
+    handleFormInit() {
+        this.rwJabatanForm = new FormGroup({
+            jabatanCode: new FormControl('', [Validators.required]),
+            jenjangCode: new FormControl('', [Validators.required]),
+            tmt: new FormControl('', [Validators.required]),
+            fileSkJabatan: new FormControl('', [
+                Validators.required,
+                fileValidator(['application/pdf'], 2)
+            ])
+        })
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwJabatanForm.get(controlName), controlName, label);
+    }
+
+    handleSubscribe() {
+        this.rwJabatanForm
+            .get('jabatanCode')
+            .valueChanges.subscribe(jabatanCode => {
+                if (jabatanCode) {
+                    this.getJenjangList(jabatanCode)
+                } else {
+                    this.jenjangList = []
+                    this.rwJabatanForm.get('jenjangCode').setValue('')
+                }
+            })
     }
 
     getJabatanList() {

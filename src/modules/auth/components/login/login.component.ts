@@ -59,13 +59,12 @@ export class LoginComponent {
         private router: Router
     ) {
         setTimeout(() => { }, 0)
-
-        if (LoginContext.isLogin()) {
-            this.router.navigate(['/'])
-        }
     }
 
     ngOnInit() {
+        if (LoginContext.isLogin()) {
+            this.router.navigate(['/'])
+        }
         this.isLoginLoading$.next(false)
         this.getApplicationList()
         this.handleFormInit()

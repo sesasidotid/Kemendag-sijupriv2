@@ -103,11 +103,11 @@ export class AdminDashboardComponent {
     totalUserAdmin: number = 0
     totalUserInstansi: number = 0
 
-    constructor(private apiService: ApiService, private router: Router) {
-        this.userRole = LoginContext.getRoleCodes()
-    }
+    constructor(private apiService: ApiService, private router: Router) { }
 
     ngOnInit() {
+        this.userRole = LoginContext.getRoleCodes()
+
         this.getTotalAKPPending()
         this.getTotalUKOMPending()
         this.getTotalFormasiPending()
@@ -117,7 +117,6 @@ export class AdminDashboardComponent {
     }
 
     rounding(value: string): string {
-        console.log(value)
         return parseFloat(value).toFixed(2)
     }
 

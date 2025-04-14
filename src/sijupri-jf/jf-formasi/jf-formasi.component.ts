@@ -9,60 +9,58 @@ import { ApiService } from '../../modules/base/services/api.service'
 import { Router } from '@angular/router'
 
 @Component({
-  selector: 'app-jf-formasi',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './jf-formasi.component.html',
-  styleUrl: './jf-formasi.component.scss'
+    selector: 'app-jf-formasi',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './jf-formasi.component.html',
+    styleUrl: './jf-formasi.component.scss'
 })
 export class JfFormasiComponent {
-  availableFormation: AvailableFormasiInMap[] = []
-  unitKerjaDetail: UnitKerja = new UnitKerja()
+    availableFormation: AvailableFormasiInMap[] = []
+    unitKerjaDetail: UnitKerja = new UnitKerja()
+    hoveredJabatanIndex: number | null = null
 
-  constructor (private apiService: ApiService, private router: Router) {
-    this.getUnitKerjaAvailableFormation(LoginContext.getUnitKerjaId())
-  }
+    constructor(private apiService: ApiService, private router: Router) { }
 
-  ngOnInit () {
-    this.getUnitKerjaDetail(LoginContext.getUnitKerjaId())
-  }
+    ngOnInit() {
+        this.getUnitKerjaAvailableFormation(LoginContext.getUnitKerjaId())
+        this.getUnitKerjaDetail(LoginContext.getUnitKerjaId())
+    }
 
-  hoveredJabatanIndex: number | null = null
+    hoverJabatan(index: number, isHovering: boolean) {
+        this.hoveredJabatanIndex = isHovering ? index : null
+    }
 
-  hoverJabatan (index: number, isHovering: boolean) {
-    this.hoveredJabatanIndex = isHovering ? index : null
-  }
+    getUnitKerjaAvailableFormation(unit_kerja_id: string) {
+        console.log('unit_kerja2_id', unit_kerja_id)
 
-  getUnitKerjaAvailableFormation (unit_kerja_id: string) {
-    console.log('unit_kerja2_id', unit_kerja_id)
+        this.apiService
+            .getData(`/api/v1/formasi/calculate/unit_kerja/${unit_kerja_id}`)
+            .subscribe({
+                next: (res: any) => {
+                    this.availableFormation = res
+                }
+            })
+    }
 
-    this.apiService
-      .getData(`/api/v1/formasi/calculate/unit_kerja/${unit_kerja_id}`)
-      .subscribe({
-        next: (res: any) => {
-          this.availableFormation = res
-        }
-      })
-  }
+    getUnitKerjaDetail(unit_kerja_id: string) {
+        console.log('unit_kerja_id', unit_kerja_id)
+        this.apiService
+            .getData(`/api/v1/unit_kerja/search?eq_id=${unit_kerja_id}`)
+            .subscribe({
+                next: (res: any) => {
+                    this.unitKerjaDetail = res.data[0]
+                }
+            })
+    }
 
-  getUnitKerjaDetail (unit_kerja_id: string) {
-    console.log('unit_kerja_id', unit_kerja_id)
-    this.apiService
-      .getData(`/api/v1/unit_kerja/search?eq_id=${unit_kerja_id}`)
-      .subscribe({
-        next: (res: any) => {
-          this.unitKerjaDetail = res.data[0]
-        }
-      })
-  }
-
-  getTotalRekapitulasi (): number {
-    let total = 0
-    this.availableFormation.forEach(item => {
-      item.jenjangSumList.forEach(formasi => {
-        total += Number(formasi.resultSum) || 0
-      })
-    })
-    return total
-  }
+    getTotalRekapitulasi(): number {
+        let total = 0
+        this.availableFormation.forEach(item => {
+            item.jenjangSumList.forEach(formasi => {
+                total += Number(formasi.resultSum) || 0
+            })
+        })
+        return total
+    }
 }

@@ -19,7 +19,13 @@ import {
 export class JfTaskListComponent {
     pagable: Pagable
 
-    constructor(private router: Router) {
+    constructor(private router: Router) { }
+
+    ngOnInit() {
+        this.handlePagable()
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/jf/task/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'user|name').build())

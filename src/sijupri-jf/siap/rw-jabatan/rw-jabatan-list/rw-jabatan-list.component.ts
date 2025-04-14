@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import {
-  ActionColumnBuilder,
-  PagableBuilder,
-  PageFilterBuilder,
-  PrimaryColumnBuilder
+    ActionColumnBuilder,
+    PagableBuilder,
+    PageFilterBuilder,
+    PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { CommonModule } from '@angular/common'
@@ -17,84 +17,88 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { BehaviorSubject } from 'rxjs'
 
 @Component({
-  selector: 'app-rw-jabatan-list',
-  standalone: true,
-  imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent],
-  templateUrl: './rw-jabatan-list.component.html',
-  styleUrl: './rw-jabatan-list.component.scss'
+    selector: 'app-rw-jabatan-list',
+    standalone: true,
+    imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent],
+    templateUrl: './rw-jabatan-list.component.html',
+    styleUrl: './rw-jabatan-list.component.scss'
 })
 export class RwJabatanListComponent {
-  @Input() nip?: string = ''
-  apiUrl: string = '/api/v1/rw_jabatan/search'
+    @Input() nip?: string = ''
+    apiUrl: string = '/api/v1/rw_jabatan/search'
 
-  pagable: Pagable
-  isDetailOpen: boolean = false
-  rwJabatan: RWJabatan = new RWJabatan()
+    pagable: Pagable
+    isDetailOpen: boolean = false
+    rwJabatan: RWJabatan = new RWJabatan()
 
-  loading$ = new BehaviorSubject<boolean>(true)
+    loading$ = new BehaviorSubject<boolean>(true)
 
-  constructor (
-    private apiService: ApiService,
-    private alertService: AlertService
-  ) {}
+    constructor(
+        private apiService: ApiService,
+        private alertService: AlertService
+    ) { }
 
-  ngOnInit () {
-    this.apiUrl =
-      this.nip === ''
-        ? '/api/v1/rw_jabatan/search'
-        : `/api/v1/rw_jabatan/search?eq_nip=${this.nip}`
+    ngOnInit() {
+        this.handlePagable()
+    }
 
-    this.pagable = new PagableBuilder(this.apiUrl)
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Jabatan', 'jabatan|name').build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Jenjang', 'jenjang|name').build()
-      )
-      .addPrimaryColumn(
-        new PrimaryColumnBuilder('Terhitung Mulai', 'tmt').build()
-      )
-      .addActionColumn(
-        new ActionColumnBuilder()
-          .setAction((rwJabatan: any) => {
-            this.getRWJabatan(rwJabatan.id)
-            this.isDetailOpen = true
-          }, 'info')
-          .withIcon('detail')
-          .build()
-      )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('jabatan|name')
-          .withField('Jabatan', 'text')
-          .build()
-      )
-      .addFilter(
-        new PageFilterBuilder('like')
-          .setProperty('jenjang|name')
-          .withField('Jenjang', 'text')
-          .build()
-      )
-      .build()
-  }
+    handlePagable() {
+        this.apiUrl =
+            this.nip === ''
+                ? '/api/v1/rw_jabatan/search'
+                : `/api/v1/rw_jabatan/search?eq_nip=${this.nip}`
 
-  getRWJabatan (id: string) {
-    this.loading$.next(true)
-    this.apiService.getData(`/api/v1/rw_jabatan/${id}`).subscribe({
-      next: response => {
-        this.rwJabatan = new RWJabatan(response)
-        this.loading$.next(false)
-      },
-      error: error => {
-        console.log('error', error)
-        this.alertService.showToast('Error', 'Gagal mendapatkan data riwayat')
-        this.loading$.next(false)
-      }
-    })
-  }
+        this.pagable = new PagableBuilder(this.apiUrl)
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Jabatan', 'jabatan|name').build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Jenjang', 'jenjang|name').build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Terhitung Mulai', 'tmt').build()
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((rwJabatan: any) => {
+                        this.getRWJabatan(rwJabatan.id)
+                        this.isDetailOpen = true
+                    }, 'info')
+                    .withIcon('detail')
+                    .build()
+            )
+            .addFilter(
+                new PageFilterBuilder('like')
+                    .setProperty('jabatan|name')
+                    .withField('Jabatan', 'text')
+                    .build()
+            )
+            .addFilter(
+                new PageFilterBuilder('like')
+                    .setProperty('jenjang|name')
+                    .withField('Jenjang', 'text')
+                    .build()
+            )
+            .build()
+    }
 
-  back () {
-    this.isDetailOpen = false
-    this.rwJabatan = new RWJabatan()
-  }
+    getRWJabatan(id: string) {
+        this.loading$.next(true)
+        this.apiService.getData(`/api/v1/rw_jabatan/${id}`).subscribe({
+            next: response => {
+                this.rwJabatan = new RWJabatan(response)
+                this.loading$.next(false)
+            },
+            error: error => {
+                console.log('error', error)
+                this.alertService.showToast('Error', 'Gagal mendapatkan data riwayat')
+                this.loading$.next(false)
+            }
+        })
+    }
+
+    back() {
+        this.isDetailOpen = false
+        this.rwJabatan = new RWJabatan()
+    }
 }

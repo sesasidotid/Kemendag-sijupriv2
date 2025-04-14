@@ -27,6 +27,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-jabatan-pending',
@@ -61,7 +62,16 @@ export class RwJabatanPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-    ) {
+        private formValidationService: FormValidationService,
+    ) { }
+
+    ngOnInit() {
+        this.handlePagable()
+        this.handleFormInit()
+        this.handleSubscribe()
+    }
+
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/rw_jabatan/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -95,7 +105,8 @@ export class RwJabatanPendingComponent {
                     .build()
             )
             .build()
-
+    }
+    handleFormInit() {
         this.rwJabatanForm = new FormGroup({
             jabatanCode: new FormControl('', [Validators.required]),
             jenjangCode: new FormControl('', [Validators.required]),
@@ -105,7 +116,13 @@ export class RwJabatanPendingComponent {
                 fileValidator(['application/pdf'], 2)
             ])
         })
+    }
 
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwJabatanForm.get(controlName), controlName, label);
+    }
+
+    handleSubscribe() {
         this.rwJabatanForm
             .get('jabatanCode')
             .valueChanges.subscribe(jabatanCode => {
@@ -117,6 +134,7 @@ export class RwJabatanPendingComponent {
                 }
             })
     }
+
     fileLoadHandler() {
         this.inputs = {
             files: {

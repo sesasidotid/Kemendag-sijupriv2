@@ -15,71 +15,72 @@ import { SafeUrl } from '@angular/platform-browser'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
+import { first } from 'rxjs/operators'
 @Component({
-  selector: 'app-jf-detail',
-  standalone: true,
-  imports: [
-    RwPendidikanListComponent,
-    RwPangkatListComponent,
-    RwJabatanListComponent,
-    RwKinerjaListComponent,
-    RwKompetensiListComponent,
-    RwSertifikasiListComponent,
-    CommonModule
-  ],
-  templateUrl: './jf-detail.component.html',
-  styleUrl: './jf-detail.component.scss'
+    selector: 'app-jf-detail',
+    standalone: true,
+    imports: [
+        RwPendidikanListComponent,
+        RwPangkatListComponent,
+        RwJabatanListComponent,
+        RwKinerjaListComponent,
+        RwKompetensiListComponent,
+        RwSertifikasiListComponent,
+        CommonModule
+    ],
+    templateUrl: './jf-detail.component.html',
+    styleUrl: './jf-detail.component.scss'
 })
 export class JfDetailComponent {
-  nip: string
-  jf: JF = new JF()
-  profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
+    nip: string
+    jf: JF = new JF()
+    profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
-  constructor (
-    private jfService: JfService,
-    private activatedRoute: ActivatedRoute,
-    private apiService: ApiService,
-    private sanitizer: DomSanitizer,
-    private filePreviewService: FilePreviewService
-  ) {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.nip = params.get('id')
-    })
-    this.getJF()
-  }
+    constructor(
+        private jfService: JfService,
+        private activatedRoute: ActivatedRoute,
+        private apiService: ApiService,
+        private sanitizer: DomSanitizer,
+        private filePreviewService: FilePreviewService
+    ) { }
 
-  ngOnInit () {
-    this.fetchPhotoProfile()
-  }
+    ngOnInit() {
+        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+            this.nip = params.get('id')
 
-  backToList () {
-    history.back()
-  }
+        })
+        this.getJF()
+        this.fetchPhotoProfile()
+    }
 
-  getJF () {
-    this.jfService.findByNip(this.nip).subscribe({
-      next: (jf: JF) => (this.jf = jf)
-    })
-  }
+    backToList() {
+        history.back()
+    }
 
-  fetchPhotoProfile () {
-    this.apiService.getPhotoProfile(this.nip).subscribe({
-      next: blob => {
-        if (blob.size === 0) {
-          this.profileImageSrc = 'assets/no-profile.jpg'
-          return
-        }
-        const objectUrl = URL.createObjectURL(blob)
-        this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
-      },
-      error: err => {
-        console.error('Error fetching profile image', err)
-        this.profileImageSrc = 'assets/no-profile.jpg'
-      }
-    })
-  }
+    getJF() {
+        this.jfService.findByNip(this.nip).subscribe({
+            next: (jf: JF) => (this.jf = jf)
+        })
+    }
 
-  preview (fileName: string, source: string) {
-    this.filePreviewService.open(fileName, source)
-  }
+    fetchPhotoProfile() {
+        this.apiService.getPhotoProfile(this.nip).subscribe({
+            next: blob => {
+                if (blob.size === 0) {
+                    this.profileImageSrc = 'assets/no-profile.jpg'
+                    return
+                }
+                const objectUrl = URL.createObjectURL(blob)
+                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+            },
+            error: err => {
+                console.error('Error fetching profile image', err)
+                this.profileImageSrc = 'assets/no-profile.jpg'
+            }
+        })
+    }
+
+    preview(fileName: string, source: string) {
+        this.filePreviewService.open(fileName, source)
+    }
 }

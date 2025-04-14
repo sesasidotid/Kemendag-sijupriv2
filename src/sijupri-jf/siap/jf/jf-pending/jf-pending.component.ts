@@ -22,6 +22,7 @@ import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../../../modules/base/components/empty-state/empty-state.component'
 import { Router } from '@angular/router'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-jf-pending',
@@ -55,17 +56,25 @@ export class JfPendingComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
+        private formValidationService: FormValidationService,
     ) { }
 
     ngOnInit() {
         this.getPendingTask()
         this.getJenisKelamin()
+        this.handleFormInit()
+    }
 
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.jfDetailForm.get(controlName), controlName, label);
+    }
+
+    handleFormInit() {
         this.jfDetailForm = new FormGroup({
             name: new FormControl(this.jf.name, [Validators.required]),
             phone: new FormControl(this.jf.phone, [
                 Validators.required,
-                Validators.pattern('^[0-9]+$')
+                Validators.pattern(/^\d{10,15}$/)
             ]),
             email: new FormControl(this.jf.email, [
                 Validators.required,
@@ -80,8 +89,7 @@ export class JfPendingComponent {
             ]),
             nik: new FormControl(this.jf.nik, [
                 Validators.required,
-                Validators.pattern('^[0-9]+$'),
-                Validators.minLength(13)
+                Validators.pattern(/^\d{16}$/)
             ]),
             fileKtp: new FormControl('', [
                 Validators.required,

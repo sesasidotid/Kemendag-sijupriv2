@@ -19,15 +19,10 @@
             <option [value]="'bulanan'">Bulanan</option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              rwKinerjaForm.get('type').invalid &&
-              rwKinerjaForm.get('type').touched
-            "
+            *ngIf="getErrorMessage('type', 'Tipe') as error"
+            class="text-danger"
           >
-            <small *ngIf="rwKinerjaForm.get('type').errors?.['required']"
-              >Tipe perlu dipilih.</small
-            >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -45,15 +40,10 @@
           formControlName="dateStart"
         />
         <div
-          class="feedback"
-          *ngIf="
-            rwKinerjaForm.get('dateStart').invalid &&
-            rwKinerjaForm.get('dateStart').touched
-          "
+          *ngIf="getErrorMessage('dateStart', 'Tanggal mulai') as error"
+          class="text-danger"
         >
-          <small *ngIf="rwKinerjaForm.get('dateStart').errors?.['required']"
-            >Tanggal mulai perlu dipilih.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -70,15 +60,10 @@
           formControlName="dateEnd"
         />
         <div
-          class="feedback"
-          *ngIf="
-            rwKinerjaForm.get('dateEnd').invalid &&
-            rwKinerjaForm.get('dateEnd').touched
-          "
+          *ngIf="getErrorMessage('dateEnd', 'Tanggal selesai') as error"
+          class="text-danger"
         >
-          <small *ngIf="rwKinerjaForm.get('dateEnd').errors?.['required']"
-            >Tanggal selesai perlu dipilih.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -114,15 +99,10 @@
           </option>
         </select>
         <div
-          class="feedback"
-          *ngIf="
-            rwKinerjaForm.get('ratingHasilId').invalid &&
-            rwKinerjaForm.get('ratingHasilId').touched
-          "
+          *ngIf="getErrorMessage('ratingHasilId', 'Rating hasil') as error"
+          class="text-danger"
         >
-          <small *ngIf="rwKinerjaForm.get('ratingHasilId').errors?.['required']"
-            >Rating hasil perlu dipilih.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -158,16 +138,10 @@
           </option>
         </select>
         <div
-          class="feedback"
-          *ngIf="
-            rwKinerjaForm.get('ratingKinerjaId').invalid &&
-            rwKinerjaForm.get('ratingKinerjaId').touched
-          "
+          *ngIf="getErrorMessage('ratingKinerjaId', 'Rating perilaku') as error"
+          class="text-danger"
         >
-          <small
-            *ngIf="rwKinerjaForm.get('ratingKinerjaId').errors?.['required']"
-            >Rating perilaku perlu dipilih.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -203,16 +177,12 @@
           </option>
         </select>
         <div
-          class="feedback"
           *ngIf="
-            rwKinerjaForm.get('predikatKinerjaId').invalid &&
-            rwKinerjaForm.get('predikatKinerjaId').touched
+            getErrorMessage('predikatKinerjaId', 'Predikat kinerja') as error
           "
+          class="text-danger"
         >
-          <small
-            *ngIf="rwKinerjaForm.get('predikatKinerjaId').errors?.['required']"
-            >Predikat kinerja perlu dipilih.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
@@ -230,116 +200,16 @@
           placeholder="Masukkan angka kredit"
         />
         <div
-          class="feedback"
-          *ngIf="
-            rwKinerjaForm.get('angkaKredit').invalid &&
-            rwKinerjaForm.get('angkaKredit').touched
-          "
+          *ngIf="getErrorMessage('angkaKredit', 'Angka kredit') as error"
+          class="text-danger"
         >
-          <small *ngIf="rwKinerjaForm.get('angkaKredit').errors?.['required']"
-            >Angka kredit perlu diisi.</small
-          >
-          <small *ngIf="rwKinerjaForm.get('angkaKredit').errors?.['pattern']"
-            >Angka kredit harus angka.</small
-          >
+          {{ error }}
         </div>
       </div>
     </div>
     <div class="col-lg-12">
       <div class="row">
         <app-file-handler [inputs]="inputs"></app-file-handler>
-        <div
-          class="feedback"
-          *ngIf="rwKinerjaForm.get('fileDocEvaluasi').invalid"
-        >
-          <small
-            *ngIf="rwKinerjaForm.get('fileDocEvaluasi').errors?.['required']"
-            >File dokumen evaluasi perlu diunggah.</small
-          >
-          <small
-            *ngIf="
-              rwKinerjaForm.get('fileDocEvaluasi')?.hasError('invalidFileType')
-            "
-            >File dokumen evaluasi harus format .pdf</small
-          >
-          <div
-            *ngIf="
-              rwKinerjaForm.get('fileDocEvaluasi')?.hasError('fileTooLarge')
-            "
-          >
-            File dokumen evaluasi lebih dari 2MB.
-          </div>
-        </div>
-        <div
-          class="feedback"
-          *ngIf="rwKinerjaForm.get('fileDocPredikat').invalid"
-        >
-          <small
-            *ngIf="rwKinerjaForm.get('fileDocPredikat').errors?.['required']"
-            >File dokumen predikat perlu diunggah.</small
-          >
-          <small
-            *ngIf="
-              rwKinerjaForm.get('fileDocPredikat')?.hasError('invalidFileType')
-            "
-            >File dokumen predikat harus format .pdf</small
-          >
-          <div
-            *ngIf="
-              rwKinerjaForm.get('fileDocPredikat')?.hasError('fileTooLarge')
-            "
-          >
-            File dokumen predikat lebih dari 2MB.
-          </div>
-        </div>
-        <div
-          class="feedback"
-          *ngIf="rwKinerjaForm.get('fileDocAkumulasiAk').invalid"
-        >
-          <small
-            *ngIf="rwKinerjaForm.get('fileDocAkumulasiAk').errors?.['required']"
-            >File dokumen akumulasi AK perlu diunggah.</small
-          >
-          <small
-            *ngIf="
-              rwKinerjaForm
-                .get('fileDocAkumulasiAk')
-                ?.hasError('invalidFileType')
-            "
-            >File dokumen akumulasi AK harus format .pdf</small
-          >
-          <div
-            *ngIf="
-              rwKinerjaForm.get('fileDocAkumulasiAk')?.hasError('fileTooLarge')
-            "
-          >
-            File dokumen akumulasi AK lebih dari 2MB.
-          </div>
-        </div>
-        <div
-          class="feedback"
-          *ngIf="rwKinerjaForm.get('fileDocPenetapanAk').invalid"
-        >
-          <small
-            *ngIf="rwKinerjaForm.get('fileDocPenetapanAk').errors?.['required']"
-            >File dokumen penetapan AK perlu diunggah.</small
-          >
-          <small
-            *ngIf="
-              rwKinerjaForm
-                .get('fileDocPenetapanAk')
-                ?.hasError('invalidFileType')
-            "
-            >File dokumen penetapan AK harus format .pdf</small
-          >
-          <div
-            *ngIf="
-              rwKinerjaForm.get('fileDocPenetapanAk')?.hasError('fileTooLarge')
-            "
-          >
-            File dokumen penetapan AK lebih dari 2MB.
-          </div>
-        </div>
       </div>
     </div>
     <div class="col-lg-12">
