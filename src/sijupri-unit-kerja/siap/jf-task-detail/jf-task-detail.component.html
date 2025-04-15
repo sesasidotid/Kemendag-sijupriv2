@@ -530,22 +530,47 @@
                     </ng-container>
                   </div>
                   <div class="text-center float-end m-2 mt-3">
-                    <button
-                      type="button"
-                      class="btn btn-success me-1"
-                      (click)="openConfirmationDialog(pendingTask, 'approve')"
+                    <ng-container
+                      *ngIf="submitTaskLoading$ | async; else submitNoLoading"
                     >
-                      Terima
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-danger"
-                      (click)="
-                        openConfirmationDialog(pendingTask, 'reject', true)
-                      "
-                    >
-                      Tolak
-                    </button>
+                      <button class="btn btn-success me-1" disabled>
+                        <div
+                          class="spinner-border"
+                          style="width: 19px; height: 19px"
+                          role="status"
+                        >
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </button>
+                      <button class="btn btn-danger" disabled>
+                        <div
+                          class="spinner-border"
+                          style="width: 19px; height: 19px"
+                          role="status"
+                        >
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </button>
+                    </ng-container>
+
+                    <ng-template #submitNoLoading>
+                      <button
+                        type="button"
+                        class="btn btn-success me-1"
+                        (click)="openConfirmationDialog(pendingTask, 'approve')"
+                      >
+                        Terima
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        (click)="
+                          openConfirmationDialog(pendingTask, 'reject', true)
+                        "
+                      >
+                        Tolak
+                      </button>
+                    </ng-template>
                   </div>
                 </div>
               </ng-template>

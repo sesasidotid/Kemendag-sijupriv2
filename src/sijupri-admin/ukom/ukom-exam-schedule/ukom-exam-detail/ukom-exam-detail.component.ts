@@ -38,7 +38,7 @@ export class UkomExamDetailComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+        this.activatedRoute.paramMap.subscribe(params => {
             this.roomId = params.get('id')
         })
 

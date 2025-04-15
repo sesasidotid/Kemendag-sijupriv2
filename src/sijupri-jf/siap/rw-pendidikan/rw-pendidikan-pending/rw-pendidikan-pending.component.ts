@@ -27,6 +27,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { PageColumn } from '../../../../modules/base/commons/pagable/page-column'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-pendidikan-pending',
@@ -45,7 +46,7 @@ export class RwPendidikanPendingComponent {
     pagable: Pagable
     isDetailOpen: boolean = false
     rwPendidikan: RWPendidikan = new RWPendidikan()
-    pendidikanList: Pendidikan[] = []
+    pendidikanList: Pendidikan[]
     pendingTask: PendingTask
 
     rwPendidikanForm!: FormGroup
@@ -60,11 +61,16 @@ export class RwPendidikanPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
         this.handlePagable()
         this.handleFormInit()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwPendidikanForm.get(controlName), controlName, label);
     }
 
     handlePagable() {
@@ -109,7 +115,6 @@ export class RwPendidikanPendingComponent {
             tanggalIjazah: new FormControl('', [Validators.required]),
             fileIjazah: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
             ])
         })
     }

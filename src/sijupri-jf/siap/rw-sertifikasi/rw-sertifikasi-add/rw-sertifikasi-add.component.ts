@@ -1,5 +1,6 @@
+import { FormValidationService } from './../../../../modules/base/services/form-validation.service';
 import { CommonModule } from '@angular/common'
-import { Component } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import {
     FormControl,
     FormGroup,
@@ -33,8 +34,10 @@ import { fileValidator } from '../../../../modules/base/validators/file-format.v
     styleUrl: './rw-sertifikasi-add.component.scss'
 })
 export class RwSertifikasiAddComponent {
+    @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
+
     rwSertifikasi: RWSertifikasi = new RWSertifikasi()
-    kategoriSertifikasiList: KategoriSertifikasi[] = []
+    kategoriSertifikasiList: KategoriSertifikasi[]
     kategori: number = 1
 
     kategori$ = new BehaviorSubject<number>(1)
@@ -51,6 +54,7 @@ export class RwSertifikasiAddComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
+        private formValidationService: FormValidationService,
     ) { }
 
     ngOnInit() {
@@ -59,13 +63,22 @@ export class RwSertifikasiAddComponent {
         this.fileLoadHandler()
     }
 
+    clearFilesName() {
+        if (this.fileHandler) {
+            this.fileHandler.clearFileName()
+        }
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwSertifikasiForm.get(controlName), controlName, label);
+    }
+
     handleFormInit() {
         this.rwSertifikasiForm = new FormGroup({
             noSk: new FormControl('', [Validators.required]),
             tglSk: new FormControl('', [Validators.required]),
             fileSkPengangkatan: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
             ])
         })
     }
@@ -134,7 +147,6 @@ export class RwSertifikasiAddComponent {
                 tglSk: new FormControl('', [Validators.required]),
                 fileSkPengangkatan: new FormControl('', [
                     Validators.required,
-                    fileValidator(['application/pdf'], 2)
                 ])
             })
         } else if (kategoriSertifikasiValue === 2) {
@@ -147,14 +159,13 @@ export class RwSertifikasiAddComponent {
                 uuKawalan: new FormControl('', [Validators.required]),
                 fileSkPengangkatan: new FormControl('', [
                     Validators.required,
-                    fileValidator(['application/pdf'], 2)
                 ]),
                 fileKtpPpns: new FormControl('', [
                     Validators.required,
-                    fileValidator(['application/pdf'], 2)
                 ])
             })
         }
+        this.clearFilesName()
         this.kategoriChangeLoading$.next(false)
     }
 

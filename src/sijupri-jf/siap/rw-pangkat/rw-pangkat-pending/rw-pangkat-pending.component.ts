@@ -26,6 +26,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-pangkat-pending',
@@ -44,7 +45,7 @@ export class RwPangkatPendingComponent {
     pagable: Pagable
     isDetailOpen: boolean = false
     rwPangkat: RWPangkat = new RWPangkat()
-    pangkatList: Pangkat[] = []
+    pangkatList: Pangkat[]
     pendingTask: PendingTask
     rwPangkatForm!: FormGroup
 
@@ -58,11 +59,17 @@ export class RwPangkatPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
+
     ) { }
 
     ngOnInit() {
         this.handlePagable()
         this.handleFormInit()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwPangkatForm.get(controlName), controlName, label);
     }
 
     handlePagable() {
@@ -107,7 +114,6 @@ export class RwPangkatPendingComponent {
             tmt: new FormControl('', [Validators.required]),
             fileSkPangkat: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
             ])
         })
     }

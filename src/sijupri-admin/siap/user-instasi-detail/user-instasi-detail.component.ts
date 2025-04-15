@@ -1,20 +1,17 @@
-import { filter, first } from 'rxjs/operators'
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { CommonModule } from '@angular/common'
 import { UserInstansiDetail } from '../../../modules/siap/models/user-instansi-detail.model'
 import { HandlerService } from '../../../modules/base/services/handler.service'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
-import { InstasiDetailComponent } from '../../maintenance/instasi-detail/instasi-detail.component'
 import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 import { InstansiType } from '../../../modules/maintenance/models/instansi-type.model'
 @Component({
     selector: 'app-user-instasi-detail',
     standalone: true,
-    imports: [CommonModule, InstasiDetailComponent],
+    imports: [CommonModule],
     templateUrl: './user-instasi-detail.component.html',
     styleUrl: './user-instasi-detail.component.scss'
 })
@@ -33,7 +30,7 @@ export class UserInstasiDetailComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+        this.activatedRoute.paramMap.subscribe(params => {
             this.nip = params.get('id')
         })
         this.fetchPhotoProfile()

@@ -132,7 +132,6 @@ export class FormasiTaskDetailComponent {
 
     ngOnInit() {
         this.activatedRoute.paramMap
-            .pipe(first())
             .subscribe(params => {
                 this.unit_kerja_id = params.get('id');
             });

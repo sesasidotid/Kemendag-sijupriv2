@@ -53,7 +53,7 @@ export class UkomClassDetailComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+        this.activatedRoute.paramMap.subscribe(params => {
             this.id = params.get('id')
         })
 

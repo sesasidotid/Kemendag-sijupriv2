@@ -39,6 +39,7 @@ export class RwJabatanAddComponent {
 
     jenjangLoading$ = new BehaviorSubject<boolean>(false)
     submitLoading$ = new BehaviorSubject<boolean>(false)
+    jabatanListLoading$ = new BehaviorSubject<boolean>(false)
 
     rwJabatanForm!: FormGroup
     inputs: FIleHandler = {
@@ -102,13 +103,16 @@ export class RwJabatanAddComponent {
     }
 
     getJabatanList() {
+        this.jabatanListLoading$.next(true)
         this.apiService.getData(`/api/v1/jabatan`).subscribe({
             next: response => {
+                this.jabatanListLoading$.next(false)
                 this.jabatanList = response.map(
                     (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
                 )
             },
             error: error => {
+                this.jabatanListLoading$.next(false)
                 console.log('error', error)
                 this.alertService.showToast('Error', 'Gagal mendapatkan data jabatan!')
             }

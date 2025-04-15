@@ -32,7 +32,7 @@ export class RoleUpdateComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.params.pipe(first()).subscribe(params => {
+        this.activatedRoute.params.subscribe(params => {
             this.roleCode = params['code'];
         });
         this.getRole()

@@ -52,7 +52,7 @@ export class FormasiJabatanComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+        this.activatedRoute.paramMap.subscribe(params => {
             this.jabatanCode = params.get('id')
         })
 

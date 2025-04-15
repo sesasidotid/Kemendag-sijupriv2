@@ -68,15 +68,10 @@
               placeholder="Masukkan nomor SK"
             />
             <div
-              class="feedback"
-              *ngIf="
-                rwSertifikasiForm.get('noSk').invalid &&
-                rwSertifikasiForm.get('noSk').touched
-              "
+              *ngIf="getErrorMessage('noSk', 'Nomor SK') as error"
+              class="text-danger"
             >
-              <small *ngIf="rwSertifikasiForm.get('noSk').errors?.['required']"
-                >Nomor SK perlu diisi.</small
-              >
+              {{ error }}
             </div>
           </div>
         </div>
@@ -93,15 +88,10 @@
               formControlName="tglSk"
             />
             <div
-              class="feedback"
-              *ngIf="
-                rwSertifikasiForm.get('tglSk').invalid &&
-                rwSertifikasiForm.get('tglSk').touched
-              "
+              *ngIf="getErrorMessage('tglSk', 'Tanggal SK') as error"
+              class="text-danger"
             >
-              <small *ngIf="rwSertifikasiForm.get('tglSk').errors?.['required']"
-                >Tanggal SK perlu dipilih.</small
-              >
+              {{ error }}
             </div>
           </div>
         </div>
@@ -119,16 +109,10 @@
               placeholder="Masukkan wilayah kerja"
             />
             <div
-              class="feedback"
-              *ngIf="
-                rwSertifikasiForm.get('wilayahKerja').invalid &&
-                rwSertifikasiForm.get('wilayahKerja').touched
-              "
+              *ngIf="getErrorMessage('wilayahKerja', 'Wilayah kerja') as error"
+              class="text-danger"
             >
-              <small
-                *ngIf="rwSertifikasiForm.get('wilayahKerja').errors?.['required']"
-                >Wilayah kerja perlu diisi.</small
-              >
+              {{ error }}
             </div>
           </div>
         </div>
@@ -146,16 +130,10 @@
               placeholder="Masukkan UU yang dikawal"
             />
             <div
-              class="feedback"
-              *ngIf="
-                rwSertifikasiForm.get('uuKawalan').invalid &&
-                rwSertifikasiForm.get('uuKawalan').touched
-              "
+              *ngIf="getErrorMessage('uuKawalan', 'UU yang dikawal') as error"
+              class="text-danger"
             >
-              <small
-                *ngIf="rwSertifikasiForm.get('uuKawalan').errors?.['required']"
-                >UU yang dikawal perlu diisi.</small
-              >
+              {{ error }}
             </div>
           </div>
         </div>
@@ -172,16 +150,10 @@
               formControlName="dateStart"
             />
             <div
-              class="feedback"
-              *ngIf="
-                rwSertifikasiForm.get('dateStart').invalid &&
-                rwSertifikasiForm.get('dateStart').touched
-              "
+              *ngIf="getErrorMessage('dateStart', 'Tanggal mulai') as error"
+              class="text-danger"
             >
-              <small
-                *ngIf="rwSertifikasiForm.get('dateStart').errors?.['required']"
-                >Tanggal mulai perlu dipilih.</small
-              >
+              {{ error }}
             </div>
           </div>
         </div>
@@ -198,16 +170,10 @@
               formControlName="dateEnd"
             />
             <div
-              class="feedback"
-              *ngIf="
-                rwSertifikasiForm.get('dateEnd').invalid &&
-                rwSertifikasiForm.get('dateEnd').touched
-              "
+              *ngIf="getErrorMessage('dateEnd', 'Tanggal berakhir') as error"
+              class="text-danger"
             >
-              <small
-                *ngIf="rwSertifikasiForm.get('dateEnd').errors?.['required']"
-                >Tanggal berakhir perlu dipilih.</small
-              >
+              {{ error }}
             </div>
           </div>
         </div>
@@ -222,60 +188,6 @@
                 *ngIf="(kategori$ | async) === 2"
                 [inputs]="inputs"
               ></app-file-handler>
-            </ng-container>
-            <div
-              class="feedback"
-              *ngIf="rwSertifikasiForm.get('fileSkPengangkatan').invalid"
-            >
-              <small
-                *ngIf="rwSertifikasiForm.get('fileSkPengangkatan').errors?.['required']"
-                >File SK pengangkatan perlu diunggah.</small
-              >
-              <small
-                *ngIf="
-                  rwSertifikasiForm
-                    .get('fileSkPengangkatan')
-                    ?.hasError('invalidFileType')
-                "
-                >File SK pengangkatan harus format .pdf</small
-              >
-              <div
-                *ngIf="
-                  rwSertifikasiForm
-                    .get('fileSkPengangkatan')
-                    ?.hasError('fileTooLarge')
-                "
-              >
-                File SK pengangkatan lebih dari 2MB.
-              </div>
-            </div>
-            <ng-container *ngIf="(kategori$ | async) === 2">
-              <div
-                class="feedback"
-                *ngIf="rwSertifikasiForm.get('fileKtpPpns').invalid"
-              >
-                <small
-                  *ngIf="rwSertifikasiForm.get('fileKtpPpns').errors?.['required']"
-                  >File KTP PPNS perlu diunggah.</small
-                >
-                <small
-                  *ngIf="
-                    rwSertifikasiForm
-                      .get('fileKtpPpns')
-                      ?.hasError('invalidFileType')
-                  "
-                  >File KTP PPNS harus format .pdf</small
-                >
-                <div
-                  *ngIf="
-                    rwSertifikasiForm
-                      .get('fileKtpPpns')
-                      ?.hasError('fileTooLarge')
-                  "
-                >
-                  File KTP PPNS lebih dari 2MB.
-                </div>
-              </div>
             </ng-container>
           </div>
         </div>

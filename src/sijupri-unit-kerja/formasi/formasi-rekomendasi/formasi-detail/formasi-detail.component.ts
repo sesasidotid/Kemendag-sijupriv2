@@ -29,7 +29,7 @@ export class FormasiDetailComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+        this.activatedRoute.paramMap.subscribe(params => {
             this.formasiId = params.get('formasiId')
         })
         this.getRekomendasiFormasiDetail()

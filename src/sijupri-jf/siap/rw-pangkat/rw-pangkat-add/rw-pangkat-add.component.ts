@@ -17,6 +17,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-pangkat-add',
@@ -60,11 +61,16 @@ export class RwPangkatAddComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
         this.handleFormInit()
         this.getPangkatList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwPangkatForm.get(controlName), controlName, label);
     }
 
     handleFormInit() {
@@ -73,7 +79,6 @@ export class RwPangkatAddComponent {
             tmt: new FormControl('', [Validators.required]),
             fileSkPangkat: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
             ])
         })
     }

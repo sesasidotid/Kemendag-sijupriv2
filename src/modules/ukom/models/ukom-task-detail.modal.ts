@@ -61,7 +61,7 @@ export class UkomTaskDetail extends Serializable {
     jurusan: string = undefined
     predikatKinerja1Id: string = undefined
     predikatKinerja2Id: string = undefined
-    isMengulang: boolean = undefined
+    isMengulang: boolean | string = undefined
     bidangJabatanCode: string = undefined
     participantStatus: string = undefined
 

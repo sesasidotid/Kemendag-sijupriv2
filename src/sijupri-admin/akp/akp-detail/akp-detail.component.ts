@@ -7,17 +7,14 @@ import { CommonModule } from '@angular/common'
 import { MatrixOneTableComponent } from '../../../modules/base/components/matrix-one-table/matrix-one-table.component'
 import { MatrixTwoTableComponent } from '../../../modules/base/components/matrix-two-table/matrix-two-table.component'
 import { MatrixThreeTableComponent } from '../../../modules/base/components/matrix-three-table/matrix-three-table.component'
-import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { RekapTableComponent } from '../../../modules/base/components/rekap-table/rekap-table.component'
-import { first } from 'rxjs/operators';
 
 @Component({
     selector: 'app-akp-detail',
     standalone: true,
     imports: [
         CommonModule,
-        FileHandlerComponent,
         MatrixOneTableComponent,
         MatrixTwoTableComponent,
         MatrixThreeTableComponent,
@@ -43,7 +40,6 @@ export class AkpDetailComponent {
 
     ngOnInit() {
         this.activatedRoute.paramMap
-            .pipe(first())
             .subscribe(params => {
                 this.akpId = params.get('id');
             });

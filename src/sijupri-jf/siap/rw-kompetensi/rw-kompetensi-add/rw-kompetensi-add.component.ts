@@ -18,6 +18,7 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 import { LoginContext } from '../../../../modules/base/commons/login-context'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-kompetensi-add',
@@ -33,7 +34,7 @@ import { BehaviorSubject } from 'rxjs'
 })
 export class RwKompetensiAddComponent {
     rwKompetensi: RWKompetensi = new RWKompetensi()
-    kategoriPengembanganList: KategoriPengembangan[] = []
+    kategoriPengembanganList: KategoriPengembangan[]
 
     rwKompetensiForm!: FormGroup
 
@@ -47,12 +48,17 @@ export class RwKompetensiAddComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
         this.handleFormInit()
         this.getKategoriPengembanganList()
         this.fileLoadHandler()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwKompetensiForm.get(controlName), controlName, label);
     }
 
     handleFormInit() {
@@ -64,7 +70,6 @@ export class RwKompetensiAddComponent {
             tglSertifikat: new FormControl('', [Validators.required]),
             fileSertifikat: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
             ])
         })
     }

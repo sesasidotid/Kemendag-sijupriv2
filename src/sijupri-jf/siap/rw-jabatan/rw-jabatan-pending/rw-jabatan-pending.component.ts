@@ -46,14 +46,14 @@ export class RwJabatanPendingComponent {
     pagable: Pagable
     isDetailOpen: boolean = false
     rwJabatan: RWJabatan = new RWJabatan()
-    jabatanList: Jabatan[] = []
-    jenjangList: Jenjang[] = []
+    jabatanList: Jabatan[]
+    jenjangList: Jenjang[]
     pendingTask: PendingTask
 
     jenjangLoading$ = new BehaviorSubject<boolean>(false)
     rwJabatanLoading$ = new BehaviorSubject<boolean>(false)
     submitLoading$ = new BehaviorSubject<boolean>(false)
-
+    jabatanListLoading$ = new BehaviorSubject<boolean>(false)
     rwJabatanForm!: FormGroup
 
     inputs: FIleHandler
@@ -106,6 +106,7 @@ export class RwJabatanPendingComponent {
             )
             .build()
     }
+
     handleFormInit() {
         this.rwJabatanForm = new FormGroup({
             jabatanCode: new FormControl('', [Validators.required]),
@@ -113,7 +114,6 @@ export class RwJabatanPendingComponent {
             tmt: new FormControl('', [Validators.required]),
             fileSkJabatan: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
             ])
         })
     }
@@ -129,7 +129,7 @@ export class RwJabatanPendingComponent {
                 if (jabatanCode) {
                     this.getJenjangList(jabatanCode)
                 } else {
-                    this.jenjangList = [] // Clear jenjang list if no jabatan selected
+                    this.jenjangList = null
                     this.rwJabatanForm.get('jenjangCode').setValue('')
                 }
             })
@@ -156,15 +156,18 @@ export class RwJabatanPendingComponent {
     }
 
     getJabatanList() {
+        this.jabatanListLoading$.next(true)
         this.apiService.getData(`/api/v1/jabatan`).subscribe({
             next: response => {
                 this.jabatanList = response.map(
                     (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
                 )
+                this.jabatanListLoading$.next(false)
             },
             error: error => {
                 console.log('error', error)
                 this.alertService.showToast('Error', 'Gagal mendapatkan data jabatan!')
+                this.jabatanListLoading$.next(false)
             }
         })
     }

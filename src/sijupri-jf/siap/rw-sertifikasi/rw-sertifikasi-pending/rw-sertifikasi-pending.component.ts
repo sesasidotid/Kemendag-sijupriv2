@@ -26,6 +26,7 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { BehaviorSubject } from 'rxjs'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
+import { FormValidationService } from './../../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-rw-sertifikasi-pending',
     standalone: true,
@@ -60,12 +61,16 @@ export class RwSertifikasiPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService,
     ) { }
 
     ngOnInit() {
         this.handlePagable()
         this.getKategoriSertifikasiList()
+    }
 
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwSertifikasiForm.get(controlName), controlName, label);
     }
 
     handlePagable() {
@@ -260,6 +265,8 @@ export class RwSertifikasiPendingComponent {
                 // this.isDetailOpen = true;
                 this.fileLoadHandler()
                 this.rwSertifikasiLoading$.next(false)
+
+
             },
             error: error => {
                 console.log('error', error)

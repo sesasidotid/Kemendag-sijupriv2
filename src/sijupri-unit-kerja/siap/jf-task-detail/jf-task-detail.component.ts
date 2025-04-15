@@ -40,6 +40,7 @@ export class JfTaskDetailComponent {
 
     pendingTaskloading$ = new BehaviorSubject<boolean>(true)
     detailTaskloading$ = new BehaviorSubject<boolean>(true)
+    submitTaskLoading$ = new BehaviorSubject<boolean>(false)
 
     constructor(
         private apiService: ApiService,
@@ -54,7 +55,7 @@ export class JfTaskDetailComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.queryParamMap.pipe(first()).subscribe(params => {
+        this.activatedRoute.paramMap.subscribe(params => {
             this.nip = params.get('id')
         })
         this.getJF()
@@ -191,6 +192,7 @@ export class JfTaskDetailComponent {
     }
 
     submit(pendingTask: PendingTask) {
+        this.submitTaskLoading$.next(true)
         const task = new Task()
         task.id = pendingTask.id
         task.taskAction = pendingTask.taskAction
@@ -209,10 +211,12 @@ export class JfTaskDetailComponent {
                     } else {
                         this.alertService.showToast('Success', 'Berhasil menolak!')
                     }
+                    this.submitTaskLoading$.next(false)
                     this.getTaskDetail()
                 },
                 error: error => {
                     console.error('Error fetching data', error)
+                    this.submitTaskLoading$.next(false)
                     if (task.taskAction == 'approve') {
                         this.alertService.showToast('Error', 'Gagal menyetujui!')
                     } else {

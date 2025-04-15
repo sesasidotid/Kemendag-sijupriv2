@@ -59,11 +59,11 @@ export class UkomExamChooseCompQuestionsComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+        this.activatedRoute.paramMap.subscribe(params => {
             this.room_ukom_id = params.get('roomid');
         });
 
-        this.activatedRoute.queryParams.pipe(first()).subscribe(params => {
+        this.activatedRoute.queryParams.subscribe(params => {
             const type_ukom = params['type_ukom'];
             if (type_ukom) {
                 this.type_ukom = type_ukom;

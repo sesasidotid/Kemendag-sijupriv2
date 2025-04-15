@@ -18,6 +18,7 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 import { LoginContext } from '../../../../modules/base/commons/login-context'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-rw-pendidikan-add',
@@ -60,6 +61,7 @@ export class RwPendidikanAddComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
+        private formValidationService: FormValidationService
     ) {
 
     }
@@ -67,6 +69,10 @@ export class RwPendidikanAddComponent {
     ngOnInit() {
         this.handleFormInit()
         this.getPendidikanList()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwPendidikanForm.get(controlName), controlName, label);
     }
 
     handleFormInit() {
@@ -77,7 +83,6 @@ export class RwPendidikanAddComponent {
             tanggalIjazah: new FormControl('', [Validators.required]),
             fileIjazah: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
             ])
         })
     }

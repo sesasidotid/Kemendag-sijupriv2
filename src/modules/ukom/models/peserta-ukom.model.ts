@@ -51,7 +51,7 @@ export class PesertaUkom extends Serializable {
     predikatKinerja2Id: string = undefined
     jenisInstansi: string = undefined
     jenisInstasiName: string = undefined
-    isMengulang: boolean = undefined
+    isMengulang: boolean | string = undefined
     age: string = undefined
 
     jenis_instansi: string = undefined

@@ -26,7 +26,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { BehaviorSubject } from 'rxjs'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
-
+import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-rw-kompetensi-pending',
     standalone: true,
@@ -59,11 +59,16 @@ export class RwKompetensiPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
         this.handlePagable()
         this.handleFormInit()
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.rwKompetensiForm.get(controlName), controlName, label);
     }
 
     handlePagable() {

@@ -44,7 +44,7 @@ export class JfDetailComponent {
     ) { }
 
     ngOnInit() {
-        this.activatedRoute.paramMap.pipe(first()).subscribe(params => {
+        this.activatedRoute.paramMap.subscribe(params => {
             this.nip = params.get('id')
         })
         this.getJF()
