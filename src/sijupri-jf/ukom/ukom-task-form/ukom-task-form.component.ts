@@ -458,8 +458,7 @@ export class UkomTaskFormComponent {
                 this.pesertaUkom.pendidikanTerakhirCode = this.pendidikanJF
                 this.pesertaUkom.jurusan = this.jurusanJF
                 this.pesertaUkom.JenjangName = this.jf.jenjangName
-
-                console.log('body', this.pesertaUkom)
+                this.pesertaUkom.isMengulang = this.passwordForm.get('isMengulang')?.value
 
                 this.apiService
                     .postData(`/api/v1/participant_ukom/task/jf`, this.pesertaUkom)

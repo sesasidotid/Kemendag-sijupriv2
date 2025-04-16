@@ -10,15 +10,8 @@
         id="name"
         formControlName="name"
       />
-      <div
-        class="feedback"
-        *ngIf="
-          addUserForm.get('name').invalid && addUserForm.get('name').touched
-        "
-      >
-        <small *ngIf="addUserForm.get('name').errors?.['required']"
-          >Nama perlu diisi.</small
-        >
+      <div *ngIf="getErrorMessage('name', 'Nama') as error" class="text-danger">
+        {{ error }}
       </div>
     </div>
   </div>
@@ -34,20 +27,8 @@
         id="nip"
         formControlName="nip"
       />
-      <div
-        class="feedback"
-        *ngIf="addUserForm.get('nip').invalid && addUserForm.get('nip').touched"
-      >
-        <small *ngIf="addUserForm.get('nip').errors?.['required']"
-          >NIP perlu diisi.</small
-        >
-        <small
-          *ngIf="addUserForm.get('nip').errors?.['minlength'] || addUserForm.get('nip').errors?.['maxlength']"
-          >NIP harus 18 karakter.</small
-        >
-        <small *ngIf="addUserForm.get('nip').errors?.['pattern']"
-          >NIP harus angka.</small
-        >
+      <div *ngIf="getErrorMessage('nip', 'NIP') as error" class="text-danger">
+        {{ error }}
       </div>
     </div>
   </div>
@@ -63,17 +44,10 @@
         formControlName="email"
       />
       <div
-        class="feedback"
-        *ngIf="
-          addUserForm.get('email').invalid && addUserForm.get('email').touched
-        "
+        *ngIf="getErrorMessage('email', 'Email') as error"
+        class="text-danger"
       >
-        <small *ngIf="addUserForm.get('email').errors?.['required']"
-          >Email perlu diisi.</small
-        >
-        <small *ngIf="addUserForm.get('email').errors?.['email']"
-          >Format email tidak valid.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -102,14 +76,10 @@
         ></span>
       </div>
       <div
-        class="feedback"
-        *ngIf="
-          addUserForm.get('email').invalid && addUserForm.get('email').touched
-        "
+        *ngIf="getErrorMessage('password', 'Password') as error"
+        class="text-danger"
       >
-        <small *ngIf="addUserForm.get('password').errors?.['required']"
-          >Password perlu diisi.</small
-        >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -138,10 +108,16 @@
           ></i-lucide>
         </span>
       </div>
-      <div *ngIf="addUserForm.get('confirmPassword')?.hasError('mismatch')">
-        <small class="text-danger">
-          Password dan Konfirmasi Password tidak cocok.</small
-        >
+      <div
+        *ngIf="
+          getErrorMessage(
+            'confirmPassword',
+            ' Password dan Konfirmasi Password'
+          ) as error
+        "
+        class="text-danger"
+      >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -177,13 +153,20 @@
   </div>
   <div class="row text-center">
     <div class="col-12">
-      <button
+      <!-- <button
         type="submit"
         class="btn btn-success float-end"
         [disabled]="addUserForm.invalid || roleCodes.length === 0"
       >
         Simpan
-      </button>
+      </button> -->
+      <app-loading-button
+        [isLoading]="isLoading$ | async"
+        [disabled]="addUserForm.invalid || roleCodes.length === 0"
+        [type]="'submit'"
+        label="Simpan"
+        [className]="'btn btn-success float-end'"
+      ></app-loading-button>
     </div>
   </div>
 </form>

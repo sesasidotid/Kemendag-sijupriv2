@@ -5,18 +5,19 @@ import { CommonModule } from '@angular/common'
 import { User } from '../../../modules/security/models/user.model'
 import { AlertService } from '../../../modules/base/services/alert.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
-import { LoginContext } from '../../../modules/base/commons/login-context'
-import { first } from 'rxjs/operators'
+import { LoadingButtonComponent } from '../../../modules/base/components/loading-button/loading-button.component'
+import { BehaviorSubject } from 'rxjs'
 @Component({
     selector: 'app-user-detail',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, LoadingButtonComponent],
     templateUrl: './user-detail.component.html',
     styleUrl: './user-detail.component.scss'
 })
 export class UserDetailComponent {
     id: string
     userData: User = new User()
+    isLoading$ = new BehaviorSubject<boolean>(false)
 
     constructor(
         private router: Router,
@@ -42,13 +43,16 @@ export class UserDetailComponent {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
+                this.isLoading$.next(true)
 
                 this.apiService.deleteData(`/api/v1/user/${this.id}`).subscribe({
                     next: () => {
+                        this.isLoading$.next(false)
                         this.router.navigate(['/security/user'])
-                        this.alertService.showToast('Info', 'Berhasil Menghapus user')
+                        this.alertService.showToast('Success', 'Berhasil Menghapus user')
                     },
                     error: error => {
+                        this.isLoading$.next(false)
                         console.error('Error fetching data', error)
                         this.alertService.showToast('Error', 'Terjadi Masalah')
                     }

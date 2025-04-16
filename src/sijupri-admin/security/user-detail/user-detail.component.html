@@ -46,13 +46,21 @@
   </div>
   <div class="row">
     <div class="text-center">
-      <a
+      <!-- <a
         type="submit"
         class="btn btn-danger float-end"
         [ngClass]="{ disabled: userData.status === 'DELETED' }"
         (click)="delete()"
         >Hapus</a
-      >
+      > -->
+      <app-loading-button
+        [isLoading]="isLoading$ | async"
+        [disabled]="userData.status === 'DELETED'"
+        [type]="'button'"
+        label="Hapus"
+        [className]="'btn btn-danger float-end'"
+        (click)="delete()"
+      ></app-loading-button>
       <!-- <a class="btn btn-warning me-2 float-end" (click)="backToList()"
         >Kembali</a
       > -->

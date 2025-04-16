@@ -7,18 +7,18 @@ import {
     Validators
 } from '@angular/forms'
 import { User } from '../../../modules/security/models/user.model'
-import { UserService } from '../../../modules/security/services/user.service'
 import { RoleService } from '../../../modules/security/services/role.service'
 import { Role } from '../../../modules/security/models/role.model'
 import { CommonModule } from '@angular/common'
-import { Router } from '@angular/router'
 import { AlertService } from '../../../modules/base/services/alert.service'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { LucideAngularModule, Trash2, Eye, EyeOff } from 'lucide-angular'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
+import { BehaviorSubject } from 'rxjs'
+import { LoadingButtonComponent } from '../../../modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-user-add',
     standalone: true,
@@ -26,7 +26,8 @@ import { ConfirmationService } from '../../../modules/base/services/confirmation
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        LucideAngularModule
+        LucideAngularModule,
+        LoadingButtonComponent
     ],
     templateUrl: './user-add.component.html',
     styleUrl: './user-add.component.scss'
@@ -39,6 +40,7 @@ export class UserAddComponent {
 
     addUserForm!: FormGroup
     isPasswordVisible: boolean = false
+    isLoading$ = new BehaviorSubject<boolean>(false)
 
     readonly Trash2 = Trash2
     readonly Eye = Eye
@@ -50,7 +52,8 @@ export class UserAddComponent {
         private roleService: RoleService,
         private tabService: TabService,
         private handlerService: HandlerService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit(): void {
@@ -61,13 +64,15 @@ export class UserAddComponent {
         this.handleFormInit()
     }
 
+    getErrorMessage(controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(this.addUserForm.get(controlName), controlName, label);
+    }
+
     handleFormInit() {
         this.addUserForm = new FormGroup({
             nip: new FormControl('', [
                 Validators.required,
-                Validators.pattern('^[0-9]+$'),
-                Validators.minLength(18),
-                Validators.maxLength(18)
+                Validators.pattern(/^\d{18}$/)
             ]),
             name: new FormControl('', [Validators.required]),
             email: new FormControl('', [Validators.required, Validators.email]),
@@ -75,7 +80,7 @@ export class UserAddComponent {
             confirmPassword: new FormControl('', [
                 Validators.required,
                 this.passwordMatchValidator.bind(this)
-            ])
+            ]),
         })
     }
 
@@ -128,6 +133,8 @@ export class UserAddComponent {
             next: result => {
                 if (!result.confirmed) return
 
+                this.isLoading$.next(true)
+
                 if (this.addUserForm.valid) {
                     this.user.roleCodeList = this.roleCodes
                     this.user.applicationCode = 'sijupri-admin'
@@ -139,10 +146,12 @@ export class UserAddComponent {
 
                     this.apiService.postData(`/api/v1/user`, this.user).subscribe({
                         next: () => {
+                            this.isLoading$.next(false)
                             this.alertService.showToast('Success', 'Berhasil')
                             this.handlerService.handleNavigate('/security/user')
                         },
                         error: error => {
+                            this.isLoading$.next(false)
                             console.log('error', error)
                             this.handlerService.handleAlert(
                                 'Error',
