@@ -152,8 +152,6 @@ export class UkomQuestionListComponent {
     }
 
     submit() {
-
-
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
@@ -177,7 +175,7 @@ export class UkomQuestionListComponent {
                             }, 1000)
                         },
                         error: error => {
-                            this.isLoading$.next(true)
+                            this.isLoading$.next(false)
                             console.log('error', error)
                             this.handlerService.handleAlert(
                                 'Error',
