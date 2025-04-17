@@ -57,17 +57,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addSiapReportForm.get('instansiId').invalid &&
-              addSiapReportForm.get('instansiId').touched
-            "
+            *ngIf="getErrorMessage('instansiId', 'Instansi') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addSiapReportForm.get('instansiId').errors?.['required']"
-            >
-              Unit Kerja perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -98,17 +91,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addSiapReportForm.get('unitKerjaId').invalid &&
-              addSiapReportForm.get('unitKerjaId').touched
-            "
+            *ngIf="getErrorMessage('unitKerjaId', 'Unit Kerja') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addSiapReportForm.get('unitKerjaId').errors?.['required']"
-            >
-              Unit Kerja perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -136,17 +122,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addSiapReportForm.get('provinsiId').invalid &&
-              addSiapReportForm.get('provinsiId').touched
-            "
+            *ngIf="getErrorMessage('provinsiId', 'Provinsi') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addSiapReportForm.get('provinsiId').errors?.['required']"
-            >
-              Provinsi perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -174,17 +153,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addSiapReportForm.get('kabKotaId').invalid &&
-              addSiapReportForm.get('kabKotaId').touched
-            "
+            *ngIf="getErrorMessage('kabKotaId', 'Kabupaten/Kota') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addSiapReportForm.get('kabKotaId').errors?.['required']"
-            >
-              Kabupaten/Kota perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -199,25 +171,16 @@
             formControlName="fileType"
             name="fileType"
           >
-            <option selected value="" style="display: none">
-              Pilih Format File
-            </option>
+            <option value="" disabled selected hidden>Pilih Format File</option>
             <option [value]="'xlsx'">Excel 2007</option>
             <option [value]="'xls'">Excel</option>
             <option [value]="'csv'">CSV</option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addSiapReportForm.get('fileType').invalid &&
-              addSiapReportForm.get('fileType').touched
-            "
+            *ngIf="getErrorMessage('fileType', 'Format file') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addSiapReportForm.get('fileType').errors?.['required']"
-            >
-              Format file perlu dipilih.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>

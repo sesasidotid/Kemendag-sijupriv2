@@ -60,6 +60,12 @@ export class FormasiJabatanComponent {
         this.getFormasiId()
     }
 
+    preventMinus(event: KeyboardEvent) {
+        if (event.key === '-' || event.key === 'e') {
+          event.preventDefault();
+        }
+      }
+      
     getFormasiObjectTask() {
         this.getJabatan()
         this.getFormasiTree()

@@ -25,6 +25,7 @@ import { UnitKerja } from '../../../modules/maintenance/models/unit-kerja.model'
 import { map, filter } from 'rxjs/operators'
 import { BehaviorSubject } from 'rxjs'
 import { ReportGenerate } from '../../../modules/report/models/report-generate.model'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-report-formasi',
     standalone: true,
@@ -45,10 +46,6 @@ export class ReportFormasiComponent {
 
     reportId: string = 'formasiReport'
 
-    //   provinsiList$: Observable<Provinsi[]>
-    //   kabKotaList$: Observable<KabKota[]>
-    //   unitKerjaList$: Observable<UnitKerja[]>
-
     unitKerjaList: UnitKerja[]
     provinsiList: Provinsi[]
     kabKotaList: KabKota[]
@@ -59,7 +56,9 @@ export class ReportFormasiComponent {
     constructor(
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private apiService: ApiService
+        private apiService: ApiService,
+        private formValidationService: FormValidationService
+        
     ) { }
 
     ngOnInit() {
@@ -67,6 +66,63 @@ export class ReportFormasiComponent {
         this.handleFormInit()
         // this.getListProvinsi()
         this.getExportTypeData()
+        this.handleSubscribe()
+    }
+
+    handleSubscribe() {
+        this.addFormasiReportForm.get('exportType')?.valueChanges.subscribe(value => {
+            this.addFormasiReportForm.patchValue({ 
+                unitKerjaId: '',
+                unitKerjaName: '',
+                provinsiId: '',
+                provinsiName: '',
+                kabKotaId: '',
+                kabKotaName: ''
+             });
+
+             const dynamicFields = [
+                'unitKerjaId',
+                'provinsiId',
+                'kabKotaId'
+            ]
+
+            dynamicFields.forEach(field => {
+                const control = this.addFormasiReportForm.get(field)
+                control?.clearValidators()
+                control?.updateValueAndValidity()
+                control?.markAsUntouched()
+            })
+
+            switch (value) {
+                case 'unitKerja':
+                    this.addFormasiReportForm
+                        .get('unitKerjaId')
+                        ?.setValidators([Validators.required])
+                    break
+                case 'provinsi':
+                    this.addFormasiReportForm
+                        .get('provinsiId')
+                        ?.setValidators([Validators.required])
+                    break
+                case 'kabKota':
+                    this.addFormasiReportForm
+                        .get('kabKotaId')
+                        ?.setValidators([Validators.required])
+                    break
+            }
+
+            this.addFormasiReportForm.updateValueAndValidity()
+
+        })
+    }
+
+    getErrorMessage(controlName: string, label: string) {
+        const control = this.addFormasiReportForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label
+        )
     }
 
     handlePagable() {

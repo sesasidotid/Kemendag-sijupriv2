@@ -12,7 +12,7 @@
           formControlName="unitKerjaId"
           name="unitKerjaId"
         >
-          <option [value]="''">Pilih</option>
+          <option selected value="" hidden>Pilih</option>
           <option
             *ngFor="let unitKerja of unitKerjaList"
             [value]="unitKerja.id"
@@ -21,17 +21,10 @@
           </option>
         </select>
         <div
-          class="feedback"
-          *ngIf="
-            addAkpReportForm.get('unitKerjaId').invalid &&
-            addAkpReportForm.get('unitKerjaId').touched
-          "
+          *ngIf="getErrorMessage('unitKerjaId', 'Unit Kerja') as error"
+          class="text-danger"
         >
-          <small
-            *ngIf="addAkpReportForm.get('unitKerjaId').errors?.['required']"
-          >
-            Unit Kerja perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
     </div>
@@ -49,15 +42,10 @@
           formControlName="dateFrom"
         />
         <div
-          class="feedback"
-          *ngIf="
-            addAkpReportForm.get('dateFrom').invalid &&
-            addAkpReportForm.get('dateFrom').touched
-          "
+          *ngIf="getErrorMessage('dateFrom', 'Tanggal mulai') as error"
+          class="text-danger"
         >
-          <small *ngIf="addAkpReportForm.get('dateFrom').errors?.['required']">
-            Tanggal mulai perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
       <div class="col-sm-5">
@@ -69,15 +57,10 @@
           formControlName="dateTo"
         />
         <div
-          class="feedback"
-          *ngIf="
-            addAkpReportForm.get('dateTo').invalid &&
-            addAkpReportForm.get('dateTo').touched
-          "
+          *ngIf="getErrorMessage('dateTo', 'Tanggal tujuan') as error"
+          class="text-danger"
         >
-          <small *ngIf="addAkpReportForm.get('dateTo').errors?.['required']">
-            Tanggal tujuan perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
     </div>
@@ -93,21 +76,16 @@
           formControlName="fileType"
           name="fileType"
         >
-          <option [value]="''">Pilih</option>
+          <option [value]="''" selected hidden>Pilih</option>
           <option [value]="'xlsx'">Excel 2007</option>
           <option [value]="'xls'">Excel</option>
           <option [value]="'csv'">CSV</option>
         </select>
         <div
-          class="feedback"
-          *ngIf="
-            addAkpReportForm.get('fileType').invalid &&
-            addAkpReportForm.get('fileType').touched
-          "
+          *ngIf="getErrorMessage('fileType', 'Format File') as error"
+          class="text-danger"
         >
-          <small *ngIf="addAkpReportForm.get('fileType').errors?.['required']">
-            File type perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
     </div>

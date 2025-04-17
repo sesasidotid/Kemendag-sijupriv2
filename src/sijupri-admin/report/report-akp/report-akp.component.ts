@@ -21,6 +21,7 @@ import { ConfirmationService } from '../../../modules/base/services/confirmation
 import { ApiService } from '../../../modules/base/services/api.service'
 import { ReportGenerate } from '../../../modules/report/models/report-generate.model'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-report-akp',
@@ -44,12 +45,23 @@ export class ReportAkpComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
+        private formValidationService: FormValidationService
+        
     ) { }
 
     ngOnInit() {
         this.handlePagable()
         this.getUnitKerjaList()
         this.handleFormInit()
+    }
+
+    getErrorMessage(controlName: string, label: string) {
+        const control = this.addAkpReportForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label
+        )
     }
 
     handlePagable() {
@@ -141,7 +153,6 @@ export class ReportAkpComponent {
             error: error => {
                 this.unitKerjaList = []
                 console.log(error)
-                // this.handlerService.handleException(error)
             }
         })
     }

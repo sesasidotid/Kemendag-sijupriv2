@@ -35,9 +35,7 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
     selector: 'app-ukom-question-list',
     standalone: true,
     imports: [
-        PagableComponent,
         CommonModule,
-        UkomQuestionAddComponent,
         FileHandlerComponent,
         FormsModule,
         ReactiveFormsModule

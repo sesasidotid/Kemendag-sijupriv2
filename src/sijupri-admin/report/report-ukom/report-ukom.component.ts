@@ -20,6 +20,7 @@ import {
 } from '@angular/forms'
 import { ReportGenerate } from '../../../modules/report/models/report-generate.model'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 @Component({
     selector: 'app-report-ukom',
     standalone: true,
@@ -40,11 +41,21 @@ export class ReportUkomComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
+        private formValidationService: FormValidationService
     ) { }
 
     ngOnInit() {
         this.handlePagable()
         this.handleFormInit()
+    }
+
+    getErrorMessage(controlName: string, label: string) {
+        const control = this.addUKomReportForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label
+        )
     }
 
     handleFormInit() {

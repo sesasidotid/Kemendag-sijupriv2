@@ -13,15 +13,10 @@
           formControlName="dateFrom"
         />
         <div
-          class="feedback"
-          *ngIf="
-            addUKomReportForm.get('dateFrom').invalid &&
-            addUKomReportForm.get('dateFrom').touched
-          "
+          *ngIf="getErrorMessage('dateFrom', 'Tanggal mulai') as error"
+          class="text-danger"
         >
-          <small *ngIf="addUKomReportForm.get('dateFrom').errors?.['required']">
-            Tanggal mulai perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
 
@@ -34,15 +29,10 @@
           formControlName="dateTo"
         />
         <div
-          class="feedback"
-          *ngIf="
-            addUKomReportForm.get('dateTo').invalid &&
-            addUKomReportForm.get('dateTo').touched
-          "
+          *ngIf="getErrorMessage('dateTo', 'Tanggal tujuan') as error"
+          class="text-danger"
         >
-          <small *ngIf="addUKomReportForm.get('dateTo').errors?.['required']">
-            Tanggal tujuan perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
     </div>
@@ -64,15 +54,10 @@
           <option [value]="'csv'">CSV</option>
         </select>
         <div
-          class="feedback"
-          *ngIf="
-            addUKomReportForm.get('fileType').invalid &&
-            addUKomReportForm.get('fileType').touched
-          "
+          *ngIf="getErrorMessage('fileType', 'File type') as error"
+          class="text-danger"
         >
-          <small *ngIf="addUKomReportForm.get('fileType').errors?.['required']">
-            File type perlu diisi.
-          </small>
+          {{ error }}
         </div>
       </div>
     </div>

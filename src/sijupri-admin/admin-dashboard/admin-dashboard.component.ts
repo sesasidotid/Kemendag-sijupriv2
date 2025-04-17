@@ -189,68 +189,6 @@ export class AdminDashboardComponent {
             .subscribe({
                 next: res => {
                     this.apiData = res
-                    //   this.apiData = [
-                    //     {
-                    //       month: 'March',
-                    //       year: '2024',
-                    //       count: 32
-                    //     },
-                    //     {
-                    //       month: 'April',
-                    //       year: '2024',
-                    //       count: 15
-                    //     },
-                    //     {
-                    //       month: 'May',
-                    //       year: '2024',
-                    //       count: 85
-                    //     },
-                    //     {
-                    //       month: 'June',
-                    //       year: '2024',
-                    //       count: 117
-                    //     },
-                    //     {
-                    //       month: 'July',
-                    //       year: '2024',
-                    //       count: 52
-                    //     },
-                    //     {
-                    //       month: 'August',
-                    //       year: '2024',
-                    //       count: 116
-                    //     },
-                    //     {
-                    //       month: 'September',
-                    //       year: '2024',
-                    //       count: 10
-                    //     },
-                    //     {
-                    //       month: 'October',
-                    //       year: '2024',
-                    //       count: 166
-                    //     },
-                    //     {
-                    //       month: 'November',
-                    //       year: '2024',
-                    //       count: 42
-                    //     },
-                    //     {
-                    //       month: 'December',
-                    //       year: '2024',
-                    //       count: 29
-                    //     },
-                    //     {
-                    //       month: 'January',
-                    //       year: '2025',
-                    //       count: 51
-                    //     },
-                    //     {
-                    //       month: 'February',
-                    //       year: '2025',
-                    //       count: 4
-                    //     }
-                    //   ]
                     this.applyFilters()
                 },
                 error: err => {

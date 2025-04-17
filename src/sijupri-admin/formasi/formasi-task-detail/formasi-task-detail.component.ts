@@ -204,6 +204,12 @@ export class FormasiTaskDetailComponent {
             })
     }
 
+    preventMinus(event: KeyboardEvent) {
+        if (event.key === '-' || event.key === 'e') {
+          event.preventDefault();
+        }
+      }
+
     initializeForm() {
         console.log('formasiList', this.formasiList)
         this.formasiList.forEach((item, i) => {
@@ -211,8 +217,11 @@ export class FormasiTaskDetailComponent {
                 const controlName = `formasi_${i}_${j}`
                 this.flow3Form.addControl(
                     controlName,
-                    new FormControl(formasi.pembulatan || '0')
-                )
+                    new FormControl(
+                      formasi.pembulatan || '0',
+                      [Validators.pattern(/^\d+$/)]
+                    )
+                  );
             })
         })
     }
@@ -393,27 +402,34 @@ export class FormasiTaskDetailComponent {
     }
 
     submitFl3() {
-        const formasiDetailDtoList = this.formasiList.map((item, i) => ({
-            id: item.id,
-            formasiResultDtoList: item.formasiResultDtoList.map((formasi, j) => ({
-                id: formasi.id,
-                result: this.flow3Form.get(`formasi_${i}_${j}`)?.value.toString()
-            }))
-        }))
-
-        const payload = {
-            id: this.pendingTask.id, // Replace with actual ID
-            taskAction: 'approve',
-            object: {
-                id: this.pendingTask.objectId, // Replace with actual formasi_id
-                formasiDetailDtoList: formasiDetailDtoList
-            }
-        }
+        
 
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
 
+                const formasiDetailDtoList = this.formasiList.map((item, i) => ({
+                    id: item.id,
+                    formasiResultDtoList: item.formasiResultDtoList.map((formasi, j) => {
+                      const controlValue = this.flow3Form.get(`formasi_${i}_${j}`)?.value ?? '0';
+                      return {
+                        id: formasi.id,
+                        result: controlValue.toString()
+                      };
+                    })
+                  }));
+                  
+                  
+        
+                const payload = {
+                    id: this.pendingTask.id,
+                    taskAction: 'approve',
+                    object: {
+                        id: this.pendingTask.objectId, 
+                        formasiDetailDtoList: formasiDetailDtoList
+                    }
+                }
+                
                 this.isFl3Loading$.next(true)
                 this.apiService
                     .postData(`/api/v1/formasi/task/submit`, payload)

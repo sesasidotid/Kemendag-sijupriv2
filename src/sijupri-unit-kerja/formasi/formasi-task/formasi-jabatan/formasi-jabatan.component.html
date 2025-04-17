@@ -132,7 +132,6 @@
   <div [ngStyle]="{ 'margin-left': level * 20 + 'px' }" class="unsur-item">
     <div class="row">
       <div class="col-lg-6">
-        <!-- Display unsur -->
         <p>{{ item.unsur }}</p>
       </div>
       <!-- Bottom-level child: Add jenjangName and input field -->
@@ -149,6 +148,9 @@
             [(ngModel)]="unsurVolumeData[item.id].volume"
             name="{{ 'volume' + item.id }}"
             class="form-control"
+            min="0"
+            step="1"
+            (keydown)="preventMinus($event)"
           />
         </div>
         <hr />

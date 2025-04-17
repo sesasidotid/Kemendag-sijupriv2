@@ -23,6 +23,7 @@ import { ReportGenerate } from '../../../modules/report/models/report-generate.m
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
 import { Instansi } from '../../../modules/maintenance/models/instansi.model'
 import { BehaviorSubject } from 'rxjs'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-report-siap',
@@ -41,6 +42,18 @@ export class ReportSiapComponent {
     provinsiList: Provinsi[]
     kabKotaList: KabKota[]
 
+    initialFormValue = {
+        instansiId: '',
+        instansiName: '',
+        unitKerjaId: '',
+        unitKerjaName: '',
+        provinsiId: '',
+        provinsiName: '',
+        kabKotaId: '',
+        kabKotaName: '',
+        fileType: ''
+    }
+
     reportId: string = 'siapReport'
 
     @ViewChild(PagableComponent) pagableComponent!: PagableComponent
@@ -50,10 +63,9 @@ export class ReportSiapComponent {
     constructor(
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private apiService: ApiService
-    ) {
-
-    }
+        private apiService: ApiService,
+        private formValidationService: FormValidationService
+    ) { }
 
     ngOnInit() {
         this.handlePagable()
@@ -64,11 +76,61 @@ export class ReportSiapComponent {
 
     handleSubscribe() {
         this.addSiapReportForm.get('exportType')?.valueChanges.subscribe(value => {
-            this.addSiapReportForm.reset();
-            this.addSiapReportForm.get('exportType')?.setValue(value, { emitEvent: false });
-        });
-    }
+            this.addSiapReportForm.patchValue({ 
+                instansiId: '',
+                instansiName: '',
+                unitKerjaId: '',
+                unitKerjaName: '',
+                provinsiId: '',
+                provinsiName: '',
+                kabKotaId: '',
+                kabKotaName: ''
+             });
 
+            const dynamicFields = [
+                'instansiId',
+                'unitKerjaId',
+                'provinsiId',
+                'kabKotaId'
+            ]
+            
+            dynamicFields.forEach(field => {
+                const control = this.addSiapReportForm.get(field)
+                control?.clearValidators()
+                control?.updateValueAndValidity()
+                control?.markAsUntouched()
+            })
+
+            switch (value) {
+                case 'instansi':
+                    this.addSiapReportForm
+                        .get('instansiId')
+                        ?.setValidators([Validators.required])
+                    break
+                case 'unitKerja':
+                    this.addSiapReportForm
+                        .get('unitKerjaId')
+                        ?.setValidators([Validators.required])
+                    break
+                case 'provinsi':
+                    this.addSiapReportForm
+                        .get('provinsiId')
+                        ?.setValidators([Validators.required])
+                    break
+                case 'kabKota':
+                    this.addSiapReportForm
+                        .get('kabKotaId')
+                        ?.setValidators([Validators.required])
+                    break
+            }
+
+            this.addSiapReportForm.updateValueAndValidity()
+        })
+
+        this.addSiapReportForm.valueChanges.subscribe(value => {
+            console.log(value)
+        })
+    }
 
     handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/report/search')
@@ -147,6 +209,15 @@ export class ReportSiapComponent {
             )
             .setLimit(5)
             .build()
+    }
+
+    getErrorMessage(controlName: string, label: string) {
+        const control = this.addSiapReportForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label
+        )
     }
 
     handleInitForm() {

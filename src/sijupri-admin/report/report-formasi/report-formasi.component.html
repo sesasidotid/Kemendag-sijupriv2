@@ -22,9 +22,7 @@
             name="exportType"
             formControlName="exportType"
           >
-            <option selected value="" style="display: none">
-              Pilih Tipe Report
-            </option>
+            <option selected value="">Pilih Tipe Report</option>
             <option [value]="'unitKerja'">Unit Kerja</option>
             <option [value]="'provinsi'">Provinsi</option>
             <option [value]="'kabKota'">Kabupaten/Kota</option>
@@ -40,7 +38,7 @@
         *ngIf="addFormasiReportForm.get('exportType').value === 'unitKerja'"
       >
         <label for="inputUnitKerjaId" class="col-sm-2 col-form-label fw-bold"
-          >Unit Kerja</label
+          >Unit Kerja <span class="text-danger">*</span></label
         >
         <div class="col-sm-10">
           <select
@@ -50,9 +48,7 @@
             name="unitKerjaId"
             (change)="patchFormValue($event, 'unitKerja')"
           >
-            <option selected value="" style="display: none">
-              Pilih Unit Kerja
-            </option>
+            <option selected value="" hidden>Pilih Unit Kerja</option>
             <option
               *ngFor="let unitKerja of unitKerjaList"
               [value]="unitKerja.id"
@@ -61,17 +57,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addFormasiReportForm.get('unitKerjaId').invalid &&
-              addFormasiReportForm.get('unitKerjaId').touched
-            "
+            *ngIf="getErrorMessage('unitKerjaId', 'Unit Kerja') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addFormasiReportForm.get('unitKerjaId').errors?.['required']"
-            >
-              Unit Kerja perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -81,7 +70,7 @@
         *ngIf="addFormasiReportForm.get('exportType').value === 'provinsi'"
       >
         <label for="inputProvinsiId" class="col-sm-2 col-form-label fw-bold"
-          >Provinsi</label
+          >Provinsi <span class="text-danger">*</span></label
         >
         <div class="col-sm-10">
           <select
@@ -99,17 +88,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addFormasiReportForm.get('provinsiId').invalid &&
-              addFormasiReportForm.get('provinsiId').touched
-            "
+            *ngIf="getErrorMessage('provinsiId', 'Provinsi') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addFormasiReportForm.get('provinsiId').errors?.['required']"
-            >
-              Provinsi perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -119,7 +101,7 @@
         *ngIf="addFormasiReportForm.get('exportType').value === 'kabKota'"
       >
         <label for="inputKabKotaId" class="col-sm-2 col-form-label fw-bold"
-          >Kabupaten/Kota</label
+          >Kabupaten/Kota <span class="text-danger">*</span></label
         >
         <div class="col-sm-10">
           <select
@@ -137,17 +119,10 @@
             </option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addFormasiReportForm.get('kabKotaId').invalid &&
-              addFormasiReportForm.get('kabKotaId').touched
-            "
+            *ngIf="getErrorMessage('kabKotaId', 'Kabupaten/Kota') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addFormasiReportForm.get('kabKotaId').errors?.['required']"
-            >
-              Kabupaten/Kota perlu diisi.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>
@@ -171,17 +146,10 @@
             <option [value]="'csv'">CSV</option>
           </select>
           <div
-            class="feedback"
-            *ngIf="
-              addFormasiReportForm.get('fileType').invalid &&
-              addFormasiReportForm.get('fileType').touched
-            "
+            *ngIf="getErrorMessage('fileType', 'Format file') as error"
+            class="text-danger"
           >
-            <small
-              *ngIf="addFormasiReportForm.get('fileType').errors?.['required']"
-            >
-              Format file perlu dipilih.
-            </small>
+            {{ error }}
           </div>
         </div>
       </div>

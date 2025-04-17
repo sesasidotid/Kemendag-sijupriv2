@@ -292,6 +292,9 @@
                       type="number"
                       class="form-control"
                       [value]="formasi.pembulatan || 0"
+                      min="0"
+                      step="1"
+                      (keydown)="preventMinus($event)"
                     />
                   </td>
                 </tr>
