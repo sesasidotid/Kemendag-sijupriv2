@@ -74,7 +74,7 @@ export class AkpVerifikasiPelatihanComponent {
   }
 
   ngOnInit () {
-    this.handleTabService()
+    // this.handleTabService()
   }
 
   isAnyFileMissing (): boolean {

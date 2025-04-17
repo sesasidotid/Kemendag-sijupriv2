@@ -77,12 +77,12 @@ export class UkomGradeImportComponent {
                 icon: 'mdi-plus-circle',
                 onClick: () => this.router.navigate([`/ukom/ukom-grade-list/import`])
             })
-            .addTab({
-                label: 'Template Nilai',
-                isActive: true,
-                icon: 'mdi-file-download',
-                onClick: () => this.downloadTemplate()
-            })
+            // .addTab({
+            //     label: 'Template Nilai',
+            //     isActive: true,
+            //     icon: 'mdi-file-download',
+            //     onClick: () => this.downloadTemplate()
+            // })
             .addTab({
                 label: 'Export Nilai',
                 isActive: false,
