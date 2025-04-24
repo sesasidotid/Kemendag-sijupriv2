@@ -188,7 +188,9 @@
                     Status Pendaftaran
                   </label>
                   <p class="text-muted">
-                    {{ pendingTask.isMengulang ? 'Mengulang' : 'Baru' }}
+                    {{
+                      pendingTask.isMengulang == 'true' ? 'Mengulang' : 'Baru'
+                    }}
                   </p>
                 </div>
 
