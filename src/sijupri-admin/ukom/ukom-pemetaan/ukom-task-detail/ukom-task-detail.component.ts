@@ -30,7 +30,7 @@ export class UkomTaskDetailComponent {
     ukomDetail = new UkomTaskDetail()
     ukomDetailLoading$ = new BehaviorSubject<boolean>(false)
     isModalOpen$ = new BehaviorSubject<boolean>(false)
-    unitKerjaName: string | null = null;
+    unitKerjaName: string | null = null
 
     fileHandlerData: FIleHandler = {
         files: {},
@@ -47,125 +47,138 @@ export class UkomTaskDetailComponent {
 
     predikatKinerjaList: any[] = []
 
-    constructor(
+    constructor (
         private activatedRoute: ActivatedRoute,
         private apiService: ApiService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.loadPredikatKinerja()
     }
 
-    getPendidikanList(pendidikanTerakhirCode: string) {
+    getPendidikanList (pendidikanTerakhirCode: string) {
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
             next: response => {
                 const matchedPendidikan = response.find(
-                    (pendidikan: any) => pendidikan.code === pendidikanTerakhirCode
-                );
-                this.pendidikanName = matchedPendidikan ? matchedPendidikan.name : null;
-            },
-        });
-    }
-
-    getBidangjabatanNameByCode(bidangJabatanCode: string) {
-        this.apiService.getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`).subscribe({
-            next: response => {
-                this.bidangJabatanName = response.name ?? null;
+                    (pendidikan: any) =>
+                        pendidikan.code === pendidikanTerakhirCode
+                )
+                this.pendidikanName = matchedPendidikan
+                    ? matchedPendidikan.name
+                    : null
             }
         })
     }
 
-    getProvinsiNameByCode(provinsiCode: string) {
+    getBidangjabatanNameByCode (bidangJabatanCode: string) {
+        this.apiService
+            .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
+            .subscribe({
+                next: response => {
+                    this.bidangJabatanName = response.name ?? null
+                }
+            })
+    }
+
+    getProvinsiNameByCode (provinsiCode: string) {
         this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
             next: response => {
-                this.provinsiName = response.name ?? null;
-            },
-        });
-    }
-
-    getKabupatenNameByCode(kabupatenCode: string) {
-        this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
-            next: response => {
-                this.kabupatenName = response.name ?? null;
-                this.typeKabKota = response.type ?? null;
-            },
-        });
-    }
-
-    loadPredikatKinerja() {
-        this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
-            next: res => {
-                this.predikatKinerjaList = res;
-            },
-            error: err => {
-                console.error('Failed to fetch predikat kinerja:', err);
+                this.provinsiName = response.name ?? null
             }
-        });
-
-        this.activatedRoute.paramMap.subscribe(params => {
-            this.participant_ukom_id = params.get('id')
-            this.getParticipantUkomDetail()
-            this.getDokumenUkomList()
         })
     }
 
-    transformInstansiName(value: string): string {
-        if (!value) return null;
+    getKabupatenNameByCode (kabupatenCode: string) {
+        this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
+            next: response => {
+                this.kabupatenName = response.name ?? null
+                this.typeKabKota = response.type ?? null
+            }
+        })
+    }
+
+    loadPredikatKinerja () {
+        this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
+            next: res => {
+                this.predikatKinerjaList = res
+                this.activatedRoute.paramMap.subscribe(params => {
+                    this.participant_ukom_id = params.get('id')
+                    this.getParticipantUkomDetail()
+                    this.getDokumenUkomList()
+                })
+            },
+            error: err => {
+                console.error('Failed to fetch predikat kinerja:', err)
+            }
+        })
+    }
+
+    transformInstansiName (value: string): string {
+        if (!value) return null
 
         return value
             .toLowerCase() // Ubah ke lowercase semua dulu
             .replace(/_/g, ' ') // Ganti underscore dengan spasi
-            .replace(/\b\w/g, char => char.toUpperCase()); // Kapitalisasi setiap kata
+            .replace(/\b\w/g, char => char.toUpperCase()) // Kapitalisasi setiap kata
     }
 
-    calculateAge(tanggalLahir: string | Date, tglSuratUsulan: string | Date): string {
-        console.log('calculateAge', tanggalLahir, tglSuratUsulan);
+    calculateAge (
+        tanggalLahir: string | Date,
+        tglSuratUsulan: string | Date
+    ): string {
+        console.log('calculateAge', tanggalLahir, tglSuratUsulan)
 
         if (!tanggalLahir || !tglSuratUsulan) {
-            return '-';
+            return '-'
         }
 
-        const birthDate = new Date(tanggalLahir);
-        const suratDate = new Date(tglSuratUsulan);
+        const birthDate = new Date(tanggalLahir)
+        const suratDate = new Date(tglSuratUsulan)
 
-        console.log(typeof birthDate, typeof suratDate);
+        console.log(typeof birthDate, typeof suratDate)
 
         if (isNaN(birthDate.getTime()) || isNaN(suratDate.getTime())) {
-            return '-'; // Return '-' jika format tanggal salah
+            return '-' // Return '-' jika format tanggal salah
         }
 
-        let ageYears = suratDate.getFullYear() - birthDate.getFullYear();
-        let ageMonths = suratDate.getMonth() - birthDate.getMonth();
-        let ageDays = suratDate.getDate() - birthDate.getDate();
+        let ageYears = suratDate.getFullYear() - birthDate.getFullYear()
+        let ageMonths = suratDate.getMonth() - birthDate.getMonth()
+        let ageDays = suratDate.getDate() - birthDate.getDate()
 
         // Jika bulan dalam tgl_surat_usulan kurang dari bulan lahir, atau bulan sama tapi tanggal lebih kecil
         if (ageMonths < 0 || (ageMonths === 0 && ageDays < 0)) {
-            ageYears--;
-            ageMonths += 12;
+            ageYears--
+            ageMonths += 12
         }
 
         if (ageDays < 0) {
-            const lastMonth = new Date(suratDate.getFullYear(), suratDate.getMonth(), 0);
-            ageDays += lastMonth.getDate();
-            ageMonths--;
+            const lastMonth = new Date(
+                suratDate.getFullYear(),
+                suratDate.getMonth(),
+                0
+            )
+            ageDays += lastMonth.getDate()
+            ageMonths--
         }
 
-        return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`;
+        return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    toggleModal() {
+    toggleModal () {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    getUnitKerjaById(unit_kerja_id: string) {
-        this.apiService.getData(`/api/v1/unit_kerja/${unit_kerja_id}`).subscribe({
-            next: (response: any) => {
-                this.unitKerjaName = response.name
-            }
-        })
+    getUnitKerjaById (unit_kerja_id: string) {
+        this.apiService
+            .getData(`/api/v1/unit_kerja/${unit_kerja_id}`)
+            .subscribe({
+                next: (response: any) => {
+                    this.unitKerjaName = response.name
+                }
+            })
     }
 
-    getCATScore() {
+    getCATScore () {
         const exam_type_code = 'CAT'
 
         this.apiService
@@ -179,18 +192,20 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    back() {
+    back () {
         history.back()
     }
 
-    getPredikatKinerja(code: string | null): string {
+    getPredikatKinerja (code: string | null): string {
         console.log('code', code)
-        if (!code || code == null) return '-';
-        const predikat = this.predikatKinerjaList.find(predikat => predikat.id === code);
-        return predikat ? predikat.name : '-';
+        if (!code || code == null) return '-'
+        const predikat = this.predikatKinerjaList.find(
+            predikat => predikat.id === code
+        )
+        return predikat ? predikat.name : '-'
     }
 
-    getParticipantUkomDetail() {
+    getParticipantUkomDetail () {
         this.ukomDetailLoading$.next(true)
         this.apiService
             .getData(`/api/v1/participant_ukom/${this.participant_ukom_id}`)
@@ -201,22 +216,32 @@ export class UkomTaskDetailComponent {
                         this.getUnitKerjaById(response.unitKerjaId)
                     }
 
-                    this.getPendidikanList(this.ukomDetail.pendidikanTerakhirCode)
+                    this.getPendidikanList(
+                        this.ukomDetail.pendidikanTerakhirCode
+                    )
 
                     if (this.ukomDetail.provinsiId) {
                         this.getProvinsiNameByCode(this.ukomDetail.provinsiId)
                     }
 
                     if (this.ukomDetail.kabupatenKotaId) {
-                        this.getKabupatenNameByCode(this.ukomDetail.kabupatenKotaId)
+                        this.getKabupatenNameByCode(
+                            this.ukomDetail.kabupatenKotaId
+                        )
                     }
 
                     if (this.ukomDetail.bidangJabatanCode) {
-                        this.getBidangjabatanNameByCode(this.ukomDetail.bidangJabatanCode)
+                        this.getBidangjabatanNameByCode(
+                            this.ukomDetail.bidangJabatanCode
+                        )
                     }
 
-                    this.predikat1Name = this.getPredikatKinerja(this.ukomDetail.predikatKinerja1Id);
-                    this.predikat2Name = this.getPredikatKinerja(this.ukomDetail.predikatKinerja2Id);
+                    this.predikat1Name = this.getPredikatKinerja(
+                        this.ukomDetail.predikatKinerja1Id
+                    )
+                    this.predikat2Name = this.getPredikatKinerja(
+                        this.ukomDetail.predikatKinerja2Id
+                    )
 
                     this.getCATScore()
 
@@ -230,7 +255,7 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    mapDokumenUkom() {
+    mapDokumenUkom () {
         this.dataDokumenUkom.forEach((doc, index) => {
             this.fileHandlerData.files[`file${index}`] = {
                 label: doc.dokumenPersyaratanName,
@@ -241,9 +266,11 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    getDokumenUkomList() {
+    getDokumenUkomList () {
         this.apiService
-            .getData(`/api/v1/document_ukom/participant/${this.participant_ukom_id}`)
+            .getData(
+                `/api/v1/document_ukom/participant/${this.participant_ukom_id}`
+            )
             .subscribe({
                 next: (response: DataDokumenUkom[]) => {
                     this.dataDokumenUkom = response
@@ -255,7 +282,7 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    getCorrectAnswer(question: any): string {
+    getCorrectAnswer (question: any): string {
         const correctChoice = question.multipleChoiceDtoList.find(
             (choice: any) => choice.correct
         )

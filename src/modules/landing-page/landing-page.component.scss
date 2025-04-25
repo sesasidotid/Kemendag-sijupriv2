@@ -132,7 +132,8 @@ section {
   background-color: #13182b; /* Replace with your desired background color */
 
   /* SVG pattern overlay */
-  background-image: url('/assets/cst.svg');
+  //   background-image: url('/assets/cst.svg');
+  background-image: url('../../assets//cst.svg');
 
   /* Cover styling */
   background-size: contain;
@@ -302,7 +303,7 @@ section {
 
     .feature-1 {
       /* SVG pattern overlay */
-      background-image: url('/assets/sun.svg');
+      background-image: url('../../assets/sun.svg');
 
       /* Cover styling */
       background-size: contain;
@@ -311,7 +312,7 @@ section {
     }
     .feature-2 {
       /* SVG pattern overlay */
-      background-image: url('/assets/wave.svg');
+      background-image: url('../../assets/wave.svg');
 
       /* Cover styling */
       background-size: contain;
@@ -321,7 +322,7 @@ section {
 
     .feature-3 {
       /* SVG pattern overlay */
-      background-image: url('/assets/chevron.svg');
+      background-image: url('../../assets/chevron.svg');
 
       /* Cover styling */
       background-size: contain;
