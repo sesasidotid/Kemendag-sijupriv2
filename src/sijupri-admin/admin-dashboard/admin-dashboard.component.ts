@@ -158,9 +158,10 @@ export class AdminDashboardComponent {
             totalUserUnitKerja: this.apiService.getData(
                 '/api/v1/user_unit_kerja/search?page=1&limit=1'
             ),
-            totalUserAdmin: this.apiService.getData(
-                '/api/v1/user/search?eq_userApplicationChannel|applicationCode=sijupri-admin'
-            ),
+            // totalUserAdmin: this.apiService.getData(
+            //     '/api/v1/user/search?eq_userApplicationChannel|applicationCode=sijupri-admin'
+            // ),
+            totalUserAdmin: this.apiService.getData('/api/v1/user/search?page=1&limit=10&eq_userApplicationChannel|applicationCode=sijupri-admin&eq_userApplicationChannel|channelCode=WEB'),
             totalUserInstansi: this.apiService.getData(
                 '/api/v1/user_instansi/search?page=1&limit=1'
             )
