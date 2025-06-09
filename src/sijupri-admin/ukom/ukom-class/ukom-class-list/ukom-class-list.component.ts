@@ -10,17 +10,21 @@ import {
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { CommonModule } from '@angular/common'
-import { Router, RouterLink } from '@angular/router'
+import { Router } from '@angular/router'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { BehaviorSubject } from 'rxjs'
+import {
+    BehaviorSubject,
+    distinctUntilChanged,
+    map,
+    of,
+    startWith,
+    tap
+} from 'rxjs'
 import { UkomClassAddComponent } from '../ukom-class-add/ukom-class-add.component'
-import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
-import { UkomClassEditComponent } from '../ukom-class-edit/ukom-class-edit.component'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
 import {
     FormControl,
@@ -29,8 +33,8 @@ import {
     ReactiveFormsModule,
     Validators
 } from '@angular/forms'
-import { Ukom } from '../../../../modules/ukom/models/ukom.model'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
 @Component({
     selector: 'app-ukom-class-list',
     standalone: true,
@@ -50,48 +54,81 @@ export class UkomClassListComponent {
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
     fixedJenjangList$: Observable<Jenjang[]>
-
     jenjangMap: Record<string, string> = {}
     jabatanMap: Record<string, string> = {}
-
-    //   pagable$: Observable<Pagable>
+    bidangJabatanMap: Record<string, string> = {}
     pagable$ = new BehaviorSubject<Pagable | null>(null)
     data: any[] = []
     refreshToggle: boolean = false
-
     isModalOpen$ = new BehaviorSubject<boolean>(false)
-
     editRoomUkomForm: FormGroup
     submitLoading$ = new BehaviorSubject<boolean>(false)
+    private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
+    bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
 
-    constructor(
+    constructor (
         private tabService: TabService,
         private router: Router,
         private handlerService: HandlerService,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleTabService()
         this.handlePagable()
         this.handleFormInit()
         this.getJenjang()
         this.getJabatan()
+        this.getBidangJabatan()
+
+        this.handleSubscribe()
+        this.handleBidangJabatanValidation()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.editRoomUkomForm.get(controlName), controlName, label);
+    handleBidangJabatanValidation () {
+        this.bidangJabatanList$.subscribe(bidangJabatanList => {
+            const control = this.editRoomUkomForm.get('bidang_jabatan_code')
+            if (!control) return
+
+            const currentValidators = control.validator
+                ? [control.validator]
+                : []
+            const isRequiredAlreadySet = currentValidators.some(
+                v => v === Validators.required
+            )
+
+            if (bidangJabatanList.length > 0 && !isRequiredAlreadySet) {
+                control.setValidators([Validators.required])
+            } else if (bidangJabatanList.length === 0) {
+                control.clearValidators()
+            }
+
+            control.updateValueAndValidity({ emitEvent: false })
+        })
     }
 
-    handlePagable() {
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.editRoomUkomForm.get(controlName),
+            controlName,
+            label
+        )
+    }
+
+    handlePagable () {
         this.pagable$.next(
             new PagableBuilder('/api/v1/room_ukom/search')
 
-                .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Kuota Peserta', 'participantQuota').build()
+                    new PrimaryColumnBuilder('Nama', 'name').build()
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder(
+                        'Kuota Peserta',
+                        'participantQuota'
+                    ).build()
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder('Mulai', 'examStartAt').build()
@@ -111,14 +148,27 @@ export class UkomClassListComponent {
                     new PrimaryColumnBuilder()
                         .withDynamicValue(
                             'Jenjang',
-                            (data: any) => this.jenjangMap[data.jenjangCode] || ''
+                            (data: any) =>
+                                this.jenjangMap[data.jenjangCode] || ''
+                        )
+                        .build()
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder()
+                        .withDynamicValue(
+                            'Bidang Jabatan',
+                            (data: any) =>
+                                this.bidangJabatanMap[data.bidangJabatanCode] ||
+                                ''
                         )
                         .build()
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
                         .setAction((ukom: any) => {
-                            this.router.navigate([`ukom/ukom-room-list/${ukom.id}`])
+                            this.router.navigate([
+                                `ukom/ukom-room-list/${ukom.id}`
+                            ])
                         }, 'info')
                         .withIcon('detail')
                         .build()
@@ -152,7 +202,38 @@ export class UkomClassListComponent {
         )
     }
 
-    deleteClass(ukom: any) {
+    handleSubscribe () {
+        this.editRoomUkomForm
+            .get('jabatan_code')
+            ?.valueChanges.pipe(distinctUntilChanged())
+            .subscribe(jabatanCode => {
+                const bidangJabatanControl = this.editRoomUkomForm.get(
+                    'bidang_jabatan_code'
+                )
+                bidangJabatanControl?.reset()
+
+                if (jabatanCode) {
+                    this.getBidangJabatanByJabatanCode(jabatanCode)
+                }
+            })
+    }
+
+    getBidangJabatanByJabatanCode (jabatanCode: string): void {
+        this.apiService
+            .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
+            .pipe(
+                map((res: any) =>
+                    Array.isArray(res)
+                        ? res.map(item => new BidangJabatan(item))
+                        : []
+                )
+            )
+            .subscribe(list => {
+                this.bidangJabatanListSubject.next(list) // ✅ push to subject
+            })
+    }
+
+    deleteClass (ukom: any) {
         this.confirmationService.open(false).subscribe({
             next: (result: any) => {
                 if (result) {
@@ -161,7 +242,7 @@ export class UkomClassListComponent {
                     this.apiService
                         .deleteData(`/api/v1/room_ukom/${ukom.id}`)
                         .subscribe({
-                            next: (response: any) => {
+                            next: () => {
                                 this.handlerService.handleAlert(
                                     'Success',
                                     'Data berhasil dihapus'
@@ -189,19 +270,21 @@ export class UkomClassListComponent {
         })
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.editRoomUkomForm = new FormGroup({
             id: new FormControl(''),
             name: new FormControl('', Validators.required),
             jabatan_code: new FormControl('', Validators.required),
             jenjang_code: new FormControl('', Validators.required),
+            bidang_jabatan_code: new FormControl(''),
             participant_quota: new FormControl('', Validators.required),
             vid_call_link: new FormControl('', Validators.required),
             exam_start_at: new FormControl('', Validators.required),
             exam_end_at: new FormControl('', Validators.required)
         })
     }
-    refreshPagableData() {
+
+    refreshPagableData () {
         const currentPagable = this.pagable$.value
 
         const updatedPagable = {
@@ -211,7 +294,7 @@ export class UkomClassListComponent {
         this.pagable$.next(updatedPagable)
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -230,13 +313,13 @@ export class UkomClassListComponent {
             })
     }
 
-    setDefaultFormValues(data: any) {
-        console.log('data', data)
+    setDefaultFormValues (data: any) {
         this.editRoomUkomForm.patchValue({
             id: data.id || '',
             name: data.name || '',
             jabatan_code: data.jabatanCode || '',
             jenjang_code: data.jenjangCode || '',
+            bidang_jabatan_code: data.bidangJabatanCode || undefined,
             participant_quota: data.participantQuota || '',
             vid_call_link: data.vidCallLink || '',
             exam_start_at: data.examStartAt || '',
@@ -244,7 +327,7 @@ export class UkomClassListComponent {
         })
     }
 
-    getListJenjang() {
+    getListJenjang () {
         this.apiService.getData(`/api/v1/jenjang`).subscribe({
             next: (response: any) => {
                 const jenjangs = response.map(
@@ -255,7 +338,9 @@ export class UkomClassListComponent {
                     this.jenjangMap[jenjang.code] = jenjang.name
                 })
 
-                this.fixedJenjangList$ = new BehaviorSubject(jenjangs).asObservable()
+                this.fixedJenjangList$ = new BehaviorSubject(
+                    jenjangs
+                ).asObservable()
             },
             error: err => {
                 console.error('Error fetching jenjang data:', err)
@@ -263,7 +348,26 @@ export class UkomClassListComponent {
         })
     }
 
-    getJenjang() {
+    getBidangJabatan () {
+        this.apiService.getData(`/api/v1/bidang_jabatan`).subscribe({
+            next: (response: any) => {
+                const bidangJabatans = response.map(
+                    (bidangJabatan: { [key: string]: any }) =>
+                        new BidangJabatan(bidangJabatan)
+                )
+
+                bidangJabatans.forEach((bidangJabatan: any) => {
+                    this.bidangJabatanMap[bidangJabatan.code] =
+                        bidangJabatan.name
+                })
+            },
+            error: err => {
+                console.error('Error fetching jenjang data:', err)
+            }
+        })
+    }
+
+    getJenjang () {
         this.apiService.getData(`/api/v1/jenjang/`).subscribe({
             next: (response: any) => {
                 const jenjangs = response.map(
@@ -282,7 +386,7 @@ export class UkomClassListComponent {
         })
     }
 
-    getJabatan() {
+    getJabatan () {
         this.apiService.getData(`/api/v1/jabatan`).subscribe({
             next: (response: any) => {
                 const jabatans = response.map(
@@ -301,52 +405,59 @@ export class UkomClassListComponent {
         })
     }
 
-    handleRefreshToggle() {
+    handleRefreshToggle () {
         this.refreshToggle = !this.refreshToggle
     }
 
-    toggleModal() {
+    toggleModal () {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    handleTabChange(tab?: number) {
-        console.log('tab', tab)
-
+    handleTabChange (tab?: number) {
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }
 
-    submit() {
+    submit () {
         const payload = {
             id: this.editRoomUkomForm.value.id,
             name: this.editRoomUkomForm.value.name,
             jabatan_code: this.editRoomUkomForm.value.jabatan_code,
             jenjang_code: this.editRoomUkomForm.value.jenjang_code,
+            bidang_jabatan_code:
+                this.editRoomUkomForm.value.bidang_jabatan_code || undefined,
             participant_quota: this.editRoomUkomForm.value.participant_quota,
             vid_call_link: this.editRoomUkomForm.value.vid_call_link,
             exam_start_at: this.editRoomUkomForm.value.exam_start_at,
             exam_end_at: this.editRoomUkomForm.value.exam_end_at
         }
 
-        // console.log('payload', payload)
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
                 this.submitLoading$.next(true)
 
-                this.apiService.putData('/api/v1/room_ukom', payload).subscribe({
-                    next: response => {
-                        this.handlerService.handleAlert('Success', 'Berhasil mengubah data')
-                        this.handleRefreshToggle()
-                        this.toggleModal()
-                        this.submitLoading$.next(false)
-                    },
-                    error: error => {
-                        console.log('error', error)
-                        this.handlerService.handleAlert('Error', 'Gagal mengubah data')
-                        this.submitLoading$.next(false)
-                    }
-                })
+                this.apiService
+                    .putData('/api/v1/room_ukom', payload)
+                    .subscribe({
+                        next: response => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil mengubah data'
+                            )
+                            this.handleRefreshToggle()
+                            this.toggleModal()
+                            this.submitLoading$.next(false)
+                        },
+                        error: error => {
+                            console.log('error', error)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengubah data'
+                            )
+                            this.submitLoading$.next(false)
+                        }
+                    })
             }
         })
     }

@@ -1,28 +1,29 @@
 import { Serializable } from '../../base/commons/serializable'
 
 export class RoomUkom extends Serializable {
-  id: string = undefined
-  name: string = undefined
-  jabatan_code: string = undefined
-  jabatanName: string = undefined
-  jenjang_code: string = undefined
-  jenjangName: string = undefined
-  participant_quota: string = undefined
-  vid_call_link: string = undefined
-  exam_start_at: string = undefined
-  exam_end_at: string = undefined
-  examScheduleDtoList: ExamScheduleDtoList[] = []
+    id: string = undefined
+    name: string = undefined
+    jabatan_code: string = undefined
+    jabatanName: string = undefined
+    jenjang_code: string = undefined
+    jenjangName: string = undefined
+    participant_quota: string = undefined
+    vid_call_link: string = undefined
+    exam_start_at: string = undefined
+    exam_end_at: string = undefined
+    bidang_jabatan_code: string = undefined
+    examScheduleDtoList: ExamScheduleDtoList[] = []
 
-  constructor (object?: { [key: string]: any }) {
-    super()
-    if (object) this.fromObject(object)
-  }
+    constructor (object?: { [key: string]: any }) {
+        super()
+        if (object) this.fromObject(object)
+    }
 }
 
 export interface ExamScheduleDtoList {
-  id: string
-  startTime: string
-  endTime: string
-  examTypeCode: string
-  roomUkomId: string
+    id: string
+    startTime: string
+    endTime: string
+    examTypeCode: string
+    roomUkomId: string
 }

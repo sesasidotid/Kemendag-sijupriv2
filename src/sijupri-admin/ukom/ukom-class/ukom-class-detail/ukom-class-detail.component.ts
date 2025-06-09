@@ -44,15 +44,15 @@ export class UkomClassDetailComponent {
 
     data: any[] = []
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private activatedRoute: ActivatedRoute,
         private router: Router,
         public tabService: TabService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.activatedRoute.paramMap.subscribe(params => {
             this.id = params.get('id')
         })
@@ -66,21 +66,23 @@ export class UkomClassDetailComponent {
         this.handleTabService()
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder(
             `/api/v1/participant_ukom/room/${this.id}`
         )
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
-            .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'email').build())
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Email', 'email').build()
+            )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jenis Ukom', (data: any) =>
                         data.jenisUkom === 'KENAIKAN_JENJANG'
                             ? 'Kenaikan Jenjang'
                             : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                                ? 'Perpindahan Jabatan'
-                                : data.jenisUkom
+                            ? 'Perpindahan Jabatan'
+                            : data.jenisUkom
                     )
                     .build()
             )
@@ -97,7 +99,7 @@ export class UkomClassDetailComponent {
             .build()
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -116,49 +118,55 @@ export class UkomClassDetailComponent {
             })
     }
 
-    handleTabChange(tab?: number) {
+    handleTabChange (tab?: number) {
         console.log('tab', tab)
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }
 
-    getJenjang() {
+    getJenjang () {
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                        (jenjang: { [key: string]: any }) =>
+                            new Jenjang(jenjang)
                     )
                 )
             )
     }
 
-    getJabatan() {
+    getJabatan () {
         this.jabatanList$ = this.apiService
             .getData(`/api/v1/jabatan`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+                        (jabatan: { [key: string]: any }) =>
+                            new Jabatan(jabatan)
                     )
                 )
             )
     }
 
-    getDetailKelas() {
+    getDetailKelas () {
         this.apiService.getData(`/api/v1/room_ukom/${this.id}`).subscribe({
             next: res => {
                 this.detailKelas = res
                 this.filteredJabatan$ = this.jabatanList$.pipe(
                     map(jabatanList =>
-                        jabatanList.find(j => j.code === this.detailKelas.jabatanCode)
+                        jabatanList.find(
+                            j => j.code === this.detailKelas.jabatanCode
+                        )
                     )
                 )
 
                 this.filteredJenjang$ = this.jenjangList$.pipe(
                     map(jenjangList =>
-                        jenjangList.find(j => j.code === this.detailKelas.jenjangCode)
+                        jenjangList.find(
+                            j => j.code === this.detailKelas.jenjangCode
+                        )
                     )
                 )
             },

@@ -18,7 +18,6 @@ import { ModalComponent } from '../../../../modules/base/components/modal/modal.
 import { BehaviorSubject } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { first } from 'rxjs/operators';
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -38,12 +37,17 @@ export class UkomExamChooseCompQuestionsComponent {
     listQuestion$: Observable<UkomQuestion[]>
     filteredQuestions$: Observable<UkomQuestion[]>
     questCheckedList: UkomQuestion[] = []
-    submitLoadng$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
+    submitLoadng$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+        false
+    )
 
     filterText: string = ''
     private searchSubject = new BehaviorSubject<string>('')
 
     listSavedQuestion: UkomQuestion[] = []
+
+    randomCount: number = 0
+    allAvailableQuestions: UkomQuestion[] = []
 
     payload = {
         id: '',
@@ -51,24 +55,24 @@ export class UkomExamChooseCompQuestionsComponent {
         question_id_list: ['']
     }
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private activatedRoute: ActivatedRoute,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.activatedRoute.paramMap.subscribe(params => {
-            this.room_ukom_id = params.get('roomid');
-        });
+            this.room_ukom_id = params.get('roomid')
+        })
 
         this.activatedRoute.queryParams.subscribe(params => {
-            const type_ukom = params['type_ukom'];
+            const type_ukom = params['type_ukom']
             if (type_ukom) {
-                this.type_ukom = type_ukom;
+                this.type_ukom = type_ukom
             }
-        });
+        })
 
         this.getExamDetail()
         this.getListPertanyaan()
@@ -76,11 +80,11 @@ export class UkomExamChooseCompQuestionsComponent {
         this.getRoomUkomDetail()
     }
 
-    back() {
+    back () {
         history.back()
     }
 
-    getRoomUkomDetail() {
+    getRoomUkomDetail () {
         this.apiService
             .getData(`/api/v1/room_ukom/${this.room_ukom_id}`)
             .subscribe({
@@ -90,12 +94,15 @@ export class UkomExamChooseCompQuestionsComponent {
                     this.getListKompetensi()
                 },
                 error: (err: any) => {
-                    this.handlerService.handleAlert('Error', 'Failed to get room detail')
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Failed to get room detail'
+                    )
                 }
             })
     }
 
-    getUkomTypeFromParams() {
+    getUkomTypeFromParams () {
         this.activatedRoute.queryParams.subscribe(params => {
             const type_ukom = params['type_ukom']
 
@@ -105,18 +112,21 @@ export class UkomExamChooseCompQuestionsComponent {
         })
     }
 
-    getExamDetail() {
+    getExamDetail () {
         this.apiService
             .getData(`/api/v1/exam_schedule/room/${this.room_ukom_id}`)
             .subscribe({
                 next: (res: any) => {
                     if (Array.isArray(res)) {
                         this.ExamDetail = res.find(
-                            (exam: ExamDetail) => exam.examTypeCode === this.type_ukom
+                            (exam: ExamDetail) =>
+                                exam.examTypeCode === this.type_ukom
                         )
                         console.log('ExamDetail:', this.ExamDetail)
                     } else {
-                        console.error('Unexpected response format: expected an array')
+                        console.error(
+                            'Unexpected response format: expected an array'
+                        )
                         this.ExamDetail = null
                     }
                 },
@@ -127,7 +137,7 @@ export class UkomExamChooseCompQuestionsComponent {
             })
     }
 
-    getListKompetensi() {
+    getListKompetensi () {
         this.apiService
             .getData(
                 `/api/v1/kompetensi/droplist?jabatan_code=${this.RoomUkomDetail.jabatanCode}&jenjang_code=${this.RoomUkomDetail.jenjangCode}`
@@ -145,7 +155,7 @@ export class UkomExamChooseCompQuestionsComponent {
             })
     }
 
-    getDropDownQuestionList(kompetensi_id: string) {
+    getDropDownQuestionList (kompetensi_id: string) {
         const module_id = 'CAT'
         const type = 'MULTI_CHOICE'
 
@@ -155,7 +165,9 @@ export class UkomExamChooseCompQuestionsComponent {
             )
             .pipe(
                 map(response =>
-                    response.map((question: UkomQuestion) => new UkomQuestion(question))
+                    response.map(
+                        (question: UkomQuestion) => new UkomQuestion(question)
+                    )
                 )
             )
 
@@ -166,7 +178,9 @@ export class UkomExamChooseCompQuestionsComponent {
                 this.listQuestion$.pipe(
                     map(questions =>
                         questions.filter(q =>
-                            q.question.toLowerCase().includes(search.toLowerCase())
+                            q.question
+                                .toLowerCase()
+                                .includes(search.toLowerCase())
                         )
                     )
                 )
@@ -174,11 +188,11 @@ export class UkomExamChooseCompQuestionsComponent {
         )
     }
 
-    onSearchChange(search: string) {
+    onSearchChange (search: string) {
         this.searchSubject.next(search)
     }
 
-    toggleModal(kompetensi_id?: string) {
+    toggleModal (kompetensi_id?: string) {
         if (kompetensi_id) {
             this.openModal(kompetensi_id)
         } else {
@@ -186,7 +200,7 @@ export class UkomExamChooseCompQuestionsComponent {
         }
     }
 
-    onQuestionSelect(question: UkomQuestion) {
+    onQuestionSelect (question: UkomQuestion) {
         if (question.checked) {
             if (!this.questCheckedList.some(q => q.id === question.id)) {
                 this.questCheckedList.push(question)
@@ -202,7 +216,9 @@ export class UkomExamChooseCompQuestionsComponent {
                 )
             }
         } else {
-            const index = this.questCheckedList.findIndex(q => q.id === question.id)
+            const index = this.questCheckedList.findIndex(
+                q => q.id === question.id
+            )
             if (index > -1) {
                 this.questCheckedList.splice(index, 1)
                 this.listQuestion$ = this.listQuestion$.pipe(
@@ -217,11 +233,9 @@ export class UkomExamChooseCompQuestionsComponent {
                 )
             }
         }
-
-        console.log('Updated questCheckedList:', this.questCheckedList)
     }
 
-    updateCheckedState() {
+    updateCheckedState () {
         this.filteredQuestions$ = this.filteredQuestions$.pipe(
             map(questions => {
                 return questions.map((question: UkomQuestion) => {
@@ -234,7 +248,7 @@ export class UkomExamChooseCompQuestionsComponent {
         )
     }
 
-    getListPertanyaan() {
+    getListPertanyaan () {
         const module_id = 'CAT'
 
         this.apiService
@@ -249,13 +263,108 @@ export class UkomExamChooseCompQuestionsComponent {
             })
     }
 
-    openModal(kompetensi_id: string) {
+    openModal (kompetensi_id: string) {
         this.getDropDownQuestionList(kompetensi_id)
         this.updateCheckedState()
         this.isModalOpen$.next(true)
     }
 
-    submit() {
+    loadAllQuestionsFromAllKompetensi () {
+        const module_id = 'CAT'
+        const type = 'MULTI_CHOICE'
+
+        this.allAvailableQuestions = []
+
+        const loadPromises = this.UkomRoomKompetensi.map(kompetensi => {
+            return this.apiService
+                .getData(
+                    `/api/v1/question/droplist?association_id=${kompetensi.id}&module_id=${module_id}&type=${type}`
+                )
+                .toPromise()
+                .then(response => {
+                    const questions = response.map(
+                        (question: any) => new UkomQuestion(question)
+                    )
+                    this.allAvailableQuestions.push(...questions)
+                })
+                .catch(err => {
+                    console.error(
+                        `Error loading questions for kompetensi ${kompetensi.id}:`,
+                        err
+                    )
+                })
+        })
+
+        return Promise.all(loadPromises)
+    }
+
+    // New method for random selection from all kompetensi
+    async selectRandomQuestionsFromAll () {
+        if (this.randomCount <= 0) {
+            this.handlerService.handleAlert(
+                'Warning',
+                'Masukkan jumlah pertanyaan yang valid'
+            )
+            return
+        }
+
+        try {
+            await this.loadAllQuestionsFromAllKompetensi()
+
+            // Filter out already selected questions
+            const availableQuestions = this.allAvailableQuestions.filter(
+                q =>
+                    !this.questCheckedList.some(
+                        selected => selected.id === q.id
+                    )
+            )
+
+            if (this.randomCount > availableQuestions.length) {
+                this.handlerService.handleAlert(
+                    'Warning',
+                    `Hanya tersedia ${availableQuestions.length} pertanyaan yang belum dipilih dari semua kompetensi`
+                )
+                return
+            }
+
+            // Fisher-Yates shuffle algorithm for random selection
+            const shuffled = [...availableQuestions]
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1))
+                ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+            }
+
+            // Select the first 'randomCount' questions
+            const selectedQuestions = shuffled.slice(0, this.randomCount)
+
+            // Add selected questions to checked list
+            this.questCheckedList.push(...selectedQuestions)
+
+            this.handlerService.handleAlert(
+                'Success',
+                `Berhasil memilih ${selectedQuestions.length} pertanyaan secara acak dari semua kompetensi`
+            )
+
+            // Reset random count
+            this.randomCount = 0
+        } catch (error) {
+            console.error('Error during random selection:', error)
+            this.handlerService.handleAlert(
+                'Error',
+                'Gagal melakukan pemilihan acak'
+            )
+        }
+    }
+
+    clearAllSelection () {
+        this.questCheckedList = []
+        this.handlerService.handleAlert(
+            'Success',
+            'Semua pilihan pertanyaan telah dibersihkan'
+        )
+    }
+
+    submit () {
         this.payload.id = this.room_ukom_id
         this.payload.exam_type_code = this.ExamDetail.examTypeCode
         this.payload.question_id_list = this.questCheckedList.map(q => q.id)
@@ -275,6 +384,7 @@ export class UkomExamChooseCompQuestionsComponent {
                                 'Berhasil menambahkan pertanyaan'
                             )
                             this.getListPertanyaan()
+                            this.questCheckedList = []
                             this.submitLoadng$.next(false)
                         },
                         error: (err: any) => {
@@ -289,7 +399,10 @@ export class UkomExamChooseCompQuestionsComponent {
             },
             error: (err: any) => {
                 console.error('Error:', err)
-                this.handlerService.handleAlert('Error', 'Gagal menambahkan pertanyaan')
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal menambahkan pertanyaan'
+                )
                 this.submitLoadng$.next(false)
             }
         })

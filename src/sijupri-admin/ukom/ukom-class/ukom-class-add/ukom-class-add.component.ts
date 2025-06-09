@@ -9,15 +9,16 @@ import {
     Validators
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, of } from 'rxjs'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, startWith, tap } from 'rxjs/operators'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
 
 @Component({
     selector: 'app-ukom-class-add',
@@ -42,30 +43,39 @@ export class UkomClassAddComponent {
     kelasData: RoomUkom = new RoomUkom()
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
+    bidangJabatanList$: Observable<BidangJabatan[]> = of([])
 
-    constructor(
+    constructor (
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService,
         private formValidationService: FormValidationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleFormInit()
         this.getJabatanList()
         this.getListJenjang()
+        this.handleSubscribe()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.kelasForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.kelasForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.kelasForm = new FormGroup({
             name: new FormControl('', Validators.required),
             jabatan: new FormControl('', Validators.required),
             jenjang: new FormControl('', Validators.required),
-            participant_quota: new FormControl('', [Validators.required, Validators.pattern(/^\d+$/)
+            bidang_jabatan: new FormControl(''),
+            participant_quota: new FormControl('', [
+                Validators.required,
+                Validators.pattern(/^\d+$/)
             ]),
             vid_call_link: new FormControl('', Validators.required),
             exam_start_at: new FormControl('', Validators.required),
@@ -73,31 +83,76 @@ export class UkomClassAddComponent {
         })
     }
 
-    getJabatanList() {
+    setupInstansiValidation () {
+        this.bidangJabatanList$.subscribe(bidangList => {
+            const bidangJabatanControl = this.kelasForm.get('bidang_jabatan')
+
+            console.log('Bidang Jabatan List:', bidangList.length)
+            if (bidangList.length > 0) {
+                bidangJabatanControl?.setValidators(Validators.required)
+            } else {
+                bidangJabatanControl?.clearValidators()
+            }
+            bidangJabatanControl?.updateValueAndValidity()
+        })
+    }
+
+    handleSubscribe () {
+        this.kelasForm.get('jabatan')?.valueChanges.subscribe(jabatanId => {
+            if (jabatanId) {
+                this.getBidangJabatanByJabatanCode(jabatanId)
+            } else {
+                this.kelasForm.get('bidang_jabatan')?.reset()
+            }
+        })
+    }
+
+    getJabatanList () {
         this.jabatanList$ = this.apiService
             .getData(`/api/v1/jabatan`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+                        (jabatan: { [key: string]: any }) =>
+                            new Jabatan(jabatan)
                     )
                 )
             )
     }
 
-    getListJenjang() {
+    getListJenjang () {
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                        (jenjang: { [key: string]: any }) =>
+                            new Jenjang(jenjang)
                     )
                 )
             )
     }
 
-    submit() {
+    getBidangJabatanByJabatanCode (jabatanCode: string): void {
+        this.bidangJabatanList$ = this.apiService
+            .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
+            .pipe(
+                map((res: any) =>
+                    Array.isArray(res) && res.length > 0
+                        ? res.map(
+                              (bidangJabatan: { [key: string]: any }) =>
+                                  new BidangJabatan(bidangJabatan)
+                          )
+                        : []
+                ),
+                startWith([]),
+                tap(() => {
+                    this.setupInstansiValidation()
+                })
+            )
+    }
+
+    submit () {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
@@ -105,20 +160,25 @@ export class UkomClassAddComponent {
                 this.submitLoading$.next(true)
 
                 this.kelasData.name = this.kelasForm.get('name')?.value
-                this.kelasData.jabatan_code = this.kelasForm.get('jabatan')?.value
-                this.kelasData.jenjang_code = this.kelasForm.get('jenjang')?.value
+                this.kelasData.jabatan_code =
+                    this.kelasForm.get('jabatan')?.value
+                this.kelasData.jenjang_code =
+                    this.kelasForm.get('jenjang')?.value
                 this.kelasData.participant_quota =
                     this.kelasForm.get('participant_quota')?.value
                 this.kelasData.vid_call_link =
                     this.kelasForm.get('vid_call_link')?.value
                 this.kelasData.exam_start_at =
                     this.kelasForm.get('exam_start_at')?.value
-                this.kelasData.exam_end_at = this.kelasForm.get('exam_end_at')?.value
+                this.kelasData.exam_end_at =
+                    this.kelasForm.get('exam_end_at')?.value
+                this.kelasData.bidang_jabatan_code =
+                    this.kelasForm.get('bidang_jabatan')?.value
 
                 this.apiService
                     .postData(`/api/v1/room_ukom`, this.kelasData)
                     .subscribe({
-                        next: (response: any) => {
+                        next: () => {
                             this.submitLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',

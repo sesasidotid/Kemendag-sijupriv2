@@ -4,6 +4,7 @@ export const environment = {
     appBaseHref: '',
     apiBaseUrl: 'http://sijupri.com:8000',
     //   apiBaseUrl: 'https://pusbinjfdag.id:8000',
+    // apiBaseUrl: 'https://sijupri.kemendag.go.id:8000',
     firebaseConfig: {
         apiKey: 'AIzaSyBHvB-ce9lpJdWbDJCBP2XLVJHYzV62oLw',
         authDomain: 'sijupri.firebaseapp.com',
