@@ -81,7 +81,10 @@ export const routes: Routes = [
                                 loadComponent: () =>
                                     import(
                                         '../sijupri-admin/formasi/formasi-data-rekomendasi-detail/formasi-data-rekomendasi-detail.component'
-                                    ).then(m => m.FormasiDataRekomendasiDetailComponent)
+                                    ).then(
+                                        m =>
+                                            m.FormasiDataRekomendasiDetailComponent
+                                    )
                             }
                         ]
                     }
@@ -89,9 +92,9 @@ export const routes: Routes = [
                 'Monitoring Kinerja': {
                     'Pemetaan Kinerja': {
                         components: () =>
-                            import('../sijupri-admin/pak/pak-list/pak-list.component').then(
-                                m => m.PakListComponent
-                            ),
+                            import(
+                                '../sijupri-admin/pak/pak-list/pak-list.component'
+                            ).then(m => m.PakListComponent),
                         routes: [
                             {
                                 path: ':id/:rwKinerjaId',
@@ -128,9 +131,9 @@ export const routes: Routes = [
                 AKP: {
                     KKN: {
                         components: () =>
-                            import('../sijupri-admin/akp/kkn/kkn.component').then(
-                                m => m.KknComponent
-                            ),
+                            import(
+                                '../sijupri-admin/akp/kkn/kkn.component'
+                            ).then(m => m.KknComponent),
                         routes: [
                             {
                                 path: ':id',
@@ -158,9 +161,9 @@ export const routes: Routes = [
                     },
                     'Pemetaan AKP': {
                         components: () =>
-                            import('../sijupri-admin/akp/akp-list/akp-list.component').then(
-                                m => m.AkpListComponent
-                            ),
+                            import(
+                                '../sijupri-admin/akp/akp-list/akp-list.component'
+                            ).then(m => m.AkpListComponent),
                         routes: [
                             {
                                 path: ':id',
@@ -200,9 +203,9 @@ export const routes: Routes = [
                     },
                     'Rekapitulasi Hasil Verifikasi Ukom': {
                         components: () =>
-                            import('./ukom/ukom-pemetaan/ukom-list/ukom-list.component').then(
-                                m => m.UkomListComponent
-                            ),
+                            import(
+                                './ukom/ukom-pemetaan/ukom-list/ukom-list.component'
+                            ).then(m => m.UkomListComponent),
                         routes: [
                             {
                                 path: ':id',
@@ -274,14 +277,20 @@ export const routes: Routes = [
                                 loadComponent: () =>
                                     import(
                                         './ukom/ukom-class/ukom-class-participant-detail/ukom-class-participant-detail.component'
-                                    ).then(m => m.UkomClassParticipantDetailComponent)
+                                    ).then(
+                                        m =>
+                                            m.UkomClassParticipantDetailComponent
+                                    )
                             },
                             {
                                 path: ':roomid/competence/:id',
                                 loadComponent: () =>
                                     import(
                                         './ukom/ukom-exam-schedule/ukom-exam-choose-comp-questions/ukom-exam-choose-comp-questions.component'
-                                    ).then(m => m.UkomExamChooseCompQuestionsComponent)
+                                    ).then(
+                                        m =>
+                                            m.UkomExamChooseCompQuestionsComponent
+                                    )
                             }
                         ]
                     },
@@ -293,9 +302,9 @@ export const routes: Routes = [
                     },
                     'Nilai Ukom': {
                         components: () =>
-                            import('./ukom/ukom-grade-list/ukom-grade-list.component').then(
-                                m => m.UkomGradeListComponent
-                            ),
+                            import(
+                                './ukom/ukom-grade-list/ukom-grade-list.component'
+                            ).then(m => m.UkomGradeListComponent),
                         routes: [
                             {
                                 path: 'import',
@@ -387,6 +396,16 @@ export const routes: Routes = [
                                     import(
                                         '../sijupri-admin/ukom/ukom-kompetensi/ukom-kompetensi-detail/ukom-kompetensi-detail.component'
                                     ).then(m => m.UkomKompetensiDetailComponent)
+                            },
+                            {
+                                path: ':kompetensi_id/indikator/:id',
+                                loadComponent: () =>
+                                    import(
+                                        '../sijupri-admin/ukom/ukom-kompetensi/ukom-indikator-kompetensi-detail/ukom-indikator-kompetensi-detail.component'
+                                    ).then(
+                                        m =>
+                                            m.UkomIndikatorKompetensiDetailComponent
+                                    )
                             }
                         ]
                     },
@@ -396,22 +415,28 @@ export const routes: Routes = [
                                 '../sijupri-admin/maintenance/sys-conf-list/sys-conf-list.component'
                             ).then(m => m.SysConfListComponent)
                     },
-                    "Bidang": {
-                        components: () => import('../sijupri-admin/maintenance/bidang-jabatan/bidang-jabatan-list/bidang-jabatan-list.component').then(m => m.BidangJabatanListComponent),
+                    Bidang: {
+                        components: () =>
+                            import(
+                                '../sijupri-admin/maintenance/bidang-jabatan/bidang-jabatan-list/bidang-jabatan-list.component'
+                            ).then(m => m.BidangJabatanListComponent),
                         routes: [
                             {
                                 path: 'add',
-                                loadComponent: () => import('../sijupri-admin/maintenance/bidang-jabatan/bidang-jabatan-add/bidang-jabatan-add.component').then(m => m.BidangJabatanAddComponent)
+                                loadComponent: () =>
+                                    import(
+                                        '../sijupri-admin/maintenance/bidang-jabatan/bidang-jabatan-add/bidang-jabatan-add.component'
+                                    ).then(m => m.BidangJabatanAddComponent)
                             }
                         ]
                     }
-                },  
+                },
                 SIAP: {
                     'User JF': {
                         components: () =>
-                            import('../sijupri-admin/siap/jf-list/jf-list.component').then(
-                                m => m.JfListComponent
-                            ),
+                            import(
+                                '../sijupri-admin/siap/jf-list/jf-list.component'
+                            ).then(m => m.JfListComponent),
                         routes: [
                             {
                                 path: ':id',

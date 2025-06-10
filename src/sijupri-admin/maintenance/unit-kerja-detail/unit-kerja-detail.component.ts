@@ -27,20 +27,23 @@ export class UnitKerjaDetailComponent {
     isInstansiLoading$ = new BehaviorSubject<boolean>(false)
     wilayahName: string = ''
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private handlerService: HandlerService,
         private activatedRoute: ActivatedRoute
-    ) { }
+    ) {}
 
-    backToList() {
+    backToList () {
         history.back()
     }
 
-    ngOnInit(): void {
-        this.id = this.unitKerjaIdFromParent || this.activatedRoute.snapshot.paramMap.get('id') || '';
+    ngOnInit (): void {
+        this.id =
+            this.unitKerjaIdFromParent ||
+            this.activatedRoute.snapshot.paramMap.get('id') ||
+            ''
         if (this.id) {
-            this.getDetailUnitKerja();
+            this.getDetailUnitKerja()
         }
     }
 
@@ -55,7 +58,7 @@ export class UnitKerjaDetailComponent {
     //     }
     // }
 
-    getDetailUnitKerja() {
+    getDetailUnitKerja () {
         this.apiService.getData(`/api/v1/unit_kerja/${this.id}`).subscribe({
             next: (response: any) => {
                 this.isUnitKerjaLoading$.next(true)
@@ -63,40 +66,38 @@ export class UnitKerjaDetailComponent {
                 console.log(this.unitKerja)
                 this.getInstasiDetail()
                 this.getWilayahName(this.unitKerja.wilayahCode)
+                this.isUnitKerjaLoading$.next(false)
             },
             error: err => {
                 this.handlerService.handleAlert(
                     'Error',
                     'Gagal mengambil data unit kerja'
                 )
-            },
-            complete: () => {
                 this.isUnitKerjaLoading$.next(false)
             }
         })
     }
 
-    getInstasiDetail() {
+    getInstasiDetail () {
         this.apiService
             .getData(`/api/v1/instansi/${this.unitKerja.instansiId}`)
             .subscribe({
                 next: (response: any) => {
                     this.isInstansiLoading$.next(true)
                     this.instasi = new Instansi(response)
+                    this.isInstansiLoading$.next(false)
                 },
                 error: err => {
                     this.handlerService.handleAlert(
                         'Error',
                         'Gagal mengambil data instansi'
                     )
-                },
-                complete: () => {
                     this.isInstansiLoading$.next(false)
                 }
             })
     }
 
-    getWilayahName(wilayahCode: string) {
+    getWilayahName (wilayahCode: string) {
         this.apiService.getData(`/api/v1/wilayah`).subscribe({
             next: (response: any) => {
                 this.wilayahName = response.find(

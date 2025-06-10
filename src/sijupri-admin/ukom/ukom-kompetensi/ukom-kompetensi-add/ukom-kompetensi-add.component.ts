@@ -9,7 +9,7 @@ import {
     Validators
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, of } from 'rxjs'
 import { Router, RouterLink } from '@angular/router'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
@@ -17,9 +17,10 @@ import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { KompetensiUkom } from '../../../../modules/ukom/models/kompetensi'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { distinctUntilChanged, map, startWith, tap } from 'rxjs/operators'
 import { Pangkat } from '../../../../modules/maintenance/models/pangkat.model'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
 
 @Component({
     selector: 'app-ukom-kompetensi-add',
@@ -44,39 +45,69 @@ export class UkomKompetensiAddComponent {
     jenjangList$: Observable<Jenjang[]>
     pangkatList$: Observable<Pangkat[]>
 
-    constructor(
+    private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
+    bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
+
+    constructor (
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService,
         private formValidationService: FormValidationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleFormInit()
         this.getJabatanList()
         this.getListJenjang()
+        this.handleSubscribe()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.kompetensiForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.kompetensiForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.kompetensiForm = new FormGroup({
             code: new FormControl('', Validators.required),
             name: new FormControl('', Validators.required),
+            level: new FormControl('', Validators.required),
+            description: new FormControl('', Validators.required),
             jabatan_code: new FormControl('', Validators.required),
-            jenjang_code: new FormControl('', Validators.required)
+            jenjang_code: new FormControl('', Validators.required),
+            bidang_jabatan_code: new FormControl('')
         })
     }
 
-    getJabatanList() {
+    handleSubscribe () {
+        this.handleBidangJabatanValidation()
+
+        this.kompetensiForm
+            .get('jabatan_code')
+            ?.valueChanges.pipe(distinctUntilChanged())
+            .subscribe(jabatanCode => {
+                const bidangJabatanControl = this.kompetensiForm.get(
+                    'bidang_jabatan_code'
+                )
+                bidangJabatanControl?.reset()
+
+                if (jabatanCode) {
+                    this.getBidangJabatanByJabatanCode(jabatanCode)
+                }
+            })
+    }
+
+    getJabatanList () {
         this.jabatanList$ = this.apiService
             .getData(`/api/v1/jabatan`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+                        (jabatan: { [key: string]: any }) =>
+                            new Jabatan(jabatan)
                     )
                 )
             )
@@ -86,37 +117,80 @@ export class UkomKompetensiAddComponent {
         })
     }
 
-    getListJenjang() {
+    getListJenjang () {
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                        (jenjang: { [key: string]: any }) =>
+                            new Jenjang(jenjang)
                     )
                 )
             )
     }
 
-    submit() {
+    getBidangJabatanByJabatanCode (jabatanCode: string): void {
+        this.apiService
+            .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
+            .pipe(
+                map((res: any) =>
+                    Array.isArray(res)
+                        ? res.map(item => new BidangJabatan(item))
+                        : []
+                )
+            )
+            .subscribe(list => {
+                this.bidangJabatanListSubject.next(list)
+            })
+    }
+
+    handleBidangJabatanValidation () {
+        this.bidangJabatanList$.subscribe(bidangJabatanList => {
+            const control = this.kompetensiForm.get('bidang_jabatan_code')
+            if (!control) return
+
+            const currentValidators = control.validator
+                ? [control.validator]
+                : []
+            const isRequiredAlreadySet = currentValidators.some(
+                v => v === Validators.required
+            )
+
+            if (bidangJabatanList.length > 0 && !isRequiredAlreadySet) {
+                control.setValidators([Validators.required])
+            } else if (bidangJabatanList.length === 0) {
+                control.clearValidators()
+            }
+
+            control.updateValueAndValidity({ emitEvent: false })
+        })
+    }
+
+    submit () {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
 
-                this.kompetensiData.code = this.kompetensiForm.get('code')?.value
-                this.kompetensiData.name = this.kompetensiForm.get('name')?.value
+                this.kompetensiData.code =
+                    this.kompetensiForm.get('code')?.value
+                this.kompetensiData.name =
+                    this.kompetensiForm.get('name')?.value
+                this.kompetensiData.level =
+                    this.kompetensiForm.get('level')?.value
+                this.kompetensiData.description =
+                    this.kompetensiForm.get('description')?.value
                 this.kompetensiData.jabatan_code =
                     this.kompetensiForm.get('jabatan_code')?.value
                 this.kompetensiData.jenjang_code =
                     this.kompetensiForm.get('jenjang_code')?.value
-                this.kompetensiData.bidang_jabatan_code = this.kompetensiForm.get(
-                    'bidang_jabatan_code'
-                )?.value
+                this.kompetensiData.bidang_jabatan_code =
+                    this.kompetensiForm.get('bidang_jabatan_code')?.value
 
                 this.apiService
                     .postData(`/api/v1/kompetensi`, this.kompetensiData)
                     .subscribe({
-                        next: (response: any) => {
+                        next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Data berhasil disimpan'
@@ -124,8 +198,11 @@ export class UkomKompetensiAddComponent {
 
                             this.kompetensiForm.reset()
                         },
-                        error: error => {
-                            this.handlerService.handleAlert('Error', 'Data gagal disimpan')
+                        error: () => {
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Data gagal disimpan'
+                            )
                         }
                     })
             }

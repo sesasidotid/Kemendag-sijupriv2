@@ -57,9 +57,9 @@ export class UkomExamScheduleAddComponent {
     pagable: Pagable
     readonly filePlus = FilePlus
     refreshToggle: boolean = false
-    ukom_type?: string;
+    ukom_type?: string
 
-    constructor(
+    constructor (
         private confirmationService: ConfirmationService,
         private router: Router,
         private apiService: ApiService,
@@ -67,9 +67,9 @@ export class UkomExamScheduleAddComponent {
         private activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
         private formValidationService: FormValidationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.activatedRoute.paramMap.subscribe(params => {
             this.id = params.get('id')
         })
@@ -79,14 +79,16 @@ export class UkomExamScheduleAddComponent {
         this.addSchedule()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.examScheduleForm = this.fb.group({
             schedules: this.fb.array([], [Validators.required])
         })
     }
 
-    handlePagable() {
-        this.pagable = new PagableBuilder(`/api/v1/exam_schedule/room/${this.id}`)
+    handlePagable () {
+        this.pagable = new PagableBuilder(
+            `/api/v1/exam_schedule/room/${this.id}`
+        )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Waktu Mulai', 'startTime').build()
             )
@@ -100,7 +102,9 @@ export class UkomExamScheduleAddComponent {
                 new ActionColumnBuilder()
                     .setAction((item: any) => {
                         this.router.navigate(
-                            [`ukom/ukom-room-list/${this.id}/competence/${item.id}`],
+                            [
+                                `ukom/ukom-room-list/${this.id}/competence/${item.id}`
+                            ],
                             { queryParams: { type_ukom: item.examTypeCode } }
                         )
                     }, 'info')
@@ -110,33 +114,44 @@ export class UkomExamScheduleAddComponent {
             .build()
     }
 
-    getJenisUkomList() {
+    getJenisUkomList () {
         this.jenisUkomList$ = this.apiService
             .getData(`/api/v1/exam_type`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jenisUkom: { [key: string]: any }) => new JenisUkom(jenisUkom)
+                        (jenisUkom: { [key: string]: any }) =>
+                            new JenisUkom(jenisUkom)
                     )
                 )
             )
     }
 
-    getError(controlName: string, label: string) {
-        const control = this.examScheduleForm.get(controlName);
-        return this.formValidationService.getErrorMessage(control, controlName, label);
+    getError (controlName: string, label: string) {
+        const control = this.examScheduleForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label
+        )
     }
 
-    getScheduleError(index: number, controlName: string, label: string) {
-        const control = (this.examScheduleForm.get('schedules') as any).controls[index].get(controlName);
-        return this.formValidationService.getErrorMessage(control, controlName, label);
+    getScheduleError (index: number, controlName: string, label: string) {
+        const control = (
+            this.examScheduleForm.get('schedules') as any
+        ).controls[index].get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label
+        )
     }
 
-    get schedules() {
+    get schedules () {
         return this.examScheduleForm.get('schedules') as FormArray
     }
 
-    addSchedule(): void {
+    addSchedule (): void {
         const scheduleGroup = this.fb.group({
             start_time: ['', Validators.required],
             end_time: ['', Validators.required],
@@ -145,11 +160,11 @@ export class UkomExamScheduleAddComponent {
         this.schedules.push(scheduleGroup)
     }
 
-    removeSchedule(index: number): void {
+    removeSchedule (index: number): void {
         this.schedules.removeAt(index)
     }
 
-    getAvailableExamTypes(selectedCode: string): Observable<JenisUkom[]> {
+    getAvailableExamTypes (selectedCode: string): Observable<JenisUkom[]> {
         return this.jenisUkomList$.pipe(
             map(jenisUkomList => {
                 const selectedCodes = this.schedules.value.map(
@@ -163,10 +178,10 @@ export class UkomExamScheduleAddComponent {
             })
         )
     }
-    handleRefreshToggle() {
+    handleRefreshToggle () {
         this.refreshToggle = !this.refreshToggle
     }
-    submit(): void {
+    submit (): void {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
@@ -190,7 +205,8 @@ export class UkomExamScheduleAddComponent {
                     (schedule: any) => schedule.exam_type_code
                 )
                 const hasDuplicate = examTypeCodes.some(
-                    (value: any, index: any) => examTypeCodes.indexOf(value) !== index
+                    (value: any, index: any) =>
+                        examTypeCodes.indexOf(value) !== index
                 )
 
                 if (hasDuplicate) {
@@ -208,17 +224,19 @@ export class UkomExamScheduleAddComponent {
                 this.apiService
                     .postData(`/api/v1/exam_schedule`, this.examScheduleData)
                     .subscribe({
-                        next: response => {
+                        next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Data berhasil disimpan'
                             )
                             this.handleRefreshToggle()
+                            this.submitLoading$.next(false)
                         },
                         error: error => {
-                            this.handlerService.handleAlert('Error', error.error.message)
-                        },
-                        complete: () => {
+                            this.handlerService.handleAlert(
+                                'Error',
+                                error.error.message
+                            )
                             this.submitLoading$.next(false)
                         }
                     })

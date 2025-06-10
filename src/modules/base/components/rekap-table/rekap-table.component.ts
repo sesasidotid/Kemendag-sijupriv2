@@ -190,7 +190,7 @@ export class RekapTableComponent {
     sourceFile: string
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
-    constructor(
+    constructor (
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService,
@@ -249,7 +249,7 @@ export class RekapTableComponent {
                     showFirstButton: (data: RekapData) => {
                         return (
                             data.jenisPengembanganKompetensi ==
-                            'Seminar/Bimtek/Belajar Mandiri' ||
+                                'Seminar/Bimtek/Belajar Mandiri' ||
                             data.jenisPengembanganKompetensi == 'Magang'
                         )
                     },
@@ -296,17 +296,17 @@ export class RekapTableComponent {
         }
     }
 
-    get sanitizedSource() {
+    get sanitizedSource () {
         return this.sanitizer.bypassSecurityTrustResourceUrl(this.sourceFile)
     }
 
-    clearFilesName() {
+    clearFilesName () {
         if (this.fileHandler) {
             this.fileHandler.clearFileName()
         }
     }
 
-    toggleModal(data?: RekapData) {
+    toggleModal (data?: RekapData) {
         if (data) {
             this.selectedRekapId$.next(Number(data.id))
             this.selectedRekapData = data
@@ -318,20 +318,19 @@ export class RekapTableComponent {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    isAnyFileMissing(): boolean {
-       
+    isAnyFileMissing (): boolean {
         console.log('dokumenImport', this.dokumentImport.fileDokumenVerifikasi)
         return !this.dokumentImport.fileDokumenVerifikasi
     }
 
-    toggleModalPreview(data?: RekapData) {
+    toggleModalPreview (data?: RekapData) {
         this.filePreviewService.open(
             data.dokumenVerifikasi,
             data.dokumenVerifikasiUrl
         )
     }
 
-    verifyDocument(data?: RekapData) {
+    verifyDocument (data?: RekapData) {
         this.commentTouched = true
         // if (!this.comment && this.action$.value == 'REJECT') {
         //   return // Prevent saving if remark is empty
@@ -353,7 +352,6 @@ export class RekapTableComponent {
                     remark: this.comment
                 }
 
-
                 this.apiService
                     .postData(
                         '/api/v1/akp_pelatihan_teknis/validate/dokumen_verifikasi',
@@ -362,13 +360,19 @@ export class RekapTableComponent {
                     .subscribe({
                         next: () => {
                             this.submitLoading$.next(false)
-                            this.alertService.showToast('Success', 'Verification successful')
+                            this.alertService.showToast(
+                                'Success',
+                                'Verification successful'
+                            )
                             this.isModalOpen$.next(false)
                         },
                         error: error => {
                             this.submitLoading$.next(false)
                             console.error('Error verifying document', error)
-                            this.alertService.showToast('Error', 'Failed to verify document')
+                            this.alertService.showToast(
+                                'Error',
+                                'Failed to verify document'
+                            )
                         },
                         complete: () => {
                             setTimeout(() => {
@@ -380,7 +384,7 @@ export class RekapTableComponent {
         })
     }
 
-    submit() {
+    submit () {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
@@ -394,19 +398,22 @@ export class RekapTableComponent {
                         this.dokumentImport
                     )
                     .subscribe({
-                        next: response => {
+                        next: () => {
                             this.submitLoading$.next(false)
-                            this.alertService.showToast('Success', 'Upload Success')
+                            this.alertService.showToast(
+                                'Success',
+                                'Upload Success'
+                            )
                             this.isModalOpen$.next(!this.isModalOpen$.value)
                         },
-                        error: error => {
+                        error: () => {
                             this.submitLoading$.next(false)
-
-                            console.log(error)
-                            this.handlerService.handleAlert('Error', 'Upload Failed')
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Upload Failed'
+                            )
                         },
                         complete: () => {
-                            this.submitLoading$.next(false)
                             setTimeout(() => {
                                 window.location.reload()
                             }, 1000)

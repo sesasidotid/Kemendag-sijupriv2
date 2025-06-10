@@ -10,7 +10,7 @@ import {
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
-import { Router, } from '@angular/router'
+import { Router } from '@angular/router'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { Observable } from 'rxjs'
@@ -43,24 +43,28 @@ export class UkomDocumentAddComponent {
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
 
-    constructor(
+    constructor (
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService,
         private formValidationService: FormValidationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleFormInit()
         this.getJenjangList()
         this.getJabatanList()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.documentForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.documentForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.documentForm = new FormGroup({
             dokumenPersyaratanName: new FormControl('', Validators.required),
             jenisUkom: new FormControl('', Validators.required),
@@ -70,62 +74,85 @@ export class UkomDocumentAddComponent {
         })
     }
 
-    getJenjangList() {
+    getJenjangList () {
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                        (jenjang: { [key: string]: any }) =>
+                            new Jenjang(jenjang)
                     )
                 )
             )
     }
 
-    getJabatanList() {
+    getJabatanList () {
         this.jabatanList$ = this.apiService
             .getData(`/api/v1/jabatan`)
             .pipe(
                 map(response =>
                     response.map(
-                        (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+                        (jabatan: { [key: string]: any }) =>
+                            new Jabatan(jabatan)
                     )
                 )
             )
     }
 
-    submit() {
+    submit () {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
-                if (!confirmed) return;
+                if (!confirmed) return
 
-                this.submitLoading$.next(true);
+                this.submitLoading$.next(true)
 
-                let { dokumenPersyaratanName, jenisUkom, jabatanCode, jenjangCode, isMengulang } = this.documentForm.value;
+                let {
+                    dokumenPersyaratanName,
+                    jenisUkom,
+                    jabatanCode,
+                    jenjangCode,
+                    isMengulang
+                } = this.documentForm.value
 
-                Object.assign(this.documentData, { dokumenPersyaratanName, jenisUkom, jabatanCode, jenjangCode, isMengulang });
+                Object.assign(this.documentData, {
+                    dokumenPersyaratanName,
+                    jenisUkom,
+                    jabatanCode,
+                    jenjangCode,
+                    isMengulang
+                })
 
-                console.log(this.documentData);
+                console.log(this.documentData)
 
-                this.apiService.postData(`/api/v1/document_ukom/dokumen_persyaratan`, this.documentData)
+                this.apiService
+                    .postData(
+                        `/api/v1/document_ukom/dokumen_persyaratan`,
+                        this.documentData
+                    )
                     .subscribe({
-                        next: () => this.handleSuccess(),
-                        error: (error) => this.handleError(error),
-                        complete: () => this.submitLoading$.next(false)
-                    });
+                        next: () => {
+                            this.handleSuccess()
+                            this.submitLoading$.next(false)
+                        },
+                        error: error => {
+                            this.handleError(error)
+                            this.submitLoading$.next(false)
+                        }
+                    })
             }
-        });
+        })
     }
 
-    private handleSuccess() {
-        this.submitLoading$.next(false);
-        this.handlerService.handleAlert('Success', 'Data berhasil disimpan');
-        this.changeTabActive.emit(0);
+    private handleSuccess () {
+        this.submitLoading$.next(false)
+        this.handlerService.handleAlert('Success', 'Data berhasil disimpan')
+        this.changeTabActive.emit(0)
     }
 
-    private handleError(error: any) {
-        this.submitLoading$.next(false);
-        console.error(error.error.message);
-        this.handlerService.handleAlert('Error', 'Gagal menyimpan data');
+    private handleError (error: any) {
+        this.submitLoading$.next(false)
+        console.error(error.error.message)
+        this.handlerService.handleAlert('Error', 'Gagal menyimpan data')
     }
 }

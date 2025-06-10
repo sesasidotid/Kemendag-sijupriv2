@@ -1,0 +1,38 @@
+<div
+    *ngIf="isLoading$ | async; else indikatorKompetensiContent"
+    class="d-flex justify-content-center my-5"
+>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<ng-template #indikatorKompetensiContent
+    ><button class="btn btn-sm btn-outline-secondary mb-3" (click)="onBack()">
+        <i class="mdi mdi-chevron-left"></i> Kembali
+    </button>
+    <div class="card flex-grow-1 m-0 detail-jf">
+        <div class="card-header">
+            <h5 class="m-0">
+                <i class="mdi mdi-certificate me-2"></i> Informasi Indikator
+                Komptensi
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label class="form-label">Kode Indikator Kompetensi</label>
+                    <p>{{ detailIndikatorKompetensi.code }}</p>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label">Kompetensi </label>
+                    <p>{{ detailKompetensi.name }}</p>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label">Nama Indikator Kompetensi</label>
+                    <p>{{ detailIndikatorKompetensi.name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

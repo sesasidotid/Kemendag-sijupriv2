@@ -49,21 +49,21 @@ export class AKPTaskComponent {
     action$ = new BehaviorSubject<'approve' | 'reject'>('approve')
     pagable$ = new BehaviorSubject<Pagable | null>(null)
 
-    constructor(
+    constructor (
         private tabService: TabService,
         private akpTaskService: AkpTaskService,
         private alertService: AlertService,
         private router: Router,
         private confirmationService: ConfirmationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleForm()
         this.handleTabService()
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable$.next(
             new PagableBuilder('/api/v1/akp/task/search')
                 .addPrimaryColumn(
@@ -87,9 +87,13 @@ export class AKPTaskComponent {
                 .addActionColumn(
                     new ActionColumnBuilder()
                         .setAction((task: any) => {
-                            this.router.navigate([`/akp/akp-task-list/${task.id}`])
+                            this.router.navigate([
+                                `/akp/akp-task-list/${task.id}`
+                            ])
                         }, 'info')
-                        .addInactiveCondition((task: any) => task.flowId === 'akp_flow_1')
+                        .addInactiveCondition(
+                            (task: any) => task.flowId === 'akp_flow_1'
+                        )
                         .withIcon('detail')
                         .build()
                 )
@@ -99,7 +103,9 @@ export class AKPTaskComponent {
                             this.taskId$.next(task.id)
                             this.toggleModal()
                         }, 'primary')
-                        .addInactiveCondition((task: any) => task.flowId !== 'akp_flow_1')
+                        .addInactiveCondition(
+                            (task: any) => task.flowId !== 'akp_flow_1'
+                        )
                         .withIcon('update')
                         .build()
                 )
@@ -119,7 +125,7 @@ export class AKPTaskComponent {
         )
     }
 
-    handleForm() {
+    handleForm () {
         this.form = new FormGroup({
             nama_atasan: new FormControl('', [Validators.required]),
             email_atasan: new FormControl('', [
@@ -130,7 +136,7 @@ export class AKPTaskComponent {
         })
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -154,7 +160,7 @@ export class AKPTaskComponent {
             })
     }
 
-    handlePagableTabChange(tab: string, tabIndex: number) {
+    handlePagableTabChange (tab: string, tabIndex: number) {
         const currentPagable = this.pagable$.value
 
         const updatedPagable = {
@@ -168,47 +174,49 @@ export class AKPTaskComponent {
         this.pagable$.next(updatedPagable)
     }
 
-    toggleModal() {
+    toggleModal () {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-
-    handleSave() {
+    handleSave () {
         this.confirmationService.open(false).subscribe({
             next: result => {
-                if (!result.confirmed) return;
+                if (!result.confirmed) return
 
-                this.submitButtonLoading$.next(true);
+                this.submitButtonLoading$.next(true)
 
-                const action = this.action$.value;
-                const isApprove = action === 'approve';
-                const isReject = action === 'reject';
+                const action = this.action$.value
+                const isApprove = action === 'approve'
+                const isReject = action === 'reject'
 
                 const isApproveValid =
                     isApprove &&
                     this.form.get('nama_atasan')?.valid &&
-                    this.form.get('email_atasan')?.valid;
+                    this.form.get('email_atasan')?.valid
 
-                const isRejectValid = isReject && this.form.get('remark')?.valid;
+                const isRejectValid = isReject && this.form.get('remark')?.valid
 
-                if ((isApprove && !isApproveValid) || (isReject && !isRejectValid)) {
-                    this.submitButtonLoading$.next(false);
-                    return;
+                if (
+                    (isApprove && !isApproveValid) ||
+                    (isReject && !isRejectValid)
+                ) {
+                    this.submitButtonLoading$.next(false)
+                    return
                 }
 
-                this.payload.id = this.taskId$.value;
-                this.payload.taskAction = action;
+                this.payload.id = this.taskId$.value
+                this.payload.taskAction = action
 
                 if (isApprove) {
                     this.payload.object = {
                         emailAtasan: this.form.get('email_atasan')?.value,
                         namaAtasan: this.form.get('nama_atasan')?.value
-                    };
+                    }
                 }
 
                 if (isReject) {
-                    const remark = this.form.get('remark')?.value;
-                    if (remark) this.payload.remark = remark;
+                    const remark = this.form.get('remark')?.value
+                    if (remark) this.payload.remark = remark
                 }
 
                 this.akpTaskService.verifAKPTask(this.payload).subscribe({
@@ -216,30 +224,28 @@ export class AKPTaskComponent {
                         const message =
                             action === 'approve'
                                 ? 'Berhasil menerima pengajuan AKP.'
-                                : 'Berhasil menolak pengajuan AKP.';
+                                : 'Berhasil menolak pengajuan AKP.'
 
-                        this.alertService.showToast('Success', message);
-                        this.toggleModal();
+                        this.alertService.showToast('Success', message)
+                        this.toggleModal()
+                        this.submitButtonLoading$.next(false)
 
                         setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
+                            window.location.reload()
+                        }, 1000)
                     },
                     error: () => {
                         const message =
                             action === 'approve'
                                 ? 'Gagal menerima pengajuan AKP.'
-                                : 'Gagal menolak pengajuan AKP.';
+                                : 'Gagal menolak pengajuan AKP.'
 
-                        this.alertService.showToast('Error', message);
-                        this.toggleModal();
-                    },
-                    complete: () => {
-                        this.submitButtonLoading$.next(false);
+                        this.alertService.showToast('Error', message)
+                        this.toggleModal()
+                        this.submitButtonLoading$.next(false)
                     }
-                });
+                })
             }
-        });
+        })
     }
-
 }

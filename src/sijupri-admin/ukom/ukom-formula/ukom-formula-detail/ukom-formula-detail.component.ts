@@ -31,20 +31,20 @@ export class UkomFormulaDetailComponent {
     filteredJabatan$: Observable<Jabatan | undefined>
     filteredJenjang$: Observable<Jenjang | undefined>
 
-    constructor(
+    constructor (
         private route: ActivatedRoute,
         private apiService: ApiService,
         private handlerService: HandlerService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.id = this.route.snapshot.paramMap.get('id') || ''
         this.getJenjang()
         this.getJabatan()
         this.getDetailFormula()
     }
 
-    getJenjang() {
+    getJenjang () {
         this.apiService.getData(`/api/v1/jenjang`).subscribe({
             next: (response: any) => {
                 const jenjangs = response.map(
@@ -63,7 +63,7 @@ export class UkomFormulaDetailComponent {
         })
     }
 
-    getJabatan() {
+    getJabatan () {
         this.apiService.getData(`/api/v1/jabatan`).subscribe({
             next: (response: any) => {
                 const jabatans = response.map(
@@ -82,11 +82,11 @@ export class UkomFormulaDetailComponent {
         })
     }
 
-    back() {
+    back () {
         history.back()
     }
 
-    getDetailFormula() {
+    getDetailFormula () {
         this.FormulaDetailLoading$.next(true)
         this.apiService.getData(`/api/v1/ukom_formula/${this.id}`).subscribe({
             next: (response: FormulaDetail) => {
@@ -94,23 +94,31 @@ export class UkomFormulaDetailComponent {
 
                 this.filteredJabatan$ = this.jabatanList$.pipe(
                     map(jabatanList =>
-                        jabatanList.find(j => j.code === this.FormulaDetail.jabatanCode)
+                        jabatanList.find(
+                            j => j.code === this.FormulaDetail.jabatanCode
+                        )
                     ),
                     startWith(undefined)
                 )
 
                 this.filteredJenjang$ = this.jenjangList$.pipe(
                     map(jenjangList =>
-                        jenjangList.find(j => j.code === this.FormulaDetail.jenjangCode)
+                        jenjangList.find(
+                            j => j.code === this.FormulaDetail.jenjangCode
+                        )
                     ),
                     startWith(undefined)
                 )
+                this.FormulaDetailLoading$.next(false)
             },
             error: err => {
                 console.error('Error fetching formula detail:', err)
-                this.handlerService.handleAlert('Error', 'Gagal mengambil data formula')
-            },
-            complete: () => this.FormulaDetailLoading$.next(false)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengambil data formula'
+                )
+                this.FormulaDetailLoading$.next(false)
+            }
         })
     }
 }

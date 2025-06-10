@@ -35,18 +35,18 @@ export class UkomExaminerAddComponent {
 
     examinerData: ExaminerUkom = new ExaminerUkom()
 
-    constructor(
+    constructor (
         private confirmationService: ConfirmationService,
         private router: Router,
         private apiService: ApiService,
         private handlerService: HandlerService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleFormInit()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.examinerForm = new FormGroup({
             name: new FormControl('', Validators.required),
             nip: new FormControl('', Validators.required),
@@ -59,7 +59,7 @@ export class UkomExaminerAddComponent {
         })
     }
 
-    passwordMatchValidator(
+    passwordMatchValidator (
         control: FormControl
     ): { [key: string]: boolean } | null {
         if (this.examinerForm) {
@@ -72,7 +72,7 @@ export class UkomExaminerAddComponent {
         return null
     }
 
-    submit() {
+    submit () {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
@@ -81,7 +81,8 @@ export class UkomExaminerAddComponent {
                 this.examinerData.nip = this.examinerForm.get('nip').value
                 this.examinerData.jenis_kelamin_code =
                     this.examinerForm.get('jenis_kelamin_code').value
-                this.examinerData.password = this.examinerForm.get('password').value
+                this.examinerData.password =
+                    this.examinerForm.get('password').value
 
                 console.log('examinerData', this.examinerData)
 
@@ -93,14 +94,17 @@ export class UkomExaminerAddComponent {
                                 'Success',
                                 'Data berhasil disimpan'
                             )
-                            //   this.router.navigate(['/ukom/ukom-examiner-list'])
                             this.changeTabActive.emit(0)
+                            this.submitLoading$.next(false)
                         },
                         error: () => {
-                            this.handlerService.handleAlert('Error', 'Data gagal disimpan')
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Data gagal disimpan'
+                            )
+                            this.submitLoading$.next(false)
                         },
                         complete: () => {
-                            this.submitLoading$.next(false)
                             this.router.navigate(['/ukom/ukom-examiner-list'])
                         }
                     })

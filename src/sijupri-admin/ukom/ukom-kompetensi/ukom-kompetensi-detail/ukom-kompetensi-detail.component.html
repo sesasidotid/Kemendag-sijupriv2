@@ -1,0 +1,66 @@
+<div
+    *ngIf="isKompetensiLoading$ | async; else kompetensiContent"
+    class="d-flex justify-content-center my-5"
+>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<ng-template #kompetensiContent>
+    <!-- <button class="btn btn-sm btn-outline-secondary mb-3" (click)="onBack()">
+        <i class="mdi mdi-chevron-left"></i> Kembali
+    </button> -->
+    <ng-container [ngSwitch]="tab$ | async">
+        <ng-container *ngSwitchCase="0">
+            <div class="card flex-grow-1 m-0 detail-jf">
+                <div class="card-header">
+                    <h5 class="m-0">
+                        <i class="mdi mdi-certificate me-2"></i> Informasi
+                        Komptensi
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Kode Kompetensi</label>
+                            <p>{{ kompetensi.code }}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Level </label>
+                            <p>{{ kompetensi.level }}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Nama Kompetensi</label>
+                            <p>{{ kompetensi.name }}</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Deskripsi</label>
+                            <p>{{ kompetensi.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="m-0">
+                        <i class="mdi mdi-list-box me-2"></i> Daftar Indikator
+                        Kompetensi
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <app-ukom-kompetensi-detail-pagable></app-ukom-kompetensi-detail-pagable>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="1">
+            <div class="card" *ngIf="kompetensi.id">
+                <app-ukom-indikator-kompetensi-add
+                    [kompetensi]="kompetensi"
+                ></app-ukom-indikator-kompetensi-add>
+            </div>
+        </ng-container>
+    </ng-container>
+</ng-template>

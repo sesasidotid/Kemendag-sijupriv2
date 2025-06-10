@@ -48,20 +48,20 @@ export class LoginComponent {
         message: ''
     })
     recaptchaSiteKey = environment.recaptcha.siteKey
-    isForgotPassword = false;
+    isForgotPassword = false
 
     readonly Eye = Eye
     readonly EyeOff = EyeOff
 
-    constructor(
+    constructor (
         private applicationServce: ApplicationService,
         private authService: AuthService,
         private router: Router
     ) {
-        setTimeout(() => { }, 0)
+        setTimeout(() => {}, 0)
     }
 
-    ngOnInit() {
+    ngOnInit () {
         if (LoginContext.isLogin()) {
             this.router.navigate(['/'])
         }
@@ -70,7 +70,7 @@ export class LoginComponent {
         this.handleFormInit()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.loginForm = new FormGroup({
             nip: new FormControl('', [
                 Validators.required,
@@ -80,64 +80,68 @@ export class LoginComponent {
             ]),
             password: new FormControl('', [Validators.required]),
             recaptcha: new FormControl(null, [Validators.required])
-        });
+        })
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        const control = this.loginForm.get(controlName);
+    getErrorMessage (controlName: string, label: string): string | null {
+        const control = this.loginForm.get(controlName)
 
-        if (!control || !control.errors || (!control.touched && !control.dirty)) {
-            return null; // No error or untouched field
+        if (
+            !control ||
+            !control.errors ||
+            (!control.touched && !control.dirty)
+        ) {
+            return null // No error or untouched field
         }
 
-        const errors = control.errors;
+        const errors = control.errors
 
         if (errors['required']) {
-            return `${label} tidak boleh kosong.`;
+            return `${label} tidak boleh kosong.`
         }
         if (errors['email']) {
-            return `Format ${label} tidak valid.`;
+            return `Format ${label} tidak valid.`
         }
         if (errors['minlength']) {
-            return `${label} minimal ${errors['minlength'].requiredLength} karakter.`;
+            return `${label} minimal ${errors['minlength'].requiredLength} karakter.`
         }
         if (errors['pattern']) {
             if (controlName == 'nip') {
-                return `${label} harus terdiri dari 18 digit angka.`;
+                return `${label} harus terdiri dari 18 digit angka.`
             }
 
             if (controlName == 'nik') {
-                return `${label} harus terdiri dari 16 digit angka.`;
+                return `${label} harus terdiri dari 16 digit angka.`
             }
 
             if (controlName === 'phone') {
-                return `${label} harus terdiri dari 10 hingga 15 digit angka.`;
+                return `${label} harus terdiri dari 10 hingga 15 digit angka.`
             }
 
-            return `Format ${label} tidak valid.`;
+            return `Format ${label} tidak valid.`
         }
         if (errors['mismatch']) {
-            return `Password dan Konfirmasi Password tidak cocok.`;
+            return `Password dan Konfirmasi Password tidak cocok.`
         }
 
-        return null; // Default case
+        return null // Default case
     }
 
-    showForgotPassword() {
-        this.isForgotPassword = true;
+    showForgotPassword () {
+        this.isForgotPassword = true
     }
 
-    showLoginForm() {
+    showLoginForm () {
         location.reload()
         // this.handleFormInit()
         // this.isForgotPassword = false;
     }
 
-    navigateTo(path: string) {
+    navigateTo (path: string) {
         this.router.navigate([path])
     }
 
-    getApplicationList() {
+    getApplicationList () {
         this.applicationServce.findAll().subscribe({
             next: (applicationList: Application[]) => {
                 this.applicationList = applicationList
@@ -145,20 +149,20 @@ export class LoginComponent {
         })
     }
 
-    onCaptchaResolved(token: string) {
+    onCaptchaResolved (token: string) {
         this.loginForm.get('recaptcha').setValue(token)
     }
 
-    togglePasswordVisibility(): void {
+    togglePasswordVisibility (): void {
         this.isPasswordVisible = !this.isPasswordVisible
     }
 
-    backToLandingPage() {
+    backToLandingPage () {
         this.isLoginLoading$.next(false)
         this.router.navigate([''])
     }
 
-    onSubmit() {
+    onSubmit () {
         if (this.loginForm.invalid) return
 
         this.isLoginLoading$.next(true)
@@ -201,5 +205,4 @@ export class LoginComponent {
             })
         }
     }
-
 }

@@ -27,6 +27,7 @@ import {
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
 @Component({
     selector: 'app-ukom-kompetensi-list',
     standalone: true,
@@ -44,8 +45,9 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
 export class UkomKompetensiListComponent {
     tab$ = new BehaviorSubject<number | null>(0)
     pagable: Pagable
-    jabatanList: Jabatan[] = []
-    jenjangList: Jenjang[] = []
+    jenjangMap: Record<string, string> = {}
+    jabatanMap: Record<string, string> = {}
+    bidangJabatanMap: Record<string, string> = {}
     refreshToggle: boolean = false
 
     isModalOpen$ = new BehaviorSubject<boolean>(false)
@@ -53,54 +55,65 @@ export class UkomKompetensiListComponent {
     editKompetensiForm: FormGroup
     loadingButton$ = new BehaviorSubject<boolean>(false)
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         public tabService: TabService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private formValidationService: FormValidationService
-    ) { }
+        private formValidationService: FormValidationService,
+        private router: Router
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleFormInit()
         this.handlePagable()
         this.handleTabService()
         this.getJabatanList()
         this.getJenjangList()
+        this.getBidangJabatanList()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.editKompetensiForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.editKompetensiForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.editKompetensiForm = new FormGroup({
             id: new FormControl(''),
             name: new FormControl('', Validators.required)
         })
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder(`/api/v1/kompetensi/search`)
             .addPrimaryColumn(new PrimaryColumnBuilder('Kode', 'code').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jabatan', (data: any) => {
-                        const matchingJabatan = this.jabatanList.find(
-                            (jabatan: Jabatan) => jabatan.code === data.jabatanCode
-                        )
-                        return matchingJabatan ? matchingJabatan.name : null
-                    })
+                    .withDynamicValue(
+                        'Jabatan',
+                        (data: any) => this.jabatanMap[data.jabatanCode]
+                    )
                     .build()
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jenjang', (data: any) => {
-                        const matchingJenjang = this.jenjangList.find(
-                            (jenjang: Jenjang) => jenjang.code === data.jenjangCode
+                        return this.jenjangMap[data.jenjangCode] || null
+                    })
+                    .build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Bidang Jabatan', (data: any) => {
+                        return (
+                            this.bidangJabatanMap[data.bidangJabatanCode] ||
+                            null
                         )
-                        return matchingJenjang ? matchingJenjang.name : null
                     })
                     .build()
             )
@@ -119,6 +132,16 @@ export class UkomKompetensiListComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((data: any) => {
+                        this.router.navigate([
+                            `maintenance/kompetensi-list/${data.id}`
+                        ])
+                    }, 'info')
+                    .withIcon('detail')
+                    .build()
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: any) => {
                         this.setDefaultFormValues(data)
                         this.toggleModal()
                     }, 'primary')
@@ -128,7 +151,7 @@ export class UkomKompetensiListComponent {
             .build()
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -147,48 +170,70 @@ export class UkomKompetensiListComponent {
             })
     }
 
-    setDefaultFormValues(data: any) {
+    setDefaultFormValues (data: any) {
         this.editKompetensiForm.patchValue({
             id: data.id || '',
             name: data.name || ''
         })
     }
 
-    getJabatanList() {
-        this.apiService.getData('/api/v1/jabatan').subscribe({
+    getJabatanList () {
+        this.apiService.getData(`/api/v1/jabatan`).subscribe({
             next: (response: any) => {
-                this.jabatanList = response.map(
-                    (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
-                )
+                response.forEach((j: any) => {
+                    const jabatan = new Jabatan(j)
+                    this.jabatanMap[jabatan.code] = jabatan.name
+                })
+            },
+            error: err => {
+                console.error('Error fetching jabatan data:', err)
             }
         })
     }
 
-    getJenjangList() {
+    getJenjangList () {
         this.apiService.getData('/api/v1/jenjang/').subscribe({
             next: (response: any) => {
-                this.jenjangList = response.map(
-                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
-                )
+                response.forEach((j: any) => {
+                    const jenjang = new Jenjang(j)
+                    this.jenjangMap[jenjang.code] = jenjang.name
+                })
+            },
+            error: err => {
+                console.error('Error fetching jenjang data:', err)
             }
         })
     }
 
-    handleTabChange(tab?: number) {
-        console.log('tab', tab)
+    getBidangJabatanList () {
+        this.apiService.getData('/api/v1/bidang_jabatan/').subscribe({
+            next: (response: any) => {
+                response.forEach((b: any) => {
+                    const bidangJabatan = new BidangJabatan(b)
+                    this.bidangJabatanMap[bidangJabatan.code] =
+                        bidangJabatan.name
+                })
+            },
+            error: err => {
+                console.error('Error fetching bidang jabatan data:', err)
+            }
+        })
+    }
+
+    handleTabChange (tab?: number) {
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }
 
-    toggleModal() {
+    toggleModal () {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    handleRefreshToggle() {
+    handleRefreshToggle () {
         this.refreshToggle = !this.refreshToggle
     }
 
-    submit() {
+    submit () {
         const payload = {
             id: this.editKompetensiForm.value.id,
             name: this.editKompetensiForm.value.name
@@ -200,21 +245,26 @@ export class UkomKompetensiListComponent {
 
                 this.loadingButton$.next(true)
 
-                this.apiService.putData('/api/v1/kompetensi', payload).subscribe({
-                    next: response => {
-                        this.loadingButton$.next(false)
-                        this.handlerService.handleAlert(
-                            'Success',
-                            'Berhasil mengubah data'
-                        )
-                        this.handleRefreshToggle()
-                        this.toggleModal()
-                    },
-                    error: error => {
-                        this.loadingButton$.next(false)
-                        this.handlerService.handleAlert("Error", "Gagal mengubah data")
-                    }
-                })
+                this.apiService
+                    .putData('/api/v1/kompetensi', payload)
+                    .subscribe({
+                        next: () => {
+                            this.loadingButton$.next(false)
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil mengubah data'
+                            )
+                            this.handleRefreshToggle()
+                            this.toggleModal()
+                        },
+                        error: () => {
+                            this.loadingButton$.next(false)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengubah data'
+                            )
+                        }
+                    })
             }
         })
     }

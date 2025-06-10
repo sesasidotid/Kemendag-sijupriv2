@@ -51,26 +51,24 @@ export class LoginCatComponent {
 
     recaptchaSiteKey = environment.recaptcha.siteKey
 
-    constructor(
+    constructor (
         private applicationServce: ApplicationService,
         private authService: AuthService,
         private router: Router
-    ) {
+    ) {}
 
-    }
-
-    backToLandingPage() {
+    backToLandingPage () {
         if (LoginContext.isLogin()) {
             this.router.navigate(['/'])
         }
         this.router.navigate([''])
     }
 
-    navigateTo(path: string) {
+    navigateTo (path: string) {
         this.router.navigate([path])
     }
 
-    ngOnInit() {
+    ngOnInit () {
         this.isLoginLoading$.next(false)
         this.getApplicationList()
         this.loginForm = new FormGroup({
@@ -85,7 +83,7 @@ export class LoginCatComponent {
         })
     }
 
-    getApplicationList() {
+    getApplicationList () {
         this.applicationServce.findAll().subscribe({
             next: (applicationList: Application[]) => {
                 this.applicationList = applicationList
@@ -94,15 +92,15 @@ export class LoginCatComponent {
         })
     }
 
-    onCaptchaResolved(token: string) {
+    onCaptchaResolved (token: string) {
         this.loginForm.get('recaptcha').setValue(token)
     }
 
-    togglePasswordVisibility(): void {
+    togglePasswordVisibility (): void {
         this.isPasswordVisible = !this.isPasswordVisible // Toggle the visibility
     }
 
-    onSubmit() {
+    onSubmit () {
         this.isLoginLoading$.next(true)
         if (this.loginForm.valid) {
             console.log(this.loginForm.value)

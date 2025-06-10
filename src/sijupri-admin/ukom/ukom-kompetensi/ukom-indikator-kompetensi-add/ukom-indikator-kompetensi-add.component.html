@@ -1,0 +1,115 @@
+<section>
+    <form [formGroup]="indikatorKompetensiForm" (ngSubmit)="onSubmit()">
+        <!-- Read-only Kompetensi Name -->
+        <div class="row mb-3">
+            <label for="kompetensiName" class="col-sm-2 col-form-label fw-bold">
+                Kompetensi <span class="text-danger">*</span>
+            </label>
+            <div class="col-sm-10">
+                <input
+                    type="text"
+                    id="kompetensiName"
+                    class="form-control"
+                    [value]="kompetensi?.name || ''"
+                    readonly
+                    disabled
+                />
+            </div>
+        </div>
+
+        <!-- Hidden Kompetensi ID -->
+        <input type="hidden" formControlName="kompetensi_id" />
+
+        <!-- code indicator-->
+        <div class="row mb-3">
+            <label for="code" class="col-sm-2 col-form-label fw-bold">
+                Kode Indikator Kompetensi <span class="text-danger">*</span>
+            </label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <span class="input-group-text" id="prefix-g"
+                        >{{ kompetensi.code }}-</span
+                    >
+
+                    <input
+                        type="text"
+                        id="code"
+                        class="form-control"
+                        name="code"
+                        formControlName="code"
+                        placeholder="Masukan kode"
+                        aria-describedby="prefix-g"
+                    />
+                </div>
+
+                <div
+                    *ngIf="
+                        getErrorMessage(
+                            'code',
+                            'Kode indikator kompetensi'
+                        ) as error
+                    "
+                    class="text-danger mt-1"
+                >
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Indikator Kompetensi Input -->
+        <div class="row mb-3">
+            <label for="name" class="col-sm-2 col-form-label fw-bold">
+                Indikator Kompetensi <span class="text-danger">*</span>
+            </label>
+            <div class="col-sm-10">
+                <textarea
+                    id="name"
+                    class="form-control"
+                    name="name"
+                    formControlName="name"
+                    placeholder="Masukan nama indikator kompetensi"
+                    rows="3"
+                ></textarea>
+                <div
+                    *ngIf="
+                        getErrorMessage(
+                            'name',
+                            'Nama indikator kompetensi'
+                        ) as error
+                    "
+                    class="text-danger"
+                >
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-12">
+                <ng-container *ngIf="isSubmitLoading$ | async; else noLoading">
+                    <button class="btn btn-success float-end" disabled>
+                        <div
+                            class="spinner-border"
+                            style="width: 19px; height: 19px"
+                            role="status"
+                        >
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </ng-container>
+                <ng-template #noLoading>
+                    <button
+                        type="submit"
+                        class="btn btn-success float-end"
+                        [disabled]="
+                            indikatorKompetensiForm.invalid ||
+                            (isSubmitLoading$ | async)
+                        "
+                    >
+                        Simpan
+                    </button>
+                </ng-template>
+            </div>
+        </div>
+    </form>
+</section>

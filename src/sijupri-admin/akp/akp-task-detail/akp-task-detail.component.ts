@@ -56,14 +56,14 @@ export class AkpTaskDetailComponent {
         }
     }
 
-    constructor(
+    constructor (
         private activatedRoute: ActivatedRoute,
         private akpTaskService: AkpTaskService,
         private alertService: AlertService,
         private router: Router
-    ) { }
+    ) {}
 
-    ngOnInit(): void {
+    ngOnInit (): void {
         this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
             this.akpId = params.get('id')
         })
@@ -71,7 +71,7 @@ export class AkpTaskDetailComponent {
         this.handleFormInit()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.form = new FormGroup({
             rekomendasiFile: new FormControl('', [
                 Validators.required,
@@ -79,28 +79,25 @@ export class AkpTaskDetailComponent {
             ])
         })
     }
-    tabChange(tab: number) {
+    tabChange (tab: number) {
         this.currentTab$.next(tab)
     }
 
-    backToList() {
+    backToList () {
         this.router.navigate(['/akp/akp-task-list'])
     }
 
-    getAKPDetail() {
+    getAKPDetail () {
         this.AKPDetailLoading$.next(true)
         this.akpTaskService.getAKPTaskDetailById(this.akpId).subscribe({
             next: response => {
                 this.AKPDetail = response
-                console.log(this.AKPDetail)
-            },
-            complete: () => {
                 this.AKPDetailLoading$.next(false)
             }
         })
     }
 
-    rekomendasiSubmit() {
+    rekomendasiSubmit () {
         this.rekomendasiSubmitLoading$.next(true)
         this.rekomendasiPayload.id = this.AKPDetail.id
         this.rekomendasiPayload.taskAction = 'approve'

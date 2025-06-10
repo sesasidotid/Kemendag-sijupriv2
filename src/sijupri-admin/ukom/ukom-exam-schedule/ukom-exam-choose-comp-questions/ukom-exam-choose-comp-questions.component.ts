@@ -378,7 +378,7 @@ export class UkomExamChooseCompQuestionsComponent {
                 this.apiService
                     .postData('/api/v1/room_ukom/question', this.payload)
                     .subscribe({
-                        next: (res: any) => {
+                        next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Berhasil menambahkan pertanyaan'
