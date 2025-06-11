@@ -1,7 +1,7 @@
 import { FilePreviewComponent } from './../file-preview/file-preview.component'
 import { Component } from '@angular/core'
 import { UkomTaskDetail } from '../../../ukom/models/ukom-task-detail.modal'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { BehaviorSubject, combineLatest, map, Observable, take } from 'rxjs'
 import { LoginContext } from '../../commons/login-context'
 import { ModalComponent } from '../modal/modal.component'
 import { UkomRevisionComponent } from '../../../../sijupri-jf/ukom/ukom-revision/ukom-revision.component'
@@ -43,7 +43,6 @@ export enum JenisUkomEnum {
 export class StatusPendaftaranUkomComponent {
     pendingTask: UkomTaskDetail = new UkomTaskDetail()
     groupedUkomPendingTaskHistory: { [key: string]: any[] } = {}
-    ukomDataLoading$ = new BehaviorSubject<boolean>(true)
 
     ukomStep$ = new BehaviorSubject<number>(1)
     currentUkomStep$ = new BehaviorSubject<number>(1)
@@ -70,6 +69,22 @@ export class StatusPendaftaranUkomComponent {
     bidangJabatanName: string
 
     key: string = undefined
+
+    isLoadPredikatKinerja: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false)
+    isLoadingPendingTask$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false)
+    isLoadingPendidikan$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false)
+    isLoadingProvinsi$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+        false
+    )
+    isLoadingKabupaten$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false)
+    isLoadingBidangJabatan$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false)
+
+    isLoading$: Observable<boolean>
     constructor (
         private converterService: ConverterService,
         private apiService: ApiService,
@@ -77,33 +92,42 @@ export class StatusPendaftaranUkomComponent {
         private activatedRoute: ActivatedRoute,
         private sanitizer: DomSanitizer,
         private handlerService: HandlerService
-    ) {}
+    ) {
+        this.isLoading$ = combineLatest([
+            this.isLoadPredikatKinerja,
+            this.isLoadingPendingTask$,
+            this.isLoadingPendidikan$,
+            this.isLoadingProvinsi$,
+            this.isLoadingKabupaten$,
+            this.isLoadingBidangJabatan$
+        ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
+    }
 
     ngOnInit () {
-        this.activatedRoute.queryParams.subscribe(params => {
+        this.activatedRoute.queryParams.pipe(take(1)).subscribe(params => {
             const key = params['key']
-
-            if (key) {
-                this.key = key
-            }
+            this.key = key
             this.loadPredikatKinerja()
         })
     }
 
     loadPredikatKinerja () {
+        this.isLoadPredikatKinerja.next(true)
         this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
             next: res => {
                 this.predikatKinerjaList = res
                 this.getPendingTask(this.key)
+                this.isLoadPredikatKinerja.next(false)
             },
             error: err => {
-                console.error('Failed to fetch predikat kinerja:', err)
                 this.getPendingTask(this.key)
+                this.isLoadPredikatKinerja.next(false)
             }
         })
     }
 
     getPendidikanList (pendidikanTerakhirCode: string) {
+        this.isLoadingPendidikan$.next(true)
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
             next: response => {
                 const matchedPendidikan = response.find(
@@ -113,6 +137,14 @@ export class StatusPendaftaranUkomComponent {
                 this.pendidikanName = matchedPendidikan
                     ? matchedPendidikan.name
                     : null
+                this.isLoadingPendidikan$.next(false)
+            },
+            error: error => {
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal memuat data pendidikan'
+                )
+                this.isLoadingPendidikan$.next(false)
             }
         })
     }
@@ -185,34 +217,60 @@ export class StatusPendaftaranUkomComponent {
     }
 
     getProvinsiNameByCode (provinsiCode: string) {
+        this.isLoadingProvinsi$.next(true)
         this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
             next: response => {
                 this.provinsiName = response.name ?? null
+                this.isLoadingProvinsi$.next(false)
+            },
+            error: error => {
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal memuat data provinsi'
+                )
+                this.isLoadingProvinsi$.next(false)
             }
         })
     }
 
     getKabupatenNameByCode (kabupatenCode: string) {
+        this.isLoadingKabupaten$.next(true)
         this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
             next: response => {
                 this.kabupatenName = response.name ?? null
                 this.typeKabKota = response.type ?? null
+                this.isLoadingKabupaten$.next(false)
+            },
+            error: error => {
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal memuat data kabupaten'
+                )
+                this.isLoadingKabupaten$.next(false)
             }
         })
     }
 
     getBidangjabatanNameByCode (bidangJabatanCode: string) {
+        this.isLoadingBidangJabatan$.next(true)
         this.apiService
             .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
             .subscribe({
                 next: response => {
                     this.bidangJabatanName = response.name ?? null
+                    this.isLoadingBidangJabatan$.next(false)
+                },
+                error: error => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data bidang jabatan'
+                    )
+                    this.isLoadingBidangJabatan$.next(false)
                 }
             })
     }
 
     getPredikatKinerja (code: string | null): string {
-        console.log('code', code)
         if (!code || code == null) return '-'
         const predikat = this.predikatKinerjaList.find(
             predikat => predikat.id === code
@@ -221,7 +279,7 @@ export class StatusPendaftaranUkomComponent {
     }
 
     getPendingTask (key: string) {
-        this.ukomDataLoading$.next(true)
+        this.isLoadingPendingTask$.next(true)
         this.apiService
             .getData(`/api/v1/participant_ukom_detail?key=${key}`)
             .subscribe({
@@ -252,7 +310,6 @@ export class StatusPendaftaranUkomComponent {
 
                     if (response.status == 'pending') {
                         this.pendingTask = response.data
-                        console.log('Pending Task:', this.pendingTask)
 
                         switch (this.pendingTask.flowId) {
                             case 'ukom_flow_1':
@@ -281,10 +338,10 @@ export class StatusPendaftaranUkomComponent {
                         this.mapDokumenUkom()
                     }
 
-                    this.ukomDataLoading$.next(false)
+                    this.isLoadingPendingTask$.next(false)
                 },
                 error: error => {
-                    this.ukomDataLoading$.next(false)
+                    this.isLoadingPendingTask$.next(false)
                 }
             })
     }
@@ -293,8 +350,6 @@ export class StatusPendaftaranUkomComponent {
         tanggalLahir: string | Date,
         tglSuratUsulan: string | Date
     ): string {
-        console.log('calculateAge', tanggalLahir, tglSuratUsulan)
-
         if (!tanggalLahir || !tglSuratUsulan) {
             return '-'
         }
@@ -377,5 +432,91 @@ export class StatusPendaftaranUkomComponent {
 
     convertDate (date: string) {
         return this.converterService.dateToHumanReadable(date)
+    }
+
+    getGroupedCompetencies (): any[] {
+        console.log('finishTask', this.finishTask)
+        if (!this.finishTask.grades.cat.kompetensiIndikatorDtoList) {
+            console.warn('No kompetensi data available')
+            return []
+        }
+
+        // Group by kompetensiId
+        const grouped =
+            this.finishTask.grades.cat.kompetensiIndikatorDtoList.reduce(
+                (acc: any, kompetensi: any) => {
+                    const key = kompetensi.kompetensiId || 'default'
+
+                    if (!acc[key]) {
+                        acc[key] = {
+                            name: kompetensi.kompetensiName || '-',
+                            items: [],
+                            total: 0,
+                            correct: 0
+                        }
+                    }
+
+                    acc[key].items.push(kompetensi)
+                    acc[key].total += kompetensi.questionDtoList?.length || 0
+                    acc[key].correct += this.getCorrectAnswersCount(kompetensi)
+
+                    return acc
+                },
+                {}
+            )
+
+        console.log('grouped', grouped)
+
+        return Object.values(grouped).map((group: any) => ({
+            ...group,
+            percentage:
+                group.total > 0
+                    ? Math.round((group.correct / group.total) * 100)
+                    : 0
+        }))
+    }
+
+    getCorrectAnswer (question: any): string {
+        const correctChoice = question.multipleChoiceDtoList.find(
+            (choice: any) => choice.correct
+        )
+        return correctChoice ? correctChoice.choiceId : ''
+    }
+
+    getCompetencyPercentage (kompetensi: any): number {
+        if (
+            !kompetensi.questionDtoList ||
+            kompetensi.questionDtoList.length === 0
+        ) {
+            return 0
+        }
+
+        const correctAnswers = this.getCorrectAnswersCount(kompetensi)
+        const totalQuestions = kompetensi.questionDtoList.length
+
+        return Math.round((correctAnswers / totalQuestions) * 100)
+    }
+
+    getCorrectAnswersCount (kompetensi: any): number {
+        if (!kompetensi.questionDtoList) {
+            return 0
+        }
+
+        return kompetensi.questionDtoList.filter(
+            (question: any) =>
+                question.answerDto?.answerChoice ===
+                this.getCorrectAnswer(question)
+        ).length
+    }
+
+    getWrongAnswersCount (kompetensi: any): number {
+        if (!kompetensi.questionDtoList) {
+            return 0
+        }
+
+        return (
+            kompetensi.questionDtoList.length -
+            this.getCorrectAnswersCount(kompetensi)
+        )
     }
 }

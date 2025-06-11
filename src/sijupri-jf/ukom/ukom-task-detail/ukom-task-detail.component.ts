@@ -239,8 +239,46 @@ export class UkomTaskDetailComponent {
                 }
             })
     }
+
     backToList () {
         this.router.navigate(['/ukom/ukom-list'])
+    }
+
+    getGroupedCompetencies (): any[] {
+        if (!this.CATSchore?.kompetensiIndikatorDtoList) {
+            return []
+        }
+
+        // Group by kompetensiId
+        const grouped = this.CATSchore.kompetensiIndikatorDtoList.reduce(
+            (acc: any, kompetensi: any) => {
+                const key = kompetensi.kompetensiId || 'default'
+
+                if (!acc[key]) {
+                    acc[key] = {
+                        name: kompetensi.kompetensiName || '-',
+                        items: [],
+                        total: 0,
+                        correct: 0
+                    }
+                }
+
+                acc[key].items.push(kompetensi)
+                acc[key].total += kompetensi.questionDtoList?.length || 0
+                acc[key].correct += this.getCorrectAnswersCount(kompetensi)
+
+                return acc
+            },
+            {}
+        )
+
+        return Object.values(grouped).map((group: any) => ({
+            ...group,
+            percentage:
+                group.total > 0
+                    ? Math.round((group.correct / group.total) * 100)
+                    : 0
+        }))
     }
 
     getCorrectAnswer (question: any): string {
@@ -248,6 +286,43 @@ export class UkomTaskDetailComponent {
             (choice: any) => choice.correct
         )
         return correctChoice ? correctChoice.choiceId : ''
+    }
+
+    getCompetencyPercentage (kompetensi: any): number {
+        if (
+            !kompetensi.questionDtoList ||
+            kompetensi.questionDtoList.length === 0
+        ) {
+            return 0
+        }
+
+        const correctAnswers = this.getCorrectAnswersCount(kompetensi)
+        const totalQuestions = kompetensi.questionDtoList.length
+
+        return Math.round((correctAnswers / totalQuestions) * 100)
+    }
+
+    getCorrectAnswersCount (kompetensi: any): number {
+        if (!kompetensi.questionDtoList) {
+            return 0
+        }
+
+        return kompetensi.questionDtoList.filter(
+            (question: any) =>
+                question.answerDto?.answerChoice ===
+                this.getCorrectAnswer(question)
+        ).length
+    }
+
+    getWrongAnswersCount (kompetensi: any): number {
+        if (!kompetensi.questionDtoList) {
+            return 0
+        }
+
+        return (
+            kompetensi.questionDtoList.length -
+            this.getCorrectAnswersCount(kompetensi)
+        )
     }
 
     getUnitKerjaById (unit_kerja_id: string) {

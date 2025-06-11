@@ -6,7 +6,7 @@ export class CATSchore extends Serializable {
     roomUkomId: string = undefined
     participantId: string = undefined
     score: string = undefined
-    kompetensiDtoList: Array<{
+    kompetensiIndikatorDtoList: Array<{
         id: string
         code: string
         name: string
@@ -19,6 +19,7 @@ export class CATSchore extends Serializable {
         bidangJabatanCode: any
         bidangJabatanName: any
         kompetensiId: string
+        kompetensiName: string
         questionDtoList: Array<{
             id: string
             question: string
