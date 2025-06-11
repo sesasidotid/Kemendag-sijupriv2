@@ -29,9 +29,9 @@ export class UkomTaskDetail extends Serializable {
     jenisUkom: string = undefined
     jenisKelaminCode: any = undefined
     jenisKelaminName: string = undefined
-    rekomendasi: any = undefined
-    rekomendasiUrl: any = undefined
-    rekomendasiFile: any = undefined
+    rekomendasi: string = undefined
+    rekomendasiUrl: string = undefined
+    rekomendasiFile: string = undefined
     jabatanCode: any = undefined
     jabatanName: string = undefined
     jenjangCode: any = undefined
@@ -65,7 +65,7 @@ export class UkomTaskDetail extends Serializable {
     bidangJabatanCode: string = undefined
     participantStatus: string = undefined
 
-    constructor(object?: { [key: string]: any }) {
+    constructor (object?: { [key: string]: any }) {
         super()
         if (object) this.fromObject(object)
     }

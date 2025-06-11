@@ -84,6 +84,7 @@ export class FileHandlerComponent {
     //   }
 
     clearFileName (key?: string) {
+        console.log('Clearing file name for key:', key)
         if (key) {
             delete this.fileNames[key]
             if (this.inputs.files[key]) {

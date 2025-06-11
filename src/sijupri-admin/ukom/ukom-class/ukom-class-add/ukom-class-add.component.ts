@@ -16,7 +16,7 @@ import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { map, startWith, tap } from 'rxjs/operators'
+import { distinctUntilChanged, map, startWith, tap } from 'rxjs/operators'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
 
@@ -43,7 +43,9 @@ export class UkomClassAddComponent {
     kelasData: RoomUkom = new RoomUkom()
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
-    bidangJabatanList$: Observable<BidangJabatan[]> = of([])
+
+    private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
+    bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
 
     constructor (
         private confirmationService: ConfirmationService,
@@ -57,6 +59,29 @@ export class UkomClassAddComponent {
         this.getJabatanList()
         this.getListJenjang()
         this.handleSubscribe()
+        this.handleBidangJabatanValidation()
+    }
+
+    handleBidangJabatanValidation () {
+        this.bidangJabatanList$.subscribe(bidangJabatanList => {
+            const control = this.kelasForm.get('bidang_jabatan')
+            if (!control) return
+
+            const currentValidators = control.validator
+                ? [control.validator]
+                : []
+            const isRequiredAlreadySet = currentValidators.some(
+                v => v === Validators.required
+            )
+
+            if (bidangJabatanList.length > 0 && !isRequiredAlreadySet) {
+                control.setValidators([Validators.required])
+            } else if (bidangJabatanList.length === 0) {
+                control.clearValidators()
+            }
+
+            control.updateValueAndValidity({ emitEvent: false })
+        })
     }
 
     getErrorMessage (controlName: string, label: string): string | null {
@@ -98,13 +123,18 @@ export class UkomClassAddComponent {
     }
 
     handleSubscribe () {
-        this.kelasForm.get('jabatan')?.valueChanges.subscribe(jabatanId => {
-            if (jabatanId) {
-                this.getBidangJabatanByJabatanCode(jabatanId)
-            } else {
-                this.kelasForm.get('bidang_jabatan')?.reset()
-            }
-        })
+        this.kelasForm
+            .get('jabatan')
+            ?.valueChanges.pipe(distinctUntilChanged())
+            .subscribe(jabatanCode => {
+                const bidangJabatanControl =
+                    this.kelasForm.get('bidang_jabatan')
+                bidangJabatanControl?.reset()
+
+                if (jabatanCode) {
+                    this.getBidangJabatanByJabatanCode(jabatanCode)
+                }
+            })
     }
 
     getJabatanList () {
@@ -134,22 +164,18 @@ export class UkomClassAddComponent {
     }
 
     getBidangJabatanByJabatanCode (jabatanCode: string): void {
-        this.bidangJabatanList$ = this.apiService
+        this.apiService
             .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
             .pipe(
                 map((res: any) =>
-                    Array.isArray(res) && res.length > 0
-                        ? res.map(
-                              (bidangJabatan: { [key: string]: any }) =>
-                                  new BidangJabatan(bidangJabatan)
-                          )
+                    Array.isArray(res)
+                        ? res.map(item => new BidangJabatan(item))
                         : []
-                ),
-                startWith([]),
-                tap(() => {
-                    this.setupInstansiValidation()
-                })
+                )
             )
+            .subscribe(list => {
+                this.bidangJabatanListSubject.next(list)
+            })
     }
 
     submit () {

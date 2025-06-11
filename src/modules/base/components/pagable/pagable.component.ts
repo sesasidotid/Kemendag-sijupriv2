@@ -23,9 +23,9 @@ export class PagableComponent implements OnChanges {
     onLoad: boolean = false
     enablePagination: boolean = true
 
-    constructor(private apiService: ApiService, private http: HttpClient) { }
+    constructor (private apiService: ApiService, private http: HttpClient) {}
 
-    ngOnChanges(changes: SimpleChanges) {
+    ngOnChanges (changes: SimpleChanges) {
         if (changes['pagable']) {
             this.pagable.primaryColumnList.forEach(column => {
                 this.sortOrder[column.property] = ''
@@ -39,7 +39,7 @@ export class PagableComponent implements OnChanges {
         }
     }
 
-    isSearchExist() {
+    isSearchExist () {
         for (const filter of this.pagable.filterList) {
             if (filter.label) {
                 return true
@@ -48,7 +48,7 @@ export class PagableComponent implements OnChanges {
         return false
     }
 
-    getPages(): (number | string)[] {
+    getPages (): (number | string)[] {
         const totalPages = this.paginator.lastPage
         const currentPage = this.page
         const pages: (number | string)[] = []
@@ -78,13 +78,14 @@ export class PagableComponent implements OnChanges {
         return pages
     }
 
-    fetchData(): void {
+    fetchData (): void {
         this.onLoad = true
 
         let query = ''
         const hasExistingQuery = this.pagable.endpoint.includes('?')
-        query += `${hasExistingQuery ? '&' : '?'}page=${this.page}&limit=${this.limit
-            }`
+        query += `${hasExistingQuery ? '&' : '?'}page=${this.page}&limit=${
+            this.limit
+        }`
 
         for (const property in this.sortOrder) {
             if (this.sortOrder[property] !== '') {
@@ -116,7 +117,8 @@ export class PagableComponent implements OnChanges {
         //   })
         // }
 
-        const isLocalEndpoint = this.pagable.endpoint.startsWith('http://localhost')
+        const isLocalEndpoint =
+            this.pagable.endpoint.startsWith('http://localhost')
 
         const fetchUrl = isLocalEndpoint
             ? this.pagable.endpoint
@@ -136,8 +138,6 @@ export class PagableComponent implements OnChanges {
                     this.paginator.data =
                         this.paginator.data.roomUkomDto.examScheduleDtoList
                 }
-
-                console.log(this.paginator)
             },
             error: e => {
                 console.error('Error fetching data', e)
@@ -145,32 +145,31 @@ export class PagableComponent implements OnChanges {
         })
     }
 
-    getPropertyValue(object: any, property: string): any {
+    getPropertyValue (object: any, property: string): any {
         return property.split('|').reduce((o, i) => (o ? o[i] : null), object)
     }
 
-    getPropertyUrlValue(
+    getPropertyUrlValue (
         object: any,
         urlDefinition: { path: string; property?: string }
     ): string {
-        console.log(`${urlDefinition.path}/${object[urlDefinition.property]}`)
         if (urlDefinition.property) {
             return `${urlDefinition.path}/${object[urlDefinition.property]}`
         }
         return `${urlDefinition.path}`
     }
 
-    next(): void {
+    next (): void {
         this.page += 1
         this.fetchData()
     }
 
-    select(page: number | string): void {
+    select (page: number | string): void {
         this.page = Number(page)
         this.fetchData()
     }
 
-    prev(): void {
+    prev (): void {
         this.page -= 1
         this.fetchData()
     }
@@ -197,7 +196,7 @@ export class PagableComponent implements OnChanges {
 
     //     this.fetchData()
     //   }
-    toggleSort(columnProperty: string): void {
+    toggleSort (columnProperty: string): void {
         const column = this.pagable.primaryColumnList.find(
             col => col.property === columnProperty
         )
@@ -226,7 +225,7 @@ export class PagableComponent implements OnChanges {
         this.fetchData()
     }
 
-    getSortIcon(columnProperty: string): string {
+    getSortIcon (columnProperty: string): string {
         return this.sortOrder[columnProperty]
     }
 }

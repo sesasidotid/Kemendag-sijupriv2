@@ -31,7 +31,8 @@ import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
     styleUrl: './ukom-grade-list.component.scss'
 })
 export class UkomGradeListComponent {
-    @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
+    @ViewChild(FileHandlerComponent)
+    fileHandler: FileHandlerComponent
 
     pagable!: Pagable
     isModalOpen$ = new BehaviorSubject<boolean>(false)
@@ -224,14 +225,20 @@ export class UkomGradeListComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((participantUkom: UkomGrade) => {
-                        this.clearFilesName()
+                        console.log(
+                            'Selected Participant Ukom:',
+                            participantUkom
+                        )
                         this.payload = {
-                            id: participantUkom.id,
+                            id: participantUkom.participantId,
                             file_rekomendasi: ''
                         }
                         this.toggleModal()
+                        setTimeout(() => {
+                            this.clearFilesName()
+                        })
                     }, 'primary')
-                    .withIcon('update')
+                    .withIcon('upload')
                     .build()
             )
             .build()

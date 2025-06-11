@@ -4,7 +4,7 @@ import { Component } from '@angular/core'
 import { Jenjang } from '../../../modules/maintenance/models/jenjang.modle'
 import { Pangkat } from '../../../modules/maintenance/models/pangkat.model'
 import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.modal'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, forkJoin, of, switchMap, tap } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { CATSchore } from '../../../modules/ukom/models/cat/cat-schore'
@@ -12,6 +12,7 @@ import { Router } from '@angular/router'
 import { DataDokumenUkom } from '../../../modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
+import { HandlerService } from '../../../modules/base/services/handler.service'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -50,7 +51,8 @@ export class UkomTaskDetailComponent {
     constructor (
         private apiService: ApiService,
         private activatedRoute: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private handlerService: HandlerService
     ) {}
 
     ngOnInit () {
@@ -114,12 +116,36 @@ export class UkomTaskDetailComponent {
         })
     }
 
+    downloadRekomendasi (): void {
+        const url = this.ukomDetail.rekomendasiUrl
+
+        if (!url) return
+
+        console.log('Downloading rekomendasi from:', url)
+
+        const parsedUrl = new URL(url)
+        const relativePath = parsedUrl.pathname + parsedUrl.search
+
+        const filename = this.ukomDetail.rekomendasi || 'rekomendasi.pdf'
+
+        this.apiService.getDownload(relativePath, filename).subscribe({
+            next: () => {
+                console.log('Download completed')
+            },
+            error: err => {
+                console.error('Download failed:', err)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengunduh rekomendasi'
+                )
+            }
+        })
+    }
+
     calculateAge (
         tanggalLahir: string | Date,
         tglSuratUsulan: string | Date
     ): string {
-        console.log('calculateAge', tanggalLahir, tglSuratUsulan)
-
         if (!tanggalLahir || !tglSuratUsulan) {
             return '-'
         }
@@ -137,7 +163,6 @@ export class UkomTaskDetailComponent {
         let ageMonths = suratDate.getMonth() - birthDate.getMonth()
         let ageDays = suratDate.getDate() - birthDate.getDate()
 
-        // Jika bulan dalam tgl_surat_usulan kurang dari bulan lahir, atau bulan sama tapi tanggal lebih kecil
         if (ageMonths < 0 || (ageMonths === 0 && ageDays < 0)) {
             ageYears--
             ageMonths += 12

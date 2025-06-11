@@ -5,7 +5,7 @@ import { RoomUkom } from '../../modules/ukom/models/cat/roomukom'
 import { ApiService } from '../../modules/base/services/api.service'
 import { Router } from '@angular/router'
 import { HandlerService } from '../../modules/base/services/handler.service'
-import { interval } from 'rxjs'
+import { interval, switchMap, tap } from 'rxjs'
 import { ConfirmationService } from '../../modules/base/services/confirmation.service'
 import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
 import { ModalComponent } from '../../modules/base/components/modal/modal.component'
@@ -27,28 +27,29 @@ export class DashboardComponent implements AfterViewInit {
     CATSchore: CATSchore = new CATSchore()
     participant_id: string = ''
     isModalOpen$ = new BehaviorSubject<boolean>(false)
+    groupedKompetensi: any[] = []
 
     t: string = LoginContext.getApplicationCode()
 
-    constructor(
+    constructor (
         private api: ApiService,
         private router: Router,
         private handler: HandlerService,
         private confirmationService: ConfirmationService,
         private elRef: ElementRef
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.getRoomUkom()
         this.updateCurrentTime()
         this.exitFullScreen()
     }
 
-    ngAfterViewInit() {
+    ngAfterViewInit () {
         this.initializeTooltips()
     }
 
-    initializeTooltips() {
+    initializeTooltips () {
         const tooltipTriggerList = this.elRef.nativeElement.querySelectorAll(
             '[data-bs-toggle="tooltip"]'
         )
@@ -57,61 +58,67 @@ export class DashboardComponent implements AfterViewInit {
         })
     }
 
-    updateCurrentTime() {
+    updateCurrentTime () {
         interval(1000).subscribe(() => {
             this.now = Date.now()
         })
     }
 
-    getAbsoluteUrl(url: string): string {
+    getAbsoluteUrl (url: string): string {
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            return `https://${url}`;
+            return `https://${url}`
         }
-        return url;
+        return url
     }
 
-    exitFullScreen() {
+    exitFullScreen () {
         if (document.exitFullscreen) {
             document.exitFullscreen()
         } else if ((document as any).mozCancelFullScreen) {
             /* Firefox */
-            ; (document as any).mozCancelFullScreen()
+            ;(document as any).mozCancelFullScreen()
         } else if ((document as any).webkitExitFullscreen) {
             /* Chrome, Safari, and Opera */
-            ; (document as any).webkitExitFullscreen()
+            ;(document as any).webkitExitFullscreen()
         } else if ((document as any).msExitFullscreen) {
             /* IE/Edge */
-            ; (document as any).msExitFullscreen()
+            ;(document as any).msExitFullscreen()
         }
     }
 
-    canStartExam(examStartTime: string): boolean {
+    canStartExam (examStartTime: string): boolean {
         return new Date(examStartTime) <= this.currentDate
     }
 
-    getRoomUkom() {
+    getRoomUkom (): void {
+        const userId = LoginContext.getUserId().replace('PU-', '')
+
         this.api
-            .getData(
-                `/api/v1/participant_ukom/nip/${LoginContext.getUserId().replace(
-                    'PU-',
-                    ''
-                )}`
+            .getData(`/api/v1/participant_ukom/nip/${userId}`)
+            .pipe(
+                tap((response: any) => {
+                    this.roomUkom = new RoomUkom(response.roomUkomDto)
+                    this.participant_id = response.id
+                    console.log('roomUkom', this.roomUkom)
+                }),
+                switchMap(() =>
+                    this.api.getData(
+                        `/api/v1/exam_grade/CAT/${this.participant_id}`
+                    )
+                ),
+                tap((scoreResponse: any) => {
+                    this.CATSchore = new CATSchore(scoreResponse)
+                })
             )
             .subscribe({
-                next: (response: any) => {
-                    this.roomUkom = new RoomUkom(response.roomUkomDto)
-                    //   this.roomUkom = new RoomUkom()
-                    console.log('roomUkom', this.roomUkom)
-                    this.participant_id = response.id
-                    this.getCATScore()
-                },
+                next: () => {},
                 error: err => {
-                    console.error('Error fetching RoomUkom:', err)
+                    console.error('Error fetching RoomUkom or CAT Score:', err)
                 }
             })
     }
 
-    startExam(room_ukom_id: string) {
+    startExam (room_ukom_id: string) {
         this.confirmationService.open(false).subscribe({
             next: response => {
                 if (!response.confirmed) {
@@ -141,23 +148,11 @@ export class DashboardComponent implements AfterViewInit {
         })
     }
 
-    getCATScore() {
-        const exam_type_code = 'CAT'
-        const room_ukom_id = this.roomUkom.id
-        this.api
-            .getData(`/api/v1/exam_grade/${exam_type_code}/${this.participant_id}`)
-            .subscribe({
-                next: (response: any) => {
-                    this.CATSchore = new CATSchore(response)
-                }
-            })
-    }
-
-    toggleModal() {
+    toggleModal () {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    getCorrectAnswer(question: any): string {
+    getCorrectAnswer (question: any): string {
         const correctChoice = question.multipleChoiceDtoList.find(
             (choice: any) => choice.correct
         )

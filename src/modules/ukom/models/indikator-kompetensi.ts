@@ -6,6 +6,7 @@ export class IndikatorKompetensiUkom extends Serializable {
     kompetensiId: string = undefined
     name: string = undefined
     code: string = undefined
+    kompetensi: any = undefined
 
     constructor (object?: { [key: string]: any }) {
         super()

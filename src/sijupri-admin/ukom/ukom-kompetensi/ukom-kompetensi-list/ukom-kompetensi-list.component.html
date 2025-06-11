@@ -1,61 +1,104 @@
 <ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable" [refresh]="refreshToggle"></app-pagable>
+    <app-pagable [pagable]="pagable" [refresh]="refreshToggle"></app-pagable>
 </ng-container>
 <ng-container *ngIf="(tab$ | async) === 1">
-  <app-ukom-kompetensi-add
-    (changeTabActive)="handleTabChange(0)"
-  ></app-ukom-kompetensi-add>
+    <app-ukom-kompetensi-add
+        (changeTabActive)="handleTabChange(0)"
+    ></app-ukom-kompetensi-add>
 </ng-container>
 
 <app-modal
-  *ngIf="isModalOpen$ | async"
-  [title]="'Update Kompetensi'"
-  (toggle)="toggleModal()"
-  [enableFooter]="false"
+    *ngIf="isModalOpen$ | async"
+    [title]="'Update Kompetensi'"
+    (toggle)="toggleModal()"
+    [enableFooter]="false"
 >
-  <div class="col-12">
-    <form [formGroup]="editKompetensiForm">
-      <div class="row mb-3">
-        <label for="name" class="form-label fw-bold">Nama</label>
-        <div>
-          <input
-            type="text"
-            class="form-control"
-            id="name"
-            required
-            formControlName="name"
-          />
-        </div>
-        <div
-          *ngIf="getErrorMessage('name', 'Nama') as error"
-          class="text-danger"
-        >
-          {{ error }}
-        </div>
-      </div>
+    <div class="col-12">
+        <form [formGroup]="editKompetensiForm">
+            <div class="row mb-3">
+                <label for="name" class="form-label fw-bold"
+                    >Nama Kompetensi<span class="text-danger">*</span></label
+                >
+                <div>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="name"
+                        required
+                        formControlName="name"
+                    />
+                </div>
+                <div
+                    *ngIf="getErrorMessage('name', 'Nama Kompetensi') as error"
+                    class="text-danger"
+                >
+                    {{ error }}
+                </div>
+            </div>
 
-      <ng-container *ngIf="loadingButton$ | async; else noLoading">
-        <button class="btn btn-success w-100" disabled>
-          <div
-            class="spinner-border"
-            style="width: 19px; height: 19px"
-            role="status"
-          >
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </button>
-      </ng-container>
+            <div class="row mb-3">
+                <label for="level" class="form-label fw-bold"
+                    >Level<span class="text-danger">*</span></label
+                >
+                <div>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="level"
+                        required
+                        formControlName="level"
+                    />
+                </div>
+                <div
+                    *ngIf="getErrorMessage('level', 'Level') as error"
+                    class="text-danger"
+                >
+                    {{ error }}
+                </div>
+            </div>
 
-      <ng-template #noLoading>
-        <button
-          type="button"
-          class="btn btn-success w-100"
-          (click)="submit()"
-          [disabled]="editKompetensiForm.invalid"
-        >
-          Update
-        </button>
-      </ng-template>
-    </form>
-  </div>
+            <div class="row mb-3">
+                <label for="description" class="form-label fw-bold"
+                    >Deskripsi<span class="text-danger">*</span></label
+                >
+                <div>
+                    <textarea
+                        class="form-control"
+                        id="description"
+                        rows="3"
+                        formControlName="description"
+                    ></textarea>
+                </div>
+                <div
+                    *ngIf="getErrorMessage('description', 'Deskripsi') as error"
+                    class="text-danger"
+                >
+                    {{ error }}
+                </div>
+            </div>
+
+            <ng-container *ngIf="loadingButton$ | async; else noLoading">
+                <button class="btn btn-success w-100" disabled>
+                    <div
+                        class="spinner-border"
+                        style="width: 19px; height: 19px"
+                        role="status"
+                    >
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </button>
+            </ng-container>
+
+            <ng-template #noLoading>
+                <button
+                    type="button"
+                    class="btn btn-success w-100"
+                    (click)="submit()"
+                    [disabled]="editKompetensiForm.invalid"
+                >
+                    Update
+                </button>
+            </ng-template>
+        </form>
+    </div>
 </app-modal>

@@ -1,159 +1,3 @@
-<!-- <button class="btn btn-sm btn-outline-secondary mb-3" (click)="back()">
-    <i class="mdi mdi-chevron-left"></i> Kembali
-</button>
-<section>
-    <div class="row mb-3">
-        <label for="" class="col-sm-2 col-form-label fw-bold">Nama Kelas</label>
-        <div class="col-sm-10 pt-2">
-            <p>: {{ RoomUkomDetail.name }}</p>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-            Waktu Mulai
-        </label>
-        <div class="col-sm-10 pt-2">
-            <p>: {{ ExamDetail.startTime }}</p>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-            Waktu Selesai
-        </label>
-        <div class="col-sm-10 pt-2">
-            <p>: {{ ExamDetail.endTime }}</p>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold">
-            Jenis Ujian
-        </label>
-        <div class="col-sm-10 pt-2">
-            <p>: {{ ExamDetail.examTypeCode }}</p>
-        </div>
-    </div>
-</section>
-
-<section class="mt-5">
-    <h4>List Kompetensi</h4>
-
-    <div *ngIf="UkomRoomKompetensi?.length > 0; else noKompetensi">
-        <div class="row mb-3" *ngFor="let kompetensi of UkomRoomKompetensi">
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label fw-bold">
-                    Kompetensi
-                </label>
-                <div class="col-sm-10 pt-2">
-                    <p>: {{ kompetensi.name }}</p>
-                    <button
-                        class="btn btn-sm btn-secondary"
-                        (click)="openModal(kompetensi.id)"
-                    >
-                        Pilih Pertanyaan
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <ng-template #noKompetensi>
-        <p class="text-muted">Tidak ada kompetensi tersedia.</p>
-    </ng-template>
-</section>
-
-<section>
-    <div class="col-lg-12">
-        <div class="hstack gap-2 justify-content-end align-items-center">
-            <p class="mb-0">Jumlah Pertanyaan: {{ questCheckedList.length }}</p>
-            <button
-                [disabled]="questCheckedList.length === 0"
-                class="btn btn-success"
-                (click)="submit()"
-                *ngIf="!(submitLoadng$ | async)"
-            >
-                Simpan
-            </button>
-            <button
-                class="btn btn-success"
-                disabled
-                *ngIf="submitLoadng$ | async"
-            >
-                <div
-                    class="spinner-border"
-                    style="width: 19px; height: 19px"
-                    role="status"
-                >
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </button>
-        </div>
-    </div>
-</section>
-
-<section *ngIf="listSavedQuestion.length > 0" class="mt-5">
-    <div class="row question-container mb-3 pb-2">
-        <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
-        <div class="col-sm-12 mt-2">
-            <ng-container
-                *ngFor="let pertanyaan of listSavedQuestion; index as i"
-            >
-                <div class="row card">
-                    <label for="" class="col-12 col-form-label fw-bold mb-1"
-                        >Pertanyaan {{ i + 1 }}</label
-                    >
-                    <div class="col">
-                        <p>{{ pertanyaan.question }}</p>
-                    </div>
-                </div>
-            </ng-container>
-        </div>
-    </div>
-</section>
-
-<app-modal
-    *ngIf="isModalOpen$ | async"
-    [title]="'Pilih pertanyaan'"
-    (toggle)="toggleModal()"
-    [size]="'lg'"
-    [enableFooter]="false"
->
-    <form>
-        <div class="mb-3">
-            <input
-                type="text"
-                placeholder="Search questions..."
-                class="form-control"
-                [(ngModel)]="filterText"
-                (ngModelChange)="onSearchChange($event)"
-                [ngModelOptions]="{ standalone: true }"
-            />
-        </div>
-
-        <div
-            class="checklist-container"
-            *ngFor="let question of filteredQuestions$ | async"
-        >
-            <label class="checklist-item">
-                <input
-                    type="checkbox"
-                    class="form-check-input"
-                    [name]="'question-' + question.id"
-                    [(ngModel)]="question.checked"
-                    (change)="onQuestionSelect(question)"
-                />
-                <span class="checklist-label">{{ question.question }}</span>
-            </label>
-        </div>
-
-        <div *ngIf="(filteredQuestions$ | async)?.length === 0">
-            Pertanyaan tidak ditemukan.
-        </div>
-    </form>
-</app-modal> -->
-
 <button class="btn btn-sm btn-outline-secondary mb-3" (click)="back()">
     <i class="mdi mdi-chevron-left"></i> Kembali
 </button>
@@ -193,7 +37,6 @@
     </div>
 </section>
 
-<!-- Random Question Selection Section -->
 <section class="mt-4">
     <div class="card p-3 bg-light">
         <h5 class="card-title mb-3">
@@ -204,56 +47,7 @@
             Pilih pertanyaan secara acak dari semua kompetensi yang tersedia
         </p>
 
-        <!-- <div class="row align-items-end">
-            <div class="col-md-3">
-                <label for="randomCountInput" class="form-label"
-                    >Jumlah Pertanyaan:</label
-                >
-                <input
-                    type="number"
-                    id="randomCountInput"
-                    class="form-control"
-                    [(ngModel)]="randomCount"
-                    [ngModelOptions]="{ standalone: true }"
-                    min="1"
-                    placeholder="Masukkan jumlah..."
-                />
-            </div>
-            <div class="col-md-3">
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="selectRandomQuestionsFromAll()"
-                    [disabled]="
-                        !randomCount ||
-                        randomCount <= 0 ||
-                        UkomRoomKompetensi?.length === 0
-                    "
-                >
-                    <i class="mdi mdi-shuffle-variant me-1"></i> Pilih Acak
-                </button>
-            </div>
-            <div class="col-md-3">
-                <button
-                    type="button"
-                    class="btn btn-warning"
-                    (click)="clearAllSelection()"
-                    [disabled]="questCheckedList.length === 0"
-                >
-                    <i class="mdi mdi-close-circle me-1"></i> Bersihkan Semua
-                </button>
-            </div>
-            <div class="col-md-3">
-                <div class="alert alert-info mb-0 py-2">
-                    <small
-                        ><strong>Terpilih:</strong>
-                        {{ questCheckedList.length }} pertanyaan</small
-                    >
-                </div>
-            </div>
-        </div> -->
         <div class="d-flex flex-column flex-md-row align-items-stretch gap-2">
-            <!-- Input field - takes remaining space -->
             <div class="flex-fill">
                 <label for="randomCountInput" class="form-label"
                     >Jumlah Pertanyaan:</label
@@ -269,7 +63,6 @@
                 />
             </div>
 
-            <!-- Button: Pilih Acak -->
             <div class="flex-shrink-0">
                 <label class="form-label d-none d-md-block">&nbsp;</label>
                 <button
@@ -279,14 +72,13 @@
                     [disabled]="
                         !randomCount ||
                         randomCount <= 0 ||
-                        UkomRoomKompetensi?.length === 0
+                        IndikatorKompetensiUkom?.length === 0
                     "
                 >
                     <i class="mdi mdi-shuffle-variant me-1"></i> Pilih Acak
                 </button>
             </div>
 
-            <!-- Button: Bersihkan Semua -->
             <div class="flex-shrink-0">
                 <label class="form-label d-none d-md-block">&nbsp;</label>
                 <button
@@ -313,37 +105,56 @@
     </div>
 </section>
 
-<section class="mt-5">
-    <h4>List Kompetensi</h4>
+<div class="card border-0">
+    <div class="row question-container">
+        <label for="" class="p-0 fw-bold">Daftar Indikator Kompetensi</label>
 
-    <div *ngIf="UkomRoomKompetensi?.length > 0; else noKompetensi">
-        <div class="row mb-3" *ngFor="let kompetensi of UkomRoomKompetensi">
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label fw-bold">
-                    Kompetensi
-                </label>
-                <div class="col-sm-10 pt-2">
-                    <p>: {{ kompetensi.name }}</p>
-                    <button
-                        class="btn btn-sm btn-secondary"
-                        (click)="openModal(kompetensi.id)"
+        <div
+            class="col-sm-12 mt-2"
+            *ngIf="IndikatorKompetensiUkom?.length > 0; else noKompetensi"
+        >
+            <ng-container
+                *ngFor="
+                    let indikatorKompetensi of IndikatorKompetensiUkom;
+                    index as i
+                "
+            >
+                <div class="row card p-3 mb-2">
+                    <div
+                        class="d-flex justify-content-between align-items-center"
                     >
-                        Pilih Pertanyaan
-                    </button>
+                        <div>
+                            <label class="fw-bold mb-1"
+                                >Indikator {{ i + 1 }}</label
+                            >
+                            <p class="mb-0">{{ indikatorKompetensi.name }}</p>
+                            <small class="text-muted">
+                                Kompetensi:
+                                {{
+                                    indikatorKompetensi.kompetensi?.name || '-'
+                                }}
+                            </small>
+                        </div>
+                        <button
+                            class="btn btn-secondary btn-sm"
+                            (click)="openModal(indikatorKompetensi.id)"
+                        >
+                            Pilih
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </ng-container>
         </div>
-    </div>
 
-    <ng-template #noKompetensi>
-        <p class="text-muted">Tidak ada kompetensi tersedia.</p>
-    </ng-template>
-</section>
+        <ng-template #noKompetensi>
+            <p class="text-muted">Tidak ada indikator kompetensi tersedia.</p>
+        </ng-template>
+    </div>
+</div>
 
 <section>
     <div class="col-lg-12">
         <div class="hstack gap-2 justify-content-end align-items-center">
-            <!-- <p class="mb-0">Jumlah Pertanyaan: {{ questCheckedList.length }}</p> -->
             <button
                 [disabled]="questCheckedList.length === 0"
                 class="btn btn-success"
@@ -370,21 +181,23 @@
 </section>
 
 <section *ngIf="listSavedQuestion.length > 0" class="mt-5">
-    <div class="row question-container mb-3 pb-2">
-        <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
-        <div class="col-sm-12 mt-2">
-            <ng-container
-                *ngFor="let pertanyaan of listSavedQuestion; index as i"
-            >
-                <div class="row card">
-                    <label for="" class="col-12 col-form-label fw-bold mb-1"
-                        >Pertanyaan {{ i + 1 }}</label
-                    >
-                    <div class="col">
-                        <p>{{ pertanyaan.question }}</p>
+    <div class="card border-0">
+        <div class="row question-container mb-3 pb-2">
+            <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
+            <div class="col-sm-12 mt-2">
+                <ng-container
+                    *ngFor="let pertanyaan of listSavedQuestion; index as i"
+                >
+                    <div class="row card">
+                        <label for="" class="col-12 col-form-label fw-bold mb-1"
+                            >Pertanyaan {{ i + 1 }}</label
+                        >
+                        <div class="col">
+                            <p>{{ pertanyaan.question }}</p>
+                        </div>
                     </div>
-                </div>
-            </ng-container>
+                </ng-container>
+            </div>
         </div>
     </div>
 </section>
@@ -397,7 +210,6 @@
     [enableFooter]="false"
 >
     <form>
-        <!-- Manual Search Section -->
         <div class="mb-3">
             <label for="searchInput" class="form-label">Pencarian:</label>
             <input

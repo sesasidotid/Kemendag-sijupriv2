@@ -28,6 +28,7 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
+import { KompetensiUkom } from '../../../../modules/ukom/models/kompetensi'
 @Component({
     selector: 'app-ukom-kompetensi-list',
     standalone: true,
@@ -84,7 +85,9 @@ export class UkomKompetensiListComponent {
     handleFormInit () {
         this.editKompetensiForm = new FormGroup({
             id: new FormControl(''),
-            name: new FormControl('', Validators.required)
+            name: new FormControl('', Validators.required),
+            level: new FormControl('', Validators.required),
+            description: new FormControl('', Validators.required)
         })
     }
 
@@ -96,25 +99,29 @@ export class UkomKompetensiListComponent {
                 new PrimaryColumnBuilder()
                     .withDynamicValue(
                         'Jabatan',
-                        (data: any) => this.jabatanMap[data.jabatanCode]
+                        (data: KompetensiUkom) =>
+                            this.jabatanMap[data.jabatanCode]
                     )
                     .build()
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenjang', (data: any) => {
+                    .withDynamicValue('Jenjang', (data: KompetensiUkom) => {
                         return this.jenjangMap[data.jenjangCode] || null
                     })
                     .build()
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Bidang Jabatan', (data: any) => {
-                        return (
-                            this.bidangJabatanMap[data.bidangJabatanCode] ||
-                            null
-                        )
-                    })
+                    .withDynamicValue(
+                        'Bidang Jabatan',
+                        (data: KompetensiUkom) => {
+                            return (
+                                this.bidangJabatanMap[data.bidangJabatanCode] ||
+                                null
+                            )
+                        }
+                    )
                     .build()
             )
             .addFilter(
@@ -131,7 +138,7 @@ export class UkomKompetensiListComponent {
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((data: any) => {
+                    .setAction((data: KompetensiUkom) => {
                         this.router.navigate([
                             `maintenance/kompetensi-list/${data.id}`
                         ])
@@ -141,11 +148,19 @@ export class UkomKompetensiListComponent {
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((data: any) => {
+                    .setAction((data: KompetensiUkom) => {
                         this.setDefaultFormValues(data)
                         this.toggleModal()
                     }, 'primary')
                     .withIcon('update')
+                    .build()
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: KompetensiUkom) => {
+                        this.deleteKompetensi(data.id)
+                    }, 'danger')
+                    .withIcon('danger')
                     .build()
             )
             .build()
@@ -173,7 +188,9 @@ export class UkomKompetensiListComponent {
     setDefaultFormValues (data: any) {
         this.editKompetensiForm.patchValue({
             id: data.id || '',
-            name: data.name || ''
+            level: data.level || '',
+            name: data.name || '',
+            description: data.description || ''
         })
     }
 
@@ -233,15 +250,43 @@ export class UkomKompetensiListComponent {
         this.refreshToggle = !this.refreshToggle
     }
 
+    deleteKompetensi (id: string) {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.apiService
+                    .deleteData(`/api/v1/kompetensi/${id}`)
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil menghapus data'
+                            )
+                            this.handleRefreshToggle()
+                        },
+                        error: () => {
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menghapus data'
+                            )
+                        }
+                    })
+            }
+        })
+    }
+
     submit () {
         const payload = {
             id: this.editKompetensiForm.value.id,
-            name: this.editKompetensiForm.value.name
+            name: this.editKompetensiForm.value.name,
+            level: this.editKompetensiForm.value.level,
+            description: this.editKompetensiForm.value.description
         }
 
         this.confirmationService.open(false).subscribe({
-            next: result => {
-                if (!result.confirmed) return
+            next: ({ confirmed }) => {
+                if (!confirmed) return
 
                 this.loadingButton$.next(true)
 

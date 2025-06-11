@@ -6,19 +6,20 @@ import { ActivatedRoute } from '@angular/router'
 import { ExamDetail } from '../../../../modules/ukom/models/exam_detail'
 import { UkomRoomKompetensi } from '../../../../modules/ukom/models/ukom-room-kompetensi'
 import { UkomQuestion } from '../../../../modules/ukom/models/ukom-question'
-import { CommonModule } from '@angular/common'
+import { CommonModule, Location } from '@angular/common'
 import { Observable } from 'rxjs'
 import {
     map,
     debounceTime,
     distinctUntilChanged,
-    switchMap
+    switchMap,
+    take
 } from 'rxjs/operators'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-
+import { IndikatorKompetensiUkom } from '../../../../modules/ukom/models/indikator-kompetensi'
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
     standalone: true,
@@ -29,7 +30,8 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 export class UkomExamChooseCompQuestionsComponent {
     RoomUkomDetail: RoomUkomDetail = new RoomUkomDetail()
     ExamDetail: ExamDetail = new ExamDetail()
-    UkomRoomKompetensi: UkomRoomKompetensi[] = []
+    // UkomRoomKompetensi: UkomRoomKompetensi[] = []
+    IndikatorKompetensiUkom: IndikatorKompetensiUkom[] = []
     room_ukom_id: string
     type_ukom: string
 
@@ -59,109 +61,99 @@ export class UkomExamChooseCompQuestionsComponent {
         private apiService: ApiService,
         private activatedRoute: ActivatedRoute,
         private handlerService: HandlerService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private location: Location
     ) {}
 
     ngOnInit () {
-        this.activatedRoute.paramMap.subscribe(params => {
+        this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
             this.room_ukom_id = params.get('roomid')
         })
 
-        this.activatedRoute.queryParams.subscribe(params => {
-            const type_ukom = params['type_ukom']
-            if (type_ukom) {
-                this.type_ukom = type_ukom
-            }
+        this.activatedRoute.queryParamMap.pipe(take(1)).subscribe(params => {
+            this.type_ukom = params.get('type_ukom')
         })
 
         this.getExamDetail()
         this.getListPertanyaan()
-        this.getUkomTypeFromParams()
-        this.getRoomUkomDetail()
+        this.getRoomUkomDetailAndListIndikator()
     }
 
     back () {
-        history.back()
-    }
-
-    getRoomUkomDetail () {
-        this.apiService
-            .getData(`/api/v1/room_ukom/${this.room_ukom_id}`)
-            .subscribe({
-                next: (res: any) => {
-                    this.RoomUkomDetail = res
-
-                    this.getListKompetensi()
-                },
-                error: (err: any) => {
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Failed to get room detail'
-                    )
-                }
-            })
-    }
-
-    getUkomTypeFromParams () {
-        this.activatedRoute.queryParams.subscribe(params => {
-            const type_ukom = params['type_ukom']
-
-            if (type_ukom) {
-                this.type_ukom = type_ukom
-            }
-        })
+        this.location.back()
     }
 
     getExamDetail () {
         this.apiService
             .getData(`/api/v1/exam_schedule/room/${this.room_ukom_id}`)
             .subscribe({
-                next: (res: any) => {
+                next: (res: ExamDetail) => {
                     if (Array.isArray(res)) {
                         this.ExamDetail = res.find(
                             (exam: ExamDetail) =>
                                 exam.examTypeCode === this.type_ukom
                         )
-                        console.log('ExamDetail:', this.ExamDetail)
                     } else {
-                        console.error(
-                            'Unexpected response format: expected an array'
-                        )
                         this.ExamDetail = null
                     }
                 },
                 error: (err: any) => {
-                    console.error('Error fetching exam details:', err)
                     this.ExamDetail = null
                 }
             })
     }
 
-    getListKompetensi () {
-        this.apiService
-            .getData(
-                `/api/v1/kompetensi/droplist?jabatan_code=${this.RoomUkomDetail.jabatanCode}&jenjang_code=${this.RoomUkomDetail.jenjangCode}`
-            )
+    getRoomUkomDetailAndListIndikator (): void {
+        this.fetchRoomDetail()
+            .pipe(switchMap(detail => this.fetchIndikatorKompetensi(detail)))
             .subscribe({
-                next: (res: any) => {
-                    this.UkomRoomKompetensi = res
+                next: result => {
+                    this.IndikatorKompetensiUkom = result
                 },
-                error: (err: any) => {
+                error: () => {
                     this.handlerService.handleAlert(
                         'Error',
-                        'Failed to get kompetensi list'
+                        'Gagal mengambil data room UKOM atau indikator kompetensi'
                     )
                 }
             })
     }
 
-    getDropDownQuestionList (kompetensi_id: string) {
+    private fetchRoomDetail () {
+        return this.apiService
+            .getData(`/api/v1/room_ukom/${this.room_ukom_id}`)
+            .pipe(
+                map((res: any) => {
+                    this.RoomUkomDetail = res
+                    return res
+                })
+            )
+    }
+
+    private fetchIndikatorKompetensi (detail: any) {
+        const { jabatanCode, jenjangCode, bidangJabatanCode } = detail
+
+        const params = new URLSearchParams()
+        if (jabatanCode) params.append('jabatanCode', jabatanCode)
+        if (jenjangCode) params.append('jenjangCode', jenjangCode)
+        if (bidangJabatanCode)
+            params.append('bidangJabatanCode', bidangJabatanCode)
+
+        const queryString = params.toString()
+        const url = `/api/v1/kompetensi_indikator/droplist${
+            queryString ? '?' + queryString : ''
+        }`
+
+        return this.apiService.getData(url)
+    }
+
+    getDropDownQuestionList (indikator_kompetensi_id: string) {
         const module_id = 'CAT'
         const type = 'MULTI_CHOICE'
 
         this.listQuestion$ = this.apiService
             .getData(
-                `/api/v1/question/droplist?association_id=${kompetensi_id}&module_id=${module_id}&type=${type}`
+                `/api/v1/question/droplist?association_id=${indikator_kompetensi_id}&module_id=${module_id}&type=${type}`
             )
             .pipe(
                 map(response =>
@@ -172,8 +164,8 @@ export class UkomExamChooseCompQuestionsComponent {
             )
 
         this.filteredQuestions$ = this.searchSubject.pipe(
-            debounceTime(300), // Delays input processing by 1 second
-            distinctUntilChanged(), // Only emit if value changed
+            debounceTime(300),
+            distinctUntilChanged(),
             switchMap(search =>
                 this.listQuestion$.pipe(
                     map(questions =>
@@ -192,9 +184,9 @@ export class UkomExamChooseCompQuestionsComponent {
         this.searchSubject.next(search)
     }
 
-    toggleModal (kompetensi_id?: string) {
-        if (kompetensi_id) {
-            this.openModal(kompetensi_id)
+    toggleModal (indikator_kompetensi_id?: string) {
+        if (indikator_kompetensi_id) {
+            this.openModal(indikator_kompetensi_id)
         } else {
             this.isModalOpen$.next(!this.isModalOpen$.value)
         }
@@ -263,22 +255,22 @@ export class UkomExamChooseCompQuestionsComponent {
             })
     }
 
-    openModal (kompetensi_id: string) {
-        this.getDropDownQuestionList(kompetensi_id)
+    openModal (indikator_kompetensi_id: string) {
+        this.getDropDownQuestionList(indikator_kompetensi_id)
         this.updateCheckedState()
         this.isModalOpen$.next(true)
     }
 
-    loadAllQuestionsFromAllKompetensi () {
+    loadAllQuestionsFromAllIndikator () {
         const module_id = 'CAT'
         const type = 'MULTI_CHOICE'
 
         this.allAvailableQuestions = []
 
-        const loadPromises = this.UkomRoomKompetensi.map(kompetensi => {
+        const loadPromises = this.IndikatorKompetensiUkom.map(indikator => {
             return this.apiService
                 .getData(
-                    `/api/v1/question/droplist?association_id=${kompetensi.id}&module_id=${module_id}&type=${type}`
+                    `/api/v1/question/droplist?association_id=${indikator.id}&module_id=${module_id}&type=${type}`
                 )
                 .toPromise()
                 .then(response => {
@@ -289,7 +281,7 @@ export class UkomExamChooseCompQuestionsComponent {
                 })
                 .catch(err => {
                     console.error(
-                        `Error loading questions for kompetensi ${kompetensi.id}:`,
+                        `Error loading questions for indikator ${indikator.id}:`,
                         err
                     )
                 })
@@ -298,7 +290,6 @@ export class UkomExamChooseCompQuestionsComponent {
         return Promise.all(loadPromises)
     }
 
-    // New method for random selection from all kompetensi
     async selectRandomQuestionsFromAll () {
         if (this.randomCount <= 0) {
             this.handlerService.handleAlert(
@@ -309,9 +300,8 @@ export class UkomExamChooseCompQuestionsComponent {
         }
 
         try {
-            await this.loadAllQuestionsFromAllKompetensi()
+            await this.loadAllQuestionsFromAllIndikator()
 
-            // Filter out already selected questions
             const availableQuestions = this.allAvailableQuestions.filter(
                 q =>
                     !this.questCheckedList.some(

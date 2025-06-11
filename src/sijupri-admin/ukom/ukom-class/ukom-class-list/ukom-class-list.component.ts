@@ -229,7 +229,7 @@ export class UkomClassListComponent {
                 )
             )
             .subscribe(list => {
-                this.bidangJabatanListSubject.next(list) // ✅ push to subject
+                this.bidangJabatanListSubject.next(list) 
             })
     }
 

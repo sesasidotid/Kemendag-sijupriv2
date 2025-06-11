@@ -18,6 +18,7 @@ import { CATSchore } from '../../../../modules/ukom/models/cat/cat-schore'
 import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
+import { HandlerService } from '../../services/handler.service'
 
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
@@ -69,15 +70,16 @@ export class StatusPendaftaranUkomComponent {
     bidangJabatanName: string
 
     key: string = undefined
-    constructor(
+    constructor (
         private converterService: ConverterService,
         private apiService: ApiService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
-        private sanitizer: DomSanitizer
-    ) { }
+        private sanitizer: DomSanitizer,
+        private handlerService: HandlerService
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.activatedRoute.queryParams.subscribe(params => {
             const key = params['key']
 
@@ -88,33 +90,60 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    loadPredikatKinerja() {
+    loadPredikatKinerja () {
         this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
             next: res => {
-                this.predikatKinerjaList = res;
+                this.predikatKinerjaList = res
                 this.getPendingTask(this.key)
             },
             error: err => {
-                console.error('Failed to fetch predikat kinerja:', err);
+                console.error('Failed to fetch predikat kinerja:', err)
                 this.getPendingTask(this.key)
             }
-        });
-
+        })
     }
 
-    getPendidikanList(pendidikanTerakhirCode: string) {
+    getPendidikanList (pendidikanTerakhirCode: string) {
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
             next: response => {
                 const matchedPendidikan = response.find(
-                    (pendidikan: any) => pendidikan.code === pendidikanTerakhirCode
-                );
-                this.pendidikanName = matchedPendidikan ? matchedPendidikan.name : null;
-            },
-        });
+                    (pendidikan: any) =>
+                        pendidikan.code === pendidikanTerakhirCode
+                )
+                this.pendidikanName = matchedPendidikan
+                    ? matchedPendidikan.name
+                    : null
+            }
+        })
     }
 
+    downloadRekomendasi (): void {
+        const url = this.finishTask.rekomendasiUrl
 
-    mapDokumenUkom() {
+        if (!url) return
+
+        console.log('Downloading rekomendasi from:', url)
+
+        const parsedUrl = new URL(url)
+        const relativePath = parsedUrl.pathname + parsedUrl.search
+
+        const filename = this.finishTask.rekomendasi || 'rekomendasi.pdf'
+
+        this.apiService.getDownload(relativePath, filename).subscribe({
+            next: () => {
+                console.log('Download completed')
+            },
+            error: err => {
+                console.error('Download failed:', err)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengunduh rekomendasi'
+                )
+            }
+        })
+    }
+
+    mapDokumenUkom () {
         this.dataDokumenUkom.forEach((doc, index) => {
             this.fileHandlerData.files[`file${index}`] = {
                 label: doc.dokumenPersyaratanName,
@@ -125,15 +154,15 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    toggleCATModal() {
+    toggleCATModal () {
         this.isCATModalOpen$.next(!this.isCATModalOpen$.value)
     }
 
-    backToLandingPage() {
+    backToLandingPage () {
         this.router.navigate(['/'])
     }
 
-    fetchPhotoProfile() {
+    fetchPhotoProfile () {
         this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
             next: blob => {
                 if (blob.size === 0) {
@@ -141,7 +170,8 @@ export class StatusPendaftaranUkomComponent {
                     return
                 }
                 const objectUrl = URL.createObjectURL(blob)
-                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+                this.profileImageSrc =
+                    this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
             error: err => {
                 console.error('Error fetching profile image', err)
@@ -150,64 +180,75 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    getJenisUkomLabel(jenisUkom: string): string {
+    getJenisUkomLabel (jenisUkom: string): string {
         return JenisUkomEnum[jenisUkom as keyof typeof JenisUkomEnum] || '-'
     }
 
-    getProvinsiNameByCode(provinsiCode: string) {
+    getProvinsiNameByCode (provinsiCode: string) {
         this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
             next: response => {
-                this.provinsiName = response.name ?? null;
-            },
-        });
-    }
-
-    getKabupatenNameByCode(kabupatenCode: string) {
-        this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
-            next: response => {
-                this.kabupatenName = response.name ?? null;
-                this.typeKabKota = response.type ?? null;
-            },
-        });
-    }
-
-    getBidangjabatanNameByCode(bidangJabatanCode: string) {
-        this.apiService.getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`).subscribe({
-            next: response => {
-                this.bidangJabatanName = response.name ?? null;
+                this.provinsiName = response.name ?? null
             }
         })
     }
 
-    getPredikatKinerja(code: string | null): string {
-        console.log('code', code)
-        if (!code || code == null) return '-';
-        const predikat = this.predikatKinerjaList.find(predikat => predikat.id === code);
-        return predikat ? predikat.name : '-';
+    getKabupatenNameByCode (kabupatenCode: string) {
+        this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
+            next: response => {
+                this.kabupatenName = response.name ?? null
+                this.typeKabKota = response.type ?? null
+            }
+        })
     }
 
-    getPendingTask(key: string) {
+    getBidangjabatanNameByCode (bidangJabatanCode: string) {
+        this.apiService
+            .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
+            .subscribe({
+                next: response => {
+                    this.bidangJabatanName = response.name ?? null
+                }
+            })
+    }
+
+    getPredikatKinerja (code: string | null): string {
+        console.log('code', code)
+        if (!code || code == null) return '-'
+        const predikat = this.predikatKinerjaList.find(
+            predikat => predikat.id === code
+        )
+        return predikat ? predikat.name : '-'
+    }
+
+    getPendingTask (key: string) {
         this.ukomDataLoading$.next(true)
         this.apiService
             .getData(`/api/v1/participant_ukom_detail?key=${key}`)
             .subscribe({
                 next: (response: any) => {
-                    console.log('response')
                     this.getPendidikanList(response.data.pendidikanTerakhirCode)
                     if (response.data.provinsiId) {
                         this.getProvinsiNameByCode(response.data.provinsiId)
                     }
 
                     if (response.data.kabupatenKotaId) {
-                        this.getKabupatenNameByCode(response.data.kabupatenKotaId)
+                        this.getKabupatenNameByCode(
+                            response.data.kabupatenKotaId
+                        )
                     }
 
                     if (response.data.bidangJabatanCode) {
-                        this.getBidangjabatanNameByCode(response.data.bidangJabatanCode)
+                        this.getBidangjabatanNameByCode(
+                            response.data.bidangJabatanCode
+                        )
                     }
 
-                    this.predikat1Name = this.getPredikatKinerja(response.data.predikatKinerja1Id);
-                    this.predikat2Name = this.getPredikatKinerja(response.data.predikatKinerja2Id);
+                    this.predikat1Name = this.getPredikatKinerja(
+                        response.data.predikatKinerja1Id
+                    )
+                    this.predikat2Name = this.getPredikatKinerja(
+                        response.data.predikatKinerja2Id
+                    )
 
                     if (response.status == 'pending') {
                         this.pendingTask = response.data
@@ -248,54 +289,60 @@ export class StatusPendaftaranUkomComponent {
             })
     }
 
-    calculateAge(tanggalLahir: string | Date, tglSuratUsulan: string | Date): string {
-        console.log('calculateAge', tanggalLahir, tglSuratUsulan);
-
+    calculateAge (
+        tanggalLahir: string | Date,
+        tglSuratUsulan: string | Date
+    ): string {
+        console.log('calculateAge', tanggalLahir, tglSuratUsulan)
 
         if (!tanggalLahir || !tglSuratUsulan) {
-            return '-';
+            return '-'
         }
 
-        const birthDate = new Date(tanggalLahir);
-        const suratDate = new Date(tglSuratUsulan);
+        const birthDate = new Date(tanggalLahir)
+        const suratDate = new Date(tglSuratUsulan)
 
         if (suratDate < birthDate) {
-            return "Tanggal surat usulan tidak boleh sebelum tanggal lahir";
+            return 'Tanggal surat usulan tidak boleh sebelum tanggal lahir'
         }
 
         if (isNaN(birthDate.getTime()) || isNaN(suratDate.getTime())) {
-            return '-'; // Return '-' jika format tanggal salah
+            return '-' // Return '-' jika format tanggal salah
         }
 
-        let ageYears = suratDate.getFullYear() - birthDate.getFullYear();
-        let ageMonths = suratDate.getMonth() - birthDate.getMonth();
-        let ageDays = suratDate.getDate() - birthDate.getDate();
+        let ageYears = suratDate.getFullYear() - birthDate.getFullYear()
+        let ageMonths = suratDate.getMonth() - birthDate.getMonth()
+        let ageDays = suratDate.getDate() - birthDate.getDate()
 
         // Jika bulan dalam tgl_surat_usulan kurang dari bulan lahir, atau bulan sama tapi tanggal lebih kecil
         if (ageMonths < 0 || (ageMonths === 0 && ageDays < 0)) {
-            ageYears--;
-            ageMonths += 12;
+            ageYears--
+            ageMonths += 12
         }
 
         if (ageDays < 0) {
-            const lastMonth = new Date(suratDate.getFullYear(), suratDate.getMonth(), 0);
-            ageDays += lastMonth.getDate();
-            ageMonths--;
+            const lastMonth = new Date(
+                suratDate.getFullYear(),
+                suratDate.getMonth(),
+                0
+            )
+            ageDays += lastMonth.getDate()
+            ageMonths--
         }
 
-        return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`;
+        return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    transformInstansiName(value: string): string {
-        if (!value) return null;
+    transformInstansiName (value: string): string {
+        if (!value) return null
 
         return value
             .toLowerCase() // Ubah ke lowercase semua dulu
             .replace(/_/g, ' ') // Ganti underscore dengan spasi
-            .replace(/\b\w/g, char => char.toUpperCase()); // Kapitalisasi setiap kata
+            .replace(/\b\w/g, char => char.toUpperCase()) // Kapitalisasi setiap kata
     }
 
-    groupAndSortTasksByFlowId(tasks: any[]): { [key: string]: any[] } {
+    groupAndSortTasksByFlowId (tasks: any[]): { [key: string]: any[] } {
         const grouped = tasks.reduce((acc, task) => {
             if (!acc[task.flowId]) {
                 acc[task.flowId] = []
@@ -315,7 +362,7 @@ export class StatusPendaftaranUkomComponent {
         return grouped
     }
 
-    handleStepClick(clickedStep: number) {
+    handleStepClick (clickedStep: number) {
         this.currentUkomStep$.subscribe(step => {
             if (clickedStep <= step) {
                 console.log('clickedStep', clickedStep)
@@ -324,11 +371,11 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    toggleModal() {
+    toggleModal () {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    convertDate(date: string) {
+    convertDate (date: string) {
         return this.converterService.dateToHumanReadable(date)
     }
 }
