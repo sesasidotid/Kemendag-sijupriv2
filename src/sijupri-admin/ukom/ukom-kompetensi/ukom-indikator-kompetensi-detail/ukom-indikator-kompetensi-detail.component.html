@@ -35,4 +35,36 @@
             </div>
         </div>
     </div>
+
+    <section *ngIf="questionsList.length > 0" class="">
+        <div class="card border-0">
+            <div class="row question-container mb-3 pb-2">
+                <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
+                <div class="col-sm-12 mt-2">
+                    <ng-container
+                        *ngFor="let pertanyaan of questionsList; index as i"
+                    >
+                        <div class="row card">
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-2"
+                            >
+                                <label for="" class="col-form-label fw-bold"
+                                    >Pertanyaan {{ i + 1 }}</label
+                                >
+                                <a
+                                    class="btn btn-sm btn-soft-danger"
+                                    (click)="deleteQuestion(pertanyaan.id)"
+                                    >Hapus</a
+                                >
+                            </div>
+
+                            <div class="col">
+                                <p>{{ pertanyaan.question }}</p>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </section>
 </ng-template>

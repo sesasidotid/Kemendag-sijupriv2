@@ -139,7 +139,7 @@ export class StatusPendaftaranUkomComponent {
                     : null
                 this.isLoadingPendidikan$.next(false)
             },
-            error: error => {
+            error: () => {
                 this.handlerService.handleAlert(
                     'Error',
                     'Gagal memuat data pendidikan'
@@ -362,14 +362,13 @@ export class StatusPendaftaranUkomComponent {
         }
 
         if (isNaN(birthDate.getTime()) || isNaN(suratDate.getTime())) {
-            return '-' // Return '-' jika format tanggal salah
+            return '-'
         }
 
         let ageYears = suratDate.getFullYear() - birthDate.getFullYear()
         let ageMonths = suratDate.getMonth() - birthDate.getMonth()
         let ageDays = suratDate.getDate() - birthDate.getDate()
 
-        // Jika bulan dalam tgl_surat_usulan kurang dari bulan lahir, atau bulan sama tapi tanggal lebih kecil
         if (ageMonths < 0 || (ageMonths === 0 && ageDays < 0)) {
             ageYears--
             ageMonths += 12
@@ -392,9 +391,9 @@ export class StatusPendaftaranUkomComponent {
         if (!value) return null
 
         return value
-            .toLowerCase() // Ubah ke lowercase semua dulu
-            .replace(/_/g, ' ') // Ganti underscore dengan spasi
-            .replace(/\b\w/g, char => char.toUpperCase()) // Kapitalisasi setiap kata
+            .toLowerCase()
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, char => char.toUpperCase())
     }
 
     groupAndSortTasksByFlowId (tasks: any[]): { [key: string]: any[] } {
@@ -435,13 +434,10 @@ export class StatusPendaftaranUkomComponent {
     }
 
     getGroupedCompetencies (): any[] {
-        console.log('finishTask', this.finishTask)
         if (!this.finishTask.grades.cat.kompetensiIndikatorDtoList) {
-            console.warn('No kompetensi data available')
             return []
         }
 
-        // Group by kompetensiId
         const grouped =
             this.finishTask.grades.cat.kompetensiIndikatorDtoList.reduce(
                 (acc: any, kompetensi: any) => {
@@ -464,8 +460,6 @@ export class StatusPendaftaranUkomComponent {
                 },
                 {}
             )
-
-        console.log('grouped', grouped)
 
         return Object.values(grouped).map((group: any) => ({
             ...group,

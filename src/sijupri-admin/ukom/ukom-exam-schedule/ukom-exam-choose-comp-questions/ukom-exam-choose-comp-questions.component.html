@@ -120,27 +120,25 @@
                 "
             >
                 <div class="row card p-3 mb-2">
-                    <div
-                        class="d-flex justify-content-between align-items-center"
-                    >
-                        <div>
-                            <label class="fw-bold mb-1"
+                    <div class="">
+                        <div
+                            class="d-flex justify-content-between align-items-center"
+                        >
+                            <label for="" class="col-form-label fw-bold"
                                 >Indikator {{ i + 1 }}</label
                             >
-                            <p class="mb-0">{{ indikatorKompetensi.name }}</p>
-                            <small class="text-muted">
-                                Kompetensi:
-                                {{
-                                    indikatorKompetensi.kompetensi?.name || '-'
-                                }}
-                            </small>
+                            <a
+                                class="btn btn-sm btn-secondary"
+                                (click)="openModal(indikatorKompetensi.id)"
+                                >Pilih Pertanyaan</a
+                            >
                         </div>
-                        <button
-                            class="btn btn-secondary btn-sm"
-                            (click)="openModal(indikatorKompetensi.id)"
-                        >
-                            Pilih
-                        </button>
+
+                        <p class="mb-0">{{ indikatorKompetensi.name }}</p>
+                        <small class="text-muted">
+                            Kompetensi:
+                            {{ indikatorKompetensi.kompetensi?.name || '-' }}
+                        </small>
                     </div>
                 </div>
             </ng-container>
