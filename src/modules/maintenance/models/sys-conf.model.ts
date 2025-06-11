@@ -4,10 +4,11 @@ export class SysConf extends Serializable {
   code: string = undefined
   name: string = undefined
   value: string = undefined
+  objectValue: { [key: string]: any } = undefined
   type: string = undefined
   rule: string = undefined
 
-  constructor (object?: { [key: string]: any }) {
+  constructor(object?: { [key: string]: any }) {
     super()
     if (object) this.fromObject(object)
   }

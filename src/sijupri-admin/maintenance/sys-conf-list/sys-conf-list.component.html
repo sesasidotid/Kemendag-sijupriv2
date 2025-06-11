@@ -27,73 +27,6 @@
               <ng-container *ngIf="!isUpdate">
                 {{ sysConf.value }}
               </ng-container>
-              <ng-container *ngIf="isUpdate">
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="{{ sysConf.code }}_value"
-                  name="nip"
-                />
-                <div
-                  class="feedback"
-                  *ngIf="
-                    sysConfForm.get(sysConf.code + '_value').invalid &&
-                    sysConfForm.get(sysConf.code + '_value').touched
-                  "
-                >
-                  <small
-                    *ngIf="sysConfForm.get(sysConf.code + '_value').errors?.['required']"
-                  >
-                    nilai perlu diisi.
-                  </small>
-                </div>
-              </ng-container>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div *ngIf="isUpdate" class="col-12">
-      <button
-        type="submit"
-        class="float-end btn btn-sm btn-success"
-        [disabled]="!sysConfForm.valid"
-      >
-        Simpan
-      </button>
-    </div>
-  </form>
-</div> -->
-
-<div class="row">
-  <form [formGroup]="sysConfForm" (submit)="submit()">
-    <div class="col-12">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>
-              Nilai
-              <a
-                class="float-end btn btn-sm"
-                [ngClass]="
-                  isUpdate
-                    ? 'btn-soft-warning ri-arrow-go-back-line'
-                    : 'btn-soft-info ri-pencil-line'
-                "
-                (click)="isUpdate = !isUpdate"
-              >
-              </a>
-            </th>
-          </tr>
-        </thead>
-        <tbody *ngIf="sysConfList.length > 0">
-          <tr *ngFor="let sysConf of sysConfList">
-            <td>{{ sysConf.name }}</td>
-            <td>
-              <ng-container *ngIf="!isUpdate">
-                {{ sysConf.value }}
-              </ng-container>
 
               <ng-container *ngIf="isUpdate">
                 <ng-container
@@ -146,6 +79,103 @@
         class="float-end btn btn-success"
         [disabled]="!sysConfForm.valid"
       >
+        Simpan
+      </button>
+    </div>
+  </form>
+</div> -->
+
+<div class="row">
+  <form [formGroup]="sysConfForm" (submit)="submit()">
+    <div class="col-12">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>
+              Nilai
+              <a class="float-end btn btn-sm" [ngClass]="
+                  isUpdate
+                    ? 'btn-soft-warning ri-arrow-go-back-line'
+                    : 'btn-soft-info ri-pencil-line'
+                " (click)="isUpdate = !isUpdate">
+              </a>
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="sysConfList.length > 0">
+          <tr *ngFor="let sysConf of sysConfList">
+            <td>{{ sysConf.name }}</td>
+            <td>
+              <ng-container *ngIf="!isUpdate">
+                <ng-container [ngSwitch]="sysConf.type">
+
+                  <ng-container *ngSwitchCase="'json:select'">
+                    <table class="table table-hover w-100">
+                      <tr *ngFor="let item of sysConf.objectValue | keyvalue">
+                        <td>{{item.key}}</td>
+                        <td>{{item.value}}</td>
+                      </tr>
+                    </table>
+                  </ng-container>
+
+                  <ng-container *ngSwitchDefault>
+                    {{ sysConf.value }}
+                  </ng-container>
+
+                </ng-container>
+              </ng-container>
+
+              <ng-container *ngIf="isUpdate">
+                <ng-container [ngSwitch]="sysConf.type">
+                  <!-- Select -->
+                  <ng-container *ngSwitchCase="'select'">
+                    <select class="form-select p-1 cursor-pointer" formControlName="{{ sysConf.code }}_value">
+                      <ng-container *ngFor="let option of extractRegexOptions(sysConf.rule)">
+                        <option [selected]="option === sysConf.value" [value]="option">{{ option }}</option>
+                      </ng-container>
+                    </select>
+                  </ng-container>
+
+                  <!-- JSON -->
+                  <ng-container *ngSwitchCase="'json:select'">
+                    <table class="table table-hover w-100">
+                      <tr *ngFor="let item of sysConf.objectValue | keyvalue">
+                        <td>{{item.key}}</td>
+                        <td>
+                          <select class="form-select p-1 cursor-pointer"
+                            (change)="onSelectChange($event, item.key, sysConf)">
+                            <ng-container *ngFor="let option of extractJsonRegexOptions(sysConf.rule, item.key)">
+                              <option [selected]="option === item.value" [value]="option">{{ option }}</option>
+                            </ng-container>
+                          </select>
+                        </td>
+                      </tr>
+                    </table>
+                  </ng-container>
+
+                  <!-- Default (normal input) -->
+                  <ng-container *ngSwitchDefault>
+                    <input type="text" class="form-control" formControlName="{{ sysConf.code }}_value" />
+                    <div class="text-danger" *ngIf="
+        sysConfForm.get(sysConf.code + '_value').invalid &&
+        sysConfForm.get(sysConf.code + '_value').touched">
+                      <small *ngIf="sysConfForm.get(sysConf.code + '_value').errors?.['required']">
+                        nilai perlu diisi.
+                      </small>
+                    </div>
+                  </ng-container>
+                </ng-container>
+
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="isUpdate" class="col-12">
+      <button type="submit" class="float-end btn btn-success" [disabled]="!sysConfForm.valid">
         Simpan
       </button>
     </div>
