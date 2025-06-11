@@ -1,5 +1,4 @@
 import { Component } from '@angular/core'
-import { Router } from '@angular/router'
 import { CommonModule } from '@angular/common'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { SysConf } from '../../../modules/maintenance/models/sys-conf.model'
@@ -25,29 +24,30 @@ export class SysConfListComponent {
 
     sysConfForm: FormGroup
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService
-    ) {}
+    ) { }
 
-    ngOnInit () {
+    ngOnInit() {
         this.findAllSysConf()
     }
 
-    toggleUkomStatus (code: string) {
+    toggleUkomStatus(code: string) {
         const currentValue = this.sysConfForm.get(code + '_value').value
         const newValue = currentValue === 'ya' ? 'tidak' : 'ya'
         this.sysConfForm.get(code + '_value').setValue(newValue)
     }
 
-    findAllSysConf () {
+    findAllSysConf() {
         this.apiService.getData('/api/v1/sys_conf').subscribe({
             next: (response: any) => {
                 const formControlMap: { [key: string]: any } = {}
                 this.sysConfList = response.map(
                     (sysConf: { [key: string]: any }) => {
                         const sysConfModel = new SysConf(sysConf)
+                        if (sysConfModel.type.startsWith('json')) sysConf['objectValue'] = JSON.parse(sysConfModel.value);
                         formControlMap[`${sysConfModel.code}_value`] =
                             new FormControl(sysConfModel.value, [
                                 Validators.required,
@@ -65,12 +65,12 @@ export class SysConfListComponent {
         })
     }
 
-    submit () {
+    submit() {
         Object.keys(this.sysConfForm.controls).forEach(key => {
             const control = this.sysConfForm.get(key)
             if (control?.invalid) {
                 console.log(
-                    `🚨 FormControl '${key}' is invalid!`,
+                    `FormControl '${key}' is invalid!`,
                     control.errors
                 )
             }
@@ -101,5 +101,33 @@ export class SysConfListComponent {
                     })
             }
         })
+    }
+
+    onSelectChange(event: Event, key: string, sysConf: SysConf) {
+        const value = (event.target as HTMLSelectElement).value;
+        
+        console.log(JSON.stringify(sysConf.objectValue))
+        sysConf.objectValue[key] = value;
+        console.log(JSON.stringify(sysConf.objectValue))
+        this.sysConfForm.get(`${sysConf.code}_value`)?.setValue(JSON.stringify(sysConf.objectValue));
+    }
+
+    extractRegexOptions(pattern: string): string[] {
+        const match = pattern.match(/^\^\((.*?)\)\$$/);
+        if (!match) return [];
+
+        const options = match[1].split('|');
+        return options;
+    }
+
+    extractJsonRegexOptions(pattern: string, key: string): string[] {
+        const regex = new RegExp(`"${key}":"\\(([^)]+)\\)"`);
+        const match = pattern.match(regex);
+        if (!match) return [];
+        return match[1].split('|')
+    }
+
+    jsonParse(jsonString: string) {
+        return JSON.parse(jsonString);
     }
 }
