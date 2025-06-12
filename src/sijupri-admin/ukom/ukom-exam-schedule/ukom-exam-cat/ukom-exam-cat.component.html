@@ -1,0 +1,223 @@
+<section>
+    <section class="mt-4">
+        <div class="card p-3 bg-light">
+            <h5 class="card-title mb-3">
+                <i class="mdi mdi-shuffle-variant me-2"></i>Pilih Pertanyaan
+                Secara Acak
+            </h5>
+            <p class="text-muted mb-3">
+                Pilih pertanyaan secara acak dari semua kompetensi yang tersedia
+            </p>
+
+            <div
+                class="d-flex flex-column flex-md-row align-items-stretch gap-2"
+            >
+                <div class="flex-fill">
+                    <label for="randomCountInput" class="form-label"
+                        >Jumlah Pertanyaan:</label
+                    >
+                    <input
+                        type="number"
+                        id="randomCountInput"
+                        class="form-control"
+                        [(ngModel)]="randomCount"
+                        [ngModelOptions]="{ standalone: true }"
+                        min="1"
+                        placeholder="Masukkan jumlah..."
+                    />
+                </div>
+
+                <div class="flex-shrink-0">
+                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                    <button
+                        type="button"
+                        class="btn btn-primary w-100"
+                        (click)="selectRandomQuestionsFromAll()"
+                        [disabled]="
+                            !randomCount ||
+                            randomCount <= 0 ||
+                            IndikatorKompetensiUkom?.length === 0
+                        "
+                    >
+                        <i class="mdi mdi-shuffle-variant me-1"></i> Pilih Acak
+                    </button>
+                </div>
+
+                <div class="flex-shrink-0">
+                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                    <button
+                        type="button"
+                        class="btn btn-warning w-100"
+                        (click)="clearAllSelection()"
+                        [disabled]="questCheckedList.length === 0"
+                    >
+                        <i class="mdi mdi-close-circle me-1"></i> Bersihkan
+                        Semua
+                    </button>
+                </div>
+
+                <!-- Selected count alert -->
+                <div class="flex-shrink-0">
+                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                    <div class="alert alert-info mb-0 py-2 px-3 w-100">
+                        <small
+                            ><strong>Terpilih:</strong>
+                            {{ questCheckedList.length }} pertanyaan</small
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="card border-0">
+        <div class="row question-container">
+            <label for="" class="p-0 fw-bold"
+                >Daftar Indikator Kompetensi</label
+            >
+
+            <div
+                class="col-sm-12 mt-2"
+                *ngIf="IndikatorKompetensiUkom?.length > 0; else noKompetensi"
+            >
+                <ng-container
+                    *ngFor="
+                        let indikatorKompetensi of IndikatorKompetensiUkom;
+                        index as i
+                    "
+                >
+                    <div class="row card p-3 mb-2">
+                        <div class="">
+                            <div
+                                class="d-flex justify-content-between align-items-center"
+                            >
+                                <label for="" class="col-form-label fw-bold"
+                                    >Indikator {{ i + 1 }}</label
+                                >
+                                <a
+                                    class="btn btn-sm btn-secondary"
+                                    (click)="openModal(indikatorKompetensi.id)"
+                                    >Pilih Pertanyaan</a
+                                >
+                            </div>
+
+                            <p class="mb-0">{{ indikatorKompetensi.name }}</p>
+                            <small class="text-muted">
+                                Kompetensi:
+                                {{
+                                    indikatorKompetensi.kompetensi?.name || '-'
+                                }}
+                            </small>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="col-lg-12">
+                    <div
+                        class="hstack gap-2 justify-content-end align-items-center"
+                    >
+                        <button
+                            [disabled]="questCheckedList.length === 0"
+                            class="btn btn-success"
+                            (click)="submit()"
+                            *ngIf="!(submitLoading$ | async)"
+                        >
+                            Simpan
+                        </button>
+                        <button
+                            class="btn btn-success"
+                            disabled
+                            *ngIf="submitLoading$ | async"
+                        >
+                            <div
+                                class="spinner-border"
+                                style="width: 19px; height: 19px"
+                                role="status"
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <ng-template #noKompetensi>
+                <p class="text-muted">
+                    Tidak ada indikator kompetensi tersedia.
+                </p>
+            </ng-template>
+        </div>
+    </div>
+
+    <section *ngIf="listSavedQuestion.length > 0" class="mt-5">
+        <div class="card border-0">
+            <div class="row question-container mb-3 pb-2">
+                <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
+                <div class="col-sm-12 mt-2">
+                    <ng-container
+                        *ngFor="let pertanyaan of listSavedQuestion; index as i"
+                    >
+                        <div class="row card">
+                            <label
+                                for=""
+                                class="col-12 col-form-label fw-bold mb-1"
+                                >Pertanyaan {{ i + 1 }}</label
+                            >
+                            <div class="col">
+                                <p>{{ pertanyaan.question }}</p>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+
+<app-modal
+    *ngIf="isModalOpen$ | async"
+    [title]="'Pilih pertanyaan'"
+    (toggle)="toggleModal()"
+    [size]="'lg'"
+    [enableFooter]="false"
+>
+    <form>
+        <div class="mb-3">
+            <label for="searchInput" class="form-label">Pencarian:</label>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search questions..."
+                class="form-control"
+                [(ngModel)]="filterText"
+                (ngModelChange)="onSearchChange($event)"
+                [ngModelOptions]="{ standalone: true }"
+            />
+        </div>
+
+        <div class="mb-3">
+            <small class="text-muted">
+                Pertanyaan terpilih: {{ questCheckedList.length }}
+            </small>
+        </div>
+
+        <div
+            class="checklist-container"
+            *ngFor="let question of filteredQuestions$ | async"
+        >
+            <label class="checklist-item">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [name]="'question-' + question.id"
+                    [(ngModel)]="question.checked"
+                    (change)="onQuestionSelect(question)"
+                />
+                <span class="checklist-label">{{ question.question }}</span>
+            </label>
+        </div>
+
+        <div *ngIf="(filteredQuestions$ | async)?.length === 0">
+            Pertanyaan tidak ditemukan.
+        </div>
+    </form>
+</app-modal>

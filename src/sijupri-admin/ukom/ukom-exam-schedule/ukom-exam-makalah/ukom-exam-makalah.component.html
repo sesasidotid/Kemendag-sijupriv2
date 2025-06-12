@@ -1,0 +1,63 @@
+<section class="mt-4">
+    <div class="card p-3 bg-light">
+        <div class="d-flex flex-column flex-md-row align-items-stretch gap-2">
+            <div class="flex-fill">
+                <label for="makalah_question" class="form-label"
+                    >Silahkan masukan petunjuk/pertanyaan makalah:</label
+                >
+                <textarea
+                    id="makalah_question"
+                    class="form-control"
+                    rows="4"
+                    [(ngModel)]="question_text"
+                    [ngModelOptions]="{ standalone: true }"
+                    placeholder="Masukkan pertanyaan makalah..."
+                ></textarea>
+            </div>
+        </div>
+
+        <div class="col-lg-12 mt-2">
+            <div class="hstack gap-2 justify-content-end align-items-center">
+                <button
+                    [disabled]="question_text.trim() === ''"
+                    class="btn btn-success"
+                    (click)="onSubmit()"
+                    *ngIf="!(submitLoading$ | async)"
+                >
+                    Simpan
+                </button>
+                <button
+                    class="btn btn-success"
+                    disabled
+                    *ngIf="submitLoading$ | async"
+                >
+                    <div
+                        class="spinner-border"
+                        style="width: 19px; height: 19px"
+                        role="status"
+                    >
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+    <section *ngIf="listSavedQuestion.length > 0" class="mt-5">
+        <div class="card border-0">
+            <div class="row question-container mb-3 pb-2">
+                <label for="" class="p-0 fw-bold">Petunjuk/Pertanyaan</label>
+                <div class="col-sm-12 mt-2">
+                    <ng-container
+                        *ngFor="let pertanyaan of listSavedQuestion; index as i"
+                    >
+                        <div class="row card">
+                            <div class="col">
+                                <p>{{ pertanyaan.question }}</p>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>

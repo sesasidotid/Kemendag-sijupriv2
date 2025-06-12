@@ -82,6 +82,13 @@
                         >
                             Lihat Nilai
                         </button>
+                        <button
+                            *ngIf="exam.examTypeCode === 'MAKALAH'"
+                            class="btn btn-primary btn-lg"
+                            (click)="toggleModalMakalah()"
+                        >
+                            Upload Makalah
+                        </button>
                     </div>
                 </div>
             </div>
@@ -98,6 +105,19 @@
         </app-empty-state>
     </ng-template>
 </section>
+
+<app-modal
+    *ngIf="isModalMakalahOpen$ | async"
+    [title]="'Upload Makalah'"
+    (toggle)="toggleModalMakalah()"
+    [enableFooter]="false"
+>
+    <app-ukom-makalah
+        [participant_id]="participant_id"
+        [room_id]="roomUkom.id"
+        (afterSubmit)="toggleModalMakalah()"
+    ></app-ukom-makalah>
+</app-modal>
 
 <app-modal
     *ngIf="isModalOpen$ | async"

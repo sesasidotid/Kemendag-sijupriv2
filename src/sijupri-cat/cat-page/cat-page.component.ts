@@ -43,14 +43,14 @@ export class CatPageComponent {
 
     private countdownInterval: any
 
-    constructor(
+    constructor (
         private api: ApiService,
         private handler: HandlerService,
         private confirmationService: ConfirmationService,
         private router: Router
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.getRoomUkom()
         this.enterFullScreen()
         // this.getQuestion()
@@ -63,14 +63,14 @@ export class CatPageComponent {
     }
 
     @HostListener('document:visibilitychange', [])
-    handleVisibilityChange() {
+    handleVisibilityChange () {
         if (document.hidden) {
             // You can also submit the exam automatically or log this action
         }
     }
 
     @HostListener('document:mousemove', ['$event'])
-    onMouseMove(event: MouseEvent) {
+    onMouseMove (event: MouseEvent) {
         if (this.isSubmitted$.value) return
 
         const inside = this.isMouseInsideExamArea(event)
@@ -92,7 +92,7 @@ export class CatPageComponent {
 
     private isInside = true
 
-    isMouseInsideExamArea(event: MouseEvent): boolean {
+    isMouseInsideExamArea (event: MouseEvent): boolean {
         const examArea = document.querySelector('.parent') as HTMLElement
         if (!examArea) return false
 
@@ -105,7 +105,7 @@ export class CatPageComponent {
         )
     }
 
-    startWarningCountdown() {
+    startWarningCountdown () {
         if (this.warningInterval) {
             clearInterval(this.warningInterval)
         }
@@ -121,47 +121,47 @@ export class CatPageComponent {
         }, 1000)
     }
 
-    resetWarningCountdown() {
+    resetWarningCountdown () {
         if (this.warningInterval) {
             clearInterval(this.warningInterval)
         }
         this.warningCountdown = 30
     }
 
-    onBlur() {
+    onBlur () {
         alert(
             'Please do not switch tabs or open other applications during the exam.'
         )
         this.enterFullScreen()
     }
 
-    enterFullScreen() {
+    enterFullScreen () {
         const elem = document.documentElement
         if (elem.requestFullscreen) {
             elem.requestFullscreen()
         } else if ((elem as any).mozRequestFullScreen) {
             /* Firefox */
-            ; (elem as any).mozRequestFullScreen()
+            ;(elem as any).mozRequestFullScreen()
         } else if ((elem as any).webkitRequestFullscreen) {
             /* Chrome, Safari and Opera */
-            ; (elem as any).webkitRequestFullscreen()
+            ;(elem as any).webkitRequestFullscreen()
         } else if ((elem as any).msRequestFullscreen) {
             /* IE/Edge */
-            ; (elem as any).msRequestFullscreen()
+            ;(elem as any).msRequestFullscreen()
         }
     }
 
-    ngOnDestroy() {
+    ngOnDestroy () {
         if (this.countdownInterval) {
             clearInterval(this.countdownInterval)
         }
     }
 
-    backToHome() {
+    backToHome () {
         this.router.navigate(['/'])
     }
 
-    startCountdown() {
+    startCountdown () {
         if (!this.examEndTime) return
 
         this.countdownInterval = setInterval(() => {
@@ -182,7 +182,7 @@ export class CatPageComponent {
         }, 1000)
     }
 
-    formatTime(ms: number): string {
+    formatTime (ms: number): string {
         const totalSeconds = Math.floor(ms / 1000)
         const hours = Math.floor(totalSeconds / 3600)
         const minutes = Math.floor((totalSeconds % 3600) / 60)
@@ -192,11 +192,11 @@ export class CatPageComponent {
         )}`
     }
 
-    padZero(num: number): string {
+    padZero (num: number): string {
         return num < 10 ? `0${num}` : `${num}`
     }
 
-    getRoomUkom() {
+    getRoomUkom () {
         this.api
             .getData(
                 `/api/v1/participant_ukom/nip/${LoginContext.getUserId().replace(
@@ -211,7 +211,6 @@ export class CatPageComponent {
                     this.roomUkom = new RoomUkom(response.roomUkomDto)
                     this.room_id = response.roomUkomDto.id
                     this.pesertaUkom = response
-                    //   console.log('peserta', this.pesertaUkom)
 
                     if (response.roomUkomDto.examScheduleDtoList) {
                         this.examEndTime = new Date(
@@ -230,7 +229,7 @@ export class CatPageComponent {
             })
     }
 
-    getQuestion() {
+    getQuestion () {
         this.api
             .getData(`/api/v1/exam/page/CAT/${this.room_id}?limit=1000&page=1`)
             .subscribe({
@@ -241,8 +240,10 @@ export class CatPageComponent {
                     // Jika ada jawaban tersimpan, load jawaban
                     this.data.data.forEach((question: any) => {
                         if (question.answerDto?.id) {
-                            this.savedAnswer[question.id] = question.answerDto.answerChoice
-                            this.selectedAnswer[question.id] = question.answerDto.answerChoice
+                            this.savedAnswer[question.id] =
+                                question.answerDto.answerChoice
+                            this.selectedAnswer[question.id] =
+                                question.answerDto.answerChoice
                         }
                     })
                 },
@@ -252,24 +253,27 @@ export class CatPageComponent {
                         this.isSubmitted$.next(true)
                         // this.isSubmitted$ = true
                     } else {
-                        this.handler.handleAlert('Error', 'Gagal mengambil pertanyaan')
+                        this.handler.handleAlert(
+                            'Error',
+                            'Gagal mengambil pertanyaan'
+                        )
                     }
                 }
             })
     }
 
-    navigateToPage(page: number) {
+    navigateToPage (page: number) {
         if (page > 0 && page <= this.totalQuestions) {
             this.currentPage = page
         }
     }
 
-    selectAnswer(questionId: string, choiceId: string) {
+    selectAnswer (questionId: string, choiceId: string) {
         this.selectedAnswer[questionId] = choiceId
         console.log('Selected answer:', this.selectedAnswer)
     }
 
-    saveAnswer(questionId: string) {
+    saveAnswer (questionId: string) {
         const selectedChoiceId = this.selectedAnswer[questionId]
         if (!selectedChoiceId) {
             console.warn('No answer selected for question:', questionId)
@@ -301,7 +305,7 @@ export class CatPageComponent {
         })
     }
 
-    submitAnswer(open_dialog: boolean = true) {
+    submitAnswer (open_dialog: boolean = true) {
         const payload = {
             examTypeCode: 'CAT',
             roomUkomId: this.room_id
@@ -311,17 +315,31 @@ export class CatPageComponent {
             this.confirmationService.open(false).subscribe({
                 next: (response: any) => {
                     if (response.confirmed) {
-                        this.api.postData('/api/v1/exam/finish', payload).subscribe({
-                            next: response => {
-                                console.log('Answer submitted successfully:', response)
-                                this.handler.handleAlert('Success', 'Jawaban berhasil disimpan')
-                                this.router.navigate(['/'])
-                            },
-                            error: err => {
-                                console.error('Error submitting answer:', err)
-                                this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
-                            }
-                        })
+                        this.api
+                            .postData('/api/v1/exam/finish', payload)
+                            .subscribe({
+                                next: response => {
+                                    console.log(
+                                        'Answer submitted successfully:',
+                                        response
+                                    )
+                                    this.handler.handleAlert(
+                                        'Success',
+                                        'Jawaban berhasil disimpan'
+                                    )
+                                    this.router.navigate(['/'])
+                                },
+                                error: err => {
+                                    console.error(
+                                        'Error submitting answer:',
+                                        err
+                                    )
+                                    this.handler.handleAlert(
+                                        'Error',
+                                        'Gagal menyimpan jawaban'
+                                    )
+                                }
+                            })
                     }
                 }
             })
@@ -331,7 +349,10 @@ export class CatPageComponent {
             this.api.postData('/api/v1/exam/finish', payload).subscribe({
                 next: response => {
                     console.log('Answer submitted successfully:', response)
-                    this.handler.handleAlert('Success', 'Jawaban berhasil disimpan')
+                    this.handler.handleAlert(
+                        'Success',
+                        'Jawaban berhasil disimpan'
+                    )
                     this.router.navigate(['/'])
                 },
                 error: err => {

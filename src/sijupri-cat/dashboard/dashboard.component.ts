@@ -11,12 +11,19 @@ import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
 import { ModalComponent } from '../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../modules/base/components/empty-state/empty-state.component'
+import { UkomMakalahComponent } from '../ukom-makalah/ukom-makalah.component'
+
 declare var bootstrap: any
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, ModalComponent, EmptyStateComponent],
+    imports: [
+        CommonModule,
+        ModalComponent,
+        EmptyStateComponent,
+        UkomMakalahComponent
+    ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
 })
@@ -29,7 +36,7 @@ export class DashboardComponent implements AfterViewInit {
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     groupedKompetensi: any[] = []
 
-    t: string = LoginContext.getApplicationCode()
+    isModalMakalahOpen$ = new BehaviorSubject<boolean>(false)
 
     constructor (
         private api: ApiService,
@@ -149,6 +156,10 @@ export class DashboardComponent implements AfterViewInit {
 
     toggleModal () {
         this.isModalOpen$.next(!this.isModalOpen$.value)
+    }
+
+    toggleModalMakalah () {
+        this.isModalMakalahOpen$.next(!this.isModalMakalahOpen$.value)
     }
 
     getGroupedCompetencies (): any[] {

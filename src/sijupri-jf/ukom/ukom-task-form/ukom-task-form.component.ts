@@ -32,6 +32,7 @@ import {
     tap
 } from 'rxjs'
 import { BidangJabatan } from '../../../modules/maintenance/models/bidang-jabatan.model'
+import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-ukom-task-form',
@@ -52,6 +53,7 @@ export class UkomTaskFormComponent {
 
     pesertaUkom: PesertaUkom = new PesertaUkom()
     jabatanList: Jabatan[] = []
+    jenjangList: Jenjang[] = []
     nextJenjang: Jenjang
     detectedDokumen: any = {}
     passwordForm: FormGroup
@@ -89,21 +91,107 @@ export class UkomTaskFormComponent {
     constructor (
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private formValidationService: FormValidationService
     ) {}
 
-    ngOnInit () {
-        this.handleFormInit()
-        this.handleSubscribe()
-        this.setupInstansiValidation()
-        this.handleFetchDokumenPersyaratan()
-        this.getJFPendidikan()
-        this.getLast2TahunPredikatJF()
+    ngOnChanges (changes: SimpleChanges) {
+        if (changes['ukom'] || changes['jf']) {
+            this.handleFormInit()
+            this.handleSubscribe()
+            this.setupInstansiValidation()
+            this.handleFetchDokumenPersyaratan()
+            this.getJFPendidikan()
+            this.getLast2TahunPredikatJF()
+            this.getListJabatan()
+            this.getListJenjang()
+        }
+    }
+
+    handleSubscribe () {
+        this.passwordForm.valueChanges.subscribe(value => {
+            console.log('Form Value Changed:', value)
+        })
+        const jenisUkomControl = this.passwordForm.get('jenis_ukom')
+        const nextJabatanControl = this.passwordForm.get('next_jabatan_code')
+        const nextJenjangControl = this.passwordForm.get('next_jenjang_code')
+        const isMengulangControl = this.passwordForm.get('isMengulang')
+        const bidangJabatanControl = this.passwordForm.get(
+            'bidang_jabatan_code'
+        )
+
+        isMengulangControl.valueChanges
+            .pipe(
+                takeUntil(this.destroy$),
+                map(value =>
+                    value === 'true' ? true : value === 'false' ? false : null
+                )
+            )
+            .subscribe(value => {
+                this.isMengulang$.next(value)
+            })
+
+        nextJabatanControl.valueChanges.subscribe(next_jabatan_code => {
+            if (next_jabatan_code) {
+                bidangJabatanControl.setValue('')
+                this.getBidangJabatanByJabatanCode(next_jabatan_code)
+                this.pesertaUkom.nextJabatanCode = next_jabatan_code
+                this.jabatanCodeArgument$.next(next_jabatan_code)
+            }
+        })
+
+        nextJenjangControl.valueChanges.subscribe(next_jenjang_code => {
+            if (next_jenjang_code) {
+                this.jenjangCodeArgument$.next(next_jenjang_code)
+            }
+        })
+
+        jenisUkomControl.valueChanges.subscribe(jenis_ukom => {
+            if (jenis_ukom) {
+                this.jenisUkom$.next(jenis_ukom)
+                this.clearFilesName()
+                this.detectedDokumen = {}
+                this.inputs.files = {}
+                bidangJabatanControl.setValue('')
+
+                this.bidangJabatanList$ = of([])
+
+                this.jabatanCodeArgument$.next(null)
+                this.jenjangCodeArgument$.next(null)
+                this.isMengulang$.next(false)
+                nextJabatanControl.setValue('')
+                nextJenjangControl.setValue('')
+
+                if (jenis_ukom == 'PERPINDAHAN_JABATAN') {
+                    nextJabatanControl.setValue('')
+                    nextJenjangControl.setValue('')
+
+                    nextJabatanControl.enable()
+                    nextJenjangControl.enable()
+                }
+
+                if (jenis_ukom == 'KENAIKAN_JENJANG') {
+                    nextJabatanControl.disable()
+                    nextJenjangControl.disable()
+
+                    nextJabatanControl.setValue(this.jf.jabatanCode)
+                    this.getNextJenjang()
+                }
+            }
+        })
     }
 
     ngOnDestroy () {
         this.destroy$.next()
         this.destroy$.complete()
+    }
+
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.passwordForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
     handleFormInit () {
@@ -117,8 +205,10 @@ export class UkomTaskFormComponent {
                 this.passwordMatchValidator.bind(this)
             ]),
             isMengulang: new FormControl('', [Validators.required]),
+            jenis_ukom: new FormControl('', Validators.required),
+            next_jabatan_code: new FormControl('', Validators.required),
+            next_jenjang_code: new FormControl('', Validators.required),
             bidang_jabatan_code: new FormControl(''),
-            // Dokumen Pendukung
             no_surat_usulan: new FormControl('', Validators.required),
             tglSuratUsulan: new FormControl('', Validators.required)
         })
@@ -161,15 +251,6 @@ export class UkomTaskFormComponent {
             )
         ])
             .pipe(
-                tap(([jenisUkom, jabatanCode, JenjangCode, isMengulang]) => {
-                    console.log(
-                        'fetching dokumen persyaratan',
-                        jenisUkom,
-                        jabatanCode,
-                        JenjangCode,
-                        isMengulang
-                    )
-                }),
                 filter(
                     ([jenisUkom, jabatanCode, JenjangCode, isMengulang]) =>
                         !!jenisUkom &&
@@ -180,9 +261,6 @@ export class UkomTaskFormComponent {
                 tap(() => {
                     this.clearFilesName()
                 })
-                // distinctUntilChanged(([prevJenis, prevJabatan, prevJenjang, prevIsMengulang], [currJenis, currJabatan, currJenjang, currIsMengulang]) =>
-                //     prevJenis === currJenis && prevJabatan === currJabatan && prevJenjang === currJenjang && prevIsMengulang === currIsMengulang
-                // )
             )
             .subscribe(([jenisUkom, jabatanCode, JenjangCode, isMengulang]) => {
                 this.getDokumenPersyaratan(
@@ -210,62 +288,6 @@ export class UkomTaskFormComponent {
             )
     }
 
-    handleSubscribe () {
-        this.passwordForm
-            .get('isMengulang')
-            ?.valueChanges.pipe(
-                takeUntil(this.destroy$),
-                map(value =>
-                    value === 'true' ? true : value === 'false' ? false : null
-                )
-            )
-            .subscribe(value => {
-                this.isMengulang$.next(value)
-            })
-    }
-
-    getErrorMessage (controlName: string, label: string): string | null {
-        const control = this.passwordForm.get(controlName)
-
-        if (
-            !control ||
-            !control.errors ||
-            (!control.touched && !control.dirty)
-        ) {
-            return null
-        }
-
-        const errors = control.errors
-
-        if (errors['required']) {
-            return `${label} tidak boleh kosong.`
-        }
-
-        if (errors['minlength']) {
-            return `${label} minimal ${errors['minlength'].requiredLength} karakter.`
-        }
-        if (errors['pattern']) {
-            if (controlName == 'nip') {
-                return `${label} harus terdiri dari 18 digit angka.`
-            }
-
-            if (controlName == 'nik') {
-                return `${label} harus terdiri dari 16 digit angka.`
-            }
-
-            if (controlName === 'phone') {
-                return `${label} harus terdiri dari 10 hingga 15 digit angka.`
-            }
-
-            return `Format ${label} tidak valid.`
-        }
-        if (errors['mismatch']) {
-            return `Password dan Konfirmasi Password tidak cocok.`
-        }
-
-        return null
-    }
-
     passwordMatchValidator (
         control: FormControl
     ): { [key: string]: boolean } | null {
@@ -282,15 +304,6 @@ export class UkomTaskFormComponent {
     clearFilesName () {
         if (this.fileHandler) {
             this.fileHandler.clearFileName()
-        }
-    }
-
-    ngOnChanges (changes: SimpleChanges) {
-        if (changes['ukom']) {
-            console.log('Ukom changed:', changes['ukom'].currentValue)
-        }
-        if (changes['jf']) {
-            console.log('JF changed:', changes['jf'].currentValue)
         }
     }
 
@@ -334,7 +347,6 @@ export class UkomTaskFormComponent {
                     this.inputs.files = {}
 
                     this.dokumenPersyaratanList.forEach((dokumen, index) => {
-                        // const key = `dokumenPersyaratan_${index + 1}`
                         const key = dokumen.dokumenPersyaratanId
                         this.inputs.files[key] = {
                             label: dokumen.dokumenPersyaratanName,
@@ -342,7 +354,11 @@ export class UkomTaskFormComponent {
                         }
                     })
                 },
-                error: error => this.handlerService.handleException(error)
+                error: error =>
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil dokumen persyaratan'
+                    )
             })
     }
 
@@ -350,16 +366,18 @@ export class UkomTaskFormComponent {
         this.apiService
             .getData(`/api/v1/jenjang/next/${this.jf.jenjangCode}`)
             .subscribe({
-                next: response => {
+                next: (response: Jenjang) => {
                     this.nextJenjang = new Jenjang(response)
-                    this.pesertaUkom.nextJenjangCode = this.nextJenjang.code
-                    this.jabatanCodeArgument$.next(this.jf.jabatanCode)
-                    this.jenjangCodeArgument$.next(
-                        this.pesertaUkom.nextJenjangCode
-                    )
-                    // this.getDokumenPersyaratan(this.jf.jabatanCode, this.pesertaUkom.nextJenjangCode, this.isMengulang$.value)
+                    this.passwordForm
+                        .get('next_jenjang_code')
+                        ?.setValue(response.code)
+                    this.jenjangCodeArgument$.next(response.code)
                 },
-                error: error => this.handlerService.handleException(error)
+                error: error =>
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil jenjang berikutnya'
+                    )
             })
     }
 
@@ -396,18 +414,15 @@ export class UkomTaskFormComponent {
                     console.log('last2Tahun', last2Tahun)
 
                     if (last2Tahun.length === 1) {
-                        // If only one record, assign it to predikat_kinerja_1_id
                         this.pesertaUkom.predikat_kinerja_1_id =
                             last2Tahun[0]?.predikatKinerjaId ?? null
                         this.pesertaUkom.predikat_kinerja_2_id = null
                     } else if (last2Tahun.length === 2) {
-                        // If two records, assign the latest to predikat_kinerja_1_id and the previous to predikat_kinerja_2_id
                         this.pesertaUkom.predikat_kinerja_1_id =
                             last2Tahun[1]?.predikatKinerjaId ?? null
                         this.pesertaUkom.predikat_kinerja_2_id =
                             last2Tahun[0]?.predikatKinerjaId ?? null
                     } else {
-                        // If no records, assign null
                         this.pesertaUkom.predikat_kinerja_1_id = null
                         this.pesertaUkom.predikat_kinerja_2_id = null
                     }
@@ -421,60 +436,26 @@ export class UkomTaskFormComponent {
                 (this.jabatanList = response.map(
                     (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
                 )),
-            error: error => this.handlerService.handleException(error)
+            error: error =>
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal Mengambil daftar jabatan'
+                )
         })
     }
 
-    onJenisUkomSwitch (event: Event) {
-        this.clearFilesName()
-        this.detectedDokumen = {}
-        this.inputs.files = {}
-        this.passwordForm.get('bidang_jabatan_code').setValue('')
-        this.bidangJabatanList$ = of([])
-
-        const jenis_ukom = (event.target as HTMLSelectElement).value
-
-        this.pesertaUkom.nextJabatanCode = null
-        this.pesertaUkom.nextJenjangCode = null
-        this.jabatanCodeArgument$.next(null)
-        this.jenjangCodeArgument$.next(null)
-        this.isMengulang$.next(false)
-
-        if (
-            jenis_ukom == 'PERPINDAHAN_JABATAN' ||
-            jenis_ukom == 'KENAIKAN_JENJANG'
-        ) {
-            this.pesertaUkom.jenis_ukom = jenis_ukom
-            this.jenisUkom$.next(jenis_ukom)
-
-            if (jenis_ukom == 'PERPINDAHAN_JABATAN') {
-                this.getListJabatan()
-            }
-            if (jenis_ukom == 'KENAIKAN_JENJANG') {
-                this.getNextJenjang()
-            }
-
-            console.log('jenis_ukom', this.pesertaUkom)
-            console.log('jenis_ukomJF', this.jf)
-        } else {
-            this.pesertaUkom.jenis_ukom = null
-            this.detectedDokumen = {}
-            this.inputs.files = {}
-        }
-        console.log('jenis_ukom', this.pesertaUkom.jenis_ukom)
-    }
-
-    onNextJabatanSwitch (event: Event) {
-        const nextJabatanCode = (event.target as HTMLSelectElement).value
-
-        if (nextJabatanCode) {
-            console.log('next', nextJabatanCode)
-            this.passwordForm.get('bidang_jabatan_code').setValue('')
-            this.getBidangJabatanByJabatanCode(nextJabatanCode)
-            this.pesertaUkom.nextJabatanCode = nextJabatanCode
-            this.jabatanCodeArgument$.next(this.pesertaUkom.nextJabatanCode)
-            this.jenjangCodeArgument$.next(this.jf.jenjangCode)
-        }
+    getListJenjang () {
+        this.apiService.getData(`/api/v1/jenjang`).subscribe({
+            next: response =>
+                (this.jenjangList = response.map(
+                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                )),
+            error: error =>
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal Mengambil daftar jenjang'
+                )
+        })
     }
 
     submit () {
@@ -489,7 +470,6 @@ export class UkomTaskFormComponent {
                 const detected = this.detectedDokumen[key]
 
                 const dokumenPersyaratan = this.dokumenPersyaratanList.find(
-                    // dokumen => dokumen.dokumenPersyaratanName === detected.label
                     dokumen => dokumen.dokumenPersyaratanId === key
                 )
 
@@ -514,15 +494,15 @@ export class UkomTaskFormComponent {
                 if (!result.confirmed) return
                 this.hadItemsLoading$.next(true)
 
+                this.pesertaUkom.jenisUkom =
+                    this.passwordForm.get('jenis_ukom').value
                 this.pesertaUkom.nip = this.jf.nip
-                if (this.pesertaUkom.jenis_ukom == 'PERPINDAHAN_JABATAN') {
-                    this.pesertaUkom.nextJenjangCode = this.jf.jenjangCode
-                }
-
-                if (this.pesertaUkom.jenis_ukom == 'KENAIKAN_JENJANG') {
-                    this.pesertaUkom.nextJabatanCode = this.jf.jabatanCode
-                }
-
+                this.pesertaUkom.nextJenjangCode = this.passwordForm
+                    .get('next_jenjang_code')
+                    ?.getRawValue()
+                this.pesertaUkom.nextJabatanCode = this.passwordForm
+                    .get('next_jabatan_code')
+                    ?.getRawValue()
                 this.pesertaUkom.nextPangkatCode = this.jf.pangkatCode
                 this.pesertaUkom.password =
                     this.passwordForm.get('password')?.value
@@ -541,7 +521,6 @@ export class UkomTaskFormComponent {
                 this.pesertaUkom.JenjangName = this.jf.jenjangName
                 this.pesertaUkom.isMengulang =
                     this.passwordForm.get('isMengulang')?.value
-
                 this.apiService
                     .postData(
                         `/api/v1/participant_ukom/task/jf`,
