@@ -26,6 +26,7 @@ export class UkomIndikatorKompetensiDetailComponent implements OnInit {
         new IndikatorKompetensiUkom()
     detailKompetensi: KompetensiUkom = new KompetensiUkom()
     questionsList: UkomQuestion[] = []
+
     constructor (
         private location: Location,
         private apiService: ApiService,

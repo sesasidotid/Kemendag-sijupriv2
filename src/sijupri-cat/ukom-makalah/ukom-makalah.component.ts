@@ -143,13 +143,13 @@ export class UkomMakalahComponent {
             )
             .subscribe({
                 next: () => {
+                    this.afterSubmit.emit()
                     this.handlerService.handleAlert(
                         'Success',
                         'Makalah berhasil disimpan'
                     )
                     this.makalah_form.reset()
                     this.clearFilesName()
-                    this.afterSubmit.emit()
                 },
                 error: error => {
                     this.handlerService.handleAlert(

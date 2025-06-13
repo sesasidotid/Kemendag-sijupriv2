@@ -354,7 +354,7 @@
             > -->
             <div class="card detail-jf" *ngIf="scoreMap | keyvalue as entries">
                 <ng-container *ngIf="entries.length > 0">
-                    <div class="card-header">
+                    <div class="card-header" *ngIf="hasVisibleUkomDetails">
                         <h5 class="m-0">
                             <i
                                 class="mdi mdi-checkbox-marked-circle-outline me-2"
@@ -367,7 +367,7 @@
                         <!-- CAT -->
                         <div
                             class="list-group-item d-flex justify-content-between align-items-center"
-                            *ngIf="scoreMap['CAT']"
+                            *ngIf="scoreMap['CAT'].id"
                         >
                             <div>
                                 <h5 class="m-0">CAT</h5>
@@ -385,7 +385,7 @@
                         <!-- MAKALAH -->
                         <div
                             class="list-group-item d-flex justify-content-between align-items-center"
-                            *ngIf="scoreMap['MAKALAH']"
+                            *ngIf="scoreMap['MAKALAH'].id"
                         >
                             <div>
                                 <h5 class="m-0">Makalah</h5>

@@ -47,19 +47,21 @@ export class UkomGradeImportComponent {
         }
     }
 
-    constructor(
+    refresh: boolean
+
+    constructor (
         private router: Router,
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         private tabService: TabService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleTabService()
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -75,23 +77,19 @@ export class UkomGradeImportComponent {
                 label: 'Import Nilai',
                 isActive: true,
                 icon: 'mdi-plus-circle',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list/import`])
+                onClick: () =>
+                    this.router.navigate([`/ukom/ukom-grade-list/import`])
             })
-            // .addTab({
-            //     label: 'Template Nilai',
-            //     isActive: true,
-            //     icon: 'mdi-file-download',
-            //     onClick: () => this.downloadTemplate()
-            // })
             .addTab({
                 label: 'Export Nilai',
                 isActive: false,
                 icon: 'mdi-export',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list/export`])
+                onClick: () =>
+                    this.router.navigate([`/ukom/ukom-grade-list/export`])
             })
     }
 
-    downloadTemplate() {
+    downloadTemplate () {
         this.apiService
             .getDownload(`/api/v1/exam_grade/download`, 'template_grade.xlsx')
             .subscribe({
@@ -99,7 +97,7 @@ export class UkomGradeImportComponent {
             })
     }
 
-    submit() {
+    submit () {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
@@ -111,11 +109,17 @@ export class UkomGradeImportComponent {
                     .subscribe({
                         next: () => {
                             this.router.navigate([`/ukom/ukom-grade-list`])
-                            this.handlerService.handleAlert('Info', 'Data berhasil diimport')
+                            this.handlerService.handleAlert(
+                                'Info',
+                                'Data berhasil diimport'
+                            )
                         },
                         error: error => {
                             console.log(error)
-                            this.handlerService.handleAlert('Error', 'Gagal mengimport data')
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengimport data'
+                            )
                         }
                     })
             }

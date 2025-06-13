@@ -101,7 +101,7 @@ export class UkomTaskDetailComponent {
                     'Error',
                     'Gagal mengambil jenis ujian'
                 )
-                return of([]) // return empty so flow continues
+                return of([])
             })
         )
     }
@@ -112,7 +112,7 @@ export class UkomTaskDetailComponent {
             .pipe(
                 switchMap((examTypes: ExamType[]) => {
                     if (!examTypes.length || !this.participant_ukom_id) {
-                        return of([]) // no exam types or ID
+                        return of([])
                     }
 
                     const requests = examTypes.map(type => {
@@ -161,6 +161,7 @@ export class UkomTaskDetailComponent {
                     })
                 }),
                 finalize(() => {
+                    console.log('score', this.scoreMap)
                     this.isAllSchoreLoading$.next(false)
                 })
             )
@@ -256,6 +257,18 @@ export class UkomTaskDetailComponent {
         })
     }
 
+    get hasVisibleUkomDetails (): boolean {
+        if (!this.scoreMap) {
+            return false
+        }
+
+        const hasCatScore = this.scoreMap['CAT'] && this.scoreMap['CAT'].id
+        const hasMakalahFile =
+            this.scoreMap['MAKALAH'] && this.scoreMap['MAKALAH'].id
+
+        return !!(hasCatScore || hasMakalahFile)
+    }
+
     transformInstansiName (value: string): string {
         if (!value) return null
 
@@ -269,8 +282,6 @@ export class UkomTaskDetailComponent {
         tanggalLahir: string | Date,
         tglSuratUsulan: string | Date
     ): string {
-        console.log('calculateAge', tanggalLahir, tglSuratUsulan)
-
         if (!tanggalLahir || !tglSuratUsulan) {
             return '-'
         }
