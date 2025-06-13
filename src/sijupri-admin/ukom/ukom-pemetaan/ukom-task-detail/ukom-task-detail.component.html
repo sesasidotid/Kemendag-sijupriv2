@@ -348,35 +348,59 @@
             </div>
 
             <!-- nilai -->
-            <div
+            <!-- <div
                 class="card detail-jf"
-                *ngIf="CATSchore.examTypeCode === 'CAT'"
-            >
-                <div class="card-header">
-                    <h5 class="m-0">
-                        <i
-                            class="mdi mdi-checkbox-marked-circle-outline me-2"
-                        ></i
-                        >Detail Nilai UKom
-                    </h5>
-                </div>
-                <div class="list-group">
-                    <div
-                        class="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                        <div>
-                            <h5 class="m-0">CAT</h5>
+                *ngIf="scoreMap['CAT']?.examTypeCode === 'CAT'"
+            > -->
+            <div class="card detail-jf" *ngIf="scoreMap | keyvalue as entries">
+                <ng-container *ngIf="entries.length > 0">
+                    <div class="card-header">
+                        <h5 class="m-0">
+                            <i
+                                class="mdi mdi-checkbox-marked-circle-outline me-2"
+                            ></i>
+                            Detail UKom
+                        </h5>
+                    </div>
+
+                    <div class="list-group">
+                        <!-- CAT -->
+                        <div
+                            class="list-group-item d-flex justify-content-between align-items-center"
+                            *ngIf="scoreMap['CAT']"
+                        >
+                            <div>
+                                <h5 class="m-0">CAT</h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button
+                                    class="btn btn-success"
+                                    (click)="toggleModal()"
+                                >
+                                    Lihat Nilai
+                                </button>
+                            </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <button
-                                class="btn btn-success"
-                                (click)="toggleModal()"
-                            >
-                                Lihat Nilai
-                            </button>
+
+                        <!-- MAKALAH -->
+                        <div
+                            class="list-group-item d-flex justify-content-between align-items-center"
+                            *ngIf="scoreMap['MAKALAH']"
+                        >
+                            <div>
+                                <h5 class="m-0">Makalah</h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button
+                                    class="btn btn-success"
+                                    (click)="viewFile()"
+                                >
+                                    Lihat Makalah
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </ng-container>
             </div>
         </div>
     </div>
@@ -392,7 +416,7 @@
     <ng-container>
         <div class="total-score-container">
             <div class="total-score-value">
-                {{ CATSchore?.score | number: '1.2-2' }}
+                {{ scoreMap['CAT']?.score | number: '1.2-2' }}
             </div>
         </div>
 

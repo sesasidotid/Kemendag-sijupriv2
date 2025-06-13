@@ -1,123 +1,167 @@
-<section>
-    <!-- Room Information -->
-    <div class="card shadow-sm border-0 mb-4" *ngIf="roomUkom.id">
-        <div class="card-body">
-            <h3 class="card-title mb-2 fw-semibold text-primary">
-                {{ roomUkom.name }}
-            </h3>
-
-            <ul class="list-unstyled mb-3">
-                <li><strong>Jabatan:</strong> {{ roomUkom.jabatanName }}</li>
-                <li><strong>Jenjang:</strong> {{ roomUkom.jenjangName }}</li>
-                <li *ngIf="roomUkom.bidangJabatanName">
-                    <strong>Bidang Jabatan:</strong>
-                    {{ roomUkom.bidangJabatanName }}
-                </li>
-            </ul>
-
-            <p class="mb-0">
-                <!-- <strong>Link Zoom:</strong> -->
-                <ng-container *ngIf="roomUkom.vidCallLink; else noLink">
-                    <a
-                        [href]="getAbsoluteUrl(roomUkom.vidCallLink)"
-                        target="_blank"
-                        class="text-decoration-none"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        [attr.title]="roomUkom.vidCallLink"
-                    >
-                        <span class="badge bg-primary">Join Zoom</span>
-                    </a>
-                </ng-container>
-                <ng-template #noLink>
-                    <span class="text-danger fst-italic"
-                        >Belum ada link Zoom</span
-                    >
-                </ng-template>
-            </p>
-        </div>
+<div
+    *ngIf="isLoading$ | async; else dashboardContent"
+    class="d-flex justify-content-center my-5"
+>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
     </div>
+</div>
 
-    <!-- Exam Schedule -->
-    <div
-        class=""
-        *ngIf="roomUkom?.examScheduleDtoList?.length > 0; else emptyState"
-    >
-        <div class="">
-            <div class="list-group">
-                <div
-                    class="list-group-item d-flex justify-content-between align-items-center mb-3"
-                    *ngFor="let exam of roomUkom.examScheduleDtoList"
-                >
-                    <div>
-                        <h5>{{ exam.examTypeCode }}</h5>
-                        <p>
-                            <strong>Waktu mulai:</strong>
-                            {{ exam.startTime }}<br />
-                            <strong>Waktu selesai:</strong>
-                            {{ exam.endTime }}
-                        </p>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <button
-                            *ngIf="
-                                exam.examTypeCode === 'CAT' &&
-                                (!canStartExam(exam.startTime) ||
-                                    !CATSchore.score)
-                            "
-                            class="btn btn-primary btn-lg"
-                            (click)="startExam(exam.roomUkomId)"
-                            [disabled]="
-                                !canStartExam(exam.startTime) || CATSchore.score
-                            "
+<ng-template #dashboardContent>
+    <section>
+        <!-- Room Information -->
+        <div class="card shadow-sm border-0 mb-4" *ngIf="roomUkom.id">
+            <div class="card-body">
+                <h3 class="card-title mb-2 fw-semibold text-primary">
+                    {{ roomUkom.name }}
+                </h3>
+
+                <ul class="list-unstyled mb-3">
+                    <li>
+                        <strong>Jabatan:</strong> {{ roomUkom.jabatanName }}
+                    </li>
+                    <li>
+                        <strong>Jenjang:</strong> {{ roomUkom.jenjangName }}
+                    </li>
+                    <li *ngIf="roomUkom.bidangJabatanName">
+                        <strong>Bidang Jabatan:</strong>
+                        {{ roomUkom.bidangJabatanName }}
+                    </li>
+                </ul>
+
+                <p class="mb-0">
+                    <!-- <strong>Link Zoom:</strong> -->
+                    <ng-container *ngIf="roomUkom.vidCallLink; else noLink">
+                        <a
+                            [href]="getAbsoluteUrl(roomUkom.vidCallLink)"
+                            target="_blank"
+                            class="text-decoration-none"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            [attr.title]="roomUkom.vidCallLink"
                         >
-                            Mulai
-                        </button>
-                        <button
-                            *ngIf="
-                                exam.examTypeCode === 'CAT' && CATSchore.score
-                            "
-                            class="btn btn-success btn-lg"
-                            (click)="toggleModal()"
+                            <span class="badge bg-primary">Join Zoom</span>
+                        </a>
+                    </ng-container>
+                    <ng-template #noLink>
+                        <span class="text-danger fst-italic"
+                            >Belum ada link Zoom</span
                         >
-                            Lihat Nilai
-                        </button>
-                        <button
-                            *ngIf="exam.examTypeCode === 'MAKALAH'"
-                            class="btn btn-primary btn-lg"
-                            (click)="toggleModalMakalah()"
-                        >
-                            Upload Makalah
-                        </button>
+                    </ng-template>
+                </p>
+            </div>
+        </div>
+
+        <!-- Exam Schedule -->
+        <div
+            class=""
+            *ngIf="roomUkom?.examScheduleDtoList?.length > 0; else emptyState"
+        >
+            <div class="">
+                <div class="list-group">
+                    <div
+                        class="list-group-item d-flex justify-content-between align-items-center mb-3"
+                        *ngFor="let exam of roomUkom.examScheduleDtoList"
+                    >
+                        <div>
+                            <h5>{{ exam.examTypeCode }}</h5>
+                            <p>
+                                <strong>Waktu mulai:</strong>
+                                {{ exam.startTime }}<br />
+                                <strong>Waktu selesai:</strong>
+                                {{ exam.endTime }}
+                            </p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- CAT Exam Buttons -->
+                            <ng-container *ngIf="exam.examTypeCode === 'CAT'">
+                                <button
+                                    class="btn btn-primary btn-lg"
+                                    *ngIf="
+                                        !canStartExam(exam.startTime) ||
+                                        scoreMap['CAT']?.score === null ||
+                                        scoreMap['CAT']?.score === undefined
+                                    "
+                                    (click)="
+                                        startExam(
+                                            exam.roomUkomId,
+                                            exam.examTypeCode
+                                        )
+                                    "
+                                    [disabled]="
+                                        !canStartExam(exam.startTime) ||
+                                        (scoreMap['CAT']?.score !== null &&
+                                            scoreMap['CAT']?.score !==
+                                                undefined)
+                                    "
+                                >
+                                    Mulai
+                                </button>
+
+                                <button
+                                    class="btn btn-success btn-lg"
+                                    *ngIf="
+                                        scoreMap['CAT']?.score !== null &&
+                                        scoreMap['CAT']?.score !== undefined
+                                    "
+                                    (click)="toggleModal()"
+                                >
+                                    Lihat Nilai
+                                </button>
+                            </ng-container>
+
+                            <ng-container
+                                *ngIf="exam.examTypeCode === 'MAKALAH'"
+                            >
+                                <ng-container
+                                    *ngIf="
+                                        !canStartExam(exam.startTime) ||
+                                            scoreMap['MAKALAH']?.score == null;
+                                        else canupload
+                                    "
+                                >
+                                    <button
+                                        class="btn btn-primary btn-lg"
+                                        (click)="
+                                            startExam(
+                                                exam.roomUkomId,
+                                                exam.examTypeCode
+                                            )
+                                        "
+                                        [disabled]="
+                                            !canStartExam(exam.startTime)
+                                        "
+                                    >
+                                        Mulai
+                                    </button>
+                                </ng-container>
+
+                                <ng-template #canupload>
+                                    <button
+                                        class="btn btn-success btn-lg"
+                                        (click)="viewFile()"
+                                    >
+                                        Lihat Makalah
+                                    </button>
+                                </ng-template>
+                            </ng-container>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <ng-template #emptyState>
-        <app-empty-state
-            [title]="'Anda belum ada jadwal UKom'"
-            [description]="
-                'Panitia belum menetapkan jadwal ujian untuk Anda. Silahkan tunggu informasi selanjutnya.'
-            "
-        >
-        </app-empty-state>
-    </ng-template>
-</section>
-
-<app-modal
-    *ngIf="isModalMakalahOpen$ | async"
-    [title]="'Upload Makalah'"
-    (toggle)="toggleModalMakalah()"
-    [enableFooter]="false"
->
-    <app-ukom-makalah
-        [participant_id]="participant_id"
-        [room_id]="roomUkom.id"
-        (afterSubmit)="toggleModalMakalah()"
-    ></app-ukom-makalah>
-</app-modal>
+        <ng-template #emptyState>
+            <app-empty-state
+                [title]="'Anda belum ada jadwal UKom'"
+                [description]="
+                    'Panitia belum menetapkan jadwal ujian untuk Anda. Silahkan tunggu informasi selanjutnya.'
+                "
+            >
+            </app-empty-state>
+        </ng-template>
+    </section>
+</ng-template>
 
 <app-modal
     *ngIf="isModalOpen$ | async"
@@ -129,7 +173,7 @@
     <ng-container>
         <div class="total-score-container">
             <div class="total-score-value">
-                {{ CATSchore?.score | number: '1.2-2' }}
+                {{ scoreMap['CAT']?.score | number: '1.2-2' }}
             </div>
         </div>
 

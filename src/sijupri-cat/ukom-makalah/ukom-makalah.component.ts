@@ -13,8 +13,17 @@ import {
 import { FileHandlerComponent } from '../../modules/base/components/file-handler/file-handler.component'
 import { FormBuilder, Validators } from '@angular/forms'
 import { UkomQuestion } from '../../modules/ukom/models/ukom-question'
-import { BehaviorSubject, finalize } from 'rxjs'
+import {
+    BehaviorSubject,
+    concatMap,
+    filter,
+    finalize,
+    switchMap,
+    take,
+    tap
+} from 'rxjs'
 import { CommonModule } from '@angular/common'
+import { Router } from '@angular/router'
 @Component({
     selector: 'app-ukom-makalah',
     standalone: true,
@@ -60,7 +69,8 @@ export class UkomMakalahComponent {
         private fb: FormBuilder,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
+        private router: Router
     ) {}
 
     ngOnChanges (changes: SimpleChanges): void {
@@ -98,45 +108,55 @@ export class UkomMakalahComponent {
     }
 
     onSubmit () {
-        this.confirmationService.open(false).subscribe({
-            next: ({ confirmed }) => {
-                if (!confirmed) return
+        this.confirmationService
+            .open(false)
+            .pipe(
+                take(1),
+                filter(({ confirmed }) => confirmed),
+                tap(() => this.isSubmitLoading$.next(true)),
 
-                this.isSubmitLoading$.next(true)
-
-                const payload = {
-                    participant_id: this.participant_id,
-                    question_id: this.question.id,
-                    file_answer_upload:
-                        this.makalah_form.value.file_answer_upload
-                }
-
-                this.apiService
-                    .postData('/api/v1/exam/answer', payload)
-                    .pipe(
-                        finalize(() => {
-                            this.isSubmitLoading$.next(false)
-                        })
+                switchMap(() => {
+                    const payload = {
+                        participant_id: this.participant_id,
+                        question_id: this.question.id,
+                        file_answer_upload:
+                            this.makalah_form.value.file_answer_upload
+                    }
+                    return this.apiService.postData(
+                        '/api/v1/exam/answer',
+                        payload
                     )
-                    .subscribe({
-                        next: () => {
-                            this.handlerService.handleAlert(
-                                'Success',
-                                'Makalah berhasil dikirim'
-                            )
-                            this.makalah_form.reset()
-                            this.clearFilesName()
-                            this.afterSubmit.emit()
-                        },
-                        error: error => {
-                            this.handlerService.handleAlert(
-                                'Error',
-                                'Gagal mengirim makalah'
-                            )
-                            console.error('Error submitting makalah:', error)
-                        }
-                    })
-            }
-        })
+                }),
+
+                concatMap(() => {
+                    const finishPayload = {
+                        examTypeCode: 'MAKALAH',
+                        roomUkomId: this.room_id
+                    }
+                    return this.apiService.postData(
+                        '/api/v1/exam/finish',
+                        finishPayload
+                    )
+                }),
+
+                finalize(() => this.isSubmitLoading$.next(false))
+            )
+            .subscribe({
+                next: () => {
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'Makalah berhasil disimpan'
+                    )
+                    this.makalah_form.reset()
+                    this.clearFilesName()
+                    this.afterSubmit.emit()
+                },
+                error: error => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal menyimpan makalah'
+                    )
+                }
+            })
     }
 }

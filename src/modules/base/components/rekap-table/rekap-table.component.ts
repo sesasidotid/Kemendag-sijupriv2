@@ -332,9 +332,6 @@ export class RekapTableComponent {
 
     verifyDocument (data?: RekapData) {
         this.commentTouched = true
-        // if (!this.comment && this.action$.value == 'REJECT') {
-        //   return // Prevent saving if remark is empty
-        // }
 
         if (!data) {
             console.error('No data provided for verification')

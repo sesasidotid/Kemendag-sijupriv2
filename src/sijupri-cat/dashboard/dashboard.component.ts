@@ -5,25 +5,33 @@ import { RoomUkom } from '../../modules/ukom/models/cat/roomukom'
 import { ApiService } from '../../modules/base/services/api.service'
 import { Router } from '@angular/router'
 import { HandlerService } from '../../modules/base/services/handler.service'
-import { interval, switchMap, tap } from 'rxjs'
+import {
+    catchError,
+    forkJoin,
+    interval,
+    map,
+    Observable,
+    of,
+    switchMap,
+    tap,
+    combineLatest,
+    finalize
+} from 'rxjs'
 import { ConfirmationService } from '../../modules/base/services/confirmation.service'
 import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
 import { ModalComponent } from '../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../modules/base/components/empty-state/empty-state.component'
 import { UkomMakalahComponent } from '../ukom-makalah/ukom-makalah.component'
-
+import { ExamType } from '../../modules/ukom/models/exam-type'
+import { MakalahScore } from '../../modules/ukom/models/cat/makalah-score'
+import { FilePreviewService } from '../../modules/base/services/file-preview.service'
 declare var bootstrap: any
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [
-        CommonModule,
-        ModalComponent,
-        EmptyStateComponent,
-        UkomMakalahComponent
-    ],
+    imports: [CommonModule, ModalComponent, EmptyStateComponent],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
 })
@@ -31,29 +39,108 @@ export class DashboardComponent implements AfterViewInit {
     roomUkom: RoomUkom = new RoomUkom()
     now: number = Date.now()
     currentDate = new Date()
-    CATSchore: CATSchore = new CATSchore()
     participant_id: string = ''
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     groupedKompetensi: any[] = []
+    examType: ExamType[] = []
+    scoreMap: Record<string, any> = {}
 
-    isModalMakalahOpen$ = new BehaviorSubject<boolean>(false)
+    isRoomLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
+    isExamTypeLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
+    isLoading$: Observable<boolean>
 
     constructor (
-        private api: ApiService,
+        private apiService: ApiService,
         private router: Router,
-        private handler: HandlerService,
+        private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private elRef: ElementRef
-    ) {}
+        private elRef: ElementRef,
+        private filePreviewService: FilePreviewService
+    ) {
+        this.isLoading$ = combineLatest([
+            this.isRoomLoading$,
+            this.isExamTypeLoading$
+        ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
+    }
 
     ngOnInit () {
-        this.getRoomUkom()
+        this.getExamType()
+            .pipe(switchMap(() => this.getRoomUkom()))
+            .subscribe()
         this.updateCurrentTime()
         this.exitFullScreen()
     }
 
     ngAfterViewInit () {
         this.initializeTooltips()
+    }
+
+    getExamType (): Observable<ExamType[]> {
+        this.isExamTypeLoading$.next(true)
+        return this.apiService.getData('/api/v1/exam_type').pipe(
+            map((response: any[]) => response.map(item => new ExamType(item))),
+            tap((examTypes: ExamType[]) => {
+                this.examType = examTypes
+            }),
+            catchError(error => {
+                console.error('Failed to fetch exam types:', error)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengambil jenis ujian'
+                )
+                return of([])
+            }),
+            finalize(() => {
+                this.isExamTypeLoading$.next(false)
+            })
+        )
+    }
+
+    getAllScores (): Observable<any> {
+        if (!this.examType?.length || !this.participant_id) {
+            return of([]) // return empty observable if not ready
+        }
+
+        const requests = this.examType.map(type => {
+            const examCode = type.code
+            return this.apiService
+                .getData(
+                    `/api/v1/exam_grade/${examCode}/${this.participant_id}`
+                )
+                .pipe(
+                    catchError(error => {
+                        console.error(
+                            `Failed to fetch score for ${examCode}:`,
+                            error
+                        )
+                        return of(null)
+                    }),
+                    map(response => {
+                        let scoreInstance: any
+                        switch (examCode) {
+                            case 'CAT':
+                                scoreInstance = new CATSchore(response)
+                                break
+                            case 'MAKALAH':
+                                scoreInstance = new MakalahScore(response)
+                                break
+                            default:
+                                scoreInstance = response
+                        }
+                        return { examCode, scoreInstance }
+                    })
+                )
+        })
+
+        return forkJoin(requests).pipe(
+            tap(results => {
+                results.forEach(result => {
+                    if (result && result.examCode) {
+                        this.scoreMap[result.examCode] = result.scoreInstance
+                    }
+                })
+            })
+        )
     }
 
     initializeTooltips () {
@@ -97,57 +184,51 @@ export class DashboardComponent implements AfterViewInit {
         return new Date(examStartTime) <= this.currentDate
     }
 
-    getRoomUkom (): void {
+    getRoomUkom (): Observable<void> {
         const userId = LoginContext.getUserId().replace('PU-', '')
 
-        this.api
+        this.isRoomLoading$.next(true)
+
+        return this.apiService
             .getData(`/api/v1/participant_ukom/nip/${userId}`)
             .pipe(
                 tap((response: any) => {
                     this.roomUkom = new RoomUkom(response.roomUkomDto)
                     this.participant_id = response.id
                 }),
-                switchMap(() =>
-                    this.api.getData(
-                        `/api/v1/exam_grade/CAT/${this.participant_id}`
-                    )
-                ),
-                tap((scoreResponse: any) => {
-                    this.CATSchore = new CATSchore(scoreResponse)
-                })
+                switchMap(() => this.getAllScores()),
+                finalize(() => {
+                    this.isRoomLoading$.next(false)
+                }),
+                map(() => {})
             )
-            .subscribe({
-                next: () => {},
-                error: err => {
-                    console.error('Error fetching RoomUkom or CAT Score:', err)
-                }
-            })
     }
 
-    startExam (room_ukom_id: string) {
+    startExam (room_ukom_id: string, exam_type_code: string) {
         this.confirmationService.open(false).subscribe({
             next: response => {
                 if (!response.confirmed) {
                     return
                 }
 
-                this.api
+                this.apiService
                     .postData('/api/v1/exam/start', {
-                        examTypeCode: 'CAT',
+                        examTypeCode: exam_type_code,
                         roomUkomId: room_ukom_id
                     })
                     .subscribe({
                         next: (response: any) => {
-                            console.log('test e', response)
-
-                            this.router.navigate(['/cat'])
+                            if (exam_type_code) {
+                                this.router.navigate([
+                                    `/${exam_type_code.toLowerCase()}`
+                                ])
+                            }
                         },
                         error: err => {
-                            this.handler.handleAlert(
+                            this.handlerService.handleAlert(
                                 'Error',
                                 'Gagal memulai ujian, silahkan coba lagi'
                             )
-                            console.error('Error fetching RoomUkom:', err)
                         }
                     })
             }
@@ -158,17 +239,34 @@ export class DashboardComponent implements AfterViewInit {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    toggleModalMakalah () {
-        this.isModalMakalahOpen$.next(!this.isModalMakalahOpen$.value)
+    viewFile () {
+        const answerDto =
+            this.scoreMap['MAKALAH']?.questionDtoList[0]?.answerDto
+
+        console.log('Answer DTO:', this.scoreMap['MAKALAH'])
+        if (!answerDto) {
+            this.handlerService.handleAlert(
+                'Error',
+                'Tidak ada file yang tersedia untuk ditampilkan.'
+            )
+            return
+        }
+
+        console.log('Opening file:', answerDto)
+
+        this.filePreviewService.open(
+            answerDto.answerUpload,
+            answerDto.answerUploadUrl
+        )
     }
 
     getGroupedCompetencies (): any[] {
-        if (!this.CATSchore?.kompetensiIndikatorDtoList) {
+        if (!this.scoreMap['CAT']?.kompetensiIndikatorDtoList) {
             return []
         }
 
         // Group by kompetensiId
-        const grouped = this.CATSchore.kompetensiIndikatorDtoList.reduce(
+        const grouped = this.scoreMap['CAT'].kompetensiIndikatorDtoList.reduce(
             (acc: any, kompetensi: any) => {
                 const key = kompetensi.kompetensiId || 'default'
 

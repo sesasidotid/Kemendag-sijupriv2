@@ -63,26 +63,6 @@ export class FileHandlerComponent {
         }
     }
 
-    //   handleFileUpload (event: any, key: any) {
-    //     const file = event.target.files[0]
-    //     if (file) {
-    //       const reader = new FileReader()
-
-    //       reader.onload = (e: any) => {
-    //         const base64Data = e.target.result
-    //         const source = e.target.result
-    //         const label = this.inputs.files[key].label
-    //         const id = this.inputs.files[key].id
-    //         this.inputs.files[key].source = source
-    //         this.fileNames[key] = file.name // Update displayed file name
-    //         this.fileNames[key] = file.id
-    //         this.inputs.listen(key, source, base64Data, label, id)
-    //       }
-
-    //       reader.readAsDataURL(file)
-    //     }
-    //   }
-
     clearFileName (key?: string) {
         console.log('Clearing file name for key:', key)
         if (key) {
