@@ -1,7 +1,21 @@
 import { FilePreviewComponent } from './../file-preview/file-preview.component'
 import { Component } from '@angular/core'
 import { UkomTaskDetail } from '../../../ukom/models/ukom-task-detail.modal'
-import { BehaviorSubject, combineLatest, map, Observable, take } from 'rxjs'
+import {
+    BehaviorSubject,
+    catchError,
+    combineLatest,
+    finalize,
+    forkJoin,
+    map,
+    Observable,
+    of,
+    Subject,
+    switchMap,
+    take,
+    takeUntil,
+    tap
+} from 'rxjs'
 import { LoginContext } from '../../commons/login-context'
 import { ModalComponent } from '../modal/modal.component'
 import { UkomRevisionComponent } from '../../../../sijupri-jf/ukom/ukom-revision/ukom-revision.component'
@@ -19,6 +33,10 @@ import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { HandlerService } from '../../services/handler.service'
+import { ExamType } from '../../../ukom/models/exam-type'
+import { PredikatKinerja } from '../../../maintenance/models/predikat-kinerja.model'
+import { MakalahScore } from '../../../ukom/models/cat/makalah-score'
+import { FilePreviewService } from '../../services/file-preview.service'
 
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
@@ -41,6 +59,8 @@ export enum JenisUkomEnum {
     styleUrl: './status-pendaftaran-ukom.component.scss'
 })
 export class StatusPendaftaranUkomComponent {
+    private destroy$ = new Subject<void>()
+
     pendingTask: UkomTaskDetail = new UkomTaskDetail()
     groupedUkomPendingTaskHistory: { [key: string]: any[] } = {}
 
@@ -58,7 +78,8 @@ export class StatusPendaftaranUkomComponent {
         files: {},
         viewOnly: true
     }
-    predikatKinerjaList: any[] = []
+    // predikatKinerjaList: any[] = []
+    predikatKinerjaList: PredikatKinerja[] = []
 
     pendidikanName: string
     provinsiName: string
@@ -68,9 +89,13 @@ export class StatusPendaftaranUkomComponent {
     predikat2Name: string
     bidangJabatanName: string
 
-    key: string = undefined
+    key: string
+    participantId: string
 
-    isLoadPredikatKinerja: BehaviorSubject<boolean> =
+    examType: ExamType[] = []
+    scoreMap: Record<string, any> = {}
+
+    isPredikatKerjaLoading$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
     isLoadingPendingTask$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
@@ -83,47 +108,77 @@ export class StatusPendaftaranUkomComponent {
         new BehaviorSubject<boolean>(false)
     isLoadingBidangJabatan$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
-
+    isAllSchoreLoading$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false)
     isLoading$: Observable<boolean>
+
     constructor (
         private converterService: ConverterService,
         private apiService: ApiService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private sanitizer: DomSanitizer,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
+        private filePreviewService: FilePreviewService
     ) {
         this.isLoading$ = combineLatest([
-            this.isLoadPredikatKinerja,
+            this.isPredikatKerjaLoading$,
             this.isLoadingPendingTask$,
             this.isLoadingPendidikan$,
             this.isLoadingProvinsi$,
             this.isLoadingKabupaten$,
-            this.isLoadingBidangJabatan$
+            this.isLoadingBidangJabatan$,
+            this.isAllSchoreLoading$
         ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
     }
 
     ngOnInit () {
-        this.activatedRoute.queryParams.pipe(take(1)).subscribe(params => {
-            const key = params['key']
-            this.key = key
-            this.loadPredikatKinerja()
-        })
+        this.initializeComponent()
     }
 
-    loadPredikatKinerja () {
-        this.isLoadPredikatKinerja.next(true)
-        this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
-            next: res => {
-                this.predikatKinerjaList = res
-                this.getPendingTask(this.key)
-                this.isLoadPredikatKinerja.next(false)
-            },
-            error: err => {
-                this.getPendingTask(this.key)
-                this.isLoadPredikatKinerja.next(false)
-            }
-        })
+    ngOnDestroy () {
+        this.destroy$.next()
+        this.destroy$.complete()
+    }
+
+    private initializeComponent () {
+        this.isPredikatKerjaLoading$.next(true)
+
+        this.apiService
+            .getData('/api/v1/predikat_kinerja')
+            .pipe(
+                takeUntil(this.destroy$),
+                switchMap(res => {
+                    this.predikatKinerjaList = res
+                    return this.activatedRoute.queryParamMap.pipe(take(1))
+                }),
+                tap(params => {
+                    this.key = params.get('key')
+                }),
+                finalize(() => {
+                    this.isPredikatKerjaLoading$.next(false)
+                })
+            )
+            .subscribe({
+                next: () => {
+                    if (this.key) {
+                        this.getPendingTask(this.key)
+                    } else {
+                        console.error('No ID found in route parameters')
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'ID tidak ditemukan dalam parameter route'
+                        )
+                    }
+                },
+                error: err => {
+                    console.error('Failed to initialize component:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data awal'
+                    )
+                }
+            })
     }
 
     getPendidikanList (pendidikanTerakhirCode: string) {
@@ -154,19 +209,14 @@ export class StatusPendaftaranUkomComponent {
 
         if (!url) return
 
-        console.log('Downloading rekomendasi from:', url)
-
         const parsedUrl = new URL(url)
         const relativePath = parsedUrl.pathname + parsedUrl.search
 
         const filename = this.finishTask.rekomendasi || 'rekomendasi.pdf'
 
         this.apiService.getDownload(relativePath, filename).subscribe({
-            next: () => {
-                console.log('Download completed')
-            },
+            next: () => {},
             error: err => {
-                console.error('Download failed:', err)
                 this.handlerService.handleAlert(
                     'Error',
                     'Gagal mengunduh rekomendasi'
@@ -278,53 +328,45 @@ export class StatusPendaftaranUkomComponent {
         return predikat ? predikat.name : '-'
     }
 
-    getPendingTask (key: string) {
+    getPendingTask (key: string): void {
         this.isLoadingPendingTask$.next(true)
+
         this.apiService
             .getData(`/api/v1/participant_ukom_detail?key=${key}`)
-            .subscribe({
-                next: (response: any) => {
+            .pipe(
+                tap((response: any) => {
                     this.getPendidikanList(response.data.pendidikanTerakhirCode)
                     if (response.data.provinsiId) {
                         this.getProvinsiNameByCode(response.data.provinsiId)
                     }
-
                     if (response.data.kabupatenKotaId) {
                         this.getKabupatenNameByCode(
                             response.data.kabupatenKotaId
                         )
                     }
-
                     if (response.data.bidangJabatanCode) {
                         this.getBidangjabatanNameByCode(
                             response.data.bidangJabatanCode
                         )
                     }
-
                     this.predikat1Name = this.getPredikatKinerja(
                         response.data.predikatKinerja1Id
                     )
                     this.predikat2Name = this.getPredikatKinerja(
                         response.data.predikatKinerja2Id
                     )
-
-                    if (response.status == 'pending') {
+                    this.participantId = response.data.id
+                }),
+                tap((response: any) => {
+                    if (response.status === 'pending') {
                         this.pendingTask = response.data
 
-                        switch (this.pendingTask.flowId) {
-                            case 'ukom_flow_1':
-                                this.ukomStep$.next(1)
-                                this.currentUkomStep$.next(1)
-                                break
-                            case 'ukom_flow_2':
-                                this.ukomStep$.next(2)
-                                this.currentUkomStep$.next(2)
-                                break
-                            default:
-                                break
-                        }
+                        const step =
+                            response.data.flowId === 'ukom_flow_2' ? 2 : 1
+                        this.ukomStep$.next(step)
+                        this.currentUkomStep$.next(step)
 
-                        if (this.pendingTask.pendingTaskHistory.length > 0) {
+                        if (this.pendingTask.pendingTaskHistory?.length > 0) {
                             this.groupedUkomPendingTaskHistory =
                                 this.groupAndSortTasksByFlowId(
                                     this.pendingTask.pendingTaskHistory
@@ -332,16 +374,118 @@ export class StatusPendaftaranUkomComponent {
                         }
                     }
 
-                    if (response.status == 'finish') {
+                    if (response.status === 'finish') {
                         this.finishTask = response.data
                         this.dataDokumenUkom = response.data.documentUkomList
                         this.mapDokumenUkom()
+                        this.getAllScoresFlow()
                     }
-
-                    this.isLoadingPendingTask$.next(false)
-                },
+                }),
+                finalize(() => this.isLoadingPendingTask$.next(false))
+            )
+            .subscribe({
                 error: error => {
                     this.isLoadingPendingTask$.next(false)
+                    console.error(error)
+                }
+            })
+    }
+
+    getExamType (): Observable<ExamType[]> {
+        return this.apiService.getData('/api/v1/exam_type').pipe(
+            takeUntil(this.destroy$),
+            map((response: any[]) => response.map(item => new ExamType(item))),
+            tap(examTypes => {
+                this.examType = examTypes
+            }),
+            catchError(error => {
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengambil jenis ujian'
+                )
+                return of([])
+            })
+        )
+    }
+
+    getAllScoresFlow (): void {
+        if (!this.participantId) {
+            console.warn('getAllScoresFlow: No ID available, aborting')
+            return
+        }
+
+        this.isAllSchoreLoading$.next(true)
+
+        this.getExamType()
+            .pipe(
+                takeUntil(this.destroy$),
+                switchMap((examTypes: ExamType[]) => {
+                    if (!examTypes.length) {
+                        console.warn('No exam types available')
+                        return of([])
+                    }
+
+                    const requests = examTypes.map(type => {
+                        const examCode = type.code
+                        return this.apiService
+                            .getData(
+                                `/api/v1/exam_grade/${examCode}/${this.participantId}`
+                            )
+                            .pipe(
+                                takeUntil(this.destroy$),
+                                catchError(error => {
+                                    console.error(
+                                        `Failed to fetch score for ${examCode}:`,
+                                        error
+                                    )
+                                    return of(null)
+                                }),
+                                map(response => {
+                                    if (!response) {
+                                        return { examCode, scoreInstance: null }
+                                    }
+
+                                    let scoreInstance: any
+                                    switch (examCode) {
+                                        case 'CAT':
+                                            scoreInstance = new CATSchore(
+                                                response
+                                            )
+                                            break
+                                        case 'MAKALAH':
+                                            scoreInstance = new MakalahScore(
+                                                response
+                                            )
+                                            break
+                                        default:
+                                            scoreInstance = response
+                                    }
+                                    return { examCode, scoreInstance }
+                                })
+                            )
+                    })
+
+                    return forkJoin(requests)
+                }),
+                tap(results => {
+                    results.forEach(result => {
+                        if (result && result.examCode && result.scoreInstance) {
+                            this.scoreMap[result.examCode] =
+                                result.scoreInstance
+                        }
+                    })
+                }),
+                finalize(() => {
+                    this.isAllSchoreLoading$.next(false)
+                })
+            )
+            .subscribe({
+                next: () => {},
+                error: error => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data nilai ujian'
+                    )
                 }
             })
     }
@@ -416,13 +560,47 @@ export class StatusPendaftaranUkomComponent {
         return grouped
     }
 
+    // handleStepClick (clickedStep: number) {
+    //     this.currentUkomStep$.subscribe(step => {
+    //         if (clickedStep <= step) {
+    //             this.ukomStep$.next(clickedStep)
+    //         }
+    //     })
+    // }
     handleStepClick (clickedStep: number) {
-        this.currentUkomStep$.subscribe(step => {
-            if (clickedStep <= step) {
-                console.log('clickedStep', clickedStep)
-                this.ukomStep$.next(clickedStep)
-            }
-        })
+        // Get the current value directly without subscribing
+        if (clickedStep <= this.currentUkomStep$.value) {
+            this.ukomStep$.next(clickedStep)
+        }
+    }
+
+    viewFile () {
+        const answerDto =
+            this.scoreMap['MAKALAH']?.questionDtoList?.[0]?.answerDto
+
+        if (!answerDto) {
+            this.handlerService.handleAlert(
+                'Error',
+                'Tidak ada file yang tersedia untuk ditampilkan.'
+            )
+            return
+        }
+
+        this.filePreviewService.open(
+            answerDto.answerUpload,
+            answerDto.answerUploadUrl
+        )
+    }
+
+    get hasVisibleUkomDetails (): boolean {
+        if (!this.scoreMap) {
+            return false
+        }
+
+        const hasCatScore = this.scoreMap['CAT']?.id
+        const hasMakalahFile = this.scoreMap['MAKALAH']?.id
+
+        return !!(hasCatScore || hasMakalahFile)
     }
 
     toggleModal () {
@@ -434,32 +612,31 @@ export class StatusPendaftaranUkomComponent {
     }
 
     getGroupedCompetencies (): any[] {
-        if (!this.finishTask.grades.cat.kompetensiIndikatorDtoList) {
+        if (!this.scoreMap['CAT']?.kompetensiIndikatorDtoList) {
             return []
         }
 
-        const grouped =
-            this.finishTask.grades.cat.kompetensiIndikatorDtoList.reduce(
-                (acc: any, kompetensi: any) => {
-                    const key = kompetensi.kompetensiId || 'default'
+        const grouped = this.scoreMap['CAT']?.kompetensiIndikatorDtoList.reduce(
+            (acc: any, kompetensi: any) => {
+                const key = kompetensi.kompetensiId || 'default'
 
-                    if (!acc[key]) {
-                        acc[key] = {
-                            name: kompetensi.kompetensiName || '-',
-                            items: [],
-                            total: 0,
-                            correct: 0
-                        }
+                if (!acc[key]) {
+                    acc[key] = {
+                        name: kompetensi.kompetensiName || '-',
+                        items: [],
+                        total: 0,
+                        correct: 0
                     }
+                }
 
-                    acc[key].items.push(kompetensi)
-                    acc[key].total += kompetensi.questionDtoList?.length || 0
-                    acc[key].correct += this.getCorrectAnswersCount(kompetensi)
+                acc[key].items.push(kompetensi)
+                acc[key].total += kompetensi.questionDtoList?.length || 0
+                acc[key].correct += this.getCorrectAnswersCount(kompetensi)
 
-                    return acc
-                },
-                {}
-            )
+                return acc
+            },
+            {}
+        )
 
         return Object.values(grouped).map((group: any) => ({
             ...group,

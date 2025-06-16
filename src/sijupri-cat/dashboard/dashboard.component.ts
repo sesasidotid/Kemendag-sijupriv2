@@ -180,8 +180,9 @@ export class DashboardComponent implements AfterViewInit {
         }
     }
 
-    canStartExam (examStartTime: string): boolean {
-        return new Date(examStartTime) <= this.currentDate
+    canStartExam (startTime: string, endTime: string): boolean {
+        const now = this.currentDate
+        return new Date(startTime) <= now && now <= new Date(endTime)
     }
 
     getRoomUkom (): Observable<void> {

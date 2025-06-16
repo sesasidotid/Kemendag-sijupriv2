@@ -24,6 +24,7 @@ import {
 } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { Router } from '@angular/router'
+import { MakalahAnswer } from '../../modules/ukom/models/cat/makalah-answer'
 @Component({
     selector: 'app-ukom-makalah',
     standalone: true,
@@ -39,6 +40,7 @@ export class UkomMakalahComponent {
     @Output() afterSubmit = new EventEmitter<void>()
 
     question: UkomQuestion = new UkomQuestion()
+    answer: MakalahAnswer = new MakalahAnswer()
 
     makalah_form = this.fb.group({
         file_answer_upload: ['', Validators.required]
@@ -64,6 +66,8 @@ export class UkomMakalahComponent {
     isSubmitLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
         false
     )
+    isLoadingAnswerFile$: BehaviorSubject<boolean> =
+        new BehaviorSubject<boolean>(false)
 
     constructor (
         private fb: FormBuilder,
@@ -76,6 +80,7 @@ export class UkomMakalahComponent {
     ngOnChanges (changes: SimpleChanges): void {
         if ((changes['room_id'] || changes['participant_id']) && this.room_id) {
             this.getQuestion()
+            this.getAnswerFile()
         }
     }
 
@@ -83,6 +88,54 @@ export class UkomMakalahComponent {
         if (this.fileHandler) {
             this.fileHandler.clearFileName()
         }
+    }
+
+    getAnswerFile () {
+        this.isLoadingAnswerFile$.next(true)
+        this.apiService
+            .getData(
+                `/api/v1/exam/page/MAKALAH/${this.room_id}?page=1&limit=10`
+            )
+            .pipe(
+                finalize(() => {
+                    this.isLoadingAnswerFile$.next(false)
+                })
+            )
+            .subscribe({
+                next: (res: any) => {
+                    if (
+                        res.data &&
+                        res.data.length > 0 &&
+                        res.data[0].answerDto
+                    ) {
+                        this.answer = new MakalahAnswer(res)
+                        const answerDto = this.answer.data[0].answerDto
+
+                        if (
+                            answerDto.answerUpload &&
+                            answerDto.answerUploadUrl
+                        ) {
+                            this.inputs.files['file_answer_upload'].fileName =
+                                answerDto.answerUpload
+                            this.inputs.files['file_answer_upload'].source =
+                                answerDto.answerUploadUrl
+
+                            if (this.fileHandler) {
+                                this.fileHandler.fileNames[
+                                    'file_answer_upload'
+                                ] = answerDto.answerUpload
+                            }
+                        }
+                    }
+                },
+                error: err => {
+                    console.error('Error fetching answer file:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil file jawaban makalah'
+                    )
+                }
+            })
     }
 
     getQuestion () {
@@ -128,16 +181,16 @@ export class UkomMakalahComponent {
                     )
                 }),
 
-                concatMap(() => {
-                    const finishPayload = {
-                        examTypeCode: 'MAKALAH',
-                        roomUkomId: this.room_id
-                    }
-                    return this.apiService.postData(
-                        '/api/v1/exam/finish',
-                        finishPayload
-                    )
-                }),
+                // concatMap(() => {
+                //     const finishPayload = {
+                //         examTypeCode: 'MAKALAH',
+                //         roomUkomId: this.room_id
+                //     }
+                //     return this.apiService.postData(
+                //         '/api/v1/exam/finish',
+                //         finishPayload
+                //     )
+                // }),
 
                 finalize(() => this.isSubmitLoading$.next(false))
             )

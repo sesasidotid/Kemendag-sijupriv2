@@ -1,9 +1,9 @@
 export const environment = {
     production: true,
-    //   appBaseHref: '/sijupri',
+    // appBaseHref: '/sijupri',
     appBaseHref: '',
     apiBaseUrl: 'http://sijupri.com:8000',
-    //   apiBaseUrl: 'https://pusbinjfdag.id:8000',
+    // apiBaseUrl: 'https://pusbinjfdag.id:8000',
     // apiBaseUrl: 'https://sijupri.kemendag.go.id:8000',
     firebaseConfig: {
         apiKey: 'AIzaSyBHvB-ce9lpJdWbDJCBP2XLVJHYzV62oLw',
@@ -20,3 +20,4 @@ export const environment = {
         siteKey: '6LfF3NUqAAAAAJrrXEvzsZi5vaa1oU6xFXvOj-uI'
     }
 }
+

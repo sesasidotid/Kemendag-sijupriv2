@@ -181,6 +181,69 @@
     [enableFooter]="false"
 >
     <form>
+        <div class="card p-3 bg-light mb-3">
+            <h6 class="card-title mb-3">
+                <i class="mdi mdi-shuffle-variant me-2"></i>Pilih Pertanyaan
+                Acak (Indikator Ini)
+            </h6>
+
+            <p class="text-muted mb-3 small">
+                Pilih pertanyaan secara acak hanya dari indikator kompetensi ini
+            </p>
+
+            <div
+                class="d-flex flex-column flex-sm-row align-items-stretch gap-2"
+            >
+                <div class="flex-fill">
+                    <label
+                        for="randomCountPerIndicatorInput"
+                        class="form-label small"
+                        >Jumlah Pertanyaan:</label
+                    >
+                    <input
+                        type="number"
+                        id="randomCountPerIndicatorInput"
+                        class="form-control form-control-sm"
+                        [(ngModel)]="randomCountPerIndicator"
+                        [ngModelOptions]="{ standalone: true }"
+                        min="1"
+                        placeholder="Masukkan jumlah..."
+                    />
+                </div>
+
+                <div class="flex-shrink-0">
+                    <label class="form-label small d-none d-sm-block"
+                        >&nbsp;</label
+                    >
+                    <button
+                        type="button"
+                        class="btn btn-primary btn-sm w-100"
+                        (click)="selectRandomQuestionsFromCurrentIndicator()"
+                        [disabled]="
+                            !randomCountPerIndicator ||
+                            randomCountPerIndicator <= 0 ||
+                            currentIndicatorQuestions?.length === 0
+                        "
+                    >
+                        <i class="mdi mdi-shuffle-variant me-1"></i> Pilih Acak
+                    </button>
+                </div>
+
+                <div class="flex-shrink-0">
+                    <label class="form-label small d-none d-sm-block"
+                        >&nbsp;</label
+                    >
+                    <button
+                        type="button"
+                        class="btn btn-warning btn-sm w-100"
+                        (click)="clearCurrentIndicatorSelection()"
+                    >
+                        <i class="mdi mdi-close-circle me-1"></i> Bersihkan
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="mb-3">
             <label for="searchInput" class="form-label">Pencarian:</label>
             <input

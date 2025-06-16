@@ -209,7 +209,7 @@ export class UkomKompetensiListComponent {
     }
 
     getJenjangList () {
-        this.apiService.getData('/api/v1/jenjang/').subscribe({
+        this.apiService.getData('/api/v1/jenjang').subscribe({
             next: (response: any) => {
                 response.forEach((j: any) => {
                     const jenjang = new Jenjang(j)
@@ -218,12 +218,16 @@ export class UkomKompetensiListComponent {
             },
             error: err => {
                 console.error('Error fetching jenjang data:', err)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengambil data jenjang'
+                )
             }
         })
     }
 
     getBidangJabatanList () {
-        this.apiService.getData('/api/v1/bidang_jabatan/').subscribe({
+        this.apiService.getData('/api/v1/bidang_jabatan').subscribe({
             next: (response: any) => {
                 response.forEach((b: any) => {
                     const bidangJabatan = new BidangJabatan(b)
@@ -233,6 +237,10 @@ export class UkomKompetensiListComponent {
             },
             error: err => {
                 console.error('Error fetching bidang jabatan data:', err)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengambil data bidang jabatan'
+                )
             }
         })
     }

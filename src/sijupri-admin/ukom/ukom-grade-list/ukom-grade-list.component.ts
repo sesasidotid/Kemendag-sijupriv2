@@ -31,17 +31,18 @@ import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
     styleUrl: './ukom-grade-list.component.scss'
 })
 export class UkomGradeListComponent {
-    @ViewChild(FileHandlerComponent)
-    fileHandler: FileHandlerComponent
+    @ViewChild(FileHandlerComponent) fileHandler: FileHandlerComponent
 
     pagable!: Pagable
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     isSubmitLoading$ = new BehaviorSubject<boolean>(false)
-
+    isDeleteLoading$ = new BehaviorSubject<boolean>(false)
     payload: { id: string; file_rekomendasi: string } = {
         id: '',
         file_rekomendasi: ''
     }
+
+    refresh: boolean
 
     inputs: FIleHandler = {
         files: {
@@ -225,20 +226,27 @@ export class UkomGradeListComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((participantUkom: UkomGrade) => {
-                        console.log(
-                            'Selected Participant Ukom:',
-                            participantUkom
-                        )
                         this.payload = {
                             id: participantUkom.participantId,
                             file_rekomendasi: ''
                         }
+
+                        this.inputs.files['file_rekom'].fileName =
+                            participantUkom.rekomendasi
+                        this.inputs.files['file_rekom'].source =
+                            participantUkom.rekomendasiUrl
+
                         this.toggleModal()
-                        setTimeout(() => {
-                            this.clearFilesName()
-                        })
                     }, 'primary')
                     .withIcon('upload')
+                    .build()
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((item: UkomGrade) => {
+                        this.onDelete(item.id)
+                    }, 'danger')
+                    .withIcon('danger')
                     .build()
             )
             .build()
@@ -273,11 +281,50 @@ export class UkomGradeListComponent {
     }
 
     toggleModal () {
-        this.isModalOpen$.next(!this.isModalOpen$.value)
+        const isClosing = this.isModalOpen$.value
+        this.isModalOpen$.next(!isClosing)
+
+        if (isClosing) {
+            this.inputs.files['file_rekom'].fileName = undefined
+            this.inputs.files['file_rekom'].source = undefined
+            this.payload = {
+                id: '',
+                file_rekomendasi: ''
+            }
+        }
     }
 
     rounding (value: string | number): string {
         return parseFloat(value.toString()).toFixed(2)
+    }
+
+    onDelete (id: string) {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.isDeleteLoading$.next(true)
+                this.apiService
+                    .deleteData(`/api/v1/ukom_grade/${id}`)
+                    .subscribe({
+                        next: () => {
+                            this.isDeleteLoading$.next(false)
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil menghapus nilai'
+                            )
+                            this.refresh = !this.refresh
+                        },
+                        error: err => {
+                            this.isDeleteLoading$.next(false)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menghapus nilai'
+                            )
+                        }
+                    })
+            }
+        })
     }
 
     onSubmit () {
@@ -298,11 +345,8 @@ export class UkomGradeListComponent {
                                 'Success',
                                 'Berhasil mengunggah rekomendasi'
                             )
-                            this.isModalOpen$.next(false)
-                            this.payload = {
-                                id: '',
-                                file_rekomendasi: ''
-                            }
+                            this.toggleModal()
+                            this.refresh = !this.refresh
                         },
                         error: err => {
                             console.error('Error uploading rekomendasi:', err)

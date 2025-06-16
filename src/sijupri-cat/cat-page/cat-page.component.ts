@@ -36,12 +36,15 @@ export class CatPageComponent {
     remainingTime: string = ''
     remainingSeconds: number = 0
     isSubmitted$ = new BehaviorSubject<boolean>(false)
-    //   isSubmitted$ = false
     showWarning: boolean = false
     warningCountdown: number = 30
-    private warningInterval: any
 
+    private warningInterval: any
     private countdownInterval: any
+    private isInside = true
+
+    isSavingAnswer$ = new BehaviorSubject<boolean>(false)
+    isSubmittingAnswer$ = new BehaviorSubject<boolean>(false)
 
     constructor (
         private api: ApiService,
@@ -79,18 +82,14 @@ export class CatPageComponent {
             this.isInside = inside
 
             if (!inside) {
-                console.log('Mouse exited the exam area')
                 this.showWarning = true
                 this.startWarningCountdown()
             } else {
-                console.log('Mouse entered the exam area')
                 this.showWarning = false
                 this.resetWarningCountdown()
             }
         }
     }
-
-    private isInside = true
 
     isMouseInsideExamArea (event: MouseEvent): boolean {
         const examArea = document.querySelector('.parent') as HTMLElement
@@ -109,7 +108,6 @@ export class CatPageComponent {
         if (this.warningInterval) {
             clearInterval(this.warningInterval)
         }
-        // if (this.warningInterval) return // Don't restart countdown if already running
 
         this.warningCountdown = 30
         this.warningInterval = setInterval(() => {
@@ -140,13 +138,10 @@ export class CatPageComponent {
         if (elem.requestFullscreen) {
             elem.requestFullscreen()
         } else if ((elem as any).mozRequestFullScreen) {
-            /* Firefox */
             ;(elem as any).mozRequestFullScreen()
         } else if ((elem as any).webkitRequestFullscreen) {
-            /* Chrome, Safari and Opera */
             ;(elem as any).webkitRequestFullscreen()
         } else if ((elem as any).msRequestFullscreen) {
-            /* IE/Edge */
             ;(elem as any).msRequestFullscreen()
         }
     }
@@ -173,11 +168,11 @@ export class CatPageComponent {
             if (timeLeft <= 0) {
                 clearInterval(this.countdownInterval)
                 this.remainingTime = '00:00:00'
-                this.remainingSeconds = 0 // Pastikan bernilai 0
+                this.remainingSeconds = 0
                 this.submitAnswer(false)
             } else {
                 this.remainingTime = this.formatTime(timeLeft)
-                this.remainingSeconds = Math.floor(timeLeft / 1000) // Simpan dalam detik
+                this.remainingSeconds = Math.floor(timeLeft / 1000)
             }
         }, 1000)
     }
@@ -206,8 +201,6 @@ export class CatPageComponent {
             )
             .subscribe({
                 next: (response: any) => {
-                    console.log('focus', response.roomUkomDto.id)
-
                     this.roomUkom = new RoomUkom(response.roomUkomDto)
                     this.room_id = response.roomUkomDto.id
                     this.pesertaUkom = response
@@ -237,7 +230,6 @@ export class CatPageComponent {
                     this.data.data = response.data
                     this.totalQuestions = this.data.data.length
 
-                    // Jika ada jawaban tersimpan, load jawaban
                     this.data.data.forEach((question: any) => {
                         if (question.answerDto?.id) {
                             this.savedAnswer[question.id] =
@@ -251,7 +243,6 @@ export class CatPageComponent {
                     console.error('Error fetching questions:', err)
                     if (err.error.message === `Exam's already ended`) {
                         this.isSubmitted$.next(true)
-                        // this.isSubmitted$ = true
                     } else {
                         this.handler.handleAlert(
                             'Error',
@@ -286,21 +277,22 @@ export class CatPageComponent {
             question_id: questionId
         }
 
-        console.log('Payload:', payload)
+        this.isSavingAnswer$.next(true)
 
         this.api.postData('/api/v1/exam/answer', payload).subscribe({
             next: response => {
                 console.log('Answer saved successfully:', response)
                 this.savedAnswer[questionId] = selectedChoiceId
 
-                // Pindah ke pertanyaan berikutnya jika masih ada
                 if (this.currentPage < this.totalQuestions) {
                     this.navigateToPage(this.currentPage + 1)
                 }
+                this.isSavingAnswer$.next(false)
             },
             error: err => {
                 console.error('Error saving answer:', err)
                 this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
+                this.isSavingAnswer$.next(false)
             }
         })
     }
@@ -315,19 +307,18 @@ export class CatPageComponent {
             this.confirmationService.open(false).subscribe({
                 next: (response: any) => {
                     if (response.confirmed) {
+                        this.isSubmittingAnswer$.next(true)
+
                         this.api
                             .postData('/api/v1/exam/finish', payload)
                             .subscribe({
                                 next: response => {
-                                    console.log(
-                                        'Answer submitted successfully:',
-                                        response
-                                    )
                                     this.handler.handleAlert(
                                         'Success',
                                         'Jawaban berhasil disimpan'
                                     )
                                     this.router.navigate(['/'])
+                                    this.isSubmittingAnswer$.next(false)
                                 },
                                 error: err => {
                                     console.error(
@@ -338,6 +329,7 @@ export class CatPageComponent {
                                         'Error',
                                         'Gagal menyimpan jawaban'
                                     )
+                                    this.isSubmittingAnswer$.next(false)
                                 }
                             })
                     }
@@ -346,6 +338,7 @@ export class CatPageComponent {
         }
 
         if (!open_dialog) {
+            this.isSubmittingAnswer$.next(true)
             this.api.postData('/api/v1/exam/finish', payload).subscribe({
                 next: response => {
                     console.log('Answer submitted successfully:', response)
@@ -354,11 +347,12 @@ export class CatPageComponent {
                         'Jawaban berhasil disimpan'
                     )
                     this.router.navigate(['/'])
+                    this.isSubmittingAnswer$.next(false)
                 },
                 error: err => {
                     console.error('Error submitting answer:', err)
                     this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
-                    this.router.navigate(['/'])
+                    this.isSubmittingAnswer$.next(false)
                 }
             })
         }

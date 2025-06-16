@@ -1,98 +1,100 @@
 <!-- file-handler.component.html -->
 <div class="file-parent">
-  <div *ngIf="!inputs.viewOnly">
-    <div class="mb-3">
-      <label for="emailInput" class="form-label">
-        File: <span class="text-danger">*</span></label
-      >
-      <small
-        *ngIf="inputs.allowedTypes?.length || inputs.maxSize"
-        class="text-muted d-block"
-      >
-        <span *ngIf="inputs.allowedTypes?.length">
-          Jenis file yang diperbolehkan: {{ getAllowedTypes() }}
-          <br />
-        </span>
+    <div *ngIf="!inputs.viewOnly">
+        <div class="mb-3">
+            <label for="emailInput" class="form-label">
+                File: <span class="text-danger">*</span></label
+            >
+            <small
+                *ngIf="inputs.allowedTypes?.length || inputs.maxSize"
+                class="text-muted d-block"
+            >
+                <span *ngIf="inputs.allowedTypes?.length">
+                    Jenis file yang diperbolehkan: {{ getAllowedTypes() }}
+                    <br />
+                </span>
 
-        <span *ngIf="inputs.maxSize">
-          Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
-        </span>
-      </small>
-    </div>
-  </div>
-  <ng-container *ngFor="let obj of inputs.files | keyvalue">
-    <div
-      class="mb-3 d-flex flex-column gap-2"
-      *ngIf="
-        obj.value.visible == null ||
-        obj.value.visible == undefined ||
-        obj.value.visible()
-      "
-    >
-      <!-- <h6 class="">{{ obj.value.label }}</h6> -->
-      <label class="form-label">
-        {{ obj.value.label }}
-        <span *ngIf="obj.value.required" class="text-danger">*</span>
-      </label>
-      <div
-        class="spinner-border"
-        role="status"
-        *ngIf="hadItemsLoading$ | async; else loadCompleted"
-      >
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <ng-template #loadCompleted>
-        <div class="d-flex flex-column flex-md-row gap-3">
-          <div class="d-flex align-items-center">
-            <!-- Preview section -->
-            <!-- <div class="file-preview" *ngIf="obj.value.source">
-                            <img [src]="isImage(obj.value.source) ? obj.value.source : defaultImage" class="w-fit"
-                                alt="{{ obj.value.label }}">
-                        </div> -->
-            <!-- Upload Button (only show if previewOnly is false) -->
-            <div *ngIf="!inputs.viewOnly">
-              <!-- <input
-                type="file"
-                (change)="handleFileUpload($event, obj.key)"
-                class="form-control"
-              /> -->
-              <div class="custom-file-upload">
-                <input
-                  type="file"
-                  [id]="'fileInput' + obj.key"
-                  (change)="handleFileUpload($event, obj.key)"
-                  class="hidden-input"
-                />
-                <label [for]="'fileInput' + obj.key" class="custom-file-label">
-                  <span class="file-icon"></span>
-                  <span class="file-text">Pilih File</span>
-                </label>
-              </div>
-            </div>
-            <!-- Display file name if selected or pre-existing -->
-            <div *ngIf="fileNames[obj.key]" class="file-name">
-              {{ fileNames[obj.key] }}
-            </div>
-          </div>
-          <!-- Preview Button -->
-          <a
-            class="btn btn-soft-success w-fit d-flex align-items-center justify-content-center text-center"
-            *ngIf="obj.value.source"
-            (click)="previewFile(obj.value.label, obj.value.source)"
-          >
-            Preview
-          </a>
+                <span *ngIf="inputs.maxSize">
+                    Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
+                </span>
+            </small>
         </div>
-        <!-- <p class="text-danger mt-1" *ngIf="obj.value.remark">
-          <strong>Remark:</strong> {{ obj.value.remark }}
-        </p> -->
-        <ng-container *ngIf="obj.value.remark">
-          <div class="alert alert-warning mt-1">
-            <strong>Catatan Revisi : </strong>
-            {{ obj.value.remark }}
-          </div>
-        </ng-container>
-      </ng-template>
     </div>
-  </ng-container>
+    <ng-container *ngFor="let obj of inputs.files | keyvalue">
+        <div
+            class="mb-3 d-flex flex-column gap-2"
+            *ngIf="
+                obj.value.visible == null ||
+                obj.value.visible == undefined ||
+                obj.value.visible()
+            "
+        >
+            <label class="form-label">
+                {{ obj.value.label }}
+                <span *ngIf="obj.value.required" class="text-danger">*</span>
+            </label>
+            <div
+                class="spinner-border"
+                role="status"
+                *ngIf="hadItemsLoading$ | async; else loadCompleted"
+            >
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <ng-template #loadCompleted>
+                <div
+                    #container
+                    class="d-flex align-items-center gap-3 w-100"
+                    [class.justify-content-between]="isSmallScreen"
+                >
+                    <div
+                        class="d-flex align-items-center"
+                        style="overflow: hidden"
+                    >
+                        <div *ngIf="!inputs.viewOnly">
+                            <div class="custom-file-upload">
+                                <input
+                                    type="file"
+                                    [id]="'fileInput' + obj.key"
+                                    (change)="handleFileUpload($event, obj.key)"
+                                    class="hidden-input"
+                                />
+                                <label
+                                    [for]="'fileInput' + obj.key"
+                                    class="custom-file-label"
+                                >
+                                    <span class="file-icon"></span>
+                                    <span class="file-text">Pilih File</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div
+                            *ngIf="fileNames[obj.key]"
+                            class="file-name text-truncate"
+                            [title]="fileNames[obj.key]"
+                        >
+                            {{ fileNames[obj.key] }}
+                        </div>
+                    </div>
+
+                    <ng-container *ngIf="obj.value.source">
+                        <a
+                            class="btn btn-soft-success d-flex align-items-center justify-content-center text-center flex-shrink-0"
+                            (click)="
+                                previewFile(obj.value.label, obj.value.source)
+                            "
+                        >
+                            Preview
+                        </a>
+                    </ng-container>
+                </div>
+
+                <ng-container *ngIf="obj.value.remark">
+                    <div class="alert alert-warning mt-1">
+                        <strong>Catatan Revisi : </strong>
+                        {{ obj.value.remark }}
+                    </div>
+                </ng-container>
+            </ng-template>
+        </div>
+    </ng-container>
 </div>

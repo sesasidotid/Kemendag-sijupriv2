@@ -49,6 +49,7 @@ export class UkomExamScheduleAddComponent {
 
     examScheduleForm: FormGroup
     submitLoading$ = new BehaviorSubject<boolean>(false)
+    loadingDefaultData$ = new BehaviorSubject<boolean>(false)
 
     examScheduleData: ExamScheduleUkom = new ExamScheduleUkom()
     jenisUkomList$: Observable<JenisUkom[]>
@@ -76,7 +77,50 @@ export class UkomExamScheduleAddComponent {
         this.handleFormInit()
         this.handlePagable()
         this.getJenisUkomList()
-        this.addSchedule()
+        // this.addSchedule()
+        this.loadDefaultScheduleData()
+    }
+
+    loadDefaultScheduleData () {
+        this.loadingDefaultData$.next(true)
+
+        this.apiService
+            .getData(`/api/v1/exam_schedule/room/${this.id}?page=1&limit=10`)
+            .subscribe({
+                next: (response: any[]) => {
+                    while (this.schedules.length !== 0) {
+                        this.schedules.removeAt(0)
+                    }
+                    if (response && response.length > 0) {
+                        response.forEach(schedule => {
+                            const scheduleGroup = this.fb.group({
+                                start_time: [
+                                    schedule.startTime,
+                                    Validators.required
+                                ],
+                                end_time: [
+                                    schedule.endTime,
+                                    Validators.required
+                                ],
+                                exam_type_code: [
+                                    schedule.examTypeCode || '',
+                                    Validators.required
+                                ]
+                            })
+                            this.schedules.push(scheduleGroup)
+                        })
+                    } else {
+                        this.addSchedule()
+                    }
+
+                    this.loadingDefaultData$.next(false)
+                },
+                error: error => {
+                    console.error('Error loading default schedule data:', error)
+                    this.addSchedule()
+                    this.loadingDefaultData$.next(false)
+                }
+            })
     }
 
     handleFormInit () {
@@ -178,9 +222,11 @@ export class UkomExamScheduleAddComponent {
             })
         )
     }
+
     handleRefreshToggle () {
         this.refreshToggle = !this.refreshToggle
     }
+
     submit (): void {
         this.confirmationService.open(false).subscribe({
             next: result => {
@@ -195,11 +241,6 @@ export class UkomExamScheduleAddComponent {
                     end_time: schedule.end_time,
                     exam_type_code: schedule.exam_type_code
                 }))
-
-                const payload = {
-                    id: this.id,
-                    examScheduleDtoList: schedules
-                }
 
                 const examTypeCodes = this.schedules.value.map(
                     (schedule: any) => schedule.exam_type_code
@@ -218,7 +259,6 @@ export class UkomExamScheduleAddComponent {
                     return
                 }
 
-                console.log(payload)
                 this.examScheduleData.examScheduleDtoList = this.schedules.value
 
                 this.apiService

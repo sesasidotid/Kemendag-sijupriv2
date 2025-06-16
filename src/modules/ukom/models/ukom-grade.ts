@@ -31,6 +31,8 @@ export class UkomGrade extends Serializable {
     participantId: string
     participantName: string
     nip: string
+    rekomendasi: string
+    rekomendasiUrl: string
 
     constructor (object?: { [key: string]: any }) {
         super()

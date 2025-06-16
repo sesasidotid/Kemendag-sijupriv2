@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, Input } from '@angular/core'
+import { Component, ElementRef, Input, ViewChild } from '@angular/core'
 import { FilePreviewService } from '../../services/file-preview.service'
 import { FIleHandler } from '../../commons/file-handler/file-handler'
 import { FileConverterService } from '../../services/file-converter.service'
@@ -13,13 +13,16 @@ import { HandlerService } from '../../services/handler.service'
     styleUrl: './file-handler.component.scss'
 })
 export class FileHandlerComponent {
+    @ViewChild('container') containerRef!: ElementRef
+
     @Input() inputs: FIleHandler
 
     fileNames: { [key: string]: string } = {}
-
     hadItemsLoading$ = new BehaviorSubject<boolean>(false)
-
     defaultImage: string = 'assets/eyegil/default-file-handler.jpg'
+
+    isSmallScreen = false
+    private resizeObserver!: ResizeObserver
 
     constructor (
         private filePreviewService: FilePreviewService,
@@ -35,7 +38,6 @@ export class FileHandlerComponent {
     }
 
     ngOnInit () {
-        // Set default file names on load if available
         for (const key in this.inputs.files) {
             if (
                 this.inputs.files[key].fileName &&
@@ -60,6 +62,29 @@ export class FileHandlerComponent {
                         }
                     })
             }
+        }
+    }
+
+    ngAfterViewInit () {
+        this.observeContainerResize()
+    }
+
+    observeContainerResize () {
+        this.resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const width = entry.contentRect.width
+                this.isSmallScreen = width < 500
+            }
+        })
+
+        if (this.containerRef) {
+            this.resizeObserver.observe(this.containerRef.nativeElement)
+        }
+    }
+
+    ngOnDestroy () {
+        if (this.resizeObserver && this.containerRef) {
+            this.resizeObserver.unobserve(this.containerRef.nativeElement)
         }
     }
 

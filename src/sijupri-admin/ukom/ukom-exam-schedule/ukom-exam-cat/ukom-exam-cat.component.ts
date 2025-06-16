@@ -46,6 +46,10 @@ export class UkomExamCatComponent {
     randomCount: number = 0
     allAvailableQuestions: UkomQuestion[] = []
 
+    currentIndicatorId: string = ''
+    randomCountPerIndicator: number = 0
+    currentIndicatorQuestions: UkomQuestion[] = []
+
     payload = {
         id: '',
         exam_type_code: '',
@@ -136,6 +140,10 @@ export class UkomExamCatComponent {
                 )
             )
         )
+
+        this.listQuestion$.subscribe(questions => {
+            this.currentIndicatorQuestions = questions
+        })
     }
 
     onSearchChange (search: string) {
@@ -147,6 +155,9 @@ export class UkomExamCatComponent {
             this.openModal(indikator_kompetensi_id)
         } else {
             this.isModalOpen$.next(!this.isModalOpen$.value)
+            this.currentIndicatorId = ''
+            this.randomCountPerIndicator = 0
+            this.currentIndicatorQuestions = []
         }
     }
 
@@ -214,9 +225,111 @@ export class UkomExamCatComponent {
     }
 
     openModal (indikator_kompetensi_id: string) {
+        this.currentIndicatorId = indikator_kompetensi_id
+        this.randomCountPerIndicator = 0
+
         this.getDropDownQuestionList(indikator_kompetensi_id)
         this.updateCheckedState()
         this.isModalOpen$.next(true)
+    }
+
+    selectRandomQuestionsFromCurrentIndicator () {
+        if (this.randomCountPerIndicator <= 0) {
+            this.handlerService.handleAlert(
+                'Warning',
+                'Masukkan jumlah pertanyaan yang valid'
+            )
+            return
+        }
+
+        const availableQuestions = this.currentIndicatorQuestions.filter(
+            q => !this.questCheckedList.some(selected => selected.id === q.id)
+        )
+
+        if (this.randomCountPerIndicator > availableQuestions.length) {
+            this.handlerService.handleAlert(
+                'Warning',
+                `Hanya tersedia ${availableQuestions.length} pertanyaan yang belum dipilih dari indikator ini`
+            )
+            return
+        }
+
+        const shuffled = [...availableQuestions]
+
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        }
+
+        const selectedQuestions = shuffled.slice(
+            0,
+            this.randomCountPerIndicator
+        )
+
+        selectedQuestions.forEach(question => {
+            question.checked = true
+        })
+
+        this.questCheckedList.push(...selectedQuestions)
+
+        this.listQuestion$ = this.listQuestion$.pipe(
+            map(questions => {
+                return questions.map((q: UkomQuestion) => {
+                    const isSelected = selectedQuestions.some(
+                        selected => selected.id === q.id
+                    )
+                    if (isSelected) {
+                        q.checked = true
+                    }
+                    return q
+                })
+            })
+        )
+
+        this.updateCheckedState()
+
+        this.handlerService.handleAlert(
+            'Success',
+            `Berhasil memilih ${selectedQuestions.length} pertanyaan secara acak dari indikator ini`
+        )
+        this.randomCountPerIndicator = 0
+    }
+
+    clearCurrentIndicatorSelection () {
+        const currentIndicatorCheckedQuestions = this.questCheckedList.filter(
+            checkedQ =>
+                this.currentIndicatorQuestions.some(
+                    currQ => currQ.id === checkedQ.id
+                )
+        )
+        if (currentIndicatorCheckedQuestions.length === 0) {
+            this.handlerService.handleAlert(
+                'Info',
+                'Tidak ada pertanyaan yang dipilih dari indikator ini'
+            )
+            return
+        }
+        this.questCheckedList = this.questCheckedList.filter(
+            checkedQ =>
+                !this.currentIndicatorQuestions.some(
+                    currQ => currQ.id === checkedQ.id
+                )
+        )
+
+        this.listQuestion$ = this.listQuestion$.pipe(
+            map(questions => {
+                return questions.map((q: UkomQuestion) => {
+                    q.checked = false
+                    return q
+                })
+            })
+        )
+
+        this.updateCheckedState()
+        this.handlerService.handleAlert(
+            'Success',
+            `Berhasil membersihkan ${currentIndicatorCheckedQuestions.length} pertanyaan dari indikator ini`
+        )
     }
 
     loadAllQuestionsFromAllIndikator () {
