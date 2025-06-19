@@ -1,132 +1,148 @@
 <form [formGroup]="jfAddForm" (ngSubmit)="submit()">
-  <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold">Instansi</label>
-    <div class="col-sm-10">
-      <div *ngIf="loadingInstansi$ | async; else instansiItem" class="d-flex">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Loading...</span>
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Instansi</label>
+        <div class="col-sm-10">
+            <div
+                *ngIf="loadingInstansi$ | async; else instansiItem"
+                class="d-flex"
+            >
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <ng-template #instansiItem>
+                <p class="mt-2">
+                    <b>{{ instansi.name }}</b>
+                </p>
+            </ng-template>
         </div>
-      </div>
-      <ng-template #instansiItem>
-        <p class="mt-2">
-          <b>{{ instansi.name }}</b>
-        </p>
-      </ng-template>
     </div>
-  </div>
 
-  <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
-    <div class="col-sm-10">
-      <div *ngIf="loadingUnitKerja$ | async; else unitItem" class="d-flex">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Loading...</span>
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
+        <div class="col-sm-10">
+            <div
+                *ngIf="loadingUnitKerja$ | async; else unitItem"
+                class="d-flex"
+            >
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <ng-template #unitItem>
+                <p class="mt-2">
+                    <b>{{ unitKerja.name }}</b>
+                </p>
+            </ng-template>
         </div>
-      </div>
-      <ng-template #unitItem>
-        <p class="mt-2">
-          <b>{{ unitKerja.name }}</b>
-        </p>
-      </ng-template>
     </div>
-  </div>
-  <hr />
+    <hr />
 
-  <div class="row mb-3">
-    <label for="nip" class="col-sm-2 col-form-label fw-bold"
-      >NIP <span class="text-danger">*</span>
-    </label>
-    <div class="col-sm-10">
-      <input
-        type="text"
-        class="form-control"
-        name="nip"
-        id="nip"
-        formControlName="nip"
-      />
-      <div *ngIf="getErrorMessage('nip', 'NIP') as error" class="text-danger">
-        {{ error }}
-      </div>
+    <div class="row mb-3">
+        <label for="nip" class="col-sm-2 col-form-label fw-bold"
+            >NIP <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+            <input
+                type="text"
+                class="form-control"
+                name="nip"
+                id="nip"
+                formControlName="nip"
+            />
+            <div
+                *ngIf="getErrorMessage('nip', 'NIP') as error"
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="row mb-3">
-    <label for="name" class="col-sm-2 col-form-label fw-bold"
-      >Nama Lengkap <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="text"
-        class="form-control"
-        name="name"
-        id="name"
-        formControlName="name"
-      />
-      <div
-        *ngIf="getErrorMessage('name', 'Nama Lengkap') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-  </div>
-  <div class="row mb-3">
-    <label for="email" class="col-sm-2 col-form-label fw-bold"
-      >Email <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="email"
-        class="form-control"
-        name="email"
-        id="email"
-        formControlName="email"
-      />
-      <div
-        *ngIf="getErrorMessage('email', 'Email') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-3">
-    <label for="kelamin" class="col-sm-2 col-form-label fw-bold"
-      >Jenis Kelamin <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <select
-        id="inputState"
-        class="form-select"
-        name="instansiId"
-        formControlName="jenisKelaminCode"
-        id="kelamin"
-      >
-        <option selected value="" style="display: none">
-          Pilih Jenis Kelamin
-        </option>
-        <option
-          *ngFor="let jenisKelamin of jenisKelaminList"
-          [value]="jenisKelamin.code"
+    <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold"
+            >Nama Lengkap <span class="text-danger">*</span></label
         >
-          {{ jenisKelamin.name }}
-        </option>
-      </select>
-      <div
-        *ngIf="getErrorMessage('jenisKelaminCode', 'Jenis Kelamin') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
+        <div class="col-sm-10">
+            <input
+                type="text"
+                class="form-control"
+                name="name"
+                id="name"
+                formControlName="name"
+            />
+            <div
+                *ngIf="getErrorMessage('name', 'Nama Lengkap') as error"
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="row">
-    <app-loading-button
-      [isLoading]="createJFLoading$ | async"
-      [disabled]="jfAddForm.invalid"
-      [type]="'submit'"
-      label="Simpan"
-      [className]="'btn btn-success float-end'"
-    ></app-loading-button>
-  </div>
+    <div class="row mb-3">
+        <label for="email" class="col-sm-2 col-form-label fw-bold"
+            >Email <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <input
+                type="email"
+                class="form-control"
+                name="email"
+                id="email"
+                formControlName="email"
+            />
+            <div
+                *ngIf="getErrorMessage('email', 'Email') as error"
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="kelamin" class="col-sm-2 col-form-label fw-bold"
+            >Jenis Kelamin <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <select
+                id="inputState"
+                class="form-select"
+                name="instansiId"
+                formControlName="jenisKelaminCode"
+                id="kelamin"
+            >
+                <option selected value="" style="display: none">
+                    Pilih Jenis Kelamin
+                </option>
+                <option
+                    *ngFor="let jenisKelamin of jenisKelaminList"
+                    [value]="jenisKelamin.code"
+                >
+                    {{ jenisKelamin.name }}
+                </option>
+            </select>
+            <div
+                *ngIf="
+                    getErrorMessage(
+                        'jenisKelaminCode',
+                        'Jenis Kelamin'
+                    ) as error
+                "
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <app-loading-button
+                [isLoading]="createJFLoading$ | async"
+                [disabled]="jfAddForm.invalid"
+                [type]="'submit'"
+                label="Simpan"
+                [className]="'btn btn-success float-end'"
+            ></app-loading-button>
+        </div>
+    </div>
 </form>

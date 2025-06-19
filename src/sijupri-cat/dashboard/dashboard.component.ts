@@ -22,7 +22,6 @@ import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
 import { ModalComponent } from '../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../modules/base/components/empty-state/empty-state.component'
-import { UkomMakalahComponent } from '../ukom-makalah/ukom-makalah.component'
 import { ExamType } from '../../modules/ukom/models/exam-type'
 import { MakalahScore } from '../../modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../modules/base/services/file-preview.service'
@@ -252,8 +251,6 @@ export class DashboardComponent implements AfterViewInit {
             )
             return
         }
-
-        console.log('Opening file:', answerDto)
 
         this.filePreviewService.open(
             answerDto.answerUpload,

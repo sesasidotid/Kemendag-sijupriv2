@@ -46,13 +46,13 @@ export class RwKinerjaAddComponent {
     inputs: FIleHandler = {
         files: {
             docEvaluas: {
-                label: 'Upload Dokumen Evaluasi',
+                label: 'Upload Dokumen Evaluasi kinerja',
                 fileName: this.rwKinerja.docEvaluasi,
                 source: this.rwKinerja.docEvaluasiUrl,
                 required: true
             },
             docPredikat: {
-                label: 'Upload Dokumen Predikat',
+                label: 'Upload Dokumen Konversi Predikat Kinerja',
                 fileName: this.rwKinerja.docPredikat,
                 source: this.rwKinerja.docPredikatUrl,
                 required: true
@@ -78,31 +78,39 @@ export class RwKinerjaAddComponent {
             if (key == 'docPredikat')
                 this.rwKinerjaForm.patchValue({ fileDocPredikat: base64Data })
             if (key == 'docAkumulasiAk')
-                this.rwKinerjaForm.patchValue({ fileDocAkumulasiAk: base64Data })
+                this.rwKinerjaForm.patchValue({
+                    fileDocAkumulasiAk: base64Data
+                })
             if (key == 'docPenetapanAk')
-                this.rwKinerjaForm.patchValue({ fileDocPenetapanAk: base64Data })
+                this.rwKinerjaForm.patchValue({
+                    fileDocPenetapanAk: base64Data
+                })
         }
     }
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
         private router: Router,
-        private formValidationService: FormValidationService,
-    ) { }
+        private formValidationService: FormValidationService
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleFormInit()
         this.getRatingKinerjaList()
         this.getPredikatKinerjaList()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.rwKinerjaForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.rwKinerjaForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.rwKinerjaForm = new FormGroup({
             dateEnd: new FormControl('', [Validators.required]),
             dateStart: new FormControl('', [Validators.required]),
@@ -112,7 +120,7 @@ export class RwKinerjaAddComponent {
             type: new FormControl('', [Validators.required]),
             angkaKredit: new FormControl('', [
                 Validators.required,
-                Validators.pattern('^[0-9]+$')
+                Validators.pattern('^[0-9]+(\\.[0-9]+)?$')
             ]),
             fileDocEvaluasi: new FormControl('', [
                 Validators.required,
@@ -133,7 +141,7 @@ export class RwKinerjaAddComponent {
         })
     }
 
-    getRatingKinerjaList() {
+    getRatingKinerjaList () {
         this.ratingLoading$.next(true)
         this.apiService.getData(`/api/v1/rating_kinerja`).subscribe({
             next: response => {
@@ -154,7 +162,7 @@ export class RwKinerjaAddComponent {
         })
     }
 
-    getPredikatKinerjaList() {
+    getPredikatKinerjaList () {
         this.predikatLoading$.next(true)
         this.apiService.getData(`/api/v1/predikat_kinerja`).subscribe({
             next: response => {
@@ -175,18 +183,22 @@ export class RwKinerjaAddComponent {
         })
     }
 
-    submit() {
+    submit () {
         if (this.rwKinerjaForm.valid) {
             this.rwKinerja.dateEnd = this.rwKinerjaForm.value.dateEnd
             this.rwKinerja.dateStart = this.rwKinerjaForm.value.dateStart
             this.rwKinerja.predikatKinerjaId =
                 this.rwKinerjaForm.value.predikatKinerjaId
-            this.rwKinerja.ratingHasilId = this.rwKinerjaForm.value.ratingHasilId
-            this.rwKinerja.ratingKinerjaId = this.rwKinerjaForm.value.ratingKinerjaId
+            this.rwKinerja.ratingHasilId =
+                this.rwKinerjaForm.value.ratingHasilId
+            this.rwKinerja.ratingKinerjaId =
+                this.rwKinerjaForm.value.ratingKinerjaId
             this.rwKinerja.type = this.rwKinerjaForm.value.type
             this.rwKinerja.angkaKredit = this.rwKinerjaForm.value.angkaKredit
-            this.rwKinerja.fileDocEvaluasi = this.rwKinerjaForm.value.fileDocEvaluasi
-            this.rwKinerja.fileDocPredikat = this.rwKinerjaForm.value.fileDocPredikat
+            this.rwKinerja.fileDocEvaluasi =
+                this.rwKinerjaForm.value.fileDocEvaluasi
+            this.rwKinerja.fileDocPredikat =
+                this.rwKinerjaForm.value.fileDocPredikat
             this.rwKinerja.fileDocAkumulasiAk =
                 this.rwKinerjaForm.value.fileDocAkumulasiAk
             this.rwKinerja.fileDocPenetapanAk =
@@ -207,7 +219,9 @@ export class RwKinerjaAddComponent {
                                 )
                                 this.submitLoading$.next(false)
                                 setTimeout(() => {
-                                    this.router.navigate(['/profile/rw-kinerja/pending'])
+                                    this.router.navigate([
+                                        '/profile/rw-kinerja/pending'
+                                    ])
                                 }, 1000) // Adjust the delay as needed
                             },
                             error: error => {

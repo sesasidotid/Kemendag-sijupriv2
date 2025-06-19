@@ -47,8 +47,6 @@ export class UkomGradeImportComponent {
         }
     }
 
-    refresh: boolean
-
     constructor (
         private router: Router,
         private apiService: ApiService,
@@ -58,7 +56,9 @@ export class UkomGradeImportComponent {
     ) {}
 
     ngOnInit () {
-        this.handleTabService()
+        setTimeout(() => {
+            this.handleTabService()
+        }, 0)
     }
 
     handleTabService () {
@@ -93,7 +93,11 @@ export class UkomGradeImportComponent {
         this.apiService
             .getDownload(`/api/v1/exam_grade/download`, 'template_grade.xlsx')
             .subscribe({
-                error: error => this.handlerService.handleException(error)
+                error: error =>
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengunduh template'
+                    )
             })
     }
 

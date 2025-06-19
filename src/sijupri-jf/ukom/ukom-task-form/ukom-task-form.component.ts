@@ -170,7 +170,10 @@ export class UkomTaskFormComponent {
                     nextJenjangControl.enable()
                 }
 
-                if (jenis_ukom == 'KENAIKAN_JENJANG') {
+                if (
+                    jenis_ukom == 'KENAIKAN_JENJANG' ||
+                    jenis_ukom == 'PROMOSI_JF'
+                ) {
                     nextJabatanControl.disable()
                     nextJenjangControl.disable()
 

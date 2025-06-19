@@ -15,9 +15,13 @@ import { FormBuilder, Validators } from '@angular/forms'
 import { UkomQuestion } from '../../modules/ukom/models/ukom-question'
 import {
     BehaviorSubject,
+    combineLatest,
     concatMap,
+    delay,
     filter,
     finalize,
+    map,
+    Observable,
     switchMap,
     take,
     tap
@@ -67,7 +71,12 @@ export class UkomMakalahComponent {
         false
     )
     isLoadingAnswerFile$: BehaviorSubject<boolean> =
-        new BehaviorSubject<boolean>(false)
+        new BehaviorSubject<boolean>(true)
+    isQuestionLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+        true
+    )
+    isFinished: boolean = false
+    isLoading$: Observable<boolean>
 
     constructor (
         private fb: FormBuilder,
@@ -75,7 +84,12 @@ export class UkomMakalahComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private router: Router
-    ) {}
+    ) {
+        this.isLoading$ = combineLatest([
+            this.isLoadingAnswerFile$,
+            this.isQuestionLoading$
+        ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
+    }
 
     ngOnChanges (changes: SimpleChanges): void {
         if ((changes['room_id'] || changes['participant_id']) && this.room_id) {
@@ -129,20 +143,34 @@ export class UkomMakalahComponent {
                     }
                 },
                 error: err => {
-                    console.error('Error fetching answer file:', err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengambil file jawaban makalah'
-                    )
+                    if (err.error.message === `Exam's already ended`) {
+                        this.isFinished = true
+                    } else {
+                        console.error('Error fetching answer file:', err)
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'Gagal mengambil file jawaban makalah'
+                        )
+                    }
                 }
             })
     }
 
+    backToHome () {
+        this.router.navigate(['/'])
+    }
+
     getQuestion () {
+        this.isQuestionLoading$.next(true)
         this.apiService
             .postData(
                 `/api/v1/room_ukom/search/MAKALAH/${this.room_id}?limit=1000`,
                 {}
+            )
+            .pipe(
+                finalize(() => {
+                    this.isQuestionLoading$.next(false)
+                })
             )
             .subscribe({
                 next: (res: any) => {

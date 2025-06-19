@@ -81,9 +81,10 @@
                                         canStartExam(
                                             exam.startTime,
                                             exam.endTime
-                                        ) ||
-                                        scoreMap['CAT']?.score === null ||
-                                        scoreMap['CAT']?.score === undefined
+                                        ) &&
+                                        (scoreMap['CAT']?.score === null ||
+                                            scoreMap['CAT']?.score ===
+                                                undefined)
                                     "
                                     (click)="
                                         startExam(
@@ -119,42 +120,46 @@
                             <ng-container
                                 *ngIf="exam.examTypeCode === 'MAKALAH'"
                             >
-                                <ng-container
+                                <button
+                                    class="btn btn-primary btn-lg"
                                     *ngIf="
                                         canStartExam(
                                             exam.startTime,
                                             exam.endTime
-                                        ) || scoreMap['MAKALAH']?.score == null;
-                                        else canupload
+                                        ) ||
+                                        scoreMap['MAKALAH']?.score == null ||
+                                            scoreMap['MAKALAH']?.score ===
+                                                undefined
+                                    "
+                                    (click)="
+                                        startExam(
+                                            exam.roomUkomId,
+                                            exam.examTypeCode
+                                        )
+                                    "
+                                    [disabled]="
+                                        !canStartExam(
+                                            exam.startTime,
+                                            exam.endTime
+                                        ) ||
+                                        (scoreMap['MAKALAH']?.score !== null &&
+                                            scoreMap['MAKALAH']?.score !==
+                                                undefined)
                                     "
                                 >
-                                    <button
-                                        class="btn btn-primary btn-lg"
-                                        (click)="
-                                            startExam(
-                                                exam.roomUkomId,
-                                                exam.examTypeCode
-                                            )
-                                        "
-                                        [disabled]="
-                                            !canStartExam(
-                                                exam.startTime,
-                                                exam.endTime
-                                            )
-                                        "
-                                    >
-                                        Upload Makalah
-                                    </button>
-                                </ng-container>
+                                    Upload Makalah
+                                </button>
 
-                                <ng-template #canupload>
-                                    <button
-                                        class="btn btn-success btn-lg"
-                                        (click)="viewFile()"
-                                    >
-                                        Lihat Makalah
-                                    </button>
-                                </ng-template>
+                                <button
+                                    class="btn btn-success btn-lg"
+                                    (click)="viewFile()"
+                                    *ngIf="
+                                        scoreMap['MAKALAH']?.score !== null &&
+                                        scoreMap['MAKALAH']?.score !== undefined
+                                    "
+                                >
+                                    Lihat Makalah
+                                </button>
                             </ng-container>
                         </div>
                     </div>

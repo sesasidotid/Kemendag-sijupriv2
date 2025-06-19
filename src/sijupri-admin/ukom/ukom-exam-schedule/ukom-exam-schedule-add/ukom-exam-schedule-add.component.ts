@@ -29,6 +29,7 @@ import {
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+
 @Component({
     selector: 'app-ukom-exam-schedule-add',
     standalone: true,
@@ -77,7 +78,6 @@ export class UkomExamScheduleAddComponent {
         this.handleFormInit()
         this.handlePagable()
         this.getJenisUkomList()
-        // this.addSchedule()
         this.loadDefaultScheduleData()
     }
 
@@ -93,6 +93,17 @@ export class UkomExamScheduleAddComponent {
                     }
                     if (response && response.length > 0) {
                         response.forEach(schedule => {
+                            let durationInMinutes = null
+
+                            if (
+                                schedule.examTypeCode === 'CAT' &&
+                                schedule.duration
+                            ) {
+                                durationInMinutes = Math.round(
+                                    schedule.duration * 60
+                                )
+                            }
+
                             const scheduleGroup = this.fb.group({
                                 start_time: [
                                     schedule.startTime,
@@ -105,6 +116,10 @@ export class UkomExamScheduleAddComponent {
                                 exam_type_code: [
                                     schedule.examTypeCode || '',
                                     Validators.required
+                                ],
+                                duration: [
+                                    durationInMinutes || null,
+                                    this.catDurationValidator()
                                 ]
                             })
                             this.schedules.push(scheduleGroup)
@@ -121,6 +136,26 @@ export class UkomExamScheduleAddComponent {
                     this.loadingDefaultData$.next(false)
                 }
             })
+    }
+
+    // Custom validator for CAT exam type duration
+    catDurationValidator () {
+        return (control: FormControl) => {
+            if (!control.parent) {
+                return null
+            }
+
+            const examTypeValue = control.parent.get('exam_type_code')?.value
+
+            if (
+                examTypeValue === 'CAT' &&
+                (!control.value || control.value.toString().trim() === '')
+            ) {
+                return { required: true }
+            }
+
+            return null
+        }
     }
 
     handleFormInit () {
@@ -141,6 +176,20 @@ export class UkomExamScheduleAddComponent {
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build()
+            )
+            // .addPrimaryColumn(
+            //     new PrimaryColumnBuilder('Durasi', 'duration').build()
+            // )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Durasi', (data: any) => {
+                        if (data.examTypeCode === 'CAT' && data.duration) {
+                            return `${Math.round(data.duration * 60)} menit`
+                        } else {
+                            return '-'
+                        }
+                    })
+                    .build()
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -199,8 +248,22 @@ export class UkomExamScheduleAddComponent {
         const scheduleGroup = this.fb.group({
             start_time: ['', Validators.required],
             end_time: ['', Validators.required],
-            exam_type_code: ['', Validators.required]
+            exam_type_code: ['', Validators.required],
+            duration: [null, this.catDurationValidator()]
         })
+
+        scheduleGroup
+            .get('exam_type_code')
+            ?.valueChanges.subscribe(examType => {
+                const durationControl = scheduleGroup.get('duration')
+
+                if (examType !== 'CAT') {
+                    durationControl?.setValue(null)
+                }
+
+                durationControl?.updateValueAndValidity()
+            })
+
         this.schedules.push(scheduleGroup)
     }
 
@@ -223,6 +286,11 @@ export class UkomExamScheduleAddComponent {
         )
     }
 
+    isCatExamType (index: number): boolean {
+        const examTypeControl = this.schedules.at(index).get('exam_type_code')
+        return examTypeControl?.value === 'CAT'
+    }
+
     handleRefreshToggle () {
         this.refreshToggle = !this.refreshToggle
     }
@@ -235,12 +303,6 @@ export class UkomExamScheduleAddComponent {
                 this.submitLoading$.next(true)
 
                 this.examScheduleData.id = this.id
-
-                const schedules = this.schedules.value.map((schedule: any) => ({
-                    start_time: schedule.start_time,
-                    end_time: schedule.end_time,
-                    exam_type_code: schedule.exam_type_code
-                }))
 
                 const examTypeCodes = this.schedules.value.map(
                     (schedule: any) => schedule.exam_type_code
@@ -259,7 +321,22 @@ export class UkomExamScheduleAddComponent {
                     return
                 }
 
-                this.examScheduleData.examScheduleDtoList = this.schedules.value
+                const scheduleData = this.schedules.value.map(
+                    (schedule: any) => {
+                        if (
+                            schedule.exam_type_code === 'CAT' &&
+                            schedule.duration
+                        ) {
+                            return {
+                                ...schedule,
+                                duration: (schedule.duration / 60).toFixed(2)
+                            }
+                        }
+                        return schedule
+                    }
+                )
+
+                this.examScheduleData.examScheduleDtoList = scheduleData
 
                 this.apiService
                     .postData(`/api/v1/exam_schedule`, this.examScheduleData)

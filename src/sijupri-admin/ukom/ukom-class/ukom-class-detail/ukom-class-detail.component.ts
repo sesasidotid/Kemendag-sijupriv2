@@ -1,25 +1,21 @@
 import { Component } from '@angular/core'
 import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
-import { CommonModule } from '@angular/common'
-import { BehaviorSubject } from 'rxjs'
+import { CommonModule, Location } from '@angular/common'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PageFilterBuilder,
     PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { ActivatedRoute } from '@angular/router'
 import { RoomUkomDetail } from '../../../../modules/ukom/models/room-ukom-detail'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
-import { Observable } from 'rxjs'
-import { first, map } from 'rxjs/operators'
+import { combineLatest, finalize, Observable, tap } from 'rxjs'
+import { map, take, BehaviorSubject } from 'rxjs'
 import { Router } from '@angular/router'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
+import { HandlerService } from '../../../../modules/base/services/handler.service'
 @Component({
     selector: 'app-ukom-class-detail',
     standalone: true,
@@ -30,40 +26,44 @@ import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam
 export class UkomClassDetailComponent {
     id: string
     detailKelas: RoomUkomDetail = new RoomUkomDetail()
-    jabatanList$: Observable<Jabatan[]>
-    jenjangList$: Observable<Jenjang[]>
-    listPeserta$: Observable<any[]>
 
-    detailKelasLoading$ = new BehaviorSubject<boolean>(false)
-    filteredJabatan$: Observable<Jabatan | undefined>
-    filteredJenjang$: Observable<Jenjang | undefined>
-
-    pagableJenisUkom: Pagable
     pagable: Pagable
     tab$ = new BehaviorSubject<number | null>(0)
 
-    data: any[] = []
+    isDetailKelasLoading$ = new BehaviorSubject<boolean>(false)
+    isLoading$: Observable<boolean>
 
     constructor (
         private apiService: ApiService,
-        private alertService: AlertService,
+        private handlerService: HandlerService,
         private activatedRoute: ActivatedRoute,
         private router: Router,
-        public tabService: TabService
-    ) {}
+        private tabService: TabService,
+        private location: Location
+    ) {
+        this.isLoading$ = combineLatest([this.isDetailKelasLoading$]).pipe(
+            map(loadings => loadings.some(isLoading => isLoading))
+        )
+    }
 
     ngOnInit () {
-        this.activatedRoute.paramMap.subscribe(params => {
+        this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
             this.id = params.get('id')
-        })
 
-        this.getJenjang()
-        this.getJabatan()
-        this.handlePagable()
-        this.getDetailKelas()
-        this.getJenjang()
-        this.getJabatan()
+            this.handlePagable()
+            this.getDetailKelas()
+        })
         this.handleTabService()
+
+        const navigationState = this.location.getState() as {
+            openTab?: number
+        } | null
+
+        if (navigationState && navigationState.openTab) {
+            if (navigationState.openTab === 1) {
+                this.handleTabChange(1)
+            }
+        }
     }
 
     handlePagable () {
@@ -77,13 +77,18 @@ export class UkomClassDetailComponent {
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Ukom', (data: any) =>
-                        data.jenisUkom === 'KENAIKAN_JENJANG'
-                            ? 'Kenaikan Jenjang'
-                            : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                            ? 'Perpindahan Jabatan'
-                            : data.jenisUkom
-                    )
+                    .withDynamicValue('Jenis Ukom', (data: any) => {
+                        switch (data.jenisUkom) {
+                            case 'KENAIKAN_JENJANG':
+                                return 'Kenaikan Jenjang'
+                            case 'PERPINDAHAN_JABATAN':
+                                return 'Perpindahan Jabatan'
+                            case 'PROMOSI_JF':
+                                return 'Promosi JF'
+                            default:
+                                return data.jenisUkom
+                        }
+                    })
                     .build()
             )
             .addActionColumn(
@@ -100,9 +105,9 @@ export class UkomClassDetailComponent {
     }
 
     handleTabService () {
-        if (this.tabService.getTabsLength() > 0) {
-            this.tabService.clearTabs()
-        }
+        // if (this.tabService.getTabsLength() > 0) {
+        //     this.tabService.clearTabs()
+        // }
 
         this.tabService
             .addTab({
@@ -119,60 +124,30 @@ export class UkomClassDetailComponent {
     }
 
     handleTabChange (tab?: number) {
-        console.log('tab', tab)
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }
 
-    getJenjang () {
-        this.jenjangList$ = this.apiService
-            .getData(`/api/v1/jenjang`)
-            .pipe(
-                map(response =>
-                    response.map(
-                        (jenjang: { [key: string]: any }) =>
-                            new Jenjang(jenjang)
-                    )
-                )
-            )
-    }
-
-    getJabatan () {
-        this.jabatanList$ = this.apiService
-            .getData(`/api/v1/jabatan`)
-            .pipe(
-                map(response =>
-                    response.map(
-                        (jabatan: { [key: string]: any }) =>
-                            new Jabatan(jabatan)
-                    )
-                )
-            )
-    }
-
     getDetailKelas () {
-        this.apiService.getData(`/api/v1/room_ukom/${this.id}`).subscribe({
-            next: res => {
-                this.detailKelas = res
-                this.filteredJabatan$ = this.jabatanList$.pipe(
-                    map(jabatanList =>
-                        jabatanList.find(
-                            j => j.code === this.detailKelas.jabatanCode
-                        )
+        this.isDetailKelasLoading$.next(true)
+        this.apiService
+            .getData(`/api/v1/room_ukom/${this.id}`)
+            .pipe(
+                finalize(() => {
+                    this.isDetailKelasLoading$.next(false)
+                }),
+                tap(res => {
+                    this.detailKelas = res
+                })
+            )
+            .subscribe({
+                next: res => {},
+                error: err => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil detail kelas UKOM'
                     )
-                )
-
-                this.filteredJenjang$ = this.jenjangList$.pipe(
-                    map(jenjangList =>
-                        jenjangList.find(
-                            j => j.code === this.detailKelas.jenjangCode
-                        )
-                    )
-                )
-            },
-            error: err => {
-                this.alertService.showToast('Error', err.error.message)
-            }
-        })
+                }
+            })
     }
 }

@@ -379,6 +379,17 @@
                                 >
                                     Lihat Nilai
                                 </button>
+                                <app-loading-button
+                                    [isLoading]="
+                                        isDeleteExamScoreLoading$ | async
+                                    "
+                                    [type]="'button'"
+                                    label="Hapus Nilai"
+                                    [className]="'btn btn-danger'"
+                                    (clicked)="
+                                        deleteExamScore(scoreMap['CAT'].id)
+                                    "
+                                ></app-loading-button>
                             </div>
                         </div>
 
@@ -397,6 +408,17 @@
                                 >
                                     Lihat Makalah
                                 </button>
+                                <app-loading-button
+                                    [isLoading]="
+                                        isDeleteExamScoreLoading$ | async
+                                    "
+                                    [type]="'button'"
+                                    label="Hapus Nilai"
+                                    [className]="'btn btn-danger'"
+                                    (clicked)="
+                                        deleteExamScore(scoreMap['MAKALAH'].id)
+                                    "
+                                ></app-loading-button>
                             </div>
                         </div>
                     </div>

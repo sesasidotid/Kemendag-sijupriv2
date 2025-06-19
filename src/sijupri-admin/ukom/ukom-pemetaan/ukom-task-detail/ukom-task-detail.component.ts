@@ -14,7 +14,9 @@ import {
     switchMap,
     tap,
     combineLatest,
-    finalize
+    finalize,
+    filter,
+    EMPTY
 } from 'rxjs'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
@@ -27,10 +29,17 @@ import { ExamType } from '../../../../modules/ukom/models/exam-type'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { MakalahScore } from '../../../../modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
+import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { LoadingButtonComponent } from '../../../../modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
-    imports: [CommonModule, ModalComponent, FileHandlerComponent],
+    imports: [
+        CommonModule,
+        ModalComponent,
+        FileHandlerComponent,
+        LoadingButtonComponent
+    ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss'
 })
@@ -71,11 +80,13 @@ export class UkomTaskDetailComponent {
     isAllSchoreLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isLoading$: Observable<boolean>
 
+    isDeleteExamScoreLoading$ = new BehaviorSubject<boolean>(false)
     constructor (
         private activatedRoute: ActivatedRoute,
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
+        private confirmationService: ConfirmationService
     ) {
         this.isLoading$ = combineLatest([
             this.isAllSchoreLoading$,
@@ -85,8 +96,8 @@ export class UkomTaskDetailComponent {
     }
 
     ngOnInit () {
-        this.loadPredikatKinerja()
-        this.getAllScoresFlow()
+        // this.getAllScoresFlow()
+        this.loadInitialDataFlow()
     }
 
     getExamType (): Observable<ExamType[]> {
@@ -106,63 +117,91 @@ export class UkomTaskDetailComponent {
         )
     }
 
-    getAllScoresFlow (): void {
-        this.isAllSchoreLoading$.next(true)
-        this.getExamType()
+    private loadInitialDataFlow (): void {
+        this.apiService
+            .getData('/api/v1/predikat_kinerja')
             .pipe(
-                switchMap((examTypes: ExamType[]) => {
-                    if (!examTypes.length || !this.participant_ukom_id) {
-                        return of([])
-                    }
+                tap(res => {
+                    this.predikatKinerjaList = res
+                }),
+                switchMap(() => this.activatedRoute.paramMap),
+                tap(params => {
+                    this.participant_ukom_id = params.get('id')
+                    this.getParticipantUkomDetail()
+                    this.getDokumenUkomList()
+                }),
+                filter(() => !!this.participant_ukom_id),
+                switchMap(() => {
+                    this.isAllSchoreLoading$.next(true)
+                    return this.getExamType().pipe(
+                        switchMap((examTypes: ExamType[]) => {
+                            if (
+                                !examTypes.length ||
+                                !this.participant_ukom_id
+                            ) {
+                                console.warn(
+                                    'Skipping API calls: Exam types or participant ID missing.'
+                                )
+                                return of([])
+                            }
 
-                    const requests = examTypes.map(type => {
-                        const examCode = type.code
-                        return this.apiService
-                            .getData(
-                                `/api/v1/exam_grade/${examCode}/${this.participant_ukom_id}`
-                            )
-                            .pipe(
-                                catchError(error => {
-                                    console.error(
-                                        `Failed to fetch score for ${examCode}:`,
-                                        error
+                            const requests = examTypes.map(type => {
+                                const examCode = type.code
+                                return this.apiService
+                                    .getData(
+                                        `/api/v1/exam_grade/${examCode}/${this.participant_ukom_id}`
                                     )
-                                    return of(null)
-                                }),
-                                map(response => {
-                                    let scoreInstance: any
-                                    switch (examCode) {
-                                        case 'CAT':
-                                            scoreInstance = new CATSchore(
-                                                response
+                                    .pipe(
+                                        catchError(error => {
+                                            console.error(
+                                                `Failed to fetch score for ${examCode}:`,
+                                                error
                                             )
-                                            break
-                                        case 'MAKALAH':
-                                            scoreInstance = new MakalahScore(
-                                                response
-                                            )
-                                            break
-                                        default:
-                                            scoreInstance = response
-                                    }
-                                    return { examCode, scoreInstance }
-                                })
-                            )
-                    })
-
-                    return forkJoin(requests)
+                                            return of(null)
+                                        }),
+                                        map(response => {
+                                            let scoreInstance: any
+                                            switch (examCode) {
+                                                case 'CAT':
+                                                    scoreInstance =
+                                                        new CATSchore(response)
+                                                    break
+                                                case 'MAKALAH':
+                                                    scoreInstance =
+                                                        new MakalahScore(
+                                                            response
+                                                        )
+                                                    break
+                                                default:
+                                                    scoreInstance = response
+                                            }
+                                            return { examCode, scoreInstance }
+                                        })
+                                    )
+                            })
+                            return forkJoin(requests)
+                        }),
+                        tap(results => {
+                            results.forEach(result => {
+                                if (result && result.examCode) {
+                                    this.scoreMap[result.examCode] =
+                                        result.scoreInstance
+                                }
+                            })
+                        }),
+                        finalize(() => {
+                            this.isAllSchoreLoading$.next(false)
+                        })
+                    )
                 }),
-                tap(results => {
-                    results.forEach(result => {
-                        if (result && result.examCode) {
-                            this.scoreMap[result.examCode] =
-                                result.scoreInstance
-                        }
-                    })
-                }),
-                finalize(() => {
-                    console.log('score', this.scoreMap)
+                catchError(err => {
+                    console.error('Error in initial data flow:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data awal ujian'
+                    )
                     this.isAllSchoreLoading$.next(false)
+                    return of(null)
                 })
             )
             .subscribe()
@@ -237,26 +276,6 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    loadPredikatKinerja () {
-        this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
-            next: res => {
-                this.predikatKinerjaList = res
-                this.activatedRoute.paramMap.subscribe(params => {
-                    this.participant_ukom_id = params.get('id')
-                    this.getParticipantUkomDetail()
-                    this.getDokumenUkomList()
-                })
-            },
-            error: err => {
-                console.error('Failed to fetch predikat kinerja:', err)
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengambil data predikat kinerja'
-                )
-            }
-        })
-    }
-
     get hasVisibleUkomDetails (): boolean {
         if (!this.scoreMap) {
             return false
@@ -288,8 +307,6 @@ export class UkomTaskDetailComponent {
 
         const birthDate = new Date(tanggalLahir)
         const suratDate = new Date(tglSuratUsulan)
-
-        console.log(typeof birthDate, typeof suratDate)
 
         if (isNaN(birthDate.getTime()) || isNaN(suratDate.getTime())) {
             return '-' // Return '-' jika format tanggal salah
@@ -340,7 +357,6 @@ export class UkomTaskDetailComponent {
         const answerDto =
             this.scoreMap['MAKALAH']?.questionDtoList[0]?.answerDto
 
-        console.log('Answer DTO:', this.scoreMap['MAKALAH'])
         if (!answerDto) {
             this.handlerService.handleAlert(
                 'Error',
@@ -356,7 +372,6 @@ export class UkomTaskDetailComponent {
     }
 
     getPredikatKinerja (code: string | null): string {
-        console.log('code', code)
         if (!code || code == null) return '-'
         const predikat = this.predikatKinerjaList.find(
             predikat => predikat.id === code
@@ -517,5 +532,45 @@ export class UkomTaskDetailComponent {
             kompetensi.questionDtoList.length -
             this.getCorrectAnswersCount(kompetensi)
         )
+    }
+
+    deleteExamScore (exam_grade_id: string): void {
+        const deleteAction = () => {
+            this.isDeleteExamScoreLoading$.next(true)
+            this.apiService
+                .deleteData(`/api/v1/exam_grade/${exam_grade_id}`)
+                .pipe(
+                    catchError(error => {
+                        console.error('Failed to delete exam score:', error)
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'Gagal menghapus nilai ujian'
+                        )
+                        return EMPTY
+                    }),
+                    finalize(() => {
+                        this.isDeleteExamScoreLoading$.next(false)
+                    })
+                )
+                .subscribe({
+                    next: () => {
+                        this.handlerService.handleAlert(
+                            'Success',
+                            'Nilai ujian berhasil dihapus'
+                        )
+                        this.loadInitialDataFlow()
+                    },
+                    error: err => {
+                        console.error('Unhandled error in subscribe:', err)
+                    }
+                })
+        }
+
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+                deleteAction()
+            }
+        })
     }
 }

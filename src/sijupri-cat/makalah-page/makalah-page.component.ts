@@ -31,7 +31,7 @@ export class MakalahPageComponent {
         this.getRoomUkom()
     }
 
-    afterSubmit () {
+    backToDashboard () {
         this.router.navigate(['/'])
     }
 

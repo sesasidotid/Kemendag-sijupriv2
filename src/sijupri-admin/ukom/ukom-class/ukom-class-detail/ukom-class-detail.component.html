@@ -1,6 +1,6 @@
 <ng-container *ngIf="(tab$ | async) === 0">
     <div
-        *ngIf="detailKelasLoading$ | async; else kelasHadItem"
+        *ngIf="isLoading$ | async; else kelasHadItem"
         class="d-flex justify-content-center my-5"
     >
         <div class="spinner-border" role="status">
@@ -94,7 +94,6 @@
 
         <section class="mt-5">
             <h5 class="fw-bold">Daftar Peserta</h5>
-
             <app-pagable [pagable]="pagable"></app-pagable>
         </section>
     </ng-template>

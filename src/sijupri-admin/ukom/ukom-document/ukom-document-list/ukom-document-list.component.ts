@@ -28,35 +28,43 @@ export class UkomDocumentListComponent {
 
     refresh: boolean = false
 
-    constructor(
+    constructor (
         private tabService: TabService,
         private router: Router,
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleTabService()
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/document_ukom/all')
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Nama', 'dokumenPersyaratanName').build()
+                new PrimaryColumnBuilder(
+                    'Nama',
+                    'dokumenPersyaratanName'
+                ).build()
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Ukom', (data: any) =>
-                        data.jenisUkom === 'KENAIKAN_JENJANG'
-                            ? 'Kenaikan Jenjang'
-                            : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                                ? 'Perpindahan Jabatan'
-                                : data.jenisUkom === 'PROMOSI'
-                                    ? 'Promosi'
-                                    : data.jenisUkom
-                    )
+                    .withDynamicValue('Jenis Ukom', (data: any) => {
+                        switch (data.jenisUkom) {
+                            case 'KENAIKAN_JENJANG':
+                                return 'Kenaikan Jenjang'
+                            case 'PERPINDAHAN_JABATAN':
+                                return 'Perpindahan Jabatan'
+                            case 'PROMOSI':
+                                return 'Promosi'
+                            case 'PROMOSI_JF':
+                                return 'Promosi Jabatan Fungsional'
+                            default:
+                                return data.jenisUkom
+                        }
+                    })
                     .build()
             )
             .addPrimaryColumn(
@@ -66,7 +74,11 @@ export class UkomDocumentListComponent {
                 new PrimaryColumnBuilder('Jenjang', 'jenjangName').build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder().withDynamicValue('Khusus Mengulang?', (data: any) => data.isMengulang ? 'Ya' : 'Tidak').build()
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Khusus Mengulang?', (data: any) =>
+                        data.isMengulang ? 'Ya' : 'Tidak'
+                    )
+                    .build()
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -79,7 +91,7 @@ export class UkomDocumentListComponent {
             .build()
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -98,30 +110,34 @@ export class UkomDocumentListComponent {
             })
     }
 
-    delete(id: string) {
+    delete (id: string) {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
 
-                this.apiService.deleteData(`/api/v1/doc_persyaratan/${id}`).subscribe({
-                    next: () => {
-                        this.refresh = !this.refresh
-                        this.handlerService.handleAlert(
-                            'Success',
-                            'Dokumen berhasil di hapus'
-                        )
-                    },
-                    error: error => {
-                        console.error('Error fetching data', error)
-                        this.handlerService.handleAlert('Error', 'Gagal menghapus dokumen')
-                    }
-                })
+                this.apiService
+                    .deleteData(`/api/v1/doc_persyaratan/${id}`)
+                    .subscribe({
+                        next: () => {
+                            this.refresh = !this.refresh
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Dokumen berhasil di hapus'
+                            )
+                        },
+                        error: error => {
+                            console.error('Error fetching data', error)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menghapus dokumen'
+                            )
+                        }
+                    })
             }
         })
     }
 
-    handleTabChange(tab?: number) {
-        console.log('tab', tab)
+    handleTabChange (tab?: number) {
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }

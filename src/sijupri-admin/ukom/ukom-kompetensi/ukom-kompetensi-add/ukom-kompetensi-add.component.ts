@@ -83,7 +83,7 @@ export class UkomKompetensiAddComponent {
     }
 
     handleSubscribe () {
-        this.handleBidangJabatanValidation()
+        // this.handleBidangJabatanValidation()
 
         this.kompetensiForm
             .get('jabatan_code')

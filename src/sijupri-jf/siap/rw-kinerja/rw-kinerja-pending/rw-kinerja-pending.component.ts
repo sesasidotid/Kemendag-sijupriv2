@@ -59,25 +59,28 @@ export class RwKinerjaPendingComponent {
 
     inputs: FIleHandler
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService,
+        private formValidationService: FormValidationService
+    ) {}
 
-    ) { }
-
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleFormInit()
         this.handleSubscribe()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.rwKinerjaForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.rwKinerjaForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/rw_kinerja/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -93,14 +96,14 @@ export class RwKinerjaPendingComponent {
                     .setAction((pendingTask: PendingTask) => {
                         this.pendingTask = pendingTask
                         if (pendingTask.flowId == 'siap_flow_2') {
-                            // this.getPendingRWKinerja(this.pendingTask.id)
                             this.getRatingKinerjaList(this.pendingTask.id)
                             this.getPredikatKinerjaList()
                             this.isDetailOpen = true
                         }
                     }, 'info')
                     .addInactiveCondition(
-                        (pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1'
+                        (pendingTask: PendingTask) =>
+                            pendingTask.flowId == 'siap_flow_1'
                     )
                     .withIcon('update')
                     .build()
@@ -108,7 +111,7 @@ export class RwKinerjaPendingComponent {
             .build()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.rwKinerjaForm = new FormGroup({
             dateEnd: new FormControl('', [Validators.required]),
             dateStart: new FormControl('', [Validators.required]),
@@ -118,24 +121,16 @@ export class RwKinerjaPendingComponent {
             type: new FormControl('', [Validators.required]),
             angkaKredit: new FormControl('', [
                 Validators.required,
-                Validators.pattern('^[0-9]+$')
+                Validators.pattern('^[0-9]+(\\.[0-9]+)?$')
             ]),
-            fileDocEvaluasi: new FormControl('', [
-                Validators.required,
-            ]),
-            fileDocPredikat: new FormControl('', [
-                Validators.required,
-            ]),
-            fileDocAkumulasiAk: new FormControl('', [
-                Validators.required,
-            ]),
-            fileDocPenetapanAk: new FormControl('', [
-                Validators.required,
-            ])
+            fileDocEvaluasi: new FormControl('', [Validators.required]),
+            fileDocPredikat: new FormControl('', [Validators.required]),
+            fileDocAkumulasiAk: new FormControl('', [Validators.required]),
+            fileDocPenetapanAk: new FormControl('', [Validators.required])
         })
     }
 
-    patchFormValue() {
+    patchFormValue () {
         this.rwKinerjaForm.patchValue({
             dateEnd: this.rwKinerja.dateEnd,
             dateStart: this.rwKinerja.dateStart,
@@ -144,27 +139,26 @@ export class RwKinerjaPendingComponent {
             ratingKinerjaId: this.rwKinerja.ratingKinerjaId,
             type: this.rwKinerja.type,
             angkaKredit: this.rwKinerja.angkaKredit
-        });
+        })
     }
 
-    handleSubscribe() {
+    handleSubscribe () {
         this.rwKinerjaForm.valueChanges.subscribe(() => {
             console.log('this.rwKinerjaForm', this.rwKinerjaForm.value)
-        }
-        )
+        })
     }
 
-    fileLoadHandler() {
+    fileLoadHandler () {
         this.inputs = {
             files: {
                 docEvaluas: {
-                    label: 'Upload Dokumen Evaluasi',
+                    label: 'Upload Dokumen Evaluasi Kinerja',
                     source: this.rwKinerja.docEvaluasiUrl,
                     fileName: this.rwKinerja.docEvaluasi,
                     required: true
                 },
                 docPredikat: {
-                    label: 'Upload Dokumen Predikat',
+                    label: 'Upload Dokumen Konversi Predikat Kinerja',
                     source: this.rwKinerja.docPredikatUrl,
                     fileName: this.rwKinerja.docPredikat,
                     required: true
@@ -186,18 +180,26 @@ export class RwKinerjaPendingComponent {
             allowedTypes: [{ type: 'application/pdf' }],
             listen: (key: string, source: string, base64Data: string) => {
                 if (key == 'docEvaluas')
-                    this.rwKinerjaForm.patchValue({ fileDocEvaluasi: base64Data })
+                    this.rwKinerjaForm.patchValue({
+                        fileDocEvaluasi: base64Data
+                    })
                 if (key == 'docPredikat')
-                    this.rwKinerjaForm.patchValue({ fileDocPredikat: base64Data })
+                    this.rwKinerjaForm.patchValue({
+                        fileDocPredikat: base64Data
+                    })
                 if (key == 'docAkumulasiAk')
-                    this.rwKinerjaForm.patchValue({ fileDocAkumulasiAk: base64Data })
+                    this.rwKinerjaForm.patchValue({
+                        fileDocAkumulasiAk: base64Data
+                    })
                 if (key == 'docPenetapanAk')
-                    this.rwKinerjaForm.patchValue({ fileDocPenetapanAk: base64Data })
+                    this.rwKinerjaForm.patchValue({
+                        fileDocPenetapanAk: base64Data
+                    })
             }
         }
     }
 
-    getRatingKinerjaList(pending_task_id: string) {
+    getRatingKinerjaList (pending_task_id: string) {
         this.ratingLoading$.next(true)
         this.apiService.getData(`/api/v1/rating_kinerja`).subscribe({
             next: response => {
@@ -220,7 +222,7 @@ export class RwKinerjaPendingComponent {
         })
     }
 
-    getPredikatKinerjaList() {
+    getPredikatKinerjaList () {
         this.predikatLoading$.next(true)
         this.apiService.getData(`/api/v1/predikat_kinerja`).subscribe({
             next: response => {
@@ -241,7 +243,7 @@ export class RwKinerjaPendingComponent {
         })
     }
 
-    getPendingRWKinerja(id: string) {
+    getPendingRWKinerja (id: string) {
         this.rwKinerjaLoading$.next(true)
         this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
             next: response => {
@@ -263,7 +265,7 @@ export class RwKinerjaPendingComponent {
         })
     }
 
-    back() {
+    back () {
         this.ratingKinerjaList = []
         this.predikatKinerjaList = []
         this.pendingTask = null
@@ -271,24 +273,27 @@ export class RwKinerjaPendingComponent {
         this.rwKinerja = new RWKinerja()
     }
 
-    handlePayload() {
+    handlePayload () {
         this.rwKinerja.dateEnd = this.rwKinerjaForm.value.dateEnd
         this.rwKinerja.dateStart = this.rwKinerjaForm.value.dateStart
         this.rwKinerja.predikatKinerjaId =
             this.rwKinerjaForm.value.predikatKinerjaId
         this.rwKinerja.ratingHasilId = this.rwKinerjaForm.value.ratingHasilId
-        this.rwKinerja.ratingKinerjaId = this.rwKinerjaForm.value.ratingKinerjaId
+        this.rwKinerja.ratingKinerjaId =
+            this.rwKinerjaForm.value.ratingKinerjaId
         this.rwKinerja.type = this.rwKinerjaForm.value.type
         this.rwKinerja.angkaKredit = this.rwKinerjaForm.value.angkaKredit
-        this.rwKinerja.fileDocEvaluasi = this.rwKinerjaForm.value.fileDocEvaluasi
-        this.rwKinerja.fileDocPredikat = this.rwKinerjaForm.value.fileDocPredikat
+        this.rwKinerja.fileDocEvaluasi =
+            this.rwKinerjaForm.value.fileDocEvaluasi
+        this.rwKinerja.fileDocPredikat =
+            this.rwKinerjaForm.value.fileDocPredikat
         this.rwKinerja.fileDocAkumulasiAk =
             this.rwKinerjaForm.value.fileDocAkumulasiAk
         this.rwKinerja.fileDocPenetapanAk =
             this.rwKinerjaForm.value.fileDocPenetapanAk
     }
 
-    submit() {
+    submit () {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return

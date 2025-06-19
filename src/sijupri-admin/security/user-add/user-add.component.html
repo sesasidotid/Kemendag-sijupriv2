@@ -1,172 +1,175 @@
 <form [formGroup]="addUserForm" (submit)="onSubmit()">
-  <div class="row mb-3">
-    <label for="name" class="col-sm-2 col-form-label fw-bold"
-      >Nama <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="text"
-        class="form-control"
-        id="name"
-        formControlName="name"
-      />
-      <div *ngIf="getErrorMessage('name', 'Nama') as error" class="text-danger">
-        {{ error }}
-      </div>
-    </div>
-  </div>
-  <div class="row mb-3">
-    <label for="nip" class="col-sm-2 col-form-label fw-bold"
-      >NIP <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="text"
-        name="nip"
-        class="form-control"
-        id="nip"
-        formControlName="nip"
-      />
-      <div *ngIf="getErrorMessage('nip', 'NIP') as error" class="text-danger">
-        {{ error }}
-      </div>
-    </div>
-  </div>
-  <div class="row mb-3">
-    <label for="email" class="col-sm-2 col-form-label fw-bold"
-      >Email <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="email"
-        class="form-control"
-        id="email"
-        formControlName="email"
-      />
-      <div
-        *ngIf="getErrorMessage('email', 'Email') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-3">
-    <label for="password" class="col-sm-2 col-form-label fw-bold"
-      >Password <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <div class="input-group has-validation">
-        <input
-          [type]="isPasswordVisible ? 'text' : 'password'"
-          name="password"
-          class="form-control"
-          id="password"
-          formControlName="password"
-        />
-        <span
-          class="input-group-text cursor-pointer"
-          (click)="togglePasswordVisibility()"
-          ><i-lucide
-            [img]="isPasswordVisible ? Eye : EyeOff"
-            [size]="16"
-            class="my-icon"
-          ></i-lucide
-        ></span>
-      </div>
-      <div
-        *ngIf="getErrorMessage('password', 'Password') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-3">
-    <label for="confirmPassword" class="col-sm-2 col-form-label fw-bold"
-      >Konfirmasi Password <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <div class="input-group has-validation">
-        <input
-          [type]="isPasswordVisible ? 'text' : 'password'"
-          name="confirmPassword"
-          class="form-control"
-          id="confirmPassword"
-          formControlName="confirmPassword"
-        />
-        <span
-          class="input-group-text cursor-pointer"
-          (click)="togglePasswordVisibility()"
+    <div class="row mb-3">
+        <label for="name" class="col-sm-2 col-form-label fw-bold"
+            >Nama <span class="text-danger">*</span></label
         >
-          <i-lucide
-            [img]="isPasswordVisible ? Eye : EyeOff"
-            [size]="16"
-            class="my-icon"
-          ></i-lucide>
-        </span>
-      </div>
-      <div
-        *ngIf="
-          getErrorMessage(
-            'confirmPassword',
-            ' Password dan Konfirmasi Password'
-          ) as error
-        "
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
+        <div class="col-sm-10">
+            <input
+                type="text"
+                class="form-control"
+                id="name"
+                formControlName="name"
+            />
+            <div
+                *ngIf="getErrorMessage('name', 'Nama') as error"
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
-
-  <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Roles <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <select
-        id="inputState"
-        class="form-select"
-        (change)="addRoleCode($event)"
-        [(ngModel)]="roleCode"
-        name="roleCode"
-      >
-        <option [value]="''">Pilih</option>
-        <option *ngFor="let role of roleList" [value]="role.code">
-          {{ role.name }}
-        </option>
-      </select>
-      <div class="mt-2">
-        <button
-          *ngFor="let roleCode of roleCodes"
-          class="btn btn-sm btn-outline-danger me-1"
-          (click)="removeRoleCode(roleCode)"
+    <div class="row mb-3">
+        <label for="nip" class="col-sm-2 col-form-label fw-bold"
+            >NIP <span class="text-danger">*</span></label
         >
-          {{ roleCode
-          }}<i-lucide [img]="Trash2" [size]="14" class="ms-1 mt-n1"></i-lucide>
-        </button>
-      </div>
+        <div class="col-sm-10">
+            <input
+                type="text"
+                name="nip"
+                class="form-control"
+                id="nip"
+                formControlName="nip"
+            />
+            <div
+                *ngIf="getErrorMessage('nip', 'NIP') as error"
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="row text-center">
-    <div class="col-12">
-      <!-- <button
-        type="submit"
-        class="btn btn-success float-end"
-        [disabled]="addUserForm.invalid || roleCodes.length === 0"
-      >
-        Simpan
-      </button> -->
-      <app-loading-button
-        [isLoading]="isLoading$ | async"
-        [disabled]="addUserForm.invalid || roleCodes.length === 0"
-        [type]="'submit'"
-        label="Simpan"
-        [className]="'btn btn-success float-end'"
-      ></app-loading-button>
+    <div class="row mb-3">
+        <label for="email" class="col-sm-2 col-form-label fw-bold"
+            >Email <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <input
+                type="email"
+                class="form-control"
+                id="email"
+                formControlName="email"
+            />
+            <div
+                *ngIf="getErrorMessage('email', 'Email') as error"
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
+
+    <div class="row mb-3">
+        <label for="password" class="col-sm-2 col-form-label fw-bold"
+            >Password <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <div class="input-group has-validation">
+                <input
+                    [type]="isPasswordVisible ? 'text' : 'password'"
+                    name="password"
+                    class="form-control"
+                    id="password"
+                    formControlName="password"
+                />
+                <span
+                    class="input-group-text cursor-pointer"
+                    (click)="togglePasswordVisibility()"
+                    ><i-lucide
+                        [img]="isPasswordVisible ? Eye : EyeOff"
+                        [size]="16"
+                        class="my-icon"
+                    ></i-lucide
+                ></span>
+            </div>
+            <div
+                *ngIf="getErrorMessage('password', 'Password') as error"
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="confirmPassword" class="col-sm-2 col-form-label fw-bold"
+            >Konfirmasi Password <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <div class="input-group has-validation">
+                <input
+                    [type]="isPasswordVisible ? 'text' : 'password'"
+                    name="confirmPassword"
+                    class="form-control"
+                    id="confirmPassword"
+                    formControlName="confirmPassword"
+                />
+                <span
+                    class="input-group-text cursor-pointer"
+                    (click)="togglePasswordVisibility()"
+                >
+                    <i-lucide
+                        [img]="isPasswordVisible ? Eye : EyeOff"
+                        [size]="16"
+                        class="my-icon"
+                    ></i-lucide>
+                </span>
+            </div>
+            <div
+                *ngIf="
+                    getErrorMessage(
+                        'confirmPassword',
+                        ' Password dan Konfirmasi Password'
+                    ) as error
+                "
+                class="text-danger"
+            >
+                {{ error }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold"
+            >Roles <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <select
+                id="inputState"
+                class="form-select"
+                (change)="addRoleCode($event)"
+                [(ngModel)]="roleCode"
+                name="roleCode"
+            >
+                <option [value]="''">Pilih</option>
+                <option *ngFor="let role of roleList" [value]="role.code">
+                    {{ role.name }}
+                </option>
+            </select>
+            <div class="mt-2">
+                <button
+                    *ngFor="let roleCode of roleCodes"
+                    class="btn btn-sm btn-outline-danger me-1"
+                    (click)="removeRoleCode(roleCode)"
+                >
+                    {{ roleCode
+                    }}<i-lucide
+                        [img]="Trash2"
+                        [size]="14"
+                        class="ms-1 mt-n1"
+                    ></i-lucide>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-12">
+            <app-loading-button
+                [isLoading]="isLoading$ | async"
+                [disabled]="addUserForm.invalid || roleCodes.length === 0"
+                [type]="'submit'"
+                label="Simpan"
+                [className]="'btn btn-success float-end'"
+            ></app-loading-button>
+        </div>
+    </div>
 </form>

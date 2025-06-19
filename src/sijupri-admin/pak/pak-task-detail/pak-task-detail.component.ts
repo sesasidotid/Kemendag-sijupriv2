@@ -14,7 +14,7 @@ import { AlertService } from '../../../modules/base/services/alert.service'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { ConverterService } from '../../../modules/base/services/converter.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, take } from 'rxjs'
 import { SafeUrl } from '@angular/platform-browser'
 import { RWKinerja } from '../../../modules/siap/models/rw-kinerja.model'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
@@ -37,7 +37,7 @@ export class PakTaskDetailComponent {
     pendingTaskloading$ = new BehaviorSubject<boolean>(true)
     detailTaskloading$ = new BehaviorSubject<boolean>(true)
     submitTaskLoading$ = new BehaviorSubject<boolean>(false)
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
@@ -47,20 +47,18 @@ export class PakTaskDetailComponent {
         private jfService: JfService,
         private sanitizer: DomSanitizer,
         private filePreviewService: FilePreviewService
-    ) {
+    ) {}
 
-    }
-
-    ngOnInit() {
-        this.activatedRoute.paramMap.subscribe(params => {
+    ngOnInit () {
+        this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
             this.nip = params.get('id')
-        })
 
-        this.getJF()
-        this.getTaskDetail()
+            this.getJF()
+            this.getTaskDetail()
+        })
     }
 
-    fetchPhotoProfile() {
+    fetchPhotoProfile () {
         this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
             next: blob => {
                 if (blob.size === 0) {
@@ -68,7 +66,8 @@ export class PakTaskDetailComponent {
                     return
                 }
                 const objectUrl = URL.createObjectURL(blob)
-                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+                this.profileImageSrc =
+                    this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
             error: err => {
                 console.error('Error fetching profile image', err)
@@ -77,7 +76,7 @@ export class PakTaskDetailComponent {
         })
     }
 
-    getTaskDetail() {
+    getTaskDetail () {
         this.pendingTaskloading$.next(true)
         this.apiService
             .getData(`/api/v1/jf/task/kinerja/group/${this.nip}`)
@@ -101,7 +100,7 @@ export class PakTaskDetailComponent {
             })
     }
 
-    toggleExpand(pendingTask: PendingTask) {
+    toggleExpand (pendingTask: PendingTask) {
         pendingTask['isOpen'] = !(pendingTask['isOpen'] || false)
 
         if (
@@ -135,7 +134,7 @@ export class PakTaskDetailComponent {
         }
     }
 
-    openConfirmationDialog(
+    openConfirmationDialog (
         pendingTask: PendingTask,
         taskAction: string,
         withComment: boolean = false
@@ -153,24 +152,24 @@ export class PakTaskDetailComponent {
         })
     }
 
-    visibility(rwSertifikasi: any) {
+    visibility (rwSertifikasi: any) {
         return () => rwSertifikasi.kategoriSertifikasiValue == 2
     }
 
-    getTaskDate(date: string) {
+    getTaskDate (date: string) {
         return this.converterService.dateToHumanReadable(date)
     }
 
-    preview(filename: string, source: string) {
+    preview (filename: string, source: string) {
         this.filePreviewService.open(filename, source)
     }
-    getJF() {
+    getJF () {
         this.jfService.findByNip(this.nip).subscribe({
             next: (jf: JF) => (this.jf = jf)
         })
     }
 
-    submit(pendingTask: PendingTask) {
+    submit (pendingTask: PendingTask) {
         this.submitTaskLoading$.next(true)
         const task = new Task()
         task.id = pendingTask.id
@@ -180,15 +179,24 @@ export class PakTaskDetailComponent {
 
         this.apiService
             .postData(
-                `/api/v1/${pendingTask.workflowName.replace('_task', '')}/task/submit`,
+                `/api/v1/${pendingTask.workflowName.replace(
+                    '_task',
+                    ''
+                )}/task/submit`,
                 task
             )
             .subscribe({
                 next: () => {
                     if (task.taskAction == 'approve') {
-                        this.alertService.showToast('Success', 'Berhasil menyetujui!')
+                        this.alertService.showToast(
+                            'Success',
+                            'Berhasil menyetujui!'
+                        )
                     } else {
-                        this.alertService.showToast('Success', 'Berhasil menolak!')
+                        this.alertService.showToast(
+                            'Success',
+                            'Berhasil menolak!'
+                        )
                     }
                     this.getTaskDetail()
                     this.submitTaskLoading$.next(false)
@@ -196,7 +204,10 @@ export class PakTaskDetailComponent {
                 error: error => {
                     console.error('Error fetching data', error)
                     if (task.taskAction == 'approve') {
-                        this.alertService.showToast('Error', 'Gagal menyetujui!')
+                        this.alertService.showToast(
+                            'Error',
+                            'Gagal menyetujui!'
+                        )
                     } else {
                         this.alertService.showToast('Error', 'Gagal menolak!')
                     }

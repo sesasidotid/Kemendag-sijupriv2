@@ -2,44 +2,50 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 
 export interface Tab {
-  label: string
-  isActive?: boolean
-  icon?: string
-  onClick: () => void
+    label: string
+    isActive?: boolean
+    icon?: string
+    onClick: () => void
 }
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class TabService {
-  private tabsSubject = new BehaviorSubject<Tab[]>([])
-  tabs$ = this.tabsSubject.asObservable()
+    private tabsSubject = new BehaviorSubject<Tab[]>([])
+    tabs$ = this.tabsSubject.asObservable()
 
-  addTab(tab: Tab): TabService {
-    setTimeout(() => {
-      const currentTabs = this.tabsSubject.getValue()
-      this.tabsSubject.next([...currentTabs, tab])
-    }, 0);
-    return this
-  }
+    // addTab (tab: Tab): TabService {
+    //     setTimeout(() => {
+    //         const currentTabs = this.tabsSubject.getValue()
+    //         this.tabsSubject.next([...currentTabs, tab])
+    //     }, 0)
+    //     return this
+    // }
 
-  clearTabs(): void {
-    this.tabsSubject.next([])
-  }
+    addTab (tab: Tab): TabService {
+        const currentTabs = this.tabsSubject.getValue()
+        this.tabsSubject.next([...currentTabs, tab])
+        return this
+    }
 
-  getTabsLength(): number {
-    return this.tabsSubject.getValue().length
-  }
+    clearTabs (): void {
+        this.tabsSubject.next([])
+    }
 
-  changeTabActive(tab: number) {
-    const currentTabs = this.tabsSubject.value
-    const updatedTabs = currentTabs.map((item, index) => {
-      if (index === tab) {
-        return { ...item, isActive: true }
-      }
-      return { ...item, isActive: false }
-    })
+    getTabsLength (): number {
+        return this.tabsSubject.getValue().length
+    }
 
-    this.tabsSubject.next(updatedTabs)
-  }
+    changeTabActive (tab: number) {
+        const currentTabs = this.tabsSubject.value
+        const updatedTabs = currentTabs.map((item, index) => {
+            if (index === tab) {
+                return { ...item, isActive: true }
+            }
+            return { ...item, isActive: false }
+        })
+
+        this.tabsSubject.next(updatedTabs)
+    }
 }

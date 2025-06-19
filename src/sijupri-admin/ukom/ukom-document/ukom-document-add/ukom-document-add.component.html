@@ -1,196 +1,217 @@
 <section>
-  <form [formGroup]="documentForm" (ngSubmit)="submit()">
-    <div class="row mb-3">
-      <label for="exam_start_at" class="col-sm-2 col-form-label fw-bold"
-        >Nama Dokumen <span class="text-danger">*</span></label
-      >
-      <div class="col-sm-10">
-        <input
-          type="text"
-          id="dokumenPersyaratanName"
-          class="form-control"
-          name="dokumenPersyaratanName"
-          formControlName="dokumenPersyaratanName"
-          placeholder="Nama Dokumen"
-        />
-        <div
-          *ngIf="
-            getErrorMessage('dokumenPersyaratanName', 'Nama dokumen') as error
-          "
-          class="text-danger"
-        >
-          {{ error }}
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="jenisUkom" class="col-sm-2 col-form-label fw-bold"
-        >Jenis Ukom <span class="text-danger">*</span></label
-      >
-      <div class="col-sm-10">
-        <select
-          id="jenisUkom"
-          class="form-select"
-          name="jenisUkom"
-          formControlName="jenisUkom"
-        >
-          <option selected value="" disabled style="display: none">
-            Pilih Jenis UKom
-          </option>
-          <option value="KENAIKAN_JENJANG">Kenaikan Jenjang</option>
-          <option value="PERPINDAHAN_JABATAN">Perpindahan Jabatan</option>
-          <option value="PROMOSI">Promosi</option>
-        </select>
-        <div
-          *ngIf="getErrorMessage('jenisUkom', 'Jenis UKom') as error"
-          class="text-danger"
-        >
-          {{ error }}
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold"
-        >Jabatan</label
-      >
-      <div class="col-sm-10">
-        <select
-          id="jabatanCode"
-          class="form-select"
-          name="jabatanCode"
-          formControlName="jabatanCode"
-        >
-          <option selected value="">Untuk Jabatan ...</option>
-          <ng-container
-            *ngIf="(jabatanList$ | async)?.length; else NextJenjangNotFound"
-          >
-            <option
-              *ngFor="let jabatan of jabatanList$ | async"
-              [value]="jabatan.code"
+    <form [formGroup]="documentForm" (ngSubmit)="submit()">
+        <div class="row mb-3">
+            <label for="exam_start_at" class="col-sm-2 col-form-label fw-bold"
+                >Nama Dokumen <span class="text-danger">*</span></label
             >
-              {{ jabatan.name }}
-            </option>
-          </ng-container>
-          <ng-template #NextJenjangNotFound>
-            <option disabled>Jabatan yang dituju tidak ditemukan</option>
-          </ng-template>
-        </select>
-        <div
-          *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error"
-          class="text-danger"
-        >
-          {{ error }}
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="jenjangCode" class="col-sm-2 col-form-label fw-bold"
-        >Jenjang</label
-      >
-      <div class="col-sm-10">
-        <select
-          id="jenjangCode"
-          class="form-select"
-          name="jenjangCode"
-          formControlName="jenjangCode"
-        >
-          <option selected value="">Untuk Jenjang ...</option>
-          <ng-container
-            *ngIf="(jenjangList$ | async)?.length; else JenjangNotFound"
-          >
-            <option
-              *ngFor="let jenjang of jenjangList$ | async"
-              [value]="jenjang.code"
-            >
-              {{ jenjang.name }}
-            </option>
-          </ng-container>
-          <ng-template #JenjangNotFound>
-            <option disabled>Jenjang yang dituju tidak ditemukan</option>
-          </ng-template>
-        </select>
-        <div
-          *ngIf="getErrorMessage('jenjangCode', 'Jenjang') as error"
-          class="text-danger"
-        >
-          {{ error }}
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="isMengulang" class="col-sm-2 col-form-label fw-bold">
-        Dokumen Khusus Mengulang?
-      </label>
-      <div class="col-sm-10 d-flex align-items-center">
-        <input
-          type="checkbox"
-          class="btn-check"
-          id="isMengulang"
-          autocomplete="off"
-          formControlName="isMengulang"
-        />
-        <label
-          [ngClass]="
-            documentForm.get('isMengulang')?.value
-              ? 'btn btn-primary'
-              : 'btn btn-outline-primary'
-          "
-          for="isMengulang"
-        >
-          {{
-            documentForm.get('isMengulang')?.value
-              ? 'Mengulang'
-              : 'Bukan Dokumen Mengulang'
-          }}
-          <span
-            *ngIf="documentForm.get('isMengulang')?.value"
-            class="mdi mdi-check-bold"
-          ></span>
-        </label>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="jenjangCode" class="col-sm-2 col-form-label fw-bold"></label>
-      <div class="col-sm-10">
-        <div class="bg-warning rounded border p-1">
-          <small class="text-white">
-            Isi jabatan dan jenjang jika diperlukan. Jika dokumen untuk jenjang
-            tertentu, cukup isi jenjang. Jika untuk jabatan tertentu dan jenjang
-            tertentu, isi keduanya.
-          </small>
-        </div>
-      </div>
-    </div>
-
-    <div class="row text-center">
-      <div class="col-12">
-        <ng-container *ngIf="submitLoading$ | async; else noLoading">
-          <button class="btn btn-success float-end" disabled>
-            <div
-              class="spinner-border"
-              style="width: 19px; height: 19px"
-              role="status"
-            >
-              <span class="visually-hidden">Loading...</span>
+            <div class="col-sm-10">
+                <input
+                    type="text"
+                    id="dokumenPersyaratanName"
+                    class="form-control"
+                    name="dokumenPersyaratanName"
+                    formControlName="dokumenPersyaratanName"
+                    placeholder="Nama Dokumen"
+                />
+                <div
+                    *ngIf="
+                        getErrorMessage(
+                            'dokumenPersyaratanName',
+                            'Nama dokumen'
+                        ) as error
+                    "
+                    class="text-danger"
+                >
+                    {{ error }}
+                </div>
             </div>
-          </button>
-        </ng-container>
+        </div>
 
-        <ng-template #noLoading>
-          <button
-            type="submit"
-            class="btn btn-success float-end"
-            [disabled]="documentForm.invalid || (submitLoading$ | async)"
-          >
-            Simpan
-          </button>
-        </ng-template>
-      </div>
-    </div>
-  </form>
+        <div class="row mb-3">
+            <label for="jenisUkom" class="col-sm-2 col-form-label fw-bold"
+                >Jenis Ukom <span class="text-danger">*</span></label
+            >
+            <div class="col-sm-10">
+                <select
+                    id="jenisUkom"
+                    class="form-select"
+                    name="jenisUkom"
+                    formControlName="jenisUkom"
+                >
+                    <option selected value="" disabled style="display: none">
+                        Pilih Jenis UKom
+                    </option>
+                    <option value="KENAIKAN_JENJANG">Kenaikan Jenjang</option>
+                    <option value="PERPINDAHAN_JABATAN">
+                        Perpindahan Jabatan
+                    </option>
+                    <option value="PROMOSI">Promosi</option>
+                    <option value="PROMOSI_JF">Promosi JF</option>
+                </select>
+                <div
+                    *ngIf="getErrorMessage('jenisUkom', 'Jenis UKom') as error"
+                    class="text-danger"
+                >
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold"
+                >Jabatan</label
+            >
+            <div class="col-sm-10">
+                <select
+                    id="jabatanCode"
+                    class="form-select"
+                    name="jabatanCode"
+                    formControlName="jabatanCode"
+                >
+                    <option selected value="">Untuk Jabatan ...</option>
+                    <ng-container
+                        *ngIf="
+                            (jabatanList$ | async)?.length;
+                            else NextJenjangNotFound
+                        "
+                    >
+                        <option
+                            *ngFor="let jabatan of jabatanList$ | async"
+                            [value]="jabatan.code"
+                        >
+                            {{ jabatan.name }}
+                        </option>
+                    </ng-container>
+                    <ng-template #NextJenjangNotFound>
+                        <option disabled>
+                            Jabatan yang dituju tidak ditemukan
+                        </option>
+                    </ng-template>
+                </select>
+                <div
+                    *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error"
+                    class="text-danger"
+                >
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="jenjangCode" class="col-sm-2 col-form-label fw-bold"
+                >Jenjang</label
+            >
+            <div class="col-sm-10">
+                <select
+                    id="jenjangCode"
+                    class="form-select"
+                    name="jenjangCode"
+                    formControlName="jenjangCode"
+                >
+                    <option selected value="">Untuk Jenjang ...</option>
+                    <ng-container
+                        *ngIf="
+                            (jenjangList$ | async)?.length;
+                            else JenjangNotFound
+                        "
+                    >
+                        <option
+                            *ngFor="let jenjang of jenjangList$ | async"
+                            [value]="jenjang.code"
+                        >
+                            {{ jenjang.name }}
+                        </option>
+                    </ng-container>
+                    <ng-template #JenjangNotFound>
+                        <option disabled>
+                            Jenjang yang dituju tidak ditemukan
+                        </option>
+                    </ng-template>
+                </select>
+                <div
+                    *ngIf="getErrorMessage('jenjangCode', 'Jenjang') as error"
+                    class="text-danger"
+                >
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="isMengulang" class="col-sm-2 col-form-label fw-bold">
+                Dokumen Khusus Mengulang?
+            </label>
+            <div class="col-sm-10 d-flex align-items-center">
+                <input
+                    type="checkbox"
+                    class="btn-check"
+                    id="isMengulang"
+                    autocomplete="off"
+                    formControlName="isMengulang"
+                />
+                <label
+                    [ngClass]="
+                        documentForm.get('isMengulang')?.value
+                            ? 'btn btn-primary'
+                            : 'btn btn-outline-primary'
+                    "
+                    for="isMengulang"
+                >
+                    {{
+                        documentForm.get('isMengulang')?.value
+                            ? 'Mengulang'
+                            : 'Bukan Dokumen Mengulang'
+                    }}
+                    <span
+                        *ngIf="documentForm.get('isMengulang')?.value"
+                        class="mdi mdi-check-bold"
+                    ></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label
+                for="jenjangCode"
+                class="col-sm-2 col-form-label fw-bold"
+            ></label>
+            <div class="col-sm-10">
+                <div class="bg-warning rounded border p-1">
+                    <small class="text-white">
+                        Isi jabatan dan jenjang jika diperlukan. Jika dokumen
+                        untuk jenjang tertentu, cukup isi jenjang. Jika untuk
+                        jabatan tertentu dan jenjang tertentu, isi keduanya.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-12">
+                <ng-container *ngIf="submitLoading$ | async; else noLoading">
+                    <button class="btn btn-success float-end" disabled>
+                        <div
+                            class="spinner-border"
+                            style="width: 19px; height: 19px"
+                            role="status"
+                        >
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </ng-container>
+
+                <ng-template #noLoading>
+                    <button
+                        type="submit"
+                        class="btn btn-success float-end"
+                        [disabled]="
+                            documentForm.invalid || (submitLoading$ | async)
+                        "
+                    >
+                        Simpan
+                    </button>
+                </ng-template>
+            </div>
+        </div>
+    </form>
 </section>

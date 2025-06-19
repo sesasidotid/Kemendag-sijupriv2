@@ -181,6 +181,14 @@
     [enableFooter]="false"
 >
     <form>
+        <div class="d-flex justify-content-end mb-3">
+            <div
+                class="alert alert-info d-flex align-items-center w-auto mb-0 px-1 py-2"
+                role="alert"
+            >
+                Soal Tersedia: {{ currentIndicatorQuestions?.length || 0 }}
+            </div>
+        </div>
         <div class="card p-3 bg-light mb-3">
             <h6 class="card-title mb-3">
                 <i class="mdi mdi-shuffle-variant me-2"></i>Pilih Pertanyaan

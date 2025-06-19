@@ -112,7 +112,6 @@ export class UkomClassAddComponent {
         this.bidangJabatanList$.subscribe(bidangList => {
             const bidangJabatanControl = this.kelasForm.get('bidang_jabatan')
 
-            console.log('Bidang Jabatan List:', bidangList.length)
             if (bidangList.length > 0) {
                 bidangJabatanControl?.setValidators(Validators.required)
             } else {
@@ -123,12 +122,11 @@ export class UkomClassAddComponent {
     }
 
     handleSubscribe () {
-        this.kelasForm
-            .get('jabatan')
-            ?.valueChanges.pipe(distinctUntilChanged())
+        const bidangJabatanControl = this.kelasForm.get('bidang_jabatan')
+
+        bidangJabatanControl?.valueChanges
+            .pipe(distinctUntilChanged())
             .subscribe(jabatanCode => {
-                const bidangJabatanControl =
-                    this.kelasForm.get('bidang_jabatan')
                 bidangJabatanControl?.reset()
 
                 if (jabatanCode) {

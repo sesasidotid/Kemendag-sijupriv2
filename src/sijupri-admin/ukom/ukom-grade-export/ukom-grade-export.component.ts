@@ -40,26 +40,30 @@ export class UkomGradeExportComponent {
     refresh: boolean = false
     isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
 
-    constructor(
+    constructor (
         private router: Router,
         private tabService: TabService,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private formValidationService: FormValidationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handleFormInit()
         this.handlePagable()
         this.handleTabService()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.exportGradeForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.exportGradeForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.exportGradeForm = new FormGroup({
             dateFrom: new FormControl('', [Validators.required]),
             dateTo: new FormControl('', [Validators.required]),
@@ -67,11 +71,17 @@ export class UkomGradeExportComponent {
         })
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/report/search')
-            .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'fileName').build())
-            .addPrimaryColumn(new PrimaryColumnBuilder('Tipe', 'fileType').build())
-            .addPrimaryColumn(new PrimaryColumnBuilder('Status', 'status').build())
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Nama', 'fileName').build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Tipe', 'fileType').build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Status', 'status').build()
+            )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((report: any) => {
@@ -117,7 +127,7 @@ export class UkomGradeExportComponent {
             .build()
     }
 
-    handleDownloadReport(report: any) {
+    handleDownloadReport (report: any) {
         this.apiService
             .postDownload(
                 '/api/v1/report/download',
@@ -133,7 +143,8 @@ export class UkomGradeExportComponent {
                 error: error => this.handlerService.handleException(error)
             })
     }
-    handleDeleteReport(report: any) {
+
+    handleDeleteReport (report: any) {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
@@ -147,13 +158,14 @@ export class UkomGradeExportComponent {
                             )
                             this.pagableComponent.fetchData()
                         },
-                        error: error => this.handlerService.handleException(error)
+                        error: error =>
+                            this.handlerService.handleException(error)
                     })
             }
         })
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -169,17 +181,19 @@ export class UkomGradeExportComponent {
                 label: 'Import Nilai',
                 isActive: false,
                 icon: 'mdi-plus-circle',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list/import`])
+                onClick: () =>
+                    this.router.navigate([`/ukom/ukom-grade-list/import`])
             })
             .addTab({
                 label: 'Export Nilai',
                 isActive: true,
                 icon: 'mdi-export',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list/export`])
+                onClick: () =>
+                    this.router.navigate([`/ukom/ukom-grade-list/export`])
             })
     }
 
-    submit() {
+    submit () {
         this.exportGradeForm.markAllAsTouched()
 
         if (!this.exportGradeForm.valid) {

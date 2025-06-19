@@ -2,7 +2,7 @@ import { HandlerService } from './../../../../modules/base/services/handler.serv
 import { RoomUkomDetail } from './../../../../modules/ukom/models/room-ukom-detail'
 import { Component } from '@angular/core'
 import { ApiService } from '../../../../modules/base/services/api.service'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { ExamDetail } from '../../../../modules/ukom/models/exam_detail'
 import { CommonModule, Location } from '@angular/common'
 import {
@@ -46,7 +46,8 @@ export class UkomExamChooseCompQuestionsComponent {
         private apiService: ApiService,
         private activatedRoute: ActivatedRoute,
         private handlerService: HandlerService,
-        private location: Location
+        private location: Location,
+        private router: Router
     ) {
         this.isLoading$ = combineLatest([
             this.isLoadingRoomDetail$,
@@ -61,14 +62,17 @@ export class UkomExamChooseCompQuestionsComponent {
         ]).subscribe(([paramMap, queryParamMap]) => {
             this.room_ukom_id = paramMap.get('roomid')
             this.type_ukom = queryParamMap.get('type_ukom')
-        })
 
-        this.getRoomDetail()
-        this.getExamDetail()
+            this.getRoomDetail()
+            this.getExamDetail()
+        })
     }
 
     back () {
-        this.location.back()
+        // this.location.back()
+        this.router.navigate([`/ukom/ukom-room-list/${this.room_ukom_id}`], {
+            state: { openTab: 1 }
+        })
     }
 
     getRoomDetail () {

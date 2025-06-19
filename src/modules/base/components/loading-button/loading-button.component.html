@@ -1,35 +1,24 @@
-<!-- <button [type]="type" [disabled]="disabled || isLoading" [ngClass]="className">
-  <ng-container *ngIf="isLoading; else labelText">
-    <div class="spinner-border" style="width: 19px; height: 19px" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </ng-container>
-  <ng-template #labelText>
-    {{ label }}
-  </ng-template>
-</button> -->
-
-<div class="col-12">
-  <ng-container *ngIf="isLoading; else noLoading">
+<!-- <div class="col-12"> -->
+<ng-container *ngIf="isLoading; else noLoading">
     <button [type]="type" [class]="className" [disabled]="true">
-      <div
-        class="spinner-border"
-        style="width: 19px; height: 19px"
-        role="status"
-      >
-        <span class="visually-hidden">Loading...</span>
-      </div>
+        <div
+            class="spinner-border"
+            style="width: 19px; height: 19px"
+            role="status"
+        >
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </button>
-  </ng-container>
+</ng-container>
 
-  <ng-template #noLoading>
+<ng-template #noLoading>
     <button
-      [type]="type"
-      [class]="className"
-      [disabled]="disabled || isLoading"
-      (click)="handleClick()"
+        [type]="type"
+        [class]="className"
+        [disabled]="disabled || isLoading"
+        (click)="handleClick()"
     >
-      {{ label }}
+        {{ label }}
     </button>
-  </ng-template>
-</div>
+</ng-template>
+<!-- </div> -->
