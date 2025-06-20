@@ -92,6 +92,21 @@ export class UkomTaskDetailComponent implements OnDestroy {
         this.initializeComponent()
     }
 
+    getJenisUkomLabel (jenisUkom: string): string {
+        switch (jenisUkom) {
+            case 'KENAIKAN_JENJANG':
+                return 'Kenaikan Jenjang'
+            case 'PERPINDAHAN_JABATAN':
+                return 'Perpindahan Jabatan'
+            case 'PROMOSI':
+                return 'Promosi'
+            case 'PROMOSI_JF':
+                return 'Promosi Jabatan Fungsional'
+            default:
+                return jenisUkom
+        }
+    }
+
     ngOnDestroy () {
         this.destroy$.next()
         this.destroy$.complete()

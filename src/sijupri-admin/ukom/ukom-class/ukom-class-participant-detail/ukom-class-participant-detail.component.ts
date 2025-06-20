@@ -21,32 +21,47 @@ export class UkomClassParticipantDetailComponent {
     id: string
     pagable!: Pagable
 
-    constructor(private activatedRoute: ActivatedRoute, private router: Router) { }
+    constructor (
+        private activatedRoute: ActivatedRoute,
+        private router: Router
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.activatedRoute.paramMap.subscribe(params => {
             this.id = params.get('id')
         })
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder(`/api/v1/participant_ukom/${this.id}`)
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
-            .addPrimaryColumn(new PrimaryColumnBuilder('Email', 'email').build())
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Email', 'email').build()
+            )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Ukom', (data: any) =>
-                        data.jenisUkom === 'KENAIKAN_JENJANG'
-                            ? 'Kenaikan Jenjang'
-                            : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                                ? 'Perpindahan Jabatan'
-                                : data.jenisUkom
-                    )
+                    .withDynamicValue('Jenis Ukom', (data: any) => {
+                        switch (data.jenisUkom) {
+                            case 'KENAIKAN_JENJANG':
+                                return 'Kenaikan Jenjang'
+                            case 'PERPINDAHAN_JABATAN':
+                                return 'Perpindahan Jabatan'
+                            case 'PROMOSI':
+                                return 'Promosi'
+                            case 'PROMOSI_JF':
+                                return 'Promosi Jabatan Fungsional'
+                            default:
+                                return data.jenisUkom
+                        }
+                    })
                     .build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenis Kelamin', 'jenisKelaminName').build()
+                new PrimaryColumnBuilder(
+                    'Jenis Kelamin',
+                    'jenisKelaminName'
+                ).build()
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Jabatan Awal', 'jabatanName').build()
@@ -58,16 +73,28 @@ export class UkomClassParticipantDetailComponent {
                 new PrimaryColumnBuilder('Pangkat', 'pangkatName').build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jabatan Tujuan', 'nextJabatanName').build()
+                new PrimaryColumnBuilder(
+                    'Jabatan Tujuan',
+                    'nextJabatanName'
+                ).build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenjang Tujuan', 'nextJenjangName').build()
+                new PrimaryColumnBuilder(
+                    'Jenjang Tujuan',
+                    'nextJenjangName'
+                ).build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Nama Instansi', 'instansiName').build()
+                new PrimaryColumnBuilder(
+                    'Nama Instansi',
+                    'instansiName'
+                ).build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Nama Unit Kerja', 'unitKerjaName').build()
+                new PrimaryColumnBuilder(
+                    'Nama Unit Kerja',
+                    'unitKerjaName'
+                ).build()
             )
             .build()
     }

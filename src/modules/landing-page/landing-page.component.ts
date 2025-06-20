@@ -54,9 +54,9 @@ export class LandingPageComponent {
     dokumenKenaikanDanPindah: DataDokumenUkom[] = []
     dokumenPromosiDanPindah: DataDokumenUkom[] = []
 
-    constructor(private router: Router, private service: ApiService) { }
+    constructor (private router: Router, private service: ApiService) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.ukomForm = new FormGroup({
             ukomCode: new FormControl('', [
                 Validators.required,
@@ -68,86 +68,121 @@ export class LandingPageComponent {
         this.dokumenKenaikanJenjang
     }
 
-    fetchDokumenUkom() {
+    fetchDokumenUkom () {
         forkJoin({
-            kenaikanJenjang: this.service.getData('/api/v1/document_ukom/jenis_ukom/KENAIKAN_JENJANG'),
-            pindahJabatan: this.service.getData('/api/v1/document_ukom/jenis_ukom/PERPINDAHAN_JABATAN'),
-            promosi: this.service.getData('/api/v1/document_ukom/jenis_ukom/PROMOSI')
-        }).pipe(
-            map(({ kenaikanJenjang, pindahJabatan, promosi }) => {
-                // const jenjangCode = 'JJ7'; // ahli madya
-                const jenjangCodes = ['JJ7', 'JJ8']; //ahli madya dan ahli utama
+            kenaikanJenjang: this.service.getData(
+                '/api/v1/document_ukom/jenis_ukom/KENAIKAN_JENJANG'
+            ),
+            pindahJabatan: this.service.getData(
+                '/api/v1/document_ukom/jenis_ukom/PERPINDAHAN_JABATAN'
+            ),
+            promosi: this.service.getData(
+                '/api/v1/document_ukom/jenis_ukom/PROMOSI'
+            )
+        })
+            .pipe(
+                map(({ kenaikanJenjang, pindahJabatan, promosi }) => {
+                    // const jenjangCode = 'JJ7'; // ahli madya
+                    const jenjangCodes = ['JJ7', 'JJ8'] //ahli madya dan ahli utama
 
-                const filteredKenaikan = this.filterUniqueByName(kenaikanJenjang);
-                const filteredPindah = this.filterUniqueByName(pindahJabatan);
-                const filteredPromosi = this.filterUniqueByName(promosi);
+                    const filteredKenaikan =
+                        this.filterUniqueByName(kenaikanJenjang)
+                    const filteredPindah =
+                        this.filterUniqueByName(pindahJabatan)
+                    const filteredPromosi = this.filterUniqueByName(promosi)
 
+                    const uniqueByNameAndJenjang = (
+                        data: DataDokumenUkom[]
+                    ) => {
+                        const seen = new Set<string>()
+                        return data.filter(doc => {
+                            const key = `${doc.dokumenPersyaratanName}-${doc.jabatanCode}`
+                            if (seen.has(key)) {
+                                return false
+                            }
+                            seen.add(key)
+                            return true
+                        })
+                    }
 
+                    const sortByName = (
+                        a: DataDokumenUkom,
+                        b: DataDokumenUkom
+                    ) => {
+                        const nameComparison =
+                            a.dokumenPersyaratanName.localeCompare(
+                                b.dokumenPersyaratanName
+                            )
+                        return nameComparison !== 0
+                            ? nameComparison
+                            : a.jabatanName.localeCompare(b.jabatanName)
+                    }
 
-                const uniqueByNameAndJenjang = (data: DataDokumenUkom[]) => {
-                    const seen = new Set<string>();
-                    return data.filter(doc => {
-                        const key = `${doc.dokumenPersyaratanName}-${doc.jabatanCode}`;
-                        if (seen.has(key)) {
-                            return false;
-                        }
-                        seen.add(key);
-                        return true;
-                    });
-                };
-
-                const sortByName = (a: DataDokumenUkom, b: DataDokumenUkom) => {
-                    const nameComparison = a.dokumenPersyaratanName.localeCompare(b.dokumenPersyaratanName);
-                    return nameComparison !== 0 ? nameComparison : a.jabatanName.localeCompare(b.jabatanName);
-                };
-
-
-                return {
-                    kenaikanJenjang: filteredKenaikan,
-                    pindahJabatan: filteredPindah,
-                    promosi: filteredPromosi,
-                    dokumenKenaikanDanPindah: uniqueByNameAndJenjang([...kenaikanJenjang, ...pindahJabatan]
-                        .filter(doc => jenjangCodes.includes(doc.jenjangCode)))
-                        .sort(sortByName),
-                    dokumenPromosiDanPindah: uniqueByNameAndJenjang([...promosi, ...pindahJabatan]
-                        .filter(doc => jenjangCodes.includes(doc.jenjangCode)))
-                        .sort(sortByName)
-                };
-            })
-        ).subscribe(({ kenaikanJenjang, pindahJabatan, promosi, dokumenKenaikanDanPindah, dokumenPromosiDanPindah }) => {
-            this.dokumenKenaikanJenjang = kenaikanJenjang;
-            this.dokumenPindahJabatan = pindahJabatan;
-            this.dokumenPromosi = promosi;
-            this.dokumenKenaikanDanPindah = dokumenKenaikanDanPindah;
-            this.dokumenPromosiDanPindah = dokumenPromosiDanPindah;
-        });
+                    return {
+                        kenaikanJenjang: filteredKenaikan,
+                        pindahJabatan: filteredPindah,
+                        promosi: filteredPromosi,
+                        dokumenKenaikanDanPindah: uniqueByNameAndJenjang(
+                            [...kenaikanJenjang, ...pindahJabatan].filter(doc =>
+                                jenjangCodes.includes(doc.jenjangCode)
+                            )
+                        ).sort(sortByName),
+                        dokumenPromosiDanPindah: uniqueByNameAndJenjang(
+                            [...promosi, ...pindahJabatan].filter(doc =>
+                                jenjangCodes.includes(doc.jenjangCode)
+                            )
+                        ).sort(sortByName)
+                    }
+                })
+            )
+            .subscribe(
+                ({
+                    kenaikanJenjang,
+                    pindahJabatan,
+                    promosi,
+                    dokumenKenaikanDanPindah,
+                    dokumenPromosiDanPindah
+                }) => {
+                    this.dokumenKenaikanJenjang = kenaikanJenjang
+                    this.dokumenPindahJabatan = pindahJabatan
+                    this.dokumenPromosi = promosi
+                    this.dokumenKenaikanDanPindah = dokumenKenaikanDanPindah
+                    this.dokumenPromosiDanPindah = dokumenPromosiDanPindah
+                }
+            )
     }
 
-    private filterUniqueByName(data: DataDokumenUkom[]): DataDokumenUkom[] {
-        const seen = new Set<string>();
+    private filterUniqueByName (data: DataDokumenUkom[]): DataDokumenUkom[] {
+        const seen = new Set<string>()
         return data.filter(item => {
-            if (!item.dokumenPersyaratanName || seen.has(item.dokumenPersyaratanName) || item.jenjangCode === 'JJ7') {
-                return false;
+            if (
+                !item.dokumenPersyaratanName ||
+                seen.has(item.dokumenPersyaratanName) ||
+                item.jenjangCode === 'JJ7'
+            ) {
+                return false
             }
-            seen.add(item.dokumenPersyaratanName);
-            return true;
-        });
+            seen.add(item.dokumenPersyaratanName)
+            return true
+        })
     }
 
-    formatJabatanJenjang(item: any): string {
-        const names = [item.jabatanName, item.jenjangName].filter(Boolean).join(' - ');
-        return names ? ` (${names})` : '';
+    formatJabatanJenjang (item: any): string {
+        const names = [item.jabatanName, item.jenjangName]
+            .filter(Boolean)
+            .join(' - ')
+        return names ? ` (${names})` : ''
     }
 
-    toggleMenu() {
+    toggleMenu () {
         this.isMenuOpen = !this.isMenuOpen
     }
 
-    navigateTo(path: string) {
+    navigateTo (path: string) {
         this.router.navigate([path])
     }
 
-    onSubmit() {
+    onSubmit () {
         if (this.ukomForm.valid) {
             console.log(this.ukomForm.value)
 

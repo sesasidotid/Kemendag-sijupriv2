@@ -253,7 +253,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenis UKom</label>
                                 <p class="border-bottom">
-                                    {{
+                                    <!-- {{
                                         ukomDetail.jenisUkom ===
                                         'KENAIKAN_JENJANG'
                                             ? 'Kenaikan Jenjang'
@@ -263,6 +263,9 @@
                                             : ukomDetail.jenisUkom === 'PROMOSI'
                                             ? 'Promosi'
                                             : ukomDetail.jenisUkom
+                                    }} -->
+                                    {{
+                                        getJenisUkomLabel(ukomDetail.jenisUkom)
                                     }}
                                 </p>
                             </div>

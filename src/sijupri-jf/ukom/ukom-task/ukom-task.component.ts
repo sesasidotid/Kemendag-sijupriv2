@@ -24,7 +24,8 @@ import { SafeUrl } from '@angular/platform-browser'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
-    PROMOSI = 'Promosi'
+    PROMOSI = 'Promosi',
+    PROMOSI_JF = 'Promosi Jabatan Fungsional'
 }
 
 @Component({

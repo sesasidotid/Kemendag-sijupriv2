@@ -100,6 +100,21 @@ export class UkomTaskDetailComponent {
         this.loadInitialDataFlow()
     }
 
+    getJenisUkomLabel (jenisUkom: string): string {
+        switch (jenisUkom) {
+            case 'KENAIKAN_JENJANG':
+                return 'Kenaikan Jenjang'
+            case 'PERPINDAHAN_JABATAN':
+                return 'Perpindahan Jabatan'
+            case 'PROMOSI':
+                return 'Promosi'
+            case 'PROMOSI_JF':
+                return 'Promosi Jabatan Fungsional'
+            default:
+                return jenisUkom
+        }
+    }
+
     getExamType (): Observable<ExamType[]> {
         return this.apiService.getData('/api/v1/exam_type').pipe(
             map((response: any[]) => response.map(item => new ExamType(item))),

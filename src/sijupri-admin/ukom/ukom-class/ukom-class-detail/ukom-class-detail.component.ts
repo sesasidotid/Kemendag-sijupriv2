@@ -84,7 +84,7 @@ export class UkomClassDetailComponent {
                             case 'PERPINDAHAN_JABATAN':
                                 return 'Perpindahan Jabatan'
                             case 'PROMOSI_JF':
-                                return 'Promosi JF'
+                                return 'Promosi Jabatan Fungsional'
                             default:
                                 return data.jenisUkom
                         }

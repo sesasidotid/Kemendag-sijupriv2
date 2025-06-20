@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable';
+import { Component } from '@angular/core'
+import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { Router } from '@angular/router'
 import {
@@ -23,46 +23,55 @@ export class UkomRejectedListComponent {
     jabatanNameCache: { [key: string]: string } = {}
     refresh: boolean = false
 
-    constructor(private router: Router, private apiService: ApiService) { }
+    constructor (private router: Router, private apiService: ApiService) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.getJabatanList()
     }
 
-    getJabatanList() {
+    getJabatanList () {
         this.apiService.getData('/api/v1/jabatan').subscribe({
-            next: (response) => {
+            next: response => {
                 response.forEach((item: any) => {
-                    this.jabatanNameCache[item.code] = item.name;
-                });
+                    this.jabatanNameCache[item.code] = item.name
+                })
                 this.refresh = !this.refresh
             }
-        });
+        })
     }
 
-    handlePagable() {
-        this.pagable = new PagableBuilder('/api/v1/participant_ukom/task/failed/search')
+    handlePagable () {
+        this.pagable = new PagableBuilder(
+            '/api/v1/participant_ukom/task/failed/search'
+        )
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jabatan Yang Dituju', (data: any) => {
-                        return this.jabatanNameCache[data.nextJabatanCode] || '-';
+                        return (
+                            this.jabatanNameCache[data.nextJabatanCode] || '-'
+                        )
                     })
                     .build()
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis UKom', (data: any) =>
-                        data.jenisUkom === 'KENAIKAN_JENJANG'
-                            ? 'Kenaikan Jenjang'
-                            : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                                ? 'Perpindahan Jabatan'
-                                : data.jenisUkom === 'PROMOSI'
-                                    ? 'Promosi'
-                                    : data.jenisUkom
-                    )
+                    .withDynamicValue('Jenis Ukom', (data: any) => {
+                        switch (data.jenisUkom) {
+                            case 'KENAIKAN_JENJANG':
+                                return 'Kenaikan Jenjang'
+                            case 'PERPINDAHAN_JABATAN':
+                                return 'Perpindahan Jabatan'
+                            case 'PROMOSI':
+                                return 'Promosi'
+                            case 'PROMOSI_JF':
+                                return 'Promosi Jabatan Fungsional'
+                            default:
+                                return data.jenisUkom
+                        }
+                    })
                     .build()
             )
             .addPrimaryColumn(
@@ -95,31 +104,32 @@ export class UkomRejectedListComponent {
             .addFilter(
                 new PageFilterBuilder('equal')
                     .setProperty('nextJabatanCode')
-                    .withField('Jabatan Yang Dituju', 'select').withDefaultValue("")
+                    .withField('Jabatan Yang Dituju', 'select')
+                    .withDefaultValue('')
                     .setOptionList([
                         {
-                            label: "Analis Perdagangan",
-                            value: "JB1"
+                            label: 'Analis Perdagangan',
+                            value: 'JB1'
                         },
                         {
-                            label: "Pengawas Perdagangan",
-                            value: "JB4"
+                            label: 'Pengawas Perdagangan',
+                            value: 'JB4'
                         },
                         {
-                            label: "Penguji Mutu Barang",
-                            value: "JB7"
+                            label: 'Penguji Mutu Barang',
+                            value: 'JB7'
                         },
                         {
-                            label: "Pengamat Tera",
-                            value: "JB10"
+                            label: 'Pengamat Tera',
+                            value: 'JB10'
                         },
                         {
-                            label: "Penera",
-                            value: "JB11"
+                            label: 'Penera',
+                            value: 'JB11'
                         },
                         {
-                            label: "Negosiator Perdagangan",
-                            value: "JB5"
+                            label: 'Negosiator Perdagangan',
+                            value: 'JB5'
                         }
                     ])
                     .build()
@@ -127,11 +137,22 @@ export class UkomRejectedListComponent {
             .addFilter(
                 new PageFilterBuilder('equal')
                     .setProperty('jenisUkom')
-                    .withField('Jenis UKom', 'select').withDefaultValue("")
+                    .withField('Jenis UKom', 'select')
+                    .withDefaultValue('')
                     .setOptionList([
                         { label: 'Promosi', value: 'PROMOSI' },
-                        { label: 'Kenaikan Jenjang', value: 'KENAIKAN_JENJANG' },
-                        { label: 'Perpindahan Jabatan', value: 'PERPINDAHAN_JABATAN' }
+                        {
+                            label: 'Kenaikan Jenjang',
+                            value: 'KENAIKAN_JENJANG'
+                        },
+                        {
+                            label: 'Perpindahan Jabatan',
+                            value: 'PERPINDAHAN_JABATAN'
+                        },
+                        {
+                            label: 'Promosi Jabatan Fungsional',
+                            value: 'PROMOSI_JF'
+                        }
                     ])
                     .build()
             )

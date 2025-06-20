@@ -50,13 +50,27 @@ export class UkomListComponent {
         )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Ukom', (data: any) =>
-                        data.jenisUkom === 'KENAIKAN_JENJANG'
-                            ? 'Kenaikan Jenjang'
-                            : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                            ? 'Perpindahan Jabatan'
-                            : data.jenisUkom
-                    )
+                    // .withDynamicValue('Jenis Ukom', (data: any) =>
+                    //     data.jenisUkom === 'KENAIKAN_JENJANG'
+                    //         ? 'Kenaikan Jenjang'
+                    //         : data.jenisUkom === 'PERPINDAHAN_JABATAN'
+                    //         ? 'Perpindahan Jabatan'
+                    //         : data.jenisUkom
+                    // )
+                    .withDynamicValue('Jenis Ukom', (data: any) => {
+                        switch (data.jenisUkom) {
+                            case 'KENAIKAN_JENJANG':
+                                return 'Kenaikan Jenjang'
+                            case 'PERPINDAHAN_JABATAN':
+                                return 'Perpindahan Jabatan'
+                            case 'PROMOSI':
+                                return 'Promosi'
+                            case 'PROMOSI_JF':
+                                return 'Promosi Jabatan Fungsional'
+                            default:
+                                return data.jenisUkom
+                        }
+                    })
                     .build()
             )
             .addPrimaryColumn(

@@ -1,4 +1,4 @@
-import { ConfirmationService } from './../../../../modules/base/services/confirmation.service';
+import { ConfirmationService } from './../../../../modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
 import {
     ActionColumnBuilder,
@@ -45,7 +45,7 @@ export class UkomDetailComponent {
     predikatKinerjaList: any[] = []
     refresh: boolean
 
-    constructor(
+    constructor (
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private apiService: ApiService,
@@ -53,9 +53,9 @@ export class UkomDetailComponent {
         private filePreviewService: FilePreviewService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.activatedRoute.paramMap.subscribe(params => {
             this.id = params.get('id')
         })
@@ -65,19 +65,33 @@ export class UkomDetailComponent {
         this.isUserBanned()
     }
 
-
-
-    handlePagable() {
-        this.pagable = new PagableBuilder(`/api/v1/participant_ukom/all/${this.id}`)
+    handlePagable () {
+        this.pagable = new PagableBuilder(
+            `/api/v1/participant_ukom/all/${this.id}`
+        )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Ukom', (data: any) =>
-                        data.jenisUkom === 'KENAIKAN_JENJANG'
-                            ? 'Kenaikan Jenjang'
-                            : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                                ? 'Perpindahan Jabatan'
-                                : data.jenisUkom
-                    )
+                    // .withDynamicValue('Jenis Ukom', (data: any) =>
+                    //     data.jenisUkom === 'KENAIKAN_JENJANG'
+                    //         ? 'Kenaikan Jenjang'
+                    //         : data.jenisUkom === 'PERPINDAHAN_JABATAN'
+                    //         ? 'Perpindahan Jabatan'
+                    //         : data.jenisUkom
+                    // )
+                    .withDynamicValue('Jenis Ukom', (data: any) => {
+                        switch (data.jenisUkom) {
+                            case 'KENAIKAN_JENJANG':
+                                return 'Kenaikan Jenjang'
+                            case 'PERPINDAHAN_JABATAN':
+                                return 'Perpindahan Jabatan'
+                            case 'PROMOSI':
+                                return 'Promosi'
+                            case 'PROMOSI_JF':
+                                return 'Promosi Jabatan Fungsional'
+                            default:
+                                return data.jenisUkom
+                        }
+                    })
                     .build()
             )
             .addPrimaryColumn(
@@ -86,7 +100,9 @@ export class UkomDetailComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((ukom: any) => {
-                        this.router.navigate([`/ukom/ukom-list/detail/${ukom.id}`])
+                        this.router.navigate([
+                            `/ukom/ukom-list/detail/${ukom.id}`
+                        ])
                     }, 'info')
                     .withIcon('detail')
                     .build()
@@ -102,32 +118,40 @@ export class UkomDetailComponent {
             .build()
     }
 
-    handleDeleteTask(id: string) {
+    handleDeleteTask (id: string) {
         this.confirmationService.open(false).subscribe({
             next: res => {
                 if (!res.confirmed) {
                     return
                 }
 
-                this.apiService.deleteData(`/api/v1/participant_ukom/${id} `).subscribe({
-                    next: res => {
-                        this.handlerService.handleAlert('Success', 'Data berhasil dihapus')
-                        this.refresh = !this.refresh
-                    },
-                    error: err => {
-                        this.handlerService.handleAlert('Error', 'Data gagal dihapus')
-                        this.refresh = !this.refresh
-                    }
-                })
+                this.apiService
+                    .deleteData(`/api/v1/participant_ukom/${id} `)
+                    .subscribe({
+                        next: res => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Data berhasil dihapus'
+                            )
+                            this.refresh = !this.refresh
+                        },
+                        error: err => {
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Data gagal dihapus'
+                            )
+                            this.refresh = !this.refresh
+                        }
+                    })
             }
         })
     }
 
-    preview(fileName: string, fileSource: string) {
+    preview (fileName: string, fileSource: string) {
         this.filePreviewService.open(fileName, fileSource)
     }
 
-    getJF() {
+    getJF () {
         this.jfLoading$.next(true)
 
         this.apiService.getData(`/api/v1/jf/${this.id}`).subscribe({
@@ -138,7 +162,7 @@ export class UkomDetailComponent {
         })
     }
 
-    fetchPhotoProfile() {
+    fetchPhotoProfile () {
         this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
             next: blob => {
                 if (blob.size === 0) {
@@ -146,7 +170,8 @@ export class UkomDetailComponent {
                     return
                 }
                 const objectUrl = URL.createObjectURL(blob)
-                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+                this.profileImageSrc =
+                    this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
             error: err => {
                 console.error('Error fetching profile image', err)
@@ -155,13 +180,15 @@ export class UkomDetailComponent {
         })
     }
 
-    back() {
+    back () {
         history.back()
     }
 
-    isUserBanned() {
+    isUserBanned () {
         this.apiService
-            .getData(`/api/v1/participant_ukom/search?limit=100&eq_nip=${this.id}`)
+            .getData(
+                `/api/v1/participant_ukom/search?limit=100&eq_nip=${this.id}`
+            )
             .subscribe({
                 next: (response: any) => {
                     this.isBanned = response.data[0].ukomBan != null

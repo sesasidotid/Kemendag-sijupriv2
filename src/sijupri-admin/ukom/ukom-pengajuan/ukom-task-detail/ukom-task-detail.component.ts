@@ -72,8 +72,23 @@ export class UkomTaskDetailComponent {
     ngOnInit () {
         this.activatedRoute.params.subscribe(params => {
             this.id = params['id']
+            this.loadPredikatKinerja()
         })
-        this.loadPredikatKinerja()
+    }
+
+    getJenisUkomLabel (jenisUkom: string): string {
+        switch (jenisUkom) {
+            case 'KENAIKAN_JENJANG':
+                return 'Kenaikan Jenjang'
+            case 'PERPINDAHAN_JABATAN':
+                return 'Perpindahan Jabatan'
+            case 'PROMOSI':
+                return 'Promosi'
+            case 'PROMOSI_JF':
+                return 'Promosi Jabatan Fungsional'
+            default:
+                return jenisUkom
+        }
     }
 
     getPendidikanList (pendidikanTerakhirCode: string) {

@@ -41,7 +41,8 @@ import { FilePreviewService } from '../../services/file-preview.service'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
-    PROMOSI = 'Promosi'
+    PROMOSI = 'Promosi',
+    PROMOSI_JF = 'Promosi Jabatan Fungsional'
 }
 @Component({
     selector: 'app-status-pendaftaran-ukom',
