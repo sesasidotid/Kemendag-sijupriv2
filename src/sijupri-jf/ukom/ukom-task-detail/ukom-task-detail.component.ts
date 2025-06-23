@@ -29,11 +29,17 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ExamType } from '../../../modules/ukom/models/exam-type'
 import { MakalahScore } from '../../../modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
+import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
 
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
-    imports: [CommonModule, ModalComponent, FileHandlerComponent],
+    imports: [
+        CommonModule,
+        ModalComponent,
+        FileHandlerComponent,
+        TanggalIndoPipe
+    ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss'
 })

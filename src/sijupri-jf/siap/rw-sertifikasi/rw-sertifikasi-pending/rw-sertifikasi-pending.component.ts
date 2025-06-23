@@ -57,23 +57,27 @@ export class RwSertifikasiPendingComponent {
 
     inputs: FIleHandler
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService,
-    ) { }
+        private formValidationService: FormValidationService
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.getKategoriSertifikasiList()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.rwSertifikasiForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.rwSertifikasiForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/rw_sertifikasi/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -82,7 +86,7 @@ export class RwSertifikasiPendingComponent {
                 new PrimaryColumnBuilder('Sertifikasi', 'objectName').build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'taskStatus').build()
+                new PrimaryColumnBuilder('Status', 'flowName').build()
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -95,7 +99,8 @@ export class RwSertifikasiPendingComponent {
                         }
                     }, 'info')
                     .addInactiveCondition(
-                        (pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1'
+                        (pendingTask: PendingTask) =>
+                            pendingTask.flowId == 'siap_flow_1'
                     )
                     .withIcon('update')
                     .build()
@@ -109,7 +114,7 @@ export class RwSertifikasiPendingComponent {
             .build()
     }
 
-    fileLoadHandler() {
+    fileLoadHandler () {
         this.inputs = {
             files: {
                 skPengangkatan: {
@@ -131,16 +136,20 @@ export class RwSertifikasiPendingComponent {
             listen: (key: string, source: string, base64Data: string) => {
                 console.log('key', key)
                 if (key == 'skPengangkatan') {
-                    this.rwSertifikasiForm.patchValue({ fileSkPengangkatan: base64Data })
+                    this.rwSertifikasiForm.patchValue({
+                        fileSkPengangkatan: base64Data
+                    })
                 }
                 if (key == 'ktpPpns') {
-                    this.rwSertifikasiForm.patchValue({ fileKtpPpns: base64Data })
+                    this.rwSertifikasiForm.patchValue({
+                        fileKtpPpns: base64Data
+                    })
                 }
             }
         }
     }
 
-    getKategoriSertifikasiList() {
+    getKategoriSertifikasiList () {
         this.kategoriLoading$.next(true)
         this.apiService.getData(`/api/v1/kategori_sertifikasi`).subscribe({
             next: response => {
@@ -161,7 +170,10 @@ export class RwSertifikasiPendingComponent {
         })
     }
 
-    setKategori(kategoriSertifikasiValue: number, kategoriSertifikasiId: string) {
+    setKategori (
+        kategoriSertifikasiValue: number,
+        kategoriSertifikasiId: string
+    ) {
         this.kategoriChangeLoading$.next(true)
         this.kategori$.next(kategoriSertifikasiValue)
         this.rwSertifikasi.kategoriSertifikasiId = kategoriSertifikasiId
@@ -213,12 +225,14 @@ export class RwSertifikasiPendingComponent {
         }
     }
 
-    getPendingRWSertifikasi(id: string) {
+    getPendingRWSertifikasi (id: string) {
         this.rwSertifikasiLoading$.next(true)
         this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
             next: response => {
                 const pendingTask = new PendingTask(response)
-                this.rwSertifikasi = new RWSertifikasi(pendingTask.objectTask.object)
+                this.rwSertifikasi = new RWSertifikasi(
+                    pendingTask.objectTask.object
+                )
                 this.kategori$.next(this.rwSertifikasi.kategoriSertifikasiValue)
 
                 if (this.kategori$.value === 1) {
@@ -241,7 +255,9 @@ export class RwSertifikasiPendingComponent {
                         tglSk: new FormControl('', [Validators.required]),
                         dateStart: new FormControl('', [Validators.required]),
                         dateEnd: new FormControl('', [Validators.required]),
-                        wilayahKerja: new FormControl('', [Validators.required]),
+                        wilayahKerja: new FormControl('', [
+                            Validators.required
+                        ]),
                         uuKawalan: new FormControl('', [Validators.required]),
                         fileSkPengangkatan: new FormControl('', [
                             Validators.required,
@@ -265,8 +281,6 @@ export class RwSertifikasiPendingComponent {
                 // this.isDetailOpen = true;
                 this.fileLoadHandler()
                 this.rwSertifikasiLoading$.next(false)
-
-
             },
             error: error => {
                 console.log('error', error)
@@ -275,23 +289,26 @@ export class RwSertifikasiPendingComponent {
         })
     }
 
-    back() {
+    back () {
         this.kategoriSertifikasiList.length = 0
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwSertifikasi = new RWSertifikasi()
     }
 
-    submit() {
+    submit () {
         if (this.rwSertifikasiForm.valid) {
             this.rwSertifikasi.noSk = this.rwSertifikasiForm.value.noSk
             this.rwSertifikasi.tglSk = this.rwSertifikasiForm.value.tglSk
-            this.rwSertifikasi.dateStart = this.rwSertifikasiForm.value.dateStart
+            this.rwSertifikasi.dateStart =
+                this.rwSertifikasiForm.value.dateStart
             this.rwSertifikasi.dateEnd = this.rwSertifikasiForm.value.dateEnd
             this.rwSertifikasi.wilayahKerja =
                 this.rwSertifikasiForm.value.wilayahKerja
-            this.rwSertifikasi.uuKawalan = this.rwSertifikasiForm.value.uuKawalan
-            this.rwSertifikasi.fileKtpPpns = this.rwSertifikasiForm.value.fileKtpPpns
+            this.rwSertifikasi.uuKawalan =
+                this.rwSertifikasiForm.value.uuKawalan
+            this.rwSertifikasi.fileKtpPpns =
+                this.rwSertifikasiForm.value.fileKtpPpns
             this.rwSertifikasi.fileSkPengangkatan =
                 this.rwSertifikasiForm.value.fileSkPengangkatan
 
@@ -341,7 +358,10 @@ export class RwSertifikasiPendingComponent {
                             error: error => {
                                 console.log('error', error)
                                 this.submitLoading$.next(false)
-                                this.alertService.showToast('Error', 'gagal mengirim data')
+                                this.alertService.showToast(
+                                    'Error',
+                                    'gagal mengirim data'
+                                )
                             }
                         })
                 }

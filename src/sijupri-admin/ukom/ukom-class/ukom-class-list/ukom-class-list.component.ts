@@ -35,6 +35,8 @@ import {
 } from '@angular/forms'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
+import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
+import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
 @Component({
     selector: 'app-ukom-class-list',
     standalone: true,
@@ -44,7 +46,8 @@ import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jab
         UkomClassAddComponent,
         ModalComponent,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        TanggalWaktuIndoPipe
     ],
     templateUrl: './ukom-class-list.component.html',
     styleUrl: './ukom-class-list.component.scss'
@@ -65,6 +68,7 @@ export class UkomClassListComponent {
     submitLoading$ = new BehaviorSubject<boolean>(false)
     private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
     bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
+    tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
     constructor (
         private tabService: TabService,
@@ -131,10 +135,26 @@ export class UkomClassListComponent {
                     ).build()
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Mulai', 'examStartAt').build()
+                    new PrimaryColumnBuilder()
+                        .withDynamicValue('Mulai', (data: RoomUkom) => {
+                            const formattedDate =
+                                this.tanggalWaktuPipe.transform(
+                                    data.examStartAt
+                                )
+
+                            return formattedDate
+                        })
+                        .build()
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Selesai', 'examEndAt').build()
+                    new PrimaryColumnBuilder()
+                        .withDynamicValue('Selesai', (data: RoomUkom) => {
+                            const formattedDate =
+                                this.tanggalWaktuPipe.transform(data.examEndAt)
+
+                            return formattedDate
+                        })
+                        .build()
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()

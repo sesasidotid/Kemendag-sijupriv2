@@ -29,6 +29,7 @@ import {
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
 
 @Component({
     selector: 'app-ukom-exam-schedule-add',
@@ -38,7 +39,8 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
         FormsModule,
         LucideAngularModule,
         ReactiveFormsModule,
-        PagableComponent
+        PagableComponent,
+        TanggalWaktuIndoPipe
     ],
     templateUrl: './ukom-exam-schedule-add.component.html',
     styleUrl: './ukom-exam-schedule-add.component.scss'
@@ -60,6 +62,8 @@ export class UkomExamScheduleAddComponent {
     readonly filePlus = FilePlus
     refreshToggle: boolean = false
     ukom_type?: string
+
+    tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
     constructor (
         private confirmationService: ConfirmationService,
@@ -169,10 +173,26 @@ export class UkomExamScheduleAddComponent {
             `/api/v1/exam_schedule/room/${this.id}`
         )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Waktu Mulai', 'startTime').build()
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Waktu Mulai', (data: any) => {
+                        const formattedDate = this.tanggalWaktuPipe.transform(
+                            data.startTime
+                        )
+
+                        return formattedDate
+                    })
+                    .build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Waktu selesai', 'endTime').build()
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Waktu selesai', (data: any) => {
+                        const formattedDate = this.tanggalWaktuPipe.transform(
+                            data.endTime
+                        )
+
+                        return formattedDate
+                    })
+                    .build()
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build()

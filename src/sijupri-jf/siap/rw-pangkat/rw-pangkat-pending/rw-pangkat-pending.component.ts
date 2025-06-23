@@ -55,24 +55,27 @@ export class RwPangkatPendingComponent {
 
     inputs: FIleHandler
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService
+    ) {}
 
-    ) { }
-
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleFormInit()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.rwPangkatForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.rwPangkatForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/rw_pangkat/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -81,7 +84,7 @@ export class RwPangkatPendingComponent {
                 new PrimaryColumnBuilder('Pangkat', 'objectName').build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'taskStatus').build()
+                new PrimaryColumnBuilder('Status', 'flowName').build()
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -94,7 +97,8 @@ export class RwPangkatPendingComponent {
                         }
                     }, 'info')
                     .addInactiveCondition(
-                        (pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1'
+                        (pendingTask: PendingTask) =>
+                            pendingTask.flowId == 'siap_flow_1'
                     )
                     .withIcon('update')
                     .build()
@@ -108,17 +112,15 @@ export class RwPangkatPendingComponent {
             .build()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.rwPangkatForm = new FormGroup({
             pangkatCode: new FormControl('', [Validators.required]),
             tmt: new FormControl('', [Validators.required]),
-            fileSkPangkat: new FormControl('', [
-                Validators.required,
-            ])
+            fileSkPangkat: new FormControl('', [Validators.required])
         })
     }
 
-    fileLoadHandler() {
+    fileLoadHandler () {
         this.inputs = {
             files: {
                 docEvaluas: {
@@ -138,7 +140,7 @@ export class RwPangkatPendingComponent {
         }
     }
 
-    getPangkatList() {
+    getPangkatList () {
         this.pangkatListLoading$.next(true)
         this.apiService.getData(`/api/v1/pangkat`).subscribe({
             next: response => {
@@ -149,13 +151,16 @@ export class RwPangkatPendingComponent {
             },
             error: error => {
                 console.log('error', error)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data pangkat!')
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data pangkat!'
+                )
                 this.pangkatListLoading$.next(false)
             }
         })
     }
 
-    getPendingRWPangkat(id: string) {
+    getPendingRWPangkat (id: string) {
         this.rwPangkatLoading$.next(true)
         this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
             next: response => {
@@ -171,23 +176,27 @@ export class RwPangkatPendingComponent {
             error: error => {
                 console.log('error', error)
                 this.rwPangkatLoading$.next(false)
-                this.alertService.showToast('Error', 'Gagal mandapatkan data pangat!')
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mandapatkan data pangat!'
+                )
             }
         })
     }
 
-    back() {
+    back () {
         this.pangkatList.length = 0
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwPangkat = new RWPangkat()
     }
 
-    submit() {
+    submit () {
         if (this.rwPangkatForm.valid) {
             this.rwPangkat.pangkatCode = this.rwPangkatForm.value.pangkatCode
             this.rwPangkat.tmt = this.rwPangkatForm.value.tmt
-            this.rwPangkat.fileSkPangkat = this.rwPangkatForm.value.fileSkPangkat
+            this.rwPangkat.fileSkPangkat =
+                this.rwPangkatForm.value.fileSkPangkat
 
             this.confirmationService.open(false).subscribe({
                 next: result => {

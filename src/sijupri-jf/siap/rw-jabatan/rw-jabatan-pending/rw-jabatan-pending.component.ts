@@ -58,29 +58,32 @@ export class RwJabatanPendingComponent {
 
     inputs: FIleHandler
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService,
-    ) { }
+        private formValidationService: FormValidationService
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleFormInit()
         this.handleSubscribe()
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/rw_jabatan/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jabatan | Jenjang', 'objectName').build()
+                new PrimaryColumnBuilder(
+                    'Jabatan | Jenjang',
+                    'objectName'
+                ).build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'taskStatus').build()
+                new PrimaryColumnBuilder('Status', 'flowName').build()
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -93,7 +96,8 @@ export class RwJabatanPendingComponent {
                         }
                     }, 'info')
                     .addInactiveCondition(
-                        (pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1'
+                        (pendingTask: PendingTask) =>
+                            pendingTask.flowId == 'siap_flow_1'
                     )
                     .withIcon('update')
                     .build()
@@ -107,22 +111,24 @@ export class RwJabatanPendingComponent {
             .build()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.rwJabatanForm = new FormGroup({
             jabatanCode: new FormControl('', [Validators.required]),
             jenjangCode: new FormControl('', [Validators.required]),
             tmt: new FormControl('', [Validators.required]),
-            fileSkJabatan: new FormControl('', [
-                Validators.required,
-            ])
+            fileSkJabatan: new FormControl('', [Validators.required])
         })
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.rwJabatanForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.rwJabatanForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handleSubscribe() {
+    handleSubscribe () {
         this.rwJabatanForm
             .get('jabatanCode')
             .valueChanges.subscribe(jabatanCode => {
@@ -135,7 +141,7 @@ export class RwJabatanPendingComponent {
             })
     }
 
-    fileLoadHandler() {
+    fileLoadHandler () {
         this.inputs = {
             files: {
                 ijazah: {
@@ -155,7 +161,7 @@ export class RwJabatanPendingComponent {
         }
     }
 
-    getJabatanList() {
+    getJabatanList () {
         this.jabatanListLoading$.next(true)
         this.apiService.getData(`/api/v1/jabatan`).subscribe({
             next: response => {
@@ -166,33 +172,42 @@ export class RwJabatanPendingComponent {
             },
             error: error => {
                 console.log('error', error)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data jabatan!')
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data jabatan!'
+                )
                 this.jabatanListLoading$.next(false)
             }
         })
     }
 
-    getJenjangList(jabatanId: string) {
+    getJenjangList (jabatanId: string) {
         this.jenjangLoading$.next(true)
-        this.apiService.getData(`/api/v1/jenjang/jabatan/${jabatanId}`).subscribe({
-            next: response => {
-                this.jenjangList = response.map(
-                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
-                )
-                this.rwJabatanForm
-                    .get('jenjangCode')
-                    .patchValue(this.jenjangList[0].code)
-                this.jenjangLoading$.next(false)
-            },
-            error: error => {
-                console.log('error', error)
-                this.jenjangLoading$.next(false)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data jenjang!')
-            }
-        })
+        this.apiService
+            .getData(`/api/v1/jenjang/jabatan/${jabatanId}`)
+            .subscribe({
+                next: response => {
+                    this.jenjangList = response.map(
+                        (jenjang: { [key: string]: any }) =>
+                            new Jenjang(jenjang)
+                    )
+                    this.rwJabatanForm
+                        .get('jenjangCode')
+                        .patchValue(this.jenjangList[0].code)
+                    this.jenjangLoading$.next(false)
+                },
+                error: error => {
+                    console.log('error', error)
+                    this.jenjangLoading$.next(false)
+                    this.alertService.showToast(
+                        'Error',
+                        'Gagal mendapatkan data jenjang!'
+                    )
+                }
+            })
     }
 
-    getPendingRWJabatan(id: string) {
+    getPendingRWJabatan (id: string) {
         this.rwJabatanLoading$.next(true)
         this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
             next: response => {
@@ -210,12 +225,15 @@ export class RwJabatanPendingComponent {
             error: error => {
                 console.log('error', error)
                 this.rwJabatanLoading$.next(false)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data jabatan!')
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data jabatan!'
+                )
             }
         })
     }
 
-    back() {
+    back () {
         this.jabatanList.length = 0
         this.jenjangList.length = 0
         this.pendingTask = null
@@ -223,12 +241,13 @@ export class RwJabatanPendingComponent {
         this.rwJabatan = new RWJabatan()
     }
 
-    submit() {
+    submit () {
         if (this.rwJabatanForm.valid) {
             this.rwJabatan.jabatanCode = this.rwJabatanForm.value.jabatanCode
             this.rwJabatan.jenjangCode = this.rwJabatanForm.value.jenjangCode
             this.rwJabatan.tmt = this.rwJabatanForm.value.tmt
-            this.rwJabatan.fileSkJabatan = this.rwJabatanForm.value.fileSkJabatan
+            this.rwJabatan.fileSkJabatan =
+                this.rwJabatanForm.value.fileSkJabatan
 
             this.confirmationService.open(false).subscribe({
                 next: result => {

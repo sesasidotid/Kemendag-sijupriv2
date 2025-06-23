@@ -31,6 +31,7 @@ import { MakalahScore } from '../../../../modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { LoadingButtonComponent } from '../../../../modules/base/components/loading-button/loading-button.component'
+import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -38,7 +39,8 @@ import { LoadingButtonComponent } from '../../../../modules/base/components/load
         CommonModule,
         ModalComponent,
         FileHandlerComponent,
-        LoadingButtonComponent
+        LoadingButtonComponent,
+        TanggalIndoPipe
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss'

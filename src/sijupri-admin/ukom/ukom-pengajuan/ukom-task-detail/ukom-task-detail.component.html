@@ -5,534 +5,633 @@
     <i class="mdi mdi-chevron-left"></i> Kembali
 </button>
 
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <h5 class="m-0">
-                    <i class="mdi mdi-account me-2"></i>Detail Pendaftaran UKom
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <!-- Identitas Peserta -->
-                    <div class="col-lg-12">
-                        <h5 class="fw-bold">Identitas Peserta</h5>
-                        <hr />
-                    </div>
+<div
+    *ngIf="isLoading$ | async; else content"
+    class="d-flex justify-content-center my-5"
+>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Status Pendaftar</label>
-                            <p class="border-bottom">
-                                {{
-                                    pesertaUkom.participantStatus == 'jf'
-                                        ? 'JF Perdagangan'
-                                        : 'Non-JF Perdagangan'
-                                }}
-                            </p>
+<ng-template #content>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h5 class="m-0">
+                        <i class="mdi mdi-account me-2"></i>Detail Pendaftaran
+                        UKom
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Identitas Peserta -->
+                        <div class="col-lg-12">
+                            <h5 class="fw-bold">Identitas Peserta</h5>
+                            <hr />
                         </div>
-                    </div>
 
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Nama Lengkap</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.name ?? '-' }}
-                            </p>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Status Pendaftar</label
+                                >
+                                <p class="border-bottom">
+                                    {{
+                                        pesertaUkom.participantStatus == 'jf'
+                                            ? 'JF Perdagangan'
+                                            : 'Non-JF Perdagangan'
+                                    }}
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">NIP</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.nip ?? '-' }}
-                            </p>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Lengkap</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.name ?? '-' }}
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Nomor Whatsapp</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.phone ?? '-' }}
-                            </p>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">NIP</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.nip ?? '-' }}
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.email ?? '-' }}
-                            </p>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nomor Whatsapp</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.phone ?? '-' }}
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Tanggal Lahir</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.tanggalLahir ?? '-' }}
-                            </p>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.email ?? '-' }}
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label"
-                                >Usia Menurut Surat Usulan</label
+                        <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal Lahir</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.tanggalLahir | tanggalIndo }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Usia Menurut Surat Usulan</label
+                                >
+                                <p class="border-bottom">
+                                    {{
+                                        calculateAge(
+                                            pesertaUkom.tanggalLahir,
+                                            pesertaUkom.tglSuratUsulan
+                                        )
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <h5 class="fw-bold mt-3">Pendidikan & Pekerjaan</h5>
+                            <hr />
+                        </div>
+
+                        <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Jenjang Pendidikan</label
+                                >
+                                <p class="border-bottom">
+                                    {{ pendidikanName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Program Studi/Jurusan</label
+                                >
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.jurusan ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Instansi</label>
+                                <p class="border-bottom">
+                                    {{
+                                        transformInstansiName(
+                                            pesertaUkom.jenisInstansi
+                                        ) ?? '-'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6" *ngIf="provinsiName">
+                            <div class="mb-3">
+                                <label class="form-label">Provinsi</label>
+                                <p class="border-bottom">
+                                    {{ provinsiName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6" *ngIf="kabupatenName">
+                            <div class="mb-3">
+                                <label class="form-label">Kabupaten/Kota</label>
+                                <p class="border-bottom">
+                                    {{
+                                        kabupatenName
+                                            ? typeKabKota + ' ' + kabupatenName
+                                            : '-'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-lg-6"> -->
+                        <div
+                            [ngClass]="{
+                                'col-lg-6':
+                                    pesertaUkom.jenisInstansi !=
+                                    'PEMERINTAH_PROVINSI',
+                                'col-lg-12':
+                                    pesertaUkom.jenisInstansi ==
+                                    'PEMERINTAH_PROVINSI'
+                            }"
+                        >
+                            <div class="mb-3">
+                                <label class="form-label">Unit Kerja</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.unitKerjaName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Jabatan</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.jabatanName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Jabatan Yang Dituju</label
+                                >
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.nextJabatanName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Jenjang</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.jenjangName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Jenjang Yang Dituju</label
+                                >
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.nextJenjangName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Pangkat</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.pangkatName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Bidang Jabatan Yang Dituju</label
+                                >
+                                <p class="border-bottom">
+                                    {{ bidangJabatanName ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <h5 class="fw-bold mt-3">Informasi Pengajuan</h5>
+                            <hr />
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Jenis UKom</label>
+                                <p class="border-bottom">
+                                    {{
+                                        getJenisUkomLabel(pesertaUkom.jenisUkom)
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Status Pendaftaran</label
+                                >
+                                <p class="border-bottom">
+                                    {{
+                                        pesertaUkom.isMengulang == 'true'
+                                            ? 'Mengulang'
+                                            : 'Baru'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Nomor Surat Usulan</label
+                                >
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.noSuratUsulan ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Tanggal Surat Usulan</label
+                                >
+                                <p class="border-bottom">
+                                    {{
+                                        pesertaUkom.tglSuratUsulan | tanggalIndo
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <ng-container
+                            *ngIf="
+                                pesertaUkom.participantStatus != 'jf';
+                                else jfStatus
+                            "
+                        >
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        >Predikat Kinerja Pegawai Satu Tahun
+                                        Terakhir</label
+                                    >
+                                    <p class="border-bottom">
+                                        {{ predikat1Name }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        >Predikat Kinerja Pegawai Dua Tahun
+                                        Terakhir</label
+                                    >
+                                    <p class="border-bottom">
+                                        {{ predikat2Name }}
+                                    </p>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <ng-template #jfStatus>
+                            <div class="col-lg-12">
+                                <h5 class="fw-bold mt-3">
+                                    Informasi Kinerja 2 Tahun Terakhir
+                                </h5>
+                                <hr />
+                            </div>
+                            <div
+                                class="col-lg-6 mb-3"
+                                *ngFor="let kinerja of kinerja2Tahun"
                             >
-                            <p class="border-bottom">
-                                {{
-                                    calculateAge(
-                                        pesertaUkom.tanggalLahir,
-                                        pesertaUkom.tglSuratUsulan
-                                    )
-                                }}
-                            </p>
-                        </div>
-                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Periode</label>
+                                    <p class="border-bottom">
+                                        {{
+                                            kinerja.dateStart
+                                                | tanggalIndo: kinerja.dateEnd
+                                        }}
+                                    </p>
+                                </div>
 
-                    <div class="col-lg-12">
-                        <h5 class="fw-bold mt-3">Pendidikan & Pekerjaan</h5>
-                        <hr />
-                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Jenis</label>
+                                    <p class="border-bottom text-capitalize">
+                                        {{ kinerja.type }}
+                                    </p>
+                                </div>
 
-                    <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Jenjang Pendidikan</label>
-                            <p class="border-bottom">
-                                {{ pendidikanName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        >Angka Kredit</label
+                                    >
+                                    <p class="border-bottom text-capitalize">
+                                        {{ kinerja.angkaKredit }}
+                                    </p>
+                                </div>
 
-                    <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label"
-                                >Program Studi/Jurusan</label
-                            >
-                            <p class="border-bottom">
-                                {{ pesertaUkom.jurusan ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        >Rating Hasil</label
+                                    >
+                                    <p class="border-bottom text-capitalize">
+                                        {{ kinerja.ratingHasilName }}
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        >Rating Kinerja</label
+                                    >
+                                    <p class="border-bottom text-capitalize">
+                                        {{ kinerja.ratingKinerjaName }}
+                                    </p>
+                                </div>
 
-                    <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Instansi</label>
-                            <p class="border-bottom">
-                                {{
-                                    transformInstansiName(
-                                        pesertaUkom.jenisInstansi
-                                    ) ?? '-'
-                                }}
-                            </p>
-                        </div>
-                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        >Predikat Kinerja</label
+                                    >
+                                    <p class="border-bottom text-capitalize">
+                                        {{ kinerja.predikatKinerjaName }}
+                                    </p>
+                                </div>
 
-                    <div class="col-lg-6" *ngIf="provinsiName">
-                        <div class="mb-3">
-                            <label class="form-label">Provinsi</label>
-                            <p class="border-bottom">
-                                {{ provinsiName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6" *ngIf="kabupatenName">
-                        <div class="mb-3">
-                            <label class="form-label">Kabupaten/Kota</label>
-                            <p class="border-bottom">
-                                {{
-                                    kabupatenName
-                                        ? typeKabKota + ' ' + kabupatenName
-                                        : '-'
-                                }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- <div class="col-lg-6"> -->
-                    <div
-                        [ngClass]="{
-                            'col-lg-6':
-                                pesertaUkom.jenisInstansi !=
-                                'PEMERINTAH_PROVINSI',
-                            'col-lg-12':
-                                pesertaUkom.jenisInstansi ==
-                                'PEMERINTAH_PROVINSI'
-                        }"
-                    >
-                        <div class="mb-3">
-                            <label class="form-label">Unit Kerja</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.unitKerjaName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Jabatan</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.jabatanName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label"
-                                >Jabatan Yang Dituju</label
-                            >
-                            <p class="border-bottom">
-                                {{ pesertaUkom.nextJabatanName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Jenjang</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.jenjangName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label"
-                                >Jenjang Yang Dituju</label
-                            >
-                            <p class="border-bottom">
-                                {{ pesertaUkom.nextJenjangName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Pangkat</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.pangkatName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- <div class="col-lg-6">
-            <div class="mb-3">
-              <label class="form-label">Pangkat Yang Dituju</label>
-              <p class="border-bottom">
-                {{ pesertaUkom.nextPangkatName ?? '-' }}
-              </p>
-            </div>
-          </div> -->
-
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label"
-                                >Bidang Jabatan Yang Dituju</label
-                            >
-                            <p class="border-bottom">
-                                {{ bidangJabatanName ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-12">
-                        <h5 class="fw-bold mt-3">Informasi Pengajuan</h5>
-                        <hr />
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Jenis UKom</label>
-                            <p class="border-bottom">
-                                <!-- {{
-                                    pesertaUkom.jenisUkom === 'KENAIKAN_JENJANG'
-                                        ? 'Kenaikan Jenjang'
-                                        : pesertaUkom.jenisUkom ===
-                                          'PERPINDAHAN_JABATAN'
-                                        ? 'Perpindahan Jabatan'
-                                        : pesertaUkom.jenisUkom === 'PROMOSI'
-                                        ? 'Promosi'
-                                        : pesertaUkom.jenisUkom
-                                }} -->
-                                {{ getJenisUkomLabel(pesertaUkom.jenisUkom) }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Status Pendaftaran</label>
-                            <p class="border-bottom">
-                                {{
-                                    pesertaUkom.isMengulang == 'true'
-                                        ? 'Mengulang'
-                                        : 'Baru'
-                                }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Nomor Surat Usulan</label>
-                            <p class="border-bottom">
-                                {{ pesertaUkom.noSuratUsulan ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label"
-                                >Tanggal Surat Usulan</label
-                            >
-                            <p class="border-bottom">
-                                {{ pesertaUkom.tglSuratUsulan ?? '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label"
-                                >Predikat Kinerja Pegawai Satu Tahun
-                                Terakhir</label
-                            >
-                            <p class="border-bottom">
-                                {{ predikat1Name }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label"
-                                >Predikat Kinerja Pegawai Dua Tahun
-                                Terakhir</label
-                            >
-                            <p class="border-bottom">
-                                {{ predikat2Name }}
-                            </p>
-                        </div>
+                                <div class="mb-3">
+                                    <app-file-handler
+                                        [inputs]="{
+                    files: {
+                      docEvaluas: { label: 'Preview Dokumen Evaluasi Kinerja', fileName: kinerja.docEvaluasi, source: kinerja.docEvaluasiUrl },
+                      docPredikat: { label: 'Preview Dokumen Konversi Predikat Kinerja', fileName: kinerja.docPredikat, source: kinerja.docPredikatUrl },
+                      docAkumulasiAk: { label: 'Preview Dokumen Akumulasi Angka Kredit', fileName: kinerja.docAkumulasiAk, source: kinerja.docAkumulasiAkUrl },
+                      docPenetapanAk: { label: 'Preview Dokumen Penetapan Angka Kredit', fileName: kinerja.docPenetapanAk, source: kinerja.docPenetapanAkUrl },
+                    },
+                    viewOnly: true
+                  }"
+                                    ></app-file-handler>
+                                </div>
+                            </div>
+                        </ng-template>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h5 class="m-0">
-                    <i class="mdi mdi-file-document-check-outline me-2"></i
-                    >Dokumen Pendaftaran UKom
-                </h5>
-            </div>
-            <div class="card-body">
-                <div
-                    *ngFor="
-                        let dokumenPeserta of pesertaUkom.dokumenUkomList;
-                        index as i
-                    "
-                    class="row mb-3"
-                >
-                    <label for="" class="col-sm-2 col-form-label fw-bold">
-                        {{ dokumenPeserta.dokumenPersyaratanName }}
-                    </label>
-                    <div class="col-sm-10">
-                        <div class="row">
-                            <div class="col">
-                                <a
-                                    class="btn btn-sm btn-info ms-2"
-                                    (click)="
-                                        preview(
-                                            dokumenPeserta.dokumenName,
-                                            dokumenPeserta.dokumenUrl
-                                        )
-                                    "
-                                    >lihat</a
-                                >
-                            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="m-0">
+                        <i class="mdi mdi-file-document-check-outline me-2"></i
+                        >Dokumen Pendaftaran UKom
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div
+                        *ngFor="
+                            let dokumenPeserta of pesertaUkom.dokumenUkomList;
+                            index as i
+                        "
+                        class="row mb-3"
+                    >
+                        <label for="" class="col-sm-2 col-form-label fw-bold">
+                            {{ dokumenPeserta.dokumenPersyaratanName }}
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col">
+                                    <a
+                                        class="btn btn-sm btn-info ms-2"
+                                        (click)="
+                                            preview(
+                                                dokumenPeserta.dokumenName,
+                                                dokumenPeserta.dokumenUrl
+                                            )
+                                        "
+                                        >lihat</a
+                                    >
+                                </div>
 
-                            <div
-                                class="col"
-                                *ngIf="pendingTask.taskStatus !== 'FAILED'"
-                            >
                                 <div
-                                    class=""
-                                    *ngIf="
-                                        !isDocumentApproved(
-                                            dokumenPeserta.dokumenPersyaratanId
-                                        ) ||
-                                            dokumenPeserta.dokumenStatus ===
-                                                'REJECT';
-                                        else Approved
-                                    "
+                                    class="col"
+                                    *ngIf="pendingTask.taskStatus !== 'FAILED'"
                                 >
                                     <div
+                                        class=""
                                         *ngIf="
-                                            pendingTask.flowId !==
-                                                'ukom_flow_2';
-                                            else Disapproved
+                                            !isDocumentApproved(
+                                                dokumenPeserta.dokumenPersyaratanId
+                                            ) ||
+                                                dokumenPeserta.dokumenStatus ===
+                                                    'REJECT';
+                                            else Approved
                                         "
                                     >
-                                        <input
-                                            type="radio"
-                                            class="btn-check"
-                                            name="options-outlined_{{ i }}"
-                                            (click)="onFIleSwitch(i, 'APPROVE')"
-                                            id="btn-approve-toggle_{{ i }}"
-                                            autocomplete="off"
-                                            checked
-                                        />
-                                        <label
-                                            class="btn btn-sm btn-soft-success"
-                                            for="btn-approve-toggle_{{ i }}"
-                                            >Terima</label
-                                        >
-
-                                        <input
-                                            type="radio"
-                                            class="btn-check"
-                                            name="options-outlined_{{ i }}"
-                                            (click)="onFIleSwitch(i, 'REJECT')"
-                                            id="btn-reject-toggle_{{ i }}"
-                                            autocomplete="off"
-                                        />
-                                        <label
-                                            class="btn btn-sm btn-soft-danger"
-                                            for="btn-reject-toggle_{{ i }}"
-                                            >Tolak</label
-                                        >
-
-                                        <!-- Input field for remarks when rejected -->
                                         <div
                                             *ngIf="
-                                                dokumenPeserta.status ===
-                                                'REJECT'
+                                                pendingTask.flowId !==
+                                                    'ukom_flow_2';
+                                                else Disapproved
                                             "
-                                            class="mt-2"
                                         >
                                             <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Masukkan alasan penolakan"
-                                                [(ngModel)]="
-                                                    dokumenPeserta.remark
+                                                type="radio"
+                                                class="btn-check"
+                                                name="options-outlined_{{ i }}"
+                                                (click)="
+                                                    onFIleSwitch(i, 'APPROVE')
                                                 "
+                                                id="btn-approve-toggle_{{ i }}"
+                                                autocomplete="off"
+                                                checked
                                             />
+                                            <label
+                                                class="btn btn-sm btn-soft-success"
+                                                for="btn-approve-toggle_{{ i }}"
+                                                >Terima</label
+                                            >
+
+                                            <input
+                                                type="radio"
+                                                class="btn-check"
+                                                name="options-outlined_{{ i }}"
+                                                (click)="
+                                                    onFIleSwitch(i, 'REJECT')
+                                                "
+                                                id="btn-reject-toggle_{{ i }}"
+                                                autocomplete="off"
+                                            />
+                                            <label
+                                                class="btn btn-sm btn-soft-danger"
+                                                for="btn-reject-toggle_{{ i }}"
+                                                >Tolak</label
+                                            >
+
+                                            <!-- Input field for remarks when rejected -->
+                                            <div
+                                                *ngIf="
+                                                    dokumenPeserta.status ===
+                                                    'REJECT'
+                                                "
+                                                class="mt-2"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    placeholder="Masukkan alasan penolakan"
+                                                    [(ngModel)]="
+                                                        dokumenPeserta.remark
+                                                    "
+                                                />
+                                            </div>
                                         </div>
                                     </div>
+                                    <ng-template #Approved>
+                                        <label
+                                            class="btn btn-sm btn-soft-success"
+                                            aria-disabled="true"
+                                            >Disetujui</label
+                                        >
+                                    </ng-template>
+                                    <ng-template #Disapproved>
+                                        <label
+                                            class="btn btn-sm btn-soft-danger"
+                                            aria-disabled="true"
+                                            >Menunggu Perbaikan</label
+                                        >
+                                    </ng-template>
                                 </div>
-                                <ng-template #Approved>
-                                    <label
-                                        class="btn btn-sm btn-soft-success"
-                                        aria-disabled="true"
-                                        >Disetujui</label
-                                    >
-                                </ng-template>
-                                <ng-template #Disapproved>
-                                    <label
-                                        class="btn btn-sm btn-soft-danger"
-                                        aria-disabled="true"
-                                        >Menunggu Perbaikan</label
-                                    >
-                                </ng-template>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-lg-12">
-                    <div
-                        class="hstack gap-2 justify-content-end"
-                        *ngIf="
-                            !(
-                                pendingTask?.flowId === 'ukom_flow_2' &&
-                                pendingTask?.taskStatus === 'PENDING'
-                            )
-                        "
-                    >
-                        <!-- Button: Lolos Verifikasi (Only shown when approve is enabled & not loading) -->
-                        <button
+                    <div class="col-lg-12">
+                        <div
+                            class="hstack gap-2 justify-content-end"
                             *ngIf="
-                                isApproveEnable &&
-                                (hadItemsLoading$ | async) === false &&
-                                pendingTask.taskStatus !== 'FAILED'
+                                !(
+                                    pendingTask?.flowId === 'ukom_flow_2' &&
+                                    pendingTask?.taskStatus === 'PENDING'
+                                )
                             "
-                            class="btn btn-success me-1"
-                            (click)="submitApprove()"
                         >
-                            Lolos Verifikasi
-                        </button>
-
-                        <!-- Button: Perbaikan (Only shown when approve is NOT enabled & not loading) -->
-                        <button
-                            *ngIf="
-                                !isApproveEnable &&
-                                (hadItemsLoading$ | async) === false
-                            "
-                            class="btn btn-warning"
-                            (click)="submitAmend()"
-                        >
-                            Perbaikan
-                        </button>
-
-                        <button
-                            *ngIf="
-                                !isApproveEnable &&
-                                (hadItemsLoading$ | async) === false
-                            "
-                            class="btn btn-danger"
-                            (click)="submitReject()"
-                        >
-                            Tidak Lolos Verifikasi
-                        </button>
-
-                        <button
-                            *ngIf="isApproveEnable && hadItemsLoading$ | async"
-                            class="btn btn-success me-1"
-                            disabled
-                        >
-                            <div
-                                class="spinner-border"
-                                style="width: 19px; height: 19px"
-                                role="status"
+                            <!-- Button: Lolos Verifikasi (Only shown when approve is enabled & not loading) -->
+                            <button
+                                *ngIf="
+                                    isApproveEnable &&
+                                    (hadItemsLoading$ | async) === false &&
+                                    pendingTask.taskStatus !== 'FAILED'
+                                "
+                                class="btn btn-success me-1"
+                                (click)="submitApprove()"
                             >
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </button>
+                                Lolos Verifikasi
+                            </button>
 
-                        <button
-                            *ngIf="!isApproveEnable && hadItemsLoading$ | async"
-                            class="btn btn-danger"
-                            disabled
-                        >
-                            <div
-                                class="spinner-border"
-                                style="width: 19px; height: 19px"
-                                role="status"
+                            <!-- Button: Perbaikan (Only shown when approve is NOT enabled & not loading) -->
+                            <button
+                                *ngIf="
+                                    !isApproveEnable &&
+                                    (hadItemsLoading$ | async) === false
+                                "
+                                class="btn btn-warning"
+                                (click)="submitAmend()"
                             >
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </button>
+                                Perbaikan
+                            </button>
+
+                            <button
+                                *ngIf="
+                                    !isApproveEnable &&
+                                    (hadItemsLoading$ | async) === false
+                                "
+                                class="btn btn-danger"
+                                (click)="submitReject()"
+                            >
+                                Tidak Lolos Verifikasi
+                            </button>
+
+                            <button
+                                *ngIf="
+                                    isApproveEnable && hadItemsLoading$ | async
+                                "
+                                class="btn btn-success me-1"
+                                disabled
+                            >
+                                <div
+                                    class="spinner-border"
+                                    style="width: 19px; height: 19px"
+                                    role="status"
+                                >
+                                    <span class="visually-hidden"
+                                        >Loading...</span
+                                    >
+                                </div>
+                            </button>
+
+                            <button
+                                *ngIf="
+                                    !isApproveEnable && hadItemsLoading$ | async
+                                "
+                                class="btn btn-danger"
+                                disabled
+                            >
+                                <div
+                                    class="spinner-border"
+                                    style="width: 19px; height: 19px"
+                                    role="status"
+                                >
+                                    <span class="visually-hidden"
+                                        >Loading...</span
+                                    >
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</ng-template>

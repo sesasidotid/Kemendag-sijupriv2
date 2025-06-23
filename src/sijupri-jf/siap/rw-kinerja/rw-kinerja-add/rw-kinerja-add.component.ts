@@ -17,7 +17,7 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, finalize } from 'rxjs'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
 @Component({
@@ -42,6 +42,22 @@ export class RwKinerjaAddComponent {
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
     rwKinerjaForm!: FormGroup
+    isAnnual: boolean = false
+    years: number[] = []
+    months = [
+        { value: '01', name: 'Januari' },
+        { value: '02', name: 'Februari' },
+        { value: '03', name: 'Maret' },
+        { value: '04', name: 'April' },
+        { value: '05', name: 'Mei' },
+        { value: '06', name: 'Juni' },
+        { value: '07', name: 'Juli' },
+        { value: '08', name: 'Agustus' },
+        { value: '09', name: 'September' },
+        { value: '10', name: 'Oktober' },
+        { value: '11', name: 'November' },
+        { value: '12', name: 'Desember' }
+    ]
 
     inputs: FIleHandler = {
         files: {
@@ -97,9 +113,101 @@ export class RwKinerjaAddComponent {
     ) {}
 
     ngOnInit () {
+        this.populateYears()
         this.handleFormInit()
         this.getRatingKinerjaList()
         this.getPredikatKinerjaList()
+        this.handleSubscribe()
+    }
+
+    populateYears () {
+        const currentYear = new Date().getFullYear()
+        for (let i = currentYear; i >= currentYear - 20; i--) {
+            this.years.push(i)
+        }
+    }
+
+    handleSubscribe () {
+        const typeControl = this.rwKinerjaForm.get('type')
+        typeControl?.valueChanges.subscribe(type => {
+            this.isAnnual = type === 'tahunan'
+            this.updateFormControlsForType(type)
+        })
+    }
+
+    updateFormControlsForType (type: string) {
+        if (type === 'tahunan') {
+            this.rwKinerjaForm.removeControl('monthStart')
+            this.rwKinerjaForm.removeControl('monthEnd')
+        } else if (type === 'bulanan') {
+            this.rwKinerjaForm.addControl(
+                'monthStart',
+                new FormControl('', Validators.required)
+            )
+            this.rwKinerjaForm.addControl(
+                'monthEnd',
+                new FormControl('', Validators.required)
+            )
+        }
+        this.rwKinerjaForm.get('dateStart')?.setValue('')
+        this.rwKinerjaForm.get('dateEnd')?.setValue('')
+
+        if (this.isAnnual) {
+            this.onYearSelected()
+        } else {
+            this.onMonthRangeSelected()
+        }
+    }
+
+    onYearSelected () {
+        const year = this.rwKinerjaForm.get('year')?.value
+        this.rwKinerjaForm.get('dateStart')?.setValue(`${year}-01-01`)
+        this.rwKinerjaForm.get('dateEnd')?.setValue(`${year}-12-31`)
+    }
+
+    onMonthRangeSelected () {
+        const startMonth = this.rwKinerjaForm.get('monthStart')?.value
+        const endMonth = this.rwKinerjaForm.get('monthEnd')?.value
+        const selectedYear = this.rwKinerjaForm.get('year')?.value
+
+        console.log(startMonth, endMonth, selectedYear)
+
+        if (startMonth && endMonth && selectedYear) {
+            const startDate = new Date(
+                selectedYear,
+                parseInt(startMonth) - 1,
+                1
+            )
+            const endDate = new Date(selectedYear, parseInt(endMonth), 0)
+
+            if (parseInt(startMonth) > parseInt(endMonth)) {
+                this.rwKinerjaForm
+                    .get('monthEnd')
+                    ?.setErrors({ monthOrder: true })
+                this.rwKinerjaForm.get('dateStart')?.setValue('')
+                this.rwKinerjaForm.get('dateEnd')?.setValue('')
+                return
+            } else {
+                this.rwKinerjaForm.get('monthEnd')?.setErrors(null)
+            }
+
+            this.rwKinerjaForm
+                .get('dateStart')
+                ?.setValue(this.formatDate(startDate))
+            this.rwKinerjaForm
+                .get('dateEnd')
+                ?.setValue(this.formatDate(endDate))
+        } else {
+            this.rwKinerjaForm.get('dateStart')?.setValue('')
+            this.rwKinerjaForm.get('dateEnd')?.setValue('')
+        }
+    }
+
+    formatDate (date: Date): string {
+        const year = date.getFullYear()
+        const month = (date.getMonth() + 1).toString().padStart(2, '0')
+        const day = date.getDate().toString().padStart(2, '0')
+        return `${year}-${month}-${day}`
     }
 
     getErrorMessage (controlName: string, label: string): string | null {
@@ -112,8 +220,6 @@ export class RwKinerjaAddComponent {
 
     handleFormInit () {
         this.rwKinerjaForm = new FormGroup({
-            dateEnd: new FormControl('', [Validators.required]),
-            dateStart: new FormControl('', [Validators.required]),
             predikatKinerjaId: new FormControl('', [Validators.required]),
             ratingHasilId: new FormControl('', [Validators.required]),
             ratingKinerjaId: new FormControl('', [Validators.required]),
@@ -137,7 +243,13 @@ export class RwKinerjaAddComponent {
             fileDocPenetapanAk: new FormControl('', [
                 Validators.required,
                 fileValidator(['application/pdf'], 2)
-            ])
+            ]),
+            year: new FormControl('', [Validators.required]),
+            monthStart: new FormControl('', []),
+            monthEnd: new FormControl('', []),
+            // Hidden controls for actual date values
+            dateStart: new FormControl('', [Validators.required]),
+            dateEnd: new FormControl('', [Validators.required])
         })
     }
 
@@ -184,57 +296,57 @@ export class RwKinerjaAddComponent {
     }
 
     submit () {
-        if (this.rwKinerjaForm.valid) {
-            this.rwKinerja.dateEnd = this.rwKinerjaForm.value.dateEnd
-            this.rwKinerja.dateStart = this.rwKinerjaForm.value.dateStart
-            this.rwKinerja.predikatKinerjaId =
-                this.rwKinerjaForm.value.predikatKinerjaId
-            this.rwKinerja.ratingHasilId =
-                this.rwKinerjaForm.value.ratingHasilId
-            this.rwKinerja.ratingKinerjaId =
-                this.rwKinerjaForm.value.ratingKinerjaId
-            this.rwKinerja.type = this.rwKinerjaForm.value.type
-            this.rwKinerja.angkaKredit = this.rwKinerjaForm.value.angkaKredit
-            this.rwKinerja.fileDocEvaluasi =
-                this.rwKinerjaForm.value.fileDocEvaluasi
-            this.rwKinerja.fileDocPredikat =
-                this.rwKinerjaForm.value.fileDocPredikat
-            this.rwKinerja.fileDocAkumulasiAk =
-                this.rwKinerjaForm.value.fileDocAkumulasiAk
-            this.rwKinerja.fileDocPenetapanAk =
-                this.rwKinerjaForm.value.fileDocPenetapanAk
-
-            this.confirmationService.open(false).subscribe({
-                next: result => {
-                    if (!result.confirmed) return
-                    this.submitLoading$.next(true)
-
-                    this.apiService
-                        .postData(`/api/v1/rw_kinerja/task`, this.rwKinerja)
-                        .subscribe({
-                            next: () => {
-                                this.alertService.showToast(
-                                    'Success',
-                                    'Berhasil menambahkan riwayat kinerja.'
-                                )
-                                this.submitLoading$.next(false)
-                                setTimeout(() => {
-                                    this.router.navigate([
-                                        '/profile/rw-kinerja/pending'
-                                    ])
-                                }, 1000) // Adjust the delay as needed
-                            },
-                            error: error => {
-                                console.log('error', error)
-                                this.alertService.showToast(
-                                    'Error',
-                                    'Gagal menambahkan riwayat kinerja!'
-                                )
-                                this.submitLoading$.next(false)
-                            }
+        // this.rwKinerja.dateEnd = this.rwKinerjaForm.value.dateEnd
+        // this.rwKinerja.dateStart = this.rwKinerjaForm.value.dateStart
+        // this.rwKinerja.predikatKinerjaId =
+        //     this.rwKinerjaForm.value.predikatKinerjaId
+        // this.rwKinerja.ratingHasilId =
+        //     this.rwKinerjaForm.value.ratingHasilId
+        // this.rwKinerja.ratingKinerjaId =
+        //     this.rwKinerjaForm.value.ratingKinerjaId
+        // this.rwKinerja.type = this.rwKinerjaForm.value.type
+        // this.rwKinerja.angkaKredit = this.rwKinerjaForm.value.angkaKredit
+        // this.rwKinerja.fileDocEvaluasi =
+        //     this.rwKinerjaForm.value.fileDocEvaluasi
+        // this.rwKinerja.fileDocPredikat =
+        //     this.rwKinerjaForm.value.fileDocPredikat
+        // this.rwKinerja.fileDocAkumulasiAk =
+        //     this.rwKinerjaForm.value.fileDocAkumulasiAk
+        // this.rwKinerja.fileDocPenetapanAk =
+        //     this.rwKinerjaForm.value.fileDocPenetapanAk
+        this.rwKinerja = new RWKinerja(this.rwKinerjaForm.value)
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
+                this.submitLoading$.next(true)
+                this.apiService
+                    .postData(`/api/v1/rw_kinerja/task`, this.rwKinerja)
+                    .pipe(
+                        finalize(() => {
+                            this.submitLoading$.next(false)
                         })
-                }
-            })
-        }
+                    )
+                    .subscribe({
+                        next: () => {
+                            this.alertService.showToast(
+                                'Success',
+                                'Berhasil menambahkan riwayat kinerja.'
+                            )
+                            setTimeout(() => {
+                                this.router.navigate([
+                                    '/profile/rw-kinerja/pending'
+                                ])
+                            }, 1000)
+                        },
+                        error: error => {
+                            console.log('error', error)
+                            this.alertService.showToast(
+                                'Error',
+                                'Gagal menambahkan riwayat kinerja!'
+                            )
+                        }
+                    })
+            }
+        })
     }
 }

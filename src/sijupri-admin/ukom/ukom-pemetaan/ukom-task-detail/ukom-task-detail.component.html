@@ -83,7 +83,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Lahir</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.tanggalLahir ?? '-' }}
+                                    {{ ukomDetail.tanggalLahir | tanggalIndo }}
                                 </p>
                             </div>
                         </div>
@@ -303,7 +303,9 @@
                                     >Tanggal Surat Usulan</label
                                 >
                                 <p class="border-bottom">
-                                    {{ ukomDetail.tglSuratUsulan ?? '-' }}
+                                    {{
+                                        ukomDetail.tglSuratUsulan | tanggalIndo
+                                    }}
                                 </p>
                             </div>
                         </div>

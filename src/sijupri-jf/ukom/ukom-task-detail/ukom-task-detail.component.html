@@ -106,7 +106,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Lahir</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.tanggalLahir ?? '-' }}
+                                    {{ ukomDetail.tanggalLahir | tanggalIndo }}
                                 </p>
                             </div>
                         </div>
@@ -276,17 +276,6 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenis UKom</label>
                                 <p class="border-bottom">
-                                    <!-- {{
-                                        ukomDetail.jenisUkom ===
-                                        'KENAIKAN_JENJANG'
-                                            ? 'Kenaikan Jenjang'
-                                            : ukomDetail.jenisUkom ===
-                                              'PERPINDAHAN_JABATAN'
-                                            ? 'Perpindahan Jabatan'
-                                            : ukomDetail.jenisUkom === 'PROMOSI'
-                                            ? 'Promosi'
-                                            : ukomDetail.jenisUkom
-                                    }} -->
                                     {{
                                         getJenisUkomLabel(ukomDetail.jenisUkom)
                                     }}
@@ -326,7 +315,9 @@
                                     >Tanggal Surat Usulan</label
                                 >
                                 <p class="border-bottom">
-                                    {{ ukomDetail.tglSuratUsulan ?? '-' }}
+                                    {{
+                                        ukomDetail.tglSuratUsulan | tanggalIndo
+                                    }}
                                 </p>
                             </div>
                         </div>

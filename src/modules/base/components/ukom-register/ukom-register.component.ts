@@ -131,7 +131,7 @@ export class UkomRegisterComponent {
     ngOnInit () {
         this.checkStatusRegister()
         this.getListJabatan()
-        this.getListJenjang()
+        // this.getListJenjang()
         this.getListPangkat()
         this.getPredikatKinerja()
         this.getPendidikanList()
@@ -176,6 +176,7 @@ export class UkomRegisterComponent {
                 bidang_jabatan_code: ''
             })
             this.getBidangJabatanByJabatanCode(value)
+            this.getListJenjang(value)
         })
     }
 
@@ -462,7 +463,6 @@ export class UkomRegisterComponent {
         return null
     }
 
-    // !important
     isAnyFileMissing (): boolean {
         if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
             return true
@@ -548,9 +548,9 @@ export class UkomRegisterComponent {
             )
     }
 
-    getListJenjang () {
+    getListJenjang (jabatanCode: string) {
         this.jenjangList$ = this.apiService
-            .getData(`/api/v1/jenjang`)
+            .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
             .pipe(
                 map(response =>
                     response.map(

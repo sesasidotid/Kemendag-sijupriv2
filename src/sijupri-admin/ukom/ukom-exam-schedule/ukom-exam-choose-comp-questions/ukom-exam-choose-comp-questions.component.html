@@ -27,7 +27,7 @@
                 Waktu Mulai
             </label>
             <div class="col-sm-10 pt-2">
-                <p>: {{ examDetail.startTime }}</p>
+                <p>: {{ examDetail.startTime | tanggalWaktuIndo }}</p>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
                 Waktu Selesai
             </label>
             <div class="col-sm-10 pt-2">
-                <p>: {{ examDetail.endTime }}</p>
+                <p>: {{ examDetail.endTime | tanggalWaktuIndo }}</p>
             </div>
         </div>
 

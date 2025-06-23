@@ -57,23 +57,27 @@ export class RwPendidikanPendingComponent {
 
     inputs: FIleHandler
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleFormInit()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.rwPendidikanForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.rwPendidikanForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/rw_pendidikan/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -81,7 +85,9 @@ export class RwPendidikanPendingComponent {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Pendidikan', 'objectName').build()
             )
-            .addPrimaryColumn(new PrimaryColumnBuilder('Proses', 'flowName').build())
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Status', 'flowName').build()
+            )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((pendingTask: PendingTask) => {
@@ -93,7 +99,8 @@ export class RwPendidikanPendingComponent {
                         }
                     }, 'info')
                     .addInactiveCondition(
-                        (pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1'
+                        (pendingTask: PendingTask) =>
+                            pendingTask.flowId == 'siap_flow_1'
                     )
                     .withIcon('update')
                     .build()
@@ -107,19 +114,17 @@ export class RwPendidikanPendingComponent {
             .build()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.rwPendidikanForm = new FormGroup({
             institusiPendidikan: new FormControl('', [Validators.required]),
             pendidikanCode: new FormControl('', [Validators.required]),
             jurusan: new FormControl('', [Validators.required]),
             tanggalIjazah: new FormControl('', [Validators.required]),
-            fileIjazah: new FormControl('', [
-                Validators.required,
-            ])
+            fileIjazah: new FormControl('', [Validators.required])
         })
     }
 
-    fileLoadHandler() {
+    fileLoadHandler () {
         this.inputs = {
             files: {
                 ijazah: {
@@ -139,12 +144,13 @@ export class RwPendidikanPendingComponent {
         }
     }
 
-    getPendidikanList() {
+    getPendidikanList () {
         this.pendidikanListLoading$.next(true)
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
             next: response => {
                 this.pendidikanList = response.map(
-                    (pendidikan: { [key: string]: any }) => new Pendidikan(pendidikan)
+                    (pendidikan: { [key: string]: any }) =>
+                        new Pendidikan(pendidikan)
                 )
                 this.pendidikanListLoading$.next(false)
             },
@@ -159,12 +165,14 @@ export class RwPendidikanPendingComponent {
         })
     }
 
-    getPendingRWPendidikan(id: string) {
+    getPendingRWPendidikan (id: string) {
         this.rwPendidikanLoading$.next(true)
         this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
             next: response => {
                 const pendingTask = new PendingTask(response)
-                this.rwPendidikan = new RWPendidikan(pendingTask.objectTask.object)
+                this.rwPendidikan = new RWPendidikan(
+                    pendingTask.objectTask.object
+                )
                 this.rwPendidikanForm.patchValue({
                     institusiPendidikan: this.rwPendidikan.institusiPendidikan,
                     pendidikanCode: this.rwPendidikan.pendidikanCode,
@@ -185,14 +193,14 @@ export class RwPendidikanPendingComponent {
         })
     }
 
-    back() {
+    back () {
         this.pendidikanList.length = 0
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwPendidikan = new RWPendidikan()
     }
 
-    submit() {
+    submit () {
         if (this.rwPendidikanForm.valid) {
             this.rwPendidikan.pendidikanCode =
                 this.rwPendidikanForm.value.pendidikanCode
@@ -201,7 +209,8 @@ export class RwPendidikanPendingComponent {
             this.rwPendidikan.jurusan = this.rwPendidikanForm.value.jurusan
             this.rwPendidikan.tanggalIjazah =
                 this.rwPendidikanForm.value.tanggalIjazah
-            this.rwPendidikan.fileIjazah = this.rwPendidikanForm.value.fileIjazah
+            this.rwPendidikan.fileIjazah =
+                this.rwPendidikanForm.value.fileIjazah
 
             this.confirmationService.open(false).subscribe({
                 next: result => {

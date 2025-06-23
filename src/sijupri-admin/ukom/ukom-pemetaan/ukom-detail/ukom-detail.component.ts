@@ -17,10 +17,11 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
 @Component({
     selector: 'app-ukom-detail',
     standalone: true,
-    imports: [PagableComponent, CommonModule],
+    imports: [PagableComponent, CommonModule, TanggalIndoPipe],
     templateUrl: './ukom-detail.component.html',
     styleUrl: './ukom-detail.component.scss'
 })

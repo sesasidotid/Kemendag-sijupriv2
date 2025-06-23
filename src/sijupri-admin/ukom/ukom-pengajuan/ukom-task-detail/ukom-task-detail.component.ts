@@ -15,16 +15,19 @@ import {
     map,
     Observable,
     of,
-    combineLatest
+    combineLatest,
+    finalize,
+    tap
 } from 'rxjs'
 import { FormsModule } from '@angular/forms'
-import { JF } from '../../../../modules/siap/models/jf.model'
 import { Router } from '@angular/router'
-
+import { RWKinerja } from '../../../../modules/siap/models/rw-kinerja.model'
+import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
+import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [TanggalIndoPipe, CommonModule, FormsModule, FileHandlerComponent],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss'
 })
@@ -37,6 +40,7 @@ export class UkomTaskDetailComponent {
     prevPendingTask: PrevPendingTask
     prevApprovedTask: any[] = []
     hadItemsLoading$ = new BehaviorSubject<boolean>(false)
+    kinerja2Tahun: RWKinerja[] = []
 
     pendidikanName: string
     provinsiName: string
@@ -48,12 +52,14 @@ export class UkomTaskDetailComponent {
 
     predikatKinerjaList: any[] = []
 
-    JFDetail: JF = new JF()
     tabIndex: number
 
     isPredikatKinerjaLoading$: BehaviorSubject<boolean> = new BehaviorSubject(
         false
     )
+    isPredikatKinerjaListLoading$: BehaviorSubject<boolean> =
+        new BehaviorSubject(false)
+    isPendingTaskLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isLoading$: Observable<boolean>
 
     constructor (
@@ -64,15 +70,17 @@ export class UkomTaskDetailComponent {
         private filePreviewService: FilePreviewService,
         private router: Router
     ) {
-        this.isLoading$ = combineLatest([this.isPredikatKinerjaLoading$]).pipe(
-            map(loadings => loadings.some(isLoading => isLoading))
-        )
+        this.isLoading$ = combineLatest([
+            this.isPredikatKinerjaLoading$,
+            this.isPredikatKinerjaListLoading$,
+            this.isPendingTaskLoading$
+        ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
     }
 
     ngOnInit () {
         this.activatedRoute.params.subscribe(params => {
             this.id = params['id']
-            this.loadPredikatKinerja()
+            this.loadPredikatKinerjaList()
         })
     }
 
@@ -132,17 +140,56 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    loadPredikatKinerja () {
+    loadPredikatKinerjaList () {
+        this.isPredikatKinerjaListLoading$.next(true)
+        this.apiService
+            .getData('/api/v1/predikat_kinerja')
+            .pipe(
+                tap(() => {
+                    this.getPendingTask()
+                }),
+                catchError(err => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data predikat kinerja'
+                    )
+                    return of([])
+                }),
+                finalize(() => {
+                    this.isPredikatKinerjaListLoading$.next(false)
+                })
+            )
+            .subscribe({
+                next: res => {
+                    this.predikatKinerjaList = res
+                },
+                error: err => {}
+            })
+    }
+
+    loadPredikatKinerja (nip: string) {
         this.isPredikatKinerjaLoading$.next(true)
-        this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
-            next: res => {
-                this.predikatKinerjaList = res
-                this.getPendingTask()
-            },
-            error: err => {
-                this.getPendingTask()
-            }
-        })
+        this.apiService
+            .getData(`/api/v1/rw_kinerja/jf/${nip}/2`)
+            .pipe(
+                catchError(err => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data predikat kinerja'
+                    )
+                    return of([])
+                }),
+                finalize(() => {
+                    this.isPredikatKinerjaLoading$.next(false)
+                })
+            )
+            .subscribe({
+                next: (res: any[]) => {
+                    this.kinerja2Tahun = res.map(
+                        (item: Partial<RWKinerja>) => new RWKinerja(item)
+                    )
+                }
+            })
     }
 
     getPredikatKinerja (code: string | null): string {
@@ -201,58 +248,71 @@ export class UkomTaskDetailComponent {
         return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    getJFDetail (nip: string) {
-        this.apiService.getData(`/api/v1/jf/${nip}`).subscribe({
-            next: response => {
-                this.JFDetail = new JF(response)
-            }
-        })
-    }
-
     getPendingTask () {
-        this.apiService.getData(`/api/v1/pending_task/${this.id}`).subscribe({
-            next: response => {
-                this.pendingTask = new PendingTask(response)
-                this.pesertaUkom = new PesertaUkom(
-                    this.pendingTask.objectTask.object
-                )
-                this.prevPendingTask = new PrevPendingTask(
-                    this.pendingTask.objectTask.prevObject
-                )
+        this.isPendingTaskLoading$.next(true)
 
-                this.getPendidikanList(
-                    this.pendingTask.objectTask.object.pendidikanTerakhirCode
-                )
-                if (this.pendingTask.objectTask.object.provinsiId) {
-                    this.getProvinsiNameByCode(
-                        this.pendingTask.objectTask.object.provinsiId
+        this.apiService
+            .getData(`/api/v1/pending_task/${this.id}`)
+            .pipe(
+                tap(() => {}),
+                catchError(error => {
+                    this.isPendingTaskLoading$.next(false)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data tugas'
                     )
-                }
-
-                if (this.pendingTask.objectTask.object.kabupatenKotaId) {
-                    this.getKabupatenNameByCode(
-                        this.pendingTask.objectTask.object.kabupatenKotaId
+                    return of(null)
+                }),
+                finalize(() => {
+                    this.isPendingTaskLoading$.next(false)
+                })
+            )
+            .subscribe({
+                next: response => {
+                    this.pendingTask = new PendingTask(response)
+                    this.pesertaUkom = new PesertaUkom(
+                        this.pendingTask.objectTask.object
                     )
-                }
-
-                if (this.pendingTask.objectTask.object.bidangJabatanCode) {
-                    this.getBidangjabatanNameByCode(
-                        this.pendingTask.objectTask.object.bidangJabatanCode
+                    this.prevPendingTask = new PrevPendingTask(
+                        this.pendingTask.objectTask.prevObject
                     )
+                    this.loadPredikatKinerja(this.pesertaUkom.nip)
+
+                    this.getPendidikanList(
+                        this.pendingTask.objectTask.object
+                            .pendidikanTerakhirCode
+                    )
+                    if (this.pendingTask.objectTask.object.provinsiId) {
+                        this.getProvinsiNameByCode(
+                            this.pendingTask.objectTask.object.provinsiId
+                        )
+                    }
+
+                    if (this.pendingTask.objectTask.object.kabupatenKotaId) {
+                        this.getKabupatenNameByCode(
+                            this.pendingTask.objectTask.object.kabupatenKotaId
+                        )
+                    }
+
+                    if (this.pendingTask.objectTask.object.bidangJabatanCode) {
+                        this.getBidangjabatanNameByCode(
+                            this.pendingTask.objectTask.object.bidangJabatanCode
+                        )
+                    }
+
+                    this.predikat1Name = this.getPredikatKinerja(
+                        this.pendingTask.objectTask.object.predikatKinerja1Id
+                    )
+                    this.predikat2Name = this.getPredikatKinerja(
+                        this.pendingTask.objectTask.object.predikatKinerja2Id
+                    )
+
+                    this.findApproveDokumen(
+                        this.prevPendingTask.dokumenUkomList
+                    )
+                    this.handlerTabIndex()
                 }
-
-                this.predikat1Name = this.getPredikatKinerja(
-                    this.pendingTask.objectTask.object.predikatKinerja1Id
-                )
-                this.predikat2Name = this.getPredikatKinerja(
-                    this.pendingTask.objectTask.object.predikatKinerja2Id
-                )
-
-                this.findApproveDokumen(this.prevPendingTask.dokumenUkomList)
-                this.handlerTabIndex()
-            },
-            error: error => this.handlerService.handleException(error)
-        })
+            })
     }
 
     handlerTabIndex () {

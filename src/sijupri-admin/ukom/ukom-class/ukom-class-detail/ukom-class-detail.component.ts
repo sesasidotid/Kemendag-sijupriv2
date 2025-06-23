@@ -16,10 +16,16 @@ import { Router } from '@angular/router'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
 @Component({
     selector: 'app-ukom-class-detail',
     standalone: true,
-    imports: [PagableComponent, CommonModule, UkomExamScheduleAddComponent],
+    imports: [
+        PagableComponent,
+        CommonModule,
+        UkomExamScheduleAddComponent,
+        TanggalIndoPipe
+    ],
     templateUrl: './ukom-class-detail.component.html',
     styleUrl: './ukom-class-detail.component.scss'
 })

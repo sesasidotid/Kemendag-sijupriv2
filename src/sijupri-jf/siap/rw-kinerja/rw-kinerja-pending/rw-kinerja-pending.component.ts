@@ -56,6 +56,22 @@ export class RwKinerjaPendingComponent {
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
     rwKinerjaForm!: FormGroup
+    isAnnual: boolean = false
+    years: number[] = []
+    months = [
+        { value: '01', name: 'Januari' },
+        { value: '02', name: 'Februari' },
+        { value: '03', name: 'Maret' },
+        { value: '04', name: 'April' },
+        { value: '05', name: 'Mei' },
+        { value: '06', name: 'Juni' },
+        { value: '07', name: 'Juli' },
+        { value: '08', name: 'Agustus' },
+        { value: '09', name: 'September' },
+        { value: '10', name: 'Oktober' },
+        { value: '11', name: 'November' },
+        { value: '12', name: 'Desember' }
+    ]
 
     inputs: FIleHandler
 
@@ -67,9 +83,17 @@ export class RwKinerjaPendingComponent {
     ) {}
 
     ngOnInit () {
+        this.populateYears()
         this.handlePagable()
         this.handleFormInit()
         this.handleSubscribe()
+    }
+
+    populateYears () {
+        const currentYear = new Date().getFullYear()
+        for (let i = currentYear; i >= currentYear - 20; i--) {
+            this.years.push(i)
+        }
     }
 
     getErrorMessage (controlName: string, label: string): string | null {
@@ -89,7 +113,7 @@ export class RwKinerjaPendingComponent {
                 new PrimaryColumnBuilder('Angka Kredit', 'objectName').build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'taskStatus').build()
+                new PrimaryColumnBuilder('Status', 'flowName').build()
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -113,8 +137,6 @@ export class RwKinerjaPendingComponent {
 
     handleFormInit () {
         this.rwKinerjaForm = new FormGroup({
-            dateEnd: new FormControl('', [Validators.required]),
-            dateStart: new FormControl('', [Validators.required]),
             predikatKinerjaId: new FormControl('', [Validators.required]),
             ratingHasilId: new FormControl('', [Validators.required]),
             ratingKinerjaId: new FormControl('', [Validators.required]),
@@ -126,26 +148,139 @@ export class RwKinerjaPendingComponent {
             fileDocEvaluasi: new FormControl('', [Validators.required]),
             fileDocPredikat: new FormControl('', [Validators.required]),
             fileDocAkumulasiAk: new FormControl('', [Validators.required]),
-            fileDocPenetapanAk: new FormControl('', [Validators.required])
+            fileDocPenetapanAk: new FormControl('', [Validators.required]),
+            year: new FormControl('', [Validators.required]),
+            monthStart: new FormControl('', []),
+            monthEnd: new FormControl('', []),
+            // Hidden controls for actual date values
+            dateStart: new FormControl('', [Validators.required]),
+            dateEnd: new FormControl('', [Validators.required])
         })
     }
 
     patchFormValue () {
+        const data = this.rwKinerja
+
         this.rwKinerjaForm.patchValue({
-            dateEnd: this.rwKinerja.dateEnd,
-            dateStart: this.rwKinerja.dateStart,
-            predikatKinerjaId: this.rwKinerja.predikatKinerjaId,
-            ratingHasilId: this.rwKinerja.ratingHasilId,
-            ratingKinerjaId: this.rwKinerja.ratingKinerjaId,
-            type: this.rwKinerja.type,
-            angkaKredit: this.rwKinerja.angkaKredit
+            dateEnd: data.dateEnd,
+            dateStart: data.dateStart,
+            predikatKinerjaId: data.predikatKinerjaId,
+            ratingHasilId: data.ratingHasilId,
+            ratingKinerjaId: data.ratingKinerjaId,
+            type: data.type,
+            angkaKredit: data.angkaKredit
         })
+
+        this.isAnnual = data.type === 'tahunan'
+        this.updateFormControlsForType(data.type)
+
+        if (this.isAnnual) {
+            const year = new Date(data.dateStart).getFullYear()
+            this.rwKinerjaForm.get('year')?.setValue(year)
+        } else {
+            const startDate = new Date(data.dateStart)
+            const endDate = new Date(data.dateEnd)
+
+            this.rwKinerjaForm.get('year')?.setValue(startDate.getFullYear()) // shared year
+            this.rwKinerjaForm
+                .get('monthStart')
+                ?.setValue(
+                    (startDate.getMonth() + 1).toString().padStart(2, '0')
+                )
+            this.rwKinerjaForm
+                .get('monthEnd')
+                ?.setValue((endDate.getMonth() + 1).toString().padStart(2, '0'))
+        }
+
+        // Re-run date calculation logic
+        if (this.isAnnual) {
+            this.onYearSelected()
+        } else {
+            this.onMonthRangeSelected()
+        }
     }
 
     handleSubscribe () {
-        this.rwKinerjaForm.valueChanges.subscribe(() => {
-            console.log('this.rwKinerjaForm', this.rwKinerjaForm.value)
+        const typeControl = this.rwKinerjaForm.get('type')
+        typeControl?.valueChanges.subscribe(type => {
+            this.isAnnual = type === 'tahunan'
+            this.updateFormControlsForType(type)
         })
+    }
+
+    updateFormControlsForType (type: string) {
+        if (type === 'tahunan') {
+            this.rwKinerjaForm.removeControl('monthStart')
+            this.rwKinerjaForm.removeControl('monthEnd')
+        } else if (type === 'bulanan') {
+            this.rwKinerjaForm.addControl(
+                'monthStart',
+                new FormControl('', Validators.required)
+            )
+            this.rwKinerjaForm.addControl(
+                'monthEnd',
+                new FormControl('', Validators.required)
+            )
+        }
+        this.rwKinerjaForm.get('dateStart')?.setValue('')
+        this.rwKinerjaForm.get('dateEnd')?.setValue('')
+
+        if (this.isAnnual) {
+            this.onYearSelected()
+        } else {
+            this.onMonthRangeSelected()
+        }
+    }
+
+    onYearSelected () {
+        const year = this.rwKinerjaForm.get('year')?.value
+        this.rwKinerjaForm.get('dateStart')?.setValue(`${year}-01-01`)
+        this.rwKinerjaForm.get('dateEnd')?.setValue(`${year}-12-31`)
+    }
+
+    onMonthRangeSelected () {
+        const startMonth = this.rwKinerjaForm.get('monthStart')?.value
+        const endMonth = this.rwKinerjaForm.get('monthEnd')?.value
+        const selectedYear = this.rwKinerjaForm.get('year')?.value
+
+        console.log(startMonth, endMonth, selectedYear)
+
+        if (startMonth && endMonth && selectedYear) {
+            const startDate = new Date(
+                selectedYear,
+                parseInt(startMonth) - 1,
+                1
+            )
+            const endDate = new Date(selectedYear, parseInt(endMonth), 0)
+
+            if (parseInt(startMonth) > parseInt(endMonth)) {
+                this.rwKinerjaForm
+                    .get('monthEnd')
+                    ?.setErrors({ monthOrder: true })
+                this.rwKinerjaForm.get('dateStart')?.setValue('')
+                this.rwKinerjaForm.get('dateEnd')?.setValue('')
+                return
+            } else {
+                this.rwKinerjaForm.get('monthEnd')?.setErrors(null)
+            }
+
+            this.rwKinerjaForm
+                .get('dateStart')
+                ?.setValue(this.formatDate(startDate))
+            this.rwKinerjaForm
+                .get('dateEnd')
+                ?.setValue(this.formatDate(endDate))
+        } else {
+            this.rwKinerjaForm.get('dateStart')?.setValue('')
+            this.rwKinerjaForm.get('dateEnd')?.setValue('')
+        }
+    }
+
+    formatDate (date: Date): string {
+        const year = date.getFullYear()
+        const month = (date.getMonth() + 1).toString().padStart(2, '0')
+        const day = date.getDate().toString().padStart(2, '0')
+        return `${year}-${month}-${day}`
     }
 
     fileLoadHandler () {
@@ -207,7 +342,6 @@ export class RwKinerjaPendingComponent {
                     (ratingKinerja: { [key: string]: any }) =>
                         new RatingKinerja(ratingKinerja)
                 )
-                console.log('ratingKinerjaList', this.ratingKinerjaList)
                 this.getPendingRWKinerja(pending_task_id)
                 this.ratingLoading$.next(false)
             },
@@ -249,7 +383,6 @@ export class RwKinerjaPendingComponent {
             next: response => {
                 const pendingTask = new PendingTask(response)
                 this.rwKinerja = new RWKinerja(pendingTask.objectTask.object)
-                console.log('rwKinerja', this.rwKinerja)
                 this.fileLoadHandler()
                 this.patchFormValue()
                 this.rwKinerjaLoading$.next(false)
@@ -299,7 +432,8 @@ export class RwKinerjaPendingComponent {
                 if (!result.confirmed) return
                 this.submitLoading$.next(true)
 
-                this.handlePayload()
+                // this.handlePayload()
+                this.rwKinerja = new RWKinerja(this.rwKinerjaForm.value)
                 const task = new Task()
                 task.id = this.pendingTask.id
                 task.taskAction = 'approve'

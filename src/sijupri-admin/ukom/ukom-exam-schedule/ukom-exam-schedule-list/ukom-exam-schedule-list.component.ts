@@ -12,10 +12,16 @@ import { BehaviorSubject } from 'rxjs'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { Router, RouterLink } from '@angular/router'
 import { UkomExamScheduleAddComponent } from '../ukom-exam-schedule-add/ukom-exam-schedule-add.component'
+import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
 @Component({
     selector: 'app-ukom-exam-schedule-list',
     standalone: true,
-    imports: [PagableComponent, CommonModule, UkomExamScheduleAddComponent],
+    imports: [
+        PagableComponent,
+        CommonModule,
+        UkomExamScheduleAddComponent,
+        TanggalWaktuIndoPipe
+    ],
     templateUrl: './ukom-exam-schedule-list.component.html',
     styleUrl: './ukom-exam-schedule-list.component.scss'
 })
@@ -23,14 +29,14 @@ export class UkomExamScheduleListComponent {
     tab$ = new BehaviorSubject<number | null>(0)
     pagable: Pagable
 
-    constructor(private tabService: TabService, private router: Router) { }
+    constructor (private tabService: TabService, private router: Router) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleTabService()
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/examiner_ukom/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Nama', 'name', ['user']).build()
@@ -44,7 +50,7 @@ export class UkomExamScheduleListComponent {
             .build()
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -63,7 +69,7 @@ export class UkomExamScheduleListComponent {
             })
     }
 
-    handleTabChange(tab?: number) {
+    handleTabChange (tab?: number) {
         console.log('tab', tab)
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)

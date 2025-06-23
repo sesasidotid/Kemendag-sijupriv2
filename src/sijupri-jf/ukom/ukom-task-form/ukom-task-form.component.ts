@@ -20,6 +20,7 @@ import {
 } from '@angular/forms'
 import {
     BehaviorSubject,
+    catchError,
     combineLatest,
     distinctUntilChanged,
     filter,
@@ -33,6 +34,8 @@ import {
 } from 'rxjs'
 import { BidangJabatan } from '../../../modules/maintenance/models/bidang-jabatan.model'
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
+import { RWKinerja } from '../../../modules/siap/models/rw-kinerja.model'
+import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
 
 @Component({
     selector: 'app-ukom-task-form',
@@ -41,7 +44,8 @@ import { FormValidationService } from '../../../modules/base/services/form-valid
         CommonModule,
         FormsModule,
         FileHandlerComponent,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        TanggalIndoPipe
     ],
     templateUrl: './ukom-task-form.component.html',
     styleUrl: './ukom-task-form.component.scss'
@@ -102,9 +106,9 @@ export class UkomTaskFormComponent {
             this.setupInstansiValidation()
             this.handleFetchDokumenPersyaratan()
             this.getJFPendidikan()
-            this.getLast2TahunPredikatJF()
             this.getListJabatan()
             this.getListJenjang()
+            if (this.jf) this.getLast2TahunPredikatJF()
         }
     }
 
@@ -134,7 +138,12 @@ export class UkomTaskFormComponent {
         nextJabatanControl.valueChanges.subscribe(next_jabatan_code => {
             if (next_jabatan_code) {
                 bidangJabatanControl.setValue('')
+                nextJenjangControl.setValue('')
                 this.getBidangJabatanByJabatanCode(next_jabatan_code)
+                if (jenisUkomControl.value === 'PERPINDAHAN_JABATAN') {
+                    this.getListJenjangForPerpindahanJabatan(next_jabatan_code)
+                }
+
                 this.pesertaUkom.nextJabatanCode = next_jabatan_code
                 this.jabatanCodeArgument$.next(next_jabatan_code)
             }
@@ -174,6 +183,7 @@ export class UkomTaskFormComponent {
                     jenis_ukom == 'KENAIKAN_JENJANG' ||
                     jenis_ukom == 'PROMOSI_JF'
                 ) {
+                    this.getListJenjang()
                     nextJabatanControl.disable()
                     nextJenjangControl.disable()
 
@@ -410,24 +420,24 @@ export class UkomTaskFormComponent {
 
     getLast2TahunPredikatJF () {
         this.apiService
-            .getData(`/api/v1/rw_kinerja/search?limit=1000&eq_type=tahunan`)
+            .getData(`/api/v1/rw_kinerja/jf/${this.jf.nip}/2`)
             .subscribe({
-                next: res => {
-                    const last2Tahun = res.data.slice(-2)
-                    console.log('last2Tahun', last2Tahun)
+                next: (res: any[]) => {
+                    const last2Tahun: RWKinerja[] = res.map(
+                        (item: Partial<RWKinerja>) => new RWKinerja(item)
+                    )
 
-                    if (last2Tahun.length === 1) {
+                    this.pesertaUkom.predikat_kinerja_1_id = null
+                    this.pesertaUkom.predikat_kinerja_2_id = null
+
+                    if (last2Tahun[0]) {
                         this.pesertaUkom.predikat_kinerja_1_id =
-                            last2Tahun[0]?.predikatKinerjaId ?? null
-                        this.pesertaUkom.predikat_kinerja_2_id = null
-                    } else if (last2Tahun.length === 2) {
-                        this.pesertaUkom.predikat_kinerja_1_id =
-                            last2Tahun[1]?.predikatKinerjaId ?? null
+                            last2Tahun[0].predikatKinerjaId
+                    }
+
+                    if (last2Tahun[1]) {
                         this.pesertaUkom.predikat_kinerja_2_id =
-                            last2Tahun[0]?.predikatKinerjaId ?? null
-                    } else {
-                        this.pesertaUkom.predikat_kinerja_1_id = null
-                        this.pesertaUkom.predikat_kinerja_2_id = null
+                            last2Tahun[1].predikatKinerjaId
                     }
                 }
             })
@@ -459,6 +469,23 @@ export class UkomTaskFormComponent {
                     'Gagal Mengambil daftar jenjang'
                 )
         })
+    }
+
+    getListJenjangForPerpindahanJabatan (next_jabatan_code: string) {
+        this.apiService
+            .getData(`/api/v1/jenjang/jabatan/${next_jabatan_code}`)
+            .subscribe({
+                next: response =>
+                    (this.jenjangList = response.map(
+                        (jenjang: { [key: string]: any }) =>
+                            new Jenjang(jenjang)
+                    )),
+                error: error =>
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal Mengambil daftar jenjang'
+                    )
+            })
     }
 
     submit () {

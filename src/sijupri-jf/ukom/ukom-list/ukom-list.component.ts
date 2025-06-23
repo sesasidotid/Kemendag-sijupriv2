@@ -16,10 +16,16 @@ import { Observable } from 'rxjs'
 import { UkomExamScheduleJF } from '../../../modules/ukom/models/ukom-exam-schedule-jf'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
+import { TanggalWaktuIndoPipe } from '../../../modules/base/pipes/tangga-waktu.pipe'
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
-    imports: [PagableComponent, EmptyStateComponent, CommonModule],
+    imports: [
+        PagableComponent,
+        EmptyStateComponent,
+        CommonModule,
+        TanggalWaktuIndoPipe
+    ],
     templateUrl: './ukom-list.component.html',
     styleUrl: './ukom-list.component.scss'
 })
@@ -30,6 +36,7 @@ export class UkomListComponent {
     ukomSchedule: UkomExamScheduleJF
 
     jadwalPagable: Pagable
+    TanggalWaktuIndo = new TanggalWaktuIndoPipe()
 
     constructor (
         private router: Router,
@@ -46,17 +53,9 @@ export class UkomListComponent {
     handlePagable () {
         this.pagable = new PagableBuilder(
             `/api/v1/participant_ukom/search/${this.id}`
-            //   `/api/v1/participant_ukom/all/${this.id}`
         )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    // .withDynamicValue('Jenis Ukom', (data: any) =>
-                    //     data.jenisUkom === 'KENAIKAN_JENJANG'
-                    //         ? 'Kenaikan Jenjang'
-                    //         : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                    //         ? 'Perpindahan Jabatan'
-                    //         : data.jenisUkom
-                    // )
                     .withDynamicValue('Jenis Ukom', (data: any) => {
                         switch (data.jenisUkom) {
                             case 'KENAIKAN_JENJANG':
@@ -74,7 +73,15 @@ export class UkomListComponent {
                     .build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Tanggal', (data: any) => {
+                        const formattedDate = this.TanggalWaktuIndo.transform(
+                            data.dateCreated
+                        )
+
+                        return formattedDate
+                    })
+                    .build()
             )
             .addActionColumn(
                 new ActionColumnBuilder()

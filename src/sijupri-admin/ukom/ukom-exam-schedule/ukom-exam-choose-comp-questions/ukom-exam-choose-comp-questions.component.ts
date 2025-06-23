@@ -16,6 +16,7 @@ import {
 import { FormsModule } from '@angular/forms'
 import { UkomExamCatComponent } from '../ukom-exam-cat/ukom-exam-cat.component'
 import { UkomExamMakalahComponent } from '../ukom-exam-makalah/ukom-exam-makalah.component'
+import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
     standalone: true,
@@ -23,7 +24,8 @@ import { UkomExamMakalahComponent } from '../ukom-exam-makalah/ukom-exam-makalah
         CommonModule,
         FormsModule,
         UkomExamCatComponent,
-        UkomExamMakalahComponent
+        UkomExamMakalahComponent,
+        TanggalWaktuIndoPipe
     ],
     templateUrl: './ukom-exam-choose-comp-questions.component.html',
     styleUrl: './ukom-exam-choose-comp-questions.component.scss'

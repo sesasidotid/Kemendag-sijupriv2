@@ -20,6 +20,7 @@ import { ModalComponent } from '../../../modules/base/components/modal/modal.com
 import { UkomRevisionComponent } from '../ukom-revision/ukom-revision.component'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
+import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
 
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
@@ -36,7 +37,8 @@ export enum JenisUkomEnum {
         UkomTaskFormComponent,
         EmptyStateComponent,
         ModalComponent,
-        UkomRevisionComponent
+        UkomRevisionComponent,
+        TanggalIndoPipe
     ],
     templateUrl: './ukom-task.component.html',
     styleUrl: './ukom-task.component.scss'

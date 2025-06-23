@@ -55,23 +55,27 @@ export class RwKompetensiPendingComponent {
 
     inputs: FIleHandler
 
-    constructor(
+    constructor (
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleFormInit()
     }
 
-    getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.rwKompetensiForm.get(controlName), controlName, label);
+    getErrorMessage (controlName: string, label: string): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.rwKompetensiForm.get(controlName),
+            controlName,
+            label
+        )
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/rw_kompetensi/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
@@ -80,7 +84,7 @@ export class RwKompetensiPendingComponent {
                 new PrimaryColumnBuilder('Kompetensi', 'objectName').build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'taskStatus').build()
+                new PrimaryColumnBuilder('Status', 'flowName').build()
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -93,7 +97,8 @@ export class RwKompetensiPendingComponent {
                         }
                     }, 'info')
                     .addInactiveCondition(
-                        (pendingTask: PendingTask) => pendingTask.flowId == 'siap_flow_1'
+                        (pendingTask: PendingTask) =>
+                            pendingTask.flowId == 'siap_flow_1'
                     )
                     .withIcon('update')
                     .build()
@@ -107,7 +112,7 @@ export class RwKompetensiPendingComponent {
             .build()
     }
 
-    handleFormInit() {
+    handleFormInit () {
         this.rwKompetensiForm = new FormGroup({
             name: new FormControl('', [Validators.required]),
             kategoriPengembanganId: new FormControl('', [Validators.required]),
@@ -121,7 +126,7 @@ export class RwKompetensiPendingComponent {
         })
     }
 
-    fileLoadHandler() {
+    fileLoadHandler () {
         this.inputs = {
             files: {
                 docEvaluas: {
@@ -141,7 +146,7 @@ export class RwKompetensiPendingComponent {
         }
     }
 
-    getKategoriPengembanganList() {
+    getKategoriPengembanganList () {
         this.kategoriPengembanganLoading$.next(true)
         this.apiService.getData(`/api/v1/kategori_pengembangan`).subscribe({
             next: response => {
@@ -162,15 +167,18 @@ export class RwKompetensiPendingComponent {
         })
     }
 
-    getPendingRWKompetensi(id: string) {
+    getPendingRWKompetensi (id: string) {
         this.rwKompetensiLoading$.next(true)
         this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
             next: response => {
                 const pendingTask = new PendingTask(response)
-                this.rwKompetensi = new RWKompetensi(pendingTask.objectTask.object)
+                this.rwKompetensi = new RWKompetensi(
+                    pendingTask.objectTask.object
+                )
                 this.rwKompetensiForm.patchValue({
                     name: this.rwKompetensi.name,
-                    kategoriPengembanganId: this.rwKompetensi.kategoriPengembanganId,
+                    kategoriPengembanganId:
+                        this.rwKompetensi.kategoriPengembanganId,
                     dateStart: this.rwKompetensi.dateStart,
                     dateEnd: this.rwKompetensi.dateEnd,
                     tglSertifikat: this.rwKompetensi.tglSertifikat
@@ -188,14 +196,14 @@ export class RwKompetensiPendingComponent {
         })
     }
 
-    back() {
+    back () {
         this.kategoriPengembanganList.length = 0
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwKompetensi = new RWKompetensi()
     }
 
-    submit() {
+    submit () {
         if (this.rwKompetensiForm.valid) {
             this.rwKompetensi.name = this.rwKompetensiForm.value.name
             this.rwKompetensi.kategoriPengembanganId =
