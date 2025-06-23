@@ -124,7 +124,6 @@ export class UkomClassListComponent {
     handlePagable () {
         this.pagable$.next(
             new PagableBuilder('/api/v1/room_ukom/search')
-
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder('Nama', 'name').build()
                 )

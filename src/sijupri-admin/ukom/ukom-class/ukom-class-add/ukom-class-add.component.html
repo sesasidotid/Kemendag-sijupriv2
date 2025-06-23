@@ -28,10 +28,10 @@
             >
             <div class="col-sm-10">
                 <select
-                    id="jabatan"
+                    id="jabatan_code"
                     class="form-select"
                     name="jabatan"
-                    formControlName="jabatan"
+                    formControlName="jabatan_code"
                 >
                     <option selected value="" style="display: none">
                         Pilih Jabatan
@@ -54,7 +54,7 @@
                     </ng-template>
                 </select>
                 <div
-                    *ngIf="getErrorMessage('jabatan', 'Jabatan') as error"
+                    *ngIf="getErrorMessage('jabatan_code', 'Jabatan') as error"
                     class="text-danger"
                 >
                     {{ error }}
@@ -68,10 +68,10 @@
             >
             <div class="col-sm-10">
                 <select
-                    id="jenjang"
+                    id="jenjang_code"
                     class="form-select"
-                    name="jenjang"
-                    formControlName="jenjang"
+                    name="jenjang_code"
+                    formControlName="jenjang_code"
                 >
                     <option selected value="" style="display: none">
                         Pilih Jenjang
@@ -96,7 +96,7 @@
                 </select>
 
                 <div
-                    *ngIf="getErrorMessage('jenjang', 'Jenjang') as error"
+                    *ngIf="getErrorMessage('jenjang_code', 'Jenjang') as error"
                     class="text-danger"
                 >
                     {{ error }}
@@ -110,10 +110,10 @@
             >
             <div class="col-sm-10">
                 <select
-                    id="bidang_jabatan"
+                    id="bidang_jabatan_code"
                     class="form-select"
-                    name="bidang_jabatan"
-                    formControlName="bidang_jabatan"
+                    name="bidang_jabatan_code"
+                    formControlName="bidang_jabatan_code"
                 >
                     <option selected [ngValue]="null" disabled selected hidden>
                         Pilih Bidang Jabatan
@@ -142,7 +142,7 @@
                 <div
                     *ngIf="
                         getErrorMessage(
-                            'bidang_jabatan',
+                            'bidang_jabatan_code',
                             'Bidang Jabatan'
                         ) as error
                     "

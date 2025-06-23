@@ -14,7 +14,7 @@ import { Router } from '@angular/router'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { finalize, map } from 'rxjs/operators'
 import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
@@ -123,36 +123,32 @@ export class UkomDocumentAddComponent {
                     isMengulang
                 })
 
-                console.log(this.documentData)
-
                 this.apiService
                     .postData(
                         `/api/v1/document_ukom/dokumen_persyaratan`,
                         this.documentData
                     )
+                    .pipe(
+                        finalize(() => {
+                            this.submitLoading$.next(false)
+                        })
+                    )
                     .subscribe({
                         next: () => {
-                            this.handleSuccess()
-                            this.submitLoading$.next(false)
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Data berhasil disimpan'
+                            )
+                            this.changeTabActive.emit(0)
                         },
                         error: error => {
-                            this.handleError(error)
-                            this.submitLoading$.next(false)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menyimpan data'
+                            )
                         }
                     })
             }
         })
-    }
-
-    private handleSuccess () {
-        this.submitLoading$.next(false)
-        this.handlerService.handleAlert('Success', 'Data berhasil disimpan')
-        this.changeTabActive.emit(0)
-    }
-
-    private handleError (error: any) {
-        this.submitLoading$.next(false)
-        console.error(error.error.message)
-        this.handlerService.handleAlert('Error', 'Gagal menyimpan data')
     }
 }

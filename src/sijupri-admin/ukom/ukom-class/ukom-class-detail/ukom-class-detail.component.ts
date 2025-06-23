@@ -10,7 +10,7 @@ import { PagableComponent } from '../../../../modules/base/components/pagable/pa
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { ActivatedRoute } from '@angular/router'
 import { RoomUkomDetail } from '../../../../modules/ukom/models/room-ukom-detail'
-import { combineLatest, finalize, Observable, tap } from 'rxjs'
+import { combineLatest, finalize, Observable } from 'rxjs'
 import { map, take, BehaviorSubject } from 'rxjs'
 import { Router } from '@angular/router'
 import { TabService } from '../../../../modules/base/services/tab.service'
@@ -141,13 +141,12 @@ export class UkomClassDetailComponent {
             .pipe(
                 finalize(() => {
                     this.isDetailKelasLoading$.next(false)
-                }),
-                tap(res => {
-                    this.detailKelas = res
                 })
             )
             .subscribe({
-                next: res => {},
+                next: res => {
+                    this.detailKelas = res
+                },
                 error: err => {
                     this.handlerService.handleAlert(
                         'Error',
