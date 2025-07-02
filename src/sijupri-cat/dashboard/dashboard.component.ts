@@ -179,9 +179,24 @@ export class DashboardComponent implements AfterViewInit {
         }
     }
 
+    // canStartExam (startTime: string, endTime: string): boolean {
+    //     const now = this.currentDate
+    //     return new Date(startTime) <= now && now <= new Date(endTime)
+    // }
     canStartExam (startTime: string, endTime: string): boolean {
         const now = this.currentDate
-        return new Date(startTime) <= now && now <= new Date(endTime)
+
+        const toGMT7 = (dateStr: string): Date => {
+            const [datePart, timePart] = dateStr.split(' ')
+            const [year, month, day] = datePart.split('-').map(Number)
+            const [hour, minute, second] = timePart.split(':').map(Number)
+
+            return new Date(
+                Date.UTC(year, month - 1, day, hour - 7, minute, second)
+            )
+        }
+
+        return toGMT7(startTime) <= now && now <= toGMT7(endTime)
     }
 
     getRoomUkom (): Observable<void> {

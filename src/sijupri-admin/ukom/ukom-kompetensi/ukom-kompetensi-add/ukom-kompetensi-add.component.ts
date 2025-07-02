@@ -58,7 +58,7 @@ export class UkomKompetensiAddComponent {
     ngOnInit () {
         this.handleFormInit()
         this.getJabatanList()
-        this.getListJenjang()
+        // this.getListJenjang()
         this.handleSubscribe()
     }
 
@@ -84,18 +84,22 @@ export class UkomKompetensiAddComponent {
 
     handleSubscribe () {
         // this.handleBidangJabatanValidation()
+        const bidangJabatanControl = this.kompetensiForm.get(
+            'bidang_jabatan_code'
+        )
+        const jenjangControl = this.kompetensiForm.get('jenjang_code')
+        const jabatanControl = this.kompetensiForm.get('jabatan_code')
 
-        this.kompetensiForm
-            .get('jabatan_code')
-            ?.valueChanges.pipe(distinctUntilChanged())
+        jabatanControl?.valueChanges
+            .pipe(distinctUntilChanged())
             .subscribe(jabatanCode => {
-                const bidangJabatanControl = this.kompetensiForm.get(
-                    'bidang_jabatan_code'
-                )
                 bidangJabatanControl?.reset()
+                jenjangControl?.reset()
+                jenjangControl?.patchValue('')
 
                 if (jabatanCode) {
                     this.getBidangJabatanByJabatanCode(jabatanCode)
+                    this.getListJenjang(jabatanCode)
                 }
             })
     }
@@ -117,9 +121,21 @@ export class UkomKompetensiAddComponent {
         })
     }
 
-    getListJenjang () {
+    // getListJenjang () {
+    //     this.jenjangList$ = this.apiService
+    //         .getData(`/api/v1/jenjang`)
+    //         .pipe(
+    //             map(response =>
+    //                 response.map(
+    //                     (jenjang: { [key: string]: any }) =>
+    //                         new Jenjang(jenjang)
+    //                 )
+    //             )
+    //         )
+    // }
+    getListJenjang (jabatanCode: string) {
         this.jenjangList$ = this.apiService
-            .getData(`/api/v1/jenjang`)
+            .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
             .pipe(
                 map(response =>
                     response.map(

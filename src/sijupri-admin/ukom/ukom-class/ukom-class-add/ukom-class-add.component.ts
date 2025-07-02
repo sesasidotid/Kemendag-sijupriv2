@@ -57,7 +57,7 @@ export class UkomClassAddComponent {
     ngOnInit () {
         this.handleFormInit()
         this.getJabatanList()
-        this.getListJenjang()
+        // this.getListJenjang()
         this.handleSubscribe()
         this.handleBidangJabatanValidation()
     }
@@ -126,14 +126,18 @@ export class UkomClassAddComponent {
     handleSubscribe () {
         const jabatanControl = this.kelasForm.get('jabatan_code')
         const bidangJabatanControl = this.kelasForm.get('bidang_jabatan_code')
+        const jenjangControl = this.kelasForm.get('jenjang_code')
 
         jabatanControl?.valueChanges
             .pipe(distinctUntilChanged())
             .subscribe(jabatanCode => {
                 bidangJabatanControl?.reset()
+                jenjangControl?.reset()
+                jenjangControl?.patchValue('')
 
                 if (jabatanCode) {
                     this.getBidangJabatanByJabatanCode(jabatanCode)
+                    this.getListJenjang(jabatanCode)
                 }
             })
     }
@@ -151,9 +155,21 @@ export class UkomClassAddComponent {
             )
     }
 
-    getListJenjang () {
+    // getListJenjang () {
+    //     this.jenjangList$ = this.apiService
+    //         .getData(`/api/v1/jenjang`)
+    //         .pipe(
+    //             map(response =>
+    //                 response.map(
+    //                     (jenjang: { [key: string]: any }) =>
+    //                         new Jenjang(jenjang)
+    //                 )
+    //             )
+    //         )
+    // }
+    getListJenjang (jabatanCode: string) {
         this.jenjangList$ = this.apiService
-            .getData(`/api/v1/jenjang`)
+            .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
             .pipe(
                 map(response =>
                     response.map(

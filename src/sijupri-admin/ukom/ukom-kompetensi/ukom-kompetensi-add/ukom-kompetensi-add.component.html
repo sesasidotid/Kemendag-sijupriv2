@@ -139,12 +139,22 @@
                     <option selected value="" style="display: none">
                         Pilih Jenjang
                     </option>
-                    <option
-                        *ngFor="let jenjang of jenjangList$ | async"
-                        [value]="jenjang.code"
+                    <ng-container
+                        *ngIf="
+                            (jenjangList$ | async)?.length;
+                            else jabatanNotSelected
+                        "
                     >
-                        {{ jenjang.name }}
-                    </option>
+                        <option
+                            *ngFor="let jenjang of jenjangList$ | async"
+                            [value]="jenjang.code"
+                        >
+                            {{ jenjang.name }}
+                        </option>
+                    </ng-container>
+                    <ng-template #jabatanNotSelected>
+                        <option disabled>Pilih Jabatan terlebih dahulu</option>
+                    </ng-template>
                 </select>
                 <div
                     *ngIf="getErrorMessage('jenjang_code', 'Jenjang') as error"

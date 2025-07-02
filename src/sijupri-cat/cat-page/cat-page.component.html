@@ -110,13 +110,12 @@
                             Simpan
                         </button> -->
                         <button
-                            *ngIf="currentPage !== totalQuestions"
                             (click)="
                                 onSaveButtonClick(
                                     data.data[currentPage - 1]?.id
                                 )
                             "
-                            class="btn btn-primary"
+                            class="btn btn-primary mb-1"
                         >
                             Simpan
                         </button>
