@@ -140,9 +140,12 @@
                         </div>
                     </div>
                 </div>
-                <a routerLink="login" class="btn btn-secondary grad-button"
+                <!-- <a routerLink="login" class="btn btn-secondary grad-button"
                     >Daftar Sekarang</a
-                >
+                > -->
+                <button class="btn btn-secondary grad-button" [disabled]="true">
+                    Daftar Sekarang
+                </button>
             </div>
 
             <div class="feature feature-2">
@@ -150,8 +153,9 @@
                     <img src="./assets/doc-icon.svg" alt="" />
                 </div>
                 <h4>
-                    Pendaftaran Ukom bagi Perpindahan dan Promosi ke dalam JF
-                    Perdagangan
+                    <!-- Pendaftaran Ukom bagi Perpindahan dan Promosi ke dalam JF
+                    Perdagangan -->
+                    Pendaftaran Ukom Jabatan Fungsional Bidang Perdagangan
                 </h4>
                 <div class="req-parent">
                     <h6 class="req-title">Dokumen Promosi</h6>
@@ -209,7 +213,34 @@
                         </ng-template>
                     </div>
                 </div>
+                <div class="req-parent">
+                    <h6 class="req-title">Dokumen Kenaikan Jenjang</h6>
+                    <div class="req-items">
+                        <div
+                            *ngIf="
+                                dokumenKenaikanJenjang.length > 0;
+                                else noKenaikanJenjangDokumenInternal
+                            "
+                        >
+                            <div
+                                class="req-item"
+                                *ngFor="let item of dokumenKenaikanJenjang"
+                            >
+                                <i-lucide
+                                    [img]="SquareCheck"
+                                    [color]="'#49AB49'"
+                                ></i-lucide>
+                                <p class="capitalize">
+                                    {{ item.dokumenPersyaratanName }}
+                                </p>
+                            </div>
+                        </div>
 
+                        <ng-template #noKenaikanJenjangDokumenInternal>
+                            <p class="text-gray-500">-</p>
+                        </ng-template>
+                    </div>
+                </div>
                 <div
                     class="req-parent"
                     *ngIf="dokumenPromosiDanPindah.length > 0"
