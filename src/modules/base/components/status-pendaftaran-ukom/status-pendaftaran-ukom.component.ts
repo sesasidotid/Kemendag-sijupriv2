@@ -18,7 +18,6 @@ import {
 } from 'rxjs'
 import { LoginContext } from '../../commons/login-context'
 import { ModalComponent } from '../modal/modal.component'
-import { UkomRevisionComponent } from '../../../../sijupri-jf/ukom/ukom-revision/ukom-revision.component'
 import { CommonModule } from '@angular/common'
 import { ConverterService } from '../../services/converter.service'
 import { ApiService } from '../../services/api.service'
@@ -79,7 +78,6 @@ export class StatusPendaftaranUkomComponent {
         files: {},
         viewOnly: true
     }
-    // predikatKinerjaList: any[] = []
     predikatKinerjaList: PredikatKinerja[] = []
 
     pendidikanName: string
@@ -112,6 +110,8 @@ export class StatusPendaftaranUkomComponent {
     isAllSchoreLoading$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
     isLoading$: Observable<boolean>
+
+    registrationStatus: string
 
     constructor (
         private converterService: ConverterService,
@@ -360,6 +360,7 @@ export class StatusPendaftaranUkomComponent {
                 }),
                 tap((response: any) => {
                     if (response.status === 'pending') {
+                        this.registrationStatus = 'pending'
                         this.pendingTask = response.data
 
                         const step =
@@ -376,10 +377,21 @@ export class StatusPendaftaranUkomComponent {
                     }
 
                     if (response.status === 'finish') {
+                        this.registrationStatus = 'finish'
                         this.finishTask = response.data
                         this.dataDokumenUkom = response.data.documentUkomList
                         this.mapDokumenUkom()
                         this.getAllScoresFlow()
+                    }
+
+                    if (response.status === 'failed') {
+                        this.registrationStatus = 'failed'
+                        this.finishTask = response.data
+                        console.log('Failed task:', this.finishTask)
+                        this.dataDokumenUkom = response.data.dokumenUkomList
+                        console.log('Data dokumen UKOM:', this.dataDokumenUkom)
+                        this.mapDokumenUkom()
+                        // this.getAllScoresFlow()
                     }
                 }),
                 finalize(() => this.isLoadingPendingTask$.next(false))

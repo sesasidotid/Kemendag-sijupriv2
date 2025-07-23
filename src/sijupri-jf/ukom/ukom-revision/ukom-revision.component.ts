@@ -13,7 +13,7 @@ import { FIleHandler } from '../../../modules/base/commons/file-handler/file-han
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { DokumenUkomPersyaratan } from '../../../modules/maintenance/models/dokumen-persyaratan-ukom'
 import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.modal'
-import { switchMap } from 'rxjs'
+import { BehaviorSubject, switchMap, finalize } from 'rxjs'
 import { RevisiDokumenUkom } from '../../../modules/ukom/models/revisi-dokumen-ukom.model'
 @Component({
     selector: 'app-ukom-revision',
@@ -54,18 +54,22 @@ export class UkomRevisionComponent {
         }
     }
 
-    constructor(
+    submitLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+        false
+    )
+
+    constructor (
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService
-    ) { }
+    ) {}
 
-    ngOnInit() {
+    ngOnInit () {
         this.getRejectedDokumen()
         this.handleRejectedDokumen()
     }
 
-    getRejectedDokumen() {
+    getRejectedDokumen () {
         if (this.pendingTask?.dokumenUkomList?.length) {
             this.rejectedDokumen = this.pendingTask.dokumenUkomList.filter(
                 dokumen => dokumen.dokumenStatus.toLowerCase() === 'reject'
@@ -75,7 +79,7 @@ export class UkomRevisionComponent {
         }
     }
 
-    handleRejectedDokumen() {
+    handleRejectedDokumen () {
         this.inputs.files = {}
         this.rejectedDokumen.forEach((dokumen, index) => {
             // const key = `rejectedDokumen_${index + 1}`
@@ -87,9 +91,9 @@ export class UkomRevisionComponent {
         })
     }
 
-    isAnyFileMissing(): boolean {
+    isAnyFileMissing (): boolean {
         if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
-            return true;
+            return true
         }
 
         return Object.keys(this.inputs.files).some(key => {
@@ -97,7 +101,7 @@ export class UkomRevisionComponent {
         })
     }
 
-    onSave() {
+    onSave () {
         if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
             this.pesertaUkom.dokumenUkomList = []
         }
@@ -109,46 +113,54 @@ export class UkomRevisionComponent {
                 const detected = this.detectedDokumen[key]
 
                 const existingDokumen = this.pendingTask.dokumenUkomList.find(
-                    // dokumen => dokumen.dokumenPersyaratanName === detected.label
                     dokumen => dokumen.dokumenPersyaratanId === key
                 )
 
                 if (existingDokumen) {
                     const newDoc = {
                         dokumenFile: detected.base64,
-                        dokumenPersyaratanName: `${this.jf.nip
-                            }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName}`,
-                        dokumenPersyaratanId: existingDokumen.dokumenPersyaratanId
+                        dokumenPersyaratanName: `${
+                            this.jf.nip
+                        }_dokumenPersyaratanUkom_${Date.now()}_${
+                            existingDokumen.dokumenPersyaratanName
+                        }`,
+                        dokumenPersyaratanId:
+                            existingDokumen.dokumenPersyaratanId
                     }
 
-                    documentMap.set(existingDokumen.dokumenPersyaratanId, newDoc)
+                    documentMap.set(
+                        existingDokumen.dokumenPersyaratanId,
+                        newDoc
+                    )
                 }
             }
         }
 
-        // Convert the Map values to an array and assign it to pesertaUkom.dokumenUkomList
         this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
 
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
+                this.submitLoading$.next(true)
 
                 this.revisedDokumen.id = this.pendingTask.id
                 this.revisedDokumen.taskAction = 'approve'
                 this.revisedDokumen.object = this.pesertaUkom
 
-                console.log(this.pesertaUkom)
-                console.log(this.revisedDokumen)
-
                 this.apiService
-                    .postData(`/api/v1/participant_ukom/task/submit`, this.revisedDokumen)
+                    .postData(
+                        `/api/v1/participant_ukom/task/submit`,
+                        this.revisedDokumen
+                    )
+                    .pipe(finalize(() => this.submitLoading$.next(false)))
                     .subscribe({
                         next: () => window.location.reload(),
-                        error: error => this.handlerService.handleException(error)
+                        error: error =>
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengirim revisi dokumen'
+                            )
                     })
-            },
-            error: error => {
-                console.log('error', error)
             }
         })
     }

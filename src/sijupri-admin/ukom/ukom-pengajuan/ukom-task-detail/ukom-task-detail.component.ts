@@ -220,8 +220,6 @@ export class UkomTaskDetailComponent {
         const birthDate = new Date(tanggalLahir)
         const suratDate = new Date(tglSuratUsulan)
 
-        console.log(typeof birthDate, typeof suratDate)
-
         if (isNaN(birthDate.getTime()) || isNaN(suratDate.getTime())) {
             return '-'
         }
@@ -367,26 +365,29 @@ export class UkomTaskDetailComponent {
     }
 
     sendSubmission () {
-        console.log('body', this.body)
-
         this.apiService
             .postData(`/api/v1/participant_ukom/task/submit`, this.body)
-            .subscribe({
-                next: () => {
-                    this.hadItemsLoading$.next(false)
-                    this.handlerService.handleAlert(
-                        'Success',
-                        'Berhasil mengirimkan tugas'
-                    )
-                    this.handlerService.handleNavigate('/ukom/ukom-task-list')
-                },
-                error: error => {
+            .pipe(
+                catchError(error => {
                     this.hadItemsLoading$.next(false)
                     console.error(error)
                     this.handlerService.handleAlert(
                         'Error',
                         'Gagal mengirimkan tugas'
                     )
+                    return of(null)
+                }),
+                finalize(() => {
+                    this.hadItemsLoading$.next(false)
+                })
+            )
+            .subscribe({
+                next: () => {
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'Berhasil mengirimkan tugas'
+                    )
+                    this.handlerService.handleNavigate('/ukom/ukom-task-list')
                 }
             })
     }
@@ -413,19 +414,16 @@ export class UkomTaskDetailComponent {
     }
 
     submitAmend () {
-        this.confirmationService.open(false).subscribe({
-            next: result => {
-                if (!result.confirmed) return
+        this.confirmationService.open(true).subscribe({
+            next: ({ confirmed, comment }) => {
+                if (!confirmed) return
                 this.hadItemsLoading$.next(true)
 
-                const task = new Task()
-                task.id = this.pendingTask.id
-                task.taskAction = 'amend'
-
-                this.body = {
+                this.body = new Task({
                     id: this.pendingTask.id,
-                    taskAction: task.taskAction
-                }
+                    remark: comment || null,
+                    taskAction: 'amend'
+                })
 
                 const rejectedDokumenUkomList =
                     this.pesertaUkom.dokumenUkomList.filter(
@@ -444,19 +442,16 @@ export class UkomTaskDetailComponent {
     }
 
     submitReject () {
-        this.confirmationService.open(false).subscribe({
-            next: result => {
-                if (!result.confirmed) return
+        this.confirmationService.open(true).subscribe({
+            next: ({ confirmed, comment }) => {
+                if (!confirmed) return
                 this.hadItemsLoading$.next(true)
 
-                const task = new Task()
-                task.id = this.pendingTask.id
-                task.taskAction = 'reject'
-
-                this.body = {
+                this.body = new Task({
                     id: this.pendingTask.id,
-                    taskAction: task.taskAction
-                }
+                    taskAction: 'reject',
+                    remark: comment || null
+                })
 
                 const rejectedDokumenUkomList =
                     this.pesertaUkom.dokumenUkomList.filter(
