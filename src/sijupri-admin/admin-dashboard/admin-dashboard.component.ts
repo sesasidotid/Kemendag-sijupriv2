@@ -6,7 +6,7 @@ import { NgChartsModule, BaseChartDirective } from 'ng2-charts'
 import { FormsModule } from '@angular/forms'
 import { Pagable } from '../../modules/base/commons/pagable/pagable'
 import { Router } from '@angular/router'
-import { forkJoin } from 'rxjs'
+import { BehaviorSubject, forkJoin, finalize, catchError, of } from 'rxjs'
 import { LoginContext } from '../../modules/base/commons/login-context'
 
 @Component({
@@ -92,99 +92,137 @@ export class AdminDashboardComponent {
         }
     ]
 
-    totalAKPPending: number = 0
-    totalUKOMPending: number = 0
-    totalFormasiPending: number = 0
-    totalSIAPPending: number = 0
-    totalPAKPending: number = 0
-
     totalUserJF: number = 0
     totalUserUnitKerja: number = 0
     totalUserAdmin: number = 0
     totalUserInstansi: number = 0
 
-    constructor(private apiService: ApiService, private router: Router) { }
-
-    ngOnInit() {
-        this.userRole = LoginContext.getRoleCodes()
-
-        this.getTotalAKPPending()
-        this.getTotalUKOMPending()
-        this.getTotalFormasiPending()
-        this.getTotalPAKPending()
-        this.fetchData()
-        this.getUserStats()
+    pendingCounts = {
+        akpVerifikasi: 0,
+        akpPenilaianAtasan: 0,
+        akpPenilaianPribadi: 0,
+        formasi: 0,
+        pak: 0,
+        verifikasiUKom: 0,
+        perbaikanDokumenUKom: 0
     }
 
-    rounding(value: string): string {
+    pendingLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+        false
+    )
+    userLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
+    constructor (private apiService: ApiService, private router: Router) {
+        this.userRole = LoginContext.getRoleCodes()
+    }
+
+    ngOnInit () {
+        this.fetchData()
+        this.getUserStats()
+        this.getPendingCount()
+    }
+
+    rounding (value: string): string {
         return parseFloat(value).toFixed(2)
     }
 
-    getTotalAKPPending() {
-        this.apiService.getData('/api/v1/akp/task/search').subscribe({
-            next: res => {
-                this.totalAKPPending = res.total
-            }
-        })
-    }
-
-    getTotalUKOMPending() {
-        this.apiService.getData('/api/v1/participant_ukom/task/search').subscribe({
-            next: res => {
-                this.totalUKOMPending = res.total
-            }
-        })
-    }
-
-    getTotalFormasiPending() {
-        this.apiService.getData('/api/v1/formasi/task/search').subscribe({
-            next: res => {
-                this.totalFormasiPending = res.total
-            }
-        })
-    }
-
-    getTotalPAKPending() {
-        this.apiService.getData('/api/v1/jf/task/kinerja/search').subscribe({
-            next: res => {
-                this.totalPAKPending = res.total
-            }
-        })
-    }
-
-    getUserStats() {
+    getPendingCount () {
+        this.pendingLoading$.next(true)
         forkJoin({
-            totalUserJF: this.apiService.getData('/api/v1/jf/search?page=1&limit=1'),
+            totalAKPVerifikasi: this.apiService.getData(
+                '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_1'
+            ),
+            totalAKPPenliaianAtasan: this.apiService.getData(
+                '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_2'
+            ),
+            totalAKPPenilaianPribadi: this.apiService.getData(
+                '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_3'
+            ),
+            totalFormasi: this.apiService.getData(
+                '/api/v1/formasi/task/search?page=1&limit=1'
+            ),
+            totalPAK: this.apiService.getData(
+                '/api/v1/jf/task/kinerja/search?page=1&limit=1'
+            ),
+            totalVerifikasiUKom: this.apiService.getData(
+                '/api/v1/participant_ukom/task/search?page=1&limit=1&eq_flowId=ukom_flow_1'
+            ),
+            totalPerbaikanDokumenUKom: this.apiService.getData(
+                '/api/v1/participant_ukom/task/search?page=1&limit=1&eq_flowId=ukom_flow_2'
+            )
+        })
+            .pipe(
+                finalize(() => {
+                    this.pendingLoading$.next(false)
+                }),
+                catchError(err => {
+                    console.error('Error fetching pending counts', err)
+                    this.pendingLoading$.next(false)
+                    return of(null)
+                })
+            )
+            .subscribe({
+                next: ({
+                    totalAKPVerifikasi,
+                    totalAKPPenliaianAtasan,
+                    totalAKPPenilaianPribadi,
+                    totalFormasi,
+                    totalPAK,
+                    totalVerifikasiUKom,
+                    totalPerbaikanDokumenUKom
+                }) => {
+                    this.pendingCounts.akpVerifikasi =
+                        totalAKPVerifikasi.total ?? 0
+                    this.pendingCounts.akpPenilaianAtasan =
+                        totalAKPPenliaianAtasan.total ?? 0
+                    this.pendingCounts.akpPenilaianPribadi =
+                        totalAKPPenilaianPribadi.total ?? 0
+                    this.pendingCounts.formasi = totalFormasi.total ?? 0
+                    this.pendingCounts.pak = totalPAK.total ?? 0
+                    this.pendingCounts.verifikasiUKom =
+                        totalVerifikasiUKom.total ?? 0
+                    this.pendingCounts.perbaikanDokumenUKom =
+                        totalPerbaikanDokumenUKom.total ?? 0
+                }
+            })
+    }
+
+    getUserStats () {
+        this.userLoading$.next(true)
+        forkJoin({
+            totalUserJF: this.apiService.getData(
+                '/api/v1/jf/search?page=1&limit=1'
+            ),
             totalUserUnitKerja: this.apiService.getData(
                 '/api/v1/user_unit_kerja/search?page=1&limit=1'
             ),
-            // totalUserAdmin: this.apiService.getData(
-            //     '/api/v1/user/search?eq_userApplicationChannel|applicationCode=sijupri-admin'
-            // ),
-            totalUserAdmin: this.apiService.getData('/api/v1/user/search?page=1&limit=10&eq_userApplicationChannel|applicationCode=sijupri-admin&eq_userApplicationChannel|channelCode=WEB'),
+            totalUserAdmin: this.apiService.getData(
+                '/api/v1/user/search?page=1&limit=10&eq_userApplicationChannel|applicationCode=sijupri-admin&eq_userApplicationChannel|channelCode=WEB'
+            ),
             totalUserInstansi: this.apiService.getData(
                 '/api/v1/user_instansi/search?page=1&limit=1'
             )
-        }).subscribe({
-            next: ({
-                totalUserJF,
-                totalUserUnitKerja,
-                totalUserAdmin,
-                totalUserInstansi
-            }) => {
-                this.totalUserJF = totalUserJF.total
-                this.totalUserUnitKerja = totalUserUnitKerja.total
-                this.totalUserAdmin = totalUserAdmin.total
-                this.totalUserInstansi = totalUserInstansi.total
-            }
         })
+            .pipe(finalize(() => this.userLoading$.next(false)))
+            .subscribe({
+                next: ({
+                    totalUserJF,
+                    totalUserUnitKerja,
+                    totalUserAdmin,
+                    totalUserInstansi
+                }) => {
+                    this.totalUserJF = totalUserJF.total
+                    this.totalUserUnitKerja = totalUserUnitKerja.total
+                    this.totalUserAdmin = totalUserAdmin.total
+                    this.totalUserInstansi = totalUserInstansi.total
+                }
+            })
     }
 
-    navigateTo(path: string) {
+    navigateTo (path: string) {
         this.router.navigate([path])
     }
 
-    fetchData() {
+    fetchData () {
         this.apiService
             .getData('/api/v1/dashboard/participant_ukom_count')
             .subscribe({
@@ -198,7 +236,7 @@ export class AdminDashboardComponent {
             })
     }
 
-    applyFilters() {
+    applyFilters () {
         this.filteredData = this.apiData.filter((item: any) => {
             const monthObj = this.months.find(m => m.eng === item.month)
             const monthIndex = monthObj ? this.months.indexOf(monthObj) + 1 : 0

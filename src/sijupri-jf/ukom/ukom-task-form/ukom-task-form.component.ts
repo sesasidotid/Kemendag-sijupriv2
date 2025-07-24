@@ -550,7 +550,9 @@ export class UkomTaskFormComponent {
                 this.pesertaUkom.jurusan = this.jurusanJF
                 this.pesertaUkom.JenjangName = this.jf.jenjangName
                 this.pesertaUkom.isMengulang =
-                    this.passwordForm.get('isMengulang')?.value
+                    String(this.passwordForm.get('isMengulang')?.value) ===
+                    'true'
+
                 this.apiService
                     .postData(
                         `/api/v1/participant_ukom/task/jf`,

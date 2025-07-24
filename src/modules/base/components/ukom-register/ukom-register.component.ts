@@ -649,7 +649,9 @@ export class UkomRegisterComponent {
             'predikat_kinerja_2_id'
         )?.value
 
-        this.pesertaUkom.isMengulang = this.nonJFForm.get('isMengulang')?.value
+        // this.pesertaUkom.isMengulang = this.nonJFForm.get('isMengulang')?.value
+        this.pesertaUkom.isMengulang =
+            String(this.nonJFForm.get('isMengulang')?.value) === 'true'
 
         if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
             this.pesertaUkom.dokumenUkomList = []
@@ -689,7 +691,6 @@ export class UkomRegisterComponent {
                 if (!result.confirmed) return
 
                 this.hadItemsLoading$.next(true)
-
                 this.apiService
                     .postData('/api/v1/participant_ukom/task', this.pesertaUkom)
                     .subscribe({

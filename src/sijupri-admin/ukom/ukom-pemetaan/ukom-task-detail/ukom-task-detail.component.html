@@ -2,10 +2,7 @@
     <i class="mdi mdi-chevron-left"></i> Kembali
 </button>
 
-<div
-    *ngIf="ukomDetailLoading$ | async; else ukomHadItem"
-    class="d-flex justify-content-center my-5"
->
+<div *ngIf="ukomDetailLoading$ | async; else ukomHadItem" class="d-flex justify-content-center my-5">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
@@ -30,14 +27,12 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Status Pendaftar</label
-                                >
+                                <label class="form-label">Status Pendaftar</label>
                                 <p class="border-bottom">
                                     {{
-                                        ukomDetail.participantStatus == 'jf'
-                                            ? 'JF Perdagangan'
-                                            : 'Non-JF Perdagangan'
+                                    ukomDetail.participantStatus == 'jf'
+                                    ? 'JF Perdagangan'
+                                    : 'Non-JF Perdagangan'
                                     }}
                                 </p>
                             </div>
@@ -90,15 +85,13 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Usia Menurut Surat Usulan</label
-                                >
+                                <label class="form-label">Usia Menurut Surat Usulan</label>
                                 <p class="border-bottom">
                                     {{
-                                        calculateAge(
-                                            ukomDetail.tanggalLahir,
-                                            ukomDetail.tglSuratUsulan
-                                        )
+                                    calculateAge(
+                                    ukomDetail.tanggalLahir,
+                                    ukomDetail.tglSuratUsulan
+                                    )
                                     }}
                                 </p>
                             </div>
@@ -111,9 +104,7 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Jenjang Pendidikan</label
-                                >
+                                <label class="form-label">Jenjang Pendidikan</label>
                                 <p class="border-bottom">
                                     {{ pendidikanName ?? '-' }}
                                 </p>
@@ -122,9 +113,7 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Program Studi/Jurusan</label
-                                >
+                                <label class="form-label">Program Studi/Jurusan</label>
                                 <p class="border-bottom">
                                     {{ ukomDetail.jurusan ?? '-' }}
                                 </p>
@@ -136,9 +125,9 @@
                                 <label class="form-label">Instansi</label>
                                 <p class="border-bottom">
                                     {{
-                                        transformInstansiName(
-                                            ukomDetail.jenisInstansi
-                                        ) ?? '-'
+                                    transformInstansiName(
+                                    ukomDetail.jenisInstansi
+                                    ) ?? '-'
                                     }}
                                 </p>
                             </div>
@@ -158,24 +147,22 @@
                                 <label class="form-label">Kabupaten/Kota</label>
                                 <p class="border-bottom">
                                     {{
-                                        kabupatenName
-                                            ? typeKabKota + ' ' + kabupatenName
-                                            : '-'
+                                    kabupatenName
+                                    ? typeKabKota + ' ' + kabupatenName
+                                    : '-'
                                     }}
                                 </p>
                             </div>
                         </div>
 
-                        <div
-                            [ngClass]="{
+                        <div [ngClass]="{
                                 'col-lg-6':
                                     ukomDetail.jenisInstansi !=
                                     'PEMERINTAH_PROVINSI',
                                 'col-lg-12':
                                     ukomDetail.jenisInstansi ==
                                     'PEMERINTAH_PROVINSI'
-                            }"
-                        >
+                            }">
                             <div class="mb-3">
                                 <label class="form-label">Unit Kerja</label>
                                 <p class="border-bottom">
@@ -195,9 +182,7 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Jabatan Yang Dituju</label
-                                >
+                                <label class="form-label">Jabatan Yang Dituju</label>
                                 <p class="border-bottom">
                                     {{ ukomDetail.nextJabatanName ?? '-' }}
                                 </p>
@@ -215,9 +200,7 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Jenjang Yang Dituju</label
-                                >
+                                <label class="form-label">Jenjang Yang Dituju</label>
                                 <p class="border-bottom">
                                     {{ ukomDetail.nextJenjangName ?? '-' }}
                                 </p>
@@ -235,9 +218,7 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Bidang Jabatan Yang Dituju</label
-                                >
+                                <label class="form-label">Bidang Jabatan Yang Dituju</label>
                                 <p class="border-bottom">
                                     {{ bidangJabatanName ?? '-' }}
                                 </p>
@@ -253,19 +234,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenis UKom</label>
                                 <p class="border-bottom">
-                                    <!-- {{
-                                        ukomDetail.jenisUkom ===
-                                        'KENAIKAN_JENJANG'
-                                            ? 'Kenaikan Jenjang'
-                                            : ukomDetail.jenisUkom ===
-                                              'PERPINDAHAN_JABATAN'
-                                            ? 'Perpindahan Jabatan'
-                                            : ukomDetail.jenisUkom === 'PROMOSI'
-                                            ? 'Promosi'
-                                            : ukomDetail.jenisUkom
-                                    }} -->
                                     {{
-                                        getJenisUkomLabel(ukomDetail.jenisUkom)
+                                    getJenisUkomLabel(ukomDetail.jenisUkom)
                                     }}
                                 </p>
                             </div>
@@ -273,14 +243,12 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Status Pendaftaran</label
-                                >
+                                <label class="form-label">Status Pendaftaran</label>
                                 <p class="border-bottom">
                                     {{
-                                        ukomDetail.isMengulang
-                                            ? 'Mengulang'
-                                            : 'Baru'
+                                    ukomDetail.isMengulang
+                                    ? 'Mengulang'
+                                    : 'Baru'
                                     }}
                                 </p>
                             </div>
@@ -288,9 +256,7 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Nomor Surat Usulan</label
-                                >
+                                <label class="form-label">Nomor Surat Usulan</label>
                                 <p class="border-bottom">
                                     {{ ukomDetail.noSuratUsulan ?? '-' }}
                                 </p>
@@ -299,12 +265,10 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Tanggal Surat Usulan</label
-                                >
+                                <label class="form-label">Tanggal Surat Usulan</label>
                                 <p class="border-bottom">
                                     {{
-                                        ukomDetail.tglSuratUsulan | tanggalIndo
+                                    ukomDetail.tglSuratUsulan | tanggalIndo
                                     }}
                                 </p>
                             </div>
@@ -312,10 +276,8 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Predikat Kinerja Pegawai Satu Tahun
-                                    Terakhir</label
-                                >
+                                <label class="form-label">Predikat Kinerja Pegawai Satu Tahun
+                                    Terakhir</label>
                                 <p class="border-bottom">
                                     {{ predikat1Name }}
                                 </p>
@@ -324,10 +286,8 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Predikat Kinerja Pegawai Dua Tahun
-                                    Terakhir</label
-                                >
+                                <label class="form-label">Predikat Kinerja Pegawai Dua Tahun
+                                    Terakhir</label>
                                 <p class="border-bottom">
                                     {{ predikat2Name }}
                                 </p>
@@ -341,14 +301,11 @@
             <div class="card detail-jf" *ngIf="dataDokumenUkom.length > 0">
                 <div class="card-header">
                     <h5 class="m-0">
-                        <i class="mdi mdi-file-document-check-outline me-2"></i
-                        >Dokumen Pendaftaran UKom
+                        <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen Pendaftaran UKom
                     </h5>
                 </div>
                 <div class="card-body">
-                    <app-file-handler
-                        [inputs]="fileHandlerData"
-                    ></app-file-handler>
+                    <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
                 </div>
             </div>
 
@@ -361,69 +318,45 @@
                 <ng-container *ngIf="entries.length > 0">
                     <div class="card-header" *ngIf="hasVisibleUkomDetails">
                         <h5 class="m-0">
-                            <i
-                                class="mdi mdi-checkbox-marked-circle-outline me-2"
-                            ></i>
+                            <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
                             Detail UKom
                         </h5>
                     </div>
 
                     <div class="list-group">
                         <!-- CAT -->
-                        <div
-                            class="list-group-item d-flex justify-content-between align-items-center"
-                            *ngIf="scoreMap['CAT'].id"
-                        >
+                        <div class="list-group-item d-flex justify-content-between align-items-center"
+                            *ngIf="scoreMap['CAT'].id">
                             <div>
                                 <h5 class="m-0">CAT</h5>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <button
-                                    class="btn btn-success"
-                                    (click)="toggleModal()"
-                                >
+                                <button class="btn btn-success" (click)="toggleModal()">
                                     Lihat Nilai
                                 </button>
-                                <app-loading-button
-                                    [isLoading]="
+                                <app-loading-button [isLoading]="
                                         isDeleteExamScoreLoading$ | async
-                                    "
-                                    [type]="'button'"
-                                    label="Hapus Nilai"
-                                    [className]="'btn btn-danger'"
-                                    (clicked)="
+                                    " [type]="'button'" label="Hapus Nilai" [className]="'btn btn-danger'" (clicked)="
                                         deleteExamScore(scoreMap['CAT'].id)
-                                    "
-                                ></app-loading-button>
+                                    "></app-loading-button>
                             </div>
                         </div>
 
                         <!-- MAKALAH -->
-                        <div
-                            class="list-group-item d-flex justify-content-between align-items-center"
-                            *ngIf="scoreMap['MAKALAH'].id"
-                        >
+                        <div class="list-group-item d-flex justify-content-between align-items-center"
+                            *ngIf="scoreMap['MAKALAH'].id">
                             <div>
                                 <h5 class="m-0">Makalah</h5>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <button
-                                    class="btn btn-success"
-                                    (click)="viewFile()"
-                                >
+                                <button class="btn btn-success" (click)="viewFile()">
                                     Lihat Makalah
                                 </button>
-                                <app-loading-button
-                                    [isLoading]="
+                                <app-loading-button [isLoading]="
                                         isDeleteExamScoreLoading$ | async
-                                    "
-                                    [type]="'button'"
-                                    label="Hapus Nilai"
-                                    [className]="'btn btn-danger'"
-                                    (clicked)="
+                                    " [type]="'button'" label="Hapus Nilai" [className]="'btn btn-danger'" (clicked)="
                                         deleteExamScore(scoreMap['MAKALAH'].id)
-                                    "
-                                ></app-loading-button>
+                                    "></app-loading-button>
                             </div>
                         </div>
                     </div>
@@ -433,13 +366,8 @@
     </div>
 </ng-template>
 
-<app-modal
-    *ngIf="isModalOpen$ | async"
-    [title]="'Hasil Ujian'"
-    (toggle)="toggleModal()"
-    [enableFooter]="false"
-    [size]="'lg'"
->
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Hasil Ujian'" (toggle)="toggleModal()" [enableFooter]="false"
+    [size]="'lg'">
     <ng-container>
         <div class="total-score-container">
             <div class="total-score-value">
@@ -447,21 +375,16 @@
             </div>
         </div>
 
-        <div
-            *ngFor="let competencyGroup of getGroupedCompetencies()"
-            class="mb-5"
-        >
+        <div *ngFor="let competencyGroup of getGroupedCompetencies()" class="mb-5">
             <div class="card border-0 mb-3">
                 <div class="card-header bg-primary text-white">
-                    <div
-                        class="d-flex justify-content-between align-items-center"
-                    >
+                    <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0 text-white">
                             {{ competencyGroup.name }}
                         </h4>
                         <span class="badge badge-light badge-lg">
                             {{ competencyGroup.percentage }}% ({{
-                                competencyGroup.correct
+                            competencyGroup.correct
                             }}/{{ competencyGroup.total }})
                         </span>
                     </div>
@@ -470,18 +393,11 @@
 
             <!-- Sub-competencies -->
             <div class="row">
-                <div
-                    *ngFor="let kompetensi of competencyGroup.items"
-                    class="col-md-6 mb-3"
-                >
+                <div *ngFor="let kompetensi of competencyGroup.items" class="col-md-6 mb-3">
                     <div class="card">
-                        <div
-                            class="card-header d-flex justify-content-between align-items-center"
-                        >
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">{{ kompetensi.name }}</h5>
-                            <span
-                                class="badge"
-                                [ngClass]="{
+                            <span class="badge" [ngClass]="{
                                     'bg-success':
                                         getCompetencyPercentage(kompetensi) >=
                                         70,
@@ -492,8 +408,7 @@
                                             70,
                                     'bg-danger':
                                         getCompetencyPercentage(kompetensi) < 50
-                                }"
-                            >
+                                }">
                                 {{ getCompetencyPercentage(kompetensi) }}%
                             </span>
                         </div>
@@ -508,11 +423,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr
-                                            *ngFor="
+                                        <tr *ngFor="
                                                 let question of kompetensi.questionDtoList
-                                            "
-                                            [ngClass]="{
+                                            " [ngClass]="{
                                                 'table-success':
                                                     question.answerDto
                                                         ?.answerChoice ===
@@ -521,25 +434,24 @@
                                                     question.answerDto
                                                         ?.answerChoice !==
                                                     getCorrectAnswer(question)
-                                            }"
-                                        >
+                                            }">
                                             <td>{{ question.question }}</td>
                                             <td>
                                                 {{
-                                                    question.answerDto
-                                                        ?.answerChoice
+                                                question.answerDto
+                                                ?.answerChoice
                                                 }}
                                             </td>
                                             <td>
                                                 <span>
                                                     {{
-                                                        question.answerDto
-                                                            ?.answerChoice ===
-                                                        getCorrectAnswer(
-                                                            question
-                                                        )
-                                                            ? 'Benar'
-                                                            : 'Salah'
+                                                    question.answerDto
+                                                    ?.answerChoice ===
+                                                    getCorrectAnswer(
+                                                    question
+                                                    )
+                                                    ? 'Benar'
+                                                    : 'Salah'
                                                     }}
                                                 </span>
                                             </td>

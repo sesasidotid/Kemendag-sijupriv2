@@ -70,7 +70,7 @@
                                 </label>
                                 <p class="text-muted">
                                     {{
-                                    pendingTask.isMengulang == 'true'
+                                    pendingTask.isMengulang
                                     ? 'Mengulang'
                                     : 'Baru'
                                     }}
@@ -488,7 +488,7 @@
                                 <label for="firstnameInput" class="form-label">Status Pendaftaran</label>
                                 <p class="text-muted">
                                     {{
-                                    finishTask.isMengulang == 'true'
+                                    finishTask.isMengulang
                                     ? 'Mengulang'
                                     : 'Baru'
                                     }}
@@ -686,12 +686,12 @@
                     </h6>
                     <ng-container *ngIf="registrationStatus === 'finish'; else pillFailed">
                         <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">
-                            Lolos Verifikasi
+                            Lolos Seleksi Administrasi
                         </span>
                     </ng-container>
                     <ng-template #pillFailed>
                         <span class="bg-danger text-white rounded-pill px-3 py-1 small fw-semibold">
-                            Tidak Lolos Verifikasi
+                            Tidak Lolos Seleksi Administrasi
                         </span>
                     </ng-template>
                 </div>
@@ -701,11 +701,6 @@
                     <strong>Alasan Penolakan:</strong> {{ finishTask.remark }}
                 </div>
             </div>
-
-
-
-
-
             <div class="card-body">
                 <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
             </div>

@@ -1,221 +1,188 @@
 <section class="container-fluid">
-  <p class="h3">Pengajuan Dengan Status Pending</p>
-  <div class="row">
-    <div
-      *ngIf="userRole?.includes('ADMIN_AKP') || userRole?.includes('ADMIN')"
-      class="col-lg-3 col-md-6 col-12 cursor-pointer"
-      (click)="navigateTo('/akp/akp-task-list')"
-    >
-      <div class="card text-center p-3 mb-0">
-        <h5>AKP</h5>
-        <h2>{{ totalAKPPending }}</h2>
-      </div>
-      <p class="text-muted small">Jumlah pengajuan AKP</p>
-    </div>
-
-    <div
-      *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-      class="col-lg-3 col-md-6 col-12 cursor-pointer"
-      (click)="navigateTo('/ukom/ukom-task-list')"
-    >
-      <div class="card text-center p-3 mb-0">
-        <h5>UKom</h5>
-        <h2>{{ totalUKOMPending }}</h2>
-      </div>
-      <p class="text-muted small">Jumlah pengajuan UKom</p>
-    </div>
-
-    <div
-      *ngIf="userRole?.includes('ADMIN_FORMASI') || userRole?.includes('ADMIN')"
-      class="col-lg-3 col-md-6 col-12 cursor-pointer"
-      (click)="navigateTo('/formasi/formasi-task-list')"
-    >
-      <div class="card text-center p-3 mb-0">
-        <h5>FORMASI</h5>
-        <h2>{{ totalFormasiPending }}</h2>
-      </div>
-      <p class="text-muted small">Jumlah pengajuan Formasi</p>
-    </div>
-
-    <div
-      *ngIf="userRole?.includes('ADMIN_PAK') || userRole?.includes('ADMIN')"
-      class="col-lg-3 col-md-6 col-12 cursor-pointer"
-      (click)="navigateTo('/pak/pak-task-list')"
-    >
-      <div class="card text-center p-3 mb-0">
-        <h5>PAK</h5>
-        <h2>{{ totalPAKPending }}</h2>
-      </div>
-      <p class="text-muted small">Jumlah konfirmasi Data Kinerja</p>
-    </div>
-  </div>
-
-  <br />
-  <div *ngIf="userRole?.includes('ADMIN')">
-    <p class="h3">User Sijupri</p>
-    <div class="row">
-      <div
-        class="col-lg-3 col-md-6 col-12 cursor-pointer"
-        (click)="navigateTo('/security/user')"
-        style="cursor: pointer"
-      >
-        <div class="card">
-          <div class="card-body">
-            <div class="media d-flex justify-content-between">
-              <div class="media-body text-left">
-                <h3 class="success">{{ totalUserAdmin }}</h3>
-                <span>Admin Sijupri</span>
-              </div>
-              <div class="align-self-center">
-                <span
-                  class="mdi mdi-account-key-outline"
-                  style="font-size: 2.5rem"
-                ></span>
-              </div>
+    <p class="h3">Pengajuan Dengan Status Pending</p>
+    <ng-container *ngIf="pendingLoading$ | async; else content">
+        <div class="d-flex justify-content-center my-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-          </div>
         </div>
-      </div>
-
-      <div
-        class="col-lg-3 col-md-6 col-12 cursor-pointer"
-        (click)="navigateTo('/siap/user-instansi')"
-        style="cursor: pointer"
-      >
-        <div class="card">
-          <div class="card-body">
-            <div class="media d-flex justify-content-between">
-              <div class="media-body text-left">
-                <h3 class="success">{{ totalUserInstansi }}</h3>
-                <span>Admin Instansi</span>
-              </div>
-              <div class="align-self-center">
-                <span
-                  class="mdi mdi-account-outline"
-                  style="font-size: 2.5rem"
-                ></span>
-              </div>
+    </ng-container>
+    <ng-template #content>
+        <div class="row">
+            <div *ngIf="userRole?.includes('ADMIN_AKP') || userRole?.includes('ADMIN')"
+                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/akp/akp-task-list')">
+                <div class="card text-center p-3 mb-0 h-100 w-100">
+                    <h5>Verfikasi Pengajuan AKP</h5>
+                    <h2>{{ pendingCounts.akpVerifikasi }}</h2>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div
-        class="col-lg-3 col-md-6 col-12 cursor-pointer"
-        (click)="navigateTo('/siap/user-unit-kerja')"
-        style="cursor: pointer"
-      >
-        <div class="card">
-          <div class="card-body">
-            <div class="media d-flex justify-content-between">
-              <div class="media-body text-left">
-                <h3 class="success">{{ totalUserUnitKerja }}</h3>
-                <span>Admin Unit Kerja</span>
-              </div>
-              <div class="align-self-center">
-                <span
-                  class="mdi mdi-account-supervisor-outline"
-                  style="font-size: 2.5rem"
-                ></span>
-              </div>
+            <div *ngIf="userRole?.includes('ADMIN_AKP') || userRole?.includes('ADMIN')"
+                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/akp/akp-task-list')">
+                <div class="card text-center p-3 mb-0 h-100 w-100">
+                    <h5>Penilaian Atasan/Rekan Kerja AKP</h5>
+                    <h2>{{ pendingCounts.akpPenilaianAtasan }}</h2>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div
-        class="col-lg-3 col-md-6 col-12 cursor-pointer"
-        (click)="navigateTo('/siap/user-jf')"
-        style="cursor: pointer"
-      >
-        <div class="card">
-          <div class="card-body">
-            <div class="media d-flex justify-content-between">
-              <div class="media-body text-left">
-                <h3 class="success">{{ totalUserJF }}</h3>
-                <span>User JF</span>
-              </div>
-              <div class="align-self-center">
-                <span
-                  class="mdi mdi-account-group-outline"
-                  style="font-size: 2.5rem"
-                ></span>
-              </div>
+            <div *ngIf="userRole?.includes('ADMIN_AKP') || userRole?.includes('ADMIN')"
+                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/akp/akp-task-list')">
+                <div class="card text-center p-3 mb-0 h-100 w-100">
+                    <h5>Penilai Pribadi AKP</h5>
+                    <h2>{{ pendingCounts.akpPenilaianPribadi }}</h2>
+                </div>
             </div>
-          </div>
+
+            <div *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
+                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/ukom/ukom-task-list')">
+                <div class="card text-center p-3 mb-0 h-100 w-100">
+                    <h5>Verifikasi Pengajuan UKom</h5>
+                    <h2>{{ pendingCounts.verifikasiUKom }}</h2>
+                </div>
+            </div>
+
+            <div *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
+                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/ukom/ukom-task-list')">
+                <div class="card text-center p-3 mb-0 h-100 w-100">
+                    <h5>Perbaikan Dokumen Ukom</h5>
+                    <h2>{{ pendingCounts.perbaikanDokumenUKom }}</h2>
+                </div>
+            </div>
+
+            <div *ngIf="userRole?.includes('ADMIN_FORMASI') || userRole?.includes('ADMIN')"
+                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/formasi/formasi-task-list')">
+                <div class="card text-center p-3 mb-0 h-100 w-100">
+                    <h5>Formasi</h5>
+                    <h2>{{ pendingCounts.formasi }}</h2>
+                </div>
+            </div>
+
+            <div *ngIf="userRole?.includes('ADMIN_PAK') || userRole?.includes('ADMIN')"
+                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/pak/pak-task-list')">
+                <div class="card text-center p-3 mb-0 h-100 w-100">
+                    <h5>PAK</h5>
+                    <h2>{{ pendingCounts.pak }}</h2>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
+    </ng-template>
 
-  <br />
-  <p
-    class="h3"
-    *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-  >
-    Statistik Pendaftaran UKom
-  </p>
-  <div
-    class="row mb-3"
-    *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-  >
-    <div class="col-md-4">
-      <label for="startMonth">Bulan Awal</label>
-      <select
-        [(ngModel)]="startMonth"
-        (change)="applyFilters()"
-        class="form-control mx-0 mb-1 mt-0"
-      >
-        <option *ngFor="let month of months; let i = index" [value]="i + 1">
-          {{ month.id }}
-        </option>
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label for="endMonth">Bulan Akhir</label>
-      <select
-        [(ngModel)]="endMonth"
-        (change)="applyFilters()"
-        class="form-control mx-0 mb-1 mt-0"
-      >
-        <option *ngFor="let month of months; let i = index" [value]="i + 1">
-          {{ month.id }}
-        </option>
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label for="year">Tahun</label>
-      <select
-        [(ngModel)]="year"
-        (change)="applyFilters()"
-        class="form-control mx-0 mb-1 mt-0"
-      >
-        <option *ngFor="let y of [2024, 2025, 2026]" [value]="y">
-          {{ y }}
-        </option>
-      </select>
-    </div>
-  </div>
+    <br />
+    <ng-container *ngIf="userLoading$ | async; else userCount">
+        <div class="d-flex justify-content-center my-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #userCount>
+        <div *ngIf="userRole?.includes('ADMIN')">
+            <p class="h3">User Sijupri</p>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/security/user')"
+                    style="cursor: pointer">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="media d-flex justify-content-between">
+                                <div class="media-body text-left">
+                                    <h3 class="success">{{ totalUserAdmin }}</h3>
+                                    <span>Admin Sijupri</span>
+                                </div>
+                                <div class="align-self-center">
+                                    <span class="mdi mdi-account-key-outline" style="font-size: 2.5rem"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-  <div
-    class="chart-container"
-    *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-    style="position: relative; height: 50vh; width: 100%"
-  >
-    <canvas
-      baseChart
-      [data]="barChartData"
-      [options]="barChartOptions"
-      chartType="bar"
-    ></canvas>
-  </div>
+                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-instansi')"
+                    style="cursor: pointer">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="media d-flex justify-content-between">
+                                <div class="media-body text-left">
+                                    <h3 class="success">{{ totalUserInstansi }}</h3>
+                                    <span>Admin Instansi</span>
+                                </div>
+                                <div class="align-self-center">
+                                    <span class="mdi mdi-account-outline" style="font-size: 2.5rem"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-  <!-- <br />
-  <div
-    class=""
-    *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-  >
-    <p class="h3">Peserta UKom terbaru</p>
-    <app-pagable [pagable]="pagable"></app-pagable>
-  </div> -->
+                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-unit-kerja')"
+                    style="cursor: pointer">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="media d-flex justify-content-between">
+                                <div class="media-body text-left">
+                                    <h3 class="success">{{ totalUserUnitKerja }}</h3>
+                                    <span>Admin Unit Kerja</span>
+                                </div>
+                                <div class="align-self-center">
+                                    <span class="mdi mdi-account-supervisor-outline" style="font-size: 2.5rem"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-jf')"
+                    style="cursor: pointer">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="media d-flex justify-content-between">
+                                <div class="media-body text-left">
+                                    <h3 class="success">{{ totalUserJF }}</h3>
+                                    <span>User JF</span>
+                                </div>
+                                <div class="align-self-center">
+                                    <span class="mdi mdi-account-group-outline" style="font-size: 2.5rem"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <br />
+    <p class="h3" *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')">
+        Statistik Pendaftaran UKom
+    </p>
+    <div class="row mb-3" *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')">
+        <div class="col-md-4">
+            <label for="startMonth">Bulan Awal</label>
+            <select [(ngModel)]="startMonth" (change)="applyFilters()" class="form-control mx-0 mb-1 mt-0">
+                <option *ngFor="let month of months; let i = index" [value]="i + 1">
+                    {{ month.id }}
+                </option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="endMonth">Bulan Akhir</label>
+            <select [(ngModel)]="endMonth" (change)="applyFilters()" class="form-control mx-0 mb-1 mt-0">
+                <option *ngFor="let month of months; let i = index" [value]="i + 1">
+                    {{ month.id }}
+                </option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="year">Tahun</label>
+            <select [(ngModel)]="year" (change)="applyFilters()" class="form-control mx-0 mb-1 mt-0">
+                <option *ngFor="let y of [2024, 2025, 2026]" [value]="y">
+                    {{ y }}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="chart-container" *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
+        style="position: relative; height: 50vh; width: 100%">
+        <canvas baseChart [data]="barChartData" [options]="barChartOptions" chartType="bar"></canvas>
+    </div>
 </section>
