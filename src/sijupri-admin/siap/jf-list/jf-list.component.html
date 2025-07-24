@@ -1,1 +1,5 @@
 <app-pagable [pagable]="pagable"></app-pagable>
+
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Update Password '" (toggle)="toggleModal()" [enableFooter]="false">
+    <app-force-password-form [userId]="userId" (passwordUpdated)="toggleModal()" />
+</app-modal>

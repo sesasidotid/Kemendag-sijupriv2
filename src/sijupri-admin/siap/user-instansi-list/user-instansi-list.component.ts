@@ -19,6 +19,7 @@ import { UserInstansi } from '../../../modules/siap/models/user-instansi.model'
 import { UserInstansiUpdateComponent } from '../user-instansi-update/user-instansi-update.component'
 import { CommonModule } from '@angular/common'
 import { Instansi } from '../../../modules/maintenance/models/instansi.model'
+import { ForcePasswordFormComponent } from '../../../modules/base/components/force-password-form/force-password-form.component'
 @Component({
     selector: 'app-user-instansi-list',
     standalone: true,
@@ -27,7 +28,8 @@ import { Instansi } from '../../../modules/maintenance/models/instansi.model'
         ModalComponent,
         PagableComponent,
         UserInstansiUpdateComponent,
-        CommonModule
+        CommonModule,
+        ForcePasswordFormComponent
     ],
     templateUrl: './user-instansi-list.component.html',
     styleUrl: './user-instansi-list.component.scss'
@@ -38,26 +40,28 @@ export class UserInstansiListComponent {
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     selectedUserInstansi: UserInstansi = new UserInstansi()
     detailInstansi: Instansi = new Instansi()
-    constructor(
+
+    isModalPasswordOpen$ = new BehaviorSubject<boolean>(false)
+    userId: string
+    constructor (
         private tabService: TabService,
         private router: Router,
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService
-    ) { }
+    ) {}
 
-
-    ngOnInit() {
+    ngOnInit () {
         this.handlePagable()
         this.handleTabService()
     }
 
-    toggleRefresh() {
+    toggleRefresh () {
         this.refresh = !this.refresh
         this.toggleModal()
     }
 
-    handleTabService() {
+    handleTabService () {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -76,7 +80,7 @@ export class UserInstansiListComponent {
             })
     }
 
-    handlePagable() {
+    handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/user_instansi/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(
@@ -88,7 +92,9 @@ export class UserInstansiListComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((data: any) => {
-                        this.router.navigate([`/siap/user-instansi/${data.nip}`])
+                        this.router.navigate([
+                            `/siap/user-instansi/${data.nip}`
+                        ])
                     }, 'info')
                     .withIcon('detail')
                     .build()
@@ -110,7 +116,15 @@ export class UserInstansiListComponent {
                     .withIcon('danger')
                     .build()
             )
-
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((user: any) => {
+                        this.userId = user.nip
+                        this.togglePasswordModal()
+                    }, 'warning')
+                    .withIcon('password')
+                    .build()
+            )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('nip')
@@ -132,7 +146,7 @@ export class UserInstansiListComponent {
             .build()
     }
 
-    getDetailInstansi(instansiId: string) {
+    getDetailInstansi (instansiId: string) {
         this.apiService.getData(`/api/v1/instansi/${instansiId}`).subscribe({
             next: (data: any) => {
                 this.detailInstansi = data
@@ -140,7 +154,7 @@ export class UserInstansiListComponent {
         })
     }
 
-    handleDelete(userNip: string) {
+    handleDelete (userNip: string) {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
@@ -169,8 +183,10 @@ export class UserInstansiListComponent {
         })
     }
 
-    toggleModal() {
+    toggleModal () {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
+    togglePasswordModal () {
+        this.isModalPasswordOpen$.next(!this.isModalPasswordOpen$.value)
+    }
 }
-

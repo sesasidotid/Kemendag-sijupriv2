@@ -32,6 +32,7 @@ import { FilePreviewService } from '../../../../modules/base/services/file-previ
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { LoadingButtonComponent } from '../../../../modules/base/components/loading-button/loading-button.component'
 import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
+import { ForcePasswordFormComponent } from '../../../../modules/base/components/force-password-form/force-password-form.component'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -40,7 +41,8 @@ import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pip
         ModalComponent,
         FileHandlerComponent,
         LoadingButtonComponent,
-        TanggalIndoPipe
+        TanggalIndoPipe,
+        ForcePasswordFormComponent
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss'
@@ -83,6 +85,8 @@ export class UkomTaskDetailComponent {
     isLoading$: Observable<boolean>
 
     isDeleteExamScoreLoading$ = new BehaviorSubject<boolean>(false)
+
+    isToggleUpdatePasswordModal$ = new BehaviorSubject<boolean>(false)
     constructor (
         private activatedRoute: ActivatedRoute,
         private apiService: ApiService,
@@ -589,5 +593,11 @@ export class UkomTaskDetailComponent {
                 deleteAction()
             }
         })
+    }
+
+    toggleUpdatePasswordModal () {
+        this.isToggleUpdatePasswordModal$.next(
+            !this.isToggleUpdatePasswordModal$.value
+        )
     }
 }

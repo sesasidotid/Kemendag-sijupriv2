@@ -207,7 +207,8 @@ export class ActionColumnBuilder {
         danger: 'ri-delete-bin-line',
         download: 'ri-download-line',
         navigate: 'ri-external-link-line',
-        upload: 'ri-upload-line'
+        upload: 'ri-upload-line',
+        password: 'ri-lock-2-line'
     }
 
     setAction (
@@ -233,6 +234,7 @@ export class ActionColumnBuilder {
             | 'download'
             | 'navigate'
             | 'upload'
+            | 'password'
     ): ActionColumnBuilder {
         this.icon = this.icons[icon]
         return this

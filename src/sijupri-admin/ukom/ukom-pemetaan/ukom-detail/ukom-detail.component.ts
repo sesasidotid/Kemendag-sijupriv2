@@ -18,10 +18,18 @@ import { SafeUrl } from '@angular/platform-browser'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
+import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
+import { ForcePasswordFormComponent } from '../../../../modules/base/components/force-password-form/force-password-form.component'
 @Component({
     selector: 'app-ukom-detail',
     standalone: true,
-    imports: [PagableComponent, CommonModule, TanggalIndoPipe],
+    imports: [
+        PagableComponent,
+        CommonModule,
+        TanggalIndoPipe,
+        ModalComponent,
+        ForcePasswordFormComponent
+    ],
     templateUrl: './ukom-detail.component.html',
     styleUrl: './ukom-detail.component.scss'
 })
@@ -46,6 +54,8 @@ export class UkomDetailComponent {
     predikatKinerjaList: any[] = []
     refresh: boolean
 
+    isModalOpen$ = new BehaviorSubject<boolean>(false)
+
     constructor (
         private activatedRoute: ActivatedRoute,
         private router: Router,
@@ -60,7 +70,6 @@ export class UkomDetailComponent {
         this.activatedRoute.paramMap.subscribe(params => {
             this.id = params.get('id')
         })
-
         this.handlePagable()
         this.getJF()
         this.isUserBanned()
@@ -72,13 +81,6 @@ export class UkomDetailComponent {
         )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    // .withDynamicValue('Jenis Ukom', (data: any) =>
-                    //     data.jenisUkom === 'KENAIKAN_JENJANG'
-                    //         ? 'Kenaikan Jenjang'
-                    //         : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                    //         ? 'Perpindahan Jabatan'
-                    //         : data.jenisUkom
-                    // )
                     .withDynamicValue('Jenis Ukom', (data: any) => {
                         switch (data.jenisUkom) {
                             case 'KENAIKAN_JENJANG':

@@ -65,6 +65,7 @@ export class UkomTaskDetail extends Serializable {
     bidangJabatanCode: string = undefined
     participantStatus: string = undefined
     grades: any = undefined
+    userId: string = undefined
 
     constructor (object?: { [key: string]: any }) {
         super()
