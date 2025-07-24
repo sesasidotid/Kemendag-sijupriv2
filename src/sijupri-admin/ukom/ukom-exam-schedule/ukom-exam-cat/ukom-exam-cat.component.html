@@ -9,48 +9,29 @@
                 Pilih pertanyaan secara acak dari semua kompetensi yang tersedia
             </p>
 
-            <div
-                class="d-flex flex-column flex-md-row align-items-stretch gap-2"
-            >
+            <div class="d-flex flex-column flex-md-row align-items-stretch gap-2">
                 <div class="flex-fill">
-                    <label for="randomCountInput" class="form-label"
-                        >Jumlah Pertanyaan:</label
-                    >
-                    <input
-                        type="number"
-                        id="randomCountInput"
-                        class="form-control"
-                        [(ngModel)]="randomCount"
-                        [ngModelOptions]="{ standalone: true }"
-                        min="1"
-                        placeholder="Masukkan jumlah..."
-                    />
+                    <label for="randomCountInput" class="form-label">Jumlah Pertanyaan:</label>
+                    <input type="number" id="randomCountInput" class="form-control" [(ngModel)]="randomCount"
+                        [ngModelOptions]="{ standalone: true }" min="1" placeholder="Masukkan jumlah..." />
                 </div>
 
                 <div class="flex-shrink-0">
                     <label class="form-label d-none d-md-block">&nbsp;</label>
-                    <button
-                        type="button"
-                        class="btn btn-primary w-100"
-                        (click)="selectRandomQuestionsFromAll()"
+                    <button type="button" class="btn btn-primary w-100" (click)="selectRandomQuestionsFromAll()"
                         [disabled]="
                             !randomCount ||
                             randomCount <= 0 ||
                             IndikatorKompetensiUkom?.length === 0
-                        "
-                    >
+                        ">
                         <i class="mdi mdi-shuffle-variant me-1"></i> Pilih Acak
                     </button>
                 </div>
 
                 <div class="flex-shrink-0">
                     <label class="form-label d-none d-md-block">&nbsp;</label>
-                    <button
-                        type="button"
-                        class="btn btn-warning w-100"
-                        (click)="clearAllSelection()"
-                        [disabled]="questCheckedList.length === 0"
-                    >
+                    <button type="button" class="btn btn-warning w-100" (click)="clearAllSelection()"
+                        [disabled]="questCheckedList.length === 0">
                         <i class="mdi mdi-close-circle me-1"></i> Bersihkan
                         Semua
                     </button>
@@ -60,10 +41,8 @@
                 <div class="flex-shrink-0">
                     <label class="form-label d-none d-md-block">&nbsp;</label>
                     <div class="alert alert-info mb-0 py-2 px-3 w-100">
-                        <small
-                            ><strong>Terpilih:</strong>
-                            {{ questCheckedList.length }} pertanyaan</small
-                        >
+                        <small><strong>Terpilih:</strong>
+                            {{ questCheckedList.length }} pertanyaan</small>
                     </div>
                 </div>
             </div>
@@ -72,67 +51,39 @@
 
     <div class="card border-0">
         <div class="row question-container">
-            <label for="" class="p-0 fw-bold"
-                >Daftar Indikator Kompetensi</label
-            >
+            <label for="" class="p-0 fw-bold">Daftar Indikator Kompetensi</label>
 
-            <div
-                class="col-sm-12 mt-2"
-                *ngIf="IndikatorKompetensiUkom?.length > 0; else noKompetensi"
-            >
-                <ng-container
-                    *ngFor="
+            <div class="col-sm-12 mt-2" *ngIf="IndikatorKompetensiUkom?.length > 0; else noKompetensi">
+                <ng-container *ngFor="
                         let indikatorKompetensi of IndikatorKompetensiUkom;
                         index as i
-                    "
-                >
+                    ">
                     <div class="row card p-3 mb-2">
                         <div class="">
-                            <div
-                                class="d-flex justify-content-between align-items-center"
-                            >
-                                <label for="" class="col-form-label fw-bold"
-                                    >Indikator {{ i + 1 }}</label
-                                >
-                                <a
-                                    class="btn btn-sm btn-secondary"
-                                    (click)="openModal(indikatorKompetensi.id)"
-                                    >Pilih Pertanyaan</a
-                                >
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label for="" class="col-form-label fw-bold">Indikator {{ i + 1 }}</label>
+                                <a class="btn btn-sm btn-secondary" (click)="openModal(indikatorKompetensi.id)">Pilih
+                                    Pertanyaan</a>
                             </div>
 
                             <p class="mb-0">{{ indikatorKompetensi.name }}</p>
                             <small class="text-muted">
                                 Kompetensi:
                                 {{
-                                    indikatorKompetensi.kompetensi?.name || '-'
+                                indikatorKompetensi.kompetensi?.name || '-'
                                 }}
                             </small>
                         </div>
                     </div>
                 </ng-container>
                 <div class="col-lg-12">
-                    <div
-                        class="hstack gap-2 justify-content-end align-items-center"
-                    >
-                        <button
-                            [disabled]="questCheckedList.length === 0"
-                            class="btn btn-success"
-                            (click)="submit()"
-                            *ngIf="!(submitLoading$ | async)"
-                        >
+                    <div class="hstack gap-2 justify-content-end align-items-center">
+                        <button [disabled]="questCheckedList.length === 0" class="btn btn-success" (click)="submit()"
+                            *ngIf="!(submitLoading$ | async)">
                             Simpan
                         </button>
-                        <button
-                            class="btn btn-success"
-                            disabled
-                            *ngIf="submitLoading$ | async"
-                        >
-                            <div
-                                class="spinner-border"
-                                style="width: 19px; height: 19px"
-                                role="status"
-                            >
+                        <button class="btn btn-success" disabled *ngIf="submitLoading$ | async">
+                            <div class="spinner-border spinner-sm-custom" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </button>
@@ -153,15 +104,9 @@
             <div class="row question-container mb-3 pb-2">
                 <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
                 <div class="col-sm-12 mt-2">
-                    <ng-container
-                        *ngFor="let pertanyaan of listSavedQuestion; index as i"
-                    >
+                    <ng-container *ngFor="let pertanyaan of listSavedQuestion; index as i">
                         <div class="row card">
-                            <label
-                                for=""
-                                class="col-12 col-form-label fw-bold mb-1"
-                                >Pertanyaan {{ i + 1 }}</label
-                            >
+                            <label for="" class="col-12 col-form-label fw-bold mb-1">Pertanyaan {{ i + 1 }}</label>
                             <div class="col">
                                 <p>{{ pertanyaan.question }}</p>
                             </div>
@@ -173,19 +118,11 @@
     </section>
 </section>
 
-<app-modal
-    *ngIf="isModalOpen$ | async"
-    [title]="'Pilih pertanyaan'"
-    (toggle)="toggleModal()"
-    [size]="'lg'"
-    [enableFooter]="false"
->
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Pilih pertanyaan'" (toggle)="toggleModal()" [size]="'lg'"
+    [enableFooter]="false">
     <form>
         <div class="d-flex justify-content-end mb-3">
-            <div
-                class="alert alert-info d-flex align-items-center w-auto mb-0 px-1 py-2"
-                role="alert"
-            >
+            <div class="alert alert-info d-flex align-items-center w-auto mb-0 px-1 py-2" role="alert">
                 Soal Tersedia: {{ currentIndicatorQuestions?.length || 0 }}
             </div>
         </div>
@@ -199,53 +136,30 @@
                 Pilih pertanyaan secara acak hanya dari indikator kompetensi ini
             </p>
 
-            <div
-                class="d-flex flex-column flex-sm-row align-items-stretch gap-2"
-            >
+            <div class="d-flex flex-column flex-sm-row align-items-stretch gap-2">
                 <div class="flex-fill">
-                    <label
-                        for="randomCountPerIndicatorInput"
-                        class="form-label small"
-                        >Jumlah Pertanyaan:</label
-                    >
-                    <input
-                        type="number"
-                        id="randomCountPerIndicatorInput"
-                        class="form-control form-control-sm"
-                        [(ngModel)]="randomCountPerIndicator"
-                        [ngModelOptions]="{ standalone: true }"
-                        min="1"
-                        placeholder="Masukkan jumlah..."
-                    />
+                    <label for="randomCountPerIndicatorInput" class="form-label small">Jumlah Pertanyaan:</label>
+                    <input type="number" id="randomCountPerIndicatorInput" class="form-control form-control-sm"
+                        [(ngModel)]="randomCountPerIndicator" [ngModelOptions]="{ standalone: true }" min="1"
+                        placeholder="Masukkan jumlah..." />
                 </div>
 
                 <div class="flex-shrink-0">
-                    <label class="form-label small d-none d-sm-block"
-                        >&nbsp;</label
-                    >
-                    <button
-                        type="button"
-                        class="btn btn-primary btn-sm w-100"
-                        (click)="selectRandomQuestionsFromCurrentIndicator()"
-                        [disabled]="
+                    <label class="form-label small d-none d-sm-block">&nbsp;</label>
+                    <button type="button" class="btn btn-primary btn-sm w-100"
+                        (click)="selectRandomQuestionsFromCurrentIndicator()" [disabled]="
                             !randomCountPerIndicator ||
                             randomCountPerIndicator <= 0 ||
                             currentIndicatorQuestions?.length === 0
-                        "
-                    >
+                        ">
                         <i class="mdi mdi-shuffle-variant me-1"></i> Pilih Acak
                     </button>
                 </div>
 
                 <div class="flex-shrink-0">
-                    <label class="form-label small d-none d-sm-block"
-                        >&nbsp;</label
-                    >
-                    <button
-                        type="button"
-                        class="btn btn-warning btn-sm w-100"
-                        (click)="clearCurrentIndicatorSelection()"
-                    >
+                    <label class="form-label small d-none d-sm-block">&nbsp;</label>
+                    <button type="button" class="btn btn-warning btn-sm w-100"
+                        (click)="clearCurrentIndicatorSelection()">
                         <i class="mdi mdi-close-circle me-1"></i> Bersihkan
                     </button>
                 </div>
@@ -254,15 +168,9 @@
 
         <div class="mb-3">
             <label for="searchInput" class="form-label">Pencarian:</label>
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="Search questions..."
-                class="form-control"
-                [(ngModel)]="filterText"
-                (ngModelChange)="onSearchChange($event)"
-                [ngModelOptions]="{ standalone: true }"
-            />
+            <input type="text" id="searchInput" placeholder="Search questions..." class="form-control"
+                [(ngModel)]="filterText" (ngModelChange)="onSearchChange($event)"
+                [ngModelOptions]="{ standalone: true }" />
         </div>
 
         <div class="mb-3">
@@ -271,18 +179,10 @@
             </small>
         </div>
 
-        <div
-            class="checklist-container"
-            *ngFor="let question of filteredQuestions$ | async"
-        >
+        <div class="checklist-container" *ngFor="let question of filteredQuestions$ | async">
             <label class="checklist-item">
-                <input
-                    type="checkbox"
-                    class="form-check-input"
-                    [name]="'question-' + question.id"
-                    [(ngModel)]="question.checked"
-                    (change)="onQuestionSelect(question)"
-                />
+                <input type="checkbox" class="form-check-input" [name]="'question-' + question.id"
+                    [(ngModel)]="question.checked" (change)="onQuestionSelect(question)" />
                 <span class="checklist-label">{{ question.question }}</span>
             </label>
         </div>

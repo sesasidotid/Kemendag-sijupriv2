@@ -1,62 +1,29 @@
 <ng-container *ngIf="(tab$ | async) === 0">
-    <app-pagable
-        [pagable]="pagable$ | async"
-        [refresh]="refreshToggle"
-    ></app-pagable>
+    <app-pagable [pagable]="pagable$ | async" [refresh]="refreshToggle"></app-pagable>
 </ng-container>
 <ng-container *ngIf="(tab$ | async) === 1">
-    <app-ukom-class-add
-        (changeTabActive)="handleTabChange(0)"
-    ></app-ukom-class-add>
+    <app-ukom-class-add (changeTabActive)="handleTabChange(0)"></app-ukom-class-add>
 </ng-container>
 
-<app-modal
-    *ngIf="isModalOpen$ | async"
-    [title]="'Update Kelas'"
-    (toggle)="toggleModal()"
-    [enableFooter]="false"
-    [size]="'lg'"
->
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Update Kelas'" (toggle)="toggleModal()" [enableFooter]="false"
+    [size]="'lg'">
     <form [formGroup]="editRoomUkomForm">
         <div class="mb-3">
-            <label for="name" class="form-label"
-                >Nama <span class="text-danger">*</span></label
-            >
-            <input
-                type="text"
-                class="form-control"
-                id="name"
-                required
-                formControlName="name"
-            />
-            <div
-                *ngIf="getErrorMessage('name', 'Nama') as error"
-                class="text-danger"
-            >
+            <label for="name" class="form-label">Nama <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" required formControlName="name" />
+            <div *ngIf="getErrorMessage('name', 'Nama') as error" class="text-danger">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="jabatan_code" class="form-label"
-                >Jabatan <span class="text-danger">*</span></label
-            >
-            <select
-                class="form-select"
-                name="jabatan_code"
-                id="jabatan_code"
-                formControlName="jabatan_code"
-            >
-                <option selected value="" style="display: none">
+            <label for="jabatan_code" class="form-label">Jabatan <span class="text-danger">*</span></label>
+            <select class="form-select" name="jabatan_code" id="jabatan_code" formControlName="jabatan_code">
+                <option selected value="" hidden>
                     Pilih Jabatan
                 </option>
-                <ng-container
-                    *ngIf="(jabatanList$ | async)?.length; else jabatanNotFound"
-                >
-                    <option
-                        *ngFor="let jabatan of jabatanList$ | async"
-                        [value]="jabatan.code"
-                    >
+                <ng-container *ngIf="(jabatanList$ | async)?.length; else jabatanNotFound">
+                    <option *ngFor="let jabatan of jabatanList$ | async" [value]="jabatan.code">
                         {{ jabatan.name }}
                     </option>
                 </ng-container>
@@ -64,37 +31,22 @@
                     <option disabled>Jabatan tidak ditemukan</option>
                 </ng-template>
             </select>
-            <div
-                *ngIf="getErrorMessage('jabatan_code', 'Jabatan') as error"
-                class="text-danger"
-            >
+            <div *ngIf="getErrorMessage('jabatan_code', 'Jabatan') as error" class="text-danger">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="jenjang_code" class="form-label"
-                >Jenjang <span class="text-danger">*</span></label
-            >
-            <select
-                class="form-select"
-                name="jenjang_code"
-                id="jenjang_code"
-                formControlName="jenjang_code"
-            >
-                <option selected value="" style="display: none">
+            <label for="jenjang_code" class="form-label">Jenjang <span class="text-danger">*</span></label>
+            <select class="form-select" name="jenjang_code" id="jenjang_code" formControlName="jenjang_code">
+                <option selected value="" hidden>
                     Pilih Jenjang
                 </option>
-                <ng-container
-                    *ngIf="
+                <ng-container *ngIf="
                         (fixedJenjangList$ | async)?.length;
                         else jabatanNotSelected
-                    "
-                >
-                    <option
-                        *ngFor="let jenjang of fixedJenjangList$ | async"
-                        [value]="jenjang.code"
-                    >
+                    ">
+                    <option *ngFor="let jenjang of fixedJenjangList$ | async" [value]="jenjang.code">
                         {{ jenjang.name }}
                     </option>
                 </ng-container>
@@ -102,39 +54,25 @@
                     <option disabled>Jenjang tidak ditemukan</option>
                 </ng-template>
             </select>
-            <div
-                *ngIf="getErrorMessage('jenjang_code', 'Jenjang') as error"
-                class="text-danger"
-            >
+            <div *ngIf="getErrorMessage('jenjang_code', 'Jenjang') as error" class="text-danger">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3" *ngIf="(bidangJabatanList$ | async)?.length">
             <!-- <div class="mb-3"> -->
-            <label for="name" class="form-label"
-                >Bidang Jabatan <span class="text-danger">*</span></label
-            >
-            <select
-                id="bidang_jabatan_code"
-                class="form-select"
-                name="bidang_jabatan_code"
-                formControlName="bidang_jabatan_code"
-            >
+            <label for="name" class="form-label">Bidang Jabatan <span class="text-danger">*</span></label>
+            <select id="bidang_jabatan_code" class="form-select" name="bidang_jabatan_code"
+                formControlName="bidang_jabatan_code">
                 <option [ngValue]="null" disabled selected hidden>
                     Pilih Bidang Jabatan
                 </option>
 
-                <ng-container
-                    *ngIf="
+                <ng-container *ngIf="
                         (bidangJabatanList$ | async)?.length;
                         else bidangJabatanNotSelected
-                    "
-                >
-                    <option
-                        *ngFor="let bidangJabatan of bidangJabatanList$ | async"
-                        [value]="bidangJabatan.code"
-                    >
+                    ">
+                    <option *ngFor="let bidangJabatan of bidangJabatanList$ | async" [value]="bidangJabatan.code">
                         {{ bidangJabatan.name }}
                     </option>
                 </ng-container>
@@ -143,120 +81,67 @@
                 </ng-template>
             </select>
 
-            <div
-                *ngIf="
+            <div *ngIf="
                     getErrorMessage(
                         'bidang_jabatan_code',
                         'Bidang Jabatan'
                     ) as error
-                "
-                class="text-danger"
-            >
+                " class="text-danger">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="participant_quota" class="form-label"
-                >Kuota Peserta <span class="text-danger">*</span></label
-            >
-            <input
-                type="text"
-                class="form-control"
-                id="participant_quota"
-                required
-                formControlName="participant_quota"
-            />
-            <div
-                *ngIf="
+            <label for="participant_quota" class="form-label">Kuota Peserta <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="participant_quota" required
+                formControlName="participant_quota" />
+            <div *ngIf="
                     getErrorMessage(
                         'participant_quota',
                         'Kuota peserta'
                     ) as error
-                "
-                class="text-danger"
-            >
+                " class="text-danger">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="vid_call_link" class="form-label"
-                >Link Zoom <span class="text-danger">*</span></label
-            >
-            <input
-                type="text"
-                class="form-control"
-                id="vid_call_link"
-                required
-                formControlName="vid_call_link"
-            />
-            <div
-                *ngIf="getErrorMessage('vid_call_link', 'Link Zoom') as error"
-                class="text-danger"
-            >
+            <label for="vid_call_link" class="form-label">Link Zoom <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="vid_call_link" required formControlName="vid_call_link" />
+            <div *ngIf="getErrorMessage('vid_call_link', 'Link Zoom') as error" class="text-danger">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="exam_start_at" class="form-label"
-                >Waktu Mulai <span class="text-danger">*</span></label
-            >
-            <input
-                type="datetime-local"
-                id="exam_start_at"
-                class="form-control"
-                required
-                formControlName="exam_start_at"
-            />
-            <div
-                *ngIf="getErrorMessage('exam_start_at', 'Waktu mulai') as error"
-                class="text-danger"
-            >
+            <label for="exam_start_at" class="form-label">Waktu Mulai <span class="text-danger">*</span></label>
+            <input type="datetime-local" id="exam_start_at" class="form-control" required
+                formControlName="exam_start_at" />
+            <div *ngIf="getErrorMessage('exam_start_at', 'Waktu mulai') as error" class="text-danger">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="exam_end_at" class="form-label"
-                >Waktu Selesai <span class="text-danger">*</span>
+            <label for="exam_end_at" class="form-label">Waktu Selesai <span class="text-danger">*</span>
             </label>
-            <input
-                type="datetime-local"
-                id="exam_end_at"
-                class="form-control"
-                required
-                formControlName="exam_end_at"
-            />
-            <div
-                *ngIf="getErrorMessage('exam_end_at', 'Waktu selesai') as error"
-                class="text-danger"
-            >
+            <input type="datetime-local" id="exam_end_at" class="form-control" required formControlName="exam_end_at" />
+            <div *ngIf="getErrorMessage('exam_end_at', 'Waktu selesai') as error" class="text-danger">
                 {{ error }}
             </div>
         </div>
 
         <ng-container *ngIf="submitLoading$ | async; else noLoading">
             <button class="btn btn-primary w-100" disabled>
-                <div
-                    class="spinner-border"
-                    style="width: 19px; height: 19px"
-                    role="status"
-                >
+                <div class="spinner-border spinner-sm-custom" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </button>
         </ng-container>
         <ng-template #noLoading>
-            <button
-                type="button"
-                class="btn btn-primary w-100"
-                [disabled]="
+            <button type="button" class="btn btn-primary w-100" [disabled]="
                     editRoomUkomForm.invalid || (submitLoading$ | async)
-                "
-                (click)="submit()"
-            >
+                " (click)="submit()">
                 Simpan
             </button>
         </ng-template>

@@ -5,22 +5,14 @@
                 <label for="type" class="form-label">
                     Tahunan/Bulanan <span class="text-danger">*</span>
                 </label>
-                <select
-                    class="form-select"
-                    name="type"
-                    id="type"
-                    formControlName="type"
-                >
-                    <option selected value="" style="display: none">
+                <select class="form-select" name="type" id="type" formControlName="type">
+                    <option selected value="" hidden>
                         Pilih Tahunan/Bulanan
                     </option>
                     <option [value]="'tahunan'">Tahunan</option>
                     <option [value]="'bulanan'">Bulanan</option>
                 </select>
-                <div
-                    *ngIf="getErrorMessage('type', 'Tipe') as error"
-                    class="text-danger"
-                >
+                <div *ngIf="getErrorMessage('type', 'Tipe') as error" class="text-danger">
                     {{ error }}
                 </div>
             </div>
@@ -31,25 +23,17 @@
                 <label for="yearPicker" class="form-label">
                     Tahun Penilaian <span class="text-danger">*</span>
                 </label>
-                <select
-                    class="form-select"
-                    id="yearPicker"
-                    formControlName="year"
-                    (change)="
+                <select class="form-select" id="yearPicker" formControlName="year" (change)="
                         isAnnual ? onYearSelected() : onMonthRangeSelected()
-                    "
-                >
-                    <option selected value="" style="display: none">
+                    ">
+                    <option selected value="" hidden>
                         Pilih Tahun
                     </option>
                     <option *ngFor="let year of years" [value]="year">
                         {{ year }}
                     </option>
                 </select>
-                <div
-                    *ngIf="getErrorMessage('year', 'Tahun') as error"
-                    class="text-danger"
-                >
+                <div *ngIf="getErrorMessage('year', 'Tahun') as error" class="text-danger">
                     {{ error }}
                 </div>
             </div>
@@ -61,31 +45,21 @@
                     <label for="monthStartPicker" class="form-label">
                         Bulan Mulai Penilaian <span class="text-danger">*</span>
                     </label>
-                    <select
-                        class="form-select"
-                        id="monthStartPicker"
-                        formControlName="monthStart"
-                        (change)="onMonthRangeSelected()"
-                    >
-                        <option selected value="" style="display: none">
+                    <select class="form-select" id="monthStartPicker" formControlName="monthStart"
+                        (change)="onMonthRangeSelected()">
+                        <option selected value="" hidden>
                             Pilih Bulan Mulai
                         </option>
-                        <option
-                            *ngFor="let month of months"
-                            [value]="month.value"
-                        >
+                        <option *ngFor="let month of months" [value]="month.value">
                             {{ month.name }}
                         </option>
                     </select>
-                    <div
-                        *ngIf="
+                    <div *ngIf="
                             getErrorMessage(
                                 'monthStart',
                                 'Bulan Mulai'
                             ) as error
-                        "
-                        class="text-danger"
-                    >
+                        " class="text-danger">
                         {{ error }}
                     </div>
                 </div>
@@ -97,31 +71,21 @@
                         Bulan Selesai Penilaian
                         <span class="text-danger">*</span>
                     </label>
-                    <select
-                        class="form-select"
-                        id="monthEndPicker"
-                        formControlName="monthEnd"
-                        (change)="onMonthRangeSelected()"
-                    >
-                        <option selected value="" style="display: none">
+                    <select class="form-select" id="monthEndPicker" formControlName="monthEnd"
+                        (change)="onMonthRangeSelected()">
+                        <option selected value="" hidden>
                             Pilih Bulan Selesai
                         </option>
-                        <option
-                            *ngFor="let month of months"
-                            [value]="month.value"
-                        >
+                        <option *ngFor="let month of months" [value]="month.value">
                             {{ month.name }}
                         </option>
                     </select>
-                    <div
-                        *ngIf="
+                    <div *ngIf="
                             getErrorMessage(
                                 'monthEnd',
                                 'Bulan Selesai'
                             ) as error
-                        "
-                        class="text-danger"
-                    >
+                        " class="text-danger">
                         {{ error }}
                     </div>
                 </div>
@@ -136,41 +100,26 @@
                 <label for="ratingHasilId" class="form-label">
                     Rating Hasil Kinerja <span class="text-danger">*</span>
                 </label>
-                <select
-                    disabled
-                    *ngIf="!ratingKinerjaList || (ratingLoading$ | async)"
-                    class="form-select"
-                >
-                    <option selected value="" style="display: none">
+                <select disabled *ngIf="!ratingKinerjaList || (ratingLoading$ | async)" class="form-select">
+                    <option selected value="" hidden>
                         Pilih Rating Hasil
                     </option>
                 </select>
-                <select
-                    *ngIf="ratingKinerjaList && !(ratingLoading$ | async)"
-                    class="form-select"
-                    name="ratingHasilId"
-                    id="ratingHasilId"
-                    formControlName="ratingHasilId"
-                >
-                    <option selected value="" style="display: none">
+                <select *ngIf="ratingKinerjaList && !(ratingLoading$ | async)" class="form-select" name="ratingHasilId"
+                    id="ratingHasilId" formControlName="ratingHasilId">
+                    <option selected value="" hidden>
                         Pilih Rating Hasil
                     </option>
-                    <option
-                        *ngFor="let ratingKinerja of ratingKinerjaList"
-                        [value]="ratingKinerja.id"
-                    >
+                    <option *ngFor="let ratingKinerja of ratingKinerjaList" [value]="ratingKinerja.id">
                         {{ ratingKinerja.name }}
                     </option>
                 </select>
-                <div
-                    *ngIf="
+                <div *ngIf="
                         getErrorMessage(
                             'ratingHasilId',
                             'Rating hasil'
                         ) as error
-                    "
-                    class="text-danger"
-                >
+                    " class="text-danger">
                     {{ error }}
                 </div>
             </div>
@@ -180,41 +129,26 @@
                 <label for="ratingKinerjaId" class="form-label">
                     Rating Perilaku Kinerja <span class="text-danger">*</span>
                 </label>
-                <select
-                    disabled
-                    *ngIf="!ratingKinerjaList || (ratingLoading$ | async)"
-                    class="form-select"
-                >
-                    <option selected value="" style="display: none">
+                <select disabled *ngIf="!ratingKinerjaList || (ratingLoading$ | async)" class="form-select">
+                    <option selected value="" hidden>
                         Pilih Rating Kinerja
                     </option>
                 </select>
-                <select
-                    *ngIf="ratingKinerjaList && !(ratingLoading$ | async)"
-                    class="form-select"
-                    name="ratingKinerjaId"
-                    id="ratingKinerjaId"
-                    formControlName="ratingKinerjaId"
-                >
-                    <option selected value="" style="display: none">
+                <select *ngIf="ratingKinerjaList && !(ratingLoading$ | async)" class="form-select"
+                    name="ratingKinerjaId" id="ratingKinerjaId" formControlName="ratingKinerjaId">
+                    <option selected value="" hidden>
                         Pilih Rating Kinerja
                     </option>
-                    <option
-                        *ngFor="let ratingKinerja of ratingKinerjaList"
-                        [value]="ratingKinerja.id"
-                    >
+                    <option *ngFor="let ratingKinerja of ratingKinerjaList" [value]="ratingKinerja.id">
                         {{ ratingKinerja.name }}
                     </option>
                 </select>
-                <div
-                    *ngIf="
+                <div *ngIf="
                         getErrorMessage(
                             'ratingKinerjaId',
                             'Rating perilaku'
                         ) as error
-                    "
-                    class="text-danger"
-                >
+                    " class="text-danger">
                     {{ error }}
                 </div>
             </div>
@@ -224,41 +158,26 @@
                 <label for="predikatKinerjaId" class="form-label">
                     Predikat Kinerja <span class="text-danger">*</span>
                 </label>
-                <select
-                    disabled
-                    *ngIf="!predikatKinerjaList || (predikatLoading$ | async)"
-                    class="form-select"
-                >
-                    <option selected value="" style="display: none">
+                <select disabled *ngIf="!predikatKinerjaList || (predikatLoading$ | async)" class="form-select">
+                    <option selected value="" hidden>
                         Pilih Predikat Kinerja
                     </option>
                 </select>
-                <select
-                    *ngIf="predikatKinerjaList && !(predikatLoading$ | async)"
-                    class="form-select"
-                    name="predikatKinerjaId"
-                    id="predikatKinerjaId"
-                    formControlName="predikatKinerjaId"
-                >
-                    <option selected value="" style="display: none">
+                <select *ngIf="predikatKinerjaList && !(predikatLoading$ | async)" class="form-select"
+                    name="predikatKinerjaId" id="predikatKinerjaId" formControlName="predikatKinerjaId">
+                    <option selected value="" hidden>
                         Pilih Predikat Kinerja
                     </option>
-                    <option
-                        *ngFor="let predikatKinerja of predikatKinerjaList"
-                        [value]="predikatKinerja.id"
-                    >
+                    <option *ngFor="let predikatKinerja of predikatKinerjaList" [value]="predikatKinerja.id">
                         {{ predikatKinerja.name }}
                     </option>
                 </select>
-                <div
-                    *ngIf="
+                <div *ngIf="
                         getErrorMessage(
                             'predikatKinerjaId',
                             'Predikat kinerja'
                         ) as error
-                    "
-                    class="text-danger"
-                >
+                    " class="text-danger">
                     {{ error }}
                 </div>
             </div>
@@ -268,20 +187,11 @@
                 <label for="angkaKredit" class="form-label">
                     Angka Kredit <span class="text-danger">*</span>
                 </label>
-                <input
-                    type="text"
-                    class="form-control"
-                    name="angkaKredit"
-                    id="angkaKredit"
-                    formControlName="angkaKredit"
-                    placeholder="Masukkan angka kredit"
-                />
-                <div
-                    *ngIf="
+                <input type="text" class="form-control" name="angkaKredit" id="angkaKredit"
+                    formControlName="angkaKredit" placeholder="Masukkan angka kredit" />
+                <div *ngIf="
                         getErrorMessage('angkaKredit', 'Angka kredit') as error
-                    "
-                    class="text-danger"
-                >
+                    " class="text-danger">
                     {{ error }}
                 </div>
             </div>
@@ -295,23 +205,15 @@
             <div class="hstack gap-2 justify-content-end">
                 <ng-container *ngIf="submitLoading$ | async; else noLoading">
                     <button class="btn btn-primary" disabled>
-                        <div
-                            class="spinner-border"
-                            style="width: 19px; height: 19px"
-                            role="status"
-                        >
+                        <div class="spinner-border spinner-sm-custom" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </button>
                 </ng-container>
                 <ng-template #noLoading>
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                        [disabled]="
+                    <button type="submit" class="btn btn-primary" [disabled]="
                             rwKinerjaForm.invalid || (submitLoading$ | async)
-                        "
-                    >
+                        ">
                         Simpan
                     </button>
                 </ng-template>

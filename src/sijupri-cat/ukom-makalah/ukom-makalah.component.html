@@ -9,25 +9,17 @@
 <ng-template #content>
     <ng-container *ngIf="isFinished; else notFinished">
         <div class="container">
-            <section
-                class="section h-100 d-flex flex-column align-items-center justify-content-center"
-            >
+            <section class="section h-100 d-flex flex-column align-items-center justify-content-center">
                 <h3 class="">Waktu Pengerjaan Makalah</h3>
 
-                <button
-                    class="btn btn-primary btn-lg mt-3 return-button"
-                    (click)="backToHome()"
-                >
+                <button class="btn btn-primary btn-lg mt-3 return-button" (click)="backToHome()">
                     Kembali
                 </button>
             </section>
         </div>
     </ng-container>
     <ng-template #notFinished>
-        <button
-            class="btn btn-sm btn-outline-secondary mb-3"
-            (click)="afterSubmit.emit()"
-        >
+        <button class="btn btn-sm btn-outline-secondary mb-3" (click)="afterSubmit.emit()">
             <i class="mdi mdi-chevron-left"></i> Kembali
         </button>
         <form>
@@ -46,29 +38,18 @@
             </div>
             <div class="row text-center">
                 <div class="col-12">
-                    <ng-container
-                        *ngIf="isSubmitLoading$ | async; else noLoading"
-                    >
+                    <ng-container *ngIf="isSubmitLoading$ | async; else noLoading">
                         <button class="btn btn-success float-end" disabled>
-                            <div
-                                class="spinner-border"
-                                style="width: 19px; height: 19px"
-                                role="status"
-                            >
+                            <div class="spinner-border spinner-sm-custom" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </button>
                     </ng-container>
                     <ng-template #noLoading>
-                        <button
-                            type="button"
-                            class="btn btn-success float-end"
-                            (click)="onSubmit()"
-                            [disabled]="
+                        <button type="button" class="btn btn-success float-end" (click)="onSubmit()" [disabled]="
                                 makalah_form.invalid ||
                                 (isSubmitLoading$ | async)
-                            "
-                        >
+                            ">
                             Simpan
                         </button>
                     </ng-template>

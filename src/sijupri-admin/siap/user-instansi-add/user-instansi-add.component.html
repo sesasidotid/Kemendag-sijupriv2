@@ -1,304 +1,186 @@
 <form (submit)="submit()" #userForm="ngForm">
-  <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >NIP <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="text"
-        class="form-control"
-        [(ngModel)]="userInstansi.nip"
-        name="nip"
-        required
-        pattern="^\d{18}$"
-        #nip="ngModel"
-        id="nip"
-      />
-      <div
-        *ngIf="
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">NIP <span class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" [(ngModel)]="userInstansi.nip" name="nip" required
+                pattern="^\d{18}$" #nip="ngModel" id="nip" />
+            <div *ngIf="
           formValidationService.getErrorMessage(
             nip.control,
             'nip',
             'NIP'
           ) as error
-        "
-        class="text-danger small"
-      >
-        {{ error }}
-      </div>
+        " class="text-danger small">
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Nama <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <input
-        type="text"
-        class="form-control"
-        [(ngModel)]="userInstansi.name"
-        name="name"
-        id="name"
-        #name="ngModel"
-        required
-      />
-      <div
-        *ngIf="
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Nama <span class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" [(ngModel)]="userInstansi.name" name="name" id="name"
+                #name="ngModel" required />
+            <div *ngIf="
           formValidationService.getErrorMessage(
             name.control,
             'name',
             'Nama'
           ) as error
-        "
-        class="text-danger small"
-      >
-        {{ error }}
-      </div>
+        " class="text-danger small">
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="row mb-3">
-    <label for="email" class="col-sm-2 col-form-label fw-bold">
-      Email <span class="text-danger">*</span>
-    </label>
-    <div class="col-sm-10">
-      <input
-        type="email"
-        class="form-control"
-        [(ngModel)]="userInstansi.email"
-        name="email"
-        required
-        #email="ngModel"
-        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-        id="email"
-      />
-      <div
-        *ngIf="
+    <div class="row mb-3">
+        <label for="email" class="col-sm-2 col-form-label fw-bold">
+            Email <span class="text-danger">*</span>
+        </label>
+        <div class="col-sm-10">
+            <input type="email" class="form-control" [(ngModel)]="userInstansi.email" name="email" required
+                #email="ngModel" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" id="email" />
+            <div *ngIf="
           formValidationService.getErrorMessage(
             email.control,
             'email',
             'Email'
           ) as error
-        "
-        class="text-danger small"
-      >
-        {{ error }}
-      </div>
+        " class="text-danger small">
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="row mb-3">
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Operasional <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <select
-        id="inputState"
-        class="form-select"
-        (change)="onOperasionalChange()"
-        [(ngModel)]="operasional"
-        name="operasional"
-        #operasionalRef="ngModel"
-        required
-      >
-        <option value="" disabled selected hidden>Pilih</option>
-        <option
-          *ngFor="let instansiType of instansiTypeList"
-          [value]="instansiType.code"
-        >
-          {{ instansiType.name }}
-        </option>
-      </select>
-      <div
-        *ngIf="
+    <div class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Operasional <span class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <select id="inputState" class="form-select" (change)="onOperasionalChange()" [(ngModel)]="operasional"
+                name="operasional" #operasionalRef="ngModel" required>
+                <option value="" disabled selected hidden>Pilih</option>
+                <option *ngFor="let instansiType of instansiTypeList" [value]="instansiType.code">
+                    {{ instansiType.name }}
+                </option>
+            </select>
+            <div *ngIf="
           formValidationService.getErrorMessage(
             operasionalRef.control,
             'operasional',
             'Operasioan'
           ) as error
-        "
-        class="text-danger small"
-      >
-        {{ error }}
-      </div>
+        " class="text-danger small">
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div
-    *ngIf="['IT3', 'IT4', 'IT5'].includes(this.operasional)"
-    (change)="onProvinsiChange()"
-    class="row mb-3"
-  >
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Provinsi <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <select
-        id="inputState"
-        class="form-select"
-        [(ngModel)]="provinsiId"
-        name="provinsiId"
-        required
-        #provinsiRef="ngModel"
-      >
-        <option [value]="null" selected disabled hidden>Pilih</option>
-        <option *ngFor="let provinsi of provinsiList" [value]="provinsi.id">
-          {{ provinsi.name }}
-        </option>
-      </select>
-      <div
-        *ngIf="
+    <div *ngIf="['IT3', 'IT4', 'IT5'].includes(this.operasional)" (change)="onProvinsiChange()" class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Provinsi <span class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <select id="inputState" class="form-select" [(ngModel)]="provinsiId" name="provinsiId" required
+                #provinsiRef="ngModel">
+                <option [value]="null" selected disabled hidden>Pilih</option>
+                <option *ngFor="let provinsi of provinsiList" [value]="provinsi.id">
+                    {{ provinsi.name }}
+                </option>
+            </select>
+            <div *ngIf="
           formValidationService.getErrorMessage(
             provinsiRef.control,
             'provinsiId',
             'Provinsi'
           ) as error
-        "
-        class="text-danger small"
-      >
-        {{ error }}
-      </div>
+        " class="text-danger small">
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div
-    *ngIf="operasional == 'IT4' && provinsiId"
-    (change)="onKabKotaChange()"
-    class="row mb-3"
-  >
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Kabupaten <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <select
-        id="inputState"
-        class="form-select"
-        [(ngModel)]="kabupatenId"
-        name="kabupatenId"
-        #kabupatenRef="ngModel"
-        required
-      >
-        <option [value]="null" selected disabled hidden>Pilih</option>
-        <option *ngFor="let kabupaten of kabKotaList" [value]="kabupaten.id">
-          {{ kabupaten.name }}
-        </option>
-      </select>
-      <div
-        *ngIf="
+    <div *ngIf="operasional == 'IT4' && provinsiId" (change)="onKabKotaChange()" class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Kabupaten <span class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <select id="inputState" class="form-select" [(ngModel)]="kabupatenId" name="kabupatenId"
+                #kabupatenRef="ngModel" required>
+                <option [value]="null" selected disabled hidden>Pilih</option>
+                <option *ngFor="let kabupaten of kabKotaList" [value]="kabupaten.id">
+                    {{ kabupaten.name }}
+                </option>
+            </select>
+            <div *ngIf="
           formValidationService.getErrorMessage(
             kabupatenRef.control,
             'kabupatenId',
             'Kabupaten'
           ) as error
-        "
-        class="text-danger small"
-      >
-        {{ error }}
-      </div>
+        " class="text-danger small">
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
-  <div
-    *ngIf="operasional == 'IT5' && provinsiId"
-    (change)="onKabKotaChange()"
-    class="row mb-3"
-  >
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Kota <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <select
-        id="inputState"
-        class="form-select"
-        [(ngModel)]="kotaId"
-        name="kotaId"
-        #kotaRef="ngModel"
-        required
-      >
-        <option [value]="null" selected disabled hidden>Pilih</option>
-        <option *ngFor="let kota of kabKotaList" [value]="kota.id">
-          {{ kota.name }}
-        </option>
-      </select>
-      <div
-        *ngIf="
+    <div *ngIf="operasional == 'IT5' && provinsiId" (change)="onKabKotaChange()" class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Kota <span class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <select id="inputState" class="form-select" [(ngModel)]="kotaId" name="kotaId" #kotaRef="ngModel" required>
+                <option [value]="null" selected disabled hidden>Pilih</option>
+                <option *ngFor="let kota of kabKotaList" [value]="kota.id">
+                    {{ kota.name }}
+                </option>
+            </select>
+            <div *ngIf="
           formValidationService.getErrorMessage(
             kotaRef.control,
             'kotaId',
             'Kota'
           ) as error
-        "
-        class="text-danger small"
-      >
-        {{ error }}
-      </div>
+        " class="text-danger small">
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div
-    *ngIf="
+    <div *ngIf="
       (operasional && ['IT1', 'IT2'].includes(operasional)) ||
       (operasional == 'IT3' && provinsiId) ||
       (['IT4', 'IT5'].includes(operasional) &&
         provinsiId &&
         (kabupatenId || kotaId))
-    "
-    class="row mb-3"
-  >
-    <label for="" class="col-sm-2 col-form-label fw-bold"
-      >Instansi <span class="text-danger">*</span></label
-    >
-    <div class="col-sm-10">
-      <select
-        id="inputState"
-        class="form-select"
-        [(ngModel)]="userInstansi.instansiId"
-        name="instansiId"
-        required
-        #instansiRef="ngModel"
-      >
-        <option [value]="null" disabled selected hidden>Pilih</option>
-        <option *ngFor="let instansi of instansiList" [value]="instansi.id">
-          {{ instansi.name }}
-        </option>
-      </select>
-      <div
-        *ngIf="
+    " class="row mb-3">
+        <label for="" class="col-sm-2 col-form-label fw-bold">Instansi <span class="text-danger">*</span></label>
+        <div class="col-sm-10">
+            <select id="inputState" class="form-select" [(ngModel)]="userInstansi.instansiId" name="instansiId" required
+                #instansiRef="ngModel">
+                <option [value]="null" disabled selected hidden>Pilih</option>
+                <option *ngFor="let instansi of instansiList" [value]="instansi.id">
+                    {{ instansi.name }}
+                </option>
+            </select>
+            <div *ngIf="
           formValidationService.getErrorMessage(
             instansiRef.control,
             'instansiId',
             'Instansi'
           ) as error
-        "
-        class="text-danger small"
-      >
-        {{ error }}
-      </div>
+        " class="text-danger small">
+                {{ error }}
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="row text-center">
-    <div class="col-12">
-      <ng-container *ngIf="isLoading$ | async; else noLoading">
-        <button class="btn btn-success float-end" disabled>
-          <div
-            class="spinner-border"
-            style="width: 19px; height: 19px"
-            role="status"
-          >
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </button>
-      </ng-container>
-      <ng-template #noLoading>
-        <button
-          type="submit"
-          class="btn btn-success float-end"
-          [disabled]="userForm.invalid || (isLoading$ | async)"
-        >
-          Simpan
-        </button>
-      </ng-template>
+    <div class="row text-center">
+        <div class="col-12">
+            <ng-container *ngIf="isLoading$ | async; else noLoading">
+                <button class="btn btn-success float-end" disabled>
+                    <div class="spinner-border spinner-sm-custom" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </button>
+            </ng-container>
+            <ng-template #noLoading>
+                <button type="submit" class="btn btn-success float-end"
+                    [disabled]="userForm.invalid || (isLoading$ | async)">
+                    Simpan
+                </button>
+            </ng-template>
+        </div>
     </div>
-  </div>
 </form>

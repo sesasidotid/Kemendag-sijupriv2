@@ -1,19 +1,12 @@
 <app-pagable [pagable]="pagable"></app-pagable>
 
-<app-modal
-    *ngIf="isModalOpen$ | async"
-    [title]="'Update Indikator Kompetensi'"
-    (toggle)="toggleModal()"
-    [enableFooter]="false"
->
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Update Indikator Kompetensi'" (toggle)="toggleModal()"
+    [enableFooter]="false">
     <div class="col-12">
         <form [formGroup]="editIndikatorKompetensiForm">
             <div class="row mb-3">
-                <label for="name" class="form-label fw-bold"
-                    >Indikator Kompetensi<span class="text-danger"
-                        >*</span
-                    ></label
-                >
+                <label for="name" class="form-label fw-bold">Indikator Kompetensi<span
+                        class="text-danger">*</span></label>
                 <div>
                     <!-- <input
                         type="text"
@@ -22,44 +15,28 @@
                         required
                         formControlName="name"
                     /> -->
-                    <textarea
-                        class="form-control"
-                        id="name"
-                        rows="3"
-                        formControlName="name"
-                        placeholder="Masukan nama indikator kompetensi"
-                    ></textarea>
+                    <textarea class="form-control" id="name" rows="3" formControlName="name"
+                        placeholder="Masukan nama indikator kompetensi"></textarea>
                 </div>
-                <div
-                    *ngIf="getErrorMessage('name', 'Nama Kompetensi') as error"
-                    class="text-danger"
-                >
+                <div *ngIf="getErrorMessage('name', 'Nama Kompetensi') as error" class="text-danger">
                     {{ error }}
                 </div>
             </div>
 
             <ng-container *ngIf="isSubmitLoading$ | async; else noLoading">
                 <button class="btn btn-success w-100" disabled>
-                    <div
-                        class="spinner-border"
-                        style="width: 19px; height: 19px"
-                        role="status"
-                    >
+                    <div class="spinner-border spinner-sm-custom" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </button>
             </ng-container>
 
             <ng-template #noLoading>
-                <button
-                    type="button"
-                    class="btn btn-success w-100"
-                    (click)="onSubmit()"
-                    [disabled]="editIndikatorKompetensiForm.invalid"
-                >
+                <button type="button" class="btn btn-success w-100" (click)="onSubmit()"
+                    [disabled]="editIndikatorKompetensiForm.invalid">
                     Update
                 </button>
             </ng-template>
         </form>
-    </div></app-modal
->
+    </div>
+</app-modal>

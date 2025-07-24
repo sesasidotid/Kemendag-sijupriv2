@@ -9,7 +9,7 @@
                             <span class="text-danger">*</span>
                         </label>
                         <select class="form-select" id="jenis_ukom" name="jenis_ukom" formControlName="jenis_ukom">
-                            <option value="" selected disabled style="display: none">
+                            <option value="" selected disabled hidden>
                                 Pilih Jenis UKom
                             </option>
                             <option [value]="'KENAIKAN_JENJANG'">
@@ -42,7 +42,7 @@
                             <span class="text-danger">*</span>
                         </label>
                         <select class="form-select" id="isMengulang" formControlName="isMengulang">
-                            <option value="" disabled selected style="display: none">
+                            <option value="" disabled selected hidden>
                                 Pilih Status Pendaftaran
                             </option>
                             <option value="false">Baru</option>
@@ -71,7 +71,7 @@
                                 passwordForm.get('jenis_ukom')?.value ===
                                 'KENAIKAN_JENJANG'
                             ">
-                            <option value="" selected style="display: none">
+                            <option value="" selected hidden>
                                 Pilih Jabatan Yang Di Tuju
                             </option>
                             <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
@@ -100,7 +100,7 @@
                                 passwordForm.get('jenis_ukom')?.value ===
                                 'KENAIKAN_JENJANG'
                             ">
-                            <option value="" selected style="display: none">
+                            <option value="" selected hidden>
                                 Pilih Jenjang Yang Di Tuju
                             </option>
                             <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code">
@@ -125,7 +125,7 @@
                                 <span class="text-danger">*</span></label>
                             <select class="form-select" name="bidang_jabatan_code" id="bidang_jabatan_code"
                                 formControlName="bidang_jabatan_code">
-                                <option selected value="" style="display: none">
+                                <option selected value="" hidden>
                                     Pilih Bidang Jabatan Yang Dituju
                                 </option>
 
@@ -228,7 +228,7 @@
                         </button>
 
                         <button *ngIf="hadItemsLoading$ | async" class="btn btn-success" disabled>
-                            <div class="spinner-border" style="width: 19px; height: 19px" role="status">
+                            <div class="spinner-border spinner-sm-custom" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </button>

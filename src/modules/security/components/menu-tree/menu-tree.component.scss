@@ -1,7 +1,7 @@
 span {
     font-size: 13px;
     font-style: italic;
-    letter-spacing: .1px;
+    letter-spacing: 0.1px;
     color: #a8a8a8;
 }
 
@@ -61,10 +61,6 @@ ul {
     }
 }
 
-// .card {
-//     width: 100%;
-// }
-
 .content-top {
     padding-left: 20px;
     padding-right: 20px;
@@ -87,4 +83,12 @@ ul {
     border-radius: 10px;
     background-color: #f1f3ff;
     height: 100%;
+}
+
+.flex-basis-33 {
+    flex-basis: calc(33.33% - 1rem);
+}
+
+.min-w-250 {
+    min-width: 250px;
 }

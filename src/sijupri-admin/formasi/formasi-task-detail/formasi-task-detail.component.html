@@ -1,9 +1,6 @@
-<div
-    *ngIf="
+<div *ngIf="
         pendingTask.flowId == 'for_flow_2' || pendingTask.flowId == 'for_flow_4'
-    "
-    class="row"
->
+    " class="row">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header align-items-center d-flex">
@@ -13,9 +10,7 @@
             <div class="card-body">
                 <form>
                     <div class="row border-bottom align-items-center">
-                        <label class="col-sm-2 col-form-label fw-bold"
-                            >Unit Kerja</label
-                        >
+                        <label class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
                         <div class="col-sm-10">
                             <p class="form-control-plaintext m-0">
                                 : {{ unitKerja?.name }}
@@ -23,9 +18,7 @@
                         </div>
                     </div>
                     <div class="row border-bottom align-items-center">
-                        <label class="col-sm-2 col-form-label fw-bold"
-                            >Alamat</label
-                        >
+                        <label class="col-sm-2 col-form-label fw-bold">Alamat</label>
                         <div class="col-sm-10">
                             <p class="form-control-plaintext m-0">
                                 : {{ unitKerja?.alamat }}
@@ -33,9 +26,7 @@
                         </div>
                     </div>
                     <div class="row border-bottom align-items-center">
-                        <label class="col-sm-2 col-form-label fw-bold"
-                            >Email</label
-                        >
+                        <label class="col-sm-2 col-form-label fw-bold">Email</label>
                         <div class="col-sm-10">
                             <p class="form-control-plaintext m-0">
                                 : {{ unitKerja?.email }}
@@ -43,9 +34,7 @@
                         </div>
                     </div>
                     <div class="row border-bottom align-items-center">
-                        <label class="col-sm-2 col-form-label fw-bold"
-                            >Phone</label
-                        >
+                        <label class="col-sm-2 col-form-label fw-bold">Phone</label>
                         <div class="col-sm-10">
                             <p class="form-control-plaintext m-0">
                                 : {{ unitKerja?.phone }}
@@ -54,118 +43,73 @@
                     </div>
                     <hr />
                     <div class="">
-                        <div
-                            *ngFor="
+                        <div *ngFor="
                                 let formasiDokumen of formasiRequest.formasiDokumenList;
                                 index as i
-                            "
-                            class="row mb-3"
-                        >
-                            <label
-                                for=""
-                                class="col-sm-2 col-form-label fw-bold"
-                                >{{
-                                    formasiDokumen.dokumenPersyaratanName
-                                }}</label
-                            >
+                            " class="row mb-3">
+                            <label for="" class="col-sm-2 col-form-label fw-bold">{{
+                                formasiDokumen.dokumenPersyaratanName
+                                }}</label>
                             <div class="col-sm-10">
                                 <div class="row">
                                     <div class="col">
-                                        <a
-                                            class="btn btn-sm btn-info"
-                                            (click)="
+                                        <a class="btn btn-sm btn-info" (click)="
                                                 preview(
                                                     formasiDokumen.dokumenName,
                                                     formasiDokumen.dokumenUrl
                                                 )
-                                            "
-                                            >lihat</a
-                                        >
+                                            ">lihat</a>
                                     </div>
                                     <div class="col">
-                                        <div
-                                            class=""
-                                            *ngIf="
+                                        <div class="" *ngIf="
                                                 !isDocumentApproved(
                                                     formasiDokumen.dokumenPersyaratanId
                                                 ) ||
                                                     formasiDokumen.dokumenStatus ===
                                                         'REJECT';
                                                 else Approved
-                                            "
-                                        >
-                                            <div
-                                                *ngIf="
+                                            ">
+                                            <div *ngIf="
                                                     pendingTask.flowId !==
                                                         'for_flow_4';
                                                     else Disapproved
-                                                "
-                                            >
-                                                <input
-                                                    type="radio"
-                                                    class="btn-check"
-                                                    name="options-outlined_{{
+                                                ">
+                                                <input type="radio" class="btn-check" name="options-outlined_{{
                                                         i
-                                                    }}"
-                                                    (click)="
+                                                    }}" (click)="
                                                         onFIleSwitch(
                                                             i,
                                                             'APPROVE'
                                                         )
-                                                    "
-                                                    id="btn-approve-toggle_{{
+                                                    " id="btn-approve-toggle_{{
                                                         i
-                                                    }}"
-                                                    autocomplete="off"
-                                                    checked
-                                                />
-                                                <label
-                                                    class="btn btn-sm btn-soft-success"
-                                                    for="btn-approve-toggle_{{
+                                                    }}" autocomplete="off" checked />
+                                                <label class="btn btn-sm btn-soft-success" for="btn-approve-toggle_{{
                                                         i
-                                                    }}"
-                                                    >Terima</label
-                                                >
+                                                    }}">Terima</label>
 
-                                                <input
-                                                    type="radio"
-                                                    class="btn-check"
-                                                    name="options-outlined_{{
+                                                <input type="radio" class="btn-check" name="options-outlined_{{
                                                         i
-                                                    }}"
-                                                    (click)="
+                                                    }}" (click)="
                                                         onFIleSwitch(
                                                             i,
                                                             'REJECT'
                                                         )
-                                                    "
-                                                    id="btn-reject-toggle_{{
+                                                    " id="btn-reject-toggle_{{
                                                         i
-                                                    }}"
-                                                    autocomplete="off"
-                                                />
-                                                <label
-                                                    class="btn btn-sm btn-soft-danger"
-                                                    for="btn-reject-toggle_{{
+                                                    }}" autocomplete="off" />
+                                                <label class="btn btn-sm btn-soft-danger" for="btn-reject-toggle_{{
                                                         i
-                                                    }}"
-                                                    >Tolak</label
-                                                >
+                                                    }}">Tolak</label>
                                             </div>
                                         </div>
                                         <ng-template #Approved>
-                                            <label
-                                                class="btn btn-sm btn-soft-success"
-                                                aria-disabled="true"
-                                                >Disetujui</label
-                                            >
+                                            <label class="btn btn-sm btn-soft-success"
+                                                aria-disabled="true">Disetujui</label>
                                         </ng-template>
                                         <ng-template #Disapproved>
-                                            <label
-                                                class="btn btn-sm btn-soft-danger"
-                                                aria-disabled="true"
-                                                >Menunggu Perbaikan</label
-                                            >
+                                            <label class="btn btn-sm btn-soft-danger" aria-disabled="true">Menunggu
+                                                Perbaikan</label>
                                         </ng-template>
                                     </div>
                                 </div>
@@ -174,82 +118,51 @@
                     </div>
                     <hr />
 
-                    <div
-                        *ngIf="
+                    <div *ngIf="
                             isApproveEnable &&
                             pendingTask.flowId !== 'for_flow_4'
-                        "
-                        class="row mb-3"
-                    >
+                        " class="row mb-3">
                         <form [formGroup]="waktuPelaksanaanForm">
                             <div class="row">
-                                <label for="waktuPelaksanaan" class="form-label"
-                                    >Waktu Pelaksanaan
+                                <label for="waktuPelaksanaan" class="form-label">Waktu Pelaksanaan
                                 </label>
                                 <div class="col">
-                                    <input
-                                        type="datetime-local"
-                                        id="waktuPelaksanaan"
-                                        class="form-control"
-                                        name="waktuPelaksanaan"
-                                        formControlName="waktuPelaksanaan"
-                                    />
+                                    <input type="datetime-local" id="waktuPelaksanaan" class="form-control"
+                                        name="waktuPelaksanaan" formControlName="waktuPelaksanaan" />
                                 </div>
                             </div>
                         </form>
 
                         <div class="row mt-4">
-                            <app-file-handler
-                                [inputs]="inputs"
-                            ></app-file-handler>
+                            <app-file-handler [inputs]="inputs"></app-file-handler>
                         </div>
                     </div>
                     <div class="text-center float-end">
-                        <ng-container
-                            *ngIf="
+                        <ng-container *ngIf="
                                 pendingTask.flowId !== 'for_flow_4' &&
                                 isApproveEnable
-                            "
-                        >
-                            <ng-container
-                                *ngIf="isFl2Loading$ | async; else approveBtn"
-                            >
+                            ">
+                            <ng-container *ngIf="isFl2Loading$ | async; else approveBtn">
                                 <button class="btn btn-success me-2" disabled>
-                                    <div
-                                        class="spinner-border"
-                                        style="width: 19px; height: 19px"
-                                        role="status"
-                                    >
-                                        <span class="visually-hidden"
-                                            >Loading...</span
-                                        >
+                                    <div class="spinner-border spinner-sm-custom" role="status">
+                                        <span class="visually-hidden">Loading...</span>
                                     </div>
                                 </button>
                             </ng-container>
                             <ng-template #approveBtn>
-                                <button
-                                    type="submit"
-                                    class="btn btn-success me-2"
-                                    [disabled]="
+                                <button type="submit" class="btn btn-success me-2" [disabled]="
                                         waktuPelaksanaanForm.invalid ||
                                         isUndanganFileMissing()
-                                    "
-                                    (click)="submitFl2(true)"
-                                >
+                                    " (click)="submitFl2(true)">
                                     Terima
                                 </button>
                             </ng-template>
                         </ng-container>
 
-                        <button
-                            *ngIf="
+                        <button *ngIf="
                                 pendingTask.flowId !== 'for_flow_4' &&
                                 !isApproveEnable
-                            "
-                            type="submit"
-                            class="btn btn-danger"
-                            (click)="submitFl2(false)"
-                        >
+                            " type="submit" class="btn btn-danger" (click)="submitFl2(false)">
                             Tolak
                         </button>
                     </div>
@@ -268,9 +181,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row border-bottom align-items-center">
-                            <label class="col-sm-2 col-form-label fw-bold"
-                                >Unit Kerja</label
-                            >
+                            <label class="col-sm-2 col-form-label fw-bold">Unit Kerja</label>
                             <div class="col-sm-10">
                                 <p class="form-control-plaintext m-0">
                                     : {{ unitKerja?.name }}
@@ -278,9 +189,7 @@
                             </div>
                         </div>
                         <div class="row border-bottom align-items-center">
-                            <label class="col-sm-2 col-form-label fw-bold"
-                                >Alamat</label
-                            >
+                            <label class="col-sm-2 col-form-label fw-bold">Alamat</label>
                             <div class="col-sm-10">
                                 <p class="form-control-plaintext m-0">
                                     : {{ unitKerja?.alamat }}
@@ -288,9 +197,7 @@
                             </div>
                         </div>
                         <div class="row border-bottom align-items-center">
-                            <label class="col-sm-2 col-form-label fw-bold"
-                                >Email</label
-                            >
+                            <label class="col-sm-2 col-form-label fw-bold">Email</label>
                             <div class="col-sm-10">
                                 <p class="form-control-plaintext m-0">
                                     : {{ unitKerja?.email }}
@@ -298,9 +205,7 @@
                             </div>
                         </div>
                         <div class="row border-bottom align-items-center">
-                            <label class="col-sm-2 col-form-label fw-bold"
-                                >Phone</label
-                            >
+                            <label class="col-sm-2 col-form-label fw-bold">Phone</label>
                             <div class="col-sm-10">
                                 <p class="form-control-plaintext m-0">
                                     : {{ unitKerja?.phone }}
@@ -332,62 +237,40 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <ng-container
-                                *ngFor="let item of formasiList; let i = index"
-                            >
-                                <tr
-                                    *ngFor="
+                            <ng-container *ngFor="let item of formasiList; let i = index">
+                                <tr *ngFor="
                                         let formasi of item.formasiResultDtoList;
                                         let j = index
-                                    "
-                                >
-                                    <td
-                                        *ngIf="j === 0"
-                                        class="align-middle"
-                                        [attr.rowspan]="
+                                    ">
+                                    <td *ngIf="j === 0" class="align-middle" [attr.rowspan]="
                                             item.formasiResultDtoList.length
-                                        "
-                                    >
+                                        ">
                                         {{ i + 1 }}
                                     </td>
-                                    <td
-                                        *ngIf="j === 0"
-                                        class="align-middle"
-                                        [attr.rowspan]="
+                                    <td *ngIf="j === 0" class="align-middle" [attr.rowspan]="
                                             item.formasiResultDtoList.length
-                                        "
-                                    >
+                                        ">
                                         {{ item.jabatanName }}
                                     </td>
                                     <td class="align-middle">
                                         {{
-                                            findJenjangName(formasi.jenjangCode)
+                                        findJenjangName(formasi.jenjangCode)
                                         }}
                                     </td>
                                     <td class="align-middle">
                                         {{ formasi.pembulatan || 0 }}
                                     </td>
                                     <td class="align-middle">
-                                        <input
-                                            [formControlName]="
+                                        <input [formControlName]="
                                                 'formasi_' + i + '_' + j
-                                            "
-                                            type="number"
-                                            class="form-control"
-                                            [value]="formasi.pembulatan || 0"
-                                            min="0"
-                                            step="1"
-                                            (keydown)="preventMinus($event)"
-                                        />
+                                            " type="number" class="form-control" [value]="formasi.pembulatan || 0"
+                                            min="0" step="1" (keydown)="preventMinus($event)" />
                                     </td>
                                 </tr>
                             </ng-container>
 
                             <tr>
-                                <td
-                                    colspan="3"
-                                    class="align-middle text-center fw-bold"
-                                >
+                                <td colspan="3" class="align-middle text-center fw-bold">
                                     Jumlah Usulan Formasi
                                 </td>
                                 <td class="align-middle fw-bold">
@@ -404,12 +287,8 @@
             Submit
           </button> -->
                     <div class="col-12">
-                        <app-loading-button
-                            [isLoading]="isFl3Loading$ | async"
-                            [type]="'submit'"
-                            label="Simpan"
-                            [className]="'btn btn-success float-end'"
-                        ></app-loading-button>
+                        <app-loading-button [isLoading]="isFl3Loading$ | async" [type]="'submit'" label="Simpan"
+                            [className]="'btn btn-success float-end'"></app-loading-button>
                     </div>
                 </form>
             </div>
@@ -427,20 +306,13 @@
             <form (submit)="submitFl5()">
                 <div class="row">
                     <div class="row">
-                        <app-file-handler
-                            [inputs]="inputsFileRekomendasi"
-                        ></app-file-handler>
+                        <app-file-handler [inputs]="inputsFileRekomendasi"></app-file-handler>
                     </div>
                 </div>
 
                 <div class="col-12">
-                    <app-loading-button
-                        [isLoading]="isF15Loading$ | async"
-                        [disabled]="isFileRekomendasiMissing()"
-                        [type]="'submit'"
-                        label="Simpan"
-                        [className]="'btn btn-success float-end'"
-                    ></app-loading-button>
+                    <app-loading-button [isLoading]="isF15Loading$ | async" [disabled]="isFileRekomendasiMissing()"
+                        [type]="'submit'" label="Simpan" [className]="'btn btn-success float-end'"></app-loading-button>
                 </div>
             </form>
         </div>

@@ -1,246 +1,120 @@
-<app-pagable
-  [pagable]="pagable$ | async"
-  [refresh]="refreshToggle"
-></app-pagable>
+<app-pagable [pagable]="pagable$ | async" [refresh]="refreshToggle"></app-pagable>
 
-<app-modal
-  *ngIf="isModalOpen$ | async"
-  [title]="'Update Formula'"
-  (toggle)="toggleModal()"
-  [enableFooter]="false"
-  [size]="'md'"
->
-  <form [formGroup]="editFormulaForm">
-    <div class="mb-3">
-      <label for="cat_percentage" class="form-label"
-        >CAT <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="cat_percentage"
-        required
-        formControlName="cat_percentage"
-      />
-      <div
-        *ngIf="getErrorMessage('cat_percentage', 'CAT') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="wawancara_percentage" class="form-label"
-        >Wawancara <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="wawancara_percentage"
-        required
-        formControlName="wawancara_percentage"
-      />
-      <div
-        *ngIf="getErrorMessage('wawancara_percentage', 'Wawancara') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="seminar_percentage" class="form-label"
-        >Seminar <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="seminar_percentage"
-        required
-        formControlName="seminar_percentage"
-      />
-      <div
-        *ngIf="getErrorMessage('seminar_percentage', 'Seminar') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="praktik_percentage" class="form-label"
-        >Praktik <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="praktik_percentage"
-        required
-        formControlName="praktik_percentage"
-      />
-      <div
-        *ngIf="getErrorMessage('praktik_percentage', 'Praktik') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="portofolio_percentage" class="form-label"
-        >Portofolia <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="portofolio_percentage"
-        required
-        formControlName="portofolio_percentage"
-      />
-      <div
-        *ngIf="getErrorMessage('portofolio_percentage', 'Portofolia') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="ukt_percentage" class="form-label"
-        >UKT <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="ukt_percentage"
-        required
-        formControlName="ukt_percentage"
-      />
-      <div
-        *ngIf="getErrorMessage('ukt_percentage', 'UKT') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="ukmsk_percentage" class="form-label"
-        >UKSMK <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="ukmsk_percentage"
-        required
-        formControlName="ukmsk_percentage"
-      />
-      <div
-        *ngIf="getErrorMessage('ukmsk_percentage', 'UKSMK') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="grade_threshold" class="form-label"
-        >Ambang Batas Nilai <span class="text-danger">*</span>
-      </label>
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="grade_threshold"
-        required
-        formControlName="grade_threshold"
-      />
-      <div
-        *ngIf="
-          getErrorMessage('grade_threshold', 'Ambang Batas Nilai') as error
-        "
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="ukt_threshold" class="form-label"
-        >Ambang Batas UKT <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="ukt_threshold"
-        required
-        formControlName="ukt_threshold"
-      />
-      <div
-        *ngIf="getErrorMessage('ukt_threshold', 'Ambang Batas UKT') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label for="jpm_threshold" class="form-label"
-        >Ambang Batas JPM <span class="text-danger">*</span></label
-      >
-      <input
-        type="number"
-        step="1"
-        class="form-control"
-        id="jpm_threshold"
-        required
-        formControlName="jpm_threshold"
-      />
-      <div
-        *ngIf="getErrorMessage('jpm_threshold', 'Ambang Batas JPM') as error"
-        class="text-danger"
-      >
-        {{ error }}
-      </div>
-    </div>
-
-    <ng-container *ngIf="isLoading$ | async; else noLoading">
-      <button class="btn btn-primary w-100" disabled>
-        <div
-          class="spinner-border"
-          style="width: 19px; height: 19px"
-          role="status"
-        >
-          <span class="visually-hidden">Loading...</span>
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Update Formula'" (toggle)="toggleModal()" [enableFooter]="false"
+    [size]="'md'">
+    <form [formGroup]="editFormulaForm">
+        <div class="mb-3">
+            <label for="cat_percentage" class="form-label">CAT <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="cat_percentage" required
+                formControlName="cat_percentage" />
+            <div *ngIf="getErrorMessage('cat_percentage', 'CAT') as error" class="text-danger">
+                {{ error }}
+            </div>
         </div>
-      </button></ng-container
-    >
-    <ng-template #noLoading>
-      <button
-        (click)="submit()"
-        [disabled]="!editFormulaForm.valid"
-        class="btn btn-primary w-100"
-      >
-        Update
-      </button>
-    </ng-template>
-    <!-- <button
+
+        <div class="mb-3">
+            <label for="wawancara_percentage" class="form-label">Wawancara <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="wawancara_percentage" required
+                formControlName="wawancara_percentage" />
+            <div *ngIf="getErrorMessage('wawancara_percentage', 'Wawancara') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="seminar_percentage" class="form-label">Seminar <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="seminar_percentage" required
+                formControlName="seminar_percentage" />
+            <div *ngIf="getErrorMessage('seminar_percentage', 'Seminar') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="praktik_percentage" class="form-label">Praktik <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="praktik_percentage" required
+                formControlName="praktik_percentage" />
+            <div *ngIf="getErrorMessage('praktik_percentage', 'Praktik') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="portofolio_percentage" class="form-label">Portofolia <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="portofolio_percentage" required
+                formControlName="portofolio_percentage" />
+            <div *ngIf="getErrorMessage('portofolio_percentage', 'Portofolia') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="ukt_percentage" class="form-label">UKT <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="ukt_percentage" required
+                formControlName="ukt_percentage" />
+            <div *ngIf="getErrorMessage('ukt_percentage', 'UKT') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="ukmsk_percentage" class="form-label">UKSMK <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="ukmsk_percentage" required
+                formControlName="ukmsk_percentage" />
+            <div *ngIf="getErrorMessage('ukmsk_percentage', 'UKSMK') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="grade_threshold" class="form-label">Ambang Batas Nilai <span class="text-danger">*</span>
+            </label>
+            <input type="number" step="1" class="form-control" id="grade_threshold" required
+                formControlName="grade_threshold" />
+            <div *ngIf="
+          getErrorMessage('grade_threshold', 'Ambang Batas Nilai') as error
+        " class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="ukt_threshold" class="form-label">Ambang Batas UKT <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="ukt_threshold" required
+                formControlName="ukt_threshold" />
+            <div *ngIf="getErrorMessage('ukt_threshold', 'Ambang Batas UKT') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="jpm_threshold" class="form-label">Ambang Batas JPM <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="jpm_threshold" required
+                formControlName="jpm_threshold" />
+            <div *ngIf="getErrorMessage('jpm_threshold', 'Ambang Batas JPM') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <ng-container *ngIf="isLoading$ | async; else noLoading">
+            <button class="btn btn-primary w-100" disabled>
+                <div class="spinner-border spinner-sm-custom" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </button></ng-container>
+        <ng-template #noLoading>
+            <button (click)="submit()" [disabled]="!editFormulaForm.valid" class="btn btn-primary w-100">
+                Update
+            </button>
+        </ng-template>
+        <!-- <button
       (click)="submit()"
       [disabled]="!editFormulaForm.valid"
       class="btn btn-primary w-100"
     >
       Update
     </button> -->
-  </form>
+    </form>
 </app-modal>
 
 <app-confirmation-dialog></app-confirmation-dialog>

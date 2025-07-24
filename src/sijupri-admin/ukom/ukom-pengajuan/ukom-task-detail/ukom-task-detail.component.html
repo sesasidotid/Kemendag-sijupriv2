@@ -477,7 +477,7 @@
                             <button *ngIf="
                                     isApproveEnable && hadItemsLoading$ | async
                                 " class="btn btn-success me-1" disabled>
-                                <div class="spinner-border" style="width: 19px; height: 19px" role="status">
+                                <div class="spinner-border spinner-sm-custom" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </button>
@@ -485,7 +485,7 @@
                             <button *ngIf="
                                     !isApproveEnable && hadItemsLoading$ | async
                                 " class="btn btn-danger" disabled>
-                                <div class="spinner-border" style="width: 19px; height: 19px" role="status">
+                                <div class="spinner-border spinner-sm-custom" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </button>

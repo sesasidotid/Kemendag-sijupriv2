@@ -1,7 +1,4 @@
-<div
-    *ngIf="isLoading$ | async; else content"
-    class="d-flex justify-content-center my-5"
->
+<div *ngIf="isLoading$ | async; else content" class="d-flex justify-content-center my-5">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
@@ -12,25 +9,17 @@
         <div class="countdown-notification"></div>
 
         <div class="container">
-            <section
-                class="section min-vh-100 d-flex flex-column align-items-center justify-content-center"
-            >
+            <section class="section min-vh-100 d-flex flex-column align-items-center justify-content-center">
                 <p class="countdown-message">
                     Anda sudah mengerjakan CAT. Silahkan tunggu hingga waktu CAT
                     selesai untuk melihat skor :
                 </p>
-                <div
-                    [class.warning]="remainingSeconds < 300"
-                    [class.danger]="remainingSeconds < 60"
-                    class="countdown-timer"
-                >
+                <div [class.warning]="remainingSeconds < 300" [class.danger]="remainingSeconds < 60"
+                    class="countdown-timer">
                     {{ remainingTime }}
                 </div>
 
-                <button
-                    class="btn btn-primary btn-lg mt-3 return-button"
-                    (click)="backToHome()"
-                >
+                <button class="btn btn-primary btn-lg mt-3 return-button" (click)="backToHome()">
                     Kembali
                 </button>
             </section>
@@ -42,60 +31,37 @@
             <div class="row w-100" *ngIf="data.data.length > 0">
                 <div class="col-8 d-flex flex-column card mb-10 pb-4">
                     <div class="text-center mb-4">
-                        <img
-                            *ngIf="data.data[currentPage - 1]?.attachmentUrl"
-                            [src]="data.data[currentPage - 1]?.attachmentUrl"
-                            alt="Question Image"
-                            class="img-fluid rounded shadow"
-                            style="max-height: 300px; object-fit: cover"
-                        />
+                        <img *ngIf="data.data[currentPage - 1]?.attachmentUrl"
+                            [src]="data.data[currentPage - 1]?.attachmentUrl" alt="Question Image"
+                            class="img-fluid rounded shadow img-custom-300 object-cover" />
                     </div>
 
                     <p class="fs-5 mb-4">
                         {{ data.data[currentPage - 1]?.question }}
                     </p>
 
-                    <div
-                        *ngFor="
+                    <div *ngFor="
                             let choice of data.data[currentPage - 1]
                                 ?.multipleChoiceDtoList
-                        "
-                        class="mb-3"
-                    >
+                        " class="mb-3">
                         <label class="d-flex align-items-center gap-2">
-                            <input
-                                type="radio"
-                                [value]="choice.choiceId"
-                                name="answer"
-                                [checked]="
+                            <input type="radio" [value]="choice.choiceId" name="answer" [checked]="
                                     selectedAnswer[
                                         data.data[currentPage - 1]?.id
                                     ] === choice.choiceId
-                                "
-                                (change)="
+                                " (change)="
                                     selectAnswer(
                                         data.data[currentPage - 1]?.id,
                                         choice.choiceId
                                     )
-                                "
-                            />
+                                " />
                             <span>{{ choice.choiceValue }}</span>
                         </label>
                     </div>
 
-                    <ng-container
-                        *ngIf="isSavingAnswer$ | async; else noSavingLoading"
-                    >
-                        <button
-                            class="btn btn-primary"
-                            disabled
-                            *ngIf="currentPage !== totalQuestions"
-                        >
-                            <div
-                                class="spinner-border"
-                                style="width: 19px; height: 19px"
-                                role="status"
-                            >
+                    <ng-container *ngIf="isSavingAnswer$ | async; else noSavingLoading">
+                        <button class="btn btn-primary" disabled *ngIf="currentPage !== totalQuestions">
+                            <div class="spinner-border spinner-sm-custom" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </button>
@@ -109,43 +75,30 @@
                         >
                             Simpan
                         </button> -->
-                        <button
-                            (click)="
+                        <button (click)="
                                 onSaveButtonClick(
                                     data.data[currentPage - 1]?.id
                                 )
-                            "
-                            class="btn btn-primary mb-1"
-                        >
+                            " class="btn btn-primary mb-1">
                             Simpan
                         </button>
                     </ng-template>
 
-                    <ng-container
-                        *ngIf="
+                    <ng-container *ngIf="
                             isSubmittingAnswer$ | async;
                             else noSubmitLoading
-                        "
-                    >
+                        ">
                         <button class="btn btn-success" disabled>
-                            <div
-                                class="spinner-border"
-                                style="width: 19px; height: 19px"
-                                role="status"
-                            >
+                            <div class="spinner-border spinner-sm-custom" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </button>
                     </ng-container>
 
                     <ng-template #noSubmitLoading>
-                        <button
-                            *ngIf="currentPage === totalQuestions"
-                            (click)="
+                        <button *ngIf="currentPage === totalQuestions" (click)="
                                 submitAfterSave(data.data[currentPage - 1]?.id)
-                            "
-                            class="btn btn-success"
-                        >
+                            " class="btn btn-success">
                             Simpan dan Selesai
                         </button>
                     </ng-template>
@@ -153,29 +106,19 @@
 
                 <div class="col-4 d-flex flex-column px-4">
                     <div class="card shadow-sm p-2 flex-grow-1">
-                        <div
-                            [class.warning]="remainingSeconds < 300"
-                            [class.danger]="remainingSeconds < 60"
-                            class="countdown-timer"
-                        >
+                        <div [class.warning]="remainingSeconds < 300" [class.danger]="remainingSeconds < 60"
+                            class="countdown-timer">
                             {{ remainingTime }}
                         </div>
 
                         <div class="row justify-content-center">
-                            <button
-                                *ngFor="
-                                    let q of [].constructor(totalQuestions);
-                                    let i = index
-                                "
-                                (click)="navigateToPage(i + 1)"
-                                [class.bg-primary]="currentPage === i + 1"
+                            <button *ngFor="
+        let q of [].constructor(totalQuestions);
+        let i = index
+    " (click)="navigateToPage(i + 1)" [class.bg-primary]="currentPage === i + 1"
                                 [class.text-white]="currentPage === i + 1"
-                                [class.bg-success]="
-                                    savedAnswer[data.data[i]?.id]
-                                "
-                                class="btn btn-light col-auto text-center m-1"
-                                style="width: 50px; height: 50px"
-                            >
+                                [class.bg-success]="savedAnswer[data.data[i]?.id]"
+                                class="btn btn-light col-auto text-center m-1 btn-square-50">
                                 {{ i + 1 }}
                             </button>
                         </div>

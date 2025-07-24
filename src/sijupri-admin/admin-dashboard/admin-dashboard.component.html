@@ -79,8 +79,7 @@
         <div *ngIf="userRole?.includes('ADMIN')">
             <p class="h3">User Sijupri</p>
             <div class="row">
-                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/security/user')"
-                    style="cursor: pointer">
+                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/security/user')">
                     <div class="card">
                         <div class="card-body">
                             <div class="media d-flex justify-content-between">
@@ -89,15 +88,14 @@
                                     <span>Admin Sijupri</span>
                                 </div>
                                 <div class="align-self-center">
-                                    <span class="mdi mdi-account-key-outline" style="font-size: 2.5rem"></span>
+                                    <span class="mdi mdi-account-key-outline fs-1"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-instansi')"
-                    style="cursor: pointer">
+                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-instansi')">
                     <div class="card">
                         <div class="card-body">
                             <div class="media d-flex justify-content-between">
@@ -106,15 +104,14 @@
                                     <span>Admin Instansi</span>
                                 </div>
                                 <div class="align-self-center">
-                                    <span class="mdi mdi-account-outline" style="font-size: 2.5rem"></span>
+                                    <span class="mdi mdi-account-outline fs-1"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-unit-kerja')"
-                    style="cursor: pointer">
+                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-unit-kerja')">
                     <div class="card">
                         <div class="card-body">
                             <div class="media d-flex justify-content-between">
@@ -123,15 +120,14 @@
                                     <span>Admin Unit Kerja</span>
                                 </div>
                                 <div class="align-self-center">
-                                    <span class="mdi mdi-account-supervisor-outline" style="font-size: 2.5rem"></span>
+                                    <span class="mdi mdi-account-supervisor-outline fs-1"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-jf')"
-                    style="cursor: pointer">
+                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-jf')">
                     <div class="card">
                         <div class="card-body">
                             <div class="media d-flex justify-content-between">
@@ -140,7 +136,7 @@
                                     <span>User JF</span>
                                 </div>
                                 <div class="align-self-center">
-                                    <span class="mdi mdi-account-group-outline" style="font-size: 2.5rem"></span>
+                                    <span class="mdi mdi-account-group-outline fs-1"></span>
                                 </div>
                             </div>
                         </div>
@@ -181,8 +177,8 @@
         </div>
     </div>
 
-    <div class="chart-container" *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-        style="position: relative; height: 50vh; width: 100%">
+    <div class="chart-container position-relative w-100"
+        *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')">
         <canvas baseChart [data]="barChartData" [options]="barChartOptions" chartType="bar"></canvas>
     </div>
 </section>

@@ -1,87 +1,54 @@
 <ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable"></app-pagable>
+    <app-pagable [pagable]="pagable"></app-pagable>
 </ng-container>
 
 <ng-container *ngIf="(tab$ | async) === 1">
-  <app-akp-pelatihan-add
-    [tab]="tab$"
-    (changeTabActive)="handleTabChange(0)"
-  ></app-akp-pelatihan-add>
+    <app-akp-pelatihan-add [tab]="tab$" (changeTabActive)="handleTabChange(0)"></app-akp-pelatihan-add>
 </ng-container>
 
-<app-modal
-  *ngIf="isModalOpen$ | async"
-  [title]="'Ubah Data Pelatihan Teknis'"
-  (toggle)="toggleModal()"
-  [enableFooter]="false"
->
-  <form [formGroup]="form">
-    <div class="row">
-      <div class="col-12">
-        <div class="mb-3">
-          <label for="nama_atasan" class="form-label">
-            Kode Pelatihan <span class="text-danger">*</span>
-          </label>
-          <input
-            type="text"
-            class="form-control"
-            id="code"
-            placeholder="Masukkan Kode Pelatihan Teknis"
-            name="name"
-            formControlName="code"
-          />
-          <div
-            *ngIf="getErrorMessage('code', 'Kode Pelatihan') as error"
-            class="text-danger"
-          >
-            {{ error }}
-          </div>
-        </div>
-        <div class="mb-3">
-          <label for="email_atasan" class="form-label">
-            Nama Pelatihan <span class="text-danger">*</span>
-          </label>
-          <input
-            type="text"
-            class="form-control"
-            id="name"
-            placeholder="Masukkan Nama Pelatihan Teknis"
-            name="name"
-            formControlName="name"
-          />
-          <div
-            *ngIf="getErrorMessage('name', 'Nama Pelatihan') as error"
-            class="text-danger"
-          >
-            {{ error }}
-          </div>
-        </div>
-        <div class="float-end">
-          <ng-container *ngIf="isLoading$ | async; else noLoading">
-            <button class="btn btn-success" disabled>
-              <div
-                class="spinner-border"
-                style="width: 19px; height: 19px"
-                role="status"
-              >
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </button>
-          </ng-container>
-          <ng-template #noLoading>
-            <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">
-              Batal
-            </button>
-            <button
-              type="button"
-              (click)="updateSumbit()"
-              class="btn btn-success"
-              [disabled]="form.invalid"
-            >
-              Simpan
-            </button>
-          </ng-template>
-          <!-- <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Ubah Data Pelatihan Teknis'" (toggle)="toggleModal()"
+    [enableFooter]="false">
+    <form [formGroup]="form">
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    <label for="nama_atasan" class="form-label">
+                        Kode Pelatihan <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="code" placeholder="Masukkan Kode Pelatihan Teknis"
+                        name="name" formControlName="code" />
+                    <div *ngIf="getErrorMessage('code', 'Kode Pelatihan') as error" class="text-danger">
+                        {{ error }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="email_atasan" class="form-label">
+                        Nama Pelatihan <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="name" placeholder="Masukkan Nama Pelatihan Teknis"
+                        name="name" formControlName="name" />
+                    <div *ngIf="getErrorMessage('name', 'Nama Pelatihan') as error" class="text-danger">
+                        {{ error }}
+                    </div>
+                </div>
+                <div class="float-end">
+                    <ng-container *ngIf="isLoading$ | async; else noLoading">
+                        <button class="btn btn-success" disabled>
+                            <div class="spinner-border spinner-sm-custom" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </ng-container>
+                    <ng-template #noLoading>
+                        <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">
+                            Batal
+                        </button>
+                        <button type="button" (click)="updateSumbit()" class="btn btn-success"
+                            [disabled]="form.invalid">
+                            Simpan
+                        </button>
+                    </ng-template>
+                    <!-- <button class="btn btn-soft-secondary me-2" (click)="toggleModal()">
             Batal
           </button>
           <button
@@ -91,8 +58,8 @@
           >
             Simpan
           </button> -->
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </form>
+    </form>
 </app-modal>

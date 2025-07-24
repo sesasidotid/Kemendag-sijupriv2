@@ -1,120 +1,77 @@
 <div class="row">
-  <form [formGroup]="hasilVerifikasiForm" (submit)="onSubmit()">
-    <div class="row mb-3">
-      <label for="inputDate" class="col-sm-2 col-form-label fw-bold"
-        >Tanggal</label
-      >
-      <div class="col-sm-5">
-        <input
-          type="date"
-          name="dateFrom"
-          class="form-control"
-          id="inputDateFrom"
-          formControlName="dateFrom"
-        />
-      </div>
-
-      <div class="col-sm-5">
-        <input
-          type="date"
-          name="dateTo"
-          class="form-control"
-          id="inputDateTo"
-          formControlName="dateTo"
-        />
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold"
-        >Jabatan</label
-      >
-      <div class="col-sm-10">
-        <select
-          id="jabatanCode"
-          class="form-select"
-          formControlName="jabatanCode"
-          name="jabatanCode"
-        >
-          <option value="" selected>Pilih Jabatan</option>
-          <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
-            {{ jabatan.name }}
-          </option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="taskStatus" class="col-sm-2 col-form-label fw-bold"
-        >Status Verifikasi <span class="text-danger">*</span></label
-      >
-      <div class="col-sm-10">
-        <select
-          id="taskStatus"
-          class="form-select"
-          formControlName="taskStatus"
-          name="taskStatus"
-        >
-          <option value="" selected>Pilih Status Verifikasi</option>
-          <option value="COMPLETED" selected>Lolos</option>
-          <option value="FAILED" selected>Tidak Lolos</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <label for="inputfileType" class="col-sm-2 col-form-label fw-bold"
-        >Format File <span class="text-danger">*</span></label
-      >
-      <div class="col-sm-10">
-        <select
-          id="inputfileType"
-          class="form-select"
-          formControlName="fileType"
-          name="fileType"
-        >
-          <option [value]="''">Pilih</option>
-          <option [value]="'xlsx'">Excel 2007</option>
-          <option [value]="'xls'">Excel</option>
-          <option [value]="'csv'">CSV</option>
-        </select>
-        <div
-          *ngIf="getErrorMessage('fileType', 'Format File') as error"
-          class="text-danger"
-        >
-          {{ error }}
-        </div>
-      </div>
-    </div>
-
-    <div class="row text-center">
-      <div class="col-12">
-        <ng-container *ngIf="isLoading$ | async; else noLoading">
-          <button class="btn btn-success float-end" disabled>
-            <div
-              class="spinner-border"
-              style="width: 19px; height: 19px"
-              role="status"
-            >
-              <span class="visually-hidden">Loading...</span>
+    <form [formGroup]="hasilVerifikasiForm" (submit)="onSubmit()">
+        <div class="row mb-3">
+            <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Tanggal</label>
+            <div class="col-sm-5">
+                <input type="date" name="dateFrom" class="form-control" id="inputDateFrom" formControlName="dateFrom" />
             </div>
-          </button>
-        </ng-container>
 
-        <ng-template #noLoading>
-          <button
-            type="submit"
-            class="btn btn-success float-end"
-            [disabled]="hasilVerifikasiForm.invalid || (isLoading$ | async)"
-          >
-            Export
-          </button>
-        </ng-template>
-      </div>
-    </div>
-  </form>
+            <div class="col-sm-5">
+                <input type="date" name="dateTo" class="form-control" id="inputDateTo" formControlName="dateTo" />
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold">Jabatan</label>
+            <div class="col-sm-10">
+                <select id="jabatanCode" class="form-select" formControlName="jabatanCode" name="jabatanCode">
+                    <option value="" selected>Pilih Jabatan</option>
+                    <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
+                        {{ jabatan.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="taskStatus" class="col-sm-2 col-form-label fw-bold">Status Verifikasi <span
+                    class="text-danger">*</span></label>
+            <div class="col-sm-10">
+                <select id="taskStatus" class="form-select" formControlName="taskStatus" name="taskStatus">
+                    <option value="" selected>Pilih Status Verifikasi</option>
+                    <option value="COMPLETED" selected>Lolos</option>
+                    <option value="FAILED" selected>Tidak Lolos</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="inputfileType" class="col-sm-2 col-form-label fw-bold">Format File <span
+                    class="text-danger">*</span></label>
+            <div class="col-sm-10">
+                <select id="inputfileType" class="form-select" formControlName="fileType" name="fileType">
+                    <option [value]="''">Pilih</option>
+                    <option [value]="'xlsx'">Excel 2007</option>
+                    <option [value]="'xls'">Excel</option>
+                    <option [value]="'csv'">CSV</option>
+                </select>
+                <div *ngIf="getErrorMessage('fileType', 'Format File') as error" class="text-danger">
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <div class="col-12">
+                <ng-container *ngIf="isLoading$ | async; else noLoading">
+                    <button class="btn btn-success float-end" disabled>
+                        <div class="spinner-border spinner-sm-custom" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </ng-container>
+
+                <ng-template #noLoading>
+                    <button type="submit" class="btn btn-success float-end"
+                        [disabled]="hasilVerifikasiForm.invalid || (isLoading$ | async)">
+                        Export
+                    </button>
+                </ng-template>
+            </div>
+        </div>
+    </form>
 </div>
 <hr />
 <div class="row">
-  <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+    <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 </div>

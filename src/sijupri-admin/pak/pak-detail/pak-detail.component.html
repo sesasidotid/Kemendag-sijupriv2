@@ -1,17 +1,12 @@
 <div class="row">
-  <div class="col-xl-8">
-    <app-pagable [pagable]="pagable"></app-pagable>
-  </div>
-  <div class="col-xl-4">
-    <div style="display: block">
-      <canvas
-        class="float-end"
-        baseChart
-        [data]="radarChartData"
-        [options]="radarChartOptions()"
-        [type]="'radar'"
-      >
-      </canvas>
+    <div class="col-xl-8">
+        <app-pagable [pagable]="pagable"></app-pagable>
     </div>
-  </div>
+    <div class="col-xl-4">
+        <div class="d-block">
+            <canvas class="float-end" baseChart [data]="radarChartData" [options]="radarChartOptions()"
+                [type]="'radar'">
+            </canvas>
+        </div>
+    </div>
 </div>

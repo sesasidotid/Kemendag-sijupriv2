@@ -282,7 +282,7 @@
                     let task of groupedUkomPendingTaskHistory | keyvalue;
                     let i = index
                 ">
-                <div style="margin-bottom: 12px !important" *ngIf="(ukomStep$ | async) === i + 1">
+                <div class="mb-3" *ngIf="(ukomStep$ | async) === i + 1">
                     <div class="d-flex flex-column mt-2 gap-3" *ngIf="task.key">
                         <ng-container *ngFor="let history of task.value">
                             <a (click)="
@@ -301,8 +301,8 @@
                                 }">
                                 <div class="card m-0 p-4 d-flex flex-row align-items-center justify-content-between">
                                     <div class="d-flex flex-column flex-md-row align-items-center gap-3">
-                                        <div class="p-3 border rounded-circle d-flex flex-column justify-content-center"
-                                            style="height: 58px">
+                                        <div
+                                            class="p-3 border rounded-circle d-flex flex-column justify-content-center h-58px">
                                             <i *ngIf="
                                                     history.flowId ===
                                                     'ukom_flow_1'

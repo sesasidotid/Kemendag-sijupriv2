@@ -1,10 +1,4 @@
 <div *ngIf="data" class="ag-theme-alpine">
-    <ag-grid-angular
-    style="height: 500px;"
-    [rowData]="data"
-    [columnDefs]="colDefs" 
-    [pagination]="pagination"
-    [paginationPageSize]="paginationPageSize"
-    [paginationPageSizeSelector]="paginationPageSizeSelector"
-    />
+    <ag-grid-angular class="h-500px" [rowData]="data" [columnDefs]="colDefs" [pagination]="pagination"
+        [paginationPageSize]="paginationPageSize" [paginationPageSizeSelector]="paginationPageSizeSelector" />
 </div>

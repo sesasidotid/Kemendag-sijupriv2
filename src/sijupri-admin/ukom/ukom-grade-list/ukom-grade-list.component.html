@@ -1,30 +1,18 @@
 <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 
-<app-modal
-    *ngIf="isModalOpen$ | async"
-    [title]="'Upload Rekomendasi Hasil UKom'"
-    (toggle)="toggleModal()"
-    [enableFooter]="false"
->
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Upload Rekomendasi Hasil UKom'" (toggle)="toggleModal()"
+    [enableFooter]="false">
     <app-file-handler [inputs]="inputs"></app-file-handler>
     <ng-container *ngIf="isSubmitLoading$ | async; else noLoading">
         <button class="btn btn-success float-end" disabled>
-            <div
-                class="spinner-border"
-                style="width: 19px; height: 19px"
-                role="status"
-            >
+            <div class="spinner-border spinner-sm-custom" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
         </button>
     </ng-container>
     <ng-template #noLoading>
-        <button
-            type="button"
-            class="btn btn-success float-end"
-            [disabled]="!payload.file_rekomendasi || (isSubmitLoading$ | async)"
-            (click)="onSubmit()"
-        >
+        <button type="button" class="btn btn-success float-end"
+            [disabled]="!payload.file_rekomendasi || (isSubmitLoading$ | async)" (click)="onSubmit()">
             Simpan
         </button>
     </ng-template>

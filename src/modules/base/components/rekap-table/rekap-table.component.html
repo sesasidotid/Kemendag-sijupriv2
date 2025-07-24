@@ -1,135 +1,82 @@
 <div *ngIf="data" class="ag-theme-alpine">
-  <ag-grid-angular
-    style="height: 500px"
-    [rowData]="data"
-    [columnDefs]="colDefs"
-    [pagination]="pagination"
-    [paginationPageSize]="paginationPageSize"
-    [paginationPageSizeSelector]="paginationPageSizeSelector"
-    [overlayNoRowsTemplate]="
+    <ag-grid-angular class="h-500px" [rowData]="data" [columnDefs]="colDefs" [pagination]="pagination"
+        [paginationPageSize]="paginationPageSize" [paginationPageSizeSelector]="paginationPageSizeSelector"
+        [overlayNoRowsTemplate]="
       '<span class=\'no-rows-message\'>Data tidak ditemukan</span>'
-    "
-  >
-  </ag-grid-angular>
+    ">
+    </ag-grid-angular>
 
-  <app-modal
-    *ngIf="isModalOpen$ | async"
-    [title]="'Verifikasi Pelatihan'"
-    (toggle)="toggleModal()"
-    [enableFooter]="false"
-  >
-    <form>
-      <div *ngIf="role.includes('USER_EXTERNAL')">
-        <div class="col-lg-12">
-          <div class="row">
-            <app-file-handler [inputs]="inputs"></app-file-handler>
-          </div>
-        </div>
-        <div class="row text-center">
-          <ng-container
-            *ngIf="submitLoading$ | async; else submitNoLoading"
-            class="col-12"
-          >
-            <button class="btn btn-primary" disabled>
-              <div
-                class="spinner-border"
-                style="width: 19px; height: 19px"
-                role="status"
-              >
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </button>
-          </ng-container>
-          <ng-template #submitNoLoading class="col-12">
-            <button
-              type="button"
-              class="btn btn-primary"
-              (click)="submit()"
-              [disabled]="isAnyFileMissing()"
-            >
-              Simpan
-            </button>
-          </ng-template>
-        </div>
-      </div>
+    <app-modal *ngIf="isModalOpen$ | async" [title]="'Verifikasi Pelatihan'" (toggle)="toggleModal()"
+        [enableFooter]="false">
+        <form>
+            <div *ngIf="role.includes('USER_EXTERNAL')">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <app-file-handler [inputs]="inputs"></app-file-handler>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <ng-container *ngIf="submitLoading$ | async; else submitNoLoading" class="col-12">
+                        <button class="btn btn-primary" disabled>
+                            <div class="spinner-border spinner-sm-custom" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </ng-container>
+                    <ng-template #submitNoLoading class="col-12">
+                        <button type="button" class="btn btn-primary" (click)="submit()"
+                            [disabled]="isAnyFileMissing()">
+                            Simpan
+                        </button>
+                    </ng-template>
+                </div>
+            </div>
 
-      <div class="col-lg-12" *ngIf="role.includes('ADMIN')">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="category-list">
-              <label> Aksi : </label>
-              <a
-                (click)="action$.next('APPROVE')"
-                class="btn"
-                [ngClass]="{
+            <div class="col-lg-12" *ngIf="role.includes('ADMIN')">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="category-list">
+                            <label> Aksi : </label>
+                            <a (click)="action$.next('APPROVE')" class="btn" [ngClass]="{
                   'btn-success': (action$ | async) === 'APPROVE',
                   'btn-soft-success': (action$ | async) === 'REJECT'
-                }"
-                >Terima</a
-              >
-              <a
-                (click)="action$.next('REJECT')"
-                class="btn"
-                [ngClass]="{
+                }">Terima</a>
+                            <a (click)="action$.next('REJECT')" class="btn" [ngClass]="{
                   'btn-danger': (action$ | async) === 'REJECT',
                   'btn-soft-danger': (action$ | async) === 'APPROVE'
-                }"
-                >Tolak</a
-              >
-            </div>
+                }">Tolak</a>
+                        </div>
 
-            <div *ngIf="(action$ | async) == 'REJECT'" class="mb-3">
-              <label for="commentTextarea" class="form-label fw-semibold"
-                >Catatan</label
-              >
-              <textarea
-                class="form-control"
-                id="commentTextarea"
-                rows="3"
-                [(ngModel)]="comment"
-                name="comment"
-                placeholder="Tuliskan catatan atau revisi"
-              ></textarea>
-              <div class="text-danger" *ngIf="!comment && commentTouched">
-                <small>Catatan perlu diisi.</small>
-              </div>
-            </div>
+                        <div *ngIf="(action$ | async) == 'REJECT'" class="mb-3">
+                            <label for="commentTextarea" class="form-label fw-semibold">Catatan</label>
+                            <textarea class="form-control" id="commentTextarea" rows="3" [(ngModel)]="comment"
+                                name="comment" placeholder="Tuliskan catatan atau revisi"></textarea>
+                            <div class="text-danger" *ngIf="!comment && commentTouched">
+                                <small>Catatan perlu diisi.</small>
+                            </div>
+                        </div>
 
-            <div class="float-end">
-              <button
-                class="btn btn-soft-secondary me-2"
-                (click)="toggleModal()"
-                type="button"
-              >
-                Batal
-              </button>
-              <ng-container
-                *ngIf="submitLoading$ | async; else adminSubmitNoLoading"
-                class="col-12"
-              >
-                <button class="btn btn-primary" disabled>
-                  <div
-                    class="spinner-border"
-                    style="width: 19px; height: 19px"
-                    role="status"
-                  >
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                </button>
-              </ng-container>
-              <ng-template #adminSubmitNoLoading class="col-12">
-                <button
-                  class="btn btn-primary"
-                  type="button"
-                  (click)="verifyDocument(selectedRekapData)"
-                >
-                  Simpan
-                </button>
-              </ng-template>
+                        <div class="float-end">
+                            <button class="btn btn-soft-secondary me-2" (click)="toggleModal()" type="button">
+                                Batal
+                            </button>
+                            <ng-container *ngIf="submitLoading$ | async; else adminSubmitNoLoading" class="col-12">
+                                <button class="btn btn-primary" disabled>
+                                    <div class="spinner-border spinner-sm-custom" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </button>
+                            </ng-container>
+                            <ng-template #adminSubmitNoLoading class="col-12">
+                                <button class="btn btn-primary" type="button"
+                                    (click)="verifyDocument(selectedRekapData)">
+                                    Simpan
+                                </button>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </app-modal>
+        </form>
+    </app-modal>
 </div>
