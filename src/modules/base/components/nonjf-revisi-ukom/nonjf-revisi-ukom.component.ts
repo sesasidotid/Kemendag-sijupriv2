@@ -192,7 +192,8 @@ export class NonjfRevisiUkomComponent {
         }
 
         this.revisedDokumen.id = this.pendingTask.id
-        this.revisedDokumen.taskAction = 'approve'
+        // this.revisedDokumen.taskAction = 'approve'
+        this.revisedDokumen.taskAction = 'amend'
         this.revisedDokumen.object = this.pesertaUkom
 
         this.confirmationService.open(false).subscribe({
@@ -201,14 +202,6 @@ export class NonjfRevisiUkomComponent {
                     return
                 }
                 this.hadItemsLoading$.next(true)
-
-                console.log(this.revisedDokumen)
-                console.log(
-                    'path',
-                    `/api/v1/participant_ukom/task/non_jf/submit?key=${this.key}`
-                )
-
-                console.log('revisedDokumen', this.revisedDokumen)
 
                 this.apiService
                     .postData(

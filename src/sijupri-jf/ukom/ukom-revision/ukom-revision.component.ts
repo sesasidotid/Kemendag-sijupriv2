@@ -58,18 +58,18 @@ export class UkomRevisionComponent {
         false
     )
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService
-    ) {}
+    ) { }
 
-    ngOnInit () {
+    ngOnInit() {
         this.getRejectedDokumen()
         this.handleRejectedDokumen()
     }
 
-    getRejectedDokumen () {
+    getRejectedDokumen() {
         if (this.pendingTask?.dokumenUkomList?.length) {
             this.rejectedDokumen = this.pendingTask.dokumenUkomList.filter(
                 dokumen => dokumen.dokumenStatus.toLowerCase() === 'reject'
@@ -79,7 +79,7 @@ export class UkomRevisionComponent {
         }
     }
 
-    handleRejectedDokumen () {
+    handleRejectedDokumen() {
         this.inputs.files = {}
         this.rejectedDokumen.forEach((dokumen, index) => {
             // const key = `rejectedDokumen_${index + 1}`
@@ -91,7 +91,7 @@ export class UkomRevisionComponent {
         })
     }
 
-    isAnyFileMissing (): boolean {
+    isAnyFileMissing(): boolean {
         if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
             return true
         }
@@ -101,7 +101,7 @@ export class UkomRevisionComponent {
         })
     }
 
-    onSave () {
+    onSave() {
         if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
             this.pesertaUkom.dokumenUkomList = []
         }
@@ -119,11 +119,9 @@ export class UkomRevisionComponent {
                 if (existingDokumen) {
                     const newDoc = {
                         dokumenFile: detected.base64,
-                        dokumenPersyaratanName: `${
-                            this.jf.nip
-                        }_dokumenPersyaratanUkom_${Date.now()}_${
-                            existingDokumen.dokumenPersyaratanName
-                        }`,
+                        dokumenPersyaratanName: `${this.jf.nip
+                            }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName
+                            }`,
                         dokumenPersyaratanId:
                             existingDokumen.dokumenPersyaratanId
                     }
@@ -142,9 +140,9 @@ export class UkomRevisionComponent {
             next: result => {
                 if (!result.confirmed) return
                 this.submitLoading$.next(true)
-
                 this.revisedDokumen.id = this.pendingTask.id
-                this.revisedDokumen.taskAction = 'approve'
+                // this.revisedDokumen.taskAction = 'approve'
+                this.revisedDokumen.taskAction = 'amend'
                 this.revisedDokumen.object = this.pesertaUkom
 
                 this.apiService

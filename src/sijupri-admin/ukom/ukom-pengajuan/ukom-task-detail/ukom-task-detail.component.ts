@@ -24,10 +24,12 @@ import { Router } from '@angular/router'
 import { RWKinerja } from '../../../../modules/siap/models/rw-kinerja.model'
 import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
+import { UkomTaskService } from '../../../../modules/ukom/services/ukom-task.service'
+import { LoadingButtonComponent } from '../../../../modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
-    imports: [TanggalIndoPipe, CommonModule, FormsModule, FileHandlerComponent],
+    imports: [TanggalIndoPipe, CommonModule, FormsModule, FileHandlerComponent, LoadingButtonComponent],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss'
 })
@@ -62,13 +64,14 @@ export class UkomTaskDetailComponent {
     isPendingTaskLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isLoading$: Observable<boolean>
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         private activatedRoute: ActivatedRoute,
         private filePreviewService: FilePreviewService,
-        private router: Router
+        private router: Router,
+        private ukomTaskService: UkomTaskService
     ) {
         this.isLoading$ = combineLatest([
             this.isPredikatKinerjaLoading$,
@@ -77,14 +80,14 @@ export class UkomTaskDetailComponent {
         ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
     }
 
-    ngOnInit () {
+    ngOnInit() {
         this.activatedRoute.params.subscribe(params => {
             this.id = params['id']
             this.loadPredikatKinerjaList()
         })
     }
 
-    getJenisUkomLabel (jenisUkom: string): string {
+    getJenisUkomLabel(jenisUkom: string): string {
         switch (jenisUkom) {
             case 'KENAIKAN_JENJANG':
                 return 'Kenaikan Jenjang'
@@ -99,7 +102,7 @@ export class UkomTaskDetailComponent {
         }
     }
 
-    getPendidikanList (pendidikanTerakhirCode: string) {
+    getPendidikanList(pendidikanTerakhirCode: string) {
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
             next: response => {
                 const matchedPendidikan = response.find(
@@ -113,7 +116,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    getBidangjabatanNameByCode (bidangJabatanCode: string) {
+    getBidangjabatanNameByCode(bidangJabatanCode: string) {
         this.apiService
             .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
             .subscribe({
@@ -123,7 +126,7 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    getProvinsiNameByCode (provinsiCode: string) {
+    getProvinsiNameByCode(provinsiCode: string) {
         this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
             next: response => {
                 this.provinsiName = response.name ?? null
@@ -131,7 +134,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    getKabupatenNameByCode (kabupatenCode: string) {
+    getKabupatenNameByCode(kabupatenCode: string) {
         this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
             next: response => {
                 this.kabupatenName = response.name ?? null
@@ -140,7 +143,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    loadPredikatKinerjaList () {
+    loadPredikatKinerjaList() {
         this.isPredikatKinerjaListLoading$.next(true)
         this.apiService
             .getData('/api/v1/predikat_kinerja')
@@ -163,11 +166,11 @@ export class UkomTaskDetailComponent {
                 next: res => {
                     this.predikatKinerjaList = res
                 },
-                error: err => {}
+                error: err => { }
             })
     }
 
-    loadPredikatKinerja (nip: string) {
+    loadPredikatKinerja(nip: string) {
         this.isPredikatKinerjaLoading$.next(true)
         this.apiService
             .getData(`/api/v1/rw_kinerja/jf/${nip}/2`)
@@ -192,7 +195,7 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    getPredikatKinerja (code: string | null): string {
+    getPredikatKinerja(code: string | null): string {
         if (!code || code == null) return '-'
         const predikat = this.predikatKinerjaList.find(
             predikat => predikat.id === code
@@ -200,7 +203,7 @@ export class UkomTaskDetailComponent {
         return predikat ? predikat.name : '-'
     }
 
-    transformInstansiName (value: string): string {
+    transformInstansiName(value: string): string {
         if (!value) return null
 
         return value
@@ -209,7 +212,7 @@ export class UkomTaskDetailComponent {
             .replace(/\b\w/g, char => char.toUpperCase())
     }
 
-    calculateAge (
+    calculateAge(
         tanggalLahir: string | Date,
         tglSuratUsulan: string | Date
     ): string {
@@ -246,13 +249,13 @@ export class UkomTaskDetailComponent {
         return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    getPendingTask () {
+    getPendingTask() {
         this.isPendingTaskLoading$.next(true)
 
         this.apiService
             .getData(`/api/v1/pending_task/${this.id}`)
             .pipe(
-                tap(() => {}),
+                tap(() => { }),
                 catchError(error => {
                     this.isPendingTaskLoading$.next(false)
                     this.handlerService.handleAlert(
@@ -313,7 +316,7 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    handlerTabIndex () {
+    handlerTabIndex() {
         if (this.pendingTask.flowId == 'ukom_flow_1') {
             this.tabIndex = 0
         }
@@ -325,24 +328,24 @@ export class UkomTaskDetailComponent {
         }
     }
 
-    findApproveDokumen (dokumenUkomList: any[]) {
+    findApproveDokumen(dokumenUkomList: any[]) {
         this.prevApprovedTask = dokumenUkomList.filter(
             dokumen => dokumen.dokumenStatus === 'APPROVE'
         )
     }
 
-    preview (fileName: string, source: string) {
+    preview(fileName: string, source: string) {
         this.filePreviewService.open(fileName, source)
     }
 
-    isDocumentApproved (dokumenPersyaratanId: string): boolean {
+    isDocumentApproved(dokumenPersyaratanId: string): boolean {
         return this.prevApprovedTask.some(
             approvedDokumen =>
                 approvedDokumen.dokumenPersyaratanId === dokumenPersyaratanId
         )
     }
 
-    onFIleSwitch (index: number, status: 'APPROVE' | 'REJECT') {
+    onFIleSwitch(index: number, status: 'APPROVE' | 'REJECT') {
         this.pesertaUkom.dokumenUkomList[index].status = status
 
         if (status == 'APPROVE') {
@@ -358,62 +361,42 @@ export class UkomTaskDetailComponent {
         }
     }
 
-    back (tabIndex: number, menu: string) {
+    back(tabIndex: number, menu: string) {
         this.router.navigate(['/ukom/ukom-task-list'], {
             state: { tabIndex: tabIndex, menu: menu }
         })
     }
 
-    sendSubmission () {
-        this.apiService
-            .postData(`/api/v1/participant_ukom/task/submit`, this.body)
-            .pipe(
-                catchError(error => {
-                    this.hadItemsLoading$.next(false)
-                    console.error(error)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengirimkan tugas'
-                    )
-                    return of(null)
-                }),
-                finalize(() => {
-                    this.hadItemsLoading$.next(false)
-                })
-            )
-            .subscribe({
-                next: () => {
-                    this.handlerService.handleAlert(
-                        'Success',
-                        'Berhasil mengirimkan tugas'
-                    )
-                    this.handlerService.handleNavigate('/ukom/ukom-task-list')
-                }
+    sendSubmission() {
+        this.ukomTaskService.submitTask(this.body).pipe(
+            finalize(() => {
+                this.hadItemsLoading$.next(false)
             })
+        ).subscribe({
+            next: () => {
+                this.handlerService.handleNavigate('/ukom/ukom-task-list')
+            }
+        })
     }
 
-    submitApprove () {
+    submitApprove() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
-                if (!result.confirmed) return
+            next: ({ confirmed, comment }) => {
+                if (!confirmed) return
                 this.hadItemsLoading$.next(true)
 
-                const task = new Task()
-                task.id = this.pendingTask.id
-                task.remark = result.comment || null
-                task.taskAction = 'approve'
-
-                this.body = {
+                this.body = new Task({
                     id: this.pendingTask.id,
-                    taskAction: task.taskAction
-                }
+                    remark: comment || null,
+                    taskAction: 'approve'
+                })
 
                 this.sendSubmission()
             }
         })
     }
 
-    submitAmend () {
+    submitAmend() {
         this.confirmationService.open(true).subscribe({
             next: ({ confirmed, comment }) => {
                 if (!confirmed) return
@@ -441,7 +424,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    submitReject () {
+    submitReject() {
         this.confirmationService.open(true).subscribe({
             next: ({ confirmed, comment }) => {
                 if (!confirmed) return
@@ -467,5 +450,23 @@ export class UkomTaskDetailComponent {
                 this.sendSubmission()
             }
         })
+    }
+
+    approveFailedTask() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+                this.hadItemsLoading$.next(true)
+
+                this.ukomTaskService.approveFailedTask(this.pendingTask.id).pipe(finalize(() => {
+                    this.hadItemsLoading$.next(false)
+                })).subscribe({
+                    next: () => {
+                        this.router.navigate(['/ukom/ukom-task-list'])
+                    },
+                })
+            }
+        })
+
     }
 }
