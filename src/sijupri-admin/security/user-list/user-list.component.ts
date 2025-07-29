@@ -19,7 +19,6 @@ import { CommonModule } from '@angular/common'
     standalone: true,
     imports: [
         PagableComponent,
-        RouterLink,
         ModalComponent,
         ForcePasswordFormComponent,
         CommonModule
@@ -32,14 +31,14 @@ export class UserListComponent {
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     userId: string
 
-    constructor (private tabService: TabService, private router: Router) {}
+    constructor(private tabService: TabService, private router: Router) { }
 
-    ngOnInit () {
+    ngOnInit() {
         this.handleTabService()
         this.handlePagable()
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/user/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'id').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
@@ -93,7 +92,7 @@ export class UserListComponent {
             .build()
     }
 
-    handleTabService () {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -112,7 +111,7 @@ export class UserListComponent {
             })
     }
 
-    toggleModal () {
+    toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 }

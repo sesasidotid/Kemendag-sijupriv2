@@ -40,7 +40,6 @@ import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-wakt
         LucideAngularModule,
         ReactiveFormsModule,
         PagableComponent,
-        TanggalWaktuIndoPipe
     ],
     templateUrl: './ukom-exam-schedule-add.component.html',
     styleUrl: './ukom-exam-schedule-add.component.scss'
@@ -65,7 +64,7 @@ export class UkomExamScheduleAddComponent {
 
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
-    constructor (
+    constructor(
         private confirmationService: ConfirmationService,
         private router: Router,
         private apiService: ApiService,
@@ -73,9 +72,9 @@ export class UkomExamScheduleAddComponent {
         private activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
         private formValidationService: FormValidationService
-    ) {}
+    ) { }
 
-    ngOnInit () {
+    ngOnInit() {
         this.activatedRoute.paramMap.subscribe(params => {
             this.id = params.get('id')
         })
@@ -85,7 +84,7 @@ export class UkomExamScheduleAddComponent {
         this.loadDefaultScheduleData()
     }
 
-    loadDefaultScheduleData () {
+    loadDefaultScheduleData() {
         this.loadingDefaultData$.next(true)
 
         this.apiService
@@ -123,7 +122,11 @@ export class UkomExamScheduleAddComponent {
                                 ],
                                 duration: [
                                     durationInMinutes || null,
-                                    this.catDurationValidator()
+                                    this.catValidator()
+                                ],
+                                secret_key: [
+                                    schedule.secretKey || '',
+                                    this.catValidator()
                                 ]
                             })
                             this.schedules.push(scheduleGroup)
@@ -143,7 +146,7 @@ export class UkomExamScheduleAddComponent {
     }
 
     // Custom validator for CAT exam type duration
-    catDurationValidator () {
+    catValidator() {
         return (control: FormControl) => {
             if (!control.parent) {
                 return null
@@ -162,13 +165,13 @@ export class UkomExamScheduleAddComponent {
         }
     }
 
-    handleFormInit () {
+    handleFormInit() {
         this.examScheduleForm = this.fb.group({
             schedules: this.fb.array([], [Validators.required])
         })
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder(
             `/api/v1/exam_schedule/room/${this.id}`
         )
@@ -197,9 +200,7 @@ export class UkomExamScheduleAddComponent {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build()
             )
-            // .addPrimaryColumn(
-            //     new PrimaryColumnBuilder('Durasi', 'duration').build()
-            // )
+
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Durasi', (data: any) => {
@@ -211,6 +212,8 @@ export class UkomExamScheduleAddComponent {
                     })
                     .build()
             )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Secret Key', 'secretKey').build())
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((item: any) => {
@@ -227,7 +230,7 @@ export class UkomExamScheduleAddComponent {
             .build()
     }
 
-    getJenisUkomList () {
+    getJenisUkomList() {
         this.jenisUkomList$ = this.apiService
             .getData(`/api/v1/exam_type`)
             .pipe(
@@ -240,7 +243,7 @@ export class UkomExamScheduleAddComponent {
             )
     }
 
-    getError (controlName: string, label: string) {
+    getError(controlName: string, label: string) {
         const control = this.examScheduleForm.get(controlName)
         return this.formValidationService.getErrorMessage(
             control,
@@ -249,7 +252,7 @@ export class UkomExamScheduleAddComponent {
         )
     }
 
-    getScheduleError (index: number, controlName: string, label: string) {
+    getScheduleError(index: number, controlName: string, label: string) {
         const control = (
             this.examScheduleForm.get('schedules') as any
         ).controls[index].get(controlName)
@@ -260,38 +263,42 @@ export class UkomExamScheduleAddComponent {
         )
     }
 
-    get schedules () {
+    get schedules() {
         return this.examScheduleForm.get('schedules') as FormArray
     }
 
-    addSchedule (): void {
+    addSchedule(): void {
         const scheduleGroup = this.fb.group({
             start_time: ['', Validators.required],
             end_time: ['', Validators.required],
             exam_type_code: ['', Validators.required],
-            duration: [null, this.catDurationValidator()]
+            duration: [null, this.catValidator()],
+            secret_key: [null, this.catValidator()]
         })
 
         scheduleGroup
             .get('exam_type_code')
             ?.valueChanges.subscribe(examType => {
                 const durationControl = scheduleGroup.get('duration')
+                const secretKeyControl = scheduleGroup.get('secret_key')
 
                 if (examType !== 'CAT') {
                     durationControl?.setValue(null)
+                    secretKeyControl?.setValue(null)
                 }
 
                 durationControl?.updateValueAndValidity()
+                secretKeyControl?.updateValueAndValidity()
             })
 
         this.schedules.push(scheduleGroup)
     }
 
-    removeSchedule (index: number): void {
+    removeSchedule(index: number): void {
         this.schedules.removeAt(index)
     }
 
-    getAvailableExamTypes (selectedCode: string): Observable<JenisUkom[]> {
+    getAvailableExamTypes(selectedCode: string): Observable<JenisUkom[]> {
         return this.jenisUkomList$.pipe(
             map(jenisUkomList => {
                 const selectedCodes = this.schedules.value.map(
@@ -306,22 +313,44 @@ export class UkomExamScheduleAddComponent {
         )
     }
 
-    isCatExamType (index: number): boolean {
+    isCatExamType(index: number): boolean {
         const examTypeControl = this.schedules.at(index).get('exam_type_code')
         return examTypeControl?.value === 'CAT'
     }
 
-    handleRefreshToggle () {
+    handleRefreshToggle() {
         this.refreshToggle = !this.refreshToggle
     }
 
-    submit (): void {
+    generateSecretKey(index: number): void {
+        const scheduleGroup = this.schedules.at(index);
+        if (!scheduleGroup) return;
+
+        const examType = scheduleGroup.get('exam_type_code')?.value;
+        if (examType !== 'CAT') {
+            this.handlerService.handleAlert(
+                'Warning',
+                'Hanya ujian dengan jenis CAT yang memerlukan secret key.'
+            );
+            return;
+        }
+
+        const randomKey = Array(6)
+            .fill(0)
+            .map(() => Math.random().toString(36).charAt(2))
+            .join('');
+
+        scheduleGroup.get('secret_key')?.setValue(randomKey);
+    }
+
+
+
+    submit(): void {
         this.confirmationService.open(false).subscribe({
             next: result => {
                 if (!result.confirmed) return
 
                 this.submitLoading$.next(true)
-
                 this.examScheduleData.id = this.id
 
                 const examTypeCodes = this.schedules.value.map(

@@ -1,7 +1,4 @@
-<div
-    *ngIf="isLoading$ | async; else dashboardContent"
-    class="d-flex justify-content-center my-5"
->
+<div *ngIf="isLoading$ | async; else dashboardContent" class="d-flex justify-content-center my-5">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
@@ -32,37 +29,24 @@
                 <p class="mb-0">
                     <!-- <strong>Link Zoom:</strong> -->
                     <ng-container *ngIf="roomUkom.vidCallLink; else noLink">
-                        <a
-                            [href]="getAbsoluteUrl(roomUkom.vidCallLink)"
-                            target="_blank"
-                            class="text-decoration-none"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            [attr.title]="roomUkom.vidCallLink"
-                        >
+                        <a [href]="getAbsoluteUrl(roomUkom.vidCallLink)" target="_blank" class="text-decoration-none"
+                            data-bs-toggle="tooltip" data-bs-placement="top" [attr.title]="roomUkom.vidCallLink">
                             <span class="badge bg-primary">Join Zoom</span>
                         </a>
                     </ng-container>
                     <ng-template #noLink>
-                        <span class="text-danger fst-italic"
-                            >Belum ada link Zoom</span
-                        >
+                        <span class="text-danger fst-italic">Belum ada link Zoom</span>
                     </ng-template>
                 </p>
             </div>
         </div>
 
         <!-- Exam Schedule -->
-        <div
-            class=""
-            *ngIf="roomUkom?.examScheduleDtoList?.length > 0; else emptyState"
-        >
+        <div class="" *ngIf="roomUkom?.examScheduleDtoList?.length > 0; else emptyState">
             <div class="">
                 <div class="list-group">
-                    <div
-                        class="list-group-item d-flex justify-content-between align-items-center mb-3"
-                        *ngFor="let exam of roomUkom.examScheduleDtoList"
-                    >
+                    <div class="list-group-item d-flex justify-content-between align-items-center mb-3"
+                        *ngFor="let exam of roomUkom.examScheduleDtoList">
                         <div>
                             <h5>{{ exam.examTypeCode }}</h5>
                             <p>
@@ -73,11 +57,14 @@
                             </p>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <!-- CAT Exam Buttons -->
                             <ng-container *ngIf="exam.examTypeCode === 'CAT'">
-                                <button
-                                    class="btn btn-primary btn-lg"
-                                    *ngIf="
+                                <app-loading-button [isLoading]="isStartCATLoading$ | async" [disabled]="!canStartExam(
+                                            exam.startTime,
+                                            exam.endTime
+                                        ) ||
+                                        (scoreMap['CAT']?.score !== null &&
+                                            scoreMap['CAT']?.score !==
+                                                undefined)" [label]="'Mulai'" [className]="'btn btn-primary'" *ngIf="
                                         canStartExam(
                                             exam.startTime,
                                             exam.endTime
@@ -85,44 +72,21 @@
                                         (scoreMap['CAT']?.score === null ||
                                             scoreMap['CAT']?.score ===
                                                 undefined)
-                                    "
-                                    (click)="
-                                        startExam(
+                                    " (clicked)="startExam(
                                             exam.roomUkomId,
                                             exam.examTypeCode
-                                        )
-                                    "
-                                    [disabled]="
-                                        !canStartExam(
-                                            exam.startTime,
-                                            exam.endTime
-                                        ) ||
-                                        (scoreMap['CAT']?.score !== null &&
-                                            scoreMap['CAT']?.score !==
-                                                undefined)
-                                    "
-                                >
-                                    Mulai
-                                </button>
+                                        )"></app-loading-button>
 
-                                <button
-                                    class="btn btn-success btn-lg"
-                                    *ngIf="
+                                <button class="btn btn-success" *ngIf="
                                         scoreMap['CAT']?.score !== null &&
                                         scoreMap['CAT']?.score !== undefined
-                                    "
-                                    (click)="toggleModal()"
-                                >
+                                    " (click)="toggleModal()">
                                     Lihat Nilai
                                 </button>
                             </ng-container>
 
-                            <ng-container
-                                *ngIf="exam.examTypeCode === 'MAKALAH'"
-                            >
-                                <button
-                                    class="btn btn-primary btn-lg"
-                                    *ngIf="
+                            <ng-container *ngIf="exam.examTypeCode === 'MAKALAH'">
+                                <app-loading-button *ngIf="
                                         canStartExam(
                                             exam.startTime,
                                             exam.endTime
@@ -130,34 +94,22 @@
                                         scoreMap['MAKALAH']?.score == null ||
                                             scoreMap['MAKALAH']?.score ===
                                                 undefined
-                                    "
-                                    (click)="
-                                        startExam(
+                                    " [className]="'btn btn-primary'" (clicked)=" startExam(
                                             exam.roomUkomId,
                                             exam.examTypeCode
-                                        )
-                                    "
-                                    [disabled]="
-                                        !canStartExam(
+                                        )" [disabled]="!canStartExam(
                                             exam.startTime,
                                             exam.endTime
                                         ) ||
                                         (scoreMap['MAKALAH']?.score !== null &&
                                             scoreMap['MAKALAH']?.score !==
-                                                undefined)
-                                    "
-                                >
-                                    Upload Makalah
-                                </button>
+                                                undefined)" [isLoading]="isMakalahLoading$ | async"
+                                    [label]="'Upload Makalah'"></app-loading-button>
 
-                                <button
-                                    class="btn btn-success btn-lg"
-                                    (click)="viewFile()"
-                                    *ngIf="
+                                <button class="btn btn-success " (click)="viewFile()" *ngIf="
                                         scoreMap['MAKALAH']?.score !== null &&
                                         scoreMap['MAKALAH']?.score !== undefined
-                                    "
-                                >
+                                    ">
                                     Lihat Makalah
                                 </button>
                             </ng-container>
@@ -168,24 +120,16 @@
         </div>
 
         <ng-template #emptyState>
-            <app-empty-state
-                [title]="'Anda belum ada jadwal UKom'"
-                [description]="
+            <app-empty-state [title]="'Anda belum ada jadwal UKom'" [description]="
                     'Panitia belum menetapkan jadwal ujian untuk Anda. Silahkan tunggu informasi selanjutnya.'
-                "
-            >
+                ">
             </app-empty-state>
         </ng-template>
     </section>
 </ng-template>
 
-<app-modal
-    *ngIf="isModalOpen$ | async"
-    [title]="'Hasil Ujian'"
-    (toggle)="toggleModal()"
-    [size]="'lg'"
-    [enableFooter]="false"
->
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Hasil Ujian'" (toggle)="toggleModal()" [size]="'lg'"
+    [enableFooter]="false">
     <ng-container>
         <div class="total-score-container">
             <div class="total-score-value">
@@ -193,21 +137,16 @@
             </div>
         </div>
 
-        <div
-            *ngFor="let competencyGroup of getGroupedCompetencies()"
-            class="mb-3"
-        >
+        <div *ngFor="let competencyGroup of getGroupedCompetencies()" class="mb-3">
             <div class="card border-0 mb-3">
                 <div class="card-header bg-primary text-white">
-                    <div
-                        class="d-flex justify-content-between align-items-center"
-                    >
+                    <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0 text-white">
                             {{ competencyGroup.name }}
                         </h4>
                         <span class="badge badge-light badge-lg">
                             {{ competencyGroup.percentage }}% ({{
-                                competencyGroup.correct
+                            competencyGroup.correct
                             }}/{{ competencyGroup.total }})
                         </span>
                     </div>

@@ -1,7 +1,4 @@
-<div
-    *ngIf="isLoading$ | async; else ukomExamContent"
-    class="d-flex justify-content-center my-5"
->
+<div *ngIf="isLoading$ | async; else ukomExamContent" class="d-flex justify-content-center my-5">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
@@ -14,9 +11,7 @@
 
     <section>
         <div class="row mb-3">
-            <label for="" class="col-sm-2 col-form-label fw-bold"
-                >Nama Kelas</label
-            >
+            <label for="" class="col-sm-2 col-form-label fw-bold">Nama Kelas</label>
             <div class="col-sm-10 pt-2">
                 <p>: {{ roomUkomDetail.name }}</p>
             </div>
@@ -51,16 +46,10 @@
     </section>
 
     <ng-container *ngIf="type_ukom === 'CAT'">
-        <app-ukom-exam-cat
-            [room_ukom_detail]="roomUkomDetail"
-            [exam_detail]="examDetail"
-        ></app-ukom-exam-cat>
+        <app-ukom-exam-cat [room_ukom_detail]="roomUkomDetail" [exam_detail]="examDetail"></app-ukom-exam-cat>
     </ng-container>
 
     <ng-container *ngIf="type_ukom === 'MAKALAH'">
-        <app-ukom-exam-makalah
-            [room_ukom_detail]="roomUkomDetail"
-            [exam_detail]="examDetail"
-        ></app-ukom-exam-makalah>
+        <app-ukom-exam-makalah [room_ukom_detail]="roomUkomDetail" [exam_detail]="examDetail"></app-ukom-exam-makalah>
     </ng-container>
 </ng-template>
