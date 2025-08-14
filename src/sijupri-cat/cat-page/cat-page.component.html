@@ -30,6 +30,9 @@
         <div class="parent">
             <div class="row w-100" *ngIf="data.data.length > 0">
                 <div class="col-8 d-flex flex-column card mb-10 pb-4">
+                    <button class="btn btn-secondary btn-sm mt-4 b-w-fit" (click)="backWithConfirmation()">
+                        Kembali
+                    </button>
                     <div class="text-center mb-4">
                         <img *ngIf="data.data[currentPage - 1]?.attachmentUrl"
                             [src]="data.data[currentPage - 1]?.attachmentUrl" alt="Question Image"
@@ -104,7 +107,7 @@
                     </ng-template>
                 </div>
 
-                <div class="col-4 d-flex flex-column px-4">
+                <div class="col-4 d-flex flex-column px-16">
                     <div class="card shadow-sm p-2 flex-grow-1">
                         <div [class.warning]="remainingSeconds < 300" [class.danger]="remainingSeconds < 60"
                             class="countdown-timer">

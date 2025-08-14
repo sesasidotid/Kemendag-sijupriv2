@@ -64,7 +64,7 @@ export class CatPageComponent {
 
     isLoading$: Observable<boolean>
 
-    constructor (
+    constructor(
         private api: ApiService,
         private handler: HandlerService,
         private confirmationService: ConfirmationService,
@@ -75,7 +75,7 @@ export class CatPageComponent {
         )
     }
 
-    ngOnInit () {
+    ngOnInit() {
         this.getRoomUkom()
         this.enterFullScreen()
         this.isSubmitted$
@@ -88,13 +88,13 @@ export class CatPageComponent {
     }
 
     @HostListener('document:visibilitychange', [])
-    handleVisibilityChange () {
+    handleVisibilityChange() {
         if (document.hidden) {
         }
     }
 
     @HostListener('document:mousemove', ['$event'])
-    onMouseMove (event: MouseEvent) {
+    onMouseMove(event: MouseEvent) {
         if (this.isSubmitted$.value) return
 
         const inside = this.isMouseInsideExamArea(event)
@@ -112,7 +112,7 @@ export class CatPageComponent {
         }
     }
 
-    isMouseInsideExamArea (event: MouseEvent): boolean {
+    isMouseInsideExamArea(event: MouseEvent): boolean {
         const examArea = document.querySelector('.parent') as HTMLElement
         if (!examArea) return false
 
@@ -125,7 +125,7 @@ export class CatPageComponent {
         )
     }
 
-    startWarningCountdown () {
+    startWarningCountdown() {
         if (this.warningInterval) {
             clearInterval(this.warningInterval)
         }
@@ -145,18 +145,18 @@ export class CatPageComponent {
         }, 1000)
     }
 
-    resetWarningCountdown () {
+    resetWarningCountdown() {
         if (this.warningInterval) {
             clearInterval(this.warningInterval)
         }
         this.warningCountdown = 30
     }
 
-    onBlur () {
+    onBlur() {
         this.enterFullScreen()
     }
 
-    enterFullScreen () {
+    enterFullScreen() {
         const elem = document.documentElement as HTMLElement & {
             mozRequestFullScreen?: () => Promise<void>
             webkitRequestFullscreen?: () => Promise<void>
@@ -178,7 +178,7 @@ export class CatPageComponent {
         }
     }
 
-    ngOnDestroy () {
+    ngOnDestroy() {
         this.destroy$.next()
         this.destroy$.complete()
 
@@ -190,11 +190,27 @@ export class CatPageComponent {
         }
     }
 
-    backToHome () {
+    backToHome() {
         this.router.navigate(['/'])
     }
 
-    startCountdown () {
+    backWithConfirmation() {
+        const title = 'Konfirmasi Kembali'
+        const message = 'Apakah Anda yakin ingin kembali? Semua jawaban akan disimpan.'
+
+        this.confirmationService.open(false, title, message).subscribe({
+            next: ({ confirmed }) => {
+                if (confirmed) {
+                    this.router.navigate(['/'])
+                }
+            },
+            error: err => {
+                console.error('Error during confirmation:', err)
+            }
+        })
+    }
+
+    startCountdown() {
         if (
             !this.examEndTime ||
             !this.examAttendance?.startAt ||
@@ -245,7 +261,7 @@ export class CatPageComponent {
         }, 1000)
     }
 
-    formatTime (ms: number): string {
+    formatTime(ms: number): string {
         const totalSeconds = Math.floor(ms / 1000)
         const hours = Math.floor(totalSeconds / 3600)
         const minutes = Math.floor((totalSeconds % 3600) / 60)
@@ -255,11 +271,11 @@ export class CatPageComponent {
         )}`
     }
 
-    padZero (num: number): string {
+    padZero(num: number): string {
         return num < 10 ? `0${num}` : `${num}`
     }
 
-    getRoomUkom () {
+    getRoomUkom() {
         this.isLoadingRoomUkom$.next(true)
         this.api
             .getData(
@@ -340,7 +356,7 @@ export class CatPageComponent {
             })
     }
 
-    getQuestion () {
+    getQuestion() {
         this.api
             .getData(`/api/v1/exam/page/CAT/${this.room_id}?limit=1000&page=1`)
             .subscribe({
@@ -370,24 +386,24 @@ export class CatPageComponent {
             })
     }
 
-    navigateToPage (page: number) {
+    navigateToPage(page: number) {
         if (page > 0 && page <= this.totalQuestions) {
             this.currentPage = page
         }
     }
 
-    selectAnswer (questionId: string, choiceId: string) {
+    selectAnswer(questionId: string, choiceId: string) {
         this.selectedAnswer[questionId] = choiceId
     }
 
-    onSaveButtonClick (questionId: string) {
+    onSaveButtonClick(questionId: string) {
         this.saveAnswer(questionId).subscribe({
-            next: () => {},
-            error: err => {}
+            next: () => { },
+            error: err => { }
         })
     }
 
-    saveAnswer (questionId: string): Observable<any> {
+    saveAnswer(questionId: string): Observable<any> {
         const selectedChoiceId = this.selectedAnswer[questionId]
         if (!selectedChoiceId) {
             console.warn('No answer selected for question:', questionId)
@@ -413,7 +429,7 @@ export class CatPageComponent {
         )
     }
 
-    submitAfterSave (questionId: string) {
+    submitAfterSave(questionId: string) {
         this.saveAnswer(questionId).subscribe({
             next: () => {
                 this.submitAnswer(true)
@@ -428,7 +444,7 @@ export class CatPageComponent {
         })
     }
 
-    submitAnswer (open_dialog: boolean = true) {
+    submitAnswer(open_dialog: boolean = true) {
         const payload = {
             examTypeCode: 'CAT',
             roomUkomId: this.room_id

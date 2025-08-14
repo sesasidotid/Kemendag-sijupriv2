@@ -1,5 +1,5 @@
 export const environment = {
-    production: false,
+    production: true,
     // appBaseHref: '/sijupri',
     appBaseHref: '',
     apiBaseUrl: 'http://sijupri.sesasi.xyz:8000',

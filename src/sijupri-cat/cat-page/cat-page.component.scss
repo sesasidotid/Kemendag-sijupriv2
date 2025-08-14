@@ -104,6 +104,10 @@
     text-align: center;
 }
 
+.b-w-fit {
+    width: fit-content !important;
+}
+
 .return-button {
     // Apply the transition to the base state of the button
     transition: transform 0.3s ease;
