@@ -315,11 +315,7 @@
                 </div>
             </div>
 
-            <!-- nilai -->
-            <!-- <div
-                class="card detail-jf"
-                *ngIf="scoreMap['CAT']?.examTypeCode === 'CAT'"
-            > -->
+
             <div class="card detail-jf" *ngIf="scoreMap | keyvalue as entries">
                 <ng-container *ngIf="entries.length > 0">
                     <div class="card-header" *ngIf="hasVisibleUkomDetails">
@@ -330,31 +326,32 @@
                     </div>
 
                     <div class="list-group">
-                        <!-- CAT -->
-                        <div class="list-group-item d-flex justify-content-between align-items-center"
+                        <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
                             *ngIf="scoreMap['CAT'].id">
+
                             <div>
                                 <h5 class="m-0">CAT</h5>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
+
+                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
                                 <button class="btn btn-success" (click)="toggleModal()">
                                     Lihat Nilai
                                 </button>
-                                <app-loading-button [isLoading]="
-                                        isDeleteExamScoreLoading$ | async
-                                    " [type]="'button'" label="Hapus Nilai" [className]="'btn btn-danger'" (clicked)="
-                                        deleteExamScore(scoreMap['CAT'].id)
-                                    "></app-loading-button>
+                                <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async" [type]="'button'"
+                                    label="Hapus Nilai" [className]="'btn btn-danger'"
+                                    (clicked)="deleteExamScore(scoreMap['CAT'].id)">
+                                </app-loading-button>
                             </div>
+
                         </div>
 
-                        <!-- MAKALAH -->
+
                         <div class="list-group-item d-flex justify-content-between align-items-center"
                             *ngIf="scoreMap['MAKALAH'].id">
                             <div>
                                 <h5 class="m-0">Makalah</h5>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
                                 <button class="btn btn-success" (click)="viewFile()">
                                     Lihat Makalah
                                 </button>

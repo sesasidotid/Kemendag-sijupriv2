@@ -114,7 +114,7 @@ export class UkomRegisterComponent {
     isProvinsiLoading$ = new BehaviorSubject<boolean>(false)
     isLoading$: Observable<boolean>
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
@@ -128,10 +128,9 @@ export class UkomRegisterComponent {
         ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
     }
 
-    ngOnInit () {
+    ngOnInit() {
         this.checkStatusRegister()
         this.getListJabatan()
-        // this.getListJenjang()
         this.getListPangkat()
         this.getPredikatKinerja()
         this.getPendidikanList()
@@ -143,7 +142,7 @@ export class UkomRegisterComponent {
         this.handleSubscribe()
     }
 
-    handleSubscribe () {
+    handleSubscribe() {
         this.nonJFForm.get('jenis_instansi')?.valueChanges.subscribe(value => {
             this.instansiSubject.next(value)
             this.nonJFForm.get('provinsi_id')?.setValue('')
@@ -180,7 +179,7 @@ export class UkomRegisterComponent {
         })
     }
 
-    handleFetchDokumenPersyaratan () {
+    handleFetchDokumenPersyaratan() {
         combineLatest([
             this.nonJFForm
                 .get('jenis_ukom')!
@@ -220,7 +219,7 @@ export class UkomRegisterComponent {
             })
     }
 
-    handleFormInitialization () {
+    handleFormInitialization() {
         this.nonJFForm = new FormGroup({
             // Informasi Pribadi
             name: new FormControl('', Validators.required),
@@ -275,7 +274,7 @@ export class UkomRegisterComponent {
         })
     }
 
-    setupInstansiValidation () {
+    setupInstansiValidation() {
         this.nonJFForm.get('jenis_instansi')?.valueChanges.subscribe(value => {
             const provinsiControl = this.nonJFForm.get('provinsi_id')
             const kabupatenControl = this.nonJFForm.get('kabupaten_kota_id')
@@ -313,23 +312,23 @@ export class UkomRegisterComponent {
         })
     }
 
-    getBidangJabatanByJabatanCode (jabatanCode: string): void {
+    getBidangJabatanByJabatanCode(jabatanCode: string): void {
         this.bidangJabatanList$ = this.apiService
             .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
             .pipe(
                 map((res: any) =>
                     Array.isArray(res) && res.length > 0
                         ? res.map(
-                              (bidangJabatan: { [key: string]: any }) =>
-                                  new BidangJabatan(bidangJabatan)
-                          )
+                            (bidangJabatan: { [key: string]: any }) =>
+                                new BidangJabatan(bidangJabatan)
+                        )
                         : []
                 ),
                 startWith([])
             )
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         const control = this.nonJFForm.get(controlName)
 
         if (
@@ -373,7 +372,7 @@ export class UkomRegisterComponent {
         return null // Default case
     }
 
-    getPredikatKinerja () {
+    getPredikatKinerja() {
         this.isPredikatKinerjaLoading$.next(true)
         this.apiService
             .getData('/api/v1/predikat_kinerja')
@@ -392,7 +391,7 @@ export class UkomRegisterComponent {
             })
     }
 
-    getPendidikanList () {
+    getPendidikanList() {
         this.isPendidikanLoading$.next(true)
         this.apiService
             .getData(`/api/v1/pendidikan`)
@@ -411,7 +410,7 @@ export class UkomRegisterComponent {
             })
     }
 
-    getProvinsi () {
+    getProvinsi() {
         this.isProvinsiLoading$.next(true)
         this.apiService
             .getData(`/api/v1/provinsi`)
@@ -422,14 +421,14 @@ export class UkomRegisterComponent {
             )
             .subscribe({
                 next: response =>
-                    (this.provinsiList = response.map(
-                        (provinsi: { [key: string]: any }) =>
-                            new Provinsi(provinsi)
-                    ))
+                (this.provinsiList = response.map(
+                    (provinsi: { [key: string]: any }) =>
+                        new Provinsi(provinsi)
+                ))
             })
     }
 
-    getKabKota (provinsiId: string | number) {
+    getKabKota(provinsiId: string | number) {
         forkJoin({
             kabupaten: this.apiService.getData(
                 `/api/v1/kab_kota/type/KABUPATEN/${provinsiId}`
@@ -450,7 +449,7 @@ export class UkomRegisterComponent {
         })
     }
 
-    passwordMatchValidator (
+    passwordMatchValidator(
         control: FormControl
     ): { [key: string]: boolean } | null {
         if (this.nonJFForm) {
@@ -463,7 +462,7 @@ export class UkomRegisterComponent {
         return null
     }
 
-    isAnyFileMissing (): boolean {
+    isAnyFileMissing(): boolean {
         if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
             return true
         }
@@ -473,11 +472,11 @@ export class UkomRegisterComponent {
         })
     }
 
-    backToLandingPage () {
+    backToLandingPage() {
         this.router.navigate([''])
     }
 
-    getDokumenPersyaratan (
+    getDokumenPersyaratan(
         jenis_ukom: string,
         jabatan: string,
         jenjang: string,
@@ -535,7 +534,7 @@ export class UkomRegisterComponent {
             })
     }
 
-    getListJabatan () {
+    getListJabatan() {
         this.jabatanList$ = this.apiService
             .getData(`/api/v1/jabatan`)
             .pipe(
@@ -548,7 +547,10 @@ export class UkomRegisterComponent {
             )
     }
 
-    getListJenjang (jabatanCode: string) {
+    getListJenjang(jabatanCode: string) {
+        if (!jabatanCode) {
+            return
+        }
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
             .pipe(
@@ -561,7 +563,7 @@ export class UkomRegisterComponent {
             )
     }
 
-    getListPangkat () {
+    getListPangkat() {
         this.pangkatList$ = this.apiService
             .getData(`/api/v1/pangkat`)
             .pipe(
@@ -574,17 +576,17 @@ export class UkomRegisterComponent {
             )
     }
 
-    clearFilesName () {
+    clearFilesName() {
         if (this.fileHandler) {
             this.fileHandler.clearFileName()
         }
     }
 
-    onChangeURL (url: SafeUrl) {
+    onChangeURL(url: SafeUrl) {
         this.qrCodeDownloadLink = url
     }
 
-    checkStatusRegister () {
+    checkStatusRegister() {
         this.isRegisterOpenLoading$.next(true)
 
         this.apiService
@@ -601,7 +603,7 @@ export class UkomRegisterComponent {
             })
     }
 
-    submit () {
+    submit() {
         const jenis_ukom = this.nonJFForm.get('jenis_ukom').value
         this.pesertaUkom.name = this.nonJFForm.get('name').value
         this.pesertaUkom.nip = this.nonJFForm.get('nip').value
@@ -671,11 +673,9 @@ export class UkomRegisterComponent {
                 if (dokumenPersyaratan) {
                     const newDoc = {
                         dokumenFile: detected.base64,
-                        dokumenPersyaratanName: `${
-                            dokumenPersyaratan.dokumenPersyaratanName
-                        }_${this.pesertaUkom.nip}_${Date.now()}_${
-                            dokumenPersyaratan.dokumenPersyaratanName
-                        }`,
+                        dokumenPersyaratanName: `${dokumenPersyaratan.dokumenPersyaratanName
+                            }_${this.pesertaUkom.nip}_${Date.now()}_${dokumenPersyaratan.dokumenPersyaratanName
+                            }`,
                         dokumenPersyaratanId: detected.id
                     }
 
@@ -722,7 +722,7 @@ export class UkomRegisterComponent {
         })
     }
 
-    downloadImage (nip: string) {
+    downloadImage(nip: string) {
         fetch(this.imageUrl)
             .then(response => response.blob()) // Convert to Blob
             .then(blob => {

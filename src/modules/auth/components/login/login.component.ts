@@ -53,15 +53,15 @@ export class LoginComponent {
     readonly Eye = Eye
     readonly EyeOff = EyeOff
 
-    constructor (
+    constructor(
         private applicationServce: ApplicationService,
         private authService: AuthService,
         private router: Router
     ) {
-        setTimeout(() => {}, 0)
+        setTimeout(() => { }, 0)
     }
 
-    ngOnInit () {
+    ngOnInit() {
         if (LoginContext.isLogin()) {
             this.router.navigate(['/'])
         }
@@ -70,7 +70,7 @@ export class LoginComponent {
         this.handleFormInit()
     }
 
-    handleFormInit () {
+    handleFormInit() {
         this.loginForm = new FormGroup({
             nip: new FormControl('', [
                 Validators.required,
@@ -83,7 +83,7 @@ export class LoginComponent {
         })
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         const control = this.loginForm.get(controlName)
 
         if (
@@ -127,21 +127,21 @@ export class LoginComponent {
         return null // Default case
     }
 
-    showForgotPassword () {
+    showForgotPassword() {
         this.isForgotPassword = true
     }
 
-    showLoginForm () {
+    showLoginForm() {
         location.reload()
         // this.handleFormInit()
         // this.isForgotPassword = false;
     }
 
-    navigateTo (path: string) {
+    navigateTo(path: string) {
         this.router.navigate([path])
     }
 
-    getApplicationList () {
+    getApplicationList() {
         this.applicationServce.findAll().subscribe({
             next: (applicationList: Application[]) => {
                 this.applicationList = applicationList
@@ -149,20 +149,20 @@ export class LoginComponent {
         })
     }
 
-    onCaptchaResolved (token: string) {
+    onCaptchaResolved(token: string) {
         this.loginForm.get('recaptcha').setValue(token)
     }
 
-    togglePasswordVisibility (): void {
+    togglePasswordVisibility(): void {
         this.isPasswordVisible = !this.isPasswordVisible
     }
 
-    backToLandingPage () {
+    backToLandingPage() {
         this.isLoginLoading$.next(false)
         this.router.navigate([''])
     }
 
-    onSubmit () {
+    onSubmit() {
         if (this.loginForm.invalid) return
 
         this.isLoginLoading$.next(true)

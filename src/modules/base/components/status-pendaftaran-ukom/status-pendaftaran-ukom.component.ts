@@ -113,7 +113,7 @@ export class StatusPendaftaranUkomComponent {
 
     registrationStatus: string
 
-    constructor (
+    constructor(
         private converterService: ConverterService,
         private apiService: ApiService,
         private router: Router,
@@ -133,16 +133,16 @@ export class StatusPendaftaranUkomComponent {
         ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
     }
 
-    ngOnInit () {
+    ngOnInit() {
         this.initializeComponent()
     }
 
-    ngOnDestroy () {
+    ngOnDestroy() {
         this.destroy$.next()
         this.destroy$.complete()
     }
 
-    private initializeComponent () {
+    private initializeComponent() {
         this.isPredikatKerjaLoading$.next(true)
 
         this.apiService
@@ -182,7 +182,7 @@ export class StatusPendaftaranUkomComponent {
             })
     }
 
-    getPendidikanList (pendidikanTerakhirCode: string) {
+    getPendidikanList(pendidikanTerakhirCode: string) {
         this.isLoadingPendidikan$.next(true)
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
             next: response => {
@@ -205,7 +205,7 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    downloadRekomendasi (): void {
+    downloadRekomendasi(): void {
         const url = this.finishTask.rekomendasiUrl
 
         if (!url) return
@@ -216,7 +216,7 @@ export class StatusPendaftaranUkomComponent {
         const filename = this.finishTask.rekomendasi || 'rekomendasi.pdf'
 
         this.apiService.getDownload(relativePath, filename).subscribe({
-            next: () => {},
+            next: () => { },
             error: err => {
                 this.handlerService.handleAlert(
                     'Error',
@@ -226,7 +226,7 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    mapDokumenUkom () {
+    mapDokumenUkom() {
         this.dataDokumenUkom.forEach((doc, index) => {
             this.fileHandlerData.files[`file${index}`] = {
                 label: doc.dokumenPersyaratanName,
@@ -237,15 +237,15 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    toggleCATModal () {
+    toggleCATModal() {
         this.isCATModalOpen$.next(!this.isCATModalOpen$.value)
     }
 
-    backToLandingPage () {
+    backToLandingPage() {
         this.router.navigate(['/'])
     }
 
-    fetchPhotoProfile () {
+    fetchPhotoProfile() {
         this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
             next: blob => {
                 if (blob.size === 0) {
@@ -263,11 +263,11 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    getJenisUkomLabel (jenisUkom: string): string {
+    getJenisUkomLabel(jenisUkom: string): string {
         return JenisUkomEnum[jenisUkom as keyof typeof JenisUkomEnum] || '-'
     }
 
-    getProvinsiNameByCode (provinsiCode: string) {
+    getProvinsiNameByCode(provinsiCode: string) {
         this.isLoadingProvinsi$.next(true)
         this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
             next: response => {
@@ -284,7 +284,7 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    getKabupatenNameByCode (kabupatenCode: string) {
+    getKabupatenNameByCode(kabupatenCode: string) {
         this.isLoadingKabupaten$.next(true)
         this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
             next: response => {
@@ -302,7 +302,7 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    getBidangjabatanNameByCode (bidangJabatanCode: string) {
+    getBidangjabatanNameByCode(bidangJabatanCode: string) {
         this.isLoadingBidangJabatan$.next(true)
         this.apiService
             .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
@@ -321,7 +321,7 @@ export class StatusPendaftaranUkomComponent {
             })
     }
 
-    getPredikatKinerja (code: string | null): string {
+    getPredikatKinerja(code: string | null): string {
         if (!code || code == null) return '-'
         const predikat = this.predikatKinerjaList.find(
             predikat => predikat.id === code
@@ -329,7 +329,7 @@ export class StatusPendaftaranUkomComponent {
         return predikat ? predikat.name : '-'
     }
 
-    getPendingTask (key: string): void {
+    getPendingTask(key: string): void {
         this.isLoadingPendingTask$.next(true)
 
         this.apiService
@@ -404,7 +404,7 @@ export class StatusPendaftaranUkomComponent {
             })
     }
 
-    getExamType (): Observable<ExamType[]> {
+    getExamType(): Observable<ExamType[]> {
         return this.apiService.getData('/api/v1/exam_type').pipe(
             takeUntil(this.destroy$),
             map((response: any[]) => response.map(item => new ExamType(item))),
@@ -421,7 +421,7 @@ export class StatusPendaftaranUkomComponent {
         )
     }
 
-    getAllScoresFlow (): void {
+    getAllScoresFlow(): void {
         if (!this.participantId) {
             console.warn('getAllScoresFlow: No ID available, aborting')
             return
@@ -493,7 +493,7 @@ export class StatusPendaftaranUkomComponent {
                 })
             )
             .subscribe({
-                next: () => {},
+                next: () => { },
                 error: error => {
                     this.handlerService.handleAlert(
                         'Error',
@@ -503,7 +503,7 @@ export class StatusPendaftaranUkomComponent {
             })
     }
 
-    calculateAge (
+    calculateAge(
         tanggalLahir: string | Date,
         tglSuratUsulan: string | Date
     ): string {
@@ -544,7 +544,7 @@ export class StatusPendaftaranUkomComponent {
         return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    transformInstansiName (value: string): string {
+    transformInstansiName(value: string): string {
         if (!value) return null
 
         return value
@@ -553,7 +553,7 @@ export class StatusPendaftaranUkomComponent {
             .replace(/\b\w/g, char => char.toUpperCase())
     }
 
-    groupAndSortTasksByFlowId (tasks: any[]): { [key: string]: any[] } {
+    groupAndSortTasksByFlowId(tasks: any[]): { [key: string]: any[] } {
         const grouped = tasks.reduce((acc, task) => {
             if (!acc[task.flowId]) {
                 acc[task.flowId] = []
@@ -580,14 +580,14 @@ export class StatusPendaftaranUkomComponent {
     //         }
     //     })
     // }
-    handleStepClick (clickedStep: number) {
+    handleStepClick(clickedStep: number) {
         // Get the current value directly without subscribing
         if (clickedStep <= this.currentUkomStep$.value) {
             this.ukomStep$.next(clickedStep)
         }
     }
 
-    viewFile () {
+    viewFile() {
         const answerDto =
             this.scoreMap['MAKALAH']?.questionDtoList?.[0]?.answerDto
 
@@ -605,7 +605,7 @@ export class StatusPendaftaranUkomComponent {
         )
     }
 
-    get hasVisibleUkomDetails (): boolean {
+    get hasVisibleUkomDetails(): boolean {
         if (!this.scoreMap) {
             return false
         }
@@ -616,15 +616,15 @@ export class StatusPendaftaranUkomComponent {
         return !!(hasCatScore || hasMakalahFile)
     }
 
-    toggleModal () {
+    toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    convertDate (date: string) {
+    convertDate(date: string) {
         return this.converterService.dateToHumanReadable(date)
     }
 
-    getGroupedCompetencies (): any[] {
+    getGroupedCompetencies(): any[] {
         if (!this.scoreMap['CAT']?.kompetensiIndikatorDtoList) {
             return []
         }
@@ -660,14 +660,14 @@ export class StatusPendaftaranUkomComponent {
         }))
     }
 
-    getCorrectAnswer (question: any): string {
+    getCorrectAnswer(question: any): string {
         const correctChoice = question.multipleChoiceDtoList.find(
             (choice: any) => choice.correct
         )
         return correctChoice ? correctChoice.choiceId : ''
     }
 
-    getCompetencyPercentage (kompetensi: any): number {
+    getCompetencyPercentage(kompetensi: any): number {
         if (
             !kompetensi.questionDtoList ||
             kompetensi.questionDtoList.length === 0
@@ -681,7 +681,7 @@ export class StatusPendaftaranUkomComponent {
         return Math.round((correctAnswers / totalQuestions) * 100)
     }
 
-    getCorrectAnswersCount (kompetensi: any): number {
+    getCorrectAnswersCount(kompetensi: any): number {
         if (!kompetensi.questionDtoList) {
             return 0
         }
@@ -693,7 +693,7 @@ export class StatusPendaftaranUkomComponent {
         ).length
     }
 
-    getWrongAnswersCount (kompetensi: any): number {
+    getWrongAnswersCount(kompetensi: any): number {
         if (!kompetensi.questionDtoList) {
             return 0
         }

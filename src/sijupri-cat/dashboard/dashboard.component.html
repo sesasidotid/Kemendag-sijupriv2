@@ -56,7 +56,7 @@
                                 {{ exam.endTime }}
                             </p>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
                             <ng-container *ngIf="exam.examTypeCode === 'CAT'">
                                 <app-loading-button [isLoading]="isStartCATLoading$ | async" [disabled]="!canStartExam(
                                             exam.startTime,
@@ -105,7 +105,6 @@
                                             scoreMap['MAKALAH']?.score !==
                                                 undefined)" [isLoading]="isMakalahLoading$ | async"
                                     [label]="'Upload Makalah'"></app-loading-button>
-
                                 <button class="btn btn-success " (click)="viewFile()" *ngIf="
                                         scoreMap['MAKALAH']?.score !== null &&
                                         scoreMap['MAKALAH']?.score !== undefined
