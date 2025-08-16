@@ -29,17 +29,19 @@
     <ng-template #hadItem>
         <div class="parent">
             <div class="row w-100" *ngIf="data.data.length > 0">
-                <div class="col-8 d-flex flex-column card mb-10 pb-4">
+                <div class="col-8 d-flex flex-column card mb-10 pb-4 question-container">
                     <button class="btn btn-secondary btn-sm mt-4 b-w-fit" (click)="backWithConfirmation()">
                         Kembali
                     </button>
+
                     <div class="text-center mb-4">
                         <img *ngIf="data.data[currentPage - 1]?.attachmentUrl"
                             [src]="data.data[currentPage - 1]?.attachmentUrl" alt="Question Image"
                             class="img-fluid rounded shadow img-custom-300 object-cover" />
                     </div>
 
-                    <p class="fs-5 mb-4">
+                    <p class="fs-5 mb-4 question-text">
+                        <span class="question-number">No {{ currentPage }}.</span>
                         {{ data.data[currentPage - 1]?.question }}
                     </p>
 
@@ -71,13 +73,6 @@
                     </ng-container>
 
                     <ng-template #noSavingLoading>
-                        <!-- <button
-                            *ngIf="currentPage !== totalQuestions"
-                            (click)="saveAnswer(data.data[currentPage - 1]?.id)"
-                            class="btn btn-primary"
-                        >
-                            Simpan
-                        </button> -->
                         <button (click)="
                                 onSaveButtonClick(
                                     data.data[currentPage - 1]?.id
