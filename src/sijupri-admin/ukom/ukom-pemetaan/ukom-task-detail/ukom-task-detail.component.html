@@ -1,8 +1,13 @@
 <button class="btn btn-sm btn-outline-secondary mb-3" (click)="back()">
     <i class="mdi mdi-chevron-left"></i> Kembali
 </button>
-
+<!-- 
 <div *ngIf="ukomDetailLoading$ | async; else ukomHadItem" class="d-flex justify-content-center my-5">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div> -->
+<div *ngIf="isLoading$ | async; else ukomHadItem" class="d-flex justify-content-center my-5">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
@@ -357,7 +362,7 @@
                                 </button>
                                 <app-loading-button [isLoading]="
                                         isDeleteExamScoreLoading$ | async
-                                    " [type]="'button'" label="Hapus Nilai" [className]="'btn btn-danger'" (clicked)="
+                                    " [type]="'button'" label="Hapus Makalah" [className]="'btn btn-danger'" (clicked)="
                                         deleteExamScore(scoreMap['MAKALAH'].id)
                                     "></app-loading-button>
                             </div>

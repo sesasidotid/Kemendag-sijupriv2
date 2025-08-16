@@ -87,7 +87,7 @@ export class UkomTaskDetailComponent {
     isDeleteExamScoreLoading$ = new BehaviorSubject<boolean>(false)
 
     isToggleUpdatePasswordModal$ = new BehaviorSubject<boolean>(false)
-    constructor (
+    constructor(
         private activatedRoute: ActivatedRoute,
         private apiService: ApiService,
         private handlerService: HandlerService,
@@ -101,12 +101,12 @@ export class UkomTaskDetailComponent {
         ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
     }
 
-    ngOnInit () {
+    ngOnInit() {
         // this.getAllScoresFlow()
         this.loadInitialDataFlow()
     }
 
-    getJenisUkomLabel (jenisUkom: string): string {
+    getJenisUkomLabel(jenisUkom: string): string {
         switch (jenisUkom) {
             case 'KENAIKAN_JENJANG':
                 return 'Kenaikan Jenjang'
@@ -121,7 +121,7 @@ export class UkomTaskDetailComponent {
         }
     }
 
-    getExamType (): Observable<ExamType[]> {
+    getExamType(): Observable<ExamType[]> {
         return this.apiService.getData('/api/v1/exam_type').pipe(
             map((response: any[]) => response.map(item => new ExamType(item))),
             tap(examTypes => {
@@ -138,7 +138,7 @@ export class UkomTaskDetailComponent {
         )
     }
 
-    private loadInitialDataFlow (): void {
+    private loadInitialDataFlow(): void {
         this.apiService
             .getData('/api/v1/predikat_kinerja')
             .pipe(
@@ -228,7 +228,7 @@ export class UkomTaskDetailComponent {
             .subscribe()
     }
 
-    getPendidikanList (pendidikanTerakhirCode: string) {
+    getPendidikanList(pendidikanTerakhirCode: string) {
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
             next: response => {
                 const matchedPendidikan = response.find(
@@ -249,7 +249,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    getBidangjabatanNameByCode (bidangJabatanCode: string) {
+    getBidangjabatanNameByCode(bidangJabatanCode: string) {
         this.apiService
             .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
             .subscribe({
@@ -266,7 +266,7 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    getProvinsiNameByCode (provinsiCode: string) {
+    getProvinsiNameByCode(provinsiCode: string) {
         this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
             next: response => {
                 this.provinsiName = response.name ?? null
@@ -281,7 +281,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    getKabupatenNameByCode (kabupatenCode: string) {
+    getKabupatenNameByCode(kabupatenCode: string) {
         this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
             next: response => {
                 this.kabupatenName = response.name ?? null
@@ -297,7 +297,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    get hasVisibleUkomDetails (): boolean {
+    get hasVisibleUkomDetails(): boolean {
         if (!this.scoreMap) {
             return false
         }
@@ -309,7 +309,7 @@ export class UkomTaskDetailComponent {
         return !!(hasCatScore || hasMakalahFile)
     }
 
-    transformInstansiName (value: string): string {
+    transformInstansiName(value: string): string {
         if (!value) return null
 
         return value
@@ -318,7 +318,7 @@ export class UkomTaskDetailComponent {
             .replace(/\b\w/g, char => char.toUpperCase()) // Kapitalisasi setiap kata
     }
 
-    calculateAge (
+    calculateAge(
         tanggalLahir: string | Date,
         tglSuratUsulan: string | Date
     ): string {
@@ -356,11 +356,11 @@ export class UkomTaskDetailComponent {
         return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    toggleModal () {
+    toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    getUnitKerjaById (unit_kerja_id: string) {
+    getUnitKerjaById(unit_kerja_id: string) {
         this.apiService
             .getData(`/api/v1/unit_kerja/${unit_kerja_id}`)
             .subscribe({
@@ -370,11 +370,11 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    back () {
+    back() {
         history.back()
     }
 
-    viewFile () {
+    viewFile() {
         const answerDto =
             this.scoreMap['MAKALAH']?.questionDtoList[0]?.answerDto
 
@@ -392,7 +392,7 @@ export class UkomTaskDetailComponent {
         )
     }
 
-    getPredikatKinerja (code: string | null): string {
+    getPredikatKinerja(code: string | null): string {
         if (!code || code == null) return '-'
         const predikat = this.predikatKinerjaList.find(
             predikat => predikat.id === code
@@ -400,7 +400,7 @@ export class UkomTaskDetailComponent {
         return predikat ? predikat.name : '-'
     }
 
-    getParticipantUkomDetail () {
+    getParticipantUkomDetail() {
         this.ukomDetailLoading$.next(true)
         this.apiService
             .getData(`/api/v1/participant_ukom/${this.participant_ukom_id}`)
@@ -447,7 +447,7 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    mapDokumenUkom () {
+    mapDokumenUkom() {
         this.dataDokumenUkom.forEach((doc, index) => {
             this.fileHandlerData.files[`file${index}`] = {
                 label: doc.dokumenPersyaratanName,
@@ -458,7 +458,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    getDokumenUkomList () {
+    getDokumenUkomList() {
         this.apiService
             .getData(
                 `/api/v1/document_ukom/participant/${this.participant_ukom_id}`
@@ -474,7 +474,7 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    getGroupedCompetencies (): any[] {
+    getGroupedCompetencies(): any[] {
         if (!this.scoreMap['CAT'].kompetensiIndikatorDtoList) {
             return []
         }
@@ -511,14 +511,14 @@ export class UkomTaskDetailComponent {
         }))
     }
 
-    getCorrectAnswer (question: any): string {
+    getCorrectAnswer(question: any): string {
         const correctChoice = question.multipleChoiceDtoList.find(
             (choice: any) => choice.correct
         )
         return correctChoice ? correctChoice.choiceId : ''
     }
 
-    getCompetencyPercentage (kompetensi: any): number {
+    getCompetencyPercentage(kompetensi: any): number {
         if (
             !kompetensi.questionDtoList ||
             kompetensi.questionDtoList.length === 0
@@ -532,7 +532,7 @@ export class UkomTaskDetailComponent {
         return Math.round((correctAnswers / totalQuestions) * 100)
     }
 
-    getCorrectAnswersCount (kompetensi: any): number {
+    getCorrectAnswersCount(kompetensi: any): number {
         if (!kompetensi.questionDtoList) {
             return 0
         }
@@ -544,7 +544,7 @@ export class UkomTaskDetailComponent {
         ).length
     }
 
-    getWrongAnswersCount (kompetensi: any): number {
+    getWrongAnswersCount(kompetensi: any): number {
         if (!kompetensi.questionDtoList) {
             return 0
         }
@@ -555,7 +555,7 @@ export class UkomTaskDetailComponent {
         )
     }
 
-    deleteExamScore (exam_grade_id: string): void {
+    deleteExamScore(exam_grade_id: string): void {
         const deleteAction = () => {
             this.isDeleteExamScoreLoading$.next(true)
             this.apiService
@@ -595,7 +595,7 @@ export class UkomTaskDetailComponent {
         })
     }
 
-    toggleUpdatePasswordModal () {
+    toggleUpdatePasswordModal() {
         this.isToggleUpdatePasswordModal$.next(
             !this.isToggleUpdatePasswordModal$.value
         )
