@@ -744,10 +744,15 @@
                 </div>
             </ng-container>
         </div>
+
+        <div *ngIf="ukomGrade">
+            <app-ukom-grade-table [nip]="finishTask.nip" [nama]="finishTask.name"
+                [gradeData]="ukomGrade"></app-ukom-grade-table>
+        </div>
     </div>
 </ng-template>
 
-<app-modal *ngIf="isCATModalOpen$ | async" [title]="'Hasil Ujian'" (toggle)="toggleCATModal()" [enableFooter]="false"
+<app-modal *ngIf=" isCATModalOpen$ | async" [title]="'Hasil Ujian'" (toggle)="toggleCATModal()" [enableFooter]="false"
     [size]="'lg'">
     <ng-container>
         <div class="total-score-container">

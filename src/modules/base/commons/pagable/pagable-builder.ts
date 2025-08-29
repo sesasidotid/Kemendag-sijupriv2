@@ -10,36 +10,36 @@ export class PagableBuilder {
     private limit: number = 10
     private enablePagination: boolean = true
 
-    constructor (endpoint: string) {
+    constructor(endpoint: string) {
         this.endpoint = endpoint
     }
 
-    addPrimaryColumn (pageColumn: PageColumn): PagableBuilder {
+    addPrimaryColumn(pageColumn: PageColumn): PagableBuilder {
         this.primaryColumnList.push(pageColumn)
         return this
     }
 
-    addActionColumn (pageColumn: PageColumn): PagableBuilder {
+    addActionColumn(pageColumn: PageColumn): PagableBuilder {
         this.actionColumnList.push(pageColumn)
         return this
     }
 
-    addFilter (pageFilter: PageFilter): PagableBuilder {
+    addFilter(pageFilter: PageFilter): PagableBuilder {
         this.filterList.push(pageFilter)
         return this
     }
 
-    setLimit (limit: number) {
+    setLimit(limit: number) {
         this.limit = limit
         return this
     }
 
-    setEnablePagination (enablePagination: boolean) {
+    setEnablePagination(enablePagination: boolean) {
         this.enablePagination = enablePagination
         return this
     }
 
-    build (): Pagable {
+    build(): Pagable {
         return new Pagable(
             this.endpoint,
             this.primaryColumnList,
@@ -63,11 +63,11 @@ export class PageFilterBuilder {
         like: 'like_'
     }
 
-    constructor (clause: 'equal' | 'like') {
+    constructor(clause: 'equal' | 'like') {
         this.clause = clause
     }
 
-    withField (
+    withField(
         lable: string,
         fieldType: 'text' | 'date' | 'select'
     ): PageFilterBuilder {
@@ -76,19 +76,19 @@ export class PageFilterBuilder {
         return this
     }
 
-    withDefaultValue (value: string | number | boolean): PageFilterBuilder {
+    withDefaultValue(value: string | number | boolean): PageFilterBuilder {
         this.value = value
         return this
     }
 
-    setOptionList (
+    setOptionList(
         optionList: { label: string; value: string | number | boolean }[]
     ): PageFilterBuilder {
         this.optionList = optionList
         return this
     }
 
-    setOptionListFromObjectList (
+    setOptionListFromObjectList(
         objectList: any[],
         labelProperty: string,
         valueProperty: string
@@ -103,7 +103,7 @@ export class PageFilterBuilder {
         return this
     }
 
-    setProperty (
+    setProperty(
         property: string,
         parentsProperty: string[] = []
     ): PageFilterBuilder {
@@ -115,7 +115,7 @@ export class PageFilterBuilder {
         return this
     }
 
-    build (): PageFilter {
+    build(): PageFilter {
         return new PageFilter({
             label: this.lable,
             fieldType: this.fieldType,
@@ -132,8 +132,10 @@ export class PrimaryColumnBuilder {
     private dynamic: Function
     private defaultValue: string | number | boolean | null
     private sortable: boolean = false // Default to true
+    private cellClass: (row: any) => string
+    private cellStyle: (row: any) => Record<string, string>
 
-    constructor (label?: string, property?: string, parentsProperty?: string[]) {
+    constructor(label?: string, property?: string, parentsProperty?: string[]) {
         if (label) {
             this.label = label
             if (parentsProperty)
@@ -147,14 +149,14 @@ export class PrimaryColumnBuilder {
         }
     }
 
-    withDynamicValue (label: string, dynamic: Function): PrimaryColumnBuilder {
+    withDynamicValue(label: string, dynamic: Function): PrimaryColumnBuilder {
         this.label = label
         this.dynamic = dynamic
 
         return this
     }
 
-    withPropertyValue (
+    withPropertyValue(
         label: string,
         property: string,
         parentsProperty?: string[]
@@ -169,26 +171,38 @@ export class PrimaryColumnBuilder {
         return this
     }
 
-    withDefaultValue (
+    withDefaultValue(
         defaultValue: string | number | boolean | null = null
     ): PrimaryColumnBuilder {
         this.defaultValue = defaultValue
         return this
     }
 
-    withSortable (sortable: boolean): PrimaryColumnBuilder {
+    withSortable(sortable: boolean): PrimaryColumnBuilder {
         this.sortable = sortable
         return this
     }
 
-    build (): PageColumn {
+    withCellClass(fn: (row: any) => string): PrimaryColumnBuilder {
+        this.cellClass = fn
+        return this
+    }
+
+    withCellStyle(fn: (row: any) => Record<string, string>): PrimaryColumnBuilder {
+        this.cellStyle = fn
+        return this
+    }
+
+    build(): PageColumn {
         return new PageColumn({
             columnType: 'primary',
             label: this.label,
             property: this.property,
             dynamic: this.dynamic,
             defaultValue: this.defaultValue,
-            sortable: this.sortable // Include the sortable property
+            sortable: this.sortable,
+            cellClass: this.cellClass,
+            cellStyle: this.cellStyle
         })
     }
 }
@@ -211,7 +225,7 @@ export class ActionColumnBuilder {
         password: 'ri-lock-2-line'
     }
 
-    setAction (
+    setAction(
         process: Function,
         color: 'primary' | 'success' | 'info' | 'danger' | 'warning'
     ): ActionColumnBuilder {
@@ -220,12 +234,12 @@ export class ActionColumnBuilder {
         return this
     }
 
-    setChecked (checked: Function): ActionColumnBuilder {
+    setChecked(checked: Function): ActionColumnBuilder {
         this.checked = checked
         return this
     }
 
-    withIcon (
+    withIcon(
         icon:
             | 'create'
             | 'detail'
@@ -240,17 +254,17 @@ export class ActionColumnBuilder {
         return this
     }
 
-    setInputType (inputType: 'button' | 'checkbox'): ActionColumnBuilder {
+    setInputType(inputType: 'button' | 'checkbox'): ActionColumnBuilder {
         this.inputType = inputType
         return this
     }
 
-    addInactiveCondition (inactive: Function): ActionColumnBuilder {
+    addInactiveCondition(inactive: Function): ActionColumnBuilder {
         this.inactive = inactive
         return this
     }
 
-    build (): PageColumn {
+    build(): PageColumn {
         return new PageColumn({
             columnType: 'action',
             process: this.process,

@@ -59,26 +59,26 @@ export class UkomGradeListComponent {
         }
     }
 
-    constructor (
+    constructor(
         private router: Router,
         private tabService: TabService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService
-    ) {}
+    ) { }
 
-    ngOnInit () {
+    ngOnInit() {
         this.handlePagable()
         this.handleTabService()
     }
 
-    clearFilesName () {
+    clearFilesName() {
         if (this.fileHandler) {
             this.fileHandler.clearFileName()
         }
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/ukom_grade/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(
@@ -176,14 +176,7 @@ export class UkomGradeListComponent {
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('JPM', (item: UkomGrade) => {
-                        return this.rounding(item.jpm)
-                    })
-                    .build()
-            )
-            .addPrimaryColumn(
-                new PrimaryColumnBuilder()
-                    .withDynamicValue('Skor', (item: UkomGrade) => {
+                    .withDynamicValue('RUKMSK', (item: UkomGrade) => {
                         return this.rounding(item.score)
                     })
                     .build()
@@ -191,6 +184,13 @@ export class UkomGradeListComponent {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('UKMSK', (item: UkomGrade) => {
+                        return this.rounding(item.jpm)
+                    })
+                    .build()
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('NB UKMSK', (item: UkomGrade) => {
                         return this.rounding(item.ukmsk)
                     })
                     .build()
@@ -203,8 +203,18 @@ export class UkomGradeListComponent {
                     .build()
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'status').build()
+                new PrimaryColumnBuilder('Status', 'status')
+                    .withCellClass((row: UkomGrade) => {
+                        if (!row.rekomendasi) {
+                            return '';
+                        }
+                        return row.passed
+                            ? 'bg-success text-white fw-bold'
+                            : 'bg-danger text-white';
+                    })
+                    .build()
             )
+
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('participantUkom|nip')
@@ -252,7 +262,7 @@ export class UkomGradeListComponent {
             .build()
     }
 
-    handleTabService () {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -280,7 +290,7 @@ export class UkomGradeListComponent {
             })
     }
 
-    toggleModal () {
+    toggleModal() {
         const isClosing = this.isModalOpen$.value
         this.isModalOpen$.next(!isClosing)
 
@@ -294,11 +304,11 @@ export class UkomGradeListComponent {
         }
     }
 
-    rounding (value: string | number): string {
+    rounding(value: string | number): string {
         return parseFloat(value.toString()).toFixed(2)
     }
 
-    onDelete (id: string) {
+    onDelete(id: string) {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
@@ -327,7 +337,7 @@ export class UkomGradeListComponent {
         })
     }
 
-    onSubmit () {
+    onSubmit() {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return

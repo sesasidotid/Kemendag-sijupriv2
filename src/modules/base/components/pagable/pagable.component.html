@@ -76,10 +76,14 @@
                         {{ i + 1 + (page * 10 - 10) }}
                     </td>
                     <ng-container *ngFor="let column of pagable.primaryColumnList">
-                        <td *ngIf="column.property" class="m-1 p-1 truncate-cell">
+                        <td *ngIf="column.property" class="m-1 p-1 truncate-cell"
+                            [ngClass]="column.cellClass ? column.cellClass(row) : ''"
+                            [ngStyle]="column.cellStyle ? column.cellStyle(row) : {}">
                             {{ getPropertyValue(row, column.property) }}
                         </td>
-                        <td *ngIf="!column.property" class="m-1 p-1 truncate-cell">
+                        <td *ngIf="!column.property" class="m-1 p-1 truncate-cell"
+                            [ngClass]="column.cellClass ? column.cellClass(row) : ''"
+                            [ngStyle]="column.cellStyle ? column.cellStyle(row) : {}">
                             {{ column.dynamic(row) }}
                         </td>
                     </ng-container>

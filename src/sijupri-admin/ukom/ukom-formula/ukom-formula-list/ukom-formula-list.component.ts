@@ -112,7 +112,7 @@ export class UkomFormulaListComponent {
                     new PrimaryColumnBuilder('Ambang Batas UKT', 'uktThreshold').build()
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Ambang Batas JPM', 'jpmThreshold').build()
+                    new PrimaryColumnBuilder('Ambang Batas UKMSK', 'jpmThreshold').build()
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()

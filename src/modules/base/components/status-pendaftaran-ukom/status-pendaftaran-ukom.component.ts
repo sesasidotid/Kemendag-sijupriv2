@@ -36,7 +36,9 @@ import { ExamType } from '../../../ukom/models/exam-type'
 import { PredikatKinerja } from '../../../maintenance/models/predikat-kinerja.model'
 import { MakalahScore } from '../../../ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../services/file-preview.service'
-
+import { UkomGradeService } from '../../../ukom/services/ukom-grade.service'
+import { UkomGrade } from '../../../ukom/models/ukom-grade'
+import { UkomGradeTableComponent } from '../ukom-grade-table/ukom-grade-table.component'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
@@ -53,7 +55,8 @@ export enum JenisUkomEnum {
         EmptyStateComponent,
         LandingPageComponent,
         FileHandlerComponent,
-        FilePreviewComponent
+        FilePreviewComponent,
+        UkomGradeTableComponent
     ],
     templateUrl: './status-pendaftaran-ukom.component.html',
     styleUrl: './status-pendaftaran-ukom.component.scss'
@@ -112,6 +115,7 @@ export class StatusPendaftaranUkomComponent {
     isLoading$: Observable<boolean>
 
     registrationStatus: string
+    ukomGrade: UkomGrade
 
     constructor(
         private converterService: ConverterService,
@@ -120,7 +124,8 @@ export class StatusPendaftaranUkomComponent {
         private activatedRoute: ActivatedRoute,
         private sanitizer: DomSanitizer,
         private handlerService: HandlerService,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
+        private ukomGradeService: UkomGradeService
     ) {
         this.isLoading$ = combineLatest([
             this.isPredikatKerjaLoading$,
@@ -393,6 +398,13 @@ export class StatusPendaftaranUkomComponent {
                         this.mapDokumenUkom()
                         // this.getAllScoresFlow()
                     }
+                }),
+                tap(() => {
+                    this.ukomGradeService.findGradeParticipantNonJF(key).subscribe({
+                        next: response => {
+                            this.ukomGrade = new UkomGrade(response)
+                        }
+                    })
                 }),
                 finalize(() => this.isLoadingPendingTask$.next(false))
             )
