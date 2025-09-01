@@ -386,7 +386,7 @@ export class StatusPendaftaranUkomComponent {
                         this.finishTask = response.data
                         this.dataDokumenUkom = response.data.documentUkomList
                         this.mapDokumenUkom()
-                        this.getAllScoresFlow()
+                        this.getAllScoresFlow(key)
                     }
 
                     if (response.status === 'failed') {
@@ -433,11 +433,11 @@ export class StatusPendaftaranUkomComponent {
         )
     }
 
-    getAllScoresFlow(): void {
-        if (!this.participantId) {
-            console.warn('getAllScoresFlow: No ID available, aborting')
-            return
-        }
+    getAllScoresFlow(key: string): void {
+        // if (!this.participantId) {
+        //     console.warn('getAllScoresFlow: No ID available, aborting')
+        //     return
+        // }
 
         this.isAllSchoreLoading$.next(true)
 
@@ -453,8 +453,11 @@ export class StatusPendaftaranUkomComponent {
                     const requests = examTypes.map(type => {
                         const examCode = type.code
                         return this.apiService
+                            // .getData(
+                            //     `/api/v1/exam_grade/${examCode}/${this.participantId}`
+                            // )
                             .getData(
-                                `/api/v1/exam_grade/${examCode}/${this.participantId}`
+                                `/api/v1/exam_grade/${examCode}?key=${key}`
                             )
                             .pipe(
                                 takeUntil(this.destroy$),

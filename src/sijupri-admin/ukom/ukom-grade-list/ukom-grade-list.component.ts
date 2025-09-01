@@ -304,9 +304,20 @@ export class UkomGradeListComponent {
         }
     }
 
-    rounding(value: string | number): string {
-        return parseFloat(value.toString()).toFixed(2)
+    rounding(value: string | number | null | undefined): string {
+        if (value === null || value === undefined) {
+            return "-";
+        }
+
+        const num = parseFloat(value.toString());
+
+        if (isNaN(num)) {
+            return "-"; // handle cases like "", "abc"
+        }
+
+        return num.toFixed(2);
     }
+
 
     onDelete(id: string) {
         this.confirmationService.open(false).subscribe({

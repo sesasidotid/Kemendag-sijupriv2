@@ -429,7 +429,7 @@
 
     <div class="card parent" *ngIf="finishTask.id">
         <div class="row px-3">
-            <div class="d-flex justify-content-end mb-3 px-0">
+            <!-- <div class="d-flex justify-content-end mb-3 px-0">
                 <div class="alert alert-info d-flex align-items-center gap-4 w-auto mb-0 px-2 py-2 shadow-sm"
                     role="alert" *ngIf="finishTask.rekomendasiUrl">
                     <div class="d-flex align-items-center">
@@ -443,7 +443,7 @@
                     </button>
                 </div>
 
-            </div>
+            </div> -->
             <div class="card card-profile shadow-sm">
                 <div class="card-body p-3 p-md-4">
                     <div class="col-12">
@@ -641,49 +641,13 @@
             </div>
         </div>
 
-        <!-- <div class="card">
-            <ng-container *ngIf="registrationStatus === 'finish'; else failedStatus">
-                <div class="alert alert-success d-flex align-items-center gap-4 w-auto mb-0 px-2 py-2 shadow-sm"
-                    role="alert">
-                    <div class="d-flex align-items-center">
-                        <i class="mdi mdi-check-circle me-3 fs-3 text-success"></i>
-                        <h4 class="mb-0 fw-semibold text-dark">
-                            Selamat! Pendaftaran UKom Anda telah lolos seleksi administrasi.
-                        </h4>
-                    </div>
-                </div>
-            </ng-container>
-            <ng-template #failedStatus>
-                <div class="alert alert-danger d-flex flex-column gap-2 w-auto mb-0 px-3 py-3 shadow-sm" role="alert">
-                    <div class="d-flex align-items-center">
-                        <i class="mdi mdi-alert-circle me-3 fs-3 text-danger"></i>
-                        <h4 class="mb-0 fw-semibold text-dark">
-                            Pendaftaran UKom Anda tidak lolos seleksi administrasi.
-                        </h4>
-                    </div>
-                    <div *ngIf="finishTask.remark">
-                        <small class="text-dark d-block">
-                            <strong>Alasan Penolakan:</strong> {{ finishTask.remark }}
-                        </small>
-                    </div>
-                </div>
-            </ng-template>
-        </div> -->
-
-        <div class="card m-0 detail-jf" *ngIf="dataDokumenUkom.length > 0">
-            <!-- <div class="card-header">
-                <h5 class="m-0">
-                    <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen Pendaftaran UKom
-                </h5>
-                <span class="badge badge-pill badge-danger">Danger</span>
-            </div> -->
+        <div class="card" *ngIf="dataDokumenUkom.length > 0">
             <div class="card-header">
-                <!-- Row 1: Title + badge -->
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <h6 class="mb-0 d-flex align-items-center">
+                    <h5 class="mb-0 d-flex align-items-center">
                         <i class="mdi mdi-file-document-check-outline me-2"></i>
                         Dokumen Pendaftaran UKom
-                    </h6>
+                    </h5>
                     <ng-container *ngIf="registrationStatus === 'finish'; else pillFailed">
                         <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">
                             Lolos Seleksi Administrasi
@@ -706,7 +670,7 @@
             </div>
         </div>
 
-        <div class="card detail-jf" *ngIf="scoreMap | keyvalue as entries">
+        <div class="card" *ngIf="scoreMap | keyvalue as entries">
             <ng-container *ngIf="entries.length > 0">
                 <div class="card-header" *ngIf="hasVisibleUkomDetails">
                     <h5 class="m-0">
@@ -716,8 +680,7 @@
                 </div>
 
                 <div class="list-group">
-                    <!-- CAT -->
-                    <div class="list-group-item d-flex justify-content-between align-items-center"
+                    <div class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
                         *ngIf="scoreMap['CAT']?.id">
                         <div>
                             <h5 class="m-0">CAT</h5>
@@ -729,8 +692,7 @@
                         </div>
                     </div>
 
-                    <!-- MAKALAH -->
-                    <div class="list-group-item d-flex justify-content-between align-items-center"
+                    <div class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
                         *ngIf="scoreMap['MAKALAH']?.id">
                         <div>
                             <h5 class="m-0">Makalah</h5>
@@ -745,10 +707,11 @@
             </ng-container>
         </div>
 
-        <div *ngIf="ukomGrade">
-            <app-ukom-grade-table [nip]="finishTask.nip" [nama]="finishTask.name"
-                [gradeData]="ukomGrade"></app-ukom-grade-table>
-        </div>
+        <ng-container *ngIf="ukomGrade">
+            <app-ukom-grade-table [nip]="finishTask.nip" [nama]="finishTask.name" [gradeData]="ukomGrade"
+                [rekomendasiUrl]="finishTask.rekomendasiUrl"
+                (downloadFile)=" downloadRekomendasi()"></app-ukom-grade-table>
+        </ng-container>
     </div>
 </ng-template>
 

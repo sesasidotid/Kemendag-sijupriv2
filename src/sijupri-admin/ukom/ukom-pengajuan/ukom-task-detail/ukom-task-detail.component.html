@@ -305,7 +305,7 @@
                             </div>
                         </ng-container>
 
-                        <ng-template #jfStatus>
+                        <!-- <ng-template #jfStatus>
                             <div class="col-lg-12">
                                 <h5 class="fw-bold mt-3">
                                     Informasi Kinerja 2 Tahun Terakhir
@@ -369,6 +369,82 @@
                   }"></app-file-handler>
                                 </div>
                             </div>
+                        </ng-template> -->
+                        <ng-template #jfStatus>
+                            <div class="col-lg-12">
+                                <h5 class="fw-bold mt-3">
+                                    Informasi Kinerja 2 Tahun Terakhir
+                                </h5>
+                                <hr />
+                            </div>
+
+                            <!-- Cek apakah ada data -->
+                            <div *ngIf="kinerja2Tahun?.length > 0; else noKinerja">
+                                <div class="col-lg-6 mb-3" *ngFor="let kinerja of kinerja2Tahun">
+                                    <div class="mb-3">
+                                        <label class="form-label">Periode</label>
+                                        <p class="border-bottom">
+                                            {{ kinerja.dateStart | tanggalIndo: kinerja.dateEnd }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Jenis</label>
+                                        <p class="border-bottom text-capitalize">
+                                            {{ kinerja.type }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Angka Kredit</label>
+                                        <p class="border-bottom text-capitalize">
+                                            {{ kinerja.angkaKredit }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Rating Hasil</label>
+                                        <p class="border-bottom text-capitalize">
+                                            {{ kinerja.ratingHasilName }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Rating Kinerja</label>
+                                        <p class="border-bottom text-capitalize">
+                                            {{ kinerja.ratingKinerjaName }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Predikat Kinerja</label>
+                                        <p class="border-bottom text-capitalize">
+                                            {{ kinerja.predikatKinerjaName }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <app-file-handler [inputs]="{
+            files: {
+              docEvaluas: { label: 'Preview Dokumen Evaluasi Kinerja', fileName: kinerja.docEvaluasi, source: kinerja.docEvaluasiUrl },
+              docPredikat: { label: 'Preview Dokumen Konversi Predikat Kinerja', fileName: kinerja.docPredikat, source: kinerja.docPredikatUrl },
+              docAkumulasiAk: { label: 'Preview Dokumen Akumulasi Angka Kredit', fileName: kinerja.docAkumulasiAk, source: kinerja.docAkumulasiAkUrl },
+              docPenetapanAk: { label: 'Preview Dokumen Penetapan Angka Kredit', fileName: kinerja.docPenetapanAk, source: kinerja.docPenetapanAkUrl }
+            },
+            viewOnly: true
+          }"></app-file-handler>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pesan kalau tidak ada data -->
+                            <ng-template #noKinerja>
+                                <div class="col-lg-12">
+                                    <p class="text-muted fst-italic">
+                                        Belum ada data kinerja 2 tahun terakhir.
+                                    </p>
+                                </div>
+                            </ng-template>
                         </ng-template>
                     </div>
                 </div>

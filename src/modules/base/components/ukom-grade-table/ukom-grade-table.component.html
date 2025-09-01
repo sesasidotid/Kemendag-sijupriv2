@@ -1,9 +1,22 @@
-<div class="card mb-4">
-    <div class="card-header fw-semibold">
-        Detail Nilai Ukom
+<div class="card m-0">
+    <div class="card-header">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+            <h5 class="m-0">
+                <i class="mdi mdi-certificate-outline me-2"></i>
+                Detail Nilai Ukom
+            </h5>
+            <ng-container *ngIf="gradeData.passed; else notPassed">
+                <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">{{gradeData.status ??
+                    "Lulus Uji Kompetensi"}}</span>
+            </ng-container>
+            <ng-template #notPassed>
+                <span class="bg-danger text-white rounded-pill px-3 py-1 small fw-semibold">{{gradeData.status ??
+                    "Tidak Lulus Uji Kompetensi"}}</span>
+            </ng-template>
+        </div>
     </div>
-    <div class="scroll-container">
-        <table class="table table-hover">
+    <div class="scroll-container ">
+        <table class="table m-0 table-hover">
             <tbody>
                 <tr>
                     <th scope="row" class="w-25">NIP</th>
@@ -15,81 +28,54 @@
                 </tr>
                 <tr>
                     <th scope="row">Skor CAT</th>
-                    <td>{{ gradeData?.nbCat }}</td>
+                    <td>{{ gradeData.nbCat ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Wawancara</th>
-                    <td>{{ gradeData?.nbWawancara }}</td>z
+                    <td>{{ gradeData.nbWawancara ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Seminar</th>
-                    <td>{{ gradeData?.nbSeminar }}</td>
+                    <td>{{ gradeData.nbSeminar ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Praktik</th>
-                    <td>{{ gradeData?.nbPraktik }}</td>
+                    <td>{{ gradeData.nbPraktik ?? "-" }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Portofolio</th>
-                    <td>{{ gradeData?.nbPortofolio }}</td>
+                    <td>{{ gradeData.nbPortofolio?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">UKT</th>
-                    <td>{{ gradeData?.ukt }}</td>
+                    <td>{{ gradeData.ukt?? '-' }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">JPM</th>
-                    <td>{{ gradeData?.jpm }}</td>
+                    <th scope="row">UKMSK</th>
+                    <td>{{ gradeData.jpm?? '-' }}</td>
                 </tr>
                 <tr class="fw-bold">
                     <th scope="row">Nilai Akhir</th>
-                    <td>{{ gradeData?.grade }}</td>
+                    <td>{{ gradeData.grade?? '-' }}</td>
                 </tr>
-                <tr>
-                    <th scope="row">Status</th>
+                <tr class="fw-bold">
+                    <th scope="row">File Rekomendasi UKom</th>
                     <td>
-                        <span class="badge px-3 py-2" [class.bg-success]="gradeData?.passed"
-                            [class.bg-danger]="!gradeData?.passed">
-                            {{ gradeData?.status }}
-                        </span>
+                        <ng-container *ngIf="rekomendasiUrl; else waitingTemplate">
+                            <button (click)="onDownloadFile()" class="btn btn-primary">
+                                Download File Rekomendasi
+                            </button>
+                        </ng-container>
+
+                        <ng-template #waitingTemplate>
+                            <span class="text-muted fst-italic">
+                                Menunggu admin mengupload
+                            </span>
+                        </ng-template>
                     </td>
                 </tr>
+
             </tbody>
         </table>
     </div>
 </div>
-
-<!-- <div class="scroll-container">
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>NIP</th>
-                <th>Nama</th>
-                <th>Skor CAT</th>
-                <th>Skor Wawancara</th>
-                <th>Skor Seminar</th>
-                <th>Skor Praktek</th>
-                <th>Skor Portfolio</th>
-                <th>UKT</th>
-                <th>UKMSK</th>
-                <th>Nilai Akhir</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="table-row">
-                <td class="truncate-cell m-1 p-1 ">{{nip}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{nama}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-                <td class="truncate-cell m-1 p-1 ">{{gradeData.nbCat}}</td>
-            </tr>
-        </tbody>
-    </table>
-</div> -->

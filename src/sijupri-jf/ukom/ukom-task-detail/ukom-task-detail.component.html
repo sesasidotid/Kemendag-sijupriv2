@@ -11,7 +11,7 @@
 <ng-template #ukomHadItem>
     <div class="row">
         <div class="col-lg-12">
-            <div class="d-flex justify-content-end mb-3">
+            <!-- <div class="d-flex justify-content-end mb-3">
                 <div class="alert alert-info d-flex align-items-center gap-4 w-auto mb-0 px-1 py-2 shadow-sm"
                     role="alert" *ngIf="ukomDetail.rekomendasiUrl">
                     <div class="d-flex align-items-center">
@@ -24,7 +24,7 @@
                         Download
                     </button>
                 </div>
-            </div>
+            </div> -->
 
             <div class="card">
                 <div class="card-header align-items-center d-flex">
@@ -313,7 +313,7 @@
             </div>
 
             <!-- Dokumen Pendaftaran -->
-            <div class="card detail-jf" *ngIf="dataDokumenUkom.length > 0">
+            <div class="card" *ngIf="dataDokumenUkom.length > 0">
                 <div class="card-header">
                     <h5 class="m-0">
                         <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen Pendaftaran UKom
@@ -324,8 +324,7 @@
                 </div>
             </div>
 
-            <!-- nilai -->
-            <div class="card detail-jf" *ngIf="scoreMap | keyvalue as entries">
+            <div class="card" *ngIf="scoreMap | keyvalue as entries">
                 <ng-container *ngIf="entries.length > 0">
                     <div class="card-header" *ngIf="hasVisibleUkomDetails">
                         <h5 class="m-0">
@@ -335,7 +334,7 @@
                     </div>
 
                     <div class="list-group">
-                        <div class="list-group-item d-flex justify-content-between align-items-center"
+                        <div class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
                             *ngIf="scoreMap['CAT']?.id">
                             <div>
                                 <h5 class="m-0">CAT</h5>
@@ -361,6 +360,12 @@
                     </div>
                 </ng-container>
             </div>
+
+            <ng-container *ngIf="ukomGrade">
+                <app-ukom-grade-table [nip]="ukomDetail.nip" [nama]="ukomDetail.name" [gradeData]="ukomGrade"
+                    [rekomendasiUrl]="ukomDetail.rekomendasiUrl"
+                    (downloadFile)=" downloadRekomendasi()"></app-ukom-grade-table>
+            </ng-container>
         </div>
     </div>
 </ng-template>
@@ -390,88 +395,7 @@
                 </div>
             </div>
 
-            <!-- <div class="row">
-                <div
-                    *ngFor="let kompetensi of competencyGroup.items"
-                    class="col-md-6 mb-3"
-                >
-                    <div class="card">
-                        <div
-                            class="card-header d-flex justify-content-between align-items-center"
-                        >
-                            <h5 class="mb-0">{{ kompetensi.name }}</h5>
-                            <span
-                                class="badge"
-                                [ngClass]="{
-                                    'bg-success':
-                                        getCompetencyPercentage(kompetensi) >=
-                                        70,
-                                    'bg-warning':
-                                        getCompetencyPercentage(kompetensi) >=
-                                            50 &&
-                                        getCompetencyPercentage(kompetensi) <
-                                            70,
-                                    'bg-danger':
-                                        getCompetencyPercentage(kompetensi) < 50
-                                }"
-                            >
-                                {{ getCompetencyPercentage(kompetensi) }}%
-                            </span>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Pertanyaan</th>
-                                            <th>Jawaban</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr
-                                            *ngFor="
-                                                let question of kompetensi.questionDtoList
-                                            "
-                                            [ngClass]="{
-                                                'table-success':
-                                                    question.answerDto
-                                                        ?.answerChoice ===
-                                                    getCorrectAnswer(question),
-                                                'table-danger':
-                                                    question.answerDto
-                                                        ?.answerChoice !==
-                                                    getCorrectAnswer(question)
-                                            }"
-                                        >
-                                            <td>{{ question.question }}</td>
-                                            <td>
-                                                {{
-                                                    question.answerDto
-                                                        ?.answerChoice
-                                                }}
-                                            </td>
-                                            <td>
-                                                <span>
-                                                    {{
-                                                        question.answerDto
-                                                            ?.answerChoice ===
-                                                        getCorrectAnswer(
-                                                            question
-                                                        )
-                                                            ? 'Benar'
-                                                            : 'Salah'
-                                                    }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
+
         </div>
     </ng-container>
 </app-modal>

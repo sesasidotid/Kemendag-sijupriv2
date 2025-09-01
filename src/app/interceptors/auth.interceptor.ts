@@ -22,7 +22,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(req).pipe(
         catchError((error) => {
-            console.log('interceptor', error);
+            // console.log('interceptor', error);
 
             const currentRoute = router.url;
             const shouldIgnore = IGNORE_LOGOUT_ROUTES.some(route =>

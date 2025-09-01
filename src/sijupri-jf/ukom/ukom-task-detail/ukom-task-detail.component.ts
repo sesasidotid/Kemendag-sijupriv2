@@ -15,6 +15,7 @@ import {
     of,
     Subject,
     switchMap,
+    take,
     takeUntil,
     tap
 } from 'rxjs'
@@ -30,7 +31,9 @@ import { ExamType } from '../../../modules/ukom/models/exam-type'
 import { MakalahScore } from '../../../modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
-
+import { UkomGradeTableComponent } from '../../../modules/base/components/ukom-grade-table/ukom-grade-table.component'
+import { UkomGradeService } from '../../../modules/ukom/services/ukom-grade.service'
+import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -38,7 +41,8 @@ import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
         CommonModule,
         ModalComponent,
         FileHandlerComponent,
-        TanggalIndoPipe
+        TanggalIndoPipe,
+        UkomGradeTableComponent
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss'
@@ -80,12 +84,15 @@ export class UkomTaskDetailComponent implements OnDestroy {
     isAllSchoreLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isLoading$: Observable<boolean>
 
-    constructor (
+    ukomGrade: UkomGrade
+
+    constructor(
         private apiService: ApiService,
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private handlerService: HandlerService,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
+        private ukomGradeService: UkomGradeService
     ) {
         this.isLoading$ = combineLatest([
             this.isAllSchoreLoading$,
@@ -94,11 +101,11 @@ export class UkomTaskDetailComponent implements OnDestroy {
         ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
     }
 
-    ngOnInit () {
+    ngOnInit() {
         this.initializeComponent()
     }
 
-    getJenisUkomLabel (jenisUkom: string): string {
+    getJenisUkomLabel(jenisUkom: string): string {
         switch (jenisUkom) {
             case 'KENAIKAN_JENJANG':
                 return 'Kenaikan Jenjang'
@@ -113,12 +120,12 @@ export class UkomTaskDetailComponent implements OnDestroy {
         }
     }
 
-    ngOnDestroy () {
+    ngOnDestroy() {
         this.destroy$.next()
         this.destroy$.complete()
     }
 
-    private initializeComponent () {
+    initializeComponent() {
         this.isPredikatKerjaLoading$.next(true)
 
         this.apiService
@@ -127,7 +134,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
                 takeUntil(this.destroy$),
                 switchMap(res => {
                     this.predikatKinerjaList = res
-                    return this.activatedRoute.paramMap
+                    return this.activatedRoute.paramMap.pipe(take(1))
                 }),
                 tap(params => {
                     this.id = params.get('id')
@@ -161,7 +168,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             })
     }
 
-    getExamType (): Observable<ExamType[]> {
+    getExamType(): Observable<ExamType[]> {
         return this.apiService.getData('/api/v1/exam_type').pipe(
             takeUntil(this.destroy$),
             map((response: any[]) => response.map(item => new ExamType(item))),
@@ -180,7 +187,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         )
     }
 
-    getAllScoresFlow (): void {
+    getAllScoresFlow(): void {
         if (!this.id) {
             console.warn('getAllScoresFlow: No ID available, aborting')
             return
@@ -196,11 +203,6 @@ export class UkomTaskDetailComponent implements OnDestroy {
                         console.warn('No exam types available')
                         return of([])
                     }
-
-                    console.log(
-                        'Processing exam types:',
-                        examTypes.map(t => t.code)
-                    )
 
                     const requests = examTypes.map(type => {
                         const examCode = type.code
@@ -257,7 +259,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
                 })
             )
             .subscribe({
-                next: () => {},
+                next: () => { },
                 error: error => {
                     this.handlerService.handleAlert(
                         'Error',
@@ -267,7 +269,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             })
     }
 
-    getPendidikanList (pendidikanTerakhirCode: string) {
+    getPendidikanList(pendidikanTerakhirCode: string) {
         if (!pendidikanTerakhirCode) {
             this.pendidikanName = null
             return
@@ -293,7 +295,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             })
     }
 
-    getBidangjabatanNameByCode (bidangJabatanCode: string) {
+    getBidangjabatanNameByCode(bidangJabatanCode: string) {
         if (!bidangJabatanCode) {
             this.bidangJabatanName = null
             return
@@ -313,7 +315,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             })
     }
 
-    getProvinsiNameByCode (provinsiCode: string) {
+    getProvinsiNameByCode(provinsiCode: string) {
         if (!provinsiCode) {
             this.provinsiName = null
             return
@@ -333,7 +335,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             })
     }
 
-    getKabupatenNameByCode (kabupatenCode: string) {
+    getKabupatenNameByCode(kabupatenCode: string) {
         if (!kabupatenCode) {
             this.kabupatenName = null
             this.typeKabKota = null
@@ -356,7 +358,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             })
     }
 
-    downloadRekomendasi (): void {
+    downloadRekomendasi(): void {
         const url = this.ukomDetail.rekomendasiUrl
 
         if (!url) {
@@ -398,7 +400,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         }
     }
 
-    calculateAge (
+    calculateAge(
         tanggalLahir: string | Date,
         tglSuratUsulan: string | Date
     ): string {
@@ -435,7 +437,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    getPredikatKinerja (code: string | null): string {
+    getPredikatKinerja(code: string | null): string {
         if (!code || code == null) return '-'
 
         const predikat = this.predikatKinerjaList.find(
@@ -444,7 +446,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         return predikat ? predikat.name : '-'
     }
 
-    transformInstansiName (value: string): string {
+    transformInstansiName(value: string): string {
         if (!value) return null
 
         return value
@@ -453,7 +455,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             .replace(/\b\w/g, char => char.toUpperCase()) // Kapitalisasi setiap kata
     }
 
-    mapDokumenUkom () {
+    mapDokumenUkom() {
         // Clear existing files first
         this.fileHandlerData.files = {}
 
@@ -469,7 +471,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         console.log('Mapped dokumen ukom:', this.fileHandlerData.files)
     }
 
-    getDokumenUkomList () {
+    getDokumenUkomList() {
         if (!this.id) {
             console.warn('getDokumenUkomList: No ID available')
             return
@@ -492,15 +494,15 @@ export class UkomTaskDetailComponent implements OnDestroy {
             })
     }
 
-    toggleModal () {
+    toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    backToList () {
+    backToList() {
         this.router.navigate(['/ukom/ukom-list'])
     }
 
-    getGroupedCompetencies (): any[] {
+    getGroupedCompetencies(): any[] {
         if (!this.scoreMap['CAT']?.kompetensiIndikatorDtoList) {
             return []
         }
@@ -537,7 +539,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         }))
     }
 
-    getCorrectAnswer (question: any): string {
+    getCorrectAnswer(question: any): string {
         if (!question?.multipleChoiceDtoList) {
             return ''
         }
@@ -548,7 +550,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         return correctChoice ? correctChoice.choiceId : ''
     }
 
-    getCompetencyPercentage (kompetensi: any): number {
+    getCompetencyPercentage(kompetensi: any): number {
         if (
             !kompetensi.questionDtoList ||
             kompetensi.questionDtoList.length === 0
@@ -562,7 +564,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         return Math.round((correctAnswers / totalQuestions) * 100)
     }
 
-    getCorrectAnswersCount (kompetensi: any): number {
+    getCorrectAnswersCount(kompetensi: any): number {
         if (!kompetensi.questionDtoList) {
             return 0
         }
@@ -574,7 +576,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         ).length
     }
 
-    getWrongAnswersCount (kompetensi: any): number {
+    getWrongAnswersCount(kompetensi: any): number {
         if (!kompetensi.questionDtoList) {
             return 0
         }
@@ -585,7 +587,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         )
     }
 
-    getUnitKerjaById (unit_kerja_id: string) {
+    getUnitKerjaById(unit_kerja_id: string) {
         if (!unit_kerja_id) {
             this.unitKerjaName = null
             return
@@ -605,7 +607,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             })
     }
 
-    get hasVisibleUkomDetails (): boolean {
+    get hasVisibleUkomDetails(): boolean {
         if (!this.scoreMap) {
             return false
         }
@@ -616,7 +618,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         return !!(hasCatScore || hasMakalahFile)
     }
 
-    viewFile () {
+    viewFile() {
         const answerDto =
             this.scoreMap['MAKALAH']?.questionDtoList?.[0]?.answerDto
 
@@ -636,7 +638,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         )
     }
 
-    getParticipantUkomDetail () {
+    getParticipantUkomDetail() {
         if (!this.id) {
             console.warn('getParticipantUkomDetail: No ID available')
             return
@@ -648,13 +650,19 @@ export class UkomTaskDetailComponent implements OnDestroy {
             .getData(`/api/v1/participant_ukom/${this.id}`)
             .pipe(
                 takeUntil(this.destroy$),
+                tap(() => {
+                    this.ukomGradeService.findGradeParticipantJF(this.id).subscribe({
+                        next: response => {
+                            this.ukomGrade = new UkomGrade(response)
+                        }
+                    })
+                }),
                 finalize(() => {
                     this.ukomDetailLoading$.next(false)
                 })
             )
             .subscribe({
                 next: response => {
-                    console.log('Participant ukom detail loaded:', response)
                     this.ukomDetail = response
 
                     if (!response.unitKerjaName && response.unitKerjaId) {
