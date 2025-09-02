@@ -18,6 +18,8 @@ import { ApiService } from '../../../modules/base/services/api.service'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { CommonModule } from '@angular/common'
 import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
+import { UkomGradeUploadBatchComponent } from './ukom-grade-upload-batch/ukom-grade-upload-batch.component'
+
 @Component({
     selector: 'app-ukom-grade-list',
     standalone: true,
@@ -25,7 +27,8 @@ import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
         PagableComponent,
         ModalComponent,
         FileHandlerComponent,
-        CommonModule
+        CommonModule,
+        UkomGradeUploadBatchComponent
     ],
     templateUrl: './ukom-grade-list.component.html',
     styleUrl: './ukom-grade-list.component.scss'
@@ -59,12 +62,14 @@ export class UkomGradeListComponent {
         }
     }
 
+    isModalUploadBatchOpen$ = new BehaviorSubject<boolean>(false)
+
     constructor(
         private router: Router,
         private tabService: TabService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private apiService: ApiService
+        private apiService: ApiService,
     ) { }
 
     ngOnInit() {
@@ -318,7 +323,6 @@ export class UkomGradeListComponent {
         return num.toFixed(2);
     }
 
-
     onDelete(id: string) {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
@@ -380,5 +384,17 @@ export class UkomGradeListComponent {
                     })
             }
         })
+    }
+
+    handleOpenBatchUploadModal() {
+        this.isModalUploadBatchOpen$.next(true)
+    }
+
+    handleCloseBatchUploadModal() {
+        this.isModalUploadBatchOpen$.next(false)
+    }
+
+    refreshPagable() {
+        this.refresh = !this.refresh
     }
 }

@@ -1,3 +1,9 @@
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-primary" (click)="handleOpenBatchUploadModal()">
+        Upload Batch Surat Rekomendasi
+    </button>
+</div>
+
 <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 
 <app-modal *ngIf="isModalOpen$ | async" [title]="'Upload Rekomendasi Hasil UKom'" (toggle)="toggleModal()"
@@ -17,3 +23,9 @@
         </button>
     </ng-template>
 </app-modal>
+
+
+<app-modal *ngIf="isModalUploadBatchOpen$ | async" [title]="'Upload Batch Rekomendasi Hasil UKom'"
+    (toggle)="handleCloseBatchUploadModal()" [enableFooter]="false">
+    <app-ukom-grade-upload-batch
+        (uploadSuccess)="handleCloseBatchUploadModal(); refreshPagable()"></app-ukom-grade-upload-batch></app-modal>

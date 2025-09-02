@@ -24,20 +24,20 @@ export class FileHandlerComponent {
     isSmallScreen = false
     private resizeObserver!: ResizeObserver
 
-    constructor (
+    constructor(
         private filePreviewService: FilePreviewService,
         private fileConverterService: FileConverterService,
         private handlerService: HandlerService
-    ) {}
+    ) { }
 
-    getAllowedTypes (): string {
+    getAllowedTypes(): string {
         return (
             this.inputs.allowedTypes?.map(t => t.label ?? t.type).join(', ') ||
             ''
         )
     }
 
-    ngOnInit () {
+    ngOnInit() {
         for (const key in this.inputs.files) {
             if (
                 this.inputs.files[key].fileName &&
@@ -65,11 +65,11 @@ export class FileHandlerComponent {
         }
     }
 
-    ngAfterViewInit () {
+    ngAfterViewInit() {
         this.observeContainerResize()
     }
 
-    observeContainerResize () {
+    observeContainerResize() {
         this.resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 const width = entry.contentRect.width
@@ -82,13 +82,13 @@ export class FileHandlerComponent {
         }
     }
 
-    ngOnDestroy () {
+    ngOnDestroy() {
         if (this.resizeObserver && this.containerRef) {
             this.resizeObserver.unobserve(this.containerRef.nativeElement)
         }
     }
 
-    clearFileName (key?: string) {
+    clearFileName(key?: string) {
         console.log('Clearing file name for key:', key)
         if (key) {
             delete this.fileNames[key]
@@ -103,12 +103,13 @@ export class FileHandlerComponent {
         }
     }
 
-    handleFileUpload (event: any, key: any) {
+    handleFileUpload(event: any, key: any) {
         const file = event.target.files[0]
 
         if (file) {
             const allowedTypes =
                 this.inputs.allowedTypes?.map(t => t.type) || []
+            console.log(allowedTypes)
             const allowedLabels =
                 this.inputs.allowedTypes?.map(t => t.label ?? t.type) || []
 
@@ -125,8 +126,7 @@ export class FileHandlerComponent {
             if (this.inputs.maxSize && file.size > this.inputs.maxSize) {
                 this.handlerService.handleAlert(
                     'Error',
-                    `Ukuran file melebihi batas ${
-                        this.inputs.maxSize / (1024 * 1024)
+                    `Ukuran file melebihi batas ${this.inputs.maxSize / (1024 * 1024)
                     } MB`
                 )
                 return
@@ -148,12 +148,12 @@ export class FileHandlerComponent {
         }
     }
 
-    isImage (source: string): boolean {
+    isImage(source: string): boolean {
         if (!source) return false
         return source.startsWith('data:image/')
     }
 
-    previewFile (fileName: string, fileSource: string) {
+    previewFile(fileName: string, fileSource: string) {
         this.filePreviewService.open(fileName, fileSource)
     }
 }

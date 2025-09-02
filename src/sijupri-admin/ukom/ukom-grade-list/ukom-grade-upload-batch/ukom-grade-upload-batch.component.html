@@ -1,0 +1,5 @@
+<app-file-handler [inputs]="input"></app-file-handler>
+<div class="d-flex justify-content-end">
+    <app-loading-button [isLoading]="isLoading" [disabled]="isLoading || !file" [label]="'Upload File'"
+        (clicked)="uploadRecomendationBatch()"></app-loading-button>
+</div>
