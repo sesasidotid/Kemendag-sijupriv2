@@ -30,6 +30,7 @@ export class UkomGradeUploadBatchComponent {
             compressed_file: { label: "File Batch Rekomendasi Hasil UKom" }
         },
         allowedTypes: [{ type: 'application/x-rar-compressed', label: 'rar' }, { type: 'application/vnd.rar' }, { type: 'application/x-rar' }, { type: 'application/x-compressed' }],
+        allowedExtensions: ['.rar'],
         listen: this.listenFileChange
     }
 

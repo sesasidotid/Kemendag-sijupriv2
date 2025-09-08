@@ -3,7 +3,7 @@ export class FIleHandler {
     viewOnly?: boolean = false
     listen?: Function
     allowedTypes?: { type: string; label?: string }[]
-    allowedExtensions?: string[] // file extensions, e.g. ['rar', 'pdf', 'xlsx']
+    allowedExtensions?: string[] 
     maxSize?: number // Optional max file size in bytes
     errors?: { [key: string]: string } = {} // Store errors for each file key
 }
