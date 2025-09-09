@@ -5,153 +5,159 @@ import { LoginContext } from '../commons/login-context'
 import { environment } from '../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ApiService {
     private baseUrl: string = environment.apiBaseUrl;
 
-  constructor (private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
 
-  public auth (
-    path: string,
-    data: any,
-    customHeader: any = null
-  ): Observable<any> {
-    const headers = this.createHeader(
-      customHeader || {
-        'Content-Type': 'application/json'
-      }
-    )
+    public auth(
+        path: string,
+        data: any,
+        customHeader: any = null
+    ): Observable<any> {
+        const headers = this.createHeader(
+            customHeader || {
+                'Content-Type': 'application/json'
+            }
+        )
 
-    return this.http.post(`${this.baseUrl}${path}`, data, { headers })
-  }
+        return this.http.post(`${this.baseUrl}${path}`, data, { headers })
+    }
 
-  public getDownload (
-    path: string,
-    expectedFileName: string = 'downloaded',
-    customHeader: any = null
-  ): Observable<void> {
-    const headers = this.createHeader(
-      customHeader || {
-        Authorization: `Bearer ${LoginContext.getAccessToken()}`,
-        Accept: 'application/octet-stream'
-      }
-    )
+    public getDownload(
+        path: string,
+        expectedFileName: string = 'downloaded',
+        customHeader: any = null
+    ): Observable<void> {
+        const headers = this.createHeader(
+            customHeader || {
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`,
+                Accept: 'application/octet-stream',
+                Pragma: 'no-cache',
+                Expires: '0'
+            }
+        )
 
-    return this.http
-      .get(`${this.baseUrl}${path}`, {
-        headers,
-        responseType: 'blob'
-      })
-      .pipe(
-        map((blob: Blob) => {
-          const url = window.URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = expectedFileName
-          a.click()
-          window.URL.revokeObjectURL(url)
+        const separator = path.includes('?') ? '&' : '?'
+        const cacheBustedPath = `${path}${separator}_ts=${Date.now()}`
+
+
+        return this.http
+            .get(`${this.baseUrl}${cacheBustedPath}`, {
+                headers,
+                responseType: 'blob'
+            })
+            .pipe(
+                map((blob: Blob) => {
+                    const url = window.URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = expectedFileName
+                    a.click()
+                    window.URL.revokeObjectURL(url)
+                })
+            )
+    }
+
+    public postDownload(
+        path: string,
+        data: any,
+        expectedFileName: string = 'downloaded',
+        customHeader: any = null
+    ): Observable<void> {
+        const headers = this.createHeader(
+            customHeader || {
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`,
+                Accept: 'application/octet-stream'
+            }
+        )
+
+        return this.http
+            .post(`${this.baseUrl}${path}`, data, {
+                headers,
+                responseType: 'blob'
+            })
+            .pipe(
+                map((blob: Blob) => {
+                    const url = window.URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = expectedFileName
+                    a.click()
+                    window.URL.revokeObjectURL(url)
+                })
+            )
+    }
+
+    public getData(
+        path: string,
+        customHeader: any = null,
+        responseType?: string
+    ): Observable<any> {
+        const headers = this.createHeader(
+            customHeader || {
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`
+            }
+        )
+
+        return this.http.get(`${this.baseUrl}${path}`, { headers })
+    }
+
+    public postData(
+        path: string,
+        data: any,
+        customHeader: any = null
+    ): Observable<any> {
+        const headers = this.createHeader(
+            customHeader || {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`
+            }
+        )
+
+        return this.http.post(`${this.baseUrl}${path}`, data, { headers })
+    }
+
+    public putData(
+        path: string,
+        data: any,
+        customHeader: any = null
+    ): Observable<any> {
+        const headers = this.createHeader(
+            customHeader || {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`
+            }
+        )
+
+        return this.http.put(`${this.baseUrl}${path}`, data, { headers })
+    }
+
+    public deleteData(path: string, customHeader: any = null): Observable<any> {
+        const headers = this.createHeader(
+            customHeader || {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`
+            }
+        )
+
+        return this.http.delete(`${this.baseUrl}${path}`, { headers })
+    }
+
+    private createHeader(headerObject: any): HttpHeaders {
+        return new HttpHeaders(headerObject)
+    }
+
+    public getPhotoProfile(userId: string): Observable<Blob> {
+        const headers = this.createHeader({
+            Authorization: `Bearer ${LoginContext.getAccessToken()}`
         })
-      )
-  }
 
-  public postDownload (
-    path: string,
-    data: any,
-    expectedFileName: string = 'downloaded',
-    customHeader: any = null
-  ): Observable<void> {
-    const headers = this.createHeader(
-      customHeader || {
-        Authorization: `Bearer ${LoginContext.getAccessToken()}`,
-        Accept: 'application/octet-stream'
-      }
-    )
-
-    return this.http
-      .post(`${this.baseUrl}${path}`, data, {
-        headers,
-        responseType: 'blob'
-      })
-      .pipe(
-        map((blob: Blob) => {
-          const url = window.URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = expectedFileName
-          a.click()
-          window.URL.revokeObjectURL(url)
+        return this.http.get(`${this.baseUrl}/api/v1/profile_img/${userId}`, {
+            headers,
+            responseType: 'blob'
         })
-      )
-  }
-
-  public getData (
-    path: string,
-    customHeader: any = null,
-    responseType?: string
-  ): Observable<any> {
-    const headers = this.createHeader(
-      customHeader || {
-        Authorization: `Bearer ${LoginContext.getAccessToken()}`
-      }
-    )
-
-    return this.http.get(`${this.baseUrl}${path}`, { headers })
-  }
-
-  public postData (
-    path: string,
-    data: any,
-    customHeader: any = null
-  ): Observable<any> {
-    const headers = this.createHeader(
-      customHeader || {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${LoginContext.getAccessToken()}`
-      }
-    )
-
-    return this.http.post(`${this.baseUrl}${path}`, data, { headers })
-  }
-
-  public putData (
-    path: string,
-    data: any,
-    customHeader: any = null
-  ): Observable<any> {
-    const headers = this.createHeader(
-      customHeader || {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${LoginContext.getAccessToken()}`
-      }
-    )
-
-    return this.http.put(`${this.baseUrl}${path}`, data, { headers })
-  }
-
-  public deleteData (path: string, customHeader: any = null): Observable<any> {
-    const headers = this.createHeader(
-      customHeader || {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${LoginContext.getAccessToken()}`
-      }
-    )
-
-    return this.http.delete(`${this.baseUrl}${path}`, { headers })
-  }
-
-  private createHeader (headerObject: any): HttpHeaders {
-    return new HttpHeaders(headerObject)
-  }
-
-  public getPhotoProfile (userId: string): Observable<Blob> {
-    const headers = this.createHeader({
-      Authorization: `Bearer ${LoginContext.getAccessToken()}`
-    })
-
-    return this.http.get(`${this.baseUrl}/api/v1/profile_img/${userId}`, {
-      headers,
-      responseType: 'blob'
-    })
-  }
+    }
 }

@@ -350,7 +350,6 @@ export class FileHandlerComponent {
                 this.fileNames[key] = file.name
                 this.inputs.listen(key, source, base64Data, label, id)
             }
-            console.log('File upload successful:', file.name, 'Extension allowed:', isExtensionAllowed, 'MIME type allowed:', isMimeTypeAllowed)
 
             reader.readAsDataURL(file)
         }
