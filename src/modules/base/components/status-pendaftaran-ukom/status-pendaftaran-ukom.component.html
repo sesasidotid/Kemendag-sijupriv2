@@ -707,7 +707,7 @@
             </ng-container>
         </div>
 
-        <ng-container *ngIf="ukomGrade">
+        <ng-container *ngIf="ukomGrade.id">
             <app-ukom-grade-table [nip]="finishTask.nip" [nama]="finishTask.name" [gradeData]="ukomGrade"
                 [rekomendasiUrl]="finishTask.rekomendasiUrl"
                 (downloadFile)=" downloadRekomendasi()"></app-ukom-grade-table>

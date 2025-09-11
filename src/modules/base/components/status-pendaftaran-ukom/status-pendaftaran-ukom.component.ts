@@ -419,7 +419,7 @@ export class StatusPendaftaranUkomComponent {
     getExamType(): Observable<ExamType[]> {
         return this.apiService.getData('/api/v1/exam_type').pipe(
             takeUntil(this.destroy$),
-            map((response: any[]) => response.map(item => new ExamType(item))),
+        map((response: any[]) => response.map(item => new ExamType(item))),
             tap(examTypes => {
                 this.examType = examTypes
             }),
