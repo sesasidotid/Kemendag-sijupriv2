@@ -8,14 +8,12 @@ import { CommonModule } from '@angular/common'
 import { UkomTaskFormComponent } from '../ukom-task-form/ukom-task-form.component'
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { PesertaUkom } from '../../../modules/ukom/models/peserta-ukom.model'
-import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
 import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.modal'
 import { ConverterService } from '../../../modules/base/services/converter.service'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
-import { RekapButtonComponent } from '../../../modules/base/components/rekap-table/rekap-button.component'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { UkomRevisionComponent } from '../ukom-revision/ukom-revision.component'
 import { DomSanitizer } from '@angular/platform-browser'
@@ -26,7 +24,7 @@ export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
     PROMOSI = 'Promosi',
-    PROMOSI_JF = 'Promosi Jabatan Fungsional'
+    PROMOSI_JF = 'Promosi Jabatan Fungsional',
 }
 
 @Component({
@@ -38,14 +36,12 @@ export enum JenisUkomEnum {
         EmptyStateComponent,
         ModalComponent,
         UkomRevisionComponent,
-        TanggalIndoPipe
+        TanggalIndoPipe,
     ],
     templateUrl: './ukom-task.component.html',
-    styleUrl: './ukom-task.component.scss'
+    styleUrl: './ukom-task.component.scss',
 })
 export class UkomTaskComponent {
-    //   pendingTask: PendingTask
-
     pendingTask: UkomTaskDetail = new UkomTaskDetail()
     pesertaUkom: PesertaUkom
     jf: JF = new JF()
@@ -63,7 +59,7 @@ export class UkomTaskComponent {
 
     canRegister: boolean = true
     registerOpened$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-        false
+        false,
     )
     predikatKinerjaList: any[] = []
 
@@ -83,51 +79,50 @@ export class UkomTaskComponent {
             key: string,
             source: string,
             base64Data: string,
-            label: string
+            label: string,
         ) => {
             this.detectedDokumen[key] = {
                 base64: base64Data,
-                label: label
+                label: label,
             }
-        }
+        },
     }
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private confirmationService: ConfirmationService,
         private ukomTaskService: UkomTaskService,
         private converterService: ConverterService,
-        private sanitizer: DomSanitizer
+        private sanitizer: DomSanitizer,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.checkStatusRegister()
         this.loadPredikatKinerja()
     }
 
-    loadPredikatKinerja () {
+    loadPredikatKinerja() {
         console.log('loadPredikatKinerja')
         this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
-            next: res => {
+            next: (res) => {
                 this.predikatKinerjaList = res
                 console.log('predikat kinerja:', this.predikatKinerjaList)
                 this.getPendingTask()
                 this.getJF()
                 this.getJFRegisterStatus()
             },
-            error: err => {
+            error: (err) => {
                 console.error('Failed to fetch predikat kinerja:', err)
                 this.getPendingTask()
                 this.getJF()
                 this.getJFRegisterStatus()
-            }
+            },
         })
     }
 
-    calculateAge (
+    calculateAge(
         tanggalLahir: string | Date,
-        tglSuratUsulan: string | Date
+        tglSuratUsulan: string | Date,
     ): string {
         console.log('calculateAge', tanggalLahir, tglSuratUsulan)
 
@@ -155,7 +150,7 @@ export class UkomTaskComponent {
             const lastMonth = new Date(
                 suratDate.getFullYear(),
                 suratDate.getMonth(),
-                0
+                0,
             )
             ageDays += lastMonth.getDate()
             ageMonths--
@@ -164,19 +159,19 @@ export class UkomTaskComponent {
         return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    getJenisUkomLabel (jenisUkom: string): string {
+    getJenisUkomLabel(jenisUkom: string): string {
         return JenisUkomEnum[jenisUkom as keyof typeof JenisUkomEnum] || '-'
     }
 
-    checkStatusRegister () {
+    checkStatusRegister() {
         this.apiService.getData(`/api/v1/sys_conf/UKM_REGISTRATION`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.registerOpened$.next(response.value == 'ya')
-            }
+            },
         })
     }
 
-    isAnyFieldEmpty (): boolean {
+    isAnyFieldEmpty(): boolean {
         return (
             !this.jf?.name ||
             !this.jf?.phone ||
@@ -191,9 +186,9 @@ export class UkomTaskComponent {
         )
     }
 
-    fetchPhotoProfile () {
+    fetchPhotoProfile() {
         this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
-            next: blob => {
+            next: (blob) => {
                 if (blob.size === 0) {
                     this.profileImageSrc = 'assets/no-profile.jpg'
                     return
@@ -202,87 +197,87 @@ export class UkomTaskComponent {
                 this.profileImageSrc =
                     this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching profile image', err)
                 this.profileImageSrc = 'assets/no-profile.jpg'
-            }
+            },
         })
     }
 
-    getJFRegisterStatus () {
+    getJFRegisterStatus() {
         this.apiService
             .getData(
-                `/api/v1/participant_ukom/latest/${LoginContext.getUserId()}`
+                `/api/v1/participant_ukom/latest/${LoginContext.getUserId()}`,
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     if (response.id) {
                         this.canRegister = false
                     }
                 },
-                error: error => {
+                error: (error) => {
                     if (error.error.code == 'RCD-00001') {
                         this.canRegister = true
                         return
                     }
-                }
+                },
             })
     }
 
-    getPendidikanList (pendidikanTerakhirCode: string) {
+    getPendidikanList(pendidikanTerakhirCode: string) {
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
-            next: response => {
+            next: (response) => {
                 const matchedPendidikan = response.find(
                     (pendidikan: any) =>
-                        pendidikan.code === pendidikanTerakhirCode
+                        pendidikan.code === pendidikanTerakhirCode,
                 )
                 this.pendidikanName = matchedPendidikan
                     ? matchedPendidikan.name
                     : null
-            }
+            },
         })
     }
 
-    getProvinsiNameByCode (provinsiCode: string) {
+    getProvinsiNameByCode(provinsiCode: string) {
         this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.provinsiName = response.name ?? null
-            }
+            },
         })
     }
 
-    getKabupatenNameByCode (kabupatenCode: string) {
+    getKabupatenNameByCode(kabupatenCode: string) {
         this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.kabupatenName = response.name ?? null
                 this.typeKabKota = response.type ?? null
-            }
+            },
         })
     }
 
-    getPredikatKinerja (code: string | null): string {
+    getPredikatKinerja(code: string | null): string {
         console.log('getPredikatKinerja', code)
         if (!code || code == null) return '-'
         const predikat = this.predikatKinerjaList.find(
-            predikat => predikat.id === code
+            (predikat) => predikat.id === code,
         )
         return predikat ? predikat.name : '-'
     }
 
-    getBidangjabatanNameByCode (bidangJabatanCode: string) {
+    getBidangjabatanNameByCode(bidangJabatanCode: string) {
         this.apiService
             .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.bidangJabatanName = response.name ?? null
-                }
+                },
             })
     }
 
-    getPendingTask () {
+    getPendingTask() {
         this.ukomDataLoading$.next(true)
         this.ukomTaskService.findByNip(LoginContext.getUserId()).subscribe({
-            next: response => {
+            next: (response) => {
                 this.pendingTask = response
                 console.log('p', response)
 
@@ -300,10 +295,10 @@ export class UkomTaskComponent {
                 }
 
                 this.predikat1Name = this.getPredikatKinerja(
-                    response.predikatKinerja1Id
+                    response.predikatKinerja1Id,
                 )
                 this.predikat2Name = this.getPredikatKinerja(
-                    response.predikatKinerja2Id
+                    response.predikatKinerja2Id,
                 )
 
                 switch (this.pendingTask.flowId) {
@@ -322,86 +317,66 @@ export class UkomTaskComponent {
                 if (this.pendingTask.pendingTaskHistory.length > 0) {
                     this.groupedUkomPendingTaskHistory =
                         this.groupAndSortTasksByFlowId(
-                            this.pendingTask.pendingTaskHistory
+                            this.pendingTask.pendingTaskHistory,
                         )
                     console.log(
                         'groupedUkomPendingTaskHistory',
-                        this.groupedUkomPendingTaskHistory
+                        this.groupedUkomPendingTaskHistory,
                     )
                 }
 
                 this.ukomDataLoading$.next(false)
-
-                // this.detectedDokumen = {}
-                // const dokumenPersyaratanListTemp: any = []
-                // let count = 1
-                // this.pesertaUkom.pendingTaskHistory.forEach(dokumenPersyaratan => {
-                //   if (dokumenPersyaratan.status == 'REJECT') {
-                //     this.inputs.files['dokumenPersyaratan_' + count] = {
-                //       label: dokumenPersyaratan.dokumenName,
-                //       source: dokumenPersyaratan.dokumenUrl
-                //     }
-                //     count = count + 1
-                //   } else {
-                //     dokumenPersyaratanListTemp.push(dokumenPersyaratan)
-                //   }
-                // })
-
-                //   this.pesertaUkom.pendingTaskHistory = dokumenPersyaratanListTemp
             },
-            error: error => {
+            error: (error) => {
                 this.ukomDataLoading$.next(false)
-                //   this.handlerService.handleException(error)
                 this.getJF()
-                //   this.getLatestUkom()
-            }
+            },
         })
     }
 
-    getJF () {
+    getJF() {
         this.apiService
             .getData(`/api/v1/jf/${LoginContext.getUserId()}`)
             .subscribe({
-                next: response => (this.jf = new JF(response)),
-                error: error => {
+                next: (response) => (this.jf = new JF(response)),
+                error: (error) => {
                     this.handlerService.handleException(error)
-                }
+                },
             })
     }
 
-    getLatestUkom () {
+    getLatestUkom() {
         this.apiService
             .getData(
-                `/api/v1/participant_ukom/task/nip/${LoginContext.getUserId()}`
+                `/api/v1/participant_ukom/task/nip/${LoginContext.getUserId()}`,
             )
             .subscribe({
-                next: response => (this.ukom = new Ukom(response)),
-                error: error => console.log('error', error)
-                // this.handlerService.handleException(Error)
+                next: (response) => (this.ukom = new Ukom(response)),
+                error: (error) => console.log('error', error),
             })
     }
 
-    handleStepClick (clickedStep: number) {
-        this.currentUkomStep$.subscribe(step => {
+    handleStepClick(clickedStep: number) {
+        this.currentUkomStep$.subscribe((step) => {
             if (clickedStep <= step) {
                 this.ukomStep$.next(clickedStep)
             }
         })
     }
 
-    groupAndSortTasksByFlowId (tasks: any[]): { [key: string]: any[] } {
-        const grouped = tasks.reduce((acc, task) => {
-            // Initialize array for each flowId if it doesn't exist
-            if (!acc[task.flowId]) {
-                acc[task.flowId] = []
-            }
-            // Push each task into its respective flowId group
-            acc[task.flowId].push(task)
-            return acc
-        }, {} as { [key: string]: any[] })
+    groupAndSortTasksByFlowId(tasks: any[]): { [key: string]: any[] } {
+        const grouped = tasks.reduce(
+            (acc, task) => {
+                if (!acc[task.flowId]) {
+                    acc[task.flowId] = []
+                }
+                acc[task.flowId].push(task)
+                return acc
+            },
+            {} as { [key: string]: any[] },
+        )
 
-        // Sort each group by lastUpdated in descending order
-        Object.keys(grouped).forEach(flowId => {
+        Object.keys(grouped).forEach((flowId) => {
             grouped[flowId].sort((a: any, b: any) => {
                 const dateA = new Date(a.lastUpdated).getTime()
                 const dateB = new Date(b.lastUpdated).getTime()
@@ -412,42 +387,19 @@ export class UkomTaskComponent {
         return grouped
     }
 
-    reqChange () {
+    reqChange() {
         this.wannaRequest = !this.wannaRequest
     }
 
-    convertDate (date: string) {
+    convertDate(date: string) {
         return this.converterService.dateToHumanReadable(date)
     }
 
-    toggleModal () {
+    toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
-    submit () {
-        // for (const key in this.detectedDokumen) {
-        //   this.pesertaUkom.pendingTaskHistory.push({
-        //     file: this.detectedDokumen[key].base64,
-        //     dokumenName: this.detectedDokumen[key].label
-        //   })
-        // }
-        // this.confirmationService.open(false).subscribe({
-        //   next: result => {
-        //     if (!result.confirmed) return
-        //     const task = new Task()
-        //     task.id = this.pendingTask.id
-        //     task.taskAction = 'approve'
-        //     task.object = this.pesertaUkom
-        //     this.apiService
-        //       .postData(`/api/v1/peserta_ukom/task/submit`, task)
-        //       .subscribe({
-        //         next: () => {},
-        //         error: error => this.handlerService.handleException(error)
-        //       })
-        //   }
-        // })
-    }
 
-    ngOnDestroy () {
+    ngOnDestroy() {
         this.ukomDataLoading$.unsubscribe()
         this.ukomStep$.unsubscribe()
         this.currentUkomStep$.unsubscribe()

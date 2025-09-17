@@ -1,26 +1,23 @@
 import { Component, Input } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { RWKompetensi } from '../../../../modules/siap/models/rw-kompetensi.model'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
+    PrimaryColumnBuilder,
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { RWKompetensi } from '@/modules/siap/models/rw-kompetensi.model'
 import { CommonModule } from '@angular/common'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { BehaviorSubject } from 'rxjs'
-
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { BehaviorSubject, finalize } from 'rxjs'
+import { RwKompetensiService } from '@/modules/siap/services/rw-kompetensi.service'
 @Component({
     selector: 'app-rw-kompetensi-list',
     standalone: true,
     imports: [CommonModule, FileHandlerComponent, PagableComponent],
     templateUrl: './rw-kompetensi-list.component.html',
-    styleUrl: './rw-kompetensi-list.component.scss'
+    styleUrl: './rw-kompetensi-list.component.scss',
 })
 export class RwKompetensiListComponent {
     @Input() nip?: string = ''
@@ -28,14 +25,11 @@ export class RwKompetensiListComponent {
 
     pagable: Pagable
     isDetailOpen: boolean = false
-    rwKompetensi: RWKompetensi = new RWKompetensi()
+    rwKompetensi: RWKompetensi
 
     loading$ = new BehaviorSubject<boolean>(true)
 
-    constructor(
-        private apiService: ApiService,
-        private alertService: AlertService
-    ) { }
+    constructor(private rwKompetensiService: RwKompetensiService) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -49,13 +43,16 @@ export class RwKompetensiListComponent {
 
         this.pagable = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tgl Mulai', 'dateStart').build()
+                new PrimaryColumnBuilder('Tgl Mulai', 'tglSertifikat').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build()
+                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tgl Sertifikat', 'tglSertifikat').build()
+                new PrimaryColumnBuilder(
+                    'Tgl Sertifikat',
+                    'tglSertifikat',
+                ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -64,30 +61,30 @@ export class RwKompetensiListComponent {
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('tglSertifikat')
                     .withField('Tgl Sertifikat', 'text')
-                    .build()
+                    .build(),
             )
             .build()
     }
 
     getRWKompetensi(id: string) {
         this.loading$.next(true)
-        this.apiService.getData(`/api/v1/rw_kompetensi/${id}`).subscribe({
-            next: response => {
-                this.rwKompetensi = new RWKompetensi(response)
-                this.loading$.next(false)
-            },
-            error: error => {
-                console.log('error', error)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data riwayat')
-                this.loading$.next(false)
-            }
-        })
+
+        this.rwKompetensiService
+            .findById(id)
+            .pipe(
+                finalize(() => {
+                    this.loading$.next(false)
+                }),
+            )
+            .subscribe((res) => {
+                this.rwKompetensi = res
+            })
     }
 
     back() {
