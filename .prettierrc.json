@@ -1,9 +1,8 @@
 {
-  "plugins": [
-    "prettier-plugin-tailwindcss"
-  ],
-  "printWidth": 80,
-  "tabWidth": 8,
-  "semi": false
+    "plugins": [
+        "prettier-plugin-tailwindcss"
+    ],
+    "printWidth": 80,
+    "tabWidth": 4,
+    "semi": false
 }
-

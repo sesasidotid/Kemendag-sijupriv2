@@ -19,4 +19,4 @@ export const environment = {
     recaptcha: {
         siteKey: '6LfF3NUqAAAAAJrrXEvzsZi5vaa1oU6xFXvOj-uI',
     },
-};
+}
