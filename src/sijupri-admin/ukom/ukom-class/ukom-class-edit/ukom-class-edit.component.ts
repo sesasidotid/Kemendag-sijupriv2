@@ -6,7 +6,7 @@ import { RoomUkomDetail } from '../../../../modules/ukom/models/room-ukom-detail
     standalone: true,
     imports: [],
     templateUrl: './ukom-class-edit.component.html',
-    styleUrl: './ukom-class-edit.component.scss'
+    styleUrl: './ukom-class-edit.component.scss',
 })
 export class UkomClassEditComponent {
     @Input() RoomUkom: RoomUkomDetail

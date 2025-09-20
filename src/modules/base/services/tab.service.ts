@@ -9,43 +9,48 @@ export interface Tab {
 }
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class TabService {
     private tabsSubject = new BehaviorSubject<Tab[]>([])
     tabs$ = this.tabsSubject.asObservable()
 
-    // addTab (tab: Tab): TabService {
-    //     setTimeout(() => {
-    //         const currentTabs = this.tabsSubject.getValue()
-    //         this.tabsSubject.next([...currentTabs, tab])
-    //     }, 0)
-    //     return this
-    // }
+    private activeTabSubject = new BehaviorSubject<number>(0)
+    activeTab$ = this.activeTabSubject.asObservable()
 
-    addTab (tab: Tab): TabService {
+    addTab(tab: Tab): TabService {
         const currentTabs = this.tabsSubject.getValue()
         this.tabsSubject.next([...currentTabs, tab])
         return this
     }
 
-    clearTabs (): void {
+    clearTabs(): void {
         this.tabsSubject.next([])
+        this.activeTabSubject.next(0)
     }
 
-    getTabsLength (): number {
+    getTabsLength(): number {
         return this.tabsSubject.getValue().length
     }
 
-    changeTabActive (tab: number) {
-        const currentTabs = this.tabsSubject.value
-        const updatedTabs = currentTabs.map((item, index) => {
-            if (index === tab) {
-                return { ...item, isActive: true }
-            }
-            return { ...item, isActive: false }
-        })
+    // changeTabActive(tab: number) {
+    //     const currentTabs = this.tabsSubject.value
+    //     const updatedTabs = currentTabs.map((item, index) => {
+    //         if (index === tab) {
+    //             return { ...item, isActive: true }
+    //         }
+    //         return { ...item, isActive: false }
+    //     })
 
+    //     this.tabsSubject.next(updatedTabs)
+    // }
+    changeTabActive(tabIndex: number) {
+        const currentTabs = this.tabsSubject.value
+        const updatedTabs = currentTabs.map((item, index) => ({
+            ...item,
+            isActive: index === tabIndex,
+        }))
         this.tabsSubject.next(updatedTabs)
+        this.activeTabSubject.next(tabIndex)
     }
 }

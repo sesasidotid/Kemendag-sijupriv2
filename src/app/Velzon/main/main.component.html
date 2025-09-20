@@ -26,7 +26,8 @@
                 </div>
                 <div class="card">
                     <ul class="nav justify-content-start arrow-navtabs nav-primary bg-light mb-3" role="tablist">
-                        <li class="nav-item cursor-pointer" *ngFor="let tab of tabs">
+                        <!-- <li class="nav-item cursor-pointer" *ngFor="let tab of tabs"> -->
+                        <li class="nav-item cursor-pointer" *ngFor="let tab of tabService.tabs$ | async">
                             <a class="nav-link {{ tab.isActive ? 'active' : 'inactive' }}" role="tab"
                                 (click)="onTabClick(tab)">
                                 <span class="me-2">

@@ -1,0 +1,102 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+        <label for="jenjangCode" class="form-label fw-bold">
+            Jenjang <span class="text-danger">*</span>
+        </label>
+        <select id="jenjangCode" class="form-select" formControlName="jenjangCode">
+            <option [ngValue]="''" hidden disabled selected>Pilih Jenjang</option>
+            <ng-container *ngIf="(jenjangService.jenjangList$ | async) as jenjangList; else noJenjang">
+                <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code">{{ jenjang.name }}</option>
+            </ng-container>
+            <ng-template #noJenjang>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
+        </select>
+        <div *ngIf="getError('jenjangCode', 'Jenjang') as error" class="text-danger">{{ error }}</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="angkaKreditThreshold" class="form-label fw-bold">
+            Angka Kredit Threshold <span class="text-danger">*</span>
+        </label>
+        <input type="number" id="angkaKreditThreshold" class="form-control" formControlName="angkaKreditThreshold"
+            placeholder="Angka Kredit Threshold" />
+        <div *ngIf="getError('angkaKreditThreshold', 'Angka Kredit Threshold') as error" class="text-danger">{{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="lastNYear" class="form-label fw-bold">
+            N Tahun Terakhir <span class="text-danger">*</span>
+        </label>
+        <input type="number" id="lastNYear" class="form-control" formControlName="lastNYear"
+            placeholder="N Tahun Terakhir" />
+        <div *ngIf="getError('lastNYear', 'N Tahun Terakhir') as error" class="text-danger">{{ error }}</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="ratingHasilId" class="form-label fw-bold">
+            Rating Hasil Kinerja <span class="text-danger">*</span>
+        </label>
+        <select id="ratingHasilId" class="form-select" formControlName="ratingHasilId">
+            <option [ngValue]="''" hidden disabled selected>Pilih Rating Hasil Kinerja</option>
+            <ng-container *ngIf="(kinerjaService.ratingKinerjaList$ | async) as ratings; else noRatings">
+                <option *ngFor="let rating of ratings" [value]="rating.id">{{ rating.name }}</option>
+            </ng-container>
+            <ng-template #noRatings>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
+        </select>
+        <div *ngIf="getError('ratingHasilId', 'Rating Hasil') as error" class="text-danger">{{ error }}</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="ratingKinerjaId" class="form-label fw-bold">
+            Rating Perilaku Kinerja <span class="text-danger">*</span>
+        </label>
+        <select id="ratingKinerjaId" class="form-select" formControlName="ratingKinerjaId">
+            <option [ngValue]="''" hidden disabled selected>Pilih Rating Perilaku Kinerja</option>
+            <ng-container *ngIf="(kinerjaService.ratingKinerjaList$ | async) as ratings; else noRatings">
+                <option *ngFor="let rating of ratings" [value]="rating.id">{{ rating.name }}</option>
+            </ng-container>
+            <ng-template #noRatings>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
+        </select>
+        <div *ngIf="getError('ratingKinerjaId', 'Rating Kinerja') as error" class="text-danger">{{ error }}</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="predikatKinerjaId" class="form-label fw-bold">
+            Predikat Kinerja <span class="text-danger">*</span>
+        </label>
+        <select id="predikatKinerjaId" class="form-select" formControlName="predikatKinerjaId">
+            <option [ngValue]="''" hidden disabled selected>Pilih Predikat Kinerja</option>
+            <ng-container *ngIf="(kinerjaService.predikatKinerjaList$ | async) as ratings; else noRatings">
+                <option *ngFor="let rating of ratings" [value]="rating.id">{{ rating.name }}</option>
+            </ng-container>
+            <ng-template #noRatings>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
+        </select>
+        <div *ngIf="getError('predikatKinerjaId', 'Predikat Kinerja') as error" class="text-danger">{{ error }}</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="jenisUkom" class="form-label fw-bold">
+            Jenis UKom <span class="text-danger">*</span>
+        </label>
+        <select id="jenisUkom" class="form-select" formControlName="jenisUkom">
+            <option [ngValue]="''" hidden disabled selected>Pilih Jenis UKom</option>
+            <option *ngFor="let jenis of jenisUkomService.jenisUkomList$ | async" [value]="jenis.value">{{ jenis.label
+                }}</option>
+        </select>
+        <div *ngIf="getError('jenisUkom', 'Jenis UKom') as error" class="text-danger">{{ error }}</div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <app-loading-button [isLoading]="ukomRegistrationRuleService.updateRuleLoading$ | async" [label]="'Update'"
+            [disabled]="form.invalid" [type]="'submit'">
+        </app-loading-button>
+    </div>
+</form>

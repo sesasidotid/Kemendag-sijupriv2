@@ -1,25 +1,25 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { CommonModule } from '@angular/common'
 
 @Component({
     selector: 'app-loading-button',
     standalone: true,
     imports: [CommonModule],
     templateUrl: './loading-button.component.html',
-    styleUrls: ['./loading-button.component.scss']
+    styleUrls: ['./loading-button.component.scss'],
 })
 export class LoadingButtonComponent {
-    @Input() isLoading: boolean = false;
-    @Input() disabled: boolean = false;
-    @Input() type: 'button' | 'submit' = 'button';
-    @Input() label: string = 'Submit';
-    @Input() className: string = 'btn btn-success';
+    @Input() isLoading: boolean = false
+    @Input() disabled: boolean = false
+    @Input() type: 'button' | 'submit' = 'button'
+    @Input() label: string = 'Submit'
+    @Input() className: string = 'btn btn-success'
 
-    @Output() clicked = new EventEmitter<void>();
+    @Output() clicked = new EventEmitter<void>()
 
     handleClick() {
         if (this.type === 'button') {
-            this.clicked.emit();
+            this.clicked.emit()
         }
     }
 }

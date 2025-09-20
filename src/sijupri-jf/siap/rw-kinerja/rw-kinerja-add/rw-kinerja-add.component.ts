@@ -9,7 +9,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { AlertService } from '../../../../modules/base/services/alert.service'
 import { ApiService } from '../../../../modules/base/services/api.service'
@@ -27,10 +27,10 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
         CommonModule,
         FormsModule,
         FileHandlerComponent,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     templateUrl: './rw-kinerja-add.component.html',
-    styleUrl: './rw-kinerja-add.component.scss'
+    styleUrl: './rw-kinerja-add.component.scss',
 })
 export class RwKinerjaAddComponent {
     rwKinerja: RWKinerja = new RWKinerja()
@@ -56,7 +56,7 @@ export class RwKinerjaAddComponent {
         { value: '09', name: 'September' },
         { value: '10', name: 'Oktober' },
         { value: '11', name: 'November' },
-        { value: '12', name: 'Desember' }
+        { value: '12', name: 'Desember' },
     ]
 
     inputs: FIleHandler = {
@@ -65,26 +65,26 @@ export class RwKinerjaAddComponent {
                 label: 'Upload Dokumen Evaluasi kinerja',
                 fileName: this.rwKinerja.docEvaluasi,
                 source: this.rwKinerja.docEvaluasiUrl,
-                required: true
+                required: true,
             },
             docPredikat: {
                 label: 'Upload Dokumen Konversi Predikat Kinerja',
                 fileName: this.rwKinerja.docPredikat,
                 source: this.rwKinerja.docPredikatUrl,
-                required: true
+                required: true,
             },
             docAkumulasiAk: {
                 label: 'Upload Dokumen Akumulasi Angka Kredit',
                 fileName: this.rwKinerja.docAkumulasiAk,
                 source: this.rwKinerja.docAkumulasiAkUrl,
-                required: true
+                required: true,
             },
             docPenetapanAk: {
                 label: 'Upload Dokumen Penetapan Angka Kredit',
                 fileName: this.rwKinerja.docPenetapanAk,
                 source: this.rwKinerja.docPenetapanAkUrl,
-                required: true
-            }
+                required: true,
+            },
         },
         allowedTypes: [{ type: 'application/pdf' }],
         maxSize: 2 * 1024 * 1024,
@@ -95,24 +95,24 @@ export class RwKinerjaAddComponent {
                 this.rwKinerjaForm.patchValue({ fileDocPredikat: base64Data })
             if (key == 'docAkumulasiAk')
                 this.rwKinerjaForm.patchValue({
-                    fileDocAkumulasiAk: base64Data
+                    fileDocAkumulasiAk: base64Data,
                 })
             if (key == 'docPenetapanAk')
                 this.rwKinerjaForm.patchValue({
-                    fileDocPenetapanAk: base64Data
+                    fileDocPenetapanAk: base64Data,
                 })
-        }
+        },
     }
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
         private router: Router,
-        private formValidationService: FormValidationService
+        private formValidationService: FormValidationService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.populateYears()
         this.handleFormInit()
         this.getRatingKinerjaList()
@@ -120,33 +120,33 @@ export class RwKinerjaAddComponent {
         this.handleSubscribe()
     }
 
-    populateYears () {
+    populateYears() {
         const currentYear = new Date().getFullYear()
         for (let i = currentYear; i >= currentYear - 20; i--) {
             this.years.push(i)
         }
     }
 
-    handleSubscribe () {
+    handleSubscribe() {
         const typeControl = this.rwKinerjaForm.get('type')
-        typeControl?.valueChanges.subscribe(type => {
+        typeControl?.valueChanges.subscribe((type) => {
             this.isAnnual = type === 'tahunan'
             this.updateFormControlsForType(type)
         })
     }
 
-    updateFormControlsForType (type: string) {
+    updateFormControlsForType(type: string) {
         if (type === 'tahunan') {
             this.rwKinerjaForm.removeControl('monthStart')
             this.rwKinerjaForm.removeControl('monthEnd')
         } else if (type === 'bulanan') {
             this.rwKinerjaForm.addControl(
                 'monthStart',
-                new FormControl('', Validators.required)
+                new FormControl('', Validators.required),
             )
             this.rwKinerjaForm.addControl(
                 'monthEnd',
-                new FormControl('', Validators.required)
+                new FormControl('', Validators.required),
             )
         }
         this.rwKinerjaForm.get('dateStart')?.setValue('')
@@ -159,13 +159,13 @@ export class RwKinerjaAddComponent {
         }
     }
 
-    onYearSelected () {
+    onYearSelected() {
         const year = this.rwKinerjaForm.get('year')?.value
         this.rwKinerjaForm.get('dateStart')?.setValue(`${year}-01-01`)
         this.rwKinerjaForm.get('dateEnd')?.setValue(`${year}-12-31`)
     }
 
-    onMonthRangeSelected () {
+    onMonthRangeSelected() {
         const startMonth = this.rwKinerjaForm.get('monthStart')?.value
         const endMonth = this.rwKinerjaForm.get('monthEnd')?.value
         const selectedYear = this.rwKinerjaForm.get('year')?.value
@@ -176,7 +176,7 @@ export class RwKinerjaAddComponent {
             const startDate = new Date(
                 selectedYear,
                 parseInt(startMonth) - 1,
-                1
+                1,
             )
             const endDate = new Date(selectedYear, parseInt(endMonth), 0)
 
@@ -203,22 +203,22 @@ export class RwKinerjaAddComponent {
         }
     }
 
-    formatDate (date: Date): string {
+    formatDate(date: Date): string {
         const year = date.getFullYear()
         const month = (date.getMonth() + 1).toString().padStart(2, '0')
         const day = date.getDate().toString().padStart(2, '0')
         return `${year}-${month}-${day}`
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.rwKinerjaForm.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    handleFormInit () {
+    handleFormInit() {
         this.rwKinerjaForm = new FormGroup({
             predikatKinerjaId: new FormControl('', [Validators.required]),
             ratingHasilId: new FormControl('', [Validators.required]),
@@ -226,97 +226,79 @@ export class RwKinerjaAddComponent {
             type: new FormControl('', [Validators.required]),
             angkaKredit: new FormControl('', [
                 Validators.required,
-                Validators.pattern('^[0-9]+(\\.[0-9]+)?$')
+                Validators.pattern('^[0-9]+(\\.[0-9]+)?$'),
             ]),
             fileDocEvaluasi: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
+                fileValidator(['application/pdf'], 2),
             ]),
             fileDocPredikat: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
+                fileValidator(['application/pdf'], 2),
             ]),
             fileDocAkumulasiAk: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
+                fileValidator(['application/pdf'], 2),
             ]),
             fileDocPenetapanAk: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
+                fileValidator(['application/pdf'], 2),
             ]),
             year: new FormControl('', [Validators.required]),
             monthStart: new FormControl('', []),
             monthEnd: new FormControl('', []),
             // Hidden controls for actual date values
             dateStart: new FormControl('', [Validators.required]),
-            dateEnd: new FormControl('', [Validators.required])
+            dateEnd: new FormControl('', [Validators.required]),
         })
     }
 
-    getRatingKinerjaList () {
+    getRatingKinerjaList() {
         this.ratingLoading$.next(true)
         this.apiService.getData(`/api/v1/rating_kinerja`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.ratingKinerjaList = response.map(
                     (ratingKinerja: { [key: string]: any }) =>
-                        new RatingKinerja(ratingKinerja)
+                        new RatingKinerja(ratingKinerja),
                 )
                 this.ratingLoading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
                 this.alertService.showToast(
                     'Error',
-                    'Gagal mendapatkan data rating kinerja!'
+                    'Gagal mendapatkan data rating kinerja!',
                 )
                 this.ratingLoading$.next(false)
-            }
+            },
         })
     }
 
-    getPredikatKinerjaList () {
+    getPredikatKinerjaList() {
         this.predikatLoading$.next(true)
         this.apiService.getData(`/api/v1/predikat_kinerja`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.predikatKinerjaList = response.map(
                     (predikatKinerja: { [key: string]: any }) =>
-                        new PredikatKinerja(predikatKinerja)
+                        new PredikatKinerja(predikatKinerja),
                 )
                 this.predikatLoading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
                 this.alertService.showToast(
                     'Error',
-                    'Gagal mendapatkan data predikat kinerja!'
+                    'Gagal mendapatkan data predikat kinerja!',
                 )
                 this.predikatLoading$.next(false)
-            }
+            },
         })
     }
 
-    submit () {
-        // this.rwKinerja.dateEnd = this.rwKinerjaForm.value.dateEnd
-        // this.rwKinerja.dateStart = this.rwKinerjaForm.value.dateStart
-        // this.rwKinerja.predikatKinerjaId =
-        //     this.rwKinerjaForm.value.predikatKinerjaId
-        // this.rwKinerja.ratingHasilId =
-        //     this.rwKinerjaForm.value.ratingHasilId
-        // this.rwKinerja.ratingKinerjaId =
-        //     this.rwKinerjaForm.value.ratingKinerjaId
-        // this.rwKinerja.type = this.rwKinerjaForm.value.type
-        // this.rwKinerja.angkaKredit = this.rwKinerjaForm.value.angkaKredit
-        // this.rwKinerja.fileDocEvaluasi =
-        //     this.rwKinerjaForm.value.fileDocEvaluasi
-        // this.rwKinerja.fileDocPredikat =
-        //     this.rwKinerjaForm.value.fileDocPredikat
-        // this.rwKinerja.fileDocAkumulasiAk =
-        //     this.rwKinerjaForm.value.fileDocAkumulasiAk
-        // this.rwKinerja.fileDocPenetapanAk =
-        //     this.rwKinerjaForm.value.fileDocPenetapanAk
+    submit() {
         this.rwKinerja = new RWKinerja(this.rwKinerjaForm.value)
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 this.submitLoading$.next(true)
                 this.apiService
@@ -324,29 +306,29 @@ export class RwKinerjaAddComponent {
                     .pipe(
                         finalize(() => {
                             this.submitLoading$.next(false)
-                        })
+                        }),
                     )
                     .subscribe({
                         next: () => {
                             this.alertService.showToast(
                                 'Success',
-                                'Berhasil menambahkan riwayat kinerja.'
+                                'Berhasil menambahkan riwayat kinerja.',
                             )
                             setTimeout(() => {
                                 this.router.navigate([
-                                    '/profile/rw-kinerja/pending'
+                                    '/profile/rw-kinerja/pending',
                                 ])
                             }, 1000)
                         },
-                        error: error => {
+                        error: (error) => {
                             console.log('error', error)
                             this.alertService.showToast(
                                 'Error',
-                                'Gagal menambahkan riwayat kinerja!'
+                                'Gagal menambahkan riwayat kinerja!',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

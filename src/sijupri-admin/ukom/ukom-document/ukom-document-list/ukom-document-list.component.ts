@@ -5,7 +5,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
@@ -20,7 +20,7 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
     standalone: true,
     imports: [PagableComponent, CommonModule, UkomDocumentAddComponent],
     templateUrl: './ukom-document-list.component.html',
-    styleUrl: './ukom-document-list.component.scss'
+    styleUrl: './ukom-document-list.component.scss',
 })
 export class UkomDocumentListComponent {
     tab$ = new BehaviorSubject<number | null>(0)
@@ -28,26 +28,26 @@ export class UkomDocumentListComponent {
 
     refresh: boolean = false
 
-    constructor (
+    constructor(
         private tabService: TabService,
         private router: Router,
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handlePagable()
         this.handleTabService()
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/document_ukom/all')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder(
                     'Nama',
-                    'dokumenPersyaratanName'
-                ).build()
+                    'dokumenPersyaratanName',
+                ).build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
@@ -65,20 +65,20 @@ export class UkomDocumentListComponent {
                                 return data.jenisUkom
                         }
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jabatan', 'jabatanName').build()
+                new PrimaryColumnBuilder('Jabatan', 'jabatanName').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenjang', 'jenjangName').build()
+                new PrimaryColumnBuilder('Jenjang', 'jenjangName').build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Khusus Mengulang?', (data: any) =>
-                        data.isMengulang ? 'Ya' : 'Tidak'
+                        data.isMengulang ? 'Ya' : 'Tidak',
                     )
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -86,12 +86,12 @@ export class UkomDocumentListComponent {
                         this.delete(item.dokumenPersyaratanId)
                     }, 'danger')
                     .withIcon('danger')
-                    .build()
+                    .build(),
             )
             .build()
     }
 
-    handleTabService () {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -101,18 +101,18 @@ export class UkomDocumentListComponent {
                 label: 'Daftar Dokumen Ukom',
                 isActive: true,
                 icon: 'mdi-list-box',
-                onClick: () => this.handleTabChange(0)
+                onClick: () => this.handleTabChange(0),
             })
             .addTab({
                 label: 'Tambah Dokumen Ukom',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1)
+                onClick: () => this.handleTabChange(1),
             })
     }
 
-    delete (id: string) {
+    delete(id: string) {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 this.apiService
@@ -122,22 +122,22 @@ export class UkomDocumentListComponent {
                             this.refresh = !this.refresh
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Dokumen berhasil di hapus'
+                                'Dokumen berhasil di hapus',
                             )
                         },
-                        error: error => {
+                        error: (error) => {
                             console.error('Error fetching data', error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menghapus dokumen'
+                                'Gagal menghapus dokumen',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
-    handleTabChange (tab?: number) {
+    handleTabChange(tab?: number) {
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }

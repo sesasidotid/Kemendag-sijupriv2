@@ -1,0 +1,17 @@
+<app-ukom-registration-requirement-add *ngIf="(tabService.activeTab$| async) === 1">
+</app-ukom-registration-requirement-add>
+
+<ng-container *ngIf="(tabService.activeTab$| async) === 0">
+    <ng-container *ngIf="pagable$ | async as pagable">
+        <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+    </ng-container>
+</ng-container>
+
+<ng-container *ngIf="isUpdateModalOpen">
+    <app-modal *ngIf="isUpdateModalOpen" [title]="'Update Syarat Pendaftaran'" (toggle)="closeUpdateModal() "
+        [enableFooter]="false">
+        <app-ukom-registration-requirement-update [rule]="selectedRule"
+            (updated)="closeUpdateModal(); refreshPagable()"></app-ukom-registration-requirement-update>
+    </app-modal>
+
+</ng-container>

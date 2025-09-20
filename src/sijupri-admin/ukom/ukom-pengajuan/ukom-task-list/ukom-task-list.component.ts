@@ -6,7 +6,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { TabService } from '../../../../modules/base/services/tab.service'
@@ -21,7 +21,7 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
     standalone: true,
     imports: [CommonModule, PagableComponent],
     templateUrl: './ukom-task-list.component.html',
-    styleUrl: './ukom-task-list.component.scss'
+    styleUrl: './ukom-task-list.component.scss',
 })
 export class UkomTaskListComponent {
     pagable$ = new BehaviorSubject<Pagable | null>(null)
@@ -29,15 +29,15 @@ export class UkomTaskListComponent {
     refresh: boolean
     tabIndex: BehaviorSubject<number> = new BehaviorSubject<number>(0)
 
-    constructor (
+    constructor(
         private router: Router,
         private tabService: TabService,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         const navigation = history.state
         this.getJabatanList()
         this.handlePagable()
@@ -49,7 +49,7 @@ export class UkomTaskListComponent {
         this.handleTabService()
     }
 
-    handleBackFromDetail (tabIndex: number) {
+    handleBackFromDetail(tabIndex: number) {
         if (tabIndex == 0) {
             this.handlePagableTabChange('ukom_flow_1', 0)
         }
@@ -63,9 +63,9 @@ export class UkomTaskListComponent {
         }
     }
 
-    handleDeleteTask (instanceId: string) {
+    handleDeleteTask(instanceId: string) {
         this.confirmationService.open(false).subscribe({
-            next: res => {
+            next: (res) => {
                 if (!res.confirmed) {
                     return
                 }
@@ -73,54 +73,45 @@ export class UkomTaskListComponent {
                 this.apiService
                     .deleteData(`/api/v1/pending_task/delete/${instanceId}`)
                     .subscribe({
-                        next: res => {
+                        next: (res) => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil dihapus'
+                                'Data berhasil dihapus',
                             )
                             this.refresh = !this.refresh
                         },
-                        error: err => {
+                        error: (err) => {
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Data gagal dihapus'
+                                'Data gagal dihapus',
                             )
                             this.refresh = !this.refresh
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable$.next(
             new PagableBuilder('/api/v1/participant_ukom/task/search')
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('NIP', 'objectGroup').build()
+                    new PrimaryColumnBuilder('NIP', 'objectGroup').build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Nama', 'objectName').build()
+                    new PrimaryColumnBuilder('Nama', 'objectName').build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Proses', 'flowName').build()
+                    new PrimaryColumnBuilder('Proses', 'flowName').build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder(
                         'Jabatan Yang Dituju',
-                        'nextJabatanName'
-                    ).build()
+                        'nextJabatanName',
+                    ).build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
-                        // .withDynamicValue('Jenis UKom', (data: any) =>
-                        //     data.jenisUkom === 'KENAIKAN_JENJANG'
-                        //         ? 'Kenaikan Jenjang'
-                        //         : data.jenisUkom === 'PERPINDAHAN_JABATAN'
-                        //             ? 'Perpindahan Jabatan'
-                        //             : data.jenisUkom === 'PROMOSI'
-                        //                 ? 'Promosi'
-                        //                 : data.jenisUkom
-                        // )
                         .withDynamicValue('Jenis Ukom', (data: any) => {
                             switch (data.jenisUkom) {
                                 case 'KENAIKAN_JENJANG':
@@ -135,26 +126,26 @@ export class UkomTaskListComponent {
                                     return data.jenisUkom
                             }
                         })
-                        .build()
+                        .build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder(
                         'Tanggal Terakhir Update',
-                        'lastUpdated'
-                    ).build()
+                        'lastUpdated',
+                    ).build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Status', 'taskStatus').build()
+                    new PrimaryColumnBuilder('Status', 'taskStatus').build(),
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
                         .setAction((pendingTask: any) => {
                             this.router.navigate([
-                                `/ukom/ukom-task-list/${pendingTask.id}`
+                                `/ukom/ukom-task-list/${pendingTask.id}`,
                             ])
                         }, 'info')
                         .withIcon('detail')
-                        .build()
+                        .build(),
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
@@ -162,26 +153,26 @@ export class UkomTaskListComponent {
                             this.handleDeleteTask(pendingTask.instanceId)
                         }, 'danger')
                         .withIcon('danger')
-                        .build()
+                        .build(),
                 )
                 .addFilter(
                     new PageFilterBuilder('equal')
                         .setProperty('flowId')
                         .withDefaultValue('ukom_flow_1')
-                        .build()
+                        .build(),
                 )
 
                 .addFilter(
                     new PageFilterBuilder('like')
                         .setProperty('objectGroup')
                         .withField('NIP', 'text')
-                        .build()
+                        .build(),
                 )
                 .addFilter(
                     new PageFilterBuilder('like')
                         .setProperty('objectName')
                         .withField('Nama', 'text')
-                        .build()
+                        .build(),
                 )
                 .addFilter(
                     new PageFilterBuilder('equal')
@@ -192,41 +183,41 @@ export class UkomTaskListComponent {
                             { label: 'Promosi', value: 'PROMOSI' },
                             {
                                 label: 'Kenaikan Jenjang',
-                                value: 'KENAIKAN_JENJANG'
+                                value: 'KENAIKAN_JENJANG',
                             },
                             {
                                 label: 'Perpindahan Jabatan',
-                                value: 'PERPINDAHAN_JABATAN'
+                                value: 'PERPINDAHAN_JABATAN',
                             },
                             {
                                 label: 'Promosi Jabatan Fungsional',
-                                value: 'PROMOSI_JF'
-                            }
+                                value: 'PROMOSI_JF',
+                            },
                         ])
-                        .build()
+                        .build(),
                 )
-                .build()
+                .build(),
         )
     }
 
-    updateFilterOptions () {
+    updateFilterOptions() {
         let updatedPagable
         const currentPagable = this.pagable$.value
 
-        const existingFilterList = currentPagable.filterList.map(item =>
+        const existingFilterList = currentPagable.filterList.map((item) =>
             item.key === 'like_nextJabatanName'
                 ? {
                       ...item,
-                      optionList: this.jabatanList.map(jabatan => ({
+                      optionList: this.jabatanList.map((jabatan) => ({
                           label: jabatan.name,
-                          value: jabatan.name
-                      }))
+                          value: jabatan.name,
+                      })),
                   }
-                : item
+                : item,
         )
 
         const filterList = existingFilterList.some(
-            item => item.key === 'like_nextJabatanName'
+            (item) => item.key === 'like_nextJabatanName',
         )
             ? existingFilterList
             : [
@@ -236,40 +227,40 @@ export class UkomTaskListComponent {
                       fieldType: 'select',
                       key: 'like_nextJabatanName',
                       value: '',
-                      optionList: this.jabatanList.map(jabatan => ({
+                      optionList: this.jabatanList.map((jabatan) => ({
                           label: jabatan.name,
-                          value: jabatan.name
-                      }))
-                  })
+                          value: jabatan.name,
+                      })),
+                  }),
               ]
 
         updatedPagable = {
             ...currentPagable,
-            filterList
+            filterList,
         }
         this.pagable$.next(updatedPagable)
     }
 
-    getJabatanList () {
+    getJabatanList() {
         this.apiService.getData('/api/v1/jabatan').subscribe({
-            next: response => {
+            next: (response) => {
                 this.jabatanList = response
             },
-            error: error => {
+            error: (error) => {
                 this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mengambil list jabatan'
+                    'Gagal mengambil list jabatan',
                 )
                 this.jabatanList = []
             },
             complete: () => {
                 console.log('complete', this.jabatanList)
                 this.updateFilterOptions()
-            }
+            },
         })
     }
 
-    handleTabService () {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -280,23 +271,23 @@ export class UkomTaskListComponent {
                 icon: 'mdi-list-box',
                 // isActive: true,
                 isActive: this.tabIndex.value == 0,
-                onClick: () => this.handlePagableTabChange('ukom_flow_1', 0)
+                onClick: () => this.handlePagableTabChange('ukom_flow_1', 0),
             })
             .addTab({
                 label: 'Perbaikan Dokumen',
                 icon: 'mdi-account-supervisor',
                 isActive: this.tabIndex.value == 1,
-                onClick: () => this.handlePagableTabChange('ukom_flow_2', 1)
+                onClick: () => this.handlePagableTabChange('ukom_flow_2', 1),
             })
             .addTab({
                 label: 'Tidak Lolos Verifikasi',
                 icon: 'mdi-close',
                 isActive: this.tabIndex.value == 2,
-                onClick: () => this.handlePagableTabChange('rejected', 2)
+                onClick: () => this.handlePagableTabChange('rejected', 2),
             })
     }
 
-    handlePagableTabChange (tab: string, tabIndex: number) {
+    handlePagableTabChange(tab: string, tabIndex: number) {
         console.log('tab', tab)
         const currentPagable = this.pagable$.value
 
@@ -306,31 +297,31 @@ export class UkomTaskListComponent {
             updatedPagable = {
                 ...currentPagable,
                 filterList: currentPagable.filterList.filter(
-                    item => item.key !== 'eq_flowId'
+                    (item) => item.key !== 'eq_flowId',
                 ),
-                endpoint: '/api/v1/participant_ukom/task/failed/search'
+                endpoint: '/api/v1/participant_ukom/task/failed/search',
             }
         } else {
-            const existingFilterList = currentPagable.filterList.map(item =>
-                item.key === 'eq_flowId' ? { ...item, value: tab } : item
+            const existingFilterList = currentPagable.filterList.map((item) =>
+                item.key === 'eq_flowId' ? { ...item, value: tab } : item,
             )
 
             const filterList = currentPagable.filterList.some(
-                item => item.key === 'eq_flowId'
+                (item) => item.key === 'eq_flowId',
             )
                 ? existingFilterList
                 : [
                       ...existingFilterList,
                       new PageFilter({
                           key: 'eq_flowId',
-                          value: tab
-                      })
+                          value: tab,
+                      }),
                   ]
 
             updatedPagable = {
                 ...currentPagable,
                 filterList,
-                endpoint: '/api/v1/participant_ukom/task/search'
+                endpoint: '/api/v1/participant_ukom/task/search',
             }
         }
 

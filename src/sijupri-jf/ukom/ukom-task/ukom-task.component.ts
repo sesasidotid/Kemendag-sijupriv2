@@ -9,7 +9,6 @@ import { UkomTaskFormComponent } from '../ukom-task-form/ukom-task-form.componen
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { PesertaUkom } from '../../../modules/ukom/models/peserta-ukom.model'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
-import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
 import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.modal'
 import { ConverterService } from '../../../modules/base/services/converter.service'
