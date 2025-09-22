@@ -7,7 +7,7 @@ export class DokumenUkom extends Serializable {
     dokumenFile: string | null = undefined
     dokumenPersyaratanId: string | null = undefined
     dokumenPersyaratanName: string | null = undefined
-    dokumenStatus: boolean | null = false
+    dokumenStatus: string | null = undefined
     jenisUkom: string | null = undefined
     jabatanCode: string | null = undefined
     jabatanName: string | null = undefined

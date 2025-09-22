@@ -29,6 +29,7 @@ import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jabatan.service'
 import { JfService } from '@/modules/siap/services/jf.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
+import { ActivatedRoute, Router } from '@angular/router'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
@@ -53,7 +54,7 @@ export enum JenisUkomEnum {
     styleUrl: './ukom-task.component.scss',
 })
 export class UkomTaskComponent {
-    pendingTask: UkomTaskDetail = new UkomTaskDetail()
+    pendingTask = new UkomTaskDetail()
     pesertaUkom: PesertaUkom
     jf: JF = new JF()
     ukom: Ukom
@@ -113,6 +114,8 @@ export class UkomTaskComponent {
         public bidangJabatanService: BidangJabatanService,
         private jfService: JfService,
         public ukomParticipantService: UkomParticipantService,
+        private router: Router,
+        private route: ActivatedRoute,
     ) {}
 
     ngOnInit() {
@@ -311,6 +314,10 @@ export class UkomTaskComponent {
 
     toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
+    }
+
+    refreshPage() {
+        window.location.reload()
     }
 
     ngOnDestroy() {

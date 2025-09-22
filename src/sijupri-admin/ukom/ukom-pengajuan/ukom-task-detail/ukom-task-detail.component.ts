@@ -1,15 +1,12 @@
-import { PredikatKinerjaService } from './../../../../modules/maintenance/services/predikat-kinerja.service'
+import { UkomPendingTaskService } from './../../../../modules/ukom/services/ukom-pending-task.service'
 import { Component } from '@angular/core'
-import { PesertaUkom } from '../../../../modules/ukom/models/peserta-ukom.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { PendingTask } from '../../../../modules/workflow/models/pending-task.model'
 import { ActivatedRoute } from '@angular/router'
 import { Task } from '../../../../modules/workflow/models/task.model'
 import { CommonModule } from '@angular/common'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
-import { PrevPendingTask } from '../../../../modules/workflow/models/prev-pending-task'
 import {
     BehaviorSubject,
     catchError,
@@ -31,6 +28,14 @@ import { KinerjaService } from '@/modules/complement/services/kinerja.service'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { AgeCalculatorPipe } from '@/modules/base/pipes/age-calculator.pipe'
 import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
+import {
+    ParticipantObject,
+    PendingTask,
+    UkomFlowId,
+} from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
+
+import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
+import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -41,17 +46,18 @@ import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom
         FileHandlerComponent,
         LoadingButtonComponent,
         AgeCalculatorPipe,
+        PrettyNamePipe,
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss',
 })
 export class UkomTaskDetailComponent {
-    pesertaUkom: PesertaUkom
+    public flowId = UkomFlowId
+
+    pesertaUkom: ParticipantObject
     pendingTask: PendingTask
     isApproveEnable: boolean = true
-    id: string
-    body: any
-    prevPendingTask: PrevPendingTask
+    body: Task
     prevApprovedTask: any[] = []
     hadItemsLoading$ = new BehaviorSubject<boolean>(false)
     kinerja2Tahun: RWKinerja[] = []
@@ -64,20 +70,14 @@ export class UkomTaskDetailComponent {
     predikat2Name: string
     bidangJabatanName: string
 
-    predikatKinerjaList: any[] = []
-
     tabIndex: number
 
-    isPredikatKinerjaLoading$: BehaviorSubject<boolean> = new BehaviorSubject(
-        false,
-    )
-    isPredikatKinerjaListLoading$: BehaviorSubject<boolean> =
-        new BehaviorSubject(false)
-    isPendingTaskLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
+    isPendingTaskLoading$ = new BehaviorSubject(false)
     isLoading$: Observable<boolean>
 
+    pendingTaskDetail$ = this.ukomPendingTaskService.pendingTaskDetail$
+
     constructor(
-        private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         private activatedRoute: ActivatedRoute,
@@ -87,161 +87,71 @@ export class UkomTaskDetailComponent {
         public kinerjaService: KinerjaService,
         public jenisUkomService: JenisUkomService,
         public pendidikanService: PendidikanService,
+        public ukomPendingTaskService: UkomPendingTaskService,
+        private kabKotaService: KabKotaService,
     ) {
         this.isLoading$ = combineLatest([
-            this.isPredikatKinerjaLoading$,
-            this.isPredikatKinerjaListLoading$,
             this.isPendingTaskLoading$,
+            this.ukomPendingTaskService.isPendingTaskDetailLoading$,
         ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
     }
 
     ngOnInit() {
         this.pendidikanService.fetchPendidikan()
+        this.kinerjaService.fetchPredikatKinerja()
         this.activatedRoute.params.subscribe((params) => {
-            this.id = params['id']
-            this.kinerjaService.fetchPredikatKinerja()
-            this.getPendingTask()
+            this.ukomPendingTaskService.findById(params['id'])
         })
-    }
 
-    getBidangjabatanNameByCode(bidangJabatanCode: string) {
-        this.apiService
-            .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
-            .subscribe({
-                next: (response) => {
-                    this.bidangJabatanName = response.name ?? null
-                },
-            })
-    }
+        this.pendingTaskDetail$.subscribe((pendingTask) => {
+            if (pendingTask) {
+                this.pendingTask = pendingTask
+                this.pesertaUkom = pendingTask.objectTask.object
 
-    getProvinsiNameByCode(provinsiCode: string) {
-        this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
-            next: (response) => {
-                this.provinsiName = response.name ?? null
-            },
+                this.pendingTask.objectTask.object.kabupatenKotaId &&
+                    this.getKabupatenNameByCode(
+                        this.pendingTask.objectTask.object.kabupatenKotaId,
+                    )
+
+                this.predikat1Name =
+                    this.kinerjaService.getPredikatKinerjaNameById(
+                        this.pendingTask.objectTask.object.predikatKinerja1Id,
+                    )
+                this.predikat2Name =
+                    this.kinerjaService.getPredikatKinerjaNameById(
+                        this.pendingTask.objectTask.object.predikatKinerja2Id,
+                    )
+
+                this.findApproveDokumen(
+                    pendingTask.objectTask.prevObject.dokumenUkomList,
+                )
+
+                this.handlerTabIndex()
+            }
         })
     }
 
     getKabupatenNameByCode(kabupatenCode: string) {
-        this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
-            next: (response) => {
-                this.kabupatenName = response.name ?? null
-                this.typeKabKota = response.type ?? null
-            },
-        })
-    }
-
-    loadPredikatKinerjaList() {
-        this.isPredikatKinerjaListLoading$.next(true)
-        this.apiService
-            .getData('/api/v1/predikat_kinerja')
+        this.kabKotaService
+            .findById(kabupatenCode)
             .pipe(
-                tap(() => {}),
-                catchError((err) => {
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal memuat data predikat kinerja',
-                    )
-                    return of([])
-                }),
-                finalize(() => {
-                    this.isPredikatKinerjaListLoading$.next(false)
+                catchError(() => {
+                    return of({ name: '-', type: '' })
                 }),
             )
             .subscribe({
                 next: (res) => {
-                    this.predikatKinerjaList = res
-                },
-                error: (err) => {},
-            })
-    }
-
-    transformInstansiName(value: string): string {
-        if (!value) return null
-
-        return value
-            .toLowerCase()
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, (char) => char.toUpperCase())
-    }
-
-    getPendingTask() {
-        this.isPendingTaskLoading$.next(true)
-
-        this.apiService
-            .getData(`/api/v1/pending_task/${this.id}`)
-            .pipe(
-                tap(() => {}),
-                catchError((error) => {
-                    this.isPendingTaskLoading$.next(false)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal memuat data tugas',
-                    )
-                    return of(null)
-                }),
-                finalize(() => {
-                    this.isPendingTaskLoading$.next(false)
-                }),
-            )
-            .subscribe({
-                next: (response) => {
-                    this.pendingTask = new PendingTask(response)
-                    this.pesertaUkom = new PesertaUkom(
-                        this.pendingTask.objectTask.object,
-                    )
-                    this.prevPendingTask = new PrevPendingTask(
-                        this.pendingTask.objectTask.prevObject,
-                    )
-                    this.pendidikanName =
-                        this.pendidikanService.getPendidikanById(
-                            this.pendingTask.objectTask.object
-                                .pendidikanTerakhirCode,
-                        ).name
-
-                    if (this.pendingTask.objectTask.object.provinsiId) {
-                        this.getProvinsiNameByCode(
-                            this.pendingTask.objectTask.object.provinsiId,
-                        )
-                    }
-
-                    if (this.pendingTask.objectTask.object.kabupatenKotaId) {
-                        this.getKabupatenNameByCode(
-                            this.pendingTask.objectTask.object.kabupatenKotaId,
-                        )
-                    }
-
-                    if (this.pendingTask.objectTask.object.bidangJabatanCode) {
-                        this.getBidangjabatanNameByCode(
-                            this.pendingTask.objectTask.object
-                                .bidangJabatanCode,
-                        )
-                    }
-
-                    this.predikat1Name =
-                        this.kinerjaService.getPredikatKinerjaNameById(
-                            this.pendingTask.objectTask.object
-                                .predikatKinerja1Id,
-                        )
-                    this.predikat2Name =
-                        this.kinerjaService.getPredikatKinerjaNameById(
-                            this.pendingTask.objectTask.object
-                                .predikatKinerja2Id,
-                        )
-
-                    this.findApproveDokumen(
-                        this.prevPendingTask.dokumenUkomList,
-                    )
-                    this.handlerTabIndex()
+                    this.kabupatenName = res.name
+                    this.typeKabKota = res.type
                 },
             })
     }
 
     handlerTabIndex() {
-        if (this.pendingTask.flowId == 'ukom_flow_1') {
+        if (this.pendingTask.flowId == UkomFlowId.UkomFlowId1) {
             this.tabIndex = 0
         }
-        if (this.pendingTask.flowId == 'ukom_flow_2') {
+        if (this.pendingTask.flowId == UkomFlowId.UkomFlowId2) {
             this.tabIndex = 1
         }
         if (this.pendingTask.taskStatus == 'FAILED') {
@@ -267,14 +177,14 @@ export class UkomTaskDetailComponent {
     }
 
     onFIleSwitch(index: number, status: 'APPROVE' | 'REJECT') {
-        this.pesertaUkom.dokumenUkomList[index].status = status
+        this.pesertaUkom.dokumenUkomList[index].dokumenStatus = status
 
         if (status == 'APPROVE') {
             this.pesertaUkom.dokumenUkomList[index].remark = ''
         }
 
         for (const formasiDokumen of this.pesertaUkom.dokumenUkomList) {
-            if (formasiDokumen.status == 'REJECT') {
+            if (formasiDokumen.dokumenStatus == 'REJECT') {
                 this.isApproveEnable = false
                 break
             }
@@ -312,7 +222,7 @@ export class UkomTaskDetailComponent {
                 this.body = new Task({
                     id: this.pendingTask.id,
                     remark: comment || null,
-                    taskAction: 'approve',
+                    taskAction: UkomFlowId.UkomFlowId4,
                 })
 
                 this.sendSubmission()
@@ -329,12 +239,12 @@ export class UkomTaskDetailComponent {
                 this.body = new Task({
                     id: this.pendingTask.id,
                     remark: comment || null,
-                    taskAction: 'amend',
+                    taskAction: UkomFlowId.UkomFlowId2,
                 })
 
                 const rejectedDokumenUkomList =
                     this.pesertaUkom.dokumenUkomList.filter(
-                        (dokumen) => dokumen.status === 'REJECT',
+                        (dokumen) => dokumen.dokumenStatus === 'REJECT',
                     )
 
                 if (rejectedDokumenUkomList.length > 0) {
@@ -356,13 +266,13 @@ export class UkomTaskDetailComponent {
 
                 this.body = new Task({
                     id: this.pendingTask.id,
-                    taskAction: 'reject',
+                    taskAction: UkomFlowId.UkomFlowId3,
                     remark: comment || null,
                 })
 
                 const rejectedDokumenUkomList =
                     this.pesertaUkom.dokumenUkomList.filter(
-                        (dokumen) => dokumen.status === 'REJECT',
+                        (dokumen) => dokumen.dokumenStatus === 'REJECT',
                     )
 
                 if (rejectedDokumenUkomList.length > 0) {
@@ -370,6 +280,22 @@ export class UkomTaskDetailComponent {
                         dokumenUkomList: rejectedDokumenUkomList,
                     }
                 }
+
+                this.sendSubmission()
+            },
+        })
+    }
+
+    submitReset() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+                this.hadItemsLoading$.next(true)
+
+                this.body = new Task({
+                    id: this.pendingTask.id,
+                    taskAction: UkomFlowId.UkomFlowId1,
+                })
 
                 this.sendSubmission()
             },

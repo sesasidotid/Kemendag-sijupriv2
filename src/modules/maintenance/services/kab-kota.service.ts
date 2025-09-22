@@ -32,7 +32,7 @@ export class KabKotaService {
 
     findById(kabkotaId: string): Observable<KabKota> {
         return this.apiService.getData(`${this.BASE_PATH}/${kabkotaId}`).pipe(
-            map((response: any) => {
+            map((response) => {
                 return new KabKota(response)
             }),
             catchError((error) => {

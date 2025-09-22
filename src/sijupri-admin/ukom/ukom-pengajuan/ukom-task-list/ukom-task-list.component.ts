@@ -16,6 +16,7 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 @Component({
     selector: 'app-ukom-task-list',
     standalone: true,
@@ -35,6 +36,7 @@ export class UkomTaskListComponent {
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
+        private jenisUkomService: JenisUkomService,
     ) {}
 
     ngOnInit() {
@@ -279,16 +281,27 @@ export class UkomTaskListComponent {
                 isActive: this.tabIndex.value == 1,
                 onClick: () => this.handlePagableTabChange('ukom_flow_2', 1),
             })
+            // .addTab({
+            //     label: 'Tidak Lolos Verifikasi',
+            //     icon: 'mdi-close',
+            //     isActive: this.tabIndex.value == 2,
+            //     onClick: () => this.handlePagableTabChange('rejected', 2),
+            // })
             .addTab({
                 label: 'Tidak Lolos Verifikasi',
                 icon: 'mdi-close',
-                isActive: this.tabIndex.value == 2,
-                onClick: () => this.handlePagableTabChange('rejected', 2),
+                isActive: this.tabIndex.value == 3,
+                onClick: () => this.handlePagableTabChange('ukom_flow_3', 2),
+            })
+            .addTab({
+                label: 'Lolos Verifikasi',
+                icon: 'mdi-check',
+                isActive: this.tabIndex.value == 4,
+                onClick: () => this.handlePagableTabChange('ukom_flow_4', 3),
             })
     }
 
     handlePagableTabChange(tab: string, tabIndex: number) {
-        console.log('tab', tab)
         const currentPagable = this.pagable$.value
 
         let updatedPagable

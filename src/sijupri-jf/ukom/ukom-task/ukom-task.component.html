@@ -6,7 +6,8 @@
 
 <app-modal *ngIf="isModalOpen$ | async" [title]="'Perbaiki Dokumen Persyaratan UKom'" (toggle)="toggleModal()"
     [enableFooter]="false">
-    <app-ukom-revision [jf]="jf" [ukom]="ukom" [pendingTask]="pendingTask"></app-ukom-revision>
+    <app-ukom-revision [jf]="jf" [ukom]="ukom" [pendingTask]="pendingTask"
+        (submitted)="refreshPage()"></app-ukom-revision>
 </app-modal>
 
 <ng-template #ukomHadItem>
@@ -208,7 +209,7 @@
                                     </label>
                                     <p class="text-muted">
                                         {{
-                                        pendingTask.isMengulang == 'true'
+                                        pendingTask.isMengulang
                                         ? 'Mengulang'
                                         : 'Baru'
                                         }}

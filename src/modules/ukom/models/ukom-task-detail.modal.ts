@@ -67,7 +67,7 @@ export class UkomTaskDetail extends Serializable {
     grades: any = undefined
     userId: string = undefined
 
-    constructor (object?: { [key: string]: any }) {
+    constructor(object?: { [key: string]: any }) {
         super()
         if (object) this.fromObject(object)
     }
