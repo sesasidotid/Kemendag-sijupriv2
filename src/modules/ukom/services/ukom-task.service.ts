@@ -93,17 +93,11 @@ export class UkomTaskService {
             case 'UEL-00005':
                 return 'Angka kredit di bawah ambang batas.'
             case 'UEL-00006':
-                return message
-                    .replace('Rating Hasil last', 'Rating hasil pada')
-                    .replace('year not eligible', 'tahun tidak memenuhi syarat')
+                return 'Rating hasil tidak memenuhi syarat.'
             case 'UEL-00007':
-                return message
-                    .replace('Rating Kinerja last', 'Rating kinerja pada')
-                    .replace('year not eligible', 'tahun tidak memenuhi syarat')
+                return 'Rating kinerja tidak memenuhi syarat.'
             case 'UEL-00008':
-                return message
-                    .replace('Predikat Kinerja last', 'Predikat kinerja pada')
-                    .replace('year not eligible', 'tahun tidak memenuhi syarat')
+                return 'Predikat kinerja tidak memenuhi syarat.'
             case 'UEL-00009':
                 return 'Pendaftaran sudah ada.'
             default:

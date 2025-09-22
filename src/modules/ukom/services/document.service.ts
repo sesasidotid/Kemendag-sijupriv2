@@ -1,9 +1,8 @@
 import { ApiService } from '@/modules/base/services/api.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { BehaviorSubject, finalize } from 'rxjs'
-import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
+import { BehaviorSubject, catchError, finalize, of } from 'rxjs'
 import { Injectable } from '@angular/core'
-
+import { DokumenUkom } from '../models/ukom-registration-refactored/document.model'
 @Injectable({
     providedIn: 'root',
 })
@@ -105,13 +104,19 @@ export class UkomDocumentService {
     getDocumentByJenisUkom(jenisUkom: string) {
         this.getDocumentByJenisUkomLoadingSubject.next(true)
         this.apiService
-            .getData(
-                `${this.BASE_PATH}/dokumen_persyaratan/jenis_ukom/${jenisUkom}`,
-            )
+            .getData(`${this.BASE_PATH}/jenis_ukom/${jenisUkom}`)
             .pipe(
+                catchError((error) => {
+                    return of([])
+                }),
                 finalize(() => {
                     this.getDocumentByJenisUkomLoadingSubject.next(false)
                 }),
             )
+            .subscribe({
+                next: (res: DokumenUkom[]) => {
+                    this.documentByJenisUkomSubject.next(res)
+                },
+            })
     }
 }

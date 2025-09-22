@@ -38,9 +38,9 @@ import { BidangJabatan } from '../../../modules/maintenance/models/bidang-jabata
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 import { RWKinerja } from '../../../modules/siap/models/rw-kinerja.model'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
-import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { UkomTaskService } from '@/modules/ukom/services/ukom-task.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { UkomDocumentService } from '@/modules/ukom/services/document.service'
 
 @Component({
     selector: 'app-ukom-task-form',
@@ -104,6 +104,7 @@ export class UkomTaskFormComponent {
         private formValidationService: FormValidationService,
         public jenisUkomService: JenisUkomService,
         public ukomTaskService: UkomTaskService,
+        public ukomDocumentService: UkomDocumentService,
     ) {}
 
     ngOnChanges(changes: SimpleChanges) {
@@ -330,12 +331,17 @@ export class UkomTaskFormComponent {
         jenjang: string,
         isMengulang: boolean,
     ) {
-        this.apiService
-            .getData(`/api/v1/document_ukom/jenis_ukom/${jenisUkom}`)
-            .subscribe({
-                next: (response) => {
-                    this.dokumenPersyaratanList = response
-                        .filter((dokumen: any) => {
+        this.ukomDocumentService.getDocumentByJenisUkom(jenisUkom)
+        this.ukomDocumentService.documentByJenisUkom$
+            .pipe(
+                filter((docs) => docs.length > 0),
+                map((docs) =>
+                    docs
+                        .filter((dokumen) => {
+                            const specificationMatch =
+                                dokumen.specification === null ||
+                                dokumen.specification === 'jf' ||
+                                dokumen.specification === 'false'
                             const jabatanMatch =
                                 !dokumen.jabatanCode ||
                                 dokumen.jabatanCode === jabatan
@@ -347,7 +353,10 @@ export class UkomTaskFormComponent {
                                 : dokumen.isMengulang === false
 
                             return (
-                                jabatanMatch && jenjangMatch && isMengulangMatch
+                                specificationMatch &&
+                                jabatanMatch &&
+                                jenjangMatch &&
+                                isMengulangMatch
                             )
                         })
                         .map(
@@ -358,12 +367,17 @@ export class UkomTaskFormComponent {
                                     dokumenPersyaratanName:
                                         dokumen.dokumenPersyaratanName,
                                 }),
-                        )
+                        ),
+                ),
+            )
+            .subscribe({
+                next: (filteredList: DokumenUkomPersyaratan[]) => {
+                    this.dokumenPersyaratanList = filteredList
 
                     this.detectedDokumen = {}
                     this.inputs.files = {}
 
-                    this.dokumenPersyaratanList.forEach((dokumen, index) => {
+                    filteredList.forEach((dokumen) => {
                         const key = dokumen.dokumenPersyaratanId
                         this.inputs.files[key] = {
                             label: dokumen.dokumenPersyaratanName,
@@ -377,6 +391,53 @@ export class UkomTaskFormComponent {
                         'Gagal mengambil dokumen persyaratan',
                     ),
             })
+        // this.apiService
+        //     .getData(`/api/v1/document_ukom/jenis_ukom/${jenisUkom}`)
+        //     .subscribe({
+        //         next: (response) => {
+        //             this.dokumenPersyaratanList = response
+        //                 .filter((dokumen: any) => {
+        //                     const jabatanMatch =
+        //                         !dokumen.jabatanCode ||
+        //                         dokumen.jabatanCode === jabatan
+        //                     const jenjangMatch =
+        //                         !dokumen.jenjangCode ||
+        //                         dokumen.jenjangCode === jenjang
+        //                     const isMengulangMatch = isMengulang
+        //                         ? true
+        //                         : dokumen.isMengulang === false
+
+        //                     return (
+        //                         jabatanMatch && jenjangMatch && isMengulangMatch
+        //                     )
+        //                 })
+        //                 .map(
+        //                     (dokumen: any) =>
+        //                         new DokumenUkomPersyaratan({
+        //                             dokumenPersyaratanId:
+        //                                 dokumen.dokumenPersyaratanId,
+        //                             dokumenPersyaratanName:
+        //                                 dokumen.dokumenPersyaratanName,
+        //                         }),
+        //                 )
+
+        //             this.detectedDokumen = {}
+        //             this.inputs.files = {}
+
+        //             this.dokumenPersyaratanList.forEach((dokumen, index) => {
+        //                 const key = dokumen.dokumenPersyaratanId
+        //                 this.inputs.files[key] = {
+        //                     label: dokumen.dokumenPersyaratanName,
+        //                     id: dokumen.dokumenPersyaratanId,
+        //                 }
+        //             })
+        //         },
+        //         error: (error) =>
+        //             this.handlerService.handleAlert(
+        //                 'Error',
+        //                 'Gagal mengambil dokumen persyaratan',
+        //             ),
+        //     })
     }
 
     getNextJenjang() {

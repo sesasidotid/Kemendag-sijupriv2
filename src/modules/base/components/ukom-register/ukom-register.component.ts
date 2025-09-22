@@ -1,4 +1,3 @@
-import { PesertaUkom } from '../../../ukom/models/peserta-ukom.model'
 import { Component, ViewChild } from '@angular/core'
 import { Jabatan } from '../../../maintenance/models/jabatan.model'
 import { Jenjang } from '../../../maintenance/models/jenjang.modle'
@@ -28,13 +27,7 @@ import { LandingPageComponent } from '../../../landing-page/landing-page.compone
 import { BehaviorSubject } from 'rxjs'
 import { KabKota } from '../../../maintenance/models/kab-kota.model'
 import { Provinsi } from '../../../maintenance/models/provinsi.model'
-import {
-    forkJoin,
-    combineLatest,
-    startWith,
-    distinctUntilChanged,
-    of,
-} from 'rxjs'
+import { forkJoin, combineLatest, startWith, of } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { PredikatKinerja } from '../../../maintenance/models/predikat-kinerja.model'
 import { Pendidikan } from '../../../maintenance/models/pendidikan.model'
@@ -45,6 +38,7 @@ import {
     NonJFParticipantUkomTask,
 } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
+import { UkomDocumentService } from '@/modules/ukom/services/document.service'
 @Component({
     selector: 'app-ukom-register',
     standalone: true,
@@ -123,6 +117,7 @@ export class UkomRegisterComponent {
         private router: Router,
         public systemConfigService: SystemConfigService,
         private ukomParticipantService: UkomParticipantService,
+        public ukomDocumentService: UkomDocumentService,
     ) {
         this.isLoading$ = combineLatest([
             this.systemConfigService.isLoading$,
@@ -496,12 +491,17 @@ export class UkomRegisterComponent {
         jenjang: string,
         isMengulang: boolean,
     ) {
-        this.apiService
-            .getData(`/api/v1/document_ukom/jenis_ukom/${jenis_ukom}`)
-            .subscribe({
-                next: (response) => {
-                    this.dokumenPersyaratanList = response
-                        .filter((dokumen: any) => {
+        this.ukomDocumentService.getDocumentByJenisUkom(jenis_ukom)
+        this.ukomDocumentService.documentByJenisUkom$
+            .pipe(
+                filter((docs) => docs.length > 0),
+                map((docs) =>
+                    docs
+                        .filter((dokumen) => {
+                            const specificationMatch =
+                                dokumen.specification === null ||
+                                dokumen.specification === 'non_jf' ||
+                                dokumen.specification === 'false'
                             const jabatanMatch =
                                 !dokumen.jabatanCode ||
                                 dokumen.jabatanCode === jabatan
@@ -514,24 +514,29 @@ export class UkomRegisterComponent {
                                 : dokumen.isMengulang === false
 
                             return (
-                                jabatanMatch && jenjangMatch && isMengulangMatch
+                                specificationMatch &&
+                                jabatanMatch &&
+                                jenjangMatch &&
+                                isMengulangMatch
                             )
                         })
                         .map(
-                            (dokumen: any) =>
+                            (dokumen) =>
                                 new DokumenUkomPersyaratan({
                                     dokumenPersyaratanId:
                                         dokumen.dokumenPersyaratanId,
                                     dokumenPersyaratanName:
                                         dokumen.dokumenPersyaratanName,
                                 }),
-                        )
-
+                        ),
+                ),
+            )
+            .subscribe({
+                next: (filteredList) => {
+                    this.dokumenPersyaratanList = filteredList
                     this.detectedDokumen = {}
                     this.inputs.files = {}
-
-                    this.dokumenPersyaratanList.forEach((dokumen, index) => {
-                        // const key = `dokumenPersyaratan_${index + 1}`;
+                    filteredList.forEach((dokumen) => {
                         const key = dokumen.dokumenPersyaratanId
                         this.inputs.files[key] = {
                             label: dokumen.dokumenPersyaratanName,
@@ -546,6 +551,56 @@ export class UkomRegisterComponent {
                     )
                 },
             })
+        // this.apiService
+        //     .getData(`/api/v1/document_ukom/jenis_ukom/${jenis_ukom}`)
+        //     .subscribe({
+        //         next: (response) => {
+        //             this.dokumenPersyaratanList = response
+        //                 .filter((dokumen: any) => {
+        //                     const jabatanMatch =
+        //                         !dokumen.jabatanCode ||
+        //                         dokumen.jabatanCode === jabatan
+        //                     const jenjangMatch =
+        //                         !dokumen.jenjangCode ||
+        //                         dokumen.jenjangCode === jenjang
+
+        //                     const isMengulangMatch = isMengulang
+        //                         ? true
+        //                         : dokumen.isMengulang === false
+
+        //                     return (
+        //                         jabatanMatch && jenjangMatch && isMengulangMatch
+        //                     )
+        //                 })
+        //                 .map(
+        //                     (dokumen: any) =>
+        //                         new DokumenUkomPersyaratan({
+        //                             dokumenPersyaratanId:
+        //                                 dokumen.dokumenPersyaratanId,
+        //                             dokumenPersyaratanName:
+        //                                 dokumen.dokumenPersyaratanName,
+        //                         }),
+        //                 )
+
+        //             this.detectedDokumen = {}
+        //             this.inputs.files = {}
+
+        //             this.dokumenPersyaratanList.forEach((dokumen, index) => {
+        //                 // const key = `dokumenPersyaratan_${index + 1}`;
+        //                 const key = dokumen.dokumenPersyaratanId
+        //                 this.inputs.files[key] = {
+        //                     label: dokumen.dokumenPersyaratanName,
+        //                     id: dokumen.dokumenPersyaratanId,
+        //                 }
+        //             })
+        //         },
+        //         error: (error) => {
+        //             this.handlerService.handleAlert(
+        //                 'Error',
+        //                 'Gagal mengambil dokumen persyaratan',
+        //             )
+        //         },
+        //     })
     }
 
     getListJabatan() {

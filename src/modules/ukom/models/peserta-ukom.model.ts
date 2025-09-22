@@ -16,6 +16,7 @@ export class PesertaUkom extends Serializable {
 
     jabatanCode: string = undefined
     jabatanName: string = undefined
+    tmtJabatan: string = undefined
     nextJabatanCode: string = undefined
     nextJabatanName: string = undefined
 
@@ -26,6 +27,7 @@ export class PesertaUkom extends Serializable {
 
     pangkatCode: string = undefined
     pangkatName: string = undefined
+    tmtPangkat: string = undefined
     nextPangkatCode: string = undefined
     nextPangkatName: string = undefined
 

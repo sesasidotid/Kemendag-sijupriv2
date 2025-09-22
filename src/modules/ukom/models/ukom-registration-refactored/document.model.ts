@@ -13,7 +13,7 @@ export class DokumenUkom extends Serializable {
     jabatanName: string | null = undefined
     jenjangCode: string | null = undefined
     jenjangName: string | null = undefined
-    isMengulang: string | null = undefined
+    isMengulang: boolean = undefined
     specification: string | null = undefined
     participantUkomId: string | null = undefined
     remark: string | null = undefined

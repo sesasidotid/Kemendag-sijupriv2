@@ -75,7 +75,16 @@
                             </div>
                         </div>
 
-                        <!-- <div class="col-lg-6" *ngIf="pesertaUkom.participantStatus != 'jf'"> -->
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tempat Lahir</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.tempatLahir ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Lahir</label>
@@ -89,12 +98,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Usia Menurut Surat Usulan</label>
                                 <p class="border-bottom">
-                                    {{
-                                    calculateAge(
-                                    pesertaUkom.tanggalLahir,
-                                    pesertaUkom.tglSuratUsulan
-                                    )
-                                    }}
+
+                                    {{pesertaUkom.tanggalLahir | ageCalculator: pesertaUkom.tglSuratUsulan}}
                                 </p>
                             </div>
                         </div>
@@ -213,6 +218,15 @@
                             </div>
                         </div>
 
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">TMT Jabatan</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.tmtJabatan | tanggalIndo }}
+                                </p>
+                            </div>
+                        </div>
+
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label class="form-label">Pangkat</label>
@@ -221,6 +235,16 @@
                                 </p>
                             </div>
                         </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">TMT Pangkat</label>
+                                <p class="border-bottom">
+                                    {{ pesertaUkom.tmtPangkat | tanggalIndo }}
+                                </p>
+                            </div>
+                        </div>
+
 
                         <div class="col-lg-6">
                             <div class="mb-3">
@@ -240,9 +264,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenis UKom</label>
                                 <p class="border-bottom">
-                                    {{
-                                    getJenisUkomLabel(pesertaUkom.jenisUkom)
-                                    }}
+                                    {{jenisUkomService.getLabelByValue(pesertaUkom.jenisUkom) ?? '-'}}
                                 </p>
                             </div>
                         </div>
