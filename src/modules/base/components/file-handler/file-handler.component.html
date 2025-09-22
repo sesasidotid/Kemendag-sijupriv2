@@ -16,7 +16,8 @@
             </small>
         </div>
     </div>
-    <ng-container *ngFor="let obj of inputs.files | keyvalue">
+    <!-- <ng-container *ngFor="let obj of inputs.files | keyvalue"> -->
+    <ng-container *ngFor="let obj of inputs.files | keyvalue: sortByLabel">
         <div class="mb-3 d-flex flex-column gap-2" *ngIf="
                 obj.value.visible == null ||
                 obj.value.visible == undefined ||
