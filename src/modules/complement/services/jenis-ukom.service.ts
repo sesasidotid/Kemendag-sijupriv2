@@ -27,4 +27,8 @@ export class JenisUkomService {
     fetchJenisUkom(): JenisUkom[] {
         return [...this.jenisUkomList]
     }
+
+    getLabelByValue(value: string): string | undefined {
+        return this.jenisUkomList.find((item) => item.value === value)?.label
+    }
 }

@@ -4,36 +4,48 @@ import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PageFilterBuilder,
     PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
-import { BehaviorSubject } from 'rxjs'
 import { TabService } from '../../../../modules/base/services/tab.service'
-import { Router, RouterLink } from '@angular/router'
 import { UkomDocumentAddComponent } from '../ukom-document-add/ukom-document-add.component'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { UkomDocumentUpdateComponent } from '../ukom-document-update/ukom-document-update.component'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
+import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
+import { UkomDocumentService } from '@/modules/ukom/services/document.service'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { SpecificationService } from '@/modules/complement/services/specification.service'
 @Component({
     selector: 'app-ukom-document-list',
     standalone: true,
-    imports: [PagableComponent, CommonModule, UkomDocumentAddComponent],
+    imports: [
+        PagableComponent,
+        CommonModule,
+        UkomDocumentAddComponent,
+        UkomDocumentUpdateComponent,
+        ModalComponent,
+    ],
     templateUrl: './ukom-document-list.component.html',
     styleUrl: './ukom-document-list.component.scss',
 })
 export class UkomDocumentListComponent {
-    tab$ = new BehaviorSubject<number | null>(0)
     pagable!: Pagable
-
     refresh: boolean = false
 
+    isUpdateModalOpen: boolean
+    selectedDocument: DokumenUkom
+
     constructor(
-        private tabService: TabService,
-        private router: Router,
+        public tabService: TabService,
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService,
+        public documentService: UkomDocumentService,
+        public jenisUkomService: JenisUkomService,
+        public sp: SpecificationService,
     ) {}
 
     ngOnInit() {
@@ -51,19 +63,12 @@ export class UkomDocumentListComponent {
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Ukom', (data: any) => {
-                        switch (data.jenisUkom) {
-                            case 'KENAIKAN_JENJANG':
-                                return 'Kenaikan Jenjang'
-                            case 'PERPINDAHAN_JABATAN':
-                                return 'Perpindahan Jabatan'
-                            case 'PROMOSI':
-                                return 'Promosi'
-                            case 'PROMOSI_JF':
-                                return 'Promosi Jabatan Fungsional'
-                            default:
-                                return data.jenisUkom
-                        }
+                    .withDynamicValue('Jenis UKom', (data: DokumenUkom) => {
+                        const jenisUkom =
+                            this.jenisUkomService.jenisUkomList.find(
+                                (j) => j.value === data.jenisUkom,
+                            )
+                        return jenisUkom ? jenisUkom.label : '-'
                     })
                     .build(),
             )
@@ -75,14 +80,36 @@ export class UkomDocumentListComponent {
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Khusus Mengulang?', (data: any) =>
-                        data.isMengulang ? 'Ya' : 'Tidak',
+                    .withDynamicValue(
+                        'Khusus Mengulang?',
+                        (data: DokumenUkom) =>
+                            data.isMengulang ? 'Ya' : 'Tidak',
+                    )
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Diperuntukan', (data: DokumenUkom) => {
+                        const specification = this.sp.specificationList.find(
+                            (s) => s.value === data.specification,
+                        )
+
+                        return specification ? specification.label : '-'
+                    })
+                    .build(),
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .withIcon('update')
+                    .setAction(
+                        (data: DokumenUkom) => this.openUpdateModal(data),
+                        'primary',
                     )
                     .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((item: any) => {
+                    .setAction((item: DokumenUkom) => {
                         this.delete(item.dokumenPersyaratanId)
                     }, 'danger')
                     .withIcon('danger')
@@ -92,53 +119,42 @@ export class UkomDocumentListComponent {
     }
 
     handleTabService() {
-        if (this.tabService.getTabsLength() > 0) {
-            this.tabService.clearTabs()
-        }
-
         this.tabService
             .addTab({
                 label: 'Daftar Dokumen Ukom',
                 isActive: true,
                 icon: 'mdi-list-box',
-                onClick: () => this.handleTabChange(0),
+                onClick: () => this.tabService.changeTabActive(0),
             })
             .addTab({
                 label: 'Tambah Dokumen Ukom',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1),
+                onClick: () => this.tabService.changeTabActive(1),
             })
+    }
+
+    refreshPagable() {
+        this.refresh = !this.refresh
+    }
+
+    closeUpdateModal() {
+        this.isUpdateModalOpen = false
+        this.selectedDocument = undefined
+    }
+
+    openUpdateModal(document: DokumenUkom) {
+        this.selectedDocument = document
+        this.isUpdateModalOpen = true
     }
 
     delete(id: string) {
         this.confirmationService.open(false).subscribe({
             next: (result) => {
                 if (!result.confirmed) return
-
-                this.apiService
-                    .deleteData(`/api/v1/doc_persyaratan/${id}`)
-                    .subscribe({
-                        next: () => {
-                            this.refresh = !this.refresh
-                            this.handlerService.handleAlert(
-                                'Success',
-                                'Dokumen berhasil di hapus',
-                            )
-                        },
-                        error: (error) => {
-                            console.error('Error fetching data', error)
-                            this.handlerService.handleAlert(
-                                'Error',
-                                'Gagal menghapus dokumen',
-                            )
-                        },
-                    })
+                this.documentService.deleteDocument(id, () => {
+                    this.refreshPagable()
+                })
             },
         })
-    }
-
-    handleTabChange(tab?: number) {
-        this.tab$.next(tab)
-        this.tabService.changeTabActive(tab)
     }
 }

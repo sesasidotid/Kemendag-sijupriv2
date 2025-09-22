@@ -7,11 +7,8 @@
     </ng-container>
 </ng-container>
 
-<ng-container *ngIf="isUpdateModalOpen">
-    <app-modal *ngIf="isUpdateModalOpen" [title]="'Update Syarat Pendaftaran'" (toggle)="closeUpdateModal() "
-        [enableFooter]="false">
-        <app-ukom-registration-requirement-update [rule]="selectedRule"
-            (updated)="closeUpdateModal(); refreshPagable()"></app-ukom-registration-requirement-update>
-    </app-modal>
-
-</ng-container>
+<app-modal *ngIf="isUpdateModalOpen" [title]="'Update Syarat Pendaftaran'" (toggle)="closeUpdateModal() "
+    [enableFooter]="false">
+    <app-ukom-registration-requirement-update [rule]="selectedRule"
+        (updated)="closeUpdateModal(); refreshPagable()"></app-ukom-registration-requirement-update>
+</app-modal>

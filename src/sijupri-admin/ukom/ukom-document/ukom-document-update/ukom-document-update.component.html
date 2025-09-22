@@ -1,0 +1,112 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+        <label for="dokumenPersyaratanName" class="form-label fw-bold">
+            Nama Dokumen Persyaratan <span class="text-danger">*</span>
+        </label>
+        <input type="text" id="dokumenPersyaratanName" class="form-control" formControlName="dokumenPersyaratanName"
+            placeholder="Nama Dokumen Persyaratan" />
+        <div *ngIf="getErrorMessage('dokumenPersyaratanName', 'Nama Dokumen Persyaratan') as error" class="text-danger">
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="jenisUkom" class="form-label fw-bold">
+            Jenis UKom <span class="text-danger">*</span>
+        </label>
+        <select id="jenisUkom" class="form-select" formControlName="jenisUkom">
+            <option [ngValue]="''" hidden disabled selected>Pilih Jenis UKom</option>
+            <ng-container *ngIf="(jenisUkomService.jenisUkomList$ | async) as jenisUkomList">
+                <ng-container *ngIf="jenisUkomList.length > 0; else noJenisUkom">
+                    <option *ngFor="let jenis of jenisUkomList" [value]="jenis.value">
+                        {{ jenis.label }}
+                    </option>
+                </ng-container>
+            </ng-container>
+            <ng-template #noJenisUkom>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
+        </select>
+        <div *ngIf="getErrorMessage('jenisUkom', 'Jenis UKom') as error" class="text-danger">
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="jabatanCode" class="form-label fw-bold">
+            Jabatan
+        </label>
+        <select id="jabatanCode" class="form-select" formControlName="jabatanCode">
+            <option [ngValue]="null" hidden disabled selected>Pilih Jabatan</option>
+            <ng-container *ngIf="(jabatanService.jabatanList$ | async) as jabatanList">
+                <ng-container *ngIf="jabatanList.length > 0; else noJabatan">
+                    <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
+                        {{ jabatan.name }}
+                    </option>
+                </ng-container>
+            </ng-container>
+            <ng-template #noJabatan>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
+        </select>
+        <div *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error" class="text-danger">
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="jenjangCode" class="form-label fw-bold">
+            Jenjang
+        </label>
+        <select id="jenjangCode" class="form-select" formControlName="jenjangCode">
+            <option [ngValue]="null" hidden disabled selected>Pilih Jenjang</option>
+            <ng-container *ngIf="(jenjangService.jenjangList$ | async) as jenjangList">
+                <ng-container *ngIf="jenjangList.length > 0; else noJenjang">
+                    <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code">
+                        {{ jenjang.name }}
+                    </option>
+                </ng-container>
+            </ng-container>
+            <ng-template #noJenjang>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
+        </select>
+        <div *ngIf="getErrorMessage('jenjangCode', 'Jenjang') as error" class="text-danger">
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="specification" class="form-label fw-bold">
+            Spesifikasi
+        </label>
+        <select id="specification" class="form-select" formControlName="specification">
+            <ng-container *ngIf="(specificationService.specificationList$ | async) as specList">
+                <ng-container *ngIf="specList.length > 0; else noSpec">
+                    <option *ngFor="let spec of specList" [value]="spec.value">
+                        {{ spec.label }}
+                    </option>
+                </ng-container>
+            </ng-container>
+            <ng-template #noSpec>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
+        </select>
+        <div *ngIf="getErrorMessage('specification', 'Spesifikasi') as error" class="text-danger">
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="isMengulang" formControlName="isMengulang">
+        <label class="form-check-label" for="isMengulang">
+            Mengulang
+        </label>
+    </div>
+
+    <div class="d-flex justify-content-end">
+        <app-loading-button [isLoading]="documentService.updateDocumentLoading$ | async" [label]="'Update'"
+            [disabled]="form.invalid" [type]="'submit'">
+        </app-loading-button>
+    </div>
+</form>

@@ -1,9 +1,13 @@
-<ng-container *ngIf="(tab$ | async) === 0">
-  <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+<ng-container *ngIf="(tabService.activeTab$| async) === 0">
+    <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 </ng-container>
 
-<ng-container *ngIf="(tab$ | async) === 1">
-  <app-ukom-document-add
-    (changeTabActive)="handleTabChange(0)"
-  ></app-ukom-document-add>
+<ng-container *ngIf="(tabService.activeTab$ | async) === 1">
+    <app-ukom-document-add (created)="tabService.changeTabActive(0)"></app-ukom-document-add>
 </ng-container>
+
+<app-modal *ngIf="isUpdateModalOpen" [title]="'Update Dokumen Persyaratan Ukom'" (toggle)="closeUpdateModal() "
+    [enableFooter]="false">
+    <app-ukom-document-update [document]="selectedDocument" (updated)="closeUpdateModal(); refreshPagable()">
+    </app-ukom-document-update>
+</app-modal>

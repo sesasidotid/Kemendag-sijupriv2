@@ -5,10 +5,12 @@
         </label>
         <select id="jenjangCode" class="form-select" formControlName="jenjangCode">
             <option [ngValue]="''" hidden disabled selected>Pilih Jenjang</option>
-            <ng-container *ngIf="(jenjangService.jenjangList$ | async) as jenjangList; else noJenjang">
-                <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code">
-                    {{ jenjang.name }}
-                </option>
+            <ng-container *ngIf="(jenjangService.jenjangList$ | async) as jenjangList">
+                <ng-container *ngIf="jenjangList.length > 0; else noJenjang">
+                    <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code">
+                        {{ jenjang.name }}
+                    </option>
+                </ng-container>
             </ng-container>
             <ng-template #noJenjang>
                 <option disabled>Tidak ada data</option>
@@ -47,8 +49,10 @@
         </label>
         <select id="ratingHasilId" class="form-select" formControlName="ratingHasilId">
             <option [ngValue]="''" hidden disabled selected>Pilih Rating Hasil Kinerja</option>
-            <ng-container *ngIf="(kinerjaService.ratingKinerjaList$ | async) as ratings; else noRatings">
-                <option *ngFor="let rating of ratings" [value]="rating.id">{{ rating.name }}</option>
+            <ng-container *ngIf="(kinerjaService.ratingKinerjaList$ | async) as ratings">
+                <ng-container *ngIf="ratings.length > 0; else noRatings">
+                    <option *ngFor="let rating of ratings" [value]="rating.id">{{ rating.name }}</option>
+                </ng-container>
             </ng-container>
             <ng-template #noRatings>
                 <option disabled>Tidak ada data</option>
@@ -83,8 +87,10 @@
         </label>
         <select id="predikatKinerjaId" class="form-select" formControlName="predikatKinerjaId">
             <option [ngValue]="''" hidden disabled selected>Pilih Predikat Kinerja</option>
-            <ng-container *ngIf="(kinerjaService.predikatKinerjaList$ | async) as ratings; else noRatings">
-                <option *ngFor="let rating of ratings" [value]="rating.id">{{ rating.name }}</option>
+            <ng-container *ngIf="(kinerjaService.predikatKinerjaList$ | async) as ratings">
+                <ng-container *ngIf="ratings.length > 0; else noRatings">
+                    <option *ngFor="let rating of ratings" [value]="rating.id">{{ rating.name }}</option>
+                </ng-container>
             </ng-container>
             <ng-template #noRatings>
                 <option disabled>Tidak ada data</option>
@@ -101,9 +107,16 @@
         </label>
         <select id="jenisUkom" class="form-select" formControlName="jenisUkom">
             <option [ngValue]="''" hidden disabled selected>Pilih Jenis UKom</option>
-            <option *ngFor="let jenis of jenisUkomService.jenisUkomList$ | async" [value]="jenis.value">
-                {{ jenis.label }}
-            </option>
+            <ng-container *ngIf="(jenisUkomService.jenisUkomList$ | async) as jenisUkomList">
+                <ng-container *ngIf="jenisUkomList.length > 0; else noJenisUkom">
+                    <option *ngFor="let jenis of jenisUkomList" [value]="jenis.value">
+                        {{ jenis.label }}
+                    </option>
+                </ng-container>
+            </ng-container>
+            <ng-template #noJenisUkom>
+                <option disabled>Tidak ada data</option>
+            </ng-template>
         </select>
         <div *ngIf="getError('jenisUkom', 'Jenis UKom') as error" class="text-danger">
             {{ error }}

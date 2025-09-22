@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Output } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { LucideAngularModule } from 'lucide-angular'
 import {
+    FormBuilder,
     FormControl,
     FormGroup,
     FormsModule,
@@ -10,12 +11,6 @@ import {
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { Observable } from 'rxjs'
-import { finalize, map } from 'rxjs/operators'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { UkomDocumentService } from '@/modules/ukom/services/document.service'
 import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
@@ -25,7 +20,7 @@ import { SpecificationService } from '@/modules/complement/services/specificatio
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
 @Component({
-    selector: 'app-ukom-document-add',
+    selector: 'app-ukom-document-update',
     standalone: true,
     imports: [
         CommonModule,
@@ -34,15 +29,13 @@ import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/
         ReactiveFormsModule,
         LoadingButtonComponent,
     ],
-    templateUrl: './ukom-document-add.component.html',
-    styleUrl: './ukom-document-add.component.scss',
+    templateUrl: './ukom-document-update.component.html',
 })
-export class UkomDocumentAddComponent {
-    @Output() created = new EventEmitter<void>()
+export class UkomDocumentUpdateComponent {
+    @Input() _document: DokumenUkom
+    @Output() updated = new EventEmitter<void>()
 
-    documentForm: FormGroup
-    submitLoading$ = new BehaviorSubject<boolean>(false)
-    documentData: DokumenUkom
+    form: FormGroup
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -52,43 +45,77 @@ export class UkomDocumentAddComponent {
         public jabatanService: JabatanService,
         public jenisUkomService: JenisUkomService,
         public specificationService: SpecificationService,
+        private fb: FormBuilder,
     ) {}
 
+    @Input()
+    set document(value: DokumenUkom) {
+        this._document = value
+        if (value && this.form) {
+            this.patchForm(value)
+        }
+    }
+    get document(): DokumenUkom {
+        return this._document
+    }
+
     ngOnInit() {
-        this.handleFormInit()
         this.jabatanService.fetchJabatan()
         this.jenjangService.fetchJenjang()
+        this.jenisUkomService.fetchJenisUkom()
+        this.initForm()
+    }
+
+    patchForm(document: DokumenUkom) {
+        this.form.patchValue({
+            dokumenPersyaratanId: document.dokumenPersyaratanId,
+            dokumenPersyaratanName: document.dokumenPersyaratanName,
+            jenisUkom: document.jenisUkom,
+            jabatanCode: document.jabatanCode,
+            jenjangCode: document.jenjangCode,
+            isMengulang: document.isMengulang,
+            specification: document.specification,
+        })
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
-            this.documentForm.get(controlName),
+            this.form.get(controlName),
             controlName,
             label,
         )
     }
 
-    handleFormInit() {
-        this.documentForm = new FormGroup({
+    initForm() {
+        this.form = this.fb.group({
+            dokumenPersyaratanId: new FormControl({
+                value: null,
+                disabled: true,
+            }),
             dokumenPersyaratanName: new FormControl('', Validators.required),
             jenisUkom: new FormControl('', Validators.required),
-            jabatanCode: new FormControl(''),
-            jenjangCode: new FormControl(''),
+            jabatanCode: new FormControl(null),
+            jenjangCode: new FormControl(null),
             isMengulang: new FormControl(false, Validators.required),
             specification: new FormControl(null),
         })
+
+        if (this._document) {
+            this.patchForm(this._document)
+        }
     }
 
     submit() {
-        console.log(this.documentForm.value)
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
 
-                this.documentData = new DokumenUkom(this.documentForm.value)
-                this.documentService.createDocument(this.documentData, () => {
-                    this.documentForm.reset()
-                    this.created.emit()
+                const updatedDocumentData = new DokumenUkom(
+                    this.form.getRawValue(),
+                )
+                this.documentService.updateDocument(updatedDocumentData, () => {
+                    this.form.reset()
+                    this.updated.emit()
                 })
             },
         })

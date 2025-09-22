@@ -9,7 +9,7 @@ import { UkomTaskFormComponent } from '../ukom-task-form/ukom-task-form.componen
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { PesertaUkom } from '../../../modules/ukom/models/peserta-ukom.model'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, finalize, tap } from 'rxjs'
 import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.modal'
 import { ConverterService } from '../../../modules/base/services/converter.service'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
@@ -18,7 +18,17 @@ import { UkomRevisionComponent } from '../ukom-revision/ukom-revision.component'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
-
+import { SystemConfigService } from '@/modules/base/services/system-config.service'
+import { AgeCalculatorPipe } from '@/modules/base/pipes/age-calculator.pipe'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { KinerjaService } from '@/modules/complement/services/kinerja.service'
+import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
+import { ProvinsiService } from '@/modules/maintenance/services/provinsi.service'
+import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
+import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jabatan.service'
+import { JfService } from '@/modules/siap/services/jf.service'
+import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
@@ -36,6 +46,8 @@ export enum JenisUkomEnum {
         ModalComponent,
         UkomRevisionComponent,
         TanggalIndoPipe,
+        LoadingButtonComponent,
+        AgeCalculatorPipe,
     ],
     templateUrl: './ukom-task.component.html',
     styleUrl: './ukom-task.component.scss',
@@ -60,7 +72,6 @@ export class UkomTaskComponent {
     registerOpened$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
         false,
     )
-    predikatKinerjaList: any[] = []
 
     pendidikanName: string
     provinsiName: string
@@ -90,84 +101,40 @@ export class UkomTaskComponent {
     constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private ukomTaskService: UkomTaskService,
+        public ukomTaskService: UkomTaskService,
         private converterService: ConverterService,
         private sanitizer: DomSanitizer,
+        public systemConfigService: SystemConfigService,
+        public jenisUkomService: JenisUkomService,
+        public kinerjaService: KinerjaService,
+        public pendidikanService: PendidikanService,
+        public provinceService: ProvinsiService,
+        public kabKotaService: KabKotaService,
+        public bidangJabatanService: BidangJabatanService,
+        private jfService: JfService,
+        public ukomParticipantService: UkomParticipantService,
     ) {}
 
     ngOnInit() {
-        this.checkStatusRegister()
-        this.loadPredikatKinerja()
-    }
-
-    loadPredikatKinerja() {
-        console.log('loadPredikatKinerja')
-        this.apiService.getData('/api/v1/predikat_kinerja').subscribe({
-            next: (res) => {
-                this.predikatKinerjaList = res
-                console.log('predikat kinerja:', this.predikatKinerjaList)
-                this.getPendingTask()
-                this.getJF()
-                this.getJFRegisterStatus()
-            },
-            error: (err) => {
-                console.error('Failed to fetch predikat kinerja:', err)
-                this.getPendingTask()
-                this.getJF()
-                this.getJFRegisterStatus()
-            },
-        })
-    }
-
-    calculateAge(
-        tanggalLahir: string | Date,
-        tglSuratUsulan: string | Date,
-    ): string {
-        console.log('calculateAge', tanggalLahir, tglSuratUsulan)
-
-        if (!tanggalLahir || !tglSuratUsulan) {
-            return '-'
-        }
-
-        const birthDate = new Date(tanggalLahir)
-        const suratDate = new Date(tglSuratUsulan)
-
-        if (isNaN(birthDate.getTime()) || isNaN(suratDate.getTime())) {
-            return '-'
-        }
-
-        let ageYears = suratDate.getFullYear() - birthDate.getFullYear()
-        let ageMonths = suratDate.getMonth() - birthDate.getMonth()
-        let ageDays = suratDate.getDate() - birthDate.getDate()
-
-        if (ageMonths < 0 || (ageMonths === 0 && ageDays < 0)) {
-            ageYears--
-            ageMonths += 12
-        }
-
-        if (ageDays < 0) {
-            const lastMonth = new Date(
-                suratDate.getFullYear(),
-                suratDate.getMonth(),
-                0,
-            )
-            ageDays += lastMonth.getDate()
-            ageMonths--
-        }
-
-        return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
-    }
-
-    getJenisUkomLabel(jenisUkom: string): string {
-        return JenisUkomEnum[jenisUkom as keyof typeof JenisUkomEnum] || '-'
-    }
-
-    checkStatusRegister() {
-        this.apiService.getData(`/api/v1/sys_conf/UKM_REGISTRATION`).subscribe({
+        this.systemConfigService.checkUkomRegistration()
+        this.kinerjaService.fetchPredikatKinerja()
+        this.pendidikanService.fetchPendidikan()
+        this.getPendingTask()
+        this.jfService.findByNip(LoginContext.getUserId()).subscribe({
             next: (response) => {
-                this.registerOpened$.next(response.value == 'ya')
+                this.jf = response
             },
         })
+        this.ukomParticipantService.isJFCanRegisterUkom(
+            LoginContext.getUserId(),
+        )
+    }
+
+    openRegistrationForm(jenisUkom: string) {
+        this.ukomTaskService.checkEligibility(
+            jenisUkom,
+            LoginContext.getUserId(),
+        )
     }
 
     isAnyFieldEmpty(): boolean {
@@ -203,134 +170,82 @@ export class UkomTaskComponent {
         })
     }
 
-    getJFRegisterStatus() {
-        this.apiService
-            .getData(
-                `/api/v1/participant_ukom/latest/${LoginContext.getUserId()}`,
+    getPendingTask() {
+        this.ukomDataLoading$.next(true)
+        this.ukomTaskService
+            .findByNip(LoginContext.getUserId())
+            .pipe(
+                tap((res) => {
+                    this.pendidikanName =
+                        this.pendidikanService.getPendidikanById(
+                            res.pendidikanTerakhirCode,
+                        )?.name
+
+                    res.provinsiId &&
+                        this.provinceService
+                            .findById(res.provinsiId)
+                            .subscribe({
+                                next: (provinsi) => {
+                                    this.provinsiName = provinsi.name
+                                },
+                            })
+
+                    res.kabupatenKotaId &&
+                        this.kabKotaService
+                            .findById(res.kabupatenKotaId)
+                            .subscribe({
+                                next: (kabKota) => {
+                                    this.kabupatenName = kabKota.name
+                                    this.typeKabKota = kabKota.type
+                                },
+                            })
+
+                    res.bidangJabatanCode &&
+                        this.bidangJabatanService
+                            .findByCode(res.bidangJabatanCode)
+                            .subscribe({
+                                next: (bidangJabatan) => {
+                                    this.bidangJabatanName = bidangJabatan.name
+                                },
+                            })
+
+                    this.predikat1Name =
+                        this.kinerjaService.getPredikatKinerjaNameById(
+                            res.predikatKinerja1Id,
+                        )
+                    this.predikat2Name =
+                        this.kinerjaService.getPredikatKinerjaNameById(
+                            res.predikatKinerja2Id,
+                        )
+                }),
+                finalize(() => {
+                    this.ukomDataLoading$.next(false)
+                }),
             )
             .subscribe({
                 next: (response) => {
-                    if (response.id) {
-                        this.canRegister = false
+                    this.pendingTask = response
+                    switch (this.pendingTask.flowId) {
+                        case 'ukom_flow_1':
+                            this.ukomStep$.next(1)
+                            this.currentUkomStep$.next(1)
+                            break
+                        case 'ukom_flow_2':
+                            this.ukomStep$.next(2)
+                            this.currentUkomStep$.next(2)
+                            break
+                        default:
+                            break
                     }
-                },
-                error: (error) => {
-                    if (error.error.code == 'RCD-00001') {
-                        this.canRegister = true
-                        return
+
+                    if (this.pendingTask.pendingTaskHistory.length > 0) {
+                        this.groupedUkomPendingTaskHistory =
+                            this.groupAndSortTasksByFlowId(
+                                this.pendingTask.pendingTaskHistory,
+                            )
                     }
                 },
             })
-    }
-
-    getPendidikanList(pendidikanTerakhirCode: string) {
-        this.apiService.getData(`/api/v1/pendidikan`).subscribe({
-            next: (response) => {
-                const matchedPendidikan = response.find(
-                    (pendidikan: any) =>
-                        pendidikan.code === pendidikanTerakhirCode,
-                )
-                this.pendidikanName = matchedPendidikan
-                    ? matchedPendidikan.name
-                    : null
-            },
-        })
-    }
-
-    getProvinsiNameByCode(provinsiCode: string) {
-        this.apiService.getData(`/api/v1/provinsi/${provinsiCode}`).subscribe({
-            next: (response) => {
-                this.provinsiName = response.name ?? null
-            },
-        })
-    }
-
-    getKabupatenNameByCode(kabupatenCode: string) {
-        this.apiService.getData(`/api/v1/kab_kota/${kabupatenCode}`).subscribe({
-            next: (response) => {
-                this.kabupatenName = response.name ?? null
-                this.typeKabKota = response.type ?? null
-            },
-        })
-    }
-
-    getPredikatKinerja(code: string | null): string {
-        console.log('getPredikatKinerja', code)
-        if (!code || code == null) return '-'
-        const predikat = this.predikatKinerjaList.find(
-            (predikat) => predikat.id === code,
-        )
-        return predikat ? predikat.name : '-'
-    }
-
-    getBidangjabatanNameByCode(bidangJabatanCode: string) {
-        this.apiService
-            .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
-            .subscribe({
-                next: (response) => {
-                    this.bidangJabatanName = response.name ?? null
-                },
-            })
-    }
-
-    getPendingTask() {
-        this.ukomDataLoading$.next(true)
-        this.ukomTaskService.findByNip(LoginContext.getUserId()).subscribe({
-            next: (response) => {
-                this.pendingTask = response
-                console.log('p', response)
-
-                this.getPendidikanList(response.pendidikanTerakhirCode)
-                if (response.provinsiId) {
-                    this.getProvinsiNameByCode(response.provinsiId)
-                }
-
-                if (response.kabupatenKotaId) {
-                    this.getKabupatenNameByCode(response.kabupatenKotaId)
-                }
-
-                if (response.bidangJabatanCode) {
-                    this.getBidangjabatanNameByCode(response.bidangJabatanCode)
-                }
-
-                this.predikat1Name = this.getPredikatKinerja(
-                    response.predikatKinerja1Id,
-                )
-                this.predikat2Name = this.getPredikatKinerja(
-                    response.predikatKinerja2Id,
-                )
-
-                switch (this.pendingTask.flowId) {
-                    case 'ukom_flow_1':
-                        this.ukomStep$.next(1)
-                        this.currentUkomStep$.next(1)
-                        break
-                    case 'ukom_flow_2':
-                        this.ukomStep$.next(2)
-                        this.currentUkomStep$.next(2)
-                        break
-                    default:
-                        break
-                }
-
-                if (this.pendingTask.pendingTaskHistory.length > 0) {
-                    this.groupedUkomPendingTaskHistory =
-                        this.groupAndSortTasksByFlowId(
-                            this.pendingTask.pendingTaskHistory,
-                        )
-                    console.log(
-                        'groupedUkomPendingTaskHistory',
-                        this.groupedUkomPendingTaskHistory,
-                    )
-                }
-
-                this.ukomDataLoading$.next(false)
-            },
-            error: (error) => {
-                this.ukomDataLoading$.next(false)
-                this.getJF()
-            },
-        })
     }
 
     getJF() {

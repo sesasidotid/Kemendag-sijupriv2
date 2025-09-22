@@ -10,16 +10,16 @@
 </app-modal>
 
 <ng-template #ukomHadItem>
-    <div *ngIf="registerOpened$ | async; else registerClosed">
+    <div *ngIf="systemConfigService.isRegisterOpen$| async; else registerClosed">
         <div class="row px-3">
             <div *ngIf="!pendingTask.jenisUkom; else hadData" class="col-lg-12">
-                <app-empty-state *ngIf="!canRegister" [title]="
+                <app-empty-state *ngIf="!(ukomParticipantService.isJFCanRegisterUkom$ | async)" [title]="
                         'Anda belum bisa mendaftar UKom. Masih ada proses UKom yang berjalan'
                     " [description]="
                         'Silahkan tunggu proses UKom yang sedang berjalan selesai terlebih dahulu.'
                     "></app-empty-state>
 
-                <app-empty-state *ngIf="!wannaRequest && canRegister"
+                <app-empty-state *ngIf="!wannaRequest && (ukomParticipantService.isJFCanRegisterUkom$ | async)"
                     [title]="'Belum ada pendaftaran UKom yang berjalan'" [description]="
                         'Anda bisa mengajukan pendaftaran UKom dengan menekan tombol dibawah ini.'
                     " [buttonText]="'Ajukan Ukom'" [buttonAction]="reqChange.bind(this)"></app-empty-state>
@@ -139,14 +139,24 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="hstack gap-2 justify-content-end">
-                                Apakan data anda sudah lengkap?
+                            <div class="hstack gap-2 justify-content-end align-items-center">
+                                <span>Apakah data anda sudah lengkap?</span>
+
+                                <!-- <app-loading-button [isLoading]="ukomTaskService.isEligibilityLoading$ | async"
+                                    [className]="'btn btn-warning text-dark'" (clicked)="openRegistrationForm()">
+                                </app-loading-button> -->
                                 <button [disabled]="isAnyFieldEmpty()" (click)="isFormOpen = true"
                                     class="btn btn-warning text-dark">
                                     Lanjut
                                 </button>
                             </div>
+
+                            <!-- <div *ngIf="(ukomTaskService.eligibility$ | async).eligible === false"
+                                class="text-danger mt-2 text-end">
+                                Anda belum bisa mendaftar UKom. {{ (ukomTaskService.eligibility$ | async).message }}
+                            </div> -->
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -188,13 +198,7 @@
                                         Jenis UKom
                                     </label>
                                     <p class="text-muted">
-                                        {{
-                                        pendingTask.jenisUkom
-                                        ? getJenisUkomLabel(
-                                        pendingTask.jenisUkom
-                                        )
-                                        : '-'
-                                        }}
+                                        {{jenisUkomService.getLabelByValue(pendingTask.jenisUkom) ?? '-'}}
                                     </p>
                                 </div>
 
@@ -216,12 +220,8 @@
                                         Usia Menurut Surat Usulan
                                     </label>
                                     <p class="text-muted">
-                                        {{
-                                        calculateAge(
-                                        pendingTask.tanggalLahir,
-                                        pendingTask.tglSuratUsulan
-                                        )
-                                        }}
+
+                                        {{ pendingTask.tanggalLahir | ageCalculator: pendingTask.tglSuratUsulan }}
                                     </p>
                                 </div>
 

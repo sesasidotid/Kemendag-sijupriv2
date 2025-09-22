@@ -67,4 +67,16 @@ export class KinerjaService {
             )
             .subscribe()
     }
+
+    getRatingKinerjaNameById(id: string): string | undefined {
+        return this.ratingKinerjaListSubject
+            .getValue()
+            .find((item) => item.id === id)?.name
+    }
+
+    getPredikatKinerjaNameById(id: string): string | undefined {
+        return this.predikatKinerjaListSubject
+            .getValue()
+            .find((item) => item.id === id)?.name
+    }
 }

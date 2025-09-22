@@ -21,8 +21,10 @@ export class UkomTaskService {
     private eligibilityLoadingSubject = new BehaviorSubject<boolean>(false)
     isEligibilityLoading$ = this.eligibilityLoadingSubject.asObservable()
 
-    private eligibleSubject = new BehaviorSubject<boolean>(false)
-    isEligible$ = this.eligibleSubject.asObservable()
+    private eligibleSubject = new BehaviorSubject<Eligibility>(
+        new Eligibility(),
+    )
+    eligibility$ = this.eligibleSubject.asObservable()
 
     constructor(
         private apiService: ApiService,
@@ -75,24 +77,74 @@ export class UkomTaskService {
                 }),
             )
     }
-    checkEligibility(nip: string): void {
+
+    private mapEligibilityMessage(code: string, message: string): string {
+        switch (code) {
+            case 'UEL-00000':
+                return 'Profil belum lengkap (email dan nomor telepon).'
+            case 'UEL-00001':
+                return 'Riwayat jabatan tidak ditemukan.'
+            case 'UEL-00002':
+                return 'Riwayat pangkat tidak ditemukan.'
+            case 'UEL-00003':
+                return 'Riwayat pendidikan tidak ditemukan.'
+            case 'UEL-00004':
+                return 'Riwayat kinerja tidak ditemukan.'
+            case 'UEL-00005':
+                return 'Angka kredit di bawah ambang batas.'
+            case 'UEL-00006':
+                return message
+                    .replace('Rating Hasil last', 'Rating hasil pada')
+                    .replace('year not eligible', 'tahun tidak memenuhi syarat')
+            case 'UEL-00007':
+                return message
+                    .replace('Rating Kinerja last', 'Rating kinerja pada')
+                    .replace('year not eligible', 'tahun tidak memenuhi syarat')
+            case 'UEL-00008':
+                return message
+                    .replace('Predikat Kinerja last', 'Predikat kinerja pada')
+                    .replace('year not eligible', 'tahun tidak memenuhi syarat')
+            case 'UEL-00009':
+                return 'Pendaftaran sudah ada.'
+            default:
+                return message
+        }
+    }
+
+    checkEligibility(jenisUkom: string, nip: string): void {
         this.eligibilityLoadingSubject.next(true)
 
         this.apiService
-            .getData(`${this.BASE_PATH_TASK}/check_eligible/${nip}`)
+            .getData(
+                `${this.BASE_PATH_TASK}/check_eligible/${jenisUkom}/${nip}`,
+            )
             .pipe(
-                map((res) => new Eligibility(res)),
+                map((res) => {
+                    const eligibility = new Eligibility(res)
+                    return new Eligibility({
+                        ...eligibility,
+                        message: this.mapEligibilityMessage(
+                            eligibility.code,
+                            eligibility.message,
+                        ),
+                    })
+                }),
                 catchError((err) => {
                     console.error('Error checking eligibility', err)
-                    this.handlerService.handleAlert('Error', err.message)
-                    return of(new Eligibility({ eligible: false }))
+                    this.handlerService.handleException(err)
+                    return of(
+                        new Eligibility({
+                            eligible: false,
+                            message: 'Terjadi kesalahan pada sistem.',
+                        }),
+                    )
                 }),
                 finalize(() => {
                     this.eligibilityLoadingSubject.next(false)
                 }),
             )
             .subscribe((eligibility) => {
-                this.eligibleSubject.next(eligibility.eligible)
+                this.eligibleSubject.next(eligibility)
             })
     }
 }

@@ -220,8 +220,8 @@
                 </div>
 
                 <div class="col-lg-12">
-                    <div class="hstack gap-2 justify-content-end">
-                        <button type="submit" class="btn btn-success" [disabled]="
+                    <div class="hstack gap-2 justify-content-end align-items-center">
+                        <!-- <button type="submit" class="btn btn-success" [disabled]="
                                 !passwordForm.valid || isAnyFileMissing()
                             " *ngIf="!(hadItemsLoading$ | async)">
                             Simpan
@@ -231,7 +231,14 @@
                             <div class="spinner-border spinner-sm-custom" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                        </button>
+                        </button> -->
+                        <app-loading-button [isLoading]="hadItemsLoading$ | async"
+                            [disabled]="!passwordForm.valid || isAnyFileMissing()" [type]="'submit'">
+                        </app-loading-button>
+                    </div>
+                    <div class="text-danger mt-2 text-end"
+                        *ngIf="(ukomTaskService.eligibility$ | async).eligible === false">
+                        Anda belum bisa mendaftar UKom. {{ (ukomTaskService.eligibility$ | async).message }}
                     </div>
                 </div>
             </div>
