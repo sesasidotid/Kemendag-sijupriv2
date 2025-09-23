@@ -108,7 +108,7 @@ export class NonjfRevisiUkomComponent {
         this.initForm()
         this.kinerjaService.fetchPredikatKinerja()
         this.pendidikanService.fetchPendidikan()
-        ;(this, this.pangkatService.findAll())
+        this.pangkatService.findAll()
         this.pangkatList$ = this.pangkatService.findAll()
         this.provinsiList$ = this.provinsiService.findAll()
         this.getRejectedDokumen()
@@ -116,6 +116,10 @@ export class NonjfRevisiUkomComponent {
         this.setDefaultFormValues(this.pendingTask)
         this.setupFormValidation()
 
+        const jenisInstansiControl = this.updateNonJFForm.get('jenisInstansi')
+        if (jenisInstansiControl?.value) {
+            jenisInstansiControl.updateValueAndValidity({ emitEvent: true })
+        }
         this.updateNonJFForm.valueChanges.subscribe(() => {
             if (this.updateNonJFForm.invalid) {
                 const invalidControls = this.findInvalidControlsWithReasons(
