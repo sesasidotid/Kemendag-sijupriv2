@@ -584,12 +584,15 @@ export class UkomTaskFormComponent {
                     )
                 }),
                 switchMap((eligibility) => {
-                    console.log('Eligibility:', eligibility)
                     if (!eligibility.eligible) {
+                        // this.handlerService.handleAlert(
+                        //     'Error',
+                        //     eligibility.message ||
+                        //         'Anda tidak memenuhi syarat untuk mengikuti ujian.',
+                        // )
                         this.handlerService.handleAlert(
                             'Error',
-                            eligibility.message ||
-                                'Anda tidak memenuhi syarat untuk mengikuti ujian.',
+                            'Anda belum memenuhi persyaratan uji kompetensi',
                         )
                         return EMPTY
                     }
@@ -671,92 +674,4 @@ export class UkomTaskFormComponent {
                 String(this.passwordForm.get('isMengulang')?.value) === 'true',
         }
     }
-
-    // submit() {
-    //     if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
-    //         this.pesertaUkom.dokumenUkomList = []
-    //     }
-
-    //     const documentMap = new Map()
-
-    //     for (const key in this.detectedDokumen) {
-    //         if (this.detectedDokumen.hasOwnProperty(key)) {
-    //             const detected = this.detectedDokumen[key]
-
-    //             const dokumenPersyaratan = this.dokumenPersyaratanList.find(
-    //                 (dokumen) => dokumen.dokumenPersyaratanId === key,
-    //             )
-
-    //             if (dokumenPersyaratan) {
-    //                 const newDoc = {
-    //                     dokumenFile: detected.base64,
-    //                     dokumenPersyaratanName: `${
-    //                         dokumenPersyaratan.dokumenPersyaratanName
-    //                     }_${this.jf.nip}_${Date.now()}`,
-    //                     dokumenPersyaratanId: detected.id,
-    //                 }
-
-    //                 documentMap.set(detected.id, newDoc)
-    //             }
-    //         }
-    //     }
-
-    //     this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
-
-    //     this.confirmationService.open(false).subscribe({
-    //         next: (result) => {
-    //             if (!result.confirmed) return
-    //             this.hadItemsLoading$.next(true)
-
-    //             this.pesertaUkom.jenisUkom =
-    //                 this.passwordForm.get('jenis_ukom').value
-    //             this.pesertaUkom.nip = this.jf.nip
-    //             this.pesertaUkom.nextJenjangCode = this.passwordForm
-    //                 .get('next_jenjang_code')
-    //                 ?.getRawValue()
-    //             this.pesertaUkom.nextJabatanCode = this.passwordForm
-    //                 .get('next_jabatan_code')
-    //                 ?.getRawValue()
-    //             this.pesertaUkom.nextPangkatCode = this.jf.pangkatCode
-    //             this.pesertaUkom.password =
-    //                 this.passwordForm.get('password')?.value
-    //             this.pesertaUkom.bidang_jabatan_code = this.passwordForm.get(
-    //                 'bidang_jabatan_code',
-    //             )?.value
-
-    //             this.pesertaUkom.no_surat_usulan =
-    //                 this.passwordForm.get('no_surat_usulan')?.value
-    //             this.pesertaUkom.tglSuratUsulan =
-    //                 this.passwordForm.get('tglSuratUsulan')?.value
-
-    //             this.pesertaUkom.tanggalLahir = this.jf.tanggalLahir
-    //             this.pesertaUkom.pendidikanTerakhirCode = this.pendidikanJF
-    //             this.pesertaUkom.jurusan = this.jurusanJF
-    //             this.pesertaUkom.JenjangName = this.jf.jenjangName
-    //             this.pesertaUkom.isMengulang =
-    //                 String(this.passwordForm.get('isMengulang')?.value) ===
-    //                 'true'
-
-    //             this.apiService
-    //                 .postData(
-    //                     `/api/v1/participant_ukom/task/jf`,
-    //                     this.pesertaUkom,
-    //                 )
-    //                 .subscribe({
-    //                     next: () => {
-    //                         this.hadItemsLoading$.next(false)
-    //                         window.location.reload()
-    //                     },
-    //                     error: (error) => {
-    //                         this.hadItemsLoading$.next(false)
-    //                         this.handlerService.handleException(error)
-    //                     },
-    //                 })
-    //         },
-    //         error: (error) => {
-    //             this.handlerService.handleAlert('Error', error.error.message)
-    //             this.hadItemsLoading$.next(false)
-    //         },
-    //     })
-    // }
 }

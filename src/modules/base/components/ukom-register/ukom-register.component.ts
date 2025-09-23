@@ -499,7 +499,7 @@ export class UkomRegisterComponent {
                     docs
                         .filter((dokumen) => {
                             const specificationMatch =
-                                dokumen.specification === null ||
+                                dokumen.specification === 'null' ||
                                 dokumen.specification === 'non_jf' ||
                                 dokumen.specification === 'false'
                             const jabatanMatch =
