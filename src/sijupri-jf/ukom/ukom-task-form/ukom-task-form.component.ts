@@ -339,7 +339,7 @@ export class UkomTaskFormComponent {
                     docs
                         .filter((dokumen) => {
                             const specificationMatch =
-                                dokumen.specification === null ||
+                                dokumen.specification === 'null' ||
                                 dokumen.specification === 'jf' ||
                                 dokumen.specification === 'false'
                             const jabatanMatch =
