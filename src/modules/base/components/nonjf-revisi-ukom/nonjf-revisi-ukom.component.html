@@ -6,8 +6,13 @@
             </div>
 
             <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="showFormCheckbox" [(ngModel)]="showForm"
-                    (change)="onCheckboxChange()" />
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="showFormCheckbox"
+                    [(ngModel)]="showForm"
+                    (change)="onCheckboxChange()"
+                />
                 <label class="form-check-label" for="showFormCheckbox">
                     Perbaiki data diri.
                 </label>
@@ -21,39 +26,605 @@
 
             <div *ngIf="showForm">
                 <form [formGroup]="updateNonJFForm">
+                    <!-- Nama -->
                     <div class="mb-3">
-                        <label for="name" class="form-label">Nama <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="name" required formControlName="name" />
-                        <div class="text-danger" *ngIf="
-                updateNonJFForm.get('name').invalid &&
-                updateNonJFForm.get('name').touched
-              ">
-                            <small *ngIf="updateNonJFForm.get('name').errors?.['required']">Nama perlu diisi.</small>
+                        <label for="name" class="form-label"
+                            >Nama <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="name"
+                            formControlName="name"
+                        />
+                        <div
+                            *ngIf="getErrorMessage('name', 'Nama') as error"
+                            class="text-danger"
+                        >
+                            {{ error }}
                         </div>
                     </div>
 
+                    <!-- Tempat Lahir -->
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="email" required formControlName="email" />
-                        <div class="text-danger" *ngIf="
-                updateNonJFForm.get('email').invalid &&
-                updateNonJFForm.get('email').touched
-              ">
-                            <small *ngIf="updateNonJFForm.get('email').errors?.['required']">Email perlu diisi.</small>
+                        <label for="tempatLahir" class="form-label"
+                            >Tempat Lahir
+                            <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="tempatLahir"
+                            formControlName="tempatLahir"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'tempatLahir',
+                                    'Tempat Lahir'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
                         </div>
                     </div>
 
+                    <!-- Tanggal Lahir -->
                     <div class="mb-3">
-                        <label for="unitKerjaName" class="form-label">Unit Kerja <span
-                                class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="unitKerjaName" required
-                            formControlName="unitKerjaName" />
-                        <div class="text-danger" *ngIf="
-                updateNonJFForm.get('unitKerjaName').invalid &&
-                updateNonJFForm.get('unitKerjaName').touched
-              ">
-                            <small *ngIf="updateNonJFForm.get('unitKerjaName').errors?.['required']">Unit Kerja perlu
-                                diisi.</small>
+                        <label for="tanggalLahir" class="form-label"
+                            >Tanggal Lahir
+                            <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="tanggalLahir"
+                            formControlName="tanggalLahir"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'tanggalLahir',
+                                    'Tanggal Lahir'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label for="phone" class="form-label"
+                            >Nomor HP <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="phone"
+                            formControlName="phone"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage('phone', 'Nomor HP') as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label"
+                            >Email <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            formControlName="email"
+                        />
+                        <div
+                            *ngIf="getErrorMessage('email', 'Email') as error"
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Jenis Instansi -->
+                    <div class="mb-3">
+                        <label for="jenisInstansi" class="form-label"
+                            >Jenis Instansi
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-select"
+                            id="jenisInstansi"
+                            formControlName="jenisInstansi"
+                        >
+                            <option
+                                *ngFor="
+                                    let jenis of jenisInstansiService.jenisInstansiList
+                                "
+                                [value]="jenis.value"
+                            >
+                                {{ jenis.label }}
+                            </option>
+                        </select>
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'jenisInstansi',
+                                    'Jenis Instansi'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Provinsi -->
+                    <div
+                        class="mb-3"
+                        *ngIf="
+                            updateNonJFForm.get('jenisInstansi')?.value ===
+                                'PEMERINTAH_PROVINSI' ||
+                            updateNonJFForm.get('jenisInstansi')?.value ===
+                                'PEMERINTAH_KABUPATEN_KOTA'
+                        "
+                    >
+                        <label for="provinsiId" class="form-label"
+                            >Provinsi <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-select"
+                            id="provinsiId"
+                            formControlName="provinsiId"
+                        >
+                            <ng-container
+                                *ngIf="
+                                    provinsiList$ | async as provinsiList;
+                                    else loadingProvinsi
+                                "
+                            >
+                                <option
+                                    *ngFor="let provinsi of provinsiList"
+                                    [value]="provinsi.id"
+                                >
+                                    {{ provinsi.name }}
+                                </option>
+                            </ng-container>
+
+                            <ng-template #loadingProvinsi>
+                                <option disabled>Loading provinsi...</option>
+                            </ng-template>
+                        </select>
+
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'provinsiId',
+                                    'Provinsi'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Kabupaten / Kota -->
+                    <div
+                        class="mb-3"
+                        *ngIf="
+                            updateNonJFForm.get('jenisInstansi')?.value ===
+                            'PEMERINTAH_KABUPATEN_KOTA' && updateNonJFForm.get('provinsiId')?.value
+                        "
+                    >
+                        <label for="kabupatenKotaId" class="form-label"
+                            >Kabupaten/Kota
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-select"
+                            id="kabupatenKotaId"
+                            formControlName="kabupatenKotaId"
+                        >
+                            <ng-container
+                                *ngIf="
+                                    kabKotaList$ | async as kabKotaList;
+                                    else loadingKabKota
+                                "
+                            >
+                                <option
+                                    *ngFor="let kabKota of kabKotaList"
+                                    [value]="kabKota.id"
+                                >
+                                    {{ kabKota.name }}
+                                </option>
+                            </ng-container>
+
+                            <ng-template #loadingKabKota>
+                                <option disabled>
+                                    Loading kabupaten/kota...
+                                </option>
+                            </ng-template>
+                        </select>
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'kabupatenKotaId',
+                                    'Kabupaten/Kota'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Unit Kerja -->
+                    <div class="mb-3">
+                        <label for="unitKerjaName" class="form-label"
+                            >Unit Kerja
+                            <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="unitKerjaName"
+                            formControlName="unitKerjaName"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'unitKerjaName',
+                                    'Unit Kerja'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Jabatan -->
+                    <div class="mb-3">
+                        <label for="jabatanName" class="form-label"
+                            >Jabatan Saat Ini
+                            <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="jabatanName"
+                            formControlName="jabatanName"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'jabatanName',
+                                    'Jabatan Saat Ini'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Jenjang -->
+                    <div class="mb-3">
+                        <label for="jenjangName" class="form-label"
+                            >Jenjang Saat Ini</label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="jenjangName"
+                            formControlName="jenjangName"
+                        />
+                        <small id="jenjangHelp" class="form-text text-muted">
+                            Kosongkan atau isi - jika tidak mempunyai jenjang.
+                        </small>
+                    </div>
+
+                    <!-- TMT Jabatan -->
+                    <div class="mb-3">
+                        <label for="tmtJabatan" class="form-label"
+                            >TMT Jabatan
+                            <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="tmtJabatan"
+                            formControlName="tmtJabatan"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'tmtJabatan',
+                                    'TMT Jabatan'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Pangkat -->
+                    <div class="mb-3">
+                        <label for="pangkatCode" class="form-label"
+                            >Pangkat Saat Ini</label
+                        >
+
+                        <select
+                            class="form-select"
+                            id="pangkatCode"
+                            formControlName="pangkatCode"
+                        >
+                            <ng-container
+                                *ngIf="
+                                    pangkatList$ | async as pangkatList;
+                                    else loadingPangkat
+                                "
+                            >
+                                <option
+                                    *ngFor="let pangkat of pangkatList"
+                                    [value]="pangkat.code"
+                                >
+                                    {{ pangkat.name }}
+                                </option>
+                            </ng-container>
+
+                            <ng-template #loadingPangkat>
+                                <option disabled>Loading pangkat...</option>
+                            </ng-template>
+                        </select>
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'pangkatCode',
+                                    'Pangkat Saat Ini'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- TMT Pangkat -->
+                    <div class="mb-3">
+                        <label for="tmtPangkat" class="form-label"
+                            >TMT Pangkat
+                            <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="tmtPangkat"
+                            formControlName="tmtPangkat"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'tmtPangkat',
+                                    'TMT Pangkat'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- No Surat Usulan -->
+                    <div class="mb-3">
+                        <label for="noSuratUsulan" class="form-label"
+                            >No Surat Usulan
+                            <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="noSuratUsulan"
+                            formControlName="noSuratUsulan"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'noSuratUsulan',
+                                    'No Surat Usulan'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Tanggal Surat Usulan -->
+                    <div class="mb-3">
+                        <label for="tglSuratUsulan" class="form-label"
+                            >Tanggal Surat Usulan
+                            <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="tglSuratUsulan"
+                            formControlName="tglSuratUsulan"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'tglSuratUsulan',
+                                    'Tanggal Surat Usulan'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Pendidikan Terakhir -->
+                    <div class="mb-3">
+                        <label for="pendidikanTerakhirCode" class="form-label"
+                            >Pendidikan Terakhir
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-select"
+                            id="pendidikanTerakhirCode"
+                            formControlName="pendidikanTerakhirCode"
+                        >
+                            <ng-container
+                                *ngIf="
+                                    pendidikanService.pendidikanList$
+                                        | async as pendidikanList;
+                                    else loadingPendidikan
+                                "
+                            >
+                                <option
+                                    *ngFor="let pendidikan of pendidikanList"
+                                    [value]="pendidikan.code"
+                                >
+                                    {{ pendidikan.name }}
+                                </option>
+                            </ng-container>
+
+                            <ng-template #loadingPendidikan>
+                                <option disabled>Loading pendidikan...</option>
+                            </ng-template>
+                        </select>
+
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'pendidikanTerakhirCode',
+                                    'Pendidikan Terakhir'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Jurusan -->
+                    <div class="mb-3">
+                        <label for="jurusan" class="form-label"
+                            >Jurusan <span class="text-danger">*</span></label
+                        >
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="jurusan"
+                            formControlName="jurusan"
+                        />
+                        <div
+                            *ngIf="
+                                getErrorMessage('jurusan', 'Jurusan') as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Predikat Kinerja 1 -->
+                    <div class="mb-3">
+                        <label for="predikatKinerja1Id" class="form-label"
+                            >Predikat Kinerja 1 Tahun Terakhir
+                            <span class="text-danger">*</span></label
+                        >
+                        <select
+                            class="form-select"
+                            id="predikatKinerja1Id"
+                            formControlName="predikatKinerja1Id"
+                        >
+                            <ng-container
+                                *ngIf="
+                                    kinerjaService.predikatKinerjaList$
+                                        | async as predikatList;
+                                    else loadingPredikat
+                                "
+                            >
+                                <option
+                                    *ngFor="let predikat of predikatList"
+                                    [value]="predikat.id"
+                                >
+                                    {{ predikat.name }}
+                                </option>
+                            </ng-container>
+
+                            <ng-template #loadingPredikat>
+                                <option disabled>Loading predikat...</option>
+                            </ng-template>
+                        </select>
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'predikatKinerja1Id',
+                                    'Predikat Kinerja 1 Tahun Terakhir'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <!-- Predikat Kinerja 2 -->
+                    <div class="mb-3">
+                        <label for="predikatKinerja2Id" class="form-label"
+                            >Predikat Kinerja 2 Tahun Terakhir
+                            <span class="text-danger">*</span></label
+                        >
+
+                        <select
+                            class="form-select"
+                            id="predikatKinerja2Id"
+                            formControlName="predikatKinerja2Id"
+                        >
+                            <ng-container
+                                *ngIf="
+                                    kinerjaService.predikatKinerjaList$
+                                        | async as predikatList;
+                                    else loadingPredikat
+                                "
+                            >
+                                <option
+                                    *ngFor="let predikat of predikatList"
+                                    [value]="predikat.id"
+                                >
+                                    {{ predikat.name }}
+                                </option>
+                            </ng-container>
+
+                            <ng-template #loadingPredikat>
+                                <option disabled>Loading predikat...</option>
+                            </ng-template>
+                        </select>
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'predikatKinerja2Id',
+                                    'Predikat Kinerja 2 Tahun Terakhir'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
                         </div>
                     </div>
                 </form>
@@ -61,17 +632,17 @@
         </div>
 
         <div class="col-lg-12">
-            <div class="hstack gap-2 justify-content-end">
-                <button (click)="onSave()" class="btn btn-success"
-                    [disabled]="isAnyFileMissing() || updateNonJFForm.invalid" *ngIf="!(hadItemsLoading$ | async)">
-                    Simpan
-                </button>
-
-                <button *ngIf="hadItemsLoading$ | async" class="btn btn-success" disabled>
-                    <div class="spinner-border spinner-sm-custom" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </button>
+            <div class="hstack justify-content-end gap-2">
+                <app-loading-button
+                    (clicked)="onSave()"
+                    [isLoading]="
+                        ukomParticipantService.isSubmitUkomTaskNonJFLoading$
+                            | async
+                    "
+                    [className]="'btn btn-success'"
+                    [type]="'button'"
+                    [disabled]="isAnyFileMissing()"
+                ></app-loading-button>
             </div>
         </div>
     </div>

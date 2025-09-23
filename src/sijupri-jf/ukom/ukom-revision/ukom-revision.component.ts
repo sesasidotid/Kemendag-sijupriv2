@@ -1,20 +1,10 @@
-import { DokumenUkomList } from '../../../modules/ukom/models/ukom-task-detail.modal'
-import {
-    Component,
-    EventEmitter,
-    Input,
-    OnChanges,
-    Output,
-    SimpleChanges,
-} from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { JF } from '../../../modules/siap/models/jf.model'
 import { CommonModule } from '@angular/common'
 import { PesertaUkom } from '../../../modules/ukom/models/peserta-ukom.model'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
-import { Jabatan } from '../../../modules/maintenance/models/jabatan.model'
-import { Jenjang } from '../../../modules/maintenance/models/jenjang.modle'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
@@ -25,9 +15,7 @@ import { RevisiDokumenUkom } from '../../../modules/ukom/models/revisi-dokumen-u
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { Task } from '@/modules/workflow/models/task.model'
 import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
-import { Router } from '@angular/router'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
-import { PendingTask } from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
 @Component({
     selector: 'app-ukom-revision',
     standalone: true,

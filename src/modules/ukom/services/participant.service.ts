@@ -98,4 +98,31 @@ export class UkomParticipantService {
                 },
             })
     }
+
+    isSubmitUkomTaskNonJFLoadingSubject = new BehaviorSubject<boolean>(false)
+    isSubmitUkomTaskNonJFLoading$ =
+        this.isSubmitUkomTaskNonJFLoadingSubject.asObservable()
+    submitUkomTaskNonJF(body: Task, key: string, onSuccess?: () => void) {
+        this.isSubmitUkomTaskNonJFLoadingSubject.next(true)
+
+        this.apiService
+            .postData(`${this.BASE_PATH}/task/non_jf/submit?key=${key}`, body)
+            .pipe(
+                catchError((error) => {
+                    console.error('Error submitting task', error)
+                    this.handlerService.handleException(error)
+                    return throwError(() => error)
+                }),
+                finalize(() =>
+                    this.isSubmitUkomTaskNonJFLoadingSubject.next(false),
+                ),
+            )
+            .subscribe(() => {
+                this.handlerService.handleAlert(
+                    'Success',
+                    'Berhasil mengirim tugas',
+                )
+                onSuccess?.()
+            })
+    }
 }

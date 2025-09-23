@@ -64,7 +64,7 @@ export enum JenisUkomEnum {
 export class StatusPendaftaranUkomComponent {
     private destroy$ = new Subject<void>()
 
-    pendingTask: UkomTaskDetail = new UkomTaskDetail()
+    pendingTask = new UkomTaskDetail()
     groupedUkomPendingTaskHistory: {
         [key: string]: any[]
     } = {}

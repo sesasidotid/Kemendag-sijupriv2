@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { PesertaUkom } from '../../../../modules/ukom/models/peserta-ukom.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
@@ -9,8 +8,9 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
 import { FilePreviewComponent } from '../file-preview/file-preview.component'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, forkJoin, map } from 'rxjs'
 import {
+    FormBuilder,
     FormControl,
     FormGroup,
     FormsModule,
@@ -19,10 +19,21 @@ import {
 } from '@angular/forms'
 import { Pangkat } from '../../../maintenance/models/pangkat.model'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
 import { Task } from '@/modules/workflow/models/task.model'
-
+import { NonJFParticipantUkomTask } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
+import { PangkatService } from '@/modules/maintenance/services/pangkat.service'
+import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
+import { DokumenUkomList } from '@/modules/ukom/models/ukom-task-detail.modal'
+import { LoadingButtonComponent } from '../loading-button/loading-button.component'
+import { FormValidationService } from '../../services/form-validation.service'
+import { JenisInstansiService } from '@/modules/complement/services/jenis-instansi.service'
+import { KinerjaService } from '@/modules/complement/services/kinerja.service'
+import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
+import { ProvinsiService } from '@/modules/maintenance/services/provinsi.service'
+import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
+import { Provinsi } from '@/modules/maintenance/models/provinsi.model'
+import { KabKota } from '@/modules/maintenance/models/kab-kota.model'
 @Component({
     selector: 'app-nonjf-revisi-ukom',
     standalone: true,
@@ -33,6 +44,7 @@ import { Task } from '@/modules/workflow/models/task.model'
         FilePreviewComponent,
         ReactiveFormsModule,
         FormsModule,
+        LoadingButtonComponent,
     ],
     templateUrl: './nonjf-revisi-ukom.component.html',
     styleUrl: './nonjf-revisi-ukom.component.scss',
@@ -41,12 +53,22 @@ export class NonjfRevisiUkomComponent {
     @Input() pendingTask = new UkomTaskDetail()
     @Input() key: string = ''
     revisedDokumen = new Task()
-    rejectedDokumen: any[] = []
-    detectedDokumen: any = {}
-    pesertaUkom = new PesertaUkom()
+    rejectedDokumen: DokumenUkomList[] = []
+    detectedDokumen: Record<
+        string,
+        {
+            base64: string
+            label: string
+            remark: string
+        }
+    > = {}
+    pesertaUkom = new NonJFParticipantUkomTask()
     isDetailIncorrect: boolean = false
     pangkatList$: Observable<Pangkat[]>
     showForm: boolean = false
+
+    provinsiList$: Observable<Provinsi[]>
+    kabKotaList$: Observable<KabKota[]>
 
     inputs: FIleHandler = {
         files: {},
@@ -66,43 +88,167 @@ export class NonjfRevisiUkomComponent {
             }
         },
     }
-    hadItemsLoading$ = new BehaviorSubject<boolean>(false)
-    defaultValues: any = {}
+    defaultValues: unknown = {}
     updateNonJFForm: FormGroup
+
     constructor(
-        private apiService: ApiService,
-        private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
+        private fb: FormBuilder,
+        public pangkatService: PangkatService,
+        public ukomParticipantService: UkomParticipantService,
+        private formValidationService: FormValidationService,
+        public jenisInstansiService: JenisInstansiService,
+        public kinerjaService: KinerjaService,
+        public pendidikanService: PendidikanService,
+        private provinsiService: ProvinsiService,
+        private kabKotaService: KabKotaService,
     ) {}
 
     ngOnInit() {
-        console.log('pendingTask', this.pendingTask)
-        this.updateNonJFForm = new FormGroup({
-            name: new FormControl('', Validators.required),
-            email: new FormControl('', Validators.required),
-            unitKerjaName: new FormControl('', Validators.required),
-        })
-
+        this.initForm()
+        this.kinerjaService.fetchPredikatKinerja()
+        this.pendidikanService.fetchPendidikan()
+        ;(this, this.pangkatService.findAll())
+        this.pangkatList$ = this.pangkatService.findAll()
+        this.provinsiList$ = this.provinsiService.findAll()
         this.getRejectedDokumen()
         this.handleRejectedDokumen()
-        this.getListPanngkat()
         this.setDefaultFormValues(this.pendingTask)
+        this.setupFormValidation()
+
+        this.updateNonJFForm.valueChanges.subscribe(() => {
+            if (this.updateNonJFForm.invalid) {
+                const invalidControls = this.findInvalidControlsWithReasons(
+                    this.updateNonJFForm,
+                )
+                console.log('Invalid controls with reasons:', invalidControls)
+            }
+        })
+    }
+
+    //helper to check form controls validity
+    private findInvalidControlsWithReasons(form: FormGroup): {
+        [key: string]: any
+    } {
+        const invalidControls: { [key: string]: any } = {}
+
+        Object.keys(form.controls).forEach((key) => {
+            const control = form.get(key)
+            if (control && control.invalid && control.errors) {
+                invalidControls[key] = control.errors
+            }
+        })
+
+        return invalidControls
+    }
+    getErrorMessage(controlName: string, label: string): string | null {
+        const control = this.updateNonJFForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label,
+        )
+    }
+
+    initForm() {
+        this.updateNonJFForm = this.fb.group({
+            name: ['', Validators.required],
+            tempatLahir: ['', Validators.required],
+            tanggalLahir: ['', Validators.required],
+            phone: [
+                '',
+                [Validators.required, Validators.pattern(/^\d{10,15}$/)],
+            ],
+            email: ['', [Validators.required, Validators.email]],
+
+            jenisInstansi: ['', Validators.required],
+            provinsiId: [''],
+            kabupatenKotaId: [''],
+            unitKerjaName: ['', Validators.required],
+            jabatanName: ['', [Validators.required]],
+            jenjangName: ['', []],
+            tmtJabatan: ['', Validators.required],
+            pangkatCode: ['', Validators.required],
+            tmtPangkat: ['', Validators.required],
+            noSuratUsulan: ['', Validators.required],
+            tglSuratUsulan: ['', Validators.required],
+
+            pendidikanTerakhirCode: ['', Validators.required],
+            jurusan: ['', Validators.required],
+            predikatKinerja1Id: ['', Validators.required],
+            predikatKinerja2Id: ['', Validators.required],
+        })
     }
 
     setDefaultFormValues(data: UkomTaskDetail) {
         this.defaultValues = { ...data }
-
         this.updateNonJFForm.patchValue({
             name: data.name || '',
+            tempatLahir: data.tempatLahir || '',
+            tanggalLahir: data.tanggalLahir || '',
+            phone: data.phone || '',
             email: data.email || '',
+            jenisInstansi: data.jenisInstansi || '',
+            provinsiId: data.provinsiId || '',
+            kabupatenKotaId: data.kabupatenKotaId || '',
             unitKerjaName: data.unitKerjaName || '',
+            jabatanName: data.jabatanName || '',
+            jenjangName: data.jenjangName || '',
+            tmtJabatan: data.tmtJabatan || '',
+            pangkatCode: data.pangkatCode || '',
+            tmtPangkat: data.tmtPangkat || '',
+            noSuratUsulan: data.noSuratUsulan || '',
+            tglSuratUsulan: data.tglSuratUsulan || '',
+            pendidikanTerakhirCode: data.pendidikanTerakhirCode || '',
+            jurusan: data.jurusan || '',
+            predikatKinerja1Id: data.predikatKinerja1Id || '',
+            predikatKinerja2Id: data.predikatKinerja2Id || '',
         })
+    }
+
+    setupFormValidation() {
+        const provinceControl = this.updateNonJFForm.get('provinsiId')
+        const kabupatenKotaControl = this.updateNonJFForm.get('kabupatenKotaId')
+
+        this.updateNonJFForm
+            .get('jenisInstansi')
+            ?.valueChanges.subscribe((value) => {
+                provinceControl?.clearValidators()
+                kabupatenKotaControl?.clearValidators()
+
+                if (value === 'PEMERINTAH_PROVINSI') {
+                    provinceControl?.setValidators([Validators.required])
+                } else if (value === 'PEMERINTAH_KABUPATEN_KOTA') {
+                    provinceControl?.setValidators([Validators.required])
+                    kabupatenKotaControl?.setValidators([Validators.required])
+
+                    provinceControl?.valueChanges.subscribe((provinsiId) => {
+                        if (provinsiId) {
+                            this.kabKotaList$ = forkJoin([
+                                this.kabKotaService.findByTypeAndProvinsiId(
+                                    'KABUPATEN',
+                                    provinsiId,
+                                ),
+                                this.kabKotaService.findByTypeAndProvinsiId(
+                                    'KOTA',
+                                    provinsiId,
+                                ),
+                            ]).pipe(
+                                map(([list1, list2]) => [...list1, ...list2]),
+                            )
+                        }
+                    })
+                }
+
+                provinceControl?.updateValueAndValidity()
+                kabupatenKotaControl?.updateValueAndValidity()
+            })
     }
 
     onCheckboxChange() {
         if (!this.showForm) {
-            this.setDefaultFormValues(this.defaultValues)
-            this.updateNonJFForm.markAsPristine() // Mark form as untouched
+            this.setDefaultFormValues(this.defaultValues as UkomTaskDetail)
+            this.updateNonJFForm.markAsPristine()
         }
     }
 
@@ -111,20 +257,8 @@ export class NonjfRevisiUkomComponent {
             this.rejectedDokumen = this.pendingTask.dokumenUkomList.filter(
                 (dokumen) => dokumen.dokumenStatus.toLowerCase() === 'reject',
             )
+            console.log(this.rejectedDokumen, 'rejectedDokumen')
         }
-    }
-
-    getListPanngkat() {
-        this.pangkatList$ = this.apiService
-            .getData(`/api/v1/pangkat`)
-            .pipe(
-                map((response) =>
-                    response.map(
-                        (pangkat: { [key: string]: any }) =>
-                            new Pangkat(pangkat),
-                    ),
-                ),
-            )
     }
 
     handleRejectedDokumen() {
@@ -149,8 +283,6 @@ export class NonjfRevisiUkomComponent {
     }
 
     onSave() {
-        console.log(this.key)
-
         if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
             this.pesertaUkom.dokumenUkomList = []
         }
@@ -186,41 +318,32 @@ export class NonjfRevisiUkomComponent {
         this.pesertaUkom.dokumenUkomList = Array.from(documentMap.values())
 
         if (this.showForm) {
-            this.pesertaUkom.name = this.updateNonJFForm.get('name').value
-            this.pesertaUkom.email = this.updateNonJFForm.get('email').value
-            this.pesertaUkom.unitKerjaName =
-                this.updateNonJFForm.get('unitKerjaName').value
+            const formValues = this.updateNonJFForm.getRawValue()
+
+            this.pesertaUkom = new NonJFParticipantUkomTask({
+                ...this.pesertaUkom,
+                ...formValues,
+            })
         }
 
-        this.revisedDokumen.id = this.pendingTask.id
-        this.revisedDokumen.taskAction = UkomFlowId.UkomFlowId1
-        this.revisedDokumen.object = this.pesertaUkom
+        this.revisedDokumen = new Task({
+            id: this.pendingTask.id,
+            taskAction: UkomFlowId.UkomFlowId1,
+            object: this.pesertaUkom,
+        })
 
         this.confirmationService.open(false).subscribe({
             next: (result) => {
                 if (!result.confirmed) {
                     return
                 }
-                this.hadItemsLoading$.next(true)
-
-                this.apiService
-                    .postData(
-                        `/api/v1/participant_ukom/task/non_jf/submit?key=${this.key}`,
-                        this.revisedDokumen,
-                    )
-                    .subscribe({
-                        next: () => {
-                            this.hadItemsLoading$.next(false)
-                            window.location.reload()
-                        },
-                        error: (error) => {
-                            this.hadItemsLoading$.next(false)
-                            this.handlerService.handleAlert(
-                                'Error',
-                                'Gagal mengupload dokumen',
-                            )
-                        },
-                    })
+                this.ukomParticipantService.submitUkomTaskNonJF(
+                    this.revisedDokumen,
+                    this.key,
+                    () => {
+                        window.location.reload()
+                    },
+                )
             },
         })
     }
