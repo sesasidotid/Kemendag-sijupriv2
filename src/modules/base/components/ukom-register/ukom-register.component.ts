@@ -142,26 +142,24 @@ export class UkomRegisterComponent {
     }
 
     handleSubscribe() {
-        this.nonJFForm
-            .get('jenis_instansi')
-            ?.valueChanges.subscribe((value) => {
-                this.instansiSubject.next(value)
-                this.nonJFForm.get('provinsi_id')?.setValue('')
-                this.nonJFForm.get('kabupaten_kota_id')?.setValue('')
-            })
+        this.nonJFForm.get('jenisInstansi')?.valueChanges.subscribe((value) => {
+            this.instansiSubject.next(value)
+            this.nonJFForm.get('provinsiId')?.setValue('')
+            this.nonJFForm.get('kabupatenKotaId')?.setValue('')
+        })
 
         this.nonJFForm
-            .get('provinsi_id')
+            .get('provinsiId')
             ?.valueChanges.subscribe((provinsiId) => {
                 if (provinsiId) {
-                    this.nonJFForm.get('kabupaten_kota_id')?.setValue('')
+                    this.nonJFForm.get('kabupatenKotaId')?.setValue('')
                     this.getKabKota(provinsiId)
                 } else {
                     this.kabKotaList = []
                 }
             })
 
-        this.nonJFForm.get('jenis_ukom')?.valueChanges.subscribe((value) => {
+        this.nonJFForm.get('jenisUkom')?.valueChanges.subscribe((value) => {
             this.clearFilesName()
             this.nonJFForm.patchValue({
                 nextJabatanCode: '',
@@ -175,7 +173,7 @@ export class UkomRegisterComponent {
             .get('nextJabatanCode')
             ?.valueChanges.subscribe((value) => {
                 this.nonJFForm.patchValue({
-                    bidang_jabatan_code: '',
+                    bidangJabatanCode: '',
                 })
                 this.getBidangJabatanByJabatanCode(value)
                 this.getListJenjang(value)
@@ -184,9 +182,7 @@ export class UkomRegisterComponent {
 
     handleFetchDokumenPersyaratan() {
         combineLatest([
-            this.nonJFForm
-                .get('jenis_ukom')!
-                .valueChanges.pipe(startWith(null)),
+            this.nonJFForm.get('jenisUkom')!.valueChanges.pipe(startWith(null)),
             this.nonJFForm
                 .get('nextJabatanCode')!
                 .valueChanges.pipe(startWith(null)),
@@ -247,31 +243,31 @@ export class UkomRegisterComponent {
             ]),
 
             // Informasi Jabatan & Unit Kerja
-            jenis_instansi: new FormControl('', Validators.required),
-            provinsi_id: new FormControl('', Validators.required),
-            kabupaten_kota_id: new FormControl('', Validators.required),
+            jenisInstansi: new FormControl('', Validators.required),
+            provinsiId: new FormControl('', Validators.required),
+            kabupatenKotaId: new FormControl('', Validators.required),
             unitKerjaName: new FormControl('', Validators.required),
             jabatanName: new FormControl('', Validators.required),
             jenjangName: new FormControl(''),
             pangkatCode: new FormControl('', Validators.required),
 
             // Informasi Kenaikan Jabatan
-            jenis_ukom: new FormControl('', Validators.required),
+            jenisUkom: new FormControl('', Validators.required),
             nextJabatanCode: new FormControl('', Validators.required),
             nextJenjangCode: new FormControl('', Validators.required),
-            bidang_jabatan_code: new FormControl(''),
+            bidangJabatanCode: new FormControl(''),
 
             // Dokumen Pendukung
-            no_surat_usulan: new FormControl('', Validators.required),
+            noSuratUsulan: new FormControl('', Validators.required),
             tglSuratUsulan: new FormControl('', Validators.required),
 
             // Informasi Pendidikan
-            pendidikan_terakhir_code: new FormControl('', Validators.required),
+            pendidikanTerakhirCode: new FormControl('', Validators.required),
             jurusan: new FormControl('', Validators.required),
 
             // Penilaian Kinerja Pegawai
-            predikat_kinerja_1_id: new FormControl('', Validators.required),
-            predikat_kinerja_2_id: new FormControl('', Validators.required),
+            predikatKinerja1Id: new FormControl('', Validators.required),
+            predikatKinerja2Id: new FormControl('', Validators.required),
 
             isMengulang: new FormControl('', Validators.required),
 
@@ -282,38 +278,34 @@ export class UkomRegisterComponent {
     }
 
     setupInstansiValidation() {
-        this.nonJFForm
-            .get('jenis_instansi')
-            ?.valueChanges.subscribe((value) => {
-                const provinsiControl = this.nonJFForm.get('provinsi_id')
-                const kabupatenControl = this.nonJFForm.get('kabupaten_kota_id')
+        this.nonJFForm.get('jenisInstansi')?.valueChanges.subscribe((value) => {
+            const provinsiControl = this.nonJFForm.get('provinsiId')
+            const kabupatenControl = this.nonJFForm.get('kabupatenKotaId')
 
-                // Reset Validasi
-                provinsiControl?.clearValidators()
-                kabupatenControl?.clearValidators()
+            // Reset Validasi
+            provinsiControl?.clearValidators()
+            kabupatenControl?.clearValidators()
 
-                if (value === 'PEMERINTAH_PROVINSI') {
-                    provinsiControl?.setValidators(Validators.required)
-                } else if (value === 'PEMERINTAH_KABUPATEN_KOTA') {
-                    provinsiControl?.setValidators(Validators.required)
-                    kabupatenControl?.setValidators(Validators.required)
-                }
+            if (value === 'PEMERINTAH_PROVINSI') {
+                provinsiControl?.setValidators(Validators.required)
+            } else if (value === 'PEMERINTAH_KABUPATEN_KOTA') {
+                provinsiControl?.setValidators(Validators.required)
+                kabupatenControl?.setValidators(Validators.required)
+            }
 
-                // Update Validasi
-                provinsiControl?.updateValueAndValidity()
-                kabupatenControl?.updateValueAndValidity()
-            })
+            // Update Validasi
+            provinsiControl?.updateValueAndValidity()
+            kabupatenControl?.updateValueAndValidity()
+        })
 
         this.bidangJabatanList$.subscribe((bidangList) => {
-            const bidangJabatanControl = this.nonJFForm.get(
-                'bidang_jabatan_code',
-            )
+            const bidangJabatanControl = this.nonJFForm.get('bidangJabatanCode')
 
             if (bidangList.length > 0) {
-                this.nonJFForm.get('bidang_jabatan_code').setValue('')
+                this.nonJFForm.get('bidangJabatanCode').setValue('')
                 bidangJabatanControl?.setValidators(Validators.required)
             } else {
-                this.nonJFForm.get('bidang_jabatan_code').setValue('')
+                this.nonJFForm.get('bidangJabatanCode').setValue('')
                 bidangJabatanControl?.clearValidators()
             }
 
@@ -500,6 +492,7 @@ export class UkomRegisterComponent {
                         .filter((dokumen) => {
                             const specificationMatch =
                                 dokumen.specification === 'null' ||
+                                dokumen.specification === null ||
                                 dokumen.specification === 'non_jf' ||
                                 dokumen.specification === 'false'
                             const jabatanMatch =
