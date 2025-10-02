@@ -26,7 +26,7 @@ export class NonJFParticipantUkomTask extends Serializable {
     kabupatenKotaId: string | number = undefined
     unitKerjaName: string = undefined
     jabatanName: string = undefined
-    jenjangName: string = '-'
+    jenjangName: string = undefined
     pangkatCode: string = undefined
 
     // Ukom Info
@@ -48,7 +48,7 @@ export class NonJFParticipantUkomTask extends Serializable {
     predikatKinerja2Id: string | number = undefined
 
     // Extra
-    isMengulang: boolean = false
+    isMengulang: boolean = undefined
     dokumenUkomList: DokumenUkom[] = []
 
     //pajangan, menunggu backend

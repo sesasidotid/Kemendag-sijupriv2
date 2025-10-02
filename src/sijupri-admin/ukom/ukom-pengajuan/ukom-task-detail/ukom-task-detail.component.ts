@@ -107,12 +107,10 @@ export class UkomTaskDetailComponent {
             if (pendingTask) {
                 this.pendingTask = pendingTask
                 this.pesertaUkom = pendingTask.objectTask.object
-
                 this.pendingTask.objectTask.object.kabupatenKotaId &&
                     this.getKabupatenNameByCode(
                         this.pendingTask.objectTask.object.kabupatenKotaId,
                     )
-
                 this.predikat1Name =
                     this.kinerjaService.getPredikatKinerjaNameById(
                         this.pendingTask.objectTask.object.predikatKinerja1Id,
@@ -121,11 +119,6 @@ export class UkomTaskDetailComponent {
                     this.kinerjaService.getPredikatKinerjaNameById(
                         this.pendingTask.objectTask.object.predikatKinerja2Id,
                     )
-
-                this.findApproveDokumen(
-                    pendingTask.objectTask.prevObject.dokumenUkomList,
-                )
-
                 this.handlerTabIndex()
             }
         })
@@ -159,38 +152,35 @@ export class UkomTaskDetailComponent {
         }
     }
 
-    findApproveDokumen(dokumenUkomList: any[]) {
-        this.prevApprovedTask = dokumenUkomList.filter(
-            (dokumen) => dokumen.dokumenStatus === 'APPROVE',
-        )
-    }
-
     preview(fileName: string, source: string) {
         this.filePreviewService.open(fileName, source)
     }
 
-    isDocumentApproved(dokumenPersyaratanId: string): boolean {
-        return this.prevApprovedTask.some(
-            (approvedDokumen) =>
-                approvedDokumen.dokumenPersyaratanId === dokumenPersyaratanId,
-        )
-    }
+    // onFIleSwitch(index: number, status: 'APPROVE' | 'REJECT') {
+    //     this.pesertaUkom.dokumenUkomList[index].dokumenStatus = status
 
+    //     if (status == 'APPROVE') {
+    //         this.pesertaUkom.dokumenUkomList[index].remark = ''
+    //     }
+
+    //     for (const formasiDokumen of this.pesertaUkom.dokumenUkomList) {
+    //         if (formasiDokumen.dokumenStatus == 'REJECT') {
+    //             this.isApproveEnable = false
+    //             break
+    //         }
+    //         this.isApproveEnable = true
+    //     }
+    // }
     onFIleSwitch(index: number, status: 'APPROVE' | 'REJECT') {
-        this.pesertaUkom.dokumenUkomList[index].dokumenStatus = status
-
-        if (status == 'APPROVE') {
+        if (status === 'APPROVE') {
             this.pesertaUkom.dokumenUkomList[index].remark = ''
         }
 
-        for (const formasiDokumen of this.pesertaUkom.dokumenUkomList) {
-            if (formasiDokumen.dokumenStatus == 'REJECT') {
-                this.isApproveEnable = false
-                break
-            }
-            this.isApproveEnable = true
-        }
+        this.isApproveEnable = this.pesertaUkom.dokumenUkomList.every(
+            d => d.dokumenStatus !== 'REJECT'
+        )
     }
+
 
     back(tabIndex: number, menu: string) {
         this.router.navigate(['/ukom/ukom-task-list'], {

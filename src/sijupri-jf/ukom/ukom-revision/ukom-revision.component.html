@@ -1,4 +1,4 @@
-<div class="row">
+<!-- <div class="row">
     <div class="col-lg-12">
         <div class="row">
             <app-file-handler [inputs]="inputs"></app-file-handler>
@@ -9,6 +9,29 @@
         <div class="hstack gap-2 justify-content-end">
             <app-loading-button [isLoading]="ukomParticipantService.isSubmitTaskLoading$ | async" (click)="onSave()"
                 [disabled]="isAnyFileMissing()" [type]="'button'">Simpan</app-loading-button>
+        </div>
+    </div>
+</div> -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <app-file-handler *ngIf="rejectedDokumen.length > 0; else noRejected" [inputs]="inputs"></app-file-handler>
+
+            <!-- kalau tidak ada, tampilkan pesan -->
+            <ng-template #noRejected>
+                <div class="alert alert-info mt-3">
+                    Klik tombol <strong>Submit</strong> jika sudah memperbaiki data SIAP.
+                </div>
+            </ng-template>
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+        <div class="hstack gap-2 justify-content-end">
+            <app-loading-button [isLoading]="ukomParticipantService.isSubmitTaskLoading$ | async" (click)="onSave()"
+                [disabled]="isAnyFileMissing()" [type]="'button'">
+                Simpan
+            </app-loading-button>
         </div>
     </div>
 </div>

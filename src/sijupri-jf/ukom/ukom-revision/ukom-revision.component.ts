@@ -10,7 +10,7 @@ import { FIleHandler } from '../../../modules/base/commons/file-handler/file-han
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { DokumenUkomPersyaratan } from '../../../modules/maintenance/models/dokumen-persyaratan-ukom'
 import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.modal'
-import { BehaviorSubject, switchMap, finalize } from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 import { RevisiDokumenUkom } from '../../../modules/ukom/models/revisi-dokumen-ukom.model'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { Task } from '@/modules/workflow/models/task.model'
@@ -65,41 +65,43 @@ export class UkomRevisionComponent {
     )
 
     constructor(
-        private apiService: ApiService,
-        private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         public ukomParticipantService: UkomParticipantService,
-    ) {}
+    ) { }
 
     ngOnInit() {
-        this.getRejectedDokumen()
-        this.handleRejectedDokumen()
+        this.loadRejectedDokumen()
     }
 
-    getRejectedDokumen() {
-        if (this.pendingTask?.dokumenUkomList?.length) {
-            this.rejectedDokumen = this.pendingTask.dokumenUkomList.filter(
-                (dokumen) => dokumen.dokumenStatus.toLowerCase() === 'reject',
-            )
-        }
-    }
+    loadRejectedDokumen() {
+        if (!this.pendingTask?.dokumenUkomList?.length) return
 
-    handleRejectedDokumen() {
-        this.inputs.files = {}
-        this.rejectedDokumen.forEach((dokumen, index) => {
-            const key = dokumen.dokumenPersyaratanId
-            this.inputs.files[key] = {
-                label: dokumen.dokumenPersyaratanName || 'Unknown Document',
-                remark: dokumen.remark,
-            }
-        })
+        this.rejectedDokumen = this.pendingTask.dokumenUkomList
+            .filter(d => d.dokumenStatus.toLowerCase() === 'reject')
+
+        this.inputs.files = Object.fromEntries(
+            this.rejectedDokumen.map(d => [
+                d.dokumenPersyaratanId,
+                {
+                    label: d.dokumenPersyaratanName || 'Unknown Document',
+                    remark: d.remark,
+                }
+            ])
+        )
     }
 
     isAnyFileMissing(): boolean {
+        // if there are no rejected docs at all, nothing is missing
+        if (!this.rejectedDokumen || this.rejectedDokumen.length === 0) {
+            return false
+        }
+
+        // if inputs.files is empty while we have rejected docs → missing
         if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
             return true
         }
 
+        // otherwise check if any required file has not been detected
         return Object.keys(this.inputs.files).some((key) => {
             return !this.detectedDokumen[key]
         })
@@ -123,11 +125,9 @@ export class UkomRevisionComponent {
                 if (existingDokumen) {
                     const newDoc = {
                         dokumenFile: detected.base64,
-                        dokumenPersyaratanName: `${
-                            this.jf.nip
-                        }_dokumenPersyaratanUkom_${Date.now()}_${
-                            existingDokumen.dokumenPersyaratanName
-                        }`,
+                        dokumenPersyaratanName: `${this.jf.nip
+                            }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName
+                            }`,
                         dokumenPersyaratanId:
                             existingDokumen.dokumenPersyaratanId,
                     }

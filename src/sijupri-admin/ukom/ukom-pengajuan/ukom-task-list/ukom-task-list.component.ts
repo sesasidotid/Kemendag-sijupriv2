@@ -17,6 +17,7 @@ import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
 @Component({
     selector: 'app-ukom-task-list',
     standalone: true,
@@ -37,11 +38,13 @@ export class UkomTaskListComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private jenisUkomService: JenisUkomService,
-    ) {}
+        public jenjangService: JenjangService
+    ) { }
 
     ngOnInit() {
         const navigation = history.state
         this.getJabatanList()
+        this.jenjangService.fetchJenjang()
         this.handlePagable()
 
         if (navigation.tabIndex && navigation.menu == 'pengajuan-ukom') {
@@ -110,6 +113,12 @@ export class UkomTaskListComponent {
                     new PrimaryColumnBuilder(
                         'Jabatan Yang Dituju',
                         'nextJabatanName',
+                    ).build(),
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder(
+                        'Jenjang Yang Dituju',
+                        'nextJenjangName',
                     ).build(),
                 )
                 .addPrimaryColumn(
@@ -203,45 +212,102 @@ export class UkomTaskListComponent {
     }
 
     updateFilterOptions() {
-        let updatedPagable
         const currentPagable = this.pagable$.value
+        let filterList = currentPagable.filterList
 
-        const existingFilterList = currentPagable.filterList.map((item) =>
-            item.key === 'like_nextJabatanName'
+        // Ensure jabatan filter
+        filterList = this.ensureFilter(
+            filterList,
+            "like_nextJabatanName",
+            "Jabatan Yang Dituju",
+            this.jabatanList
+        )
+
+        this.jenjangService.jenjangList$.subscribe((jenjangs) => {
+            const finalFilterList = this.ensureFilter(
+                filterList,
+                "like_nextJenjangName",
+                "Jenjang Yang Dituju",
+                jenjangs
+            )
+
+            this.pagable$.next({
+                ...currentPagable,
+                filterList: finalFilterList,
+            })
+        })
+    }
+
+
+    private ensureFilter(
+        filterList: PageFilter[],
+        key: string,
+        label: string,
+        sourceList: { name: string }[]
+    ): PageFilter[] {
+        const updated = filterList.map((item) =>
+            item.key === key
                 ? {
-                      ...item,
-                      optionList: this.jabatanList.map((jabatan) => ({
-                          label: jabatan.name,
-                          value: jabatan.name,
-                      })),
-                  }
+                    ...item,
+                    optionList: sourceList.map((i) => ({ label: i.name, value: i.name })),
+                }
                 : item,
         )
 
-        const filterList = existingFilterList.some(
-            (item) => item.key === 'like_nextJabatanName',
-        )
-            ? existingFilterList
+        return updated.some((item) => item.key === key)
+            ? updated
             : [
-                  ...existingFilterList,
-                  new PageFilter({
-                      label: 'Jabatan Yang Dituju',
-                      fieldType: 'select',
-                      key: 'like_nextJabatanName',
-                      value: '',
-                      optionList: this.jabatanList.map((jabatan) => ({
-                          label: jabatan.name,
-                          value: jabatan.name,
-                      })),
-                  }),
-              ]
-
-        updatedPagable = {
-            ...currentPagable,
-            filterList,
-        }
-        this.pagable$.next(updatedPagable)
+                ...updated,
+                new PageFilter({
+                    label,
+                    fieldType: "select",
+                    key,
+                    value: "",
+                    optionList: sourceList.map((i) => ({ label: i.name, value: i.name })),
+                }),
+            ]
     }
+
+    // updateFilterOptions() {
+    //     let updatedPagable
+    //     const currentPagable = this.pagable$.value
+
+    //     const existingFilterList = currentPagable.filterList.map((item) =>
+    //         item.key === 'like_nextJabatanName'
+    //             ? {
+    //                 ...item,
+    //                 optionList: this.jabatanList.map((jabatan) => ({
+    //                     label: jabatan.name,
+    //                     value: jabatan.name,
+    //                 })),
+    //             }
+    //             : item,
+    //     )
+
+    //     const filterList = existingFilterList.some(
+    //         (item) => item.key === 'like_nextJabatanName',
+    //     )
+    //         ? existingFilterList
+    //         : [
+    //             ...existingFilterList,
+    //             new PageFilter({
+    //                 label: 'Jabatan Yang Dituju',
+    //                 fieldType: 'select',
+    //                 key: 'like_nextJabatanName',
+    //                 value: '',
+    //                 optionList: this.jabatanList.map((jabatan) => ({
+    //                     label: jabatan.name,
+    //                     value: jabatan.name,
+    //                 })),
+    //             }),
+    //         ]
+
+    //     updatedPagable = {
+    //         ...currentPagable,
+    //         filterList,
+    //     }
+    //     this.pagable$.next(updatedPagable)
+    // }
 
     getJabatanList() {
         this.apiService.getData('/api/v1/jabatan').subscribe({
@@ -324,12 +390,12 @@ export class UkomTaskListComponent {
             )
                 ? existingFilterList
                 : [
-                      ...existingFilterList,
-                      new PageFilter({
-                          key: 'eq_flowId',
-                          value: tab,
-                      }),
-                  ]
+                    ...existingFilterList,
+                    new PageFilter({
+                        key: 'eq_flowId',
+                        value: tab,
+                    }),
+                ]
 
             updatedPagable = {
                 ...currentPagable,

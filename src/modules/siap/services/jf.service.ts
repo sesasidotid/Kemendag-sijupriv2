@@ -17,7 +17,7 @@ export class JfService {
     constructor(
         private apiService: ApiService,
         private alertService: AlertService,
-    ) {}
+    ) { }
 
     findAll(): Observable<JF[]> {
         return this.apiService.getData(this.BASE_PATH).pipe(
@@ -129,8 +129,8 @@ export class JfService {
             )
     }
 
-    delete(id: string): Observable<void> {
-        return this.apiService.deleteData(`${this.BASE_PATH}/${id}`).pipe(
+    delete(nip: string): Observable<void> {
+        return this.apiService.deleteData(`${this.BASE_PATH}/${nip}`).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
                 this.alertService.showToast('Error', error.message)

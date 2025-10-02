@@ -30,6 +30,7 @@ import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jaba
 import { JfService } from '@/modules/siap/services/jf.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { ActivatedRoute, Router } from '@angular/router'
+import { ReplaceUkomWordPipe } from '@/modules/base/pipes/replace-ukom-word.pipe'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
@@ -47,8 +48,8 @@ export enum JenisUkomEnum {
         ModalComponent,
         UkomRevisionComponent,
         TanggalIndoPipe,
-        LoadingButtonComponent,
         AgeCalculatorPipe,
+        ReplaceUkomWordPipe
     ],
     templateUrl: './ukom-task.component.html',
     styleUrl: './ukom-task.component.scss',
@@ -114,9 +115,7 @@ export class UkomTaskComponent {
         public bidangJabatanService: BidangJabatanService,
         private jfService: JfService,
         public ukomParticipantService: UkomParticipantService,
-        private router: Router,
-        private route: ActivatedRoute,
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.systemConfigService.checkUkomRegistration()

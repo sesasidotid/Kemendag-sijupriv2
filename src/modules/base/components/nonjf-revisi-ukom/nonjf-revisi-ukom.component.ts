@@ -1,17 +1,14 @@
 import { Component, Input } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
 import { FilePreviewComponent } from '../file-preview/file-preview.component'
-import { BehaviorSubject, forkJoin, map } from 'rxjs'
+import { forkJoin, map } from 'rxjs'
 import {
     FormBuilder,
-    FormControl,
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
@@ -102,7 +99,7 @@ export class NonjfRevisiUkomComponent {
         public pendidikanService: PendidikanService,
         private provinsiService: ProvinsiService,
         private kabKotaService: KabKotaService,
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.initForm()
@@ -111,8 +108,7 @@ export class NonjfRevisiUkomComponent {
         this.pangkatService.findAll()
         this.pangkatList$ = this.pangkatService.findAll()
         this.provinsiList$ = this.provinsiService.findAll()
-        this.getRejectedDokumen()
-        this.handleRejectedDokumen()
+        this.loadRejectedDokumen()
         this.setDefaultFormValues(this.pendingTask)
         this.setupFormValidation()
 
@@ -120,31 +116,13 @@ export class NonjfRevisiUkomComponent {
         if (jenisInstansiControl?.value) {
             jenisInstansiControl.updateValueAndValidity({ emitEvent: true })
         }
-        this.updateNonJFForm.valueChanges.subscribe(() => {
-            if (this.updateNonJFForm.invalid) {
-                const invalidControls = this.findInvalidControlsWithReasons(
-                    this.updateNonJFForm,
-                )
-                console.log('Invalid controls with reasons:', invalidControls)
-            }
-        })
+
+        if (!this.rejectedDokumen || this.rejectedDokumen.length === 0) {
+            this.showForm = true
+        }
     }
 
-    //helper to check form controls validity
-    private findInvalidControlsWithReasons(form: FormGroup): {
-        [key: string]: any
-    } {
-        const invalidControls: { [key: string]: any } = {}
 
-        Object.keys(form.controls).forEach((key) => {
-            const control = form.get(key)
-            if (control && control.invalid && control.errors) {
-                invalidControls[key] = control.errors
-            }
-        })
-
-        return invalidControls
-    }
     getErrorMessage(controlName: string, label: string): string | null {
         const control = this.updateNonJFForm.get(controlName)
         return this.formValidationService.getErrorMessage(
@@ -250,41 +228,51 @@ export class NonjfRevisiUkomComponent {
     }
 
     onCheckboxChange() {
+        if (!this.rejectedDokumen || this.rejectedDokumen.length === 0) {
+            this.showForm = true
+            return
+        }
+
         if (!this.showForm) {
             this.setDefaultFormValues(this.defaultValues as UkomTaskDetail)
             this.updateNonJFForm.markAsPristine()
         }
     }
 
-    getRejectedDokumen() {
-        if (this.pendingTask?.dokumenUkomList?.length) {
-            this.rejectedDokumen = this.pendingTask.dokumenUkomList.filter(
-                (dokumen) => dokumen.dokumenStatus.toLowerCase() === 'reject',
-            )
-            console.log(this.rejectedDokumen, 'rejectedDokumen')
-        }
-    }
+    loadRejectedDokumen() {
+        if (!this.pendingTask?.dokumenUkomList?.length) return
 
-    handleRejectedDokumen() {
-        this.inputs.files = {}
-        this.rejectedDokumen.forEach((dokumen, index) => {
-            const key = dokumen.dokumenPersyaratanId
-            this.inputs.files[key] = {
-                label: dokumen.dokumenPersyaratanName || 'Unknown Document',
-                remark: dokumen.remark,
-            }
-        })
+        this.rejectedDokumen = this.pendingTask.dokumenUkomList
+            .filter(d => d.dokumenStatus.toLowerCase() === 'reject')
+
+        this.inputs.files = Object.fromEntries(
+            this.rejectedDokumen.map(d => [
+                d.dokumenPersyaratanId,
+                {
+                    label: d.dokumenPersyaratanName || 'Unknown Document',
+                    remark: d.remark,
+                }
+            ])
+        )
     }
 
     isAnyFileMissing(): boolean {
+        // if there are no rejected docs at all, nothing is missing
+        if (!this.rejectedDokumen || this.rejectedDokumen.length === 0) {
+            return false
+        }
+
+        // if inputs.files is empty while we have rejected docs → missing
         if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
             return true
         }
 
+        // otherwise check if any required file has not been detected
         return Object.keys(this.inputs.files).some((key) => {
             return !this.detectedDokumen[key]
         })
     }
+
 
     onSave() {
         if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
@@ -304,9 +292,8 @@ export class NonjfRevisiUkomComponent {
                 if (existingDokumen) {
                     const newDoc = {
                         dokumenFile: detected.base64,
-                        dokumenPersyaratanName: `${
-                            this.pendingTask.nip
-                        }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName}`,
+                        dokumenPersyaratanName: `${this.pendingTask.nip
+                            }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName}`,
                         dokumenPersyaratanId:
                             existingDokumen.dokumenPersyaratanId,
                     }
