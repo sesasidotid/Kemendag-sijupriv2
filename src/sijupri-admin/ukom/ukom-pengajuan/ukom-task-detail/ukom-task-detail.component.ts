@@ -1,5 +1,5 @@
 import { UkomPendingTaskService } from './../../../../modules/ukom/services/ukom-pending-task.service'
-import { Component } from '@angular/core'
+import { Component, EventEmitter, Output } from '@angular/core'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { ActivatedRoute } from '@angular/router'
@@ -34,6 +34,7 @@ import {
 
 import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
 import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
+import { PesertaUkom } from '@/modules/ukom/models/peserta-ukom.model'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -41,7 +42,6 @@ import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
         TanggalIndoPipe,
         CommonModule,
         FormsModule,
-        FileHandlerComponent,
         LoadingButtonComponent,
         AgeCalculatorPipe,
         PrettyNamePipe,
@@ -51,6 +51,7 @@ import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 })
 export class UkomTaskDetailComponent {
     public flowId = UkomFlowId
+    @Output() pesertaUkomChange = new EventEmitter<ParticipantObject>()
 
     pesertaUkom: ParticipantObject
     pendingTask: PendingTask
@@ -105,6 +106,7 @@ export class UkomTaskDetailComponent {
             if (pendingTask) {
                 this.pendingTask = pendingTask
                 this.pesertaUkom = pendingTask.objectTask.object
+                this.pesertaUkomChange.emit(pendingTask.objectTask.object)
                 this.pendingTask.objectTask.object.kabupatenKotaId &&
                     this.getKabupatenNameByCode(
                         this.pendingTask.objectTask.object.kabupatenKotaId,

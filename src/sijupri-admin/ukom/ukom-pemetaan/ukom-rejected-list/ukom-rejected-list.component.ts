@@ -62,9 +62,10 @@ export class UkomRejectedListComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((ukom: FailedTask) => {
-                        // this.router.navigate([
-                        //     `/ukom/ukom-list/${ukom.objectGroup}`,
-                        // ])
+                        this.router.navigate([
+                            // `/ukom/ukom-task-list/${ukom.id}`,
+                            `/ukom/ukom-list/rejected/detail/${ukom.id}`,
+                        ])
                     }, 'info')
                     .withIcon('detail')
                     .build(),

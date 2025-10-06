@@ -1,1 +1,14 @@
-<p>ukom-task-rejected-detail works!</p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Back button -->
+    <button class="btn btn-sm btn-outline-secondary" [routerLink]="['/ukom/ukom-list']">
+        <i class=" mdi mdi-chevron-left"></i> Kembali
+    </button>
+
+    <!-- Open Detail button -->
+    <ng-container *ngIf="pesertaUkom?.participantStatus === 'jf'">
+        <a [href]="'/siap/user-jf/' + pesertaUkom.nip" target="_blank" class="btn  btn-primary">
+            <i class="mdi mdi-open-in-new"></i> Lihat Detail
+        </a>
+    </ng-container>
+</div>
+<app-ukom-task-detail (pesertaUkomChange)="onPesertaUkomReceived($event)"></app-ukom-task-detail>
