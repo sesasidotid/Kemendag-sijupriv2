@@ -10,7 +10,7 @@ import {
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { TabService } from '../../../../modules/base/services/tab.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, finalize } from 'rxjs'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
@@ -18,19 +18,30 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
+import { UkomTaskService } from '@/modules/ukom/services/ukom-task.service'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import {
+    ParticipantObject,
+    PendingTask,
+    UkomFlowId,
+} from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
 @Component({
     selector: 'app-ukom-task-list',
     standalone: true,
-    imports: [CommonModule, PagableComponent],
+    imports: [CommonModule, PagableComponent, LoadingButtonComponent],
     templateUrl: './ukom-task-list.component.html',
     styleUrl: './ukom-task-list.component.scss',
 })
 export class UkomTaskListComponent {
+    public flowId = UkomFlowId
+
     pagable$ = new BehaviorSubject<Pagable | null>(null)
     jabatanList: Jabatan[] = []
     refresh: boolean
-    tabIndex: BehaviorSubject<number> = new BehaviorSubject<number>(0)
+    tabIndex = new BehaviorSubject<number>(0)
+    currentFlow = new BehaviorSubject<string>(this.flowId.UkomFlowId1)
 
+    finalizeLoading: boolean = false
     constructor(
         private router: Router,
         private tabService: TabService,
@@ -38,35 +49,36 @@ export class UkomTaskListComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private jenisUkomService: JenisUkomService,
-        public jenjangService: JenjangService
-    ) { }
+        public jenjangService: JenjangService,
+        private ukomTaskService: UkomTaskService,
+    ) {}
 
     ngOnInit() {
-        const navigation = history.state
+        // const navigation = history.state
         this.getJabatanList()
         this.jenjangService.fetchJenjang()
         this.handlePagable()
 
-        if (navigation.tabIndex && navigation.menu == 'pengajuan-ukom') {
-            this.tabIndex.next(parseInt(navigation.tabIndex))
-            this.handleBackFromDetail(this.tabIndex.value)
-        }
+        // if (navigation.tabIndex && navigation.menu == 'pengajuan-ukom') {
+        //     this.tabIndex.next(parseInt(navigation.tabIndex))
+        //     this.handleBackFromDetail(this.tabIndex.value)
+        // }
         this.handleTabService()
     }
 
-    handleBackFromDetail(tabIndex: number) {
-        if (tabIndex == 0) {
-            this.handlePagableTabChange('ukom_flow_1', 0)
-        }
+    // handleBackFromDetail(tabIndex: number) {
+    //     if (tabIndex == 0) {
+    //         this.handlePagableTabChange('ukom_flow_1', 0)
+    //     }
 
-        if (tabIndex == 1) {
-            this.handlePagableTabChange('ukom_flow_2', 1)
-        }
+    //     if (tabIndex == 1) {
+    //         this.handlePagableTabChange('ukom_flow_2', 1)
+    //     }
 
-        if (tabIndex == 2) {
-            this.handlePagableTabChange('rejected', 2)
-        }
-    }
+    //     if (tabIndex == 2) {
+    //         this.handlePagableTabChange('rejected', 2)
+    //     }
+    // }
 
     handleDeleteTask(instanceId: string) {
         this.confirmationService.open(false).subscribe({
@@ -218,17 +230,17 @@ export class UkomTaskListComponent {
         // Ensure jabatan filter
         filterList = this.ensureFilter(
             filterList,
-            "like_nextJabatanName",
-            "Jabatan Yang Dituju",
-            this.jabatanList
+            'like_nextJabatanName',
+            'Jabatan Yang Dituju',
+            this.jabatanList,
         )
 
         this.jenjangService.jenjangList$.subscribe((jenjangs) => {
             const finalFilterList = this.ensureFilter(
                 filterList,
-                "like_nextJenjangName",
-                "Jenjang Yang Dituju",
-                jenjangs
+                'like_nextJenjangName',
+                'Jenjang Yang Dituju',
+                jenjangs,
             )
 
             this.pagable$.next({
@@ -238,34 +250,39 @@ export class UkomTaskListComponent {
         })
     }
 
-
     private ensureFilter(
         filterList: PageFilter[],
         key: string,
         label: string,
-        sourceList: { name: string }[]
+        sourceList: { name: string }[],
     ): PageFilter[] {
         const updated = filterList.map((item) =>
             item.key === key
                 ? {
-                    ...item,
-                    optionList: sourceList.map((i) => ({ label: i.name, value: i.name })),
-                }
+                      ...item,
+                      optionList: sourceList.map((i) => ({
+                          label: i.name,
+                          value: i.name,
+                      })),
+                  }
                 : item,
         )
 
         return updated.some((item) => item.key === key)
             ? updated
             : [
-                ...updated,
-                new PageFilter({
-                    label,
-                    fieldType: "select",
-                    key,
-                    value: "",
-                    optionList: sourceList.map((i) => ({ label: i.name, value: i.name })),
-                }),
-            ]
+                  ...updated,
+                  new PageFilter({
+                      label,
+                      fieldType: 'select',
+                      key,
+                      value: '',
+                      optionList: sourceList.map((i) => ({
+                          label: i.name,
+                          value: i.name,
+                      })),
+                  }),
+              ]
     }
 
     // updateFilterOptions() {
@@ -390,12 +407,12 @@ export class UkomTaskListComponent {
             )
                 ? existingFilterList
                 : [
-                    ...existingFilterList,
-                    new PageFilter({
-                        key: 'eq_flowId',
-                        value: tab,
-                    }),
-                ]
+                      ...existingFilterList,
+                      new PageFilter({
+                          key: 'eq_flowId',
+                          value: tab,
+                      }),
+                  ]
 
             updatedPagable = {
                 ...currentPagable,
@@ -406,5 +423,24 @@ export class UkomTaskListComponent {
 
         this.tabService.changeTabActive(tabIndex)
         this.pagable$.next(updatedPagable)
+        this.currentFlow.next(tab)
+    }
+
+    finalizePendingTask() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.finalizeLoading = true
+                this.ukomTaskService
+                    .finishPendingTask()
+                    .pipe(finalize(() => (this.finalizeLoading = false)))
+                    .subscribe({
+                        next: () => {
+                            this.refresh = !this.refresh
+                        },
+                    })
+            },
+        })
     }
 }

@@ -1,6 +1,20 @@
-<button class="btn btn-sm btn-outline-secondary mb-3" (click)="back(tabIndex, 'pengajuan-ukom')">
+<!-- <button class="btn btn-sm btn-outline-secondary mb-3" (click)="back(tabIndex, 'pengajuan-ukom')">
     <i class="mdi mdi-chevron-left"></i> Kembali
-</button>
+</button> -->
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Back button -->
+    <button class="btn btn-sm btn-outline-secondary" (click)="back(tabIndex, 'pengajuan-ukom')">
+        <i class="mdi mdi-chevron-left"></i> Kembali
+    </button>
+
+    <!-- Open Detail button -->
+    <ng-container *ngIf="pesertaUkom?.participantStatus === 'jf'">
+        <a [href]="'/siap/user-jf/' + pesertaUkom.nip" target="_blank" class="btn  btn-primary">
+            <i class="mdi mdi-open-in-new"></i> Lihat Detail
+        </a>
+    </ng-container>
+</div>
 
 <div *ngIf="isLoading$ | async; else content" class="d-flex justify-content-center my-5">
     <div class="spinner-border" role="status">
@@ -313,14 +327,13 @@
                         </ng-container>
 
                         <ng-template #jfStatus>
-                            <div class="col-lg-12">
+                            <!-- <div class="col-lg-12">
                                 <h5 class="fw-bold mt-3">
                                     Informasi Kinerja 2 Tahun Terakhir
                                 </h5>
                                 <hr />
                             </div>
 
-                            <!-- Cek apakah ada data -->
                             <div *ngIf="kinerja2Tahun?.length > 0; else noKinerja">
                                 <div class="col-lg-6 mb-3" *ngFor="let kinerja of kinerja2Tahun">
                                     <div class="mb-3">
@@ -380,14 +393,13 @@
                                 </div>
                             </div>
 
-                            <!-- Pesan kalau tidak ada data -->
                             <ng-template #noKinerja>
                                 <div class="col-lg-12">
                                     <p class="text-muted fst-italic">
                                         Belum ada data kinerja 2 tahun terakhir.
                                     </p>
                                 </div>
-                            </ng-template>
+                            </ng-template> -->
                         </ng-template>
                     </div>
                 </div>

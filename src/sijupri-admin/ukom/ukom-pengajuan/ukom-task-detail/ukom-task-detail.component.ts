@@ -1,6 +1,5 @@
 import { UkomPendingTaskService } from './../../../../modules/ukom/services/ukom-pending-task.service'
 import { Component } from '@angular/core'
-import { ApiService } from '../../../../modules/base/services/api.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { ActivatedRoute } from '@angular/router'
@@ -15,7 +14,6 @@ import {
     of,
     combineLatest,
     finalize,
-    tap,
 } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
@@ -156,31 +154,15 @@ export class UkomTaskDetailComponent {
         this.filePreviewService.open(fileName, source)
     }
 
-    // onFIleSwitch(index: number, status: 'APPROVE' | 'REJECT') {
-    //     this.pesertaUkom.dokumenUkomList[index].dokumenStatus = status
-
-    //     if (status == 'APPROVE') {
-    //         this.pesertaUkom.dokumenUkomList[index].remark = ''
-    //     }
-
-    //     for (const formasiDokumen of this.pesertaUkom.dokumenUkomList) {
-    //         if (formasiDokumen.dokumenStatus == 'REJECT') {
-    //             this.isApproveEnable = false
-    //             break
-    //         }
-    //         this.isApproveEnable = true
-    //     }
-    // }
     onFIleSwitch(index: number, status: 'APPROVE' | 'REJECT') {
         if (status === 'APPROVE') {
             this.pesertaUkom.dokumenUkomList[index].remark = ''
         }
 
         this.isApproveEnable = this.pesertaUkom.dokumenUkomList.every(
-            d => d.dokumenStatus !== 'REJECT'
+            (d) => d.dokumenStatus !== 'REJECT',
         )
     }
-
 
     back(tabIndex: number, menu: string) {
         this.router.navigate(['/ukom/ukom-task-list'], {

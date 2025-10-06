@@ -1,12 +1,6 @@
 import { Instansi } from './../../../modules/maintenance/models/instansi.model'
 import { ApiService } from './../../../modules/base/services/api.service'
-import {
-    Component,
-    AfterViewInit,
-    ElementRef,
-    ViewChild,
-    HostListener
-} from '@angular/core'
+import { Component } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import * as L from 'leaflet'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
@@ -38,7 +32,7 @@ type DaumT = {
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule],
     templateUrl: './formasi-pemetaan.component.html',
-    styleUrl: './formasi-pemetaan.component.scss'
+    styleUrl: './formasi-pemetaan.component.scss',
 })
 export class FormasiPemetaanComponent {
     map!: L.Map
@@ -63,7 +57,7 @@ export class FormasiPemetaanComponent {
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
-        shadowSize: [41, 41]
+        shadowSize: [41, 41],
     })
 
     private unitKerjaMarkerIcon = L.icon({
@@ -72,7 +66,7 @@ export class FormasiPemetaanComponent {
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
-        shadowSize: [41, 41]
+        shadowSize: [41, 41],
     })
 
     private provinceLayerGroup = L.layerGroup()
@@ -81,8 +75,8 @@ export class FormasiPemetaanComponent {
 
     constructor(
         private apiService: ApiService,
-        private handlerService: HandlerService
-    ) { }
+        private handlerService: HandlerService,
+    ) {}
 
     ngOnInit(): void {
         this.getProvince()
@@ -107,7 +101,7 @@ export class FormasiPemetaanComponent {
             .pipe(
                 debounceTime(500),
                 distinctUntilChanged(),
-                switchMap(term => {
+                switchMap((term) => {
                     console.log('term', term)
                     if (!term.trim()) {
                         this.results = []
@@ -115,9 +109,9 @@ export class FormasiPemetaanComponent {
                         return of([])
                     }
                     return this.search(term)
-                })
+                }),
             )
-            .subscribe(response => {
+            .subscribe((response) => {
                 this.results = response.data || []
                 if (this.results.length > 0) {
                     this.showDropdownSubject.next(true)
@@ -127,7 +121,7 @@ export class FormasiPemetaanComponent {
 
     search(term: string): Observable<any[]> | any[] {
         return this.apiService.getData(
-            `/api/v1/formasi/search?limit=10&like_unit_kerja|name=${term}`
+            `/api/v1/formasi/search?limit=10&like_unit_kerja|name=${term}`,
         )
     }
 
@@ -137,10 +131,10 @@ export class FormasiPemetaanComponent {
 
         this.selectItemSearch(item.unitKerjaName)
         this.getUnitKerjaAvailableFormation(item.unitKerjaId).subscribe(
-            response => {
+            (response) => {
                 console.log('availableFormation', response)
                 this.availableFormation = response
-            }
+            },
         )
         this.untuK = item.unitKerjaName
     }
@@ -153,16 +147,16 @@ export class FormasiPemetaanComponent {
         this.apiService
             .getData(`/api/v1/unit_kerja/search?eq_name=${eq_name}`)
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.unitKerjaData = response.data
 
                     this.removeLayers(
                         this.provinceLayerGroup,
                         this.kabKotaLayerGroup,
-                        this.unitKerjaLayerGroup
+                        this.unitKerjaLayerGroup,
                     )
                     this.addUnitKerjaMarkers()
-                }
+                },
             })
     }
 
@@ -171,88 +165,96 @@ export class FormasiPemetaanComponent {
     }
 
     getProvinceAvailableFormation(
-        provinsi_id: string
+        provinsi_id: string,
     ): Observable<AvailableFormasiInMap[]> {
         return this.apiService
             .getData(`/api/v1/formasi/calculate/provinsi/${provinsi_id}`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
                         (formation: AvailableFormasiInMap) =>
-                            new AvailableFormasiInMap(formation)
-                    )
-                )
+                            new AvailableFormasiInMap(formation),
+                    ),
+                ),
             )
     }
 
     getKabKotaAvailableFormation(
-        kabkota_id: string
+        kabkota_id: string,
     ): Observable<AvailableFormasiInMap[]> {
         return this.apiService
             .getData(`/api/v1/formasi/calculate/kab_kota/${kabkota_id}`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
                         (formation: AvailableFormasiInMap) =>
-                            new AvailableFormasiInMap(formation)
-                    )
-                )
+                            new AvailableFormasiInMap(formation),
+                    ),
+                ),
             )
     }
 
-    getUnitKerjaAvailableFormation(unit_kerja_id: string): Observable<AvailableFormasiInMap[]> {
+    getUnitKerjaAvailableFormation(
+        unit_kerja_id: string,
+    ): Observable<AvailableFormasiInMap[]> {
         console.log('getUnitKerjaAvailableFormation caleed', unit_kerja_id)
         return this.apiService
             .getData(`/api/v1/formasi/calculate/unit_kerja/${unit_kerja_id}`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
                         (formation: AvailableFormasiInMap) =>
-                            new AvailableFormasiInMap(formation)
-                    )
-                )
+                            new AvailableFormasiInMap(formation),
+                    ),
+                ),
             )
     }
 
     getProvince(isReset?: boolean): void {
-        this.apiService.getData(`/api/v1/provinsi/search?limit=1000`).subscribe({
-            next: response => {
-                this.provinceContainedData = response.data
+        this.apiService
+            .getData(`/api/v1/provinsi/search?limit=1000`)
+            .subscribe({
+                next: (response) => {
+                    this.provinceContainedData = response.data
 
-                this.addProvinceMarkers()
-            }
-        })
+                    this.addProvinceMarkers()
+                },
+            })
     }
 
     toTitleCase(str: string) {
         return str
         return str.replace(
             /\w\S*/g,
-            text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+            (text) =>
+                text.charAt(0).toUpperCase() + text.substring(1).toLowerCase(),
         )
     }
 
     addProvinceMarkers(): void {
-        this.provinceContainedData.forEach(province => {
-            const marker = L.marker([parseFloat(province.latitude), parseFloat(province.longitude)],
-                { icon: this.markerIcon }
+        this.provinceContainedData.forEach((province) => {
+            const marker = L.marker(
+                [parseFloat(province.latitude), parseFloat(province.longitude)],
+                { icon: this.markerIcon },
             ).addTo(this.provinceLayerGroup)
 
             marker.bindPopup(
-                `<b>${province.name}</b><br><br><button id="select-province-${province.id}" class="btn btn-soft-primary">Detail</button>`
+                `<b>${province.name}</b><br><br><button id="select-province-${province.id}" class="btn btn-soft-primary">Detail</button>`,
             )
 
             marker.on('popupopen', () => {
-                this.getProvinceAvailableFormation(province.id).subscribe(response => {
-                    this.availableFormation = response
-                })
+                this.getProvinceAvailableFormation(province.id).subscribe(
+                    (response) => {
+                        this.availableFormation = response
+                    },
+                )
 
                 this.untuK = this.toTitleCase(province.name)
 
                 document
                     .getElementById(`select-province-${province.id}`)
                     ?.addEventListener('click', () =>
-                        this.selectProvince(province.id, marker)
+                        this.selectProvince(province.id, marker),
                     )
             })
         })
@@ -263,41 +265,46 @@ export class FormasiPemetaanComponent {
     selectProvince(provinsiId: string, marker: L.Marker): void {
         this.apiService
             .getData(
-                `/api/v1/kab_kota/search?eq_provinsiId=${provinsiId}&limit=10000`
+                `/api/v1/kab_kota/search?eq_provinsiId=${provinsiId}&limit=10000`,
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.getUnitKerjaIT3(provinsiId)
                     this.kabKotaData = response.data
                     this.map.setView(marker.getLatLng(), 8) // Zoom into province
-                    this.removeLayers(this.provinceLayerGroup, this.unitKerjaLayerGroup) // Remove kabKota and unitKerja markers
+                    this.removeLayers(
+                        this.provinceLayerGroup,
+                        this.unitKerjaLayerGroup,
+                    ) // Remove kabKota and unitKerja markers
                     this.addKabKotaMarkers()
-                }
+                },
             })
     }
 
     addKabKotaMarkers(): void {
-        this.kabKotaData.forEach(city => {
+        this.kabKotaData.forEach((city) => {
             const marker = L.marker(
                 [parseFloat(city.latitude), parseFloat(city.longitude)],
-                { icon: this.markerIcon }
+                { icon: this.markerIcon },
             ).addTo(this.kabKotaLayerGroup)
 
             marker.bindPopup(
-                `<b>${city.name}</b><br><button id="select-kabkota-${city.id}-${city.type}" class="btn btn-soft-primary">Detail</button>`
+                `<b>${city.name}</b><br><button id="select-kabkota-${city.id}-${city.type}" class="btn btn-soft-primary">Detail</button>`,
             )
 
             marker.on('popupopen', () => {
-                this.getKabKotaAvailableFormation(city.id).subscribe(response => {
-                    this.availableFormation = response
-                })
+                this.getKabKotaAvailableFormation(city.id).subscribe(
+                    (response) => {
+                        this.availableFormation = response
+                    },
+                )
 
                 this.untuK = this.toTitleCase(city.name)
 
                 document
                     .getElementById(`select-kabkota-${city.id}-${city.type}`)
                     ?.addEventListener('click', () =>
-                        this.selectCity(city.id, city.type, marker)
+                        this.selectCity(city.id, city.type, marker),
                     )
             })
         })
@@ -312,42 +319,51 @@ export class FormasiPemetaanComponent {
                 : `/api/v1/unit_kerja/search?eq_instansi|kotaId=${cityId}&limit=10000`
 
         this.apiService.getData(apiLink).subscribe({
-            next: response => {
+            next: (response) => {
                 console.log('called getKota', this.provinceLayerGroup)
                 this.unitKerjaData = response.data
 
                 if (this.unitKerjaData.length === 0) {
-                    this.handlerService.handleAlert('Info', 'Data tidak ditemukan')
+                    this.handlerService.handleAlert(
+                        'Info',
+                        'Data tidak ditemukan',
+                    )
                     return
                 }
                 this.map.setView(marker.getLatLng(), 10) // Zoom into city
                 this.removeLayers(
                     this.provinceLayerGroup,
                     this.kabKotaLayerGroup,
-                    this.unitKerjaLayerGroup
+                    this.unitKerjaLayerGroup,
                 ) // Remove province and unitKerja markers
                 this.addUnitKerjaMarkers()
-            }
+            },
         })
     }
 
     selectKab(kabupatenId: string, marker: L.Marker): void {
         this.apiService
             .getData(
-                `/api/v1/unit_kerja/search?eq_instansi|kabupatenId=${kabupatenId}&limit=10000`
+                `/api/v1/unit_kerja/search?eq_instansi|kabupatenId=${kabupatenId}&limit=10000`,
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.unitKerjaData = response.data
 
                     if (this.unitKerjaData.length === 0) {
-                        this.handlerService.handleAlert('Info', 'Data tidak ditemukan')
+                        this.handlerService.handleAlert(
+                            'Info',
+                            'Data tidak ditemukan',
+                        )
                         return
                     }
                     this.map.setView(marker.getLatLng(), 10)
-                    this.removeLayers(this.provinceLayerGroup, this.kabKotaLayerGroup)
+                    this.removeLayers(
+                        this.provinceLayerGroup,
+                        this.kabKotaLayerGroup,
+                    )
                     this.addUnitKerjaMarkers()
-                }
+                },
             })
     }
 
@@ -356,35 +372,36 @@ export class FormasiPemetaanComponent {
     }
 
     addUnitKerjaMarkers(): void {
-        this.unitKerjaData.forEach(unitkerja => {
+        this.unitKerjaData.forEach((unitkerja) => {
             const marker = L.marker([unitkerja.latitude, unitkerja.longitude], {
                 icon: this.unitKerjaMarkerIcon,
-                layerType: 'unitkerja'
+                layerType: 'unitkerja',
             } as CustomMarkerOptions).addTo(this.unitKerjaLayerGroup)
 
-            this.getInstansiDetail(unitkerja.instansiId).subscribe(response => {
-                const instansiName = response?.name || '-'
+            this.getInstansiDetail(unitkerja.instansiId).subscribe(
+                (response) => {
+                    const instansiName = response?.name || '-'
 
-                let instansiType = ''
-                switch (response?.instansiTypeCode) {
-                    case 'IT1':
-                        instansiType = 'Pusbin'
-                        break
-                    case 'IT2':
-                        instansiType = 'Kementerian Lembaga'
-                        break
-                    case 'IT3':
-                        instansiType = 'Provinsi'
-                        break
-                    case 'IT4':
-                        instansiType = 'Kabupaten'
-                        break
-                    case 'IT5':
-                        instansiType = 'Kota'
-                        break
-                }
+                    let instansiType = ''
+                    switch (response?.instansiTypeCode) {
+                        case 'IT1':
+                            instansiType = 'Pusbin'
+                            break
+                        case 'IT2':
+                            instansiType = 'Kementerian Lembaga'
+                            break
+                        case 'IT3':
+                            instansiType = 'Provinsi'
+                            break
+                        case 'IT4':
+                            instansiType = 'Kabupaten'
+                            break
+                        case 'IT5':
+                            instansiType = 'Kota'
+                            break
+                    }
 
-                marker.bindPopup(`
+                    marker.bindPopup(`
           <div style="
             font-family: Arial, sans-serif; 
             padding: 10px; 
@@ -399,13 +416,14 @@ export class FormasiPemetaanComponent {
             <p style="margin: 5px 0;"><strong>Tipe Instansi:</strong> ${instansiType}</p>
           </div>
         `)
-            })
+                },
+            )
 
             marker.on('popupopen', () => {
                 this.getUnitKerjaAvailableFormation(unitkerja.id).subscribe(
-                    response => {
+                    (response) => {
                         this.availableFormation = response
-                    }
+                    },
                 )
 
                 this.untuK = this.toTitleCase(unitkerja.name)
@@ -421,7 +439,7 @@ export class FormasiPemetaanComponent {
 
         // Add OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: '&copy; OpenStreetMap contributors',
         }).addTo(this.map)
 
         // Add layer groups to the map
@@ -446,7 +464,7 @@ export class FormasiPemetaanComponent {
     }
 
     removeLayers(...layers: L.LayerGroup[]): void {
-        layers.forEach(layer => layer.clearLayers())
+        layers.forEach((layer) => layer.clearLayers())
     }
 
     resetMap(): void {
@@ -454,7 +472,7 @@ export class FormasiPemetaanComponent {
         this.removeLayers(
             this.provinceLayerGroup,
             this.kabKotaLayerGroup,
-            this.unitKerjaLayerGroup
+            this.unitKerjaLayerGroup,
         )
 
         this.searchControl.setValue('')
@@ -473,8 +491,8 @@ export class FormasiPemetaanComponent {
 
     getTotalRekapitulasi(): number {
         let total = 0
-        this.availableFormation.forEach(item => {
-            item.jenjangSumList.forEach(formasi => {
+        this.availableFormation.forEach((item) => {
+            item.jenjangSumList.forEach((formasi) => {
                 total += Number(formasi.resultSum) || 0
             })
         })
@@ -484,42 +502,42 @@ export class FormasiPemetaanComponent {
     getUnitKerjaIT1(isReset?: boolean): void {
         this.apiService
             .getData(
-                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT1&limit=10000`
+                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT1&limit=10000`,
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     response.data.forEach((unitkerja: any) => {
                         this.unitKerjaData.push(unitkerja)
                     })
 
                     this.addUnitKerjaMarkers()
-                }
+                },
             })
     }
 
     getUnitKerjaIT2(isReset?: boolean): void {
         this.apiService
             .getData(
-                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT2&limit=10000`
+                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT2&limit=10000`,
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     response.data.forEach((unitkerja: any) => {
                         this.unitKerjaData.push(unitkerja)
                     })
 
                     this.addUnitKerjaMarkers()
-                }
+                },
             })
     }
 
     getUnitKerjaIT3(provinsiId: string): void {
         this.apiService
             .getData(
-                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT3&eq_instansi|provinsiId=${provinsiId}&limit=10000`
+                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT3&eq_instansi|provinsiId=${provinsiId}&limit=10000`,
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     //   response.data.forEach((unitkerja: any) => {
                     //     this.unitKerjaData.push(unitkerja)
                     //   })
@@ -528,37 +546,43 @@ export class FormasiPemetaanComponent {
 
                     this.removeLayers(this.unitKerjaLayerGroup)
                     this.addUnitKerjaMarkers()
-                }
+                },
             })
     }
 
     getUnitKerjaIT4(kabupatenId: string): void {
         this.apiService
             .getData(
-                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT4&eq_instansi|kabupatenId=${kabupatenId}&limit=10000`
+                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT4&eq_instansi|kabupatenId=${kabupatenId}&limit=10000`,
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.unitKerjaData = response.data
 
-                    this.removeLayers(this.unitKerjaLayerGroup, this.provinceLayerGroup)
+                    this.removeLayers(
+                        this.unitKerjaLayerGroup,
+                        this.provinceLayerGroup,
+                    )
                     this.addUnitKerjaMarkers()
-                }
+                },
             })
     }
 
     getUnitKerjaIT5(kotaId: string): void {
         this.apiService
             .getData(
-                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT3&eq_instansi|kotaId=${kotaId}&limit=10000`
+                `/api/v1/unit_kerja/search?eq_instansi|instansiTypeCode=IT3&eq_instansi|kotaId=${kotaId}&limit=10000`,
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.unitKerjaData = response.data
 
-                    this.removeLayers(this.unitKerjaLayerGroup, this.provinceLayerGroup)
+                    this.removeLayers(
+                        this.unitKerjaLayerGroup,
+                        this.provinceLayerGroup,
+                    )
                     this.addUnitKerjaMarkers()
-                }
+                },
             })
     }
 }

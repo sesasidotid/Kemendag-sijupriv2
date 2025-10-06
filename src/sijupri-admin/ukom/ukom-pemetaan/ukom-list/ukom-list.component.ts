@@ -5,19 +5,21 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { UkomRejectedListComponent } from '../ukom-rejected-list/ukom-rejected-list.component'
 import { TabService } from '../../../../modules/base/services/tab.service'
-import { BehaviorSubject, catchError, of, tap } from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { UkomExportVerifikasiComponent } from '../ukom-export-verifikasi/ukom-export-verifikasi.component'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
@@ -25,10 +27,10 @@ import { UkomExportVerifikasiComponent } from '../ukom-export-verifikasi/ukom-ex
         PagableComponent,
         UkomRejectedListComponent,
         CommonModule,
-        UkomExportVerifikasiComponent
+        UkomExportVerifikasiComponent,
     ],
     templateUrl: './ukom-list.component.html',
-    styleUrl: './ukom-list.component.scss'
+    styleUrl: './ukom-list.component.scss',
 })
 export class UkomListComponent {
     pagable: Pagable
@@ -38,45 +40,44 @@ export class UkomListComponent {
     refresh: boolean = false
     tab$ = new BehaviorSubject<number | null>(0)
 
-    constructor (
+    constructor(
         private router: Router,
         private apiService: ApiService,
-        private tabService: TabService,
+        public tabService: TabService,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
+        private jenisUkomService: JenisUkomService,
+        private jabatanService: JabatanService,
     ) {}
 
-    ngOnInit () {
-        this.handleTabService()
+    ngOnInit() {
+        this.initTabs()
         this.getJabatanList()
         this.handlePagable()
     }
 
-    handleTabService () {
-        if (this.tabService.getTabsLength() > 0) {
-            this.tabService.clearTabs()
-        }
-
+    initTabs() {
         this.tabService
             .addTab({
                 label: 'Rekapitulasi Lolos Verifikasi',
                 icon: 'mdi-list-box',
-                isActive: true,
-                onClick: () => this.handleTabChange(0)
+                onClick: () => this.tabService.changeTabActive(0),
+            })
+            .addTab({
+                label: 'Rekapitulasi Tidak Lolos Verifikasi',
+                icon: 'mdi-close',
+                onClick: () => this.tabService.changeTabActive(1),
             })
             .addTab({
                 label: 'Export Rekapitulasi Verifikasi',
                 icon: 'mdi-export',
-                onClick: () => this.handleTabChange(1)
+                onClick: () => this.tabService.changeTabActive(2),
             })
+
+        setTimeout(() => this.tabService.changeTabActive(0), 0)
     }
 
-    handleTabChange (tab: number) {
-        this.tab$.next(tab)
-        this.tabService.changeTabActive(tab)
-    }
-
-    handlePagable () {
+    handlePagable() {
         const pagable = new PagableBuilder('/api/v1/participant_ukom/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
@@ -85,36 +86,28 @@ export class UkomListComponent {
                     .withDynamicValue('Jabatan Yang Dituju', (data: any) => {
                         return (
                             this.jabatanList.find(
-                                jabatan => jabatan.code === data.nextJabatanCode
+                                (jabatan) =>
+                                    jabatan.code === data.nextJabatanCode,
                             )?.name || '-'
                         )
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jenis Ukom', (data: any) => {
-                        switch (data.jenisUkom) {
-                            case 'KENAIKAN_JENJANG':
-                                return 'Kenaikan Jenjang'
-                            case 'PERPINDAHAN_JABATAN':
-                                return 'Perpindahan Jabatan'
-                            case 'PROMOSI':
-                                return 'Promosi'
-                            case 'PROMOSI_JF':
-                                return 'Promosi Jabatan Fungsional'
-                            default:
-                                return data.jenisUkom
-                        }
+                        return this.jenisUkomService.getLabelByValue(
+                            data.jenisUkom,
+                        )
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Status', (data: any) =>
-                        data.ukomBan != null ? 'Banned' : 'Active'
+                        data.ukomBan != null ? 'Banned' : 'Active',
                     )
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -122,7 +115,7 @@ export class UkomListComponent {
                         this.router.navigate([`/ukom/ukom-list/${ukom.nip}`])
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -130,19 +123,19 @@ export class UkomListComponent {
                         this.handleDeleteTask(ukom.nip)
                     }, 'danger')
                     .withIcon('danger')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('nip')
                     .withField('NIP', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('name')
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
@@ -153,27 +146,27 @@ export class UkomListComponent {
                         { label: 'Promosi', value: 'PROMOSI' },
                         {
                             label: 'Kenaikan Jenjang',
-                            value: 'KENAIKAN_JENJANG'
+                            value: 'KENAIKAN_JENJANG',
                         },
                         {
                             label: 'Perpindahan Jabatan',
-                            value: 'PERPINDAHAN_JABATAN'
+                            value: 'PERPINDAHAN_JABATAN',
                         },
                         {
                             label: 'Promosi Jabatan Fungsional',
-                            value: 'PROMOSI_JF'
-                        }
+                            value: 'PROMOSI_JF',
+                        },
                     ])
-                    .build()
+                    .build(),
             )
             .build()
 
         this.pagable$.next(pagable)
     }
 
-    handleDeleteTask (nip: string) {
+    handleDeleteTask(nip: string) {
         this.confirmationService.open(false).subscribe({
-            next: res => {
+            next: (res) => {
                 if (!res.confirmed) {
                     return
                 }
@@ -181,43 +174,43 @@ export class UkomListComponent {
                 this.apiService
                     .deleteData(`/api/v1/participant_ukom/delete/${nip}`)
                     .subscribe({
-                        next: res => {
+                        next: (res) => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil dihapus'
+                                'Data berhasil dihapus',
                             )
                             this.refresh = !this.refresh
                         },
-                        error: err => {
+                        error: (err) => {
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Data gagal dihapus'
+                                'Data gagal dihapus',
                             )
                             this.refresh = !this.refresh
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
-    updateFilterOptions () {
+    updateFilterOptions() {
         let updatedPagable
         const currentPagable = this.pagable$.value
 
-        const existingFilterList = currentPagable.filterList.map(item =>
+        const existingFilterList = currentPagable.filterList.map((item) =>
             item.key === 'eq_nextJabatanCode'
                 ? {
                       ...item,
-                      optionList: this.jabatanList.map(jabatan => ({
+                      optionList: this.jabatanList.map((jabatan) => ({
                           label: jabatan.name,
-                          value: jabatan.code
-                      }))
+                          value: jabatan.code,
+                      })),
                   }
-                : item
+                : item,
         )
 
         const filterList = existingFilterList.some(
-            item => item.key === 'eq_nextJabatanCode'
+            (item) => item.key === 'eq_nextJabatanCode',
         )
             ? existingFilterList
             : [
@@ -227,36 +220,32 @@ export class UkomListComponent {
                       fieldType: 'select',
                       key: 'eq_nextJabatanCode',
                       value: '',
-                      optionList: this.jabatanList.map(jabatan => ({
+                      optionList: this.jabatanList.map((jabatan) => ({
                           label: jabatan.name,
-                          value: jabatan.code
-                      }))
-                  })
+                          value: jabatan.code,
+                      })),
+                  }),
               ]
 
         updatedPagable = {
             ...currentPagable,
-            filterList
+            filterList,
         }
         this.pagable$.next(updatedPagable)
     }
 
-    getJabatanList () {
-        this.apiService.getData('/api/v1/jabatan').subscribe({
-            next: response => {
+    getJabatanList() {
+        this.jabatanService.fetchJabatan()
+
+        this.jabatanService.jabatanList$.subscribe({
+            next: (response) => {
                 this.jabatanList = response
-            },
-            error: error => {
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengambil list jabatan'
-                )
-                this.jabatanList = []
-            },
-            complete: () => {
-                console.log('complete', this.jabatanList)
                 this.updateFilterOptions()
-            }
+            },
+            error: () => {
+                this.jabatanList = []
+                this.updateFilterOptions()
+            },
         })
     }
 }

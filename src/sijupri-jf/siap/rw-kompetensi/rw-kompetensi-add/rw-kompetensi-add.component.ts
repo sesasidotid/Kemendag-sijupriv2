@@ -5,7 +5,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { RWKompetensi } from '../../../../modules/siap/models/rw-kompetensi.model'
 import { AlertService } from '../../../../modules/base/services/alert.service'
@@ -15,8 +15,6 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { LoginContext } from '../../../../modules/base/commons/login-context'
-import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 
@@ -27,10 +25,10 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
         CommonModule,
         FormsModule,
         FileHandlerComponent,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     templateUrl: './rw-kompetensi-add.component.html',
-    styleUrl: './rw-kompetensi-add.component.scss'
+    styleUrl: './rw-kompetensi-add.component.scss',
 })
 export class RwKompetensiAddComponent {
     rwKompetensi: RWKompetensi = new RWKompetensi()
@@ -48,8 +46,8 @@ export class RwKompetensiAddComponent {
         private confirmationService: ConfirmationService,
         private alertService: AlertService,
         private router: Router,
-        private formValidationService: FormValidationService
-    ) { }
+        private formValidationService: FormValidationService,
+    ) {}
 
     ngOnInit() {
         this.handleFormInit()
@@ -58,7 +56,11 @@ export class RwKompetensiAddComponent {
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.rwKompetensiForm.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.rwKompetensiForm.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handleFormInit() {
@@ -68,9 +70,7 @@ export class RwKompetensiAddComponent {
             dateStart: new FormControl('', [Validators.required]),
             dateEnd: new FormControl('', [Validators.required]),
             tglSertifikat: new FormControl('', [Validators.required]),
-            fileSertifikat: new FormControl('', [
-                Validators.required,
-            ])
+            fileSertifikat: new FormControl('', [Validators.required]),
         })
     }
 
@@ -81,35 +81,35 @@ export class RwKompetensiAddComponent {
                     label: 'Upload Dokumen Sertifikat',
                     fileName: this.rwKompetensi.sertifikat,
                     source: this.rwKompetensi.sertifikatUrl,
-                    required: true
-                }
+                    required: true,
+                },
             },
             maxSize: 2 * 1024 * 1024,
             allowedTypes: [{ type: 'application/pdf' }],
             listen: (key: string, source: string, base64Data: string) => {
                 this.rwKompetensiForm.patchValue({ fileSertifikat: base64Data })
-            }
+            },
         }
     }
 
     getKategoriPengembanganList() {
         this.kategoriPengembanganLoading$.next(true)
         this.apiService.getData(`/api/v1/kategori_pengembangan`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.kategoriPengembanganList = response.map(
                     (kategoriPengembangan: { [key: string]: any }) =>
-                        new KategoriPengembangan(kategoriPengembangan)
+                        new KategoriPengembangan(kategoriPengembangan),
                 )
                 this.kategoriPengembanganLoading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
                 this.alertService.showToast(
                     'Error',
-                    'Gagal mendapatkan data kategori pengembangan!'
+                    'Gagal mendapatkan data kategori pengembangan!',
                 )
                 this.kategoriPengembanganLoading$.next(false)
-            }
+            },
         })
     }
 
@@ -126,31 +126,36 @@ export class RwKompetensiAddComponent {
                 this.rwKompetensiForm.value.fileSertifikat
 
             this.confirmationService.open(false).subscribe({
-                next: result => {
+                next: (result) => {
                     if (!result.confirmed) return
                     this.submitLoading$.next(true)
 
                     this.apiService
-                        .postData(`/api/v1/rw_kompetensi/task`, this.rwKompetensi)
+                        .postData(
+                            `/api/v1/rw_kompetensi/task`,
+                            this.rwKompetensi,
+                        )
                         .subscribe({
                             next: () => {
                                 this.alertService.showToast(
                                     'Success',
-                                    'Berhasil menambahkan riwayat kompetensi.'
+                                    'Berhasil menambahkan riwayat kompetensi.',
                                 )
                                 this.submitLoading$.next(false)
-                                this.router.navigate(['/profile/rw-kompetensi/pending'])
+                                this.router.navigate([
+                                    '/profile/rw-kompetensi/pending',
+                                ])
                             },
-                            error: error => {
+                            error: (error) => {
                                 console.log('error', error)
                                 this.alertService.showToast(
                                     'Error',
-                                    'Gagal menambahkan riwayat kompetensi!'
+                                    'Gagal menambahkan riwayat kompetensi!',
                                 )
                                 this.submitLoading$.next(false)
-                            }
+                            },
                         })
-                }
+                },
             })
         }
     }

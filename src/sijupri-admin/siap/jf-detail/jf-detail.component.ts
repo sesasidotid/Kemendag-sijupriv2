@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { JfService } from '../../../modules/siap/services/jf.service'
 import { JF } from '../../../modules/siap/models/jf.model'
 import { CommonModule } from '@angular/common'
@@ -9,12 +9,10 @@ import { RwJabatanListComponent } from '../../../sijupri-jf/siap/rw-jabatan/rw-j
 import { RwKinerjaListComponent } from '../../../sijupri-jf/siap/rw-kinerja/rw-kinerja-list/rw-kinerja-list.component'
 import { RwKompetensiListComponent } from '../../../sijupri-jf/siap/rw-kompetensi/rw-kompetensi-list/rw-kompetensi-list.component'
 import { RwSertifikasiListComponent } from '../../../sijupri-jf/siap/rw-sertifikasi/rw-sertifikasi-list/rw-sertifikasi-list.component'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
-import { first } from 'rxjs/operators'
 @Component({
     selector: 'app-jf-detail',
     standalone: true,
@@ -40,7 +38,8 @@ export class JfDetailComponent {
         private activatedRoute: ActivatedRoute,
         private apiService: ApiService,
         private sanitizer: DomSanitizer,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
+        private router: Router
     ) { }
 
     ngOnInit() {
@@ -52,7 +51,7 @@ export class JfDetailComponent {
     }
 
     backToList() {
-        history.back()
+        this.router.navigate(['/siap/user-jf'])
     }
 
     fetchPhotoProfile() {
@@ -65,8 +64,7 @@ export class JfDetailComponent {
                 const objectUrl = URL.createObjectURL(blob)
                 this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
-            error: err => {
-                console.error('Error fetching profile image', err)
+            error: () => {
                 this.profileImageSrc = 'assets/no-profile.jpg'
             }
         })
