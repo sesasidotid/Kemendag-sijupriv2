@@ -28,35 +28,37 @@
                 </tr>
                 <tr>
                     <th scope="row">Skor CAT</th>
-                    <td>{{ gradeData.nbCat ?? '-' }}</td>
+                    <!-- <td>{{ gradeData.nbCat ?? '-' }}</td> -->
+                    <td>{{ gradeData.catGrade?.score ?? '-' }}</td>
+
                 </tr>
                 <tr>
                     <th scope="row">Skor Wawancara</th>
-                    <td>{{ gradeData.nbWawancara ?? '-' }}</td>
+                    <td>{{ gradeData.wawancaraGrade?.score ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Seminar</th>
-                    <td>{{ gradeData.nbSeminar ?? '-' }}</td>
+                    <td>{{ gradeData.seminarGrade?.score ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Praktik</th>
-                    <td>{{ gradeData.nbPraktik ?? "-" }}</td>
+                    <td>{{ gradeData.praktikGrade?.score ?? "-" }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Portofolio</th>
-                    <td>{{ gradeData.nbPortofolio?? '-' }}</td>
+                    <td>{{ gradeData.portofolioGrade?.score ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">UKT</th>
-                    <td>{{ gradeData.ukt?? '-' }}</td>
+                    <td>{{ gradeData.ukt ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">UKMSK</th>
-                    <td>{{ gradeData.jpm?? '-' }}</td>
+                    <td>{{ gradeData.jpm ?? '-' }}</td>
                 </tr>
                 <tr class="fw-bold">
                     <th scope="row">Nilai Akhir</th>
-                    <td>{{ gradeData.grade?? '-' }}</td>
+                    <td>{{ gradeData.grade ?? '-' }}</td>
                 </tr>
                 <tr class="fw-bold">
                     <th scope="row">File Rekomendasi UKom</th>

@@ -59,7 +59,7 @@ export enum JenisUkomEnum {
         FileHandlerComponent,
         FilePreviewComponent,
         UkomGradeTableComponent,
-        ReplaceUkomWordPipe
+        ReplaceUkomWordPipe,
     ],
     templateUrl: './status-pendaftaran-ukom.component.html',
     styleUrl: './status-pendaftaran-ukom.component.scss',
@@ -131,7 +131,7 @@ export class StatusPendaftaranUkomComponent {
         private handlerService: HandlerService,
         private filePreviewService: FilePreviewService,
         private ukomGradeService: UkomGradeService,
-        public kinerjaService: KinerjaService
+        public kinerjaService: KinerjaService,
     ) {
         this.isLoading$ = combineLatest([
             this.isPredikatKerjaLoading$,
@@ -228,7 +228,7 @@ export class StatusPendaftaranUkomComponent {
         const filename = this.finishTask.rekomendasi || 'rekomendasi.pdf'
 
         this.apiService.getDownload(relativePath, filename).subscribe({
-            next: () => { },
+            next: () => {},
             error: (err) => {
                 this.handlerService.handleAlert(
                     'Error',
@@ -514,7 +514,7 @@ export class StatusPendaftaranUkomComponent {
                 }),
             )
             .subscribe({
-                next: () => { },
+                next: () => {},
                 error: (error) => {
                     this.handlerService.handleAlert(
                         'Error',

@@ -1,8 +1,6 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, Input } from '@angular/core';
-import { UkomGrade } from '../../../ukom/models/ukom-grade';
-import { PagableBuilder } from '../../commons/pagable/pagable-builder';
-import { Pagable } from '../../commons/pagable/pagable';
+import { CommonModule } from '@angular/common'
+import { Component, EventEmitter, Output, Input } from '@angular/core'
+import { UkomGrade } from '../../../ukom/models/ukom-grade'
 @Component({
     selector: 'app-ukom-grade-table',
     standalone: true,
@@ -11,14 +9,14 @@ import { Pagable } from '../../commons/pagable/pagable';
     imports: [CommonModule],
 })
 export class UkomGradeTableComponent {
-    @Input() nip: string = '';
-    @Input() nama: string = '';
-    @Input() gradeData!: UkomGrade;
-    @Input() rekomendasiUrl: string | null | undefined;
+    @Input() nip: string = ''
+    @Input() nama: string = ''
+    @Input() gradeData!: UkomGrade
+    @Input() rekomendasiUrl: string | null | undefined
 
-    @Output() downloadFile = new EventEmitter<UkomGrade>();
+    @Output() downloadFile = new EventEmitter<UkomGrade>()
 
     onDownloadFile() {
-        this.downloadFile.emit(this.gradeData);
+        this.downloadFile.emit(this.gradeData)
     }
 }
