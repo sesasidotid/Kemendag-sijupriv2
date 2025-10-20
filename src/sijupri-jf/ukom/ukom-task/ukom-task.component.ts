@@ -29,7 +29,6 @@ import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jabatan.service'
 import { JfService } from '@/modules/siap/services/jf.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
-import { ActivatedRoute, Router } from '@angular/router'
 import { ReplaceUkomWordPipe } from '@/modules/base/pipes/replace-ukom-word.pipe'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
@@ -49,7 +48,7 @@ export enum JenisUkomEnum {
         UkomRevisionComponent,
         TanggalIndoPipe,
         AgeCalculatorPipe,
-        ReplaceUkomWordPipe
+        ReplaceUkomWordPipe,
     ],
     templateUrl: './ukom-task.component.html',
     styleUrl: './ukom-task.component.scss',
@@ -57,9 +56,9 @@ export enum JenisUkomEnum {
 export class UkomTaskComponent {
     pendingTask = new UkomTaskDetail()
     pesertaUkom: PesertaUkom
-    jf: JF = new JF()
+    jf = new JF()
     ukom: Ukom
-    isFormOpen: boolean = false
+    isFormOpen = false
     detectedDokumen: any = {}
 
     ukomDataLoading$ = new BehaviorSubject<boolean>(true)
@@ -115,7 +114,7 @@ export class UkomTaskComponent {
         public bidangJabatanService: BidangJabatanService,
         private jfService: JfService,
         public ukomParticipantService: UkomParticipantService,
-    ) { }
+    ) {}
 
     ngOnInit() {
         this.systemConfigService.checkUkomRegistration()
@@ -226,6 +225,7 @@ export class UkomTaskComponent {
             )
             .subscribe({
                 next: (response) => {
+                    console.log(response)
                     this.pendingTask = response
                     switch (this.pendingTask.flowId) {
                         case 'ukom_flow_1':

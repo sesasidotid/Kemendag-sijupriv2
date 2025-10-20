@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core'
 })
 export class PrettyNamePipe implements PipeTransform {
     transform(value: string | null | undefined): string | null {
-        if (!value) return null
+        if (!value) return '-'
 
         return value
             .toLowerCase()

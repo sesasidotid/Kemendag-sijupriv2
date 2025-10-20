@@ -316,10 +316,6 @@
                                 Perpindahan Jabatan
                             </option>
                             <option value="PROMOSI">Promosi</option>
-                            //
-                            <option value="KENAIKAN_JENJANG">
-                                // Kenaikan Jenjang //
-                            </option>
                         </select>
                         <div *ngIf="getErrorMessage('jenisUkom', 'Jenis UKom')" class="text-danger">
                             {{ getErrorMessage('jenisUkom', 'Jenis UKom') }}
@@ -601,7 +597,7 @@
 
 <ng-template #registerClosed>
     <div class="card parent">
-        <h1 class="text-center">Pendaftaran UKom Sedang Tutup</h1>
+        <h2 class="text-center">Pendaftaran UKom Sedang Tutup</h2>
     </div>
 </ng-template>
 <app-confirmation-dialog></app-confirmation-dialog>

@@ -1,3 +1,4 @@
+import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jabatan.service'
 import { UkomPendingTaskService } from './../../../../modules/ukom/services/ukom-pending-task.service'
 import { Component, EventEmitter, Output } from '@angular/core'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
@@ -19,7 +20,6 @@ import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import { RWKinerja } from '../../../../modules/siap/models/rw-kinerja.model'
 import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { UkomTaskService } from '../../../../modules/ukom/services/ukom-task.service'
 import { LoadingButtonComponent } from '../../../../modules/base/components/loading-button/loading-button.component'
 import { KinerjaService } from '@/modules/complement/services/kinerja.service'
@@ -34,7 +34,6 @@ import {
 
 import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
 import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
-import { PesertaUkom } from '@/modules/ukom/models/peserta-ukom.model'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -88,6 +87,7 @@ export class UkomTaskDetailComponent {
         public pendidikanService: PendidikanService,
         public ukomPendingTaskService: UkomPendingTaskService,
         private kabKotaService: KabKotaService,
+        public bidangJabatanService: BidangJabatanService,
     ) {
         this.isLoading$ = combineLatest([
             this.isPendingTaskLoading$,
@@ -109,16 +109,22 @@ export class UkomTaskDetailComponent {
                 this.pesertaUkomChange.emit(pendingTask.objectTask.object)
                 this.pendingTask.objectTask.object.kabupatenKotaId &&
                     this.getKabupatenNameByCode(
-                        this.pendingTask.objectTask.object.kabupatenKotaId,
+                        pendingTask.objectTask.object.kabupatenKotaId,
                     )
                 this.predikat1Name =
                     this.kinerjaService.getPredikatKinerjaNameById(
-                        this.pendingTask.objectTask.object.predikatKinerja1Id,
+                        pendingTask.objectTask.object.predikatKinerja1Id,
                     )
                 this.predikat2Name =
                     this.kinerjaService.getPredikatKinerjaNameById(
-                        this.pendingTask.objectTask.object.predikatKinerja2Id,
+                        pendingTask.objectTask.object.predikatKinerja2Id,
                     )
+                this.getPendidikanName(
+                    pendingTask.objectTask.object.pendidikanTerakhirCode,
+                )
+                this.getBidangJabatanName(
+                    pendingTask.objectTask.object.bidangJabatanCode,
+                )
                 this.handlerTabIndex()
             }
         })
@@ -138,6 +144,21 @@ export class UkomTaskDetailComponent {
                     this.typeKabKota = res.type
                 },
             })
+    }
+
+    getPendidikanName(pendidikanCode: string) {
+        this.pendidikanName =
+            (this.pendidikanService.getPendidikanById(pendidikanCode)?.name ||
+                this.pesertaUkom.pendidikanTerakhirName) ??
+            '-'
+    }
+
+    getBidangJabatanName(bidangJabatanCode: string) {
+        this.bidangJabatanService.findByCode(bidangJabatanCode).subscribe({
+            next: (res) => {
+                this.bidangJabatanName = res.name
+            },
+        })
     }
 
     handlerTabIndex() {

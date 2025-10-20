@@ -11,7 +11,7 @@
 </app-modal>
 
 <ng-template #ukomHadItem>
-    <div *ngIf="systemConfigService.isRegisterOpen$| async; else registerClosed">
+    <div *ngIf="(systemConfigService.isRegisterOpen$| async) || pendingTask.jenisUkom; else registerClosed">
         <div class="row px-3">
             <div *ngIf="!pendingTask.jenisUkom; else hadData" class="col-lg-12">
                 <app-empty-state *ngIf="!(ukomParticipantService.isJFCanRegisterUkom$ | async)" [title]="
@@ -45,7 +45,6 @@
                                     </p>
                                 </div>
                             </div>
-                            <!--end col-->
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label for="lastnameInput" class="form-label">
@@ -66,7 +65,6 @@
                                     </p>
                                 </div>
                             </div>
-                            <!--end col-->
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label for="emailInput" class="form-label">
@@ -541,6 +539,8 @@
     </div>
 
     <ng-template #registerClosed>
-        <h1 class="text-center">Pendaftaran UKom Sedang Tutup</h1>
+        <div *ngIf="!pendingTask.jenisUkom">
+            <h2 class="text-center">Pendaftaran UKom Sedang Tutup</h2>
+        </div>
     </ng-template>
 </ng-template>

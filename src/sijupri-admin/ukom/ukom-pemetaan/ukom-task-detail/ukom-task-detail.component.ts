@@ -33,7 +33,8 @@ import { ConfirmationService } from '../../../../modules/base/services/confirmat
 import { LoadingButtonComponent } from '../../../../modules/base/components/loading-button/loading-button.component'
 import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
 import { ForcePasswordFormComponent } from '../../../../modules/base/components/force-password-form/force-password-form.component'
-import { UkomTaskDetailComponent as UkomTaskDetailComponentPengajuan } from '@/sijupri-admin/ukom/ukom-pengajuan/ukom-task-detail/ukom-task-detail.component'
+import { PredikatKinerjaService } from '@/modules/maintenance/services/predikat-kinerja.service'
+import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -95,6 +96,8 @@ export class UkomTaskDetailComponent {
         private handlerService: HandlerService,
         private filePreviewService: FilePreviewService,
         private confirmationService: ConfirmationService,
+        public predikatKinerjaService: PredikatKinerjaService,
+        public pendidikanService: PendidikanService,
     ) {
         this.isLoading$ = combineLatest([
             this.isAllSchoreLoading$,
@@ -104,7 +107,7 @@ export class UkomTaskDetailComponent {
     }
 
     ngOnInit() {
-        // this.getAllScoresFlow()
+        this.pendidikanService.fetchPendidikan()
         this.loadInitialDataFlow()
     }
 
@@ -232,25 +235,10 @@ export class UkomTaskDetailComponent {
             .subscribe()
     }
 
-    getPendidikanList(pendidikanTerakhirCode: string) {
-        this.apiService.getData(`/api/v1/pendidikan`).subscribe({
-            next: (response) => {
-                const matchedPendidikan = response.find(
-                    (pendidikan: any) =>
-                        pendidikan.code === pendidikanTerakhirCode,
-                )
-                this.pendidikanName = matchedPendidikan
-                    ? matchedPendidikan.name
-                    : null
-            },
-            error: (error) => {
-                console.error('Failed to fetch pendidikan:', error)
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengambil data pendidikan',
-                )
-            },
-        })
+    getPendidikanName(pendidikanCode: string) {
+        this.pendidikanName =
+            this.pendidikanService.getPendidikanById(pendidikanCode)?.name ||
+            '-'
     }
 
     getBidangjabatanNameByCode(bidangJabatanCode: string) {
@@ -396,12 +384,12 @@ export class UkomTaskDetailComponent {
         )
     }
 
-    getPredikatKinerja(code: string | null): string {
-        if (!code || code == null) return '-'
+    getPredikatKinerja(code: string | null): string | null {
+        if (!code || code == null) return null
         const predikat = this.predikatKinerjaList.find(
             (predikat) => predikat.id === code,
         )
-        return predikat ? predikat.name : '-'
+        return predikat ? predikat.name : null
     }
 
     getParticipantUkomDetail() {
@@ -415,7 +403,10 @@ export class UkomTaskDetailComponent {
                         this.getUnitKerjaById(response.unitKerjaId)
                     }
 
-                    this.getPendidikanList(
+                    // this.getPendidikanList(
+                    //     this.ukomDetail.pendidikanTerakhirCode,
+                    // )
+                    this.getPendidikanName(
                         this.ukomDetail.pendidikanTerakhirCode,
                     )
 
@@ -435,12 +426,14 @@ export class UkomTaskDetailComponent {
                         )
                     }
 
-                    this.predikat1Name = this.getPredikatKinerja(
-                        this.ukomDetail.predikatKinerja1Id,
-                    )
-                    this.predikat2Name = this.getPredikatKinerja(
-                        this.ukomDetail.predikatKinerja2Id,
-                    )
+                    this.predikat1Name =
+                        this.getPredikatKinerja(
+                            this.ukomDetail.predikatKinerja1Id,
+                        ) ?? this.ukomDetail.predikatKinerja1Name
+                    this.predikat2Name =
+                        this.getPredikatKinerja(
+                            this.ukomDetail.predikatKinerja2Id,
+                        ) ?? this.ukomDetail.predikatKinerja2Name
 
                     this.ukomDetailLoading$.next(false)
                 },

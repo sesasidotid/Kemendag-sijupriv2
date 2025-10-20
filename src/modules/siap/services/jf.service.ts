@@ -17,7 +17,7 @@ export class JfService {
     constructor(
         private apiService: ApiService,
         private alertService: AlertService,
-    ) { }
+    ) {}
 
     findAll(): Observable<JF[]> {
         return this.apiService.getData(this.BASE_PATH).pipe(
