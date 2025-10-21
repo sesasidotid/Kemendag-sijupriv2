@@ -60,7 +60,7 @@ export class UkomTaskFormComponent {
     @Input() jf: JF
     @Input() ukom: Ukom = new Ukom()
 
-    pesertaUkom: PesertaUkom = new PesertaUkom()
+    pesertaUkom = new PesertaUkom()
     jabatanList: Jabatan[] = []
     jenjangList: Jenjang[] = []
     nextJenjang: Jenjang
@@ -392,53 +392,6 @@ export class UkomTaskFormComponent {
                         'Gagal mengambil dokumen persyaratan',
                     ),
             })
-        // this.apiService
-        //     .getData(`/api/v1/document_ukom/jenis_ukom/${jenisUkom}`)
-        //     .subscribe({
-        //         next: (response) => {
-        //             this.dokumenPersyaratanList = response
-        //                 .filter((dokumen: any) => {
-        //                     const jabatanMatch =
-        //                         !dokumen.jabatanCode ||
-        //                         dokumen.jabatanCode === jabatan
-        //                     const jenjangMatch =
-        //                         !dokumen.jenjangCode ||
-        //                         dokumen.jenjangCode === jenjang
-        //                     const isMengulangMatch = isMengulang
-        //                         ? true
-        //                         : dokumen.isMengulang === false
-
-        //                     return (
-        //                         jabatanMatch && jenjangMatch && isMengulangMatch
-        //                     )
-        //                 })
-        //                 .map(
-        //                     (dokumen: any) =>
-        //                         new DokumenUkomPersyaratan({
-        //                             dokumenPersyaratanId:
-        //                                 dokumen.dokumenPersyaratanId,
-        //                             dokumenPersyaratanName:
-        //                                 dokumen.dokumenPersyaratanName,
-        //                         }),
-        //                 )
-
-        //             this.detectedDokumen = {}
-        //             this.inputs.files = {}
-
-        //             this.dokumenPersyaratanList.forEach((dokumen, index) => {
-        //                 const key = dokumen.dokumenPersyaratanId
-        //                 this.inputs.files[key] = {
-        //                     label: dokumen.dokumenPersyaratanName,
-        //                     id: dokumen.dokumenPersyaratanId,
-        //                 }
-        //             })
-        //         },
-        //         error: (error) =>
-        //             this.handlerService.handleAlert(
-        //                 'Error',
-        //                 'Gagal mengambil dokumen persyaratan',
-        //             ),
-        //     })
     }
 
     getNextJenjang() {
@@ -493,16 +446,16 @@ export class UkomTaskFormComponent {
                         (item: Partial<RWKinerja>) => new RWKinerja(item),
                     )
 
-                    this.pesertaUkom.predikat_kinerja_1_id = null
-                    this.pesertaUkom.predikat_kinerja_2_id = null
+                    this.pesertaUkom.predikatKinerja1Id = null
+                    this.pesertaUkom.predikatKinerja2Id = null
 
                     if (last2Tahun[0]) {
-                        this.pesertaUkom.predikat_kinerja_1_id =
+                        this.pesertaUkom.predikatKinerja1Id =
                             last2Tahun[0].predikatKinerjaId
                     }
 
                     if (last2Tahun[1]) {
-                        this.pesertaUkom.predikat_kinerja_2_id =
+                        this.pesertaUkom.predikatKinerja2Id =
                             last2Tahun[1].predikatKinerjaId
                     }
                 },

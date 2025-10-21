@@ -4,7 +4,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { Router } from '@angular/router'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
@@ -14,23 +14,21 @@ import { CommonModule } from '@angular/common'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { Observable } from 'rxjs'
 import { UkomExamScheduleJF } from '../../../modules/ukom/models/ukom-exam-schedule-jf'
-import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { TanggalWaktuIndoPipe } from '../../../modules/base/pipes/tangga-waktu.pipe'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { PesertaUkom } from '@/modules/ukom/models/peserta-ukom.model'
+import { FailedTask } from '@/modules/ukom/models/ukom-registration-refactored/failed-task.model'
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
-    imports: [
-        PagableComponent,
-        EmptyStateComponent,
-        CommonModule,
-        TanggalWaktuIndoPipe
-    ],
+    imports: [PagableComponent, EmptyStateComponent, CommonModule],
     templateUrl: './ukom-list.component.html',
-    styleUrl: './ukom-list.component.scss'
+    styleUrl: './ukom-list.component.scss',
 })
 export class UkomListComponent {
     pagable: Pagable
+    rejectedPagable: Pagable
     schedulePagable$: Observable<Pagable>
     id: string = LoginContext.getUserId()
     ukomSchedule: UkomExamScheduleJF
@@ -38,80 +36,72 @@ export class UkomListComponent {
     jadwalPagable: Pagable
     TanggalWaktuIndo = new TanggalWaktuIndoPipe()
 
-    constructor (
+    constructor(
         private router: Router,
         private apiService: ApiService,
-        private handlerService: HandlerService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        public jenisUkomService: JenisUkomService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handlePagable()
+        this.initRejectedPagable()
         this.getUkomSchedule()
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder(
-            `/api/v1/participant_ukom/search/${this.id}`
+            `/api/v1/participant_ukom/search/${this.id}`,
         )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Ukom', (data: any) => {
-                        switch (data.jenisUkom) {
-                            case 'KENAIKAN_JENJANG':
-                                return 'Kenaikan Jenjang'
-                            case 'PERPINDAHAN_JABATAN':
-                                return 'Perpindahan Jabatan'
-                            case 'PROMOSI':
-                                return 'Promosi'
-                            case 'PROMOSI_JF':
-                                return 'Promosi Jabatan Fungsional'
-                            default:
-                                return data.jenisUkom
-                        }
+                    .withDynamicValue('Jenis Ukom', (data: PesertaUkom) => {
+                        return this.jenisUkomService.getLabelByValue(
+                            data.jenisUkom,
+                        )
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Tanggal', (data: any) => {
+                    .withDynamicValue('Tanggal', (data: PesertaUkom) => {
                         const formattedDate = this.TanggalWaktuIndo.transform(
-                            data.dateCreated
+                            data.dateCreated,
                         )
 
                         return formattedDate
                     })
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((ukom: any) => {
+                    .setAction((ukom: PesertaUkom) => {
                         this.router.navigate([
-                            `/ukom/ukom-list/detail/${ukom.id}`
+                            `/ukom/ukom-list/detail/${ukom.id}`,
                         ])
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
                     .setProperty('nip')
                     .withDefaultValue(LoginContext.getUserId())
-                    .build()
+                    .build(),
             )
             .build()
 
         this.jadwalPagable = new PagableBuilder(
-            `/api/v1/participant_ukom/nip/${this.id}`
+            `/api/v1/participant_ukom/nip/${this.id}`,
         )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenis Ujian', 'examTypeCode').build()
+                new PrimaryColumnBuilder('Jenis Ujian', 'examTypeCode').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Waktu Mulai', 'startTime').build()
+                new PrimaryColumnBuilder('Waktu Mulai', 'startTime').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Waktu Selesai', 'endTime').build()
+                new PrimaryColumnBuilder('Waktu Selesai', 'endTime').build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -119,35 +109,65 @@ export class UkomListComponent {
                         this.navigateToCATPage()
                     }, 'warning')
                     .withIcon('navigate')
-                    .build()
+                    .build(),
             )
             .build()
     }
-    getUkomSchedule () {
+
+    initRejectedPagable() {
+        this.rejectedPagable = new PagableBuilder(
+            '/api/v1/participant_ukom/task/failed/search',
+        )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Jenis Ukom', (data: FailedTask) => {
+                        return this.jenisUkomService.getLabelByValue(
+                            data.jenisUkom,
+                        )
+                    })
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Tanggal', (data: FailedTask) => {
+                        const formattedDate = this.TanggalWaktuIndo.transform(
+                            data.dateCreated,
+                        )
+
+                        return formattedDate
+                    })
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Catatan', 'comment').build(),
+            )
+            .build()
+    }
+
+    getUkomSchedule() {
         this.apiService
             .getData(`/api/v1/participant_ukom/nip/${this.id}`)
             .subscribe({
-                next: res => {
-                    console.log('dto', res)
+                next: (res) => {
                     if (res.roomUkomDto) {
                         this.ukomSchedule = new UkomExamScheduleJF(
-                            res.roomUkomDto
+                            res.roomUkomDto,
                         )
                     } else {
                         this.ukomSchedule.examScheduleDtoList = []
                     }
-                }
+                },
             })
     }
 
-    navigateToCATPage () {
+    navigateToCATPage() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 LoginContext.release()
 
                 this.router.navigate(['/login-cat'])
-            }
+            },
         })
     }
 }

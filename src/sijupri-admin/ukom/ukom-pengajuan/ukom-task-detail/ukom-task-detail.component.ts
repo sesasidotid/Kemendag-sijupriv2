@@ -114,11 +114,11 @@ export class UkomTaskDetailComponent {
                 this.predikat1Name =
                     this.kinerjaService.getPredikatKinerjaNameById(
                         pendingTask.objectTask.object.predikatKinerja1Id,
-                    )
+                    ) ?? pendingTask.objectTask.object.predikatKinerja1Name
                 this.predikat2Name =
                     this.kinerjaService.getPredikatKinerjaNameById(
                         pendingTask.objectTask.object.predikatKinerja2Id,
-                    )
+                    ) ?? pendingTask.objectTask.object.predikatKinerja2Name
                 this.getPendidikanName(
                     pendingTask.objectTask.object.pendidikanTerakhirCode,
                 )
@@ -153,7 +153,9 @@ export class UkomTaskDetailComponent {
             '-'
     }
 
-    getBidangJabatanName(bidangJabatanCode: string) {
+    getBidangJabatanName(bidangJabatanCode: string | null) {
+        if (!bidangJabatanCode) return
+
         this.bidangJabatanService.findByCode(bidangJabatanCode).subscribe({
             next: (res) => {
                 this.bidangJabatanName = res.name

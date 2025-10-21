@@ -2,7 +2,6 @@ import { Serializable } from '../../base/commons/serializable'
 
 export class PesertaUkom extends Serializable {
     id: string = undefined
-    jenis_ukom: string = undefined
     nip: string = undefined
     nik: string = undefined
     name: string = undefined
@@ -31,8 +30,8 @@ export class PesertaUkom extends Serializable {
     nextPangkatCode: string = undefined
     nextPangkatName: string = undefined
 
-    instansi_id: string = undefined
-    unit_kerja_id: string = undefined
+    instansiId: string = undefined
+    unitKerjaId: string = undefined
 
     dokumenUkomList: any[] = undefined
     pendingTaskHistory: any[] = undefined
@@ -45,10 +44,7 @@ export class PesertaUkom extends Serializable {
     pendidikanTerakhirCode: string = undefined
     jurusan: string = undefined
     tglSuratUsulan: Date | string = undefined
-    no_surat_usulan: string = undefined
     noSuratUsulan: string = undefined
-    predikat_kinerja_1_id: string = undefined
-    predikat_kinerja_2_id: string = undefined
     predikatKinerja1Id: string = undefined
     predikatKinerja2Id: string = undefined
     jenisInstansi: string = undefined
@@ -56,12 +52,12 @@ export class PesertaUkom extends Serializable {
     isMengulang: boolean | string = undefined
     age: string = undefined
 
-    jenis_instansi: string = undefined
-    provinsi_id: string = undefined
-    kabupaten_kota_id: string = undefined
-    bidang_jabatan_code: string = undefined
+    provinsiId: string = undefined
+    kabupatenKotaId: string = undefined
+    bidangJabatanCode: string = undefined
 
     participantStatus: string = undefined
+    dateCreated: string = undefined
 
     constructor(object?: { [key: string]: any }) {
         super()
