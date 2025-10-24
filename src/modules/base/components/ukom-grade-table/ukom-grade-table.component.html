@@ -5,12 +5,12 @@
                 <i class="mdi mdi-certificate-outline me-2"></i>
                 Detail Nilai Ukom
             </h5>
-            <ng-container *ngIf="gradeData.passed; else notPassed">
-                <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">{{gradeData.status ??
+            <ng-container *ngIf="gradeData?.passed; else notPassed">
+                <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">{{gradeData?.status ??
                     "Lulus Uji Kompetensi"}}</span>
             </ng-container>
             <ng-template #notPassed>
-                <span class="bg-danger text-white rounded-pill px-3 py-1 small fw-semibold">{{gradeData.status ??
+                <span class="bg-danger text-white rounded-pill px-3 py-1 small fw-semibold">{{gradeData?.status ??
                     "Tidak Lulus Uji Kompetensi"}}</span>
             </ng-template>
         </div>
@@ -29,36 +29,36 @@
                 <tr>
                     <th scope="row">Skor CAT</th>
                     <!-- <td>{{ gradeData.nbCat ?? '-' }}</td> -->
-                    <td>{{ gradeData.catGrade?.score ?? '-' }}</td>
+                    <td>{{ gradeData?.catGrade?.score ?? '-' }}</td>
 
                 </tr>
                 <tr>
                     <th scope="row">Skor Wawancara</th>
-                    <td>{{ gradeData.wawancaraGrade?.score ?? '-' }}</td>
+                    <td>{{ gradeData?.wawancaraGrade?.score ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Seminar</th>
-                    <td>{{ gradeData.seminarGrade?.score ?? '-' }}</td>
+                    <td>{{ gradeData?.seminarGrade?.score ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Praktik</th>
-                    <td>{{ gradeData.praktikGrade?.score ?? "-" }}</td>
+                    <td>{{ gradeData?.praktikGrade?.score ?? "-" }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Portofolio</th>
-                    <td>{{ gradeData.portofolioGrade?.score ?? '-' }}</td>
+                    <td>{{ gradeData?.portofolioGrade?.score ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">UKT</th>
-                    <td>{{ gradeData.ukt ?? '-' }}</td>
+                    <td>{{ gradeData?.ukt ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">UKMSK</th>
-                    <td>{{ gradeData.jpm ?? '-' }}</td>
+                    <td>{{ gradeData?.jpm ?? '-' }}</td>
                 </tr>
                 <tr class="fw-bold">
                     <th scope="row">Nilai Akhir</th>
-                    <td>{{ gradeData.grade ?? '-' }}</td>
+                    <td>{{ gradeData?.grade ?? '-' }}</td>
                 </tr>
                 <tr class="fw-bold">
                     <th scope="row">File Rekomendasi UKom</th>

@@ -17,7 +17,7 @@ import {
     switchMap,
     take,
     takeUntil,
-    tap
+    tap,
 } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
@@ -42,10 +42,10 @@ import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
         ModalComponent,
         FileHandlerComponent,
         TanggalIndoPipe,
-        UkomGradeTableComponent
+        UkomGradeTableComponent,
     ],
     templateUrl: './ukom-task-detail.component.html',
-    styleUrl: './ukom-task-detail.component.scss'
+    styleUrl: './ukom-task-detail.component.scss',
 })
 export class UkomTaskDetailComponent implements OnDestroy {
     private destroy$ = new Subject<void>()
@@ -62,7 +62,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
 
     fileHandlerData: FIleHandler = {
         files: {},
-        viewOnly: true
+        viewOnly: true,
     }
 
     pendidikanName: string
@@ -79,7 +79,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
 
     scoreMap: Record<string, any> = {}
     isPredikatKerjaLoading$: BehaviorSubject<boolean> = new BehaviorSubject(
-        false
+        false,
     )
     isAllSchoreLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isLoading$: Observable<boolean>
@@ -92,13 +92,13 @@ export class UkomTaskDetailComponent implements OnDestroy {
         private router: Router,
         private handlerService: HandlerService,
         private filePreviewService: FilePreviewService,
-        private ukomGradeService: UkomGradeService
+        private ukomGradeService: UkomGradeService,
     ) {
         this.isLoading$ = combineLatest([
             this.isAllSchoreLoading$,
             this.isPredikatKerjaLoading$,
-            this.ukomDetailLoading$
-        ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
+            this.ukomDetailLoading$,
+        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
     }
 
     ngOnInit() {
@@ -132,16 +132,16 @@ export class UkomTaskDetailComponent implements OnDestroy {
             .getData('/api/v1/predikat_kinerja')
             .pipe(
                 takeUntil(this.destroy$),
-                switchMap(res => {
+                switchMap((res) => {
                     this.predikatKinerjaList = res
                     return this.activatedRoute.paramMap.pipe(take(1))
                 }),
-                tap(params => {
+                tap((params) => {
                     this.id = params.get('id')
                 }),
                 finalize(() => {
                     this.isPredikatKerjaLoading$.next(false)
-                })
+                }),
             )
             .subscribe({
                 next: () => {
@@ -154,36 +154,38 @@ export class UkomTaskDetailComponent implements OnDestroy {
                         console.error('No ID found in route parameters')
                         this.handlerService.handleAlert(
                             'Error',
-                            'ID tidak ditemukan dalam parameter route'
+                            'ID tidak ditemukan dalam parameter route',
                         )
                     }
                 },
-                error: err => {
+                error: (err) => {
                     console.error('Failed to initialize component:', err)
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal memuat data awal'
+                        'Gagal memuat data awal',
                     )
-                }
+                },
             })
     }
 
     getExamType(): Observable<ExamType[]> {
         return this.apiService.getData('/api/v1/exam_type').pipe(
             takeUntil(this.destroy$),
-            map((response: any[]) => response.map(item => new ExamType(item))),
-            tap(examTypes => {
+            map((response: any[]) =>
+                response.map((item) => new ExamType(item)),
+            ),
+            tap((examTypes) => {
                 this.examType = examTypes
                 console.log('Exam types loaded:', examTypes)
             }),
-            catchError(error => {
+            catchError((error) => {
                 console.error('Failed to fetch exam types:', error)
                 this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mengambil jenis ujian'
+                    'Gagal mengambil jenis ujian',
                 )
                 return of([])
-            })
+            }),
         )
     }
 
@@ -204,22 +206,22 @@ export class UkomTaskDetailComponent implements OnDestroy {
                         return of([])
                     }
 
-                    const requests = examTypes.map(type => {
+                    const requests = examTypes.map((type) => {
                         const examCode = type.code
                         return this.apiService
                             .getData(
-                                `/api/v1/exam_grade/${examCode}/${this.id}`
+                                `/api/v1/exam_grade/${examCode}/${this.id}`,
                             )
                             .pipe(
                                 takeUntil(this.destroy$),
-                                catchError(error => {
+                                catchError((error) => {
                                     console.error(
                                         `Failed to fetch score for ${examCode}:`,
-                                        error
+                                        error,
                                     )
                                     return of(null)
                                 }),
-                                map(response => {
+                                map((response) => {
                                     if (!response) {
                                         return { examCode, scoreInstance: null }
                                     }
@@ -228,26 +230,26 @@ export class UkomTaskDetailComponent implements OnDestroy {
                                     switch (examCode) {
                                         case 'CAT':
                                             scoreInstance = new CATSchore(
-                                                response
+                                                response,
                                             )
                                             break
                                         case 'MAKALAH':
                                             scoreInstance = new MakalahScore(
-                                                response
+                                                response,
                                             )
                                             break
                                         default:
                                             scoreInstance = response
                                     }
                                     return { examCode, scoreInstance }
-                                })
+                                }),
                             )
                     })
 
                     return forkJoin(requests)
                 }),
-                tap(results => {
-                    results.forEach(result => {
+                tap((results) => {
+                    results.forEach((result) => {
                         if (result && result.examCode && result.scoreInstance) {
                             this.scoreMap[result.examCode] =
                                 result.scoreInstance
@@ -256,16 +258,16 @@ export class UkomTaskDetailComponent implements OnDestroy {
                 }),
                 finalize(() => {
                     this.isAllSchoreLoading$.next(false)
-                })
+                }),
             )
             .subscribe({
-                next: () => { },
-                error: error => {
+                next: () => {},
+                error: (error) => {
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal memuat data nilai ujian'
+                        'Gagal memuat data nilai ujian',
                     )
-                }
+                },
             })
     }
 
@@ -279,19 +281,19 @@ export class UkomTaskDetailComponent implements OnDestroy {
             .getData(`/api/v1/pendidikan`)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: response => {
+                next: (response) => {
                     const matchedPendidikan = response.find(
                         (pendidikan: any) =>
-                            pendidikan.code === pendidikanTerakhirCode
+                            pendidikan.code === pendidikanTerakhirCode,
                     )
                     this.pendidikanName = matchedPendidikan
                         ? matchedPendidikan.name
                         : null
                 },
-                error: err => {
+                error: (err) => {
                     console.error('Failed to fetch pendidikan:', err)
                     this.pendidikanName = null
-                }
+                },
             })
     }
 
@@ -305,13 +307,13 @@ export class UkomTaskDetailComponent implements OnDestroy {
             .getData(`/api/v1/bidang_jabatan/${bidangJabatanCode}`)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.bidangJabatanName = response.name ?? null
                 },
-                error: err => {
+                error: (err) => {
                     console.error('Failed to fetch bidang jabatan:', err)
                     this.bidangJabatanName = null
-                }
+                },
             })
     }
 
@@ -325,13 +327,13 @@ export class UkomTaskDetailComponent implements OnDestroy {
             .getData(`/api/v1/provinsi/${provinsiCode}`)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.provinsiName = response.name ?? null
                 },
-                error: err => {
+                error: (err) => {
                     console.error('Failed to fetch provinsi:', err)
                     this.provinsiName = null
-                }
+                },
             })
     }
 
@@ -346,15 +348,15 @@ export class UkomTaskDetailComponent implements OnDestroy {
             .getData(`/api/v1/kab_kota/${kabupatenCode}`)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.kabupatenName = response.name ?? null
                     this.typeKabKota = response.type ?? null
                 },
-                error: err => {
+                error: (err) => {
                     console.error('Failed to fetch kabupaten:', err)
                     this.kabupatenName = null
                     this.typeKabKota = null
-                }
+                },
             })
     }
 
@@ -364,7 +366,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         if (!url) {
             this.handlerService.handleAlert(
                 'Warning',
-                'URL rekomendasi tidak tersedia'
+                'URL rekomendasi tidak tersedia',
             )
             return
         }
@@ -383,26 +385,26 @@ export class UkomTaskDetailComponent implements OnDestroy {
                     next: () => {
                         console.log('Download completed')
                     },
-                    error: err => {
+                    error: (err) => {
                         console.error('Download failed:', err)
                         this.handlerService.handleAlert(
                             'Error',
-                            'Gagal mengunduh rekomendasi'
+                            'Gagal mengunduh rekomendasi',
                         )
-                    }
+                    },
                 })
         } catch (error) {
             console.error('Invalid URL:', error)
             this.handlerService.handleAlert(
                 'Error',
-                'URL rekomendasi tidak valid'
+                'URL rekomendasi tidak valid',
             )
         }
     }
 
     calculateAge(
         tanggalLahir: string | Date,
-        tglSuratUsulan: string | Date
+        tglSuratUsulan: string | Date,
     ): string {
         if (!tanggalLahir || !tglSuratUsulan) {
             return '-'
@@ -428,7 +430,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             const lastMonth = new Date(
                 suratDate.getFullYear(),
                 suratDate.getMonth(),
-                0
+                0,
             )
             ageDays += lastMonth.getDate()
             ageMonths--
@@ -441,7 +443,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         if (!code || code == null) return '-'
 
         const predikat = this.predikatKinerjaList.find(
-            predikat => predikat.id === code
+            (predikat) => predikat.id === code,
         )
         return predikat ? predikat.name : '-'
     }
@@ -452,7 +454,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         return value
             .toLowerCase() // Ubah ke lowercase semua dulu
             .replace(/_/g, ' ') // Ganti underscore dengan spasi
-            .replace(/\b\w/g, char => char.toUpperCase()) // Kapitalisasi setiap kata
+            .replace(/\b\w/g, (char) => char.toUpperCase()) // Kapitalisasi setiap kata
     }
 
     mapDokumenUkom() {
@@ -464,11 +466,9 @@ export class UkomTaskDetailComponent implements OnDestroy {
                 label: doc.dokumenPersyaratanName,
                 source: doc.dokumenUrl,
                 id: doc.id,
-                required: false
+                required: false,
             }
         })
-
-        console.log('Mapped dokumen ukom:', this.fileHandlerData.files)
     }
 
     getDokumenUkomList() {
@@ -486,11 +486,11 @@ export class UkomTaskDetailComponent implements OnDestroy {
                     this.dataDokumenUkom = response || []
                     this.mapDokumenUkom()
                 },
-                error: error => {
+                error: (error) => {
                     console.error('Failed to fetch dokumen ukom:', error)
                     this.dataDokumenUkom = []
                     this.mapDokumenUkom()
-                }
+                },
             })
     }
 
@@ -517,7 +517,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
                         name: kompetensi.kompetensiName || '-',
                         items: [],
                         total: 0,
-                        correct: 0
+                        correct: 0,
                     }
                 }
 
@@ -527,7 +527,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
 
                 return acc
             },
-            {}
+            {},
         )
 
         return Object.values(grouped).map((group: any) => ({
@@ -535,7 +535,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
             percentage:
                 group.total > 0
                     ? Math.round((group.correct / group.total) * 100)
-                    : 0
+                    : 0,
         }))
     }
 
@@ -545,7 +545,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         }
 
         const correctChoice = question.multipleChoiceDtoList.find(
-            (choice: any) => choice.correct
+            (choice: any) => choice.correct,
         )
         return correctChoice ? correctChoice.choiceId : ''
     }
@@ -572,7 +572,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
         return kompetensi.questionDtoList.filter(
             (question: any) =>
                 question.answerDto?.answerChoice ===
-                this.getCorrectAnswer(question)
+                this.getCorrectAnswer(question),
         ).length
     }
 
@@ -600,10 +600,10 @@ export class UkomTaskDetailComponent implements OnDestroy {
                 next: (response: any) => {
                     this.unitKerjaName = response.name
                 },
-                error: err => {
+                error: (err) => {
                     console.error('Failed to fetch unit kerja:', err)
                     this.unitKerjaName = null
-                }
+                },
             })
     }
 
@@ -627,14 +627,14 @@ export class UkomTaskDetailComponent implements OnDestroy {
         if (!answerDto) {
             this.handlerService.handleAlert(
                 'Error',
-                'Tidak ada file yang tersedia untuk ditampilkan.'
+                'Tidak ada file yang tersedia untuk ditampilkan.',
             )
             return
         }
 
         this.filePreviewService.open(
             answerDto.answerUpload,
-            answerDto.answerUploadUrl
+            answerDto.answerUploadUrl,
         )
     }
 
@@ -651,18 +651,20 @@ export class UkomTaskDetailComponent implements OnDestroy {
             .pipe(
                 takeUntil(this.destroy$),
                 tap(() => {
-                    this.ukomGradeService.findGradeParticipantJF(this.id).subscribe({
-                        next: response => {
-                            this.ukomGrade = new UkomGrade(response)
-                        }
-                    })
+                    this.ukomGradeService
+                        .findGradeParticipantJF(this.id)
+                        .subscribe({
+                            next: (response) => {
+                                this.ukomGrade = new UkomGrade(response)
+                            },
+                        })
                 }),
                 finalize(() => {
                     this.ukomDetailLoading$.next(false)
-                })
+                }),
             )
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.ukomDetail = response
 
                     if (!response.unitKerjaName && response.unitKerjaId) {
@@ -670,7 +672,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
                     }
 
                     this.getPendidikanList(
-                        this.ukomDetail.pendidikanTerakhirCode
+                        this.ukomDetail.pendidikanTerakhirCode,
                     )
 
                     if (this.ukomDetail.provinsiId) {
@@ -679,33 +681,33 @@ export class UkomTaskDetailComponent implements OnDestroy {
 
                     if (this.ukomDetail.kabupatenKotaId) {
                         this.getKabupatenNameByCode(
-                            this.ukomDetail.kabupatenKotaId
+                            this.ukomDetail.kabupatenKotaId,
                         )
                     }
 
                     if (this.ukomDetail.bidangJabatanCode) {
                         this.getBidangjabatanNameByCode(
-                            this.ukomDetail.bidangJabatanCode
+                            this.ukomDetail.bidangJabatanCode,
                         )
                     }
 
                     this.predikat1Name = this.getPredikatKinerja(
-                        this.ukomDetail.predikatKinerja1Id
+                        this.ukomDetail.predikatKinerja1Id,
                     )
                     this.predikat2Name = this.getPredikatKinerja(
-                        this.ukomDetail.predikatKinerja2Id
+                        this.ukomDetail.predikatKinerja2Id,
                     )
                 },
-                error: error => {
+                error: (error) => {
                     console.error(
                         'Failed to fetch participant ukom detail:',
-                        error
+                        error,
                     )
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal memuat detail peserta ukom'
+                        'Gagal memuat detail peserta ukom',
                     )
-                }
+                },
             })
     }
 }

@@ -282,6 +282,15 @@ export const routes: Routes = [
                                         '../sijupri-jf/ukom/ukom-task-detail/ukom-task-detail.component'
                                     ).then((m) => m.UkomTaskDetailComponent),
                             },
+                            {
+                                path: 'failed/detail/:id',
+                                loadComponent: () =>
+                                    import(
+                                        '../sijupri-jf/ukom/ukom-task-detail-failed/ukom-task-detail-failed.component'
+                                    ).then(
+                                        (m) => m.UkomTaskDetailFailedComponent,
+                                    ),
+                            },
                         ],
                     },
                 },

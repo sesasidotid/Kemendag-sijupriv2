@@ -280,7 +280,7 @@
                                 <label class="form-label">Predikat Kinerja Pegawai Satu Tahun
                                     Terakhir</label>
                                 <p class="border-bottom">
-                                    {{ predikat1Name }}
+                                    {{ predikat1Name ?? '-'}}
                                 </p>
                             </div>
                         </div>
@@ -290,7 +290,7 @@
                                 <label class="form-label">Predikat Kinerja Pegawai Dua Tahun
                                     Terakhir</label>
                                 <p class="border-bottom">
-                                    {{ predikat2Name }}
+                                    {{ predikat2Name ?? '-'}}
                                 </p>
                             </div>
                         </div>
@@ -300,10 +300,22 @@
 
             <!-- Dokumen Pendaftaran -->
             <div class="card" *ngIf="dataDokumenUkom.length > 0">
-                <div class="card-header">
+                <!-- <div class="card-header">
                     <h5 class="m-0">
                         <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen Pendaftaran UKom
                     </h5>
+                </div> -->
+                <div class="card-header">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <i class="mdi mdi-file-document-check-outline me-2"></i>
+                            Dokumen Pendaftaran UKom
+                        </h5>
+
+                        <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">
+                            Lolos Seleksi Administrasi
+                        </span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
@@ -380,8 +392,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
     </ng-container>
 </app-modal>

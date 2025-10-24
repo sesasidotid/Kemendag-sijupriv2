@@ -138,9 +138,19 @@ export class UkomListComponent {
                     })
                     .build(),
             )
-            .addPrimaryColumn(
-                new PrimaryColumnBuilder('Catatan', 'comment').build(),
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: FailedTask) => {
+                        this.router.navigate([
+                            `/ukom/ukom-list/failed/detail/${data.id}`,
+                        ])
+                    }, 'info')
+                    .withIcon('detail')
+                    .build(),
             )
+            // .addPrimaryColumn(
+            //     new PrimaryColumnBuilder('Catatan', 'comment').build(),
+            // )
             .build()
     }
 

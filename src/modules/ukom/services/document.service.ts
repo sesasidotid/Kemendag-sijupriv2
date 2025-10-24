@@ -119,4 +119,8 @@ export class UkomDocumentService {
                 },
             })
     }
+
+    getDocumentParticipantByTaskID(id: string) {
+        return this.apiService.getData(`${this.BASE_PATH}/participant/${id}`)
+    }
 }

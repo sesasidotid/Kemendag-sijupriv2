@@ -11,7 +11,7 @@ import { UkomGrade } from '../../../ukom/models/ukom-grade'
 export class UkomGradeTableComponent {
     @Input() nip: string = ''
     @Input() nama: string = ''
-    @Input() gradeData!: UkomGrade
+    @Input() gradeData: UkomGrade
     @Input() rekomendasiUrl: string | null | undefined
 
     @Output() downloadFile = new EventEmitter<UkomGrade>()
