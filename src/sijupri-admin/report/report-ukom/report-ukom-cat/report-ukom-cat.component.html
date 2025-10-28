@@ -1,5 +1,5 @@
-<!-- <div class="row">
-    <form [formGroup]="addUKomReportForm" (submit)="onSubmit()">
+<div class="row">
+    <form [formGroup]="addReportCAT" (submit)="handleGenerateReport()">
         <div class="row mb-3">
             <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Tanggal <span
                     class="text-danger">*</span></label>
@@ -34,33 +34,13 @@
             </div>
         </div>
 
-        <div class="row text-center">
-            <div class="col-12">
-                <ng-container *ngIf="isLoading$ | async; else noLoading">
-                    <button class="btn btn-success float-end" disabled>
-                        <div class="spinner-border spinner-sm-custom" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </button>
-                </ng-container>
-
-                <ng-template #noLoading>
-                    <button type="submit" class="btn btn-success float-end"
-                        [disabled]="addUKomReportForm.invalid || (isLoading$ | async)">
-                        Generate Report
-                    </button>
-                </ng-template>
-            </div>
+        <div class="row">
+            <app-loading-button [isLoading]="isLoading$ | async" [disabled]="addReportCAT.invalid" [type]="'submit'"
+                [label]="'Generate Report'" [className]="'btn btn-success float-end'"></app-loading-button>
         </div>
     </form>
 </div>
 <hr />
 <div class="row">
-    <app-pagable [pagable]="pagable"></app-pagable>
-</div> -->
-<ng-container *ngIf="(tabService.activeTab$ | async) === 0">
-    <app-report-ukom-rekapitulasi></app-report-ukom-rekapitulasi>
-</ng-container>
-<ng-container *ngIf="(tabService.activeTab$ | async) === 1">
-    <app-report-ukom-cat></app-report-ukom-cat>
-</ng-container>
+    <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+</div>

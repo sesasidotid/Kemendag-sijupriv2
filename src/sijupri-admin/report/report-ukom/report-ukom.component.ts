@@ -7,181 +7,62 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
 import {
     FormControl,
     FormGroup,
-    FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { ReportGenerate } from '../../../modules/report/models/report-generate.model'
 import { BehaviorSubject } from 'rxjs'
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
+import { ReportService } from '@/modules/report/services/report.service'
+import { ReportUkomRekapitulasiComponent } from './report-ukom-rekapitulasi/report-ukom-rekapitulasi.component'
+import { ReportUkomCatComponent } from './report-ukom-cat/report-ukom-cat.component'
+import { TabService } from '@/modules/base/services/tab.service'
 @Component({
     selector: 'app-report-ukom',
     standalone: true,
-    imports: [PagableComponent, ReactiveFormsModule, CommonModule],
+    imports: [
+        ReactiveFormsModule,
+        CommonModule,
+        ReportUkomRekapitulasiComponent,
+        ReportUkomCatComponent,
+    ],
     templateUrl: './report-ukom.component.html',
-    styleUrl: './report-ukom.component.scss'
+    styleUrl: './report-ukom.component.scss',
 })
 export class ReportUkomComponent {
-    pagable: Pagable
-    isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
-    addUKomReportForm!: FormGroup
-
-    reportId: string = 'ukomReport'
-
-    @ViewChild(PagableComponent) pagableComponent!: PagableComponent
-
     constructor(
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
-        private formValidationService: FormValidationService
-    ) { }
+        private formValidationService: FormValidationService,
+        public tabService: TabService,
+    ) {}
 
     ngOnInit() {
-        this.handlePagable()
-        this.handleFormInit()
+        this.tabService.clearTabs()
+        this.initTabs()
     }
 
-    getErrorMessage(controlName: string, label: string) {
-        const control = this.addUKomReportForm.get(controlName)
-        return this.formValidationService.getErrorMessage(
-            control,
-            controlName,
-            label
-        )
-    }
-
-    handleFormInit() {
-        this.addUKomReportForm = new FormGroup({
-            dateFrom: new FormControl('', [Validators.required]),
-            dateTo: new FormControl('', [Validators.required]),
-            fileType: new FormControl('', [Validators.required])
-        })
-    }
-
-    handlePagable() {
-        this.pagable = new PagableBuilder('/api/v1/report/search')
-            .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'fileName').build())
-            .addPrimaryColumn(new PrimaryColumnBuilder('Tipe', 'fileType').build())
-            .addPrimaryColumn(new PrimaryColumnBuilder('Status', 'status').build())
-            .addActionColumn(
-                new ActionColumnBuilder()
-                    .setAction((report: any) => {
-                        this.apiService
-                            .postDownload(
-                                '/api/v1/report/download',
-                                { id: report.id, bucketId: 'report' },
-                                report.fileName
-                            )
-                            .subscribe({
-                                next: () =>
-                                    this.handlerService.handleAlert(
-                                        'Success',
-                                        'file di download'
-                                    ),
-                                error: error => this.handlerService.handleException(error)
-                            })
-                    }, 'success')
-                    .withIcon('download')
-                    .addInactiveCondition((report: any) => {
-                        return report.status == 'FAILED'
-                    })
-                    .build()
-            )
-            .addActionColumn(
-                new ActionColumnBuilder()
-                    .setAction((report: any) => {
-                        this.confirmationService.open(false).subscribe({
-                            next: result => {
-                                if (!result.confirmed) return
-                                this.apiService
-                                    .deleteData(`/api/v1/report/${report.id}`)
-                                    .subscribe({
-                                        next: () => {
-                                            this.handlerService.handleAlert(
-                                                'Success',
-                                                'report berhasil dihapus'
-                                            )
-                                            this.pagableComponent.fetchData()
-                                        },
-                                        error: error => this.handlerService.handleException(error)
-                                    })
-                            }
-                        })
-                    }, 'danger')
-                    .withIcon('danger')
-                    .build()
-            )
-            .addFilter(
-                new PageFilterBuilder('like')
-                    .setProperty('fileName')
-                    .withField('Nama', 'text')
-                    .build()
-            )
-            .addFilter(
-                new PageFilterBuilder('like')
-                    .setProperty('fileType')
-                    .withField('Tipe', 'select')
-                    .setOptionList([
-                        { label: 'Excel', value: 'xlsx' },
-                        { label: 'CSV', value: 'csv' }
-                    ])
-                    .build()
-            )
-            .addFilter(
-                new PageFilterBuilder('equal')
-                    .setProperty('reportId')
-                    .withDefaultValue(this.reportId)
-                    .build()
-            )
-            .setLimit(5)
-            .build()
-    }
-
-    onSubmit() {
-        this.addUKomReportForm.markAllAsTouched()
-
-        if (this.addUKomReportForm.valid) {
-            this.confirmationService.open(false).subscribe({
-                next: result => {
-                    if (!result.confirmed) return
-
-                    this.isLoading$.next(true)
-                    const reportGenerate = new ReportGenerate()
-                    reportGenerate.reportId = 'ukomReport'
-                    reportGenerate.fileType = this.addUKomReportForm.value.fileType
-                    reportGenerate.parameter = {
-                        dateFrom: this.addUKomReportForm.value.dateFrom,
-                        dateTo: this.addUKomReportForm.value.dateTo
-                    }
-
-                    this.apiService
-                        .postData('/api/v1/report_generate', reportGenerate)
-                        .subscribe({
-                            next: () => {
-                                this.isLoading$.next(false)
-                                this.handlerService.handleAlert('Success', 'Report Generating')
-                                this.pagableComponent.fetchData()
-                                this.ngOnInit()
-                            },
-                            error: error => {
-                                this.isLoading$.next(false)
-                                console.error('Error generating report', error)
-                                this.handlerService.handleAlert(
-                                    'Error',
-                                    'Gagal membuat report. Silahkan Coba Lagi'
-                                )
-                            }
-                        })
-                }
+    initTabs() {
+        this.tabService
+            .addTab({
+                label: 'Report Rekapitulasi UKom',
+                icon: 'mdi-list-box',
+                onClick: () => this.tabService.changeTabActive(0),
             })
-        }
+            .addTab({
+                label: 'Report CAT UKom',
+                icon: 'mdi-list-box',
+                onClick: () => this.tabService.changeTabActive(1),
+            })
+
+        setTimeout(() => this.tabService.changeTabActive(0), 0)
     }
 }
