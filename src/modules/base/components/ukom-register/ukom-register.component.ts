@@ -63,7 +63,8 @@ export class UkomRegisterComponent {
     jenjangList$: Observable<Jenjang[]>
     pangkatList$: Observable<Pangkat[]>
     NextjabatanList$: Observable<Jabatan[]>
-    bidangJabatanList$: Observable<BidangJabatan[]> = of([])
+    // Use a stable subject so validators can react reliably when the list changes
+    bidangJabatanList$ = new BehaviorSubject<BidangJabatan[]>([])
     nextJenjang: Jenjang
     detectedDokumen: any = {}
     nonJFParticipantUkom: NonJFParticipantUkomTask
@@ -172,9 +173,13 @@ export class UkomRegisterComponent {
         this.nonJFForm
             .get('nextJabatanCode')
             ?.valueChanges.subscribe((value) => {
+                // Reset dependent fields whenever target jabatan changes
                 this.nonJFForm.patchValue({
+                    nextJenjangCode: '',
                     bidangJabatanCode: '',
                 })
+                // Clear current bidang list so UI/validators update immediately
+                this.bidangJabatanList$.next([])
                 this.getBidangJabatanByJabatanCode(value)
                 this.getListJenjang(value)
             })
@@ -314,7 +319,13 @@ export class UkomRegisterComponent {
     }
 
     getBidangJabatanByJabatanCode(jabatanCode: string): void {
-        this.bidangJabatanList$ = this.apiService
+        if (!jabatanCode) {
+            // Clear when no jabatan is selected
+            this.bidangJabatanList$.next([])
+            return
+        }
+
+        this.apiService
             .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
             .pipe(
                 map((res: any) =>
@@ -327,6 +338,10 @@ export class UkomRegisterComponent {
                 ),
                 startWith([]),
             )
+            .subscribe({
+                next: (list) => this.bidangJabatanList$.next(list),
+                error: () => this.bidangJabatanList$.next([]),
+            })
     }
 
     getErrorMessage(controlName: string, label: string): string | null {

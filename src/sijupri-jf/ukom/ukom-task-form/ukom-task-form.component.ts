@@ -92,7 +92,8 @@ export class UkomTaskFormComponent {
     jabatanCodeArgument$ = new BehaviorSubject<string | null>(null)
     jenjangCodeArgument$ = new BehaviorSubject<string | null>(null)
     jenisUkom$ = new BehaviorSubject<string | null>(null)
-    bidangJabatanList$: Observable<BidangJabatan[]> = of([])
+    // Stable subject so validator subscription always reacts to updates
+    bidangJabatanList$ = new BehaviorSubject<BidangJabatan[]>([])
 
     pendidikanJF: string = ''
     jurusanJF: string = ''
@@ -144,6 +145,8 @@ export class UkomTaskFormComponent {
             if (next_jabatan_code) {
                 bidangJabatanControl.setValue('')
                 nextJenjangControl.setValue('')
+                // Clear list immediately so UI/validators flip while loading
+                this.bidangJabatanList$.next([])
                 this.getBidangJabatanByJabatanCode(next_jabatan_code)
                 if (jenisUkomControl.value === 'PERPINDAHAN_JABATAN') {
                     this.getListJenjangForPerpindahanJabatan(next_jabatan_code)
@@ -167,8 +170,8 @@ export class UkomTaskFormComponent {
                 this.detectedDokumen = {}
                 this.inputs.files = {}
                 bidangJabatanControl.setValue('')
-
-                this.bidangJabatanList$ = of([])
+                // Reset bidang list when jenis ukom changes
+                this.bidangJabatanList$.next([])
 
                 this.jabatanCodeArgument$.next(null)
                 this.jenjangCodeArgument$.next(null)
@@ -241,8 +244,10 @@ export class UkomTaskFormComponent {
                 )
 
                 if (bidangList.length > 0) {
+                    bidangJabatanControl?.setValue('')
                     bidangJabatanControl?.setValidators(Validators.required)
                 } else {
+                    bidangJabatanControl?.setValue('')
                     bidangJabatanControl?.clearValidators()
                 }
 
@@ -291,7 +296,12 @@ export class UkomTaskFormComponent {
     }
 
     getBidangJabatanByJabatanCode(jabatanCode: string): void {
-        this.bidangJabatanList$ = this.apiService
+        if (!jabatanCode) {
+            this.bidangJabatanList$.next([])
+            return
+        }
+
+        this.apiService
             .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
             .pipe(
                 map((res: any) =>
@@ -304,6 +314,10 @@ export class UkomTaskFormComponent {
                 ),
                 startWith([]),
             )
+            .subscribe({
+                next: (list) => this.bidangJabatanList$.next(list),
+                error: () => this.bidangJabatanList$.next([]),
+            })
     }
 
     passwordMatchValidator(
