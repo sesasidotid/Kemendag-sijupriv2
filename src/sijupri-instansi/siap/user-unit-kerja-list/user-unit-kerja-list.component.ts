@@ -3,13 +3,12 @@ import { UserUnitKerja } from './../../../modules/siap/models/user-unit-kerja.mo
 import { Component } from '@angular/core'
 import { Router, RouterLink } from '@angular/router'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
@@ -22,14 +21,13 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
     selector: 'app-user-unit-kerja-list',
     standalone: true,
     imports: [
-        RouterLink,
         PagableComponent,
         UserUnitKerjaUpdateComponent,
         ModalComponent,
-        CommonModule
+        CommonModule,
     ],
     templateUrl: './user-unit-kerja-list.component.html',
-    styleUrl: './user-unit-kerja-list.component.scss'
+    styleUrl: './user-unit-kerja-list.component.scss',
 })
 export class UserUnitKerjaListComponent {
     pagable: Pagable
@@ -43,8 +41,8 @@ export class UserUnitKerjaListComponent {
         private tabService: TabService,
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
-        private handlerService: HandlerService
-    ) { }
+        private handlerService: HandlerService,
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -55,18 +53,20 @@ export class UserUnitKerjaListComponent {
         this.pagable = new PagableBuilder('/api/v1/user_unit_kerja/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Nama', 'name', ['user']).build()
+                new PrimaryColumnBuilder('Nama', 'name', ['user']).build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Email', 'email', ['user']).build()
+                new PrimaryColumnBuilder('Email', 'email', ['user']).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((unitKerja: any) => {
-                        this.router.navigate([`siap/user-unit-kerja/${unitKerja.nip}`])
+                        this.router.navigate([
+                            `siap/user-unit-kerja/${unitKerja.nip}`,
+                        ])
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -75,33 +75,33 @@ export class UserUnitKerjaListComponent {
                         this.SelecterUserUnitKerja = data
                     }, 'primary')
                     .withIcon('update')
-                    .build()
+                    .build(),
             )
-            .addActionColumn(
-                new ActionColumnBuilder()
-                    .setAction((data: any) => {
-                        this.handleDelete(data.nip)
-                    }, 'danger')
-                    .withIcon('danger')
-                    .build()
-            )
+            // .addActionColumn(
+            //     new ActionColumnBuilder()
+            //         .setAction((data: any) => {
+            //             this.handleDelete(data.nip)
+            //         }, 'danger')
+            //         .withIcon('danger')
+            //         .build(),
+            // )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('nip')
                     .withField('NIP', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('name', ['user'])
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('email', ['user'])
                     .withField('Email', 'text')
-                    .build()
+                    .build(),
             )
             .build()
     }
@@ -116,12 +116,13 @@ export class UserUnitKerjaListComponent {
                 label: 'Daftar User Unit Kerja',
                 isActive: true,
                 icon: 'mdi-list-box',
-                onClick: () => this.router.navigate([`/siap/user-unit-kerja`])
+                onClick: () => this.router.navigate([`/siap/user-unit-kerja`]),
             })
             .addTab({
                 label: 'Tambah User Unit Kerja',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.router.navigate([`/siap/user-unit-kerja/add`])
+                onClick: () =>
+                    this.router.navigate([`/siap/user-unit-kerja/add`]),
             })
     }
 
@@ -136,7 +137,7 @@ export class UserUnitKerjaListComponent {
 
     handleDelete(userNip: string) {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 this.apiService
                     .deleteData(`/api/v1/user_unit_kerja/${userNip}`)
@@ -144,21 +145,21 @@ export class UserUnitKerjaListComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menghapus user unit kerja.'
+                                'Berhasil menghapus user unit kerja.',
                             )
                             setTimeout(() => {
                                 window.location.reload()
                             }, 100)
                         },
-                        error: error => {
+                        error: (error) => {
                             console.log('error', error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menghapus data user unit kerja'
+                                'Gagal menghapus data user unit kerja',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

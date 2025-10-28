@@ -223,6 +223,13 @@ export const routes: Routes = [
                                         './ukom/ukom-pemetaan/ukom-task-detail/ukom-task-detail.component'
                                     ).then((m) => m.UkomTaskDetailComponent),
                             },
+                            {
+                                path: 'rejected/detail/:id',
+                                loadComponent: () =>
+                                    import(
+                                        './ukom/ukom-pemetaan/ukom-task-rejected-detail/ukom-task-rejected-detail.component'
+                                    ).then((m) => m.UkomTaskRejectedDetailComponent),
+                            },
                         ],
                     },
                     'Pengajuan Ukom': {

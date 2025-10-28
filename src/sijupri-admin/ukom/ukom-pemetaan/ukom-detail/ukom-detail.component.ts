@@ -3,7 +3,7 @@ import { Component } from '@angular/core'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
@@ -18,20 +18,13 @@ import { SafeUrl } from '@angular/platform-browser'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
-import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
-import { ForcePasswordFormComponent } from '../../../../modules/base/components/force-password-form/force-password-form.component'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 @Component({
     selector: 'app-ukom-detail',
     standalone: true,
-    imports: [
-        PagableComponent,
-        CommonModule,
-        TanggalIndoPipe,
-        ModalComponent,
-        ForcePasswordFormComponent
-    ],
+    imports: [PagableComponent, CommonModule, TanggalIndoPipe],
     templateUrl: './ukom-detail.component.html',
-    styleUrl: './ukom-detail.component.scss'
+    styleUrl: './ukom-detail.component.scss',
 })
 export class UkomDetailComponent {
     pagable: Pagable
@@ -56,18 +49,19 @@ export class UkomDetailComponent {
 
     isModalOpen$ = new BehaviorSubject<boolean>(false)
 
-    constructor (
+    constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private apiService: ApiService,
         private sanitizer: DomSanitizer,
         private filePreviewService: FilePreviewService,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
+        private jenisUkomService: JenisUkomService,
     ) {}
 
-    ngOnInit () {
-        this.activatedRoute.paramMap.subscribe(params => {
+    ngOnInit() {
+        this.activatedRoute.paramMap.subscribe((params) => {
             this.id = params.get('id')
         })
         this.handlePagable()
@@ -75,40 +69,31 @@ export class UkomDetailComponent {
         this.isUserBanned()
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder(
-            `/api/v1/participant_ukom/all/${this.id}`
+            `/api/v1/participant_ukom/all/${this.id}`,
         )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jenis Ukom', (data: any) => {
-                        switch (data.jenisUkom) {
-                            case 'KENAIKAN_JENJANG':
-                                return 'Kenaikan Jenjang'
-                            case 'PERPINDAHAN_JABATAN':
-                                return 'Perpindahan Jabatan'
-                            case 'PROMOSI':
-                                return 'Promosi'
-                            case 'PROMOSI_JF':
-                                return 'Promosi Jabatan Fungsional'
-                            default:
-                                return data.jenisUkom
-                        }
+                        return this.jenisUkomService.getLabelByValue(
+                            data.jenisUkom,
+                        )
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
+                new PrimaryColumnBuilder('Tanggal', 'dateCreated').build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((ukom: any) => {
                         this.router.navigate([
-                            `/ukom/ukom-list/detail/${ukom.id}`
+                            `/ukom/ukom-list/detail/${ukom.id}`,
                         ])
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -116,14 +101,14 @@ export class UkomDetailComponent {
                         this.handleDeleteTask(ukom.id)
                     }, 'danger')
                     .withIcon('danger')
-                    .build()
+                    .build(),
             )
             .build()
     }
 
-    handleDeleteTask (id: string) {
+    handleDeleteTask(id: string) {
         this.confirmationService.open(false).subscribe({
-            next: res => {
+            next: (res) => {
                 if (!res.confirmed) {
                     return
                 }
@@ -131,43 +116,43 @@ export class UkomDetailComponent {
                 this.apiService
                     .deleteData(`/api/v1/participant_ukom/${id} `)
                     .subscribe({
-                        next: res => {
+                        next: (res) => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil dihapus'
+                                'Data berhasil dihapus',
                             )
                             this.refresh = !this.refresh
                         },
-                        error: err => {
+                        error: (err) => {
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Data gagal dihapus'
+                                'Data gagal dihapus',
                             )
                             this.refresh = !this.refresh
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
-    preview (fileName: string, fileSource: string) {
+    preview(fileName: string, fileSource: string) {
         this.filePreviewService.open(fileName, fileSource)
     }
 
-    getJF () {
+    getJF() {
         this.jfLoading$.next(true)
 
         this.apiService.getData(`/api/v1/jf/${this.id}`).subscribe({
             next: (response: any) => {
                 this.jf = new JF(response)
                 this.jfLoading$.next(false)
-            }
+            },
         })
     }
 
-    fetchPhotoProfile () {
+    fetchPhotoProfile() {
         this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
-            next: blob => {
+            next: (blob) => {
                 if (blob.size === 0) {
                     this.profileImageSrc = 'assets/no-profile.jpg'
                     return
@@ -176,27 +161,27 @@ export class UkomDetailComponent {
                 this.profileImageSrc =
                     this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching profile image', err)
                 this.profileImageSrc = 'assets/no-profile.jpg'
-            }
+            },
         })
     }
 
-    back () {
+    back() {
         history.back()
     }
 
-    isUserBanned () {
+    isUserBanned() {
         this.apiService
             .getData(
-                `/api/v1/participant_ukom/search?limit=100&eq_nip=${this.id}`
+                `/api/v1/participant_ukom/search?limit=100&eq_nip=${this.id}`,
             )
             .subscribe({
                 next: (response: any) => {
                     this.isBanned = response.data[0].ukomBan != null
                     this.bannedDue = response.data[0].ukomBan?.until
-                }
+                },
             })
     }
 }

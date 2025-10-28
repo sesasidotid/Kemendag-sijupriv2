@@ -3,7 +3,7 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core'
 import { FilePreviewService } from '../../services/file-preview.service'
 import { FIleHandler } from '../../commons/file-handler/file-handler'
 import { FileConverterService } from '../../services/file-converter.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, finalize } from 'rxjs'
 import { HandlerService } from '../../services/handler.service'
 
 @Component({
@@ -29,7 +29,7 @@ export class FileHandlerComponent {
         private filePreviewService: FilePreviewService,
         private fileConverterService: FileConverterService,
         private handlerService: HandlerService,
-    ) {}
+    ) { }
 
     getAllowedTypes(): string {
         const typeLabels =
@@ -54,6 +54,9 @@ export class FileHandlerComponent {
                 this.fileNames[key] = this.inputs.files[key].fileName
                 this.fileConverterService
                     .getFileAsBase64(this.inputs.files[key].source)
+                    .pipe(finalize(() => {
+                        this.hadItemsLoading$.next(false)
+                    }))
                     .subscribe({
                         next: (base64) => {
                             this.inputs.listen(
@@ -62,9 +65,6 @@ export class FileHandlerComponent {
                                 base64,
                                 this.inputs.files[key].label,
                             )
-                            this.hadItemsLoading$.next(false)
-                        },
-                        complete: () => {
                             this.hadItemsLoading$.next(false)
                         },
                     })

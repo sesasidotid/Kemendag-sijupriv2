@@ -1,5 +1,6 @@
+import { ConfirmationService } from '@/modules/base/services/confirmation.service';
 import { Component } from '@angular/core'
-import { Router, RouterLink } from '@angular/router'
+import { Router } from '@angular/router'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import {
@@ -8,17 +9,17 @@ import {
     PageFilterBuilder,
     PrimaryColumnBuilder
 } from '../../../modules/base/commons/pagable/pagable-builder'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { CommonModule } from '@angular/common'
 import { ForcePasswordFormComponent } from '../../../modules/base/components/force-password-form/force-password-form.component'
 import { BehaviorSubject } from 'rxjs'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
-
+import { HandlerService } from '@/modules/base/services/handler.service';
+import { UserUnitKerjaService } from '@/modules/siap/services/user-unit-kerja.service';
+import { UserUnitKerja } from '@/modules/siap/models/user-unit-kerja.model';
 @Component({
     selector: 'app-user-unit-kerja-list',
     standalone: true,
     imports: [
-        RouterLink,
         PagableComponent,
         ForcePasswordFormComponent,
         CommonModule,
@@ -32,13 +33,16 @@ export class UserUnitKerjaListComponent {
     isModalPasswordOpen$ = new BehaviorSubject<boolean>(false)
     userId: string
 
-    constructor (private router: Router) {}
+    refresh: boolean
 
-    ngOnInit () {
+
+    constructor(private router: Router, private confirmationService: ConfirmationService, private handlerService: HandlerService, private userUnitKerja: UserUnitKerjaService) { }
+
+    ngOnInit() {
         this.handlePagable()
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/user_unit_kerja/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(
@@ -76,6 +80,14 @@ export class UserUnitKerjaListComponent {
                     .withIcon('password')
                     .build()
             )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((unitKerja: UserUnitKerja) => {
+                        this.deleteUserUnitKerjaByNip(unitKerja.nip)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build(),
+            )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('nip')
@@ -97,7 +109,21 @@ export class UserUnitKerjaListComponent {
             .build()
     }
 
-    togglePasswordModal () {
+    togglePasswordModal() {
         this.isModalPasswordOpen$.next(!this.isModalPasswordOpen$.value)
+    }
+    deleteUserUnitKerjaByNip(nip: string) {
+        this.confirmationService.open(false).subscribe((res) => {
+            if (!res.confirmed) return
+
+            this.userUnitKerja
+                .delete(nip)
+                .subscribe({
+                    next: () => {
+                        this.handlerService.handleAlert("Success", "Berhasil menghapus User Unit Kerja")
+                        this.refresh = !this.refresh
+                    },
+                })
+        })
     }
 }

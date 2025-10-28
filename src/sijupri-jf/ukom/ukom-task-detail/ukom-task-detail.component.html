@@ -11,20 +11,6 @@
 <ng-template #ukomHadItem>
     <div class="row">
         <div class="col-lg-12">
-            <!-- <div class="d-flex justify-content-end mb-3">
-                <div class="alert alert-info d-flex align-items-center gap-4 w-auto mb-0 px-1 py-2 shadow-sm"
-                    role="alert" *ngIf="ukomDetail.rekomendasiUrl">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-megaphone-fill me-3 fs-3 text-primary"></i>
-                        <h4 class="mb-0 fw-semibold text-dark">
-                            Rekomendasi UKom tersedia untuk diunduh.
-                        </h4>
-                    </div>
-                    <button (click)="downloadRekomendasi()" class="btn btn-primary btn-lg">
-                        Download
-                    </button>
-                </div>
-            </div> -->
 
             <div class="card">
                 <div class="card-header align-items-center d-flex">
@@ -261,7 +247,7 @@
                                 <label class="form-label">Status Pendaftaran</label>
                                 <p class="border-bottom">
                                     {{
-                                    ukomDetail.isMengulang == 'true'
+                                    ukomDetail.isMengulang
                                     ? 'Mengulang'
                                     : 'Baru'
                                     }}
@@ -294,7 +280,7 @@
                                 <label class="form-label">Predikat Kinerja Pegawai Satu Tahun
                                     Terakhir</label>
                                 <p class="border-bottom">
-                                    {{ predikat1Name }}
+                                    {{ predikat1Name ?? '-'}}
                                 </p>
                             </div>
                         </div>
@@ -304,7 +290,7 @@
                                 <label class="form-label">Predikat Kinerja Pegawai Dua Tahun
                                     Terakhir</label>
                                 <p class="border-bottom">
-                                    {{ predikat2Name }}
+                                    {{ predikat2Name ?? '-'}}
                                 </p>
                             </div>
                         </div>
@@ -315,9 +301,16 @@
             <!-- Dokumen Pendaftaran -->
             <div class="card" *ngIf="dataDokumenUkom.length > 0">
                 <div class="card-header">
-                    <h5 class="m-0">
-                        <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen Pendaftaran UKom
-                    </h5>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h5 class="mb-0 d-flex align-items-center">
+                            <i class="mdi mdi-file-document-check-outline me-2"></i>
+                            Dokumen Pendaftaran UKom
+                        </h5>
+
+                        <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">
+                            Lolos Seleksi Administrasi
+                        </span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
@@ -394,8 +387,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
     </ng-container>
 </app-modal>

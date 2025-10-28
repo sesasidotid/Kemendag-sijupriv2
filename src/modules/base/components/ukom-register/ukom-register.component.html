@@ -10,17 +10,17 @@
 
 <ng-template #content>
     <div *ngIf="systemConfigService.isRegisterOpen$| async; else registerClosed">
-        <div class="row card px-4 parent">
+        <div class="row card parent px-4">
             <div class="gradient-line"></div>
             <h1 class="p-0">Pendaftaran UKom</h1>
-            <p class="mt-1 mb-0 text-muted p-0">
+            <p class="text-muted mb-0 mt-1 p-0">
                 Silahkan isi form di bawah ini untuk mendaftar UKom
             </p>
         </div>
 
         <ng-template #hadCompleted>
-            <div class="flex flex-col items-center justify-center min-h-screen">
-                <div class="card parent bg-white shadow-lg rounded-2xl p-4 text-center">
+            <div class="flex min-h-screen flex-col items-center justify-center">
+                <div class="card parent rounded-2xl bg-white p-4 text-center shadow-lg">
                     <h1>{{ stringCode }}</h1>
                     <p class="text-success">
                         Bagi calon peserta uji kompetensi non JF Perdagangan
@@ -33,7 +33,7 @@
                     <div *ngIf="imageUrl">
                         <div class="text-center">
                             <h2 class="mb-4">Download QRCode</h2>
-                            <img id="image" [src]="imageUrl" class="img-fluid border rounded" alt="Sample Image" />
+                            <img id="image" [src]="imageUrl" class="img-fluid rounded border" alt="Sample Image" />
                             <div class="mt-3">
                                 <button (click)="downloadImage(nonJFNIP)" class="btn btn-primary">
                                     Download
@@ -74,9 +74,7 @@
                         <div *ngIf="
                                 getErrorMessage('tempatLahir', 'Tempat Lahir')
                             " class="text-danger">
-                            {{
-                            getErrorMessage('tempatLahir', 'Tempat Lahir')
-                            }}
+                            {{ getErrorMessage('tempatLahir', 'Tempat Lahir') }}
                         </div>
                     </div>
 
@@ -89,8 +87,7 @@
                         <div *ngIf="
                                 getErrorMessage('tanggalLahir', 'Tanggal Lahir')
                             " class="text-danger">
-                            {{
-                            getErrorMessage('tanggalLahir', 'Tanggal Lahir')
+                            {{ getErrorMessage('tanggalLahir', 'Tanggal Lahir')
                             }}
                         </div>
                     </div>
@@ -131,20 +128,15 @@
                                     'Konfirmasi Password'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'confirmPassword',
-                            'Konfirmasi Password'
-                            )
-                            }}
+                            {{ getErrorMessage( 'confirmPassword', 'Konfirmasi Password' ) }}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="jenis_instansi" class="form-label">
+                        <label for="jenisInstansi" class="form-label">
                             Instansi <span class="text-danger">*</span>
                         </label>
-                        <select class="form-select" id="jenis_instansi" formControlName="jenis_instansi">
+                        <select class="form-select" id="jenisInstansi" formControlName="jenisInstansi">
                             <option value="" disabled selected hidden>
                                 Pilih Instansi
                             </option>
@@ -178,9 +170,9 @@
                         </select>
 
                         <div *ngIf="
-                                getErrorMessage('jenis_instansi', 'Instansi')
+                                getErrorMessage('jenisInstansi', 'Instansi')
                             " class="text-danger">
-                            {{ getErrorMessage('jenis_instansi', 'Instansi') }}
+                            {{ getErrorMessage('jenisInstansi', 'Instansi') }}
                         </div>
                     </div>
 
@@ -189,9 +181,9 @@
                                 instansi === 'PEMERINTAH_PROVINSI' ||
                                 instansi === 'PEMERINTAH_KABUPATEN_KOTA'
                             ">
-                            <label for="provinsi_id" class="form-label">Pilih Provinsi
+                            <label for="provinsiId" class="form-label">Pilih Provinsi
                                 <span class="text-danger">*</span></label>
-                            <select class="form-select" id="provinsi_id" formControlName="provinsi_id">
+                            <select class="form-select" id="provinsiId" formControlName="provinsiId">
                                 <option value="" disabled selected hidden>
                                     Pilih Provinsi
                                 </option>
@@ -202,20 +194,15 @@
                         </div>
 
                         <div class="mb-3" *ngIf="instansi === 'PEMERINTAH_KABUPATEN_KOTA'">
-                            <label for="kabupaten_kota_id" class="form-label">Pilih Kabupaten/Kota
+                            <label for="kabupatenKotaId" class="form-label">Pilih Kabupaten/Kota
                                 <span class="text-danger">*</span></label>
-                            <select class="form-select" id="kabupaten_kota_id" formControlName="kabupaten_kota_id">
+                            <select class="form-select" id="kabupatenKotaId" formControlName="kabupatenKotaId">
                                 <option value="" disabled selected hidden>
                                     Pilih Kabupaten/Kota
                                 </option>
                                 <option *ngFor="let kabkot of kabKotaList" [value]="kabkot.id">
-                                    {{
-                                    kabkot.type +
-                                    (kabkot.name.startsWith(' ')
-                                    ? ''
-                                    : ' ') +
-                                    kabkot.name
-                                    }}
+                                    {{ kabkot.type + (kabkot.name.startsWith('
+                                    ') ? '' : ' ') + kabkot.name }}
                                 </option>
                             </select>
                         </div>
@@ -233,12 +220,7 @@
                                         'Unit Kerja'
                                     )
                                 " class="text-danger">
-                                {{
-                                getErrorMessage(
-                                'unitKerjaName',
-                                'Unit Kerja'
-                                )
-                                }}
+                                {{ getErrorMessage( 'unitKerjaName', 'Unit Kerja' ) }}
                             </div>
                         </div>
                     </div>
@@ -254,12 +236,8 @@
                                     'Jabatan Saat Ini'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'jabatanName',
-                            'Jabatan Saat Ini'
-                            )
-                            }}
+                            {{ getErrorMessage( 'jabatanName', 'Jabatan Saat
+                            Ini' ) }}
                         </div>
                     </div>
 
@@ -279,9 +257,7 @@
                         <div *ngIf="
                                 getErrorMessage('tmtJabatan', 'TMT Jabatan')
                             " class="text-danger">
-                            {{
-                            getErrorMessage('tmtJabatan', 'TMT Jabatan')
-                            }}
+                            {{ getErrorMessage('tmtJabatan', 'TMT Jabatan') }}
                         </div>
                     </div>
 
@@ -312,12 +288,8 @@
                                     'Pangkat/Golongan'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'pangkatCode',
-                            'Pangkat/Golongan'
-                            )
-                            }}
+                            {{ getErrorMessage( 'pangkatCode',
+                            'Pangkat/Golongan' ) }}
                         </div>
                     </div>
 
@@ -329,16 +301,14 @@
                         <div *ngIf="
                                 getErrorMessage('tmtPangkat', 'TMT Pangkat') as error
                             " class="text-danger">
-                            {{
-                            error
-                            }}
+                            {{ error }}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="jenis_ukom" class="form-label">Jenis UKom
+                        <label for="jenisUkom" class="form-label">Jenis UKom
                             <span class="text-danger">*</span></label>
-                        <select class="form-select" id="jenis_ukom" formControlName="jenis_ukom">
+                        <select class="form-select" id="jenisUkom" formControlName="jenisUkom">
                             <option value="" disabled selected hidden>
                                 Pilih Jenis UKom
                             </option>
@@ -346,12 +316,9 @@
                                 Perpindahan Jabatan
                             </option>
                             <option value="PROMOSI">Promosi</option>
-                            <option value="KENAIKAN_JENJANG">
-                                Kenaikan Jenjang
-                            </option>
                         </select>
-                        <div *ngIf="getErrorMessage('jenis_ukom', 'Jenis UKom')" class="text-danger">
-                            {{ getErrorMessage('jenis_ukom', 'Jenis UKom') }}
+                        <div *ngIf="getErrorMessage('jenisUkom', 'Jenis UKom')" class="text-danger">
+                            {{ getErrorMessage('jenisUkom', 'Jenis UKom') }}
                         </div>
                     </div>
 
@@ -383,12 +350,8 @@
                                     'Jabatan Yang Dituju'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'nextJabatanCode',
-                            'Jabatan Yang Dituju'
-                            )
-                            }}
+                            {{ getErrorMessage( 'nextJabatanCode', 'Jabatan Yang
+                            Dituju' ) }}
                         </div>
                     </div>
 
@@ -421,20 +384,16 @@
                                     'Jenjang Yang Dituju'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'nextJenjangCode',
-                            'Jenjang Yang Dituju'
-                            )
-                            }}
+                            {{ getErrorMessage( 'nextJenjangCode', 'Jenjang Yang
+                            Dituju' ) }}
                         </div>
                     </div>
 
                     <div class="mb-3" *ngIf="(bidangJabatanList$ | async)?.length > 0">
-                        <label for="bidang_jabatan_code" class="form-label">Bidang Jabatan Yang Dituju
+                        <label for="bidangJabatanCode" class="form-label">Bidang Jabatan Yang Dituju
                             <span class="text-danger">*</span></label>
-                        <select class="form-select" name="bidang_jabatan_code" id="bidang_jabatan_code"
-                            formControlName="bidang_jabatan_code">
+                        <select class="form-select" name="bidangJabatanCode" id="bidangJabatanCode"
+                            formControlName="bidangJabatanCode">
                             <option selected value="" hidden>
                                 Pilih Bidang Jabatan Yang Dituju
                             </option>
@@ -448,36 +407,28 @@
                         </select>
                         <div *ngIf="
                                 getErrorMessage(
-                                    'bidang_jabatan_code',
+                                    'bidangJabatanCode',
                                     'Bidang Jabatan Yang Dituju'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'bidang_jabatan_code',
-                            'Bidang Jabatan Yang Dituju'
-                            )
-                            }}
+                            {{ getErrorMessage( 'bidangJabatanCode', 'Bidang
+                            Jabatan Yang Dituju' ) }}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="no_surat_usulan" class="form-label">Nomor Surat Usulan
+                        <label for="noSuratUsulan" class="form-label">Nomor Surat Usulan
                             <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="no_surat_usulan" required
-                            formControlName="no_surat_usulan" />
+                        <input type="text" class="form-control" id="noSuratUsulan" required
+                            formControlName="noSuratUsulan" />
                         <div *ngIf="
                                 getErrorMessage(
-                                    'no_surat_usulan',
+                                    'noSuratUsulan',
                                     'Nomor Surat Usulan'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'no_surat_usulan',
-                            'Nomor Surat Usulan'
-                            )
-                            }}
+                            {{ getErrorMessage( 'noSuratUsulan', 'Nomor Surat
+                            Usulan' ) }}
                         </div>
                     </div>
 
@@ -492,21 +443,17 @@
                                     'Tanggal Surat Usulan'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'tglSuratUsulan',
-                            'Tanggal Surat Usulan'
-                            )
-                            }}
+                            {{ getErrorMessage( 'tglSuratUsulan', 'Tanggal Surat
+                            Usulan' ) }}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="pendidikan_terakhir_code" class="form-label">
+                        <label for="pendidikanTerakhirCode" class="form-label">
                             Pendidikan Terakhir<span class="text-danger">*</span>
                         </label>
-                        <select class="form-select" id="pendidikan_terakhir_code"
-                            formControlName="pendidikan_terakhir_code">
+                        <select class="form-select" id="pendidikanTerakhirCode"
+                            formControlName="pendidikanTerakhirCode">
                             <option value="" disabled selected hidden>
                                 Pilih Pendidikan Terakhir
                             </option>
@@ -517,16 +464,12 @@
 
                         <div *ngIf="
                                 getErrorMessage(
-                                    'pendidikan_terakhir_code',
+                                    'pendidikanTerakhirCode',
                                     'Pendidikan Terakhir'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'pendidikan_terakhir_code',
-                            'Pendidikan Terakhir'
-                            )
-                            }}
+                            {{ getErrorMessage( 'pendidikanTerakhirCode',
+                            'Pendidikan Terakhir' ) }}
                         </div>
                     </div>
 
@@ -542,21 +485,17 @@
                                     'Jurusan/Program Studi'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'jurusan',
-                            'Jurusan/Program Studi'
-                            )
-                            }}
+                            {{ getErrorMessage( 'jurusan', 'Jurusan/Program
+                            Studi' ) }}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="predikat_kinerja_1_id" class="form-label">
+                        <label for="predikatKinerja1Id" class="form-label">
                             Predikat Kinerja Pegawai Satu Tahun Terakhir
                             <span class="text-danger">*</span>
                         </label>
-                        <select class="form-select" id="predikat_kinerja_1_id" formControlName="predikat_kinerja_1_id">
+                        <select class="form-select" id="predikatKinerja1Id" formControlName="predikatKinerja1Id">
                             <option value="" disabled selected hidden>
                                 Pilih Predikat
                             </option>
@@ -567,25 +506,21 @@
 
                         <div *ngIf="
                                 getErrorMessage(
-                                    'predikat_kinerja_1_id',
+                                    'predikatKinerja1Id',
                                     'Predikat Kinerja Pegawai Satu Tahun Terakhir'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'predikat_kinerja_1_id',
-                            'Predikat Kinerja Pegawai Satu Tahun Terakhir'
-                            )
-                            }}
+                            {{ getErrorMessage( 'predikatKinerja1Id', 'Predikat
+                            Kinerja Pegawai Satu Tahun Terakhir' ) }}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="predikat_kinerja_2_id" class="form-label">
+                        <label for="predikatKinerja2Id" class="form-label">
                             Predikat Kinerja Pegawai Dua Tahun Terakhir
                             <span class="text-danger">*</span>
                         </label>
-                        <select class="form-select" id="predikat_kinerja_2_id" formControlName="predikat_kinerja_2_id">
+                        <select class="form-select" id="predikatKinerja2Id" formControlName="predikatKinerja2Id">
                             <option value="" disabled selected hidden>
                                 Pilih Predikat
                             </option>
@@ -596,16 +531,12 @@
 
                         <div *ngIf="
                                 getErrorMessage(
-                                    'predikat_kinerja_2_id',
+                                    'predikatKinerja2Id',
                                     'Predikat Kinerja Pegawai Dua Tahun Terakhir'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'predikat_kinerja_2_id',
-                            'Predikat Kinerja Pegawai Dua Tahun Terakhir'
-                            )
-                            }}
+                            {{ getErrorMessage( 'predikatKinerja2Id', 'Predikat
+                            Kinerja Pegawai Dua Tahun Terakhir' ) }}
                         </div>
                     </div>
 
@@ -628,12 +559,8 @@
                                     'Status Pendaftaran'
                                 )
                             " class="text-danger">
-                            {{
-                            getErrorMessage(
-                            'isMengulang',
-                            'Status Pendaftaran'
-                            )
-                            }}
+                            {{ getErrorMessage( 'isMengulang', 'Status
+                            Pendaftaran' ) }}
                         </div>
                     </div>
 
@@ -670,7 +597,7 @@
 
 <ng-template #registerClosed>
     <div class="card parent">
-        <h1 class="text-center">Pendaftaran UKom Sedang Tutup</h1>
+        <h2 class="text-center">Pendaftaran UKom Sedang Tutup</h2>
     </div>
 </ng-template>
 <app-confirmation-dialog></app-confirmation-dialog>

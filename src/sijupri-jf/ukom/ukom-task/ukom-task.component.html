@@ -4,13 +4,14 @@
     </div>
 </div>
 
-<app-modal *ngIf="isModalOpen$ | async" [title]="'Perbaiki Dokumen Persyaratan UKom'" (toggle)="toggleModal()"
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Perbaiki Data Administrasi UKom'" (toggle)="toggleModal()"
     [enableFooter]="false">
-    <app-ukom-revision [jf]="jf" [ukom]="ukom" [pendingTask]="pendingTask"></app-ukom-revision>
+    <app-ukom-revision [jf]="jf" [ukom]="ukom" [pendingTask]="pendingTask"
+        (submitted)="refreshPage()"></app-ukom-revision>
 </app-modal>
 
 <ng-template #ukomHadItem>
-    <div *ngIf="systemConfigService.isRegisterOpen$| async; else registerClosed">
+    <div *ngIf="(systemConfigService.isRegisterOpen$| async) || pendingTask.jenisUkom; else registerClosed">
         <div class="row px-3">
             <div *ngIf="!pendingTask.jenisUkom; else hadData" class="col-lg-12">
                 <app-empty-state *ngIf="!(ukomParticipantService.isJFCanRegisterUkom$ | async)" [title]="
@@ -44,7 +45,6 @@
                                     </p>
                                 </div>
                             </div>
-                            <!--end col-->
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label for="lastnameInput" class="form-label">
@@ -65,7 +65,6 @@
                                     </p>
                                 </div>
                             </div>
-                            <!--end col-->
                             <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label for="emailInput" class="form-label">
@@ -208,7 +207,7 @@
                                     </label>
                                     <p class="text-muted">
                                         {{
-                                        pendingTask.isMengulang == 'true'
+                                        pendingTask.isMengulang
                                         ? 'Mengulang'
                                         : 'Baru'
                                         }}
@@ -378,7 +377,7 @@
                             <div class="step-counter">
                                 <i class="mdi mdi-account-multiple"></i>
                             </div>
-                            <div class="step-name">Perbaikan Dokumen UKom</div>
+                            <div class="step-name">Perbaikan Data Administrasi UKom</div>
                         </div>
                     </div>
                 </div>
@@ -425,7 +424,7 @@
                                                         'COMPLETED'
                                                     ">
                                                     <h5 class="">
-                                                        {{ history.flowName }}
+                                                        {{ history.flowName | replaceUkomWord }}
                                                         <span class="badge rounded-pill text-bg-success ms-2">
                                                             {{
                                                             history.flowId ===
@@ -447,11 +446,11 @@
                                                         'PENDING'
                                                     ">
                                                     <h5 class="">
-                                                        {{ history.flowName }}
+                                                        {{ history.flowName | replaceUkomWord }}
                                                         <span class="badge rounded-pill text-bg-info ms-2">{{
                                                             history.flowId ===
                                                             'ukom_flow_2'
-                                                            ? 'Dokumen Perlu Diperbaiki'
+                                                            ? 'Perbaikan Data Administrasi UKom'
                                                             : ''
                                                             }}{{
                                                             history.flowId ===
@@ -467,7 +466,7 @@
                                                         'REJECTED'
                                                     ">
                                                     <h5 class="">
-                                                        {{ history.flowName }}
+                                                        {{ history.flowName | replaceUkomWord}}
                                                         <span
                                                             class="badge rounded-pill text-bg-danger ms-2">Ditolak</span>
                                                     </h5>
@@ -540,6 +539,8 @@
     </div>
 
     <ng-template #registerClosed>
-        <h1 class="text-center">Pendaftaran UKom Sedang Tutup</h1>
+        <div *ngIf="!pendingTask.jenisUkom">
+            <h2 class="text-center">Pendaftaran UKom Sedang Tutup</h2>
+        </div>
     </ng-template>
 </ng-template>

@@ -1,4 +1,3 @@
-<!-- <div class="col-12"> -->
 <ng-container *ngIf="isLoading; else noLoading">
     <button [type]="type" [class]="className" [disabled]="true">
         <div class="spinner-border spinner-sm-custom" role="status">
@@ -9,7 +8,8 @@
 
 <ng-template #noLoading>
     <button [type]="type" [class]="className" [disabled]="disabled || isLoading" (click)="handleClick()">
-        {{ label }}
+        <i *ngIf="icon" class="mdi" [ngClass]="icon"></i>
+        <span *ngIf="label" class="ms-1">{{ label }}</span>
+        <!-- {{ label }} -->
     </button>
 </ng-template>
-<!-- </div> -->

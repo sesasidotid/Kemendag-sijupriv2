@@ -29,6 +29,7 @@ import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jabatan.service'
 import { JfService } from '@/modules/siap/services/jf.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
+import { ReplaceUkomWordPipe } from '@/modules/base/pipes/replace-ukom-word.pipe'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
@@ -46,18 +47,18 @@ export enum JenisUkomEnum {
         ModalComponent,
         UkomRevisionComponent,
         TanggalIndoPipe,
-        LoadingButtonComponent,
         AgeCalculatorPipe,
+        ReplaceUkomWordPipe,
     ],
     templateUrl: './ukom-task.component.html',
     styleUrl: './ukom-task.component.scss',
 })
 export class UkomTaskComponent {
-    pendingTask: UkomTaskDetail = new UkomTaskDetail()
+    pendingTask = new UkomTaskDetail()
     pesertaUkom: PesertaUkom
-    jf: JF = new JF()
+    jf = new JF()
     ukom: Ukom
-    isFormOpen: boolean = false
+    isFormOpen = false
     detectedDokumen: any = {}
 
     ukomDataLoading$ = new BehaviorSubject<boolean>(true)
@@ -224,6 +225,7 @@ export class UkomTaskComponent {
             )
             .subscribe({
                 next: (response) => {
+                    console.log(response)
                     this.pendingTask = response
                     switch (this.pendingTask.flowId) {
                         case 'ukom_flow_1':
@@ -311,6 +313,10 @@ export class UkomTaskComponent {
 
     toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
+    }
+
+    refreshPage() {
+        window.location.reload()
     }
 
     ngOnDestroy() {

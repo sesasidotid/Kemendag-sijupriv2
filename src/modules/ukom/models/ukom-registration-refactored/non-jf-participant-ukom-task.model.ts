@@ -21,22 +21,22 @@ export class NonJFParticipantUkomTask extends Serializable {
     password: string = undefined
 
     // Instansi & Lokasi
-    jenis_instansi: string = undefined
-    provinsi_id: string | number = undefined
-    kabupaten_kota_id: string | number = undefined
+    jenisInstansi: string = undefined
+    provinsiId: string | number = undefined
+    kabupatenKotaId: string | number = undefined
     unitKerjaName: string = undefined
     jabatanName: string = undefined
-    jenjangName: string = '-'
+    jenjangName: string = undefined
     pangkatCode: string = undefined
 
     // Ukom Info
-    jenis_ukom: string = undefined
+    jenisUkom: string = undefined
     nextJabatanCode: string = undefined
     nextJenjangCode: string = undefined
-    bidang_jabatan_code: string = undefined
+    bidangJabatanCode: string = undefined
 
     // Surat Usulan
-    no_surat_usulan: string = undefined
+    noSuratUsulan: string = undefined
     tglSuratUsulan: string = undefined
 
     // Pendidikan
@@ -44,11 +44,11 @@ export class NonJFParticipantUkomTask extends Serializable {
     jurusan: string = undefined
 
     // Predikat Kinerja
-    predikat_kinerja_1_id: string | number = undefined
-    predikat_kinerja_2_id: string | number = undefined
+    predikatKinerja1Id: string | number = undefined
+    predikatKinerja2Id: string | number = undefined
 
     // Extra
-    isMengulang: boolean = false
+    isMengulang: boolean = undefined
     dokumenUkomList: DokumenUkom[] = []
 
     //pajangan, menunggu backend

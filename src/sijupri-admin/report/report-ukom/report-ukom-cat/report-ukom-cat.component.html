@@ -1,0 +1,46 @@
+<div class="row">
+    <form [formGroup]="addReportCAT" (submit)="handleGenerateReport()">
+        <div class="row mb-3">
+            <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Tanggal <span
+                    class="text-danger">*</span></label>
+            <div class="col-sm-5">
+                <input type="date" name="dateFrom" class="form-control" id="inputDateFrom" formControlName="dateFrom" />
+                <div *ngIf="getErrorMessage('dateFrom', 'Tanggal mulai') as error" class="text-danger">
+                    {{ error }}
+                </div>
+            </div>
+
+            <div class="col-sm-5">
+                <input type="date" name="dateTo" class="form-control" id="inputDateTo" formControlName="dateTo" />
+                <div *ngIf="getErrorMessage('dateTo', 'Tanggal tujuan') as error" class="text-danger">
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="inputfileType" class="col-sm-2 col-form-label fw-bold">Format File <span
+                    class="text-danger">*</span></label>
+            <div class="col-sm-10">
+                <select id="inputfileType" class="form-select" formControlName="fileType" name="fileType">
+                    <option [value]="''">Pilih</option>
+                    <option [value]="'xlsx'">Excel 2007</option>
+                    <option [value]="'xls'">Excel</option>
+                    <option [value]="'csv'">CSV</option>
+                </select>
+                <div *ngIf="getErrorMessage('fileType', 'File type') as error" class="text-danger">
+                    {{ error }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <app-loading-button [isLoading]="isLoading$ | async" [disabled]="addReportCAT.invalid" [type]="'submit'"
+                [label]="'Generate Report'" [className]="'btn btn-success float-end'"></app-loading-button>
+        </div>
+    </form>
+</div>
+<hr />
+<div class="row">
+    <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+</div>

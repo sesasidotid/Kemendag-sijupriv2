@@ -1,5 +1,5 @@
 <app-landing-page [imported]="true"></app-landing-page>
-<app-modal *ngIf="isModalOpen$ | async" [title]="'Perbaiki Dokumen Persyaratan UKom'" (toggle)="toggleModal()"
+<app-modal *ngIf="isModalOpen$ | async" [title]="'Perbaiki Data Administrasi UKom'" (toggle)="toggleModal()"
     [enableFooter]="false">
     <app-nonjf-revisi-ukom [pendingTask]="pendingTask" [key]="key"></app-nonjf-revisi-ukom>
 </app-modal>
@@ -273,7 +273,7 @@
                         <div class="step-counter">
                             <i class="mdi mdi-account-multiple"></i>
                         </div>
-                        <div class="step-name">Perbaikan Dokumen UKom</div>
+                        <div class="step-name">Perbaikan Data Administrasi UKom</div>
                     </div>
                 </div>
             </div>
@@ -318,7 +318,7 @@
                                                     'COMPLETED'
                                                 ">
                                                 <h5 class="">
-                                                    {{ history.flowName }}
+                                                    {{ history.flowName | replaceUkomWord }}
                                                     <span class="badge rounded-pill text-bg-success">
                                                         {{
                                                         history.flowId ===
@@ -340,7 +340,7 @@
                                                     'PENDING'
                                                 ">
                                                 <h5 class="">
-                                                    {{ history.flowName }}
+                                                    {{ history.flowName | replaceUkomWord}}
                                                     <span class="badge rounded-pill text-bg-info">{{
                                                         history.flowId ===
                                                         'ukom_flow_2'
@@ -360,7 +360,7 @@
                                                     'REJECTED'
                                                 ">
                                                 <h5 class="">
-                                                    {{ history.flowName }}
+                                                    {{ history.flowName | replaceUkomWord}}
                                                     <span class="badge rounded-pill text-bg-danger">Ditolak</span>
                                                 </h5>
                                             </ng-container>

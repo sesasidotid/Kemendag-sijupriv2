@@ -9,7 +9,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
     standalone: true,
     imports: [CommonModule, SafeUrlPipe],
     templateUrl: './file-preview.component.html',
-    styleUrl: './file-preview.component.scss'
+    styleUrl: './file-preview.component.scss',
 })
 export class FilePreviewComponent implements OnInit {
     fileName: string = ''
@@ -18,15 +18,14 @@ export class FilePreviewComponent implements OnInit {
 
     constructor(
         private filePreviewService: FilePreviewService,
-        private sanitizer: DomSanitizer
-    ) { }
-
+        private sanitizer: DomSanitizer,
+    ) {}
 
     ngOnInit() {
         this.filePreviewService.filePreviewObservable.subscribe(
             ({ fileName, fileSource }) => {
                 this.open(fileName, fileSource)
-            }
+            },
         )
     }
 
@@ -72,46 +71,47 @@ export class FilePreviewComponent implements OnInit {
     //   }
 
     open(fileName: string, fileSource: string) {
-        this.fileName = fileName;
+        this.fileName = fileName
 
-        let finalUrl: string;
-
-        const isBase64 = fileSource.startsWith('data:');
+        let finalUrl: string
+        const isBase64 = fileSource.startsWith('data:')
 
         if (isBase64) {
-            const mimeMatch = fileSource.match(/^data:(.*?);base64,/);
+            const mimeMatch = fileSource.match(/^data:(.*?);base64,/)
             if (!mimeMatch) {
-                console.error('Invalid base64 file source');
-                return;
+                console.error('Invalid base64 file source')
+                return
             }
-            const mimeType = mimeMatch[1];
+            const mimeType = mimeMatch[1]
             try {
-                const base64Data = fileSource.split(',')[1];
-                const byteCharacters = atob(base64Data);
-                const byteNumbers = new Array(byteCharacters.length);
+                const base64Data = fileSource.split(',')[1]
+                const byteCharacters = atob(base64Data)
+                const byteNumbers = new Array(byteCharacters.length)
                 for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    byteNumbers[i] = byteCharacters.charCodeAt(i)
                 }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: mimeType });
-                finalUrl = URL.createObjectURL(blob);
+                const byteArray = new Uint8Array(byteNumbers)
+                const blob = new Blob([byteArray], { type: mimeType })
+                finalUrl = URL.createObjectURL(blob)
             } catch (error) {
-                console.error('Error processing the file:', error);
-                return;
+                console.error('Error processing the file:', error)
+                return
             }
         } else {
-            const separator = fileSource.includes('?') ? '&' : '?';
-            finalUrl = `${fileSource}${separator}_ts=${Date.now()}`;
+            const separator = fileSource.includes('?') ? '&' : '?'
+            finalUrl = `${fileSource}${separator}_ts=${Date.now()}`
+
+            // cache-busting param only for remote URLs
+            const cacheSeparator = finalUrl.includes('?') ? '&' : '?'
+            finalUrl = `${finalUrl}${cacheSeparator}_cache=${Date.now()}`
         }
 
-        const separator = finalUrl.includes('?') ? '&' : '?';
-        finalUrl = `${finalUrl}${separator}_cache=${Date.now()}`;
-
         this.fileSource = this.sanitizer.bypassSecurityTrustResourceUrl(
-            finalUrl
-        ) as string;
+            finalUrl,
+        ) as string
 
-        this.showModal = true;
+        console.log('Final URL:', this.fileSource)
+        this.showModal = true
     }
 
     closeModal() {

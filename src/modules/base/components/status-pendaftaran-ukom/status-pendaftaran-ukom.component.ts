@@ -39,6 +39,8 @@ import { FilePreviewService } from '../../services/file-preview.service'
 import { UkomGradeService } from '../../../ukom/services/ukom-grade.service'
 import { UkomGrade } from '../../../ukom/models/ukom-grade'
 import { UkomGradeTableComponent } from '../ukom-grade-table/ukom-grade-table.component'
+import { KinerjaService } from '@/modules/complement/services/kinerja.service'
+import { ReplaceUkomWordPipe } from '../../pipes/replace-ukom-word.pipe'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
@@ -57,6 +59,7 @@ export enum JenisUkomEnum {
         FileHandlerComponent,
         FilePreviewComponent,
         UkomGradeTableComponent,
+        ReplaceUkomWordPipe,
     ],
     templateUrl: './status-pendaftaran-ukom.component.html',
     styleUrl: './status-pendaftaran-ukom.component.scss',
@@ -64,7 +67,7 @@ export enum JenisUkomEnum {
 export class StatusPendaftaranUkomComponent {
     private destroy$ = new Subject<void>()
 
-    pendingTask: UkomTaskDetail = new UkomTaskDetail()
+    pendingTask = new UkomTaskDetail()
     groupedUkomPendingTaskHistory: {
         [key: string]: any[]
     } = {}
@@ -128,6 +131,7 @@ export class StatusPendaftaranUkomComponent {
         private handlerService: HandlerService,
         private filePreviewService: FilePreviewService,
         private ukomGradeService: UkomGradeService,
+        public kinerjaService: KinerjaService,
     ) {
         this.isLoading$ = combineLatest([
             this.isPredikatKerjaLoading$,
@@ -141,6 +145,7 @@ export class StatusPendaftaranUkomComponent {
     }
 
     ngOnInit() {
+        this.kinerjaService.fetchPredikatKinerja()
         this.initializeComponent()
     }
 

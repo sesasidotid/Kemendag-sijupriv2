@@ -10,13 +10,13 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { JenisKelamin } from '../../../modules/maintenance/models/jenis-kelamin.model'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ApiService } from '../../../modules/base/services/api.service'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, finalize } from 'rxjs'
 import { AlertService } from '../../../modules/base/services/alert.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
@@ -24,12 +24,17 @@ import { LoadingButtonComponent } from '../../../modules/base/components/loading
 @Component({
     selector: 'app-jf-add',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, LoadingButtonComponent],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        LoadingButtonComponent,
+    ],
     templateUrl: './jf-add.component.html',
-    styleUrl: './jf-add.component.scss'
+    styleUrl: './jf-add.component.scss',
 })
 export class JfAddComponent {
-    jf: JF = new JF()
+    jf = new JF()
     instansi: Instansi
     unitKerja: UnitKerja
     jenisKelaminList: JenisKelamin[]
@@ -37,7 +42,7 @@ export class JfAddComponent {
     loadingInstansi$ = new BehaviorSubject<boolean>(true)
     loadingUnitKerja$ = new BehaviorSubject<boolean>(true)
     createJFLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-        false
+        false,
     )
 
     jfAddForm!: FormGroup
@@ -49,12 +54,10 @@ export class JfAddComponent {
         private handlerService: HandlerService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
-    ) {
-    }
+        private formValidationService: FormValidationService,
+    ) {}
 
     ngOnInit() {
-        this.jf.unitKerjaId = LoginContext.getUnitKerjaId()
         this.handleFormInit()
         this.handleTabService()
         this.getJenisKelaminList()
@@ -63,7 +66,11 @@ export class JfAddComponent {
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.jfAddForm.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.jfAddForm.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handleTabService() {
@@ -74,13 +81,15 @@ export class JfAddComponent {
             .addTab({
                 label: 'Daftar User Jabatan Fungsional',
                 icon: 'mdi-list-box',
-                onClick: () => this.handlerService.handleNavigate(`/siap/user-jf`)
+                onClick: () =>
+                    this.handlerService.handleNavigate(`/siap/user-jf`),
             })
             .addTab({
                 label: 'Tambah User Jabatan Fungsional',
                 icon: 'mdi-plus-circle',
                 isActive: true,
-                onClick: () => this.handlerService.handleNavigate(`/siap/user-jf/add`)
+                onClick: () =>
+                    this.handlerService.handleNavigate(`/siap/user-jf/add`),
             })
     }
 
@@ -90,10 +99,9 @@ export class JfAddComponent {
             jenisKelaminCode: new FormControl('', [Validators.required]),
             nip: new FormControl('', [
                 Validators.required,
-                Validators.pattern(/^\d{18}$/)
+                Validators.pattern(/^\d{18}$/),
             ]),
-            email: new FormControl('', [Validators.required, Validators.email])
-
+            email: new FormControl('', [Validators.required, Validators.email]),
         })
     }
 
@@ -106,10 +114,10 @@ export class JfAddComponent {
                     this.instansi = instansi
                     this.loadingInstansi$.next(false)
                 },
-                error: error => {
+                error: (error) => {
                     this.handlerService.handleException(error)
                     this.loadingInstansi$.next(false)
-                }
+                },
             })
     }
 
@@ -122,10 +130,10 @@ export class JfAddComponent {
                     this.unitKerja = unitKerja
                     this.loadingUnitKerja$.next(false)
                 },
-                error: error => {
+                error: (error) => {
                     this.handlerService.handleException(error)
                     this.loadingUnitKerja$.next(false)
-                }
+                },
             })
     }
 
@@ -133,43 +141,36 @@ export class JfAddComponent {
         this.apiService.getData(`/api/v1/jenis_kelamin`).subscribe({
             next: (jenisKelaminList: JenisKelamin[]) =>
                 (this.jenisKelaminList = jenisKelaminList),
-            error: error => this.handlerService.handleException(error)
+            error: (error) => this.handlerService.handleException(error),
         })
     }
 
     submit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
-                if (!result.confirmed) {
-                    return
-                }
+            next: ({ confirmed }) => {
+                if (!confirmed) return
 
                 this.createJFLoading$.next(true)
-                if (this.jfAddForm.valid) {
-                    this.jf.name = this.jfAddForm.value.name
-                    this.jf.jenisKelaminCode = this.jfAddForm.value.jenisKelaminCode
-                    this.jf.nip = this.jfAddForm.value.nip
-                    this.jf.email = this.jfAddForm.value.email
-                    this.jf.password = this.jfAddForm.value.password
-                    // console.log(this.jf)
+                this.jf = new JF(this.jfAddForm.value)
+                this.jf.unitKerjaId = LoginContext.getUnitKerjaId()
 
-                    this.jfService.save(this.jf).subscribe({
-                        next: () => {
+                this.jfService
+                    .save(this.jf)
+                    .pipe(
+                        finalize(() => {
                             this.createJFLoading$.next(false)
-
+                        }),
+                    )
+                    .subscribe({
+                        next: () => {
                             this.alertService.showToast(
                                 'Success',
-                                'Berhasil menambah user JF.'
+                                'Berhasil menambah user JF.',
                             )
                             this.handlerService.handleNavigate(`/siap/user-jf`)
                         },
-                        error: error => {
-                            this.createJFLoading$.next(false)
-                            this.alertService.showToast('Error', 'Gagal menambahkan user JF!')
-                        }
                     })
-                }
-            }
+            },
         })
     }
 }

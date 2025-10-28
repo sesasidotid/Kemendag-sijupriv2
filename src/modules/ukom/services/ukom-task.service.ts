@@ -78,6 +78,24 @@ export class UkomTaskService {
             )
     }
 
+    finishPendingTask(): Observable<void> {
+        return this.apiService
+            .postData(`${this.BASE_PATH_TASK}/submit/all`, {})
+            .pipe(
+                map(() => {
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'Berhasil memfinalisasi tugas tertunda.',
+                    )
+                }),
+                catchError((error) => {
+                    console.error('Error finishing pending task', error)
+                    this.handlerService.handleException(error)
+                    throw error
+                }),
+            )
+    }
+
     private mapEligibilityMessage(code: string, message: string): string {
         switch (code) {
             case 'UEL-00000':

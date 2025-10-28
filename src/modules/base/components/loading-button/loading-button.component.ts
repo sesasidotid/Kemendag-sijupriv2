@@ -14,6 +14,7 @@ export class LoadingButtonComponent {
     @Input() type: 'button' | 'submit' = 'button'
     @Input() label: string = 'Submit'
     @Input() className: string = 'btn btn-success'
+    @Input() icon?: string
 
     @Output() clicked = new EventEmitter<void>()
 

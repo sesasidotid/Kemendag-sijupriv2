@@ -7,8 +7,11 @@ import {
     Observable,
     of,
     throwError,
+    finalize,
 } from 'rxjs'
 import { NonJFParticipantUkomTask } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
+import { Task } from '@/modules/workflow/models/task.model'
+import { HandlerService } from '@/modules/base/services/handler.service'
 @Injectable({
     providedIn: 'root',
 })
@@ -18,7 +21,10 @@ export class UkomParticipantService {
     private canJFRegisterUkomSubject = new BehaviorSubject<boolean>(false)
     isJFCanRegisterUkom$ = this.canJFRegisterUkomSubject.asObservable()
 
-    constructor(private apiService: ApiService) {}
+    constructor(
+        private apiService: ApiService,
+        private handlerService: HandlerService,
+    ) {}
 
     uploadRecomendationBatch(compressed_file: string): Observable<void> {
         return this.apiService
@@ -64,6 +70,59 @@ export class UkomParticipantService {
             )
             .subscribe((canRegister) => {
                 this.canJFRegisterUkomSubject.next(canRegister)
+            })
+    }
+
+    isSubmitTaskLoadingSubject = new BehaviorSubject<boolean>(false)
+    isSubmitTaskLoading$ = this.isSubmitTaskLoadingSubject.asObservable()
+    submitUkomTask(body: Task, onSuccess?: () => void) {
+        this.isSubmitTaskLoadingSubject.next(true)
+
+        this.apiService
+            .postData(`${this.BASE_PATH}/task/submit`, body)
+            .pipe(
+                catchError((error) => {
+                    console.error('Error submitting task', error)
+                    this.handlerService.handleException(error)
+                    return throwError(() => error)
+                }),
+                finalize(() => this.isSubmitTaskLoadingSubject.next(false)),
+            )
+            .subscribe({
+                next: () => {
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'Berhasil mengirim tugas',
+                    )
+                    onSuccess?.()
+                },
+            })
+    }
+
+    isSubmitUkomTaskNonJFLoadingSubject = new BehaviorSubject<boolean>(false)
+    isSubmitUkomTaskNonJFLoading$ =
+        this.isSubmitUkomTaskNonJFLoadingSubject.asObservable()
+    submitUkomTaskNonJF(body: Task, key: string, onSuccess?: () => void) {
+        this.isSubmitUkomTaskNonJFLoadingSubject.next(true)
+
+        this.apiService
+            .postData(`${this.BASE_PATH}/task/non_jf/submit?key=${key}`, body)
+            .pipe(
+                catchError((error) => {
+                    console.error('Error submitting task', error)
+                    this.handlerService.handleException(error)
+                    return throwError(() => error)
+                }),
+                finalize(() =>
+                    this.isSubmitUkomTaskNonJFLoadingSubject.next(false),
+                ),
+            )
+            .subscribe(() => {
+                this.handlerService.handleAlert(
+                    'Success',
+                    'Berhasil mengirim tugas',
+                )
+                onSuccess?.()
             })
     }
 }

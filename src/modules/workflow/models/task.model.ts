@@ -4,9 +4,9 @@ export class Task extends Serializable {
     id: string = undefined
     taskAction: string = undefined
     object: TaskObject | any = {}
-    remark: any = undefined
+    remark: string = undefined
 
-    constructor (object?: { [key: string]: any }) {
+    constructor(object?: { [key: string]: any }) {
         super()
         if (object) this.fromObject(object)
     }

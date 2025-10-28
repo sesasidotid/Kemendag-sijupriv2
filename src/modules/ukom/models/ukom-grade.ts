@@ -34,8 +34,23 @@ export class UkomGrade extends Serializable {
     rekomendasi: string = undefined
     rekomendasiUrl: string = undefined
 
+    catGrade: Grade = undefined
+    wawancaraGrade: Grade = undefined
+    seminarGrade: Grade = undefined
+    praktikGrade: Grade = undefined
+    portofolioGrade: Grade = undefined
     constructor(object?: { [key: string]: any }) {
         super()
         if (object) this.fromObject(object)
     }
+}
+type Grade = {
+    id: string
+    examTypeCode: string
+    roomUkomId: string
+    participantId: string
+    score: string | null
+    createdBy: string | null
+    dateCreated?: string
+    idx?: number
 }
