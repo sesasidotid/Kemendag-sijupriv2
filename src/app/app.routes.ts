@@ -7,66 +7,73 @@ export const routes: Routes = [
         path: '',
         redirectTo: '',
         canActivate: [authGuard],
-        pathMatch: 'full'
+        pathMatch: 'full',
     },
     getMenus(),
     {
         path: 'login',
         loadComponent: () =>
             import('../modules/auth/components/login/login.component').then(
-                m => m.LoginComponent
-            )
+                (m) => m.LoginComponent,
+            ),
     },
     {
         path: 'login-cat',
         loadComponent: () =>
-            import('../modules/auth/components/login-cat/login-cat.component').then(
-                m => m.LoginCatComponent
-            )
+            import(
+                '../modules/auth/components/login-cat/login-cat.component'
+            ).then((m) => m.LoginCatComponent),
     },
     {
         path: 'forgot_password',
         loadComponent: () =>
-            import('../modules/auth/components/reset-password/reset-password.component').then(
-                m => m.ResetPasswordComponent
-            )
+            import(
+                '../modules/auth/components/reset-password/reset-password.component'
+            ).then((m) => m.ResetPasswordComponent),
     },
     {
         path: 'not-found',
         loadComponent: () =>
             import('./template/not-found/not-found.component').then(
-                m => m.NotFoundComponent
-            )
+                (m) => m.NotFoundComponent,
+            ),
     },
     {
         path: 'ukom/external',
         loadComponent: () =>
             import(
                 '../modules/base/components/ukom-register/ukom-register.component'
-            ).then(m => m.UkomRegisterComponent)
+            ).then((m) => m.UkomRegisterComponent),
     },
     {
         path: 'ukom/external/status',
         loadComponent: () =>
             import(
                 '../modules/base/components/status-pendaftaran-ukom/status-pendaftaran-ukom.component'
-            ).then(m => m.StatusPendaftaranUkomComponent)
+            ).then((m) => m.StatusPendaftaranUkomComponent),
     },
     {
         path: 'akp-grading/:whoIs/:id',
         loadComponent: () =>
             import(
                 '../modules/base/components/akp-grading/akp-grading.component'
-            ).then(m => m.AKPGradingComponent)
+            ).then((m) => m.AKPGradingComponent),
     },
     {
         path: 'ukm-clarrify',
         loadComponent: () =>
             import(
                 '../modules/base/components/reject-ukom-schedule/reject-ukom-schedule.component'
-            ).then(m => m.RejectUkomScheduleComponent)
+            ).then((m) => m.RejectUkomScheduleComponent),
     },
-    { path: '**', redirectTo: 'not-found' }
+    {
+        path: 'privacy',
+        loadComponent: () =>
+            import('@/modules/privacy-policy/privacy-policy.component').then(
+                (m) => m.PrivacyPolicyComponent,
+            ),
+    },
+    { path: '**', redirectTo: 'not-found' },
 ]
 
 function getMenus(): any {
@@ -76,52 +83,56 @@ function getMenus(): any {
                 path: '',
                 loadChildren: () =>
                     import('../sijupri-admin/sijupri-admin.module').then(
-                        m => m.SijupriAdminModule
-                    )
+                        (m) => m.SijupriAdminModule,
+                    ),
             }
         case 'sijupri-instansi':
             return {
                 path: '',
                 loadChildren: () =>
                     import('../sijupri-instansi/sijupri-instansi.module').then(
-                        m => m.SijupriInstansiModule
-                    )
+                        (m) => m.SijupriInstansiModule,
+                    ),
             }
         case 'sijupri-unit-kerja':
             return {
                 path: '',
                 loadChildren: () =>
-                    import('../sijupri-unit-kerja/sijupri-unit-kerja.module').then(
-                        m => m.SijupriUnitKerjaModule
-                    )
+                    import(
+                        '../sijupri-unit-kerja/sijupri-unit-kerja.module'
+                    ).then((m) => m.SijupriUnitKerjaModule),
             }
         case 'sijupri-external':
             return {
                 path: '',
                 loadChildren: () =>
-                    import('../sijupri-jf/sijupri-jf.module').then(m => m.SijupriJfModule)
+                    import('../sijupri-jf/sijupri-jf.module').then(
+                        (m) => m.SijupriJfModule,
+                    ),
             }
         case 'sijupri-internal':
             return {
                 path: '',
                 loadChildren: () =>
-                    import('../sijupri-jf/sijupri-jf.module').then(m => m.SijupriJfModule)
+                    import('../sijupri-jf/sijupri-jf.module').then(
+                        (m) => m.SijupriJfModule,
+                    ),
             }
         case 'siukom-participant':
             return {
                 path: '',
                 loadChildren: () =>
                     import('../sijupri-cat/sijupri-cat.module').then(
-                        m => m.SijupriCAtModule
-                    )
+                        (m) => m.SijupriCAtModule,
+                    ),
             }
         default:
             return {
                 path: '',
                 loadComponent: () =>
-                    import('../modules/landing-page/landing-page.component').then(
-                        m => m.LandingPageComponent
-                    )
+                    import(
+                        '../modules/landing-page/landing-page.component'
+                    ).then((m) => m.LandingPageComponent),
             }
     }
 }
