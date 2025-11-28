@@ -1,35 +1,23 @@
-import { Pertanyaan } from './../../../../modules/akp/models/pertanyaan.model'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import {
-    ActionColumnBuilder,
-    PagableBuilder,
-    PageFilterBuilder,
-    PrimaryColumnBuilder
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
-import { TabService } from '../../../../modules/base/services/tab.service'
+import { TabService } from '@/modules/base/services/tab.service'
 import { CommonModule } from '@angular/common'
-import { Router, RouterLink } from '@angular/router'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
 import { BehaviorSubject } from 'rxjs'
-import { UkomQuestionAddComponent } from '../ukom-question-add/ukom-question-add.component'
-import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { ExamType } from '../../../../modules/ukom/models/exam-type'
-import { ApiService } from '../../../../modules/base/services/api.service'
+import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
+import { ExamType } from '@/modules/ukom/models/exam-type'
+import { ApiService } from '@/modules/base/services/api.service'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import {
     FormControl,
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-ukom-question-list',
@@ -38,10 +26,10 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
         CommonModule,
         FileHandlerComponent,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     templateUrl: './ukom-question-list.component.html',
-    styleUrl: './ukom-question-list.component.scss'
+    styleUrl: './ukom-question-list.component.scss',
 })
 export class UkomQuestionListComponent {
     tab$ = new BehaviorSubject<number | null>(0)
@@ -56,39 +44,33 @@ export class UkomQuestionListComponent {
 
     inputs: FIleHandler = {
         files: {
-            question_template: { label: 'File Pertanyaan' }
+            question_template: { label: 'File Pertanyaan' },
         },
         allowedTypes: [
             { label: 'xls', type: 'application/vnd.ms-excel' },
             {
                 label: 'xlsx',
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            }
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            },
         ],
-        listen: (
-            key: string,
-            source: string,
-            base64Data: string,
-            label: string
-        ) => {
+        listen: (key: string, base64Data: string) => {
             switch (key) {
                 case 'question_template':
                     this.buldPertanyaan.file_question = base64Data
                     break
             }
-        }
+        },
     }
 
     isLoading$ = new BehaviorSubject<boolean>(false)
 
     constructor(
         private tabService: TabService,
-        private router: Router,
         private handlerService: HandlerService,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
-    ) { }
+        private formValidationService: FormValidationService,
+    ) {}
 
     ngOnInit() {
         this.getExamTypeList()
@@ -97,12 +79,16 @@ export class UkomQuestionListComponent {
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.templatePertanyaanForm.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.templatePertanyaanForm.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handleFormInit() {
         this.templatePertanyaanForm = new FormGroup({
-            jenis_ukom_code: new FormControl('', Validators.required)
+            jenis_ukom_code: new FormControl('', Validators.required),
         })
     }
 
@@ -115,34 +101,33 @@ export class UkomQuestionListComponent {
             label: 'Template Pertanyaan',
             isActive: true,
             icon: 'mdi-file-download',
-            onClick: () => this.handleDownloadTemplate()
+            onClick: () => this.handleDownloadTemplate(),
         })
     }
 
     handleDownloadTemplate() {
-        this.apiService.getDownload('/api/v1/ukom_module/download/CAT').subscribe({
-            error: err =>
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengunduh template pertanyaan'
-                )
-        })
+        this.apiService
+            .getDownload('/api/v1/ukom_module/download/CAT')
+            .subscribe({
+                error: (err) =>
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengunduh template pertanyaan',
+                    ),
+            })
     }
 
     getExamTypeList() {
         this.examTypeList$ = this.apiService
             .getData('/api/v1/exam_type')
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
-                        (examType: { [key: string]: any }) => new ExamType(examType)
-                    )
-                )
+                        (examType: { [key: string]: any }) =>
+                            new ExamType(examType),
+                    ),
+                ),
             )
-
-        this.examTypeList$.subscribe(examTypeList => {
-            console.log(examTypeList)
-        })
     }
 
     isAnyFileMissing(): boolean {
@@ -151,7 +136,7 @@ export class UkomQuestionListComponent {
 
     submit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 this.isLoading$.next(true)
 
@@ -159,29 +144,32 @@ export class UkomQuestionListComponent {
                     this.templatePertanyaanForm.get('jenis_ukom_code')?.value
 
                 this.apiService
-                    .postData('/api/v1/ukom_module/save/bulk', this.buldPertanyaan)
+                    .postData(
+                        '/api/v1/ukom_module/save/bulk',
+                        this.buldPertanyaan,
+                    )
                     .subscribe({
-                        next: response => {
+                        next: (response) => {
                             this.isLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menambahkan pertanyaan'
+                                'Berhasil menambahkan pertanyaan',
                             )
 
                             setTimeout(() => {
                                 window.location.reload()
                             }, 1000)
                         },
-                        error: error => {
+                        error: (error) => {
                             this.isLoading$.next(false)
                             console.log('error', error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menambahkan pertanyaan, pastikan format file benar'
+                                'Gagal menambahkan pertanyaan, pastikan format file benar',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

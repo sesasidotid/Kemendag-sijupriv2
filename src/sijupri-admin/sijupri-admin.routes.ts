@@ -228,7 +228,10 @@ export const routes: Routes = [
                                 loadComponent: () =>
                                     import(
                                         './ukom/ukom-pemetaan/ukom-task-rejected-detail/ukom-task-rejected-detail.component'
-                                    ).then((m) => m.UkomTaskRejectedDetailComponent),
+                                    ).then(
+                                        (m) =>
+                                            m.UkomTaskRejectedDetailComponent,
+                                    ),
                             },
                         ],
                     },
@@ -248,10 +251,14 @@ export const routes: Routes = [
                         ],
                     },
                     Pertanyaan: {
+                        // components: () =>
+                        //     import(
+                        //         './ukom/ukom-question/ukom-pertanyaan-list/ukom-question-list.component'
+                        //     ).then((m) => m.UkomQuestionListComponent),
                         components: () =>
                             import(
-                                './ukom/ukom-question/ukom-question-list/ukom-question-list.component'
-                            ).then((m) => m.UkomQuestionListComponent),
+                                './ukom/ukom-question/ukom-question-import/ukom-question-import.component'
+                            ).then((m) => m.UkomQuestionImportComponent),
                     },
                     'Rumus UKom': {
                         components: () =>

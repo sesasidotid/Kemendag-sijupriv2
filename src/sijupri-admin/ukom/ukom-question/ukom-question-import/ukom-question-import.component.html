@@ -1,0 +1,25 @@
+<section>
+    <form>
+        <div class="col-lg-12 mb-3">
+            <label for="examTypeCode">Jenis Ujian <span class="text-danger">*</span>
+            </label>
+            <select class="form-select" [formControl]="examTypeCode">
+                <option value="" disabled hidden>Pilih Jenis Ujian</option>
+                <option *ngFor="let examType of examTypeList$ | async" [value]="examType.code">
+                    {{ examType.code }}
+                </option>
+            </select>
+
+            <div *ngIf="getErrorMessage('examTypeCode', 'Jenis Ujian') as error" class="text-danger">
+                {{ error }}
+            </div>
+        </div>
+
+        <app-file-handler [inputs]="inputs"></app-file-handler>
+
+        <div class="row text-end">
+            <app-loading-button [isLoading]="isLoading" [disabled]="!base64FileQuestion || examTypeCode.invalid"
+                label="Impor" (clicked)="importQuestion()"></app-loading-button>
+        </div>
+    </form>
+</section>

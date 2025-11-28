@@ -5,6 +5,7 @@ import { FIleHandler } from '../../commons/file-handler/file-handler'
 import { FileConverterService } from '../../services/file-converter.service'
 import { BehaviorSubject, finalize } from 'rxjs'
 import { HandlerService } from '../../services/handler.service'
+import { FileHandlerService } from '../../services/file-handler.service'
 
 @Component({
     selector: 'app-file-handler',
@@ -29,7 +30,8 @@ export class FileHandlerComponent {
         private filePreviewService: FilePreviewService,
         private fileConverterService: FileConverterService,
         private handlerService: HandlerService,
-    ) { }
+        private fileHandlerService: FileHandlerService,
+    ) {}
 
     getAllowedTypes(): string {
         const typeLabels =
@@ -54,9 +56,11 @@ export class FileHandlerComponent {
                 this.fileNames[key] = this.inputs.files[key].fileName
                 this.fileConverterService
                     .getFileAsBase64(this.inputs.files[key].source)
-                    .pipe(finalize(() => {
-                        this.hadItemsLoading$.next(false)
-                    }))
+                    .pipe(
+                        finalize(() => {
+                            this.hadItemsLoading$.next(false)
+                        }),
+                    )
                     .subscribe({
                         next: (base64) => {
                             this.inputs.listen(
@@ -101,116 +105,53 @@ export class FileHandlerComponent {
             if (this.inputs.files[key]) {
                 this.inputs.files[key].source = ''
             }
+            const input = document.getElementById(
+                'fileInput' + key,
+            ) as HTMLInputElement
+            if (input) input.value = ''
         } else {
             this.fileNames = {}
             for (const fileKey in this.inputs.files) {
                 this.inputs.files[fileKey].source = ''
+                const input = document.getElementById(
+                    'fileInput' + fileKey,
+                ) as HTMLInputElement
+                if (input) input.value = ''
             }
         }
-    }
-
-    /**
-     * Get file extension from filename
-     */
-    private getFileExtension(filename: string): string {
-        return filename.toLowerCase().substring(filename.lastIndexOf('.'))
-    }
-
-    /**
-     * Check if file extension is in allowed extensions list
-     */
-    private isAllowedExtension(filename: string): boolean {
-        if (
-            !this.inputs.allowedExtensions ||
-            this.inputs.allowedExtensions.length === 0
-        ) {
-            return false
-        }
-
-        const fileExtension = this.getFileExtension(filename)
-        return this.inputs.allowedExtensions.some(
-            (ext) =>
-                ext.toLowerCase() === fileExtension ||
-                ext.toLowerCase() === fileExtension.substring(1), // Handle both ".rar" and "rar" formats
-        )
-    }
-
-    /**
-     * Check if file type is in allowed MIME types list
-     */
-    private isAllowedMimeType(fileType: string): boolean {
-        const allowedTypes = this.inputs.allowedTypes?.map((t) => t.type) || []
-        return allowedTypes.length === 0 || allowedTypes.includes(fileType)
     }
 
     handleFileUpload(event: any, key: any) {
         const file = event.target.files[0]
 
         if (file) {
-            // Check file extension first (bypass MIME type check if extension is allowed)
-            const isExtensionAllowed = this.isAllowedExtension(file.name)
-            const isMimeTypeAllowed = this.isAllowedMimeType(file.type)
+            const isValid = this.fileHandlerService.validateFile(file, {
+                allowedTypes: this.inputs.allowedTypes,
+                allowedExtensions: this.inputs.allowedExtensions,
+                maxSize: this.inputs.maxSize,
+            })
 
-            // If we have allowed extensions, check extension first
-            // If extension is allowed, bypass MIME type check
-            // Otherwise, check MIME type
-            if (
-                this.inputs.allowedExtensions &&
-                this.inputs.allowedExtensions.length > 0
-            ) {
-                if (!isExtensionAllowed && !isMimeTypeAllowed) {
-                    const allowedLabels =
-                        this.inputs.allowedTypes?.map(
-                            (t) => t.label ?? t.type,
-                        ) || []
-                    const allAllowed = [
-                        ...allowedLabels,
-                        ...(this.inputs.allowedExtensions || []),
-                    ]
-
-                    this.handlerService.handleAlert(
-                        'Error',
-                        `Gagal mengunggah file! Jenis file yang diperbolehkan: ${allAllowed.join(', ')}`,
-                    )
-                    return
-                }
-            } else {
-                // If no allowed extensions specified, only check MIME type
-                if (!isMimeTypeAllowed) {
-                    const allowedLabels =
-                        this.inputs.allowedTypes?.map(
-                            (t) => t.label ?? t.type,
-                        ) || []
-
-                    this.handlerService.handleAlert(
-                        'Error',
-                        `Gagal mengunggah file! Jenis file yang diperbolehkan: ${allowedLabels.join(', ')}`,
-                    )
-                    return
-                }
-            }
-
-            // Check file size
-            if (this.inputs.maxSize && file.size > this.inputs.maxSize) {
-                this.handlerService.handleAlert(
-                    'Error',
-                    `Ukuran file melebihi batas ${this.inputs.maxSize / (1024 * 1024)} MB`,
-                )
+            if (!isValid) {
                 return
             }
 
-            const reader = new FileReader()
-            reader.onload = (e: any) => {
-                const base64Data = e.target.result
-                const source = e.target.result
-                const label = this.inputs.files[key].label
-                const id = this.inputs.files[key].id
-                this.inputs.files[key].source = source
-                this.fileNames[key] = file.name
-                this.inputs.listen(key, source, base64Data, label, id)
-            }
-
-            reader.readAsDataURL(file)
+            this.fileHandlerService.readFile(file).subscribe({
+                next: (base64Data) => {
+                    const source = base64Data
+                    const label = this.inputs.files[key].label
+                    const id = this.inputs.files[key].id
+                    this.inputs.files[key].source = source
+                    this.fileNames[key] = file.name
+                    this.inputs.listen(key, source, base64Data, label, id)
+                },
+                error: (err) => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal membaca file',
+                    )
+                    console.error('File reading error:', err)
+                },
+            })
         }
     }
 

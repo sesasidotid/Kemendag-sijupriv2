@@ -2,25 +2,25 @@ import { Injectable } from '@angular/core'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { map, Observable, Subscription } from 'rxjs'
 import { LoginContext } from '../commons/login-context'
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment'
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class ApiService {
-    private baseUrl: string = environment.apiBaseUrl;
+    private baseUrl: string = environment.apiBaseUrl
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {}
 
     public auth(
         path: string,
         data: any,
-        customHeader: any = null
+        customHeader: any = null,
     ): Observable<any> {
         const headers = this.createHeader(
             customHeader || {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         )
 
         return this.http.post(`${this.baseUrl}${path}`, data, { headers })
@@ -29,25 +29,24 @@ export class ApiService {
     public getDownload(
         path: string,
         expectedFileName: string = 'downloaded',
-        customHeader: any = null
+        customHeader: any = null,
     ): Observable<void> {
         const headers = this.createHeader(
             customHeader || {
                 Authorization: `Bearer ${LoginContext.getAccessToken()}`,
                 Accept: 'application/octet-stream',
                 Pragma: 'no-cache',
-                Expires: '0'
-            }
+                Expires: '0',
+            },
         )
 
         const separator = path.includes('?') ? '&' : '?'
         const cacheBustedPath = `${path}${separator}_ts=${Date.now()}`
 
-
         return this.http
             .get(`${this.baseUrl}${cacheBustedPath}`, {
                 headers,
-                responseType: 'blob'
+                responseType: 'blob',
             })
             .pipe(
                 map((blob: Blob) => {
@@ -57,7 +56,7 @@ export class ApiService {
                     a.download = expectedFileName
                     a.click()
                     window.URL.revokeObjectURL(url)
-                })
+                }),
             )
     }
 
@@ -65,19 +64,19 @@ export class ApiService {
         path: string,
         data: any,
         expectedFileName: string = 'downloaded',
-        customHeader: any = null
+        customHeader: any = null,
     ): Observable<void> {
         const headers = this.createHeader(
             customHeader || {
                 Authorization: `Bearer ${LoginContext.getAccessToken()}`,
-                Accept: 'application/octet-stream'
-            }
+                Accept: 'application/octet-stream',
+            },
         )
 
         return this.http
             .post(`${this.baseUrl}${path}`, data, {
                 headers,
-                responseType: 'blob'
+                responseType: 'blob',
             })
             .pipe(
                 map((blob: Blob) => {
@@ -87,19 +86,19 @@ export class ApiService {
                     a.download = expectedFileName
                     a.click()
                     window.URL.revokeObjectURL(url)
-                })
+                }),
             )
     }
 
     public getData(
         path: string,
         customHeader: any = null,
-        responseType?: string
+        responseType?: string,
     ): Observable<any> {
         const headers = this.createHeader(
             customHeader || {
-                Authorization: `Bearer ${LoginContext.getAccessToken()}`
-            }
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`,
+            },
         )
 
         return this.http.get(`${this.baseUrl}${path}`, { headers })
@@ -108,13 +107,13 @@ export class ApiService {
     public postData(
         path: string,
         data: any,
-        customHeader: any = null
+        customHeader: any = null,
     ): Observable<any> {
         const headers = this.createHeader(
             customHeader || {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${LoginContext.getAccessToken()}`
-            }
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`,
+            },
         )
 
         return this.http.post(`${this.baseUrl}${path}`, data, { headers })
@@ -123,13 +122,13 @@ export class ApiService {
     public putData(
         path: string,
         data: any,
-        customHeader: any = null
+        customHeader: any = null,
     ): Observable<any> {
         const headers = this.createHeader(
             customHeader || {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${LoginContext.getAccessToken()}`
-            }
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`,
+            },
         )
 
         return this.http.put(`${this.baseUrl}${path}`, data, { headers })
@@ -139,8 +138,8 @@ export class ApiService {
         const headers = this.createHeader(
             customHeader || {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${LoginContext.getAccessToken()}`
-            }
+                Authorization: `Bearer ${LoginContext.getAccessToken()}`,
+            },
         )
 
         return this.http.delete(`${this.baseUrl}${path}`, { headers })
@@ -152,12 +151,12 @@ export class ApiService {
 
     public getPhotoProfile(userId: string): Observable<Blob> {
         const headers = this.createHeader({
-            Authorization: `Bearer ${LoginContext.getAccessToken()}`
+            Authorization: `Bearer ${LoginContext.getAccessToken()}`,
         })
 
         return this.http.get(`${this.baseUrl}/api/v1/profile_img/${userId}`, {
             headers,
-            responseType: 'blob'
+            responseType: 'blob',
         })
     }
 }
