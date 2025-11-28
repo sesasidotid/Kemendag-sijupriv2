@@ -11,7 +11,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component'
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
@@ -22,7 +22,7 @@ import { BehaviorSubject } from 'rxjs'
     standalone: true,
     imports: [MapComponent, FormsModule, CommonModule, ReactiveFormsModule],
     templateUrl: './provinsi-update.component.html',
-    styleUrl: './provinsi-update.component.scss'
+    styleUrl: './provinsi-update.component.scss',
 })
 export class ProvinsiUpdateComponent {
     @Input() id: string
@@ -38,8 +38,8 @@ export class ProvinsiUpdateComponent {
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
-    ) { }
+        private formValidationService: FormValidationService,
+    ) {}
 
     ngOnInit(): void {
         this.handleFormInit()
@@ -50,7 +50,11 @@ export class ProvinsiUpdateComponent {
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.updateProvinsiForm.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.updateProvinsiForm.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handleFormInit() {
@@ -58,7 +62,7 @@ export class ProvinsiUpdateComponent {
             name: new FormControl('', Validators.required),
             wilayah_code: new FormControl('', Validators.required),
             latitude: new FormControl(''),
-            longitude: new FormControl('')
+            longitude: new FormControl(''),
         })
     }
 
@@ -71,12 +75,15 @@ export class ProvinsiUpdateComponent {
                     name: provinsi.name,
                     wilayah_code: provinsi.wilayahCode,
                     latitude: provinsi.latitude,
-                    longitude: provinsi.longitude
+                    longitude: provinsi.longitude,
                 })
             },
-            error: error => {
-                this.handlerService.handleAlert('Error', error.error.message)
-            }
+            error: (error) => {
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal memuat data provinsi',
+                )
+            },
         })
     }
 
@@ -90,16 +97,19 @@ export class ProvinsiUpdateComponent {
             next: (wilayahList: Wilayah[]) => {
                 this.wilayahList = wilayahList
             },
-            error: error => {
-                this.handlerService.handleAlert('Error', error.error.message)
-            }
+            error: (error) => {
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal memuat data wilayah',
+                )
+            },
         })
     }
 
     onCoordinatesReceived(coordinates: { lat: number; lng: number }): void {
         this.updateProvinsiForm.patchValue({
             latitude: coordinates.lat.toString(),
-            longitude: coordinates.lng.toString()
+            longitude: coordinates.lng.toString(),
         })
     }
 
@@ -108,11 +118,11 @@ export class ProvinsiUpdateComponent {
             const updatedProvinsi = {
                 // ...this.provinsi,
                 id: this.provinsi.id.toString(),
-                ...this.updateProvinsiForm.value
+                ...this.updateProvinsiForm.value,
             }
 
             this.confirmationService.open(false).subscribe({
-                next: result => {
+                next: (result) => {
                     if (!result.confirmed) {
                         return
                     }
@@ -128,18 +138,21 @@ export class ProvinsiUpdateComponent {
                                 this.isLoading$.next(false)
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Provinsi berhasil diperbarui'
+                                    'Provinsi berhasil diperbarui',
                                 )
                                 // this.updateProvinsiForm.reset()
                                 this.refreshList.emit()
                             },
-                            error: error => {
+                            error: (error) => {
                                 this.isLoading$.next(false)
-                                this.handlerService.handleAlert('Error', "Gagal memperbarui provinsi")
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal memperbarui provinsi',
+                                )
                                 console.error('Error updating provinsi:', error)
-                            }
+                            },
                         })
-                }
+                },
             })
         }
     }

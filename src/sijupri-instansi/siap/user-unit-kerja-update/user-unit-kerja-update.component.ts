@@ -9,7 +9,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { CommonModule } from '@angular/common'
 import { UserUnitKerja } from '../../../modules/siap/models/user-unit-kerja.model'
@@ -24,14 +24,14 @@ import { LoadingButtonComponent } from '../../../modules/base/components/loading
     standalone: true,
     imports: [ReactiveFormsModule, CommonModule],
     templateUrl: './user-unit-kerja-update.component.html',
-    styleUrl: './user-unit-kerja-update.component.scss'
+    styleUrl: './user-unit-kerja-update.component.scss',
 })
 export class UserUnitKerjaUpdateComponent {
     @Input() userUnitKerja: UserUnitKerja
     @Output() refresh = new EventEmitter<void>()
 
     unitKerjaList: UnitKerja[] = []
-    instansiId: string = '';
+    instansiId: string = ''
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
     unitKerjaUser = new UnitKerja()
@@ -43,9 +43,8 @@ export class UserUnitKerjaUpdateComponent {
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
-    ) {
-    }
+        private formValidationService: FormValidationService,
+    ) {}
 
     ngOnInit(): void {
         this.instansiId = LoginContext.getInstansiId()
@@ -60,12 +59,16 @@ export class UserUnitKerjaUpdateComponent {
         this.updateUserUnitKerja = new FormGroup({
             name: new FormControl('', Validators.required),
             email: new FormControl('', [Validators.required, Validators.email]),
-            unit_kerja_id: new FormControl('', Validators.required)
+            unit_kerja_id: new FormControl('', Validators.required),
         })
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.updateUserUnitKerja.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.updateUserUnitKerja.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     patchDefaultFormValue() {
@@ -79,12 +82,15 @@ export class UserUnitKerjaUpdateComponent {
                     this.updateUserUnitKerja.patchValue({
                         name: this.userUnitKerjaData.name,
                         email: this.userUnitKerjaData.email,
-                        unit_kerja_id: this.userUnitKerjaData.unitKerjaId
+                        unit_kerja_id: this.userUnitKerjaData.unitKerjaId,
                     })
                 },
-                error: error => {
-                    this.handlerService.handleAlert('Error', error.error.message)
-                }
+                error: (error) => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        error.error.message,
+                    )
+                },
             })
     }
 
@@ -95,14 +101,17 @@ export class UserUnitKerjaUpdateComponent {
                 next: (res: UnitKerja[]) => {
                     this.unitKerjaList = res
                 },
-                error: error => {
-                    this.handlerService.handleAlert('Error', error.error.message)
-                }
+                error: (error) => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data unit kerja',
+                    )
+                },
             })
     }
 
     checkObject(obj: any) {
-        return !Object.values(obj).some(value => value === '')
+        return !Object.values(obj).some((value) => value === '')
     }
 
     submit() {
@@ -112,39 +121,44 @@ export class UserUnitKerjaUpdateComponent {
             nip: this.userUnitKerja.nip,
             name: this.updateUserUnitKerja.value.name,
             email: this.updateUserUnitKerja.value.email,
-            unit_kerja_id: this.updateUserUnitKerja.value.unit_kerja_id
+            unit_kerja_id: this.updateUserUnitKerja.value.unit_kerja_id,
         }
 
         if (!this.checkObject(payload)) {
-            this.handlerService.handleAlert('Error', 'Mohon isi semua field yang ada')
+            this.handlerService.handleAlert(
+                'Error',
+                'Mohon isi semua field yang ada',
+            )
             return
         }
 
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 this.submitLoading$.next(true)
 
-                this.apiService.putData('/api/v1/user_unit_kerja', payload).subscribe({
-                    next: () => {
-                        this.handlerService.handleAlert(
-                            'Success',
-                            'User Unit Kerja berhasil diupdate'
-                        )
-                        this.refresh.emit()
-                        this.submitLoading$.next(false)
-                    },
-                    error: error => {
-                        console.log(error)
-                        this.submitLoading$.next(false)
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengupdate user unit kerja'
-                        )
-                    }
-                })
-            }
+                this.apiService
+                    .putData('/api/v1/user_unit_kerja', payload)
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'User Unit Kerja berhasil diupdate',
+                            )
+                            this.refresh.emit()
+                            this.submitLoading$.next(false)
+                        },
+                        error: (error) => {
+                            console.log(error)
+                            this.submitLoading$.next(false)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengupdate user unit kerja',
+                            )
+                        },
+                    })
+            },
         })
     }
 }

@@ -11,7 +11,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { MapComponent } from '../../../modules/map-leaflet/components/map/map.component'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
@@ -22,11 +22,11 @@ import { FormValidationService } from '../../../modules/base/services/form-valid
     standalone: true,
     imports: [CommonModule, MapComponent, FormsModule, ReactiveFormsModule],
     templateUrl: './unit-kerja-update.component.html',
-    styleUrl: './unit-kerja-update.component.scss'
+    styleUrl: './unit-kerja-update.component.scss',
 })
 export class UnitKerjaUpdateComponent {
     @Input() id: string
-    @Output() submitComplete = new EventEmitter<void>();
+    @Output() submitComplete = new EventEmitter<void>()
 
     wilayahList: Wilayah[] = []
     unitKerja: UnitKerja = new UnitKerja()
@@ -38,10 +38,8 @@ export class UnitKerjaUpdateComponent {
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
-    ) {
-
-    }
+        private formValidationService: FormValidationService,
+    ) {}
 
     ngOnInit(): void {
         this.handleFormInit()
@@ -51,7 +49,11 @@ export class UnitKerjaUpdateComponent {
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.updateUnitKerjaForm.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.updateUnitKerjaForm.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handleFormInit() {
@@ -60,12 +62,12 @@ export class UnitKerjaUpdateComponent {
             email: new FormControl('', [Validators.required, Validators.email]),
             phone: new FormControl('', [
                 Validators.required,
-                Validators.pattern('^[0-9]*$')
+                Validators.pattern('^[0-9]*$'),
             ]),
             wilayah_code: new FormControl('', Validators.required),
             alamat: new FormControl('', Validators.required),
             latitude: new FormControl(''),
-            longitude: new FormControl('')
+            longitude: new FormControl(''),
         })
     }
 
@@ -82,14 +84,17 @@ export class UnitKerjaUpdateComponent {
                     wilayah_code: unitKerja.wilayahCode,
                     latitude: unitKerja.latitude,
                     longitude: unitKerja.longitude,
-                    instansiid: unitKerja.instansiId
+                    instansiid: unitKerja.instansiId,
                 })
 
                 this.getUnitKerjaInstasi()
             },
-            error: error => {
-                this.handlerService.handleAlert('Error', error.error.message)
-            }
+            error: (error) => {
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal memuat data unit kerja',
+                )
+            },
         })
     }
 
@@ -108,9 +113,12 @@ export class UnitKerjaUpdateComponent {
                         this.getWilayahList()
                     }
                 },
-                error: error => {
-                    this.handlerService.handleAlert('Error', error.error.message)
-                }
+                error: (error) => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        error.error.message,
+                    )
+                },
             })
     }
 
@@ -122,9 +130,12 @@ export class UnitKerjaUpdateComponent {
                     this.provinsi = provinsi
                     this.getWilayahList()
                 },
-                error: error => {
-                    this.handlerService.handleAlert('Error', error.error.message)
-                }
+                error: (error) => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        error.error.message,
+                    )
+                },
             })
     }
 
@@ -142,7 +153,7 @@ export class UnitKerjaUpdateComponent {
                 // })
                 if (this.provinsi.id) {
                     console.log('provinsi called', this.provinsi)
-                    wilayahList.forEach(wilayah => {
+                    wilayahList.forEach((wilayah) => {
                         if (
                             ['WL7', 'WL8', 'WL9'].includes(wilayah.code) ||
                             wilayah.code == this.provinsi.wilayahCode
@@ -156,16 +167,19 @@ export class UnitKerjaUpdateComponent {
                     this.wilayahList = wilayahList
                 }
             },
-            error: error => {
-                this.handlerService.handleAlert('Error', error.error.message)
-            }
+            error: (error) => {
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal memuat data wilayah',
+                )
+            },
         })
     }
 
     onCoordinatesReceived(coordinates: { lat: number; lng: number }): void {
         this.updateUnitKerjaForm.patchValue({
             latitude: coordinates.lat.toString(),
-            longitude: coordinates.lng.toString()
+            longitude: coordinates.lng.toString(),
         })
     }
 
@@ -175,11 +189,11 @@ export class UnitKerjaUpdateComponent {
                 // ...this.provinsi,
                 id: this.unitKerja.id.toString(),
                 instansi_id: this.unitKerja.instansiId.toString(),
-                ...this.updateUnitKerjaForm.value
+                ...this.updateUnitKerjaForm.value,
             }
 
             this.confirmationService.open(false).subscribe({
-                next: result => {
+                next: (result) => {
                     if (!result.confirmed) {
                         return
                     }
@@ -192,16 +206,19 @@ export class UnitKerjaUpdateComponent {
                             next: () => {
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Unit Kerja berhasil diperbarui'
+                                    'Unit Kerja berhasil diperbarui',
                                 )
                                 this.updateUnitKerjaForm.reset()
-                                this.submitComplete.emit();
+                                this.submitComplete.emit()
                             },
-                            error: error => {
-                                this.handlerService.handleAlert('Error', error.error.message)
-                            }
+                            error: (error) => {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    error.error.message,
+                                )
+                            },
                         })
-                }
+                },
             })
         }
     }

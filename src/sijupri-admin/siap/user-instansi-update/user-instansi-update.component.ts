@@ -1,4 +1,4 @@
-import { FormValidationService } from './../../../modules/base/services/form-validation.service';
+import { FormValidationService } from './../../../modules/base/services/form-validation.service'
 import { Component, Input } from '@angular/core'
 import { UserInstansi } from '../../../modules/siap/models/user-instansi.model'
 import { ApiService } from '../../../modules/base/services/api.service'
@@ -9,7 +9,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { CommonModule } from '@angular/common'
 import { Instansi } from '../../../modules/maintenance/models/instansi.model'
@@ -18,13 +18,13 @@ import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
 import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
 import { Output, EventEmitter } from '@angular/core'
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs'
 @Component({
     selector: 'app-user-instansi-update',
     standalone: true,
     imports: [FormsModule, CommonModule, ReactiveFormsModule],
     templateUrl: './user-instansi-update.component.html',
-    styleUrl: './user-instansi-update.component.scss'
+    styleUrl: './user-instansi-update.component.scss',
 })
 export class UserInstansiUpdateComponent {
     @Output() refreshList = new EventEmitter<void>()
@@ -48,7 +48,7 @@ export class UserInstansiUpdateComponent {
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService,
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         this.handleFormInit()
@@ -61,7 +61,11 @@ export class UserInstansiUpdateComponent {
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.updateUserInstasi.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.updateUserInstasi.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handleFormInit() {
@@ -72,50 +76,52 @@ export class UserInstansiUpdateComponent {
             instansiTypeCode: new FormControl('', Validators.required),
             provinsiId: new FormControl(''),
             kabupatenId: new FormControl(''),
-            kotaId: new FormControl('')
+            kotaId: new FormControl(''),
         })
 
         this.setConditionalValidators()
     }
 
     handleSubscribe() {
-        this.updateUserInstasi.get('instansiTypeCode')?.valueChanges.subscribe(() => {
-            this.setConditionalValidators();
-        });
+        this.updateUserInstasi
+            .get('instansiTypeCode')
+            ?.valueChanges.subscribe(() => {
+                this.setConditionalValidators()
+            })
 
         this.updateUserInstasi.get('provinsiId')?.valueChanges.subscribe(() => {
-            this.setConditionalValidators();
-        });
+            this.setConditionalValidators()
+        })
     }
 
     setConditionalValidators() {
-        const type = this.updateUserInstasi.get('instansiTypeCode')?.value;
-        const provinsiId = this.updateUserInstasi.get('provinsiId')?.value;
+        const type = this.updateUserInstasi.get('instansiTypeCode')?.value
+        const provinsiId = this.updateUserInstasi.get('provinsiId')?.value
 
-        const provinsiControl = this.updateUserInstasi.get('provinsiId');
-        const kabupatenControl = this.updateUserInstasi.get('kabupatenId');
-        const kotaControl = this.updateUserInstasi.get('kotaId');
+        const provinsiControl = this.updateUserInstasi.get('provinsiId')
+        const kabupatenControl = this.updateUserInstasi.get('kabupatenId')
+        const kotaControl = this.updateUserInstasi.get('kotaId')
 
-        provinsiControl?.clearValidators();
-        kabupatenControl?.clearValidators();
-        kotaControl?.clearValidators();
+        provinsiControl?.clearValidators()
+        kabupatenControl?.clearValidators()
+        kotaControl?.clearValidators()
 
         if (['IT3', 'IT4', 'IT5'].includes(type)) {
-            provinsiControl?.setValidators(Validators.required);
+            provinsiControl?.setValidators(Validators.required)
         }
 
         if (type === 'IT4' && provinsiId) {
-            kabupatenControl?.setValidators(Validators.required);
+            kabupatenControl?.setValidators(Validators.required)
         }
 
         if (type === 'IT5' && provinsiId) {
-            kotaControl?.setValidators(Validators.required);
+            kotaControl?.setValidators(Validators.required)
         }
 
         // Update value and validity
-        provinsiControl?.updateValueAndValidity();
-        kabupatenControl?.updateValueAndValidity();
-        kotaControl?.updateValueAndValidity();
+        provinsiControl?.updateValueAndValidity()
+        kabupatenControl?.updateValueAndValidity()
+        kotaControl?.updateValueAndValidity()
     }
 
     getInstasiDetail() {
@@ -129,7 +135,7 @@ export class UserInstansiUpdateComponent {
                         instansiTypeCode: res.instansiTypeCode,
                         provinsiId: res.provinsiId,
                         kabupatenId: res.kabupatenId,
-                        kotaId: res.kotaId
+                        kotaId: res.kotaId,
                     })
 
                     if (res.provinsiId) {
@@ -139,7 +145,7 @@ export class UserInstansiUpdateComponent {
                     this.getInstansiList()
 
                     console.log('z', this.updateUserInstasi.value)
-                }
+                },
             })
     }
 
@@ -149,29 +155,31 @@ export class UserInstansiUpdateComponent {
             .subscribe({
                 next: (userInstansi: UserInstansi) => {
                     this.userInstansiData = userInstansi
-                    console.log(this.updateUserInstasi)
                     this.updateUserInstasi.patchValue({
                         name: this.userInstansiData.name,
                         email: this.userInstansiData.email,
-                        instansi_id: this.userInstansiData.instansiId
+                        instansi_id: this.userInstansiData.instansiId,
                     })
                     this.getInstasiDetail()
                 },
-                error: error => {
-                    this.handlerService.handleAlert('Error', error.error.message)
-                }
+                error: (error) => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data user instansi',
+                    )
+                },
             })
         console.log('patch', this.updateUserInstasi)
     }
 
     getInstansiTypeList() {
         this.apiService.getData(`/api/v1/instansi_type`).subscribe({
-            next: response =>
-            (this.instansiTypeList = response.map(
-                (instansiType: { [key: string]: any }) =>
-                    new InstansiType(instansiType)
-            )),
-            error: error => this.handlerService.handleException(error)
+            next: (response) =>
+                (this.instansiTypeList = response.map(
+                    (instansiType: { [key: string]: any }) =>
+                        new InstansiType(instansiType),
+                )),
+            error: (error) => this.handlerService.handleException(error),
         })
     }
 
@@ -182,57 +190,69 @@ export class UserInstansiUpdateComponent {
             case 'IT2':
                 this.apiService
                     .getData(
-                        `/api/v1/instansi/type/${this.updateUserInstasi.get('instansiTypeCode').value
-                        }`
+                        `/api/v1/instansi/type/${
+                            this.updateUserInstasi.get('instansiTypeCode').value
+                        }`,
                     )
                     .subscribe({
-                        next: response =>
-                        (this.instansiList = response.map(
-                            (instansi: { [key: string]: any }) => new Instansi(instansi)
-                        )),
-                        error: error => this.handlerService.handleException(error)
+                        next: (response) =>
+                            (this.instansiList = response.map(
+                                (instansi: { [key: string]: any }) =>
+                                    new Instansi(instansi),
+                            )),
+                        error: (error) =>
+                            this.handlerService.handleException(error),
                     })
                 break
             case 'IT3':
                 this.apiService
                     .getData(
-                        `/api/v1/instansi/provinsi/${this.updateUserInstasi.get('provinsiId').value
-                        }`
+                        `/api/v1/instansi/provinsi/${
+                            this.updateUserInstasi.get('provinsiId').value
+                        }`,
                     )
                     .subscribe({
-                        next: response =>
-                        (this.instansiList = response.map(
-                            (instansi: { [key: string]: any }) => new Instansi(instansi)
-                        )),
-                        error: error => this.handlerService.handleException(error)
+                        next: (response) =>
+                            (this.instansiList = response.map(
+                                (instansi: { [key: string]: any }) =>
+                                    new Instansi(instansi),
+                            )),
+                        error: (error) =>
+                            this.handlerService.handleException(error),
                     })
                 break
             case 'IT4':
                 this.apiService
                     .getData(
-                        `/api/v1/instansi/kab_kota/${this.updateUserInstasi.get('kabupatenId').value
-                        }`
+                        `/api/v1/instansi/kab_kota/${
+                            this.updateUserInstasi.get('kabupatenId').value
+                        }`,
                     )
                     .subscribe({
-                        next: response =>
-                        (this.instansiList = response.map(
-                            (instansi: { [key: string]: any }) => new Instansi(instansi)
-                        )),
-                        error: error => this.handlerService.handleException(error)
+                        next: (response) =>
+                            (this.instansiList = response.map(
+                                (instansi: { [key: string]: any }) =>
+                                    new Instansi(instansi),
+                            )),
+                        error: (error) =>
+                            this.handlerService.handleException(error),
                     })
                 break
             case 'IT5':
                 this.apiService
                     .getData(
-                        `/api/v1/instansi/kab_kota/${this.updateUserInstasi.get('kotaId').value
-                        }`
+                        `/api/v1/instansi/kab_kota/${
+                            this.updateUserInstasi.get('kotaId').value
+                        }`,
                     )
                     .subscribe({
-                        next: response =>
-                        (this.instansiList = response.map(
-                            (instansi: { [key: string]: any }) => new Instansi(instansi)
-                        )),
-                        error: error => this.handlerService.handleException(error)
+                        next: (response) =>
+                            (this.instansiList = response.map(
+                                (instansi: { [key: string]: any }) =>
+                                    new Instansi(instansi),
+                            )),
+                        error: (error) =>
+                            this.handlerService.handleException(error),
                     })
                 break
         }
@@ -240,20 +260,21 @@ export class UserInstansiUpdateComponent {
 
     getProvinsiList() {
         this.apiService.getData(`/api/v1/provinsi`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.provinsiList = response.map(
-                    (provinsi: { [key: string]: any }) => new Provinsi(provinsi)
+                    (provinsi: { [key: string]: any }) =>
+                        new Provinsi(provinsi),
                 )
 
                 if (
                     ['IT4', 'IT5'].includes(
-                        this.updateUserInstasi.get('instansiTypeCode').value
+                        this.updateUserInstasi.get('instansiTypeCode').value,
                     )
                 ) {
                     this.getKabKotaList()
                 }
             },
-            error: error => this.handlerService.handleException(error)
+            error: (error) => this.handlerService.handleException(error),
         })
     }
 
@@ -266,16 +287,19 @@ export class UserInstansiUpdateComponent {
         if (this.updateUserInstasi.get('provinsiId').value) {
             this.apiService
                 .getData(
-                    `/api/v1/kab_kota/type/${type}/${this.updateUserInstasi.get('provinsiId').value
-                    }`
+                    `/api/v1/kab_kota/type/${type}/${
+                        this.updateUserInstasi.get('provinsiId').value
+                    }`,
                 )
                 .subscribe({
-                    next: response => {
+                    next: (response) => {
                         this.kabKotaList = response.map(
-                            (kabKota: { [key: string]: any }) => new KabKota(kabKota)
+                            (kabKota: { [key: string]: any }) =>
+                                new KabKota(kabKota),
                         )
                     },
-                    error: error => this.handlerService.handleException(error)
+                    error: (error) =>
+                        this.handlerService.handleException(error),
                 })
         }
     }
@@ -288,11 +312,11 @@ export class UserInstansiUpdateComponent {
 
         console.log(
             'instansiTypeCode',
-            this.updateUserInstasi.get('instansiTypeCode').value
+            this.updateUserInstasi.get('instansiTypeCode').value,
         )
         if (
             ['IT3', 'IT4', 'IT5'].includes(
-                this.updateUserInstasi.get('instansiTypeCode').value
+                this.updateUserInstasi.get('instansiTypeCode').value,
             )
         ) {
             this.getProvinsiList()
@@ -311,7 +335,7 @@ export class UserInstansiUpdateComponent {
 
         if (
             ['IT4', 'IT5'].includes(
-                this.updateUserInstasi.get('instansiTypeCode').value
+                this.updateUserInstasi.get('instansiTypeCode').value,
             )
         ) {
             this.getKabKotaList()
@@ -327,7 +351,7 @@ export class UserInstansiUpdateComponent {
 
     submit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) {
                     return
                 }
@@ -339,7 +363,8 @@ export class UserInstansiUpdateComponent {
                         nip: this.userInstansi.nip,
                         name: this.updateUserInstasi.get('name').value,
                         email: this.updateUserInstasi.get('email').value,
-                        instansi_id: this.updateUserInstasi.get('instansi_id').value
+                        instansi_id:
+                            this.updateUserInstasi.get('instansi_id').value,
                     }
 
                     this.apiService
@@ -349,22 +374,23 @@ export class UserInstansiUpdateComponent {
                                 this.isLoading$.next(false)
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Berhasil mengupdate user instansi'
+                                    'Berhasil mengupdate user instansi',
                                 )
                                 this.refreshList.emit()
                             },
                             error: (error) => {
                                 this.isLoading$.next(false)
                                 this.handlerService.handleAlert(
-                                    'Error', "Gagal mengupdate user instansi"
+                                    'Error',
+                                    'Gagal mengupdate user instansi',
                                 )
                                 console.log(error)
-                            }
+                            },
                         })
                 } else {
                     this.handlerService.handleAlert('Error', 'Form tidak valid')
                 }
-            }
+            },
         })
     }
 }

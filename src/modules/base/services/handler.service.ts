@@ -120,7 +120,7 @@ export class HandlerService {
         } else {
             this.alertService.showToast(
                 'Error',
-                `Masalah Tidak Dijaga (${error?.message || 'Unknown error'})`,
+                `Terjadi kesalahan tak terduga, silahkan coba lagi atau hubungi admin`,
             )
         }
     }
