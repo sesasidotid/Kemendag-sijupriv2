@@ -7,7 +7,6 @@ import {
     NavigationEnd,
     RouterOutlet,
     ActivatedRoute,
-    RouterLink,
 } from '@angular/router'
 import { ConfirmationDialogComponent } from '../../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
 import { FilePreviewComponent } from '../../../modules/base/components/file-preview/file-preview.component'
@@ -22,13 +21,12 @@ import { LoginContext } from '../../../modules/base/commons/login-context'
     standalone: true,
     imports: [
         CommonModule,
-        RouterLink,
         TopBarComponent,
         SideBarComponent,
         FooterComponent,
         RouterOutlet,
-        ConfirmationDialogComponent,
-        FilePreviewComponent,
+        // ConfirmationDialogComponent,
+        // FilePreviewComponent,
     ],
     templateUrl: './main.component.html',
     styleUrl: './main.component.scss',

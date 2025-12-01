@@ -13,7 +13,7 @@ import {
     ScrollText,
     SquareActivity,
     FileText,
-    BookOpenText
+    BookOpenText,
 } from 'lucide-angular'
 import { IsActiveMatchOptions } from '@angular/router'
 
@@ -22,7 +22,7 @@ import { IsActiveMatchOptions } from '@angular/router'
     standalone: true,
     imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule],
     templateUrl: './side-bar.component.html',
-    styleUrl: './side-bar.component.scss'
+    styleUrl: './side-bar.component.scss',
 })
 export class SideBarComponent {
     menuTree: Menu[] = LoginContext.getMenus()
@@ -30,12 +30,12 @@ export class SideBarComponent {
 
     readonly X = X
 
-    constructor (
+    constructor(
         @Inject(DOCUMENT) private document: Document,
-        private router: Router
+        private router: Router,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         if (
             this.document.documentElement.getAttribute('data-layout') ==
             'horizontal'
@@ -46,7 +46,7 @@ export class SideBarComponent {
         }
     }
 
-    closeMobileSidebar () {
+    closeMobileSidebar() {
         const windowSize = this.document.documentElement.clientWidth
         // For collapse vertical menu
         if (
@@ -57,7 +57,7 @@ export class SideBarComponent {
         }
     }
 
-    getIcon (menuCode: string): any {
+    getIcon(menuCode: string): any {
         const iconMap: { [key: string]: any } = {
             MNU_AKP0001: BookOpenText,
             MNU_AKPJE001: BookOpenText,
@@ -72,28 +72,18 @@ export class SideBarComponent {
             MNU_SIPI0001: BookUser,
             MNU_SEC0001: UserRoundCog,
             MNU_MNT0001: Database,
-            MNU_MNTI0001: Database
+            MNU_MNTI0001: Database,
         }
 
         return iconMap[menuCode] || LayoutDashboard // Default to Menu icon if no match
     }
 
-    //   isActive (menu: any): boolean {
-    //     for (let child of menu.child) {
-    //       const fullPath = `/${menu.path}/${child.path}`
-    //       console.log()
-    //       if (this.router.isActive(fullPath, true)) {
-    //         return true
-    //       }
-    //     }
-    //     return false
-    //   }
-    isActive (menu: any): boolean {
+    isActive(menu: any): boolean {
         const matchOptions: IsActiveMatchOptions = {
             paths: 'subset',
             queryParams: 'ignored',
             fragment: 'ignored',
-            matrixParams: 'ignored'
+            matrixParams: 'ignored',
         }
 
         for (let child of menu.child) {

@@ -31,10 +31,6 @@
   background: linear-gradient(45deg, #2967be, #49ab49) !important;
 }
 
-.option-wrapper {
-  //   display: inline-block;
-}
-
 .option-input {
   display: none; /* Hide the default radio input */
 }
@@ -118,4 +114,58 @@
   list-style-type: none;
   display: flex;
   align-items: center;
+}
+
+.info-page {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  font-family: "Inter", sans-serif;
+  color: #333;
+}
+
+.binbot-illustration {
+  width: 180px;
+  height: auto;
+  margin-bottom: 20px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #1d1d1d;
+}
+
+.description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 24px;
+}
+
+.link {
+  color: #4b70f5;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.w-80ch {
+  width: 100%;
+  max-width: 80ch;
+  margin: 0 auto;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.backdrop {
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
 }

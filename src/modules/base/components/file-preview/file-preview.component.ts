@@ -29,47 +29,6 @@ export class FilePreviewComponent implements OnInit {
         )
     }
 
-    //   open (fileName: string, fileSource: string) {
-    //     this.fileName = fileName
-
-    //     const isBase64 = fileSource.startsWith('data:')
-
-    //     if (isBase64) {
-    //       const mimeMatch = fileSource.match(/^data:(.*?);base64,/)
-    //       if (!mimeMatch) {
-    //         console.error('Invalid base64 file source')
-    //         return
-    //       }
-    //       const mimeType = mimeMatch[1]
-    //       console.log('Detected MIME type:', mimeType)
-
-    //       try {
-    //         const base64Data = fileSource.split(',')[1]
-    //         const byteCharacters = atob(base64Data)
-    //         const byteNumbers = new Array(byteCharacters.length)
-    //         for (let i = 0; i < byteCharacters.length; i++) {
-    //           byteNumbers[i] = byteCharacters.charCodeAt(i)
-    //         }
-    //         const byteArray = new Uint8Array(byteNumbers)
-    //         const blob = new Blob([byteArray], { type: mimeType })
-    //         const url = URL.createObjectURL(blob)
-
-    //         this.fileSource = this.sanitizer.bypassSecurityTrustResourceUrl(
-    //           url
-    //         ) as string
-    //       } catch (error) {
-    //         console.error('Error processing the file:', error)
-    //         return
-    //       }
-    //     } else {
-    //       this.fileSource = this.sanitizer.bypassSecurityTrustResourceUrl(
-    //         fileSource
-    //       ) as string
-    //     }
-
-    //     this.showModal = true
-    //   }
-
     open(fileName: string, fileSource: string) {
         this.fileName = fileName
 

@@ -1,11 +1,11 @@
-import { Component, ViewChild } from '@angular/core'
+import { Component, inject, ViewChild } from '@angular/core'
 import { Jabatan } from '../../../maintenance/models/jabatan.model'
 import { Jenjang } from '../../../maintenance/models/jenjang.modle'
 import { Pangkat } from '../../../maintenance/models/pangkat.model'
 import { FileHandlerComponent } from '../file-handler/file-handler.component'
 import {
+    FormBuilder,
     FormControl,
-    FormGroup,
     FormsModule,
     ReactiveFormsModule,
     Validators,
@@ -19,10 +19,7 @@ import { ConfirmationService } from '../../services/confirmation.service'
 import { CommonModule } from '@angular/common'
 import { finalize, map, tap } from 'rxjs/operators'
 import { QRCodeModule } from 'angularx-qrcode'
-import { SafeUrl } from '@angular/platform-browser'
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
-import { FilePreviewComponent } from '../file-preview/file-preview.component'
-import { Router } from '@angular/router'
+import { Router, RouterModule } from '@angular/router'
 import { LandingPageComponent } from '../../../landing-page/landing-page.component'
 import { BehaviorSubject } from 'rxjs'
 import { KabKota } from '../../../maintenance/models/kab-kota.model'
@@ -48,22 +45,69 @@ import { UkomDocumentService } from '@/modules/ukom/services/document.service'
         ReactiveFormsModule,
         FileHandlerComponent,
         QRCodeModule,
-        ConfirmationDialogComponent,
-        FilePreviewComponent,
         LandingPageComponent,
+        RouterModule,
     ],
     templateUrl: './ukom-register.component.html',
     styleUrl: './ukom-register.component.scss',
 })
 export class UkomRegisterComponent {
+    formBuilder = inject(FormBuilder)
+    nonJFForm = this.formBuilder.group({
+        // Informasi Pribadi
+        name: ['', Validators.required],
+        nip: ['', [Validators.required, Validators.pattern(/^\d{18}$/)]],
+        tanggalLahir: ['', Validators.required],
+        phone: ['', [Validators.required, Validators.pattern(/^\d{10,15}$/)]],
+
+        // Informasi Akun
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(8)]],
+        confirmPassword: [
+            '',
+            [Validators.required, this.passwordMatchValidator.bind(this)],
+        ],
+
+        // Informasi Jabatan & Unit Kerja
+        jenisInstansi: ['', Validators.required],
+        provinsiId: ['', Validators.required],
+        kabupatenKotaId: ['', Validators.required],
+        unitKerjaName: ['', Validators.required],
+        jabatanName: ['', Validators.required],
+        jenjangName: [''],
+        pangkatCode: ['', Validators.required],
+
+        // Informasi Kenaikan Jabatan
+        jenisUkom: ['', Validators.required],
+        nextJabatanCode: ['', Validators.required],
+        nextJenjangCode: ['', Validators.required],
+        bidangJabatanCode: [''],
+
+        // Dokumen Pendukung
+        noSuratUsulan: ['', Validators.required],
+        tglSuratUsulan: ['', Validators.required],
+
+        // Informasi Pendidikan
+        pendidikanTerakhirCode: ['', Validators.required],
+        jurusan: ['', Validators.required],
+
+        // Penilaian Kinerja Pegawai
+        predikatKinerja1Id: ['', Validators.required],
+        predikatKinerja2Id: ['', Validators.required],
+
+        isMengulang: ['', Validators.required],
+
+        tempatLahir: ['', Validators.required],
+        tmtJabatan: ['', Validators.required],
+        tmtPangkat: ['', Validators.required],
+    })
+
     @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
-    nonJFForm: FormGroup
 
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
     pangkatList$: Observable<Pangkat[]>
     NextjabatanList$: Observable<Jabatan[]>
-    // Use a stable subject so validators can react reliably when the list changes
     bidangJabatanList$ = new BehaviorSubject<BidangJabatan[]>([])
     nextJenjang: Jenjang
     detectedDokumen: any = {}
@@ -75,13 +119,12 @@ export class UkomRegisterComponent {
     predikatKinerjaList: PredikatKinerja[] = []
     pendidikanList: Pendidikan[] = []
 
-    registerComplete: boolean = false
+    registerComplete = false
 
     private instansiSubject = new BehaviorSubject<string>('')
     instansi$ = this.instansiSubject.asObservable()
 
     stringCode: string = ''
-    qrCodeDownloadLink: SafeUrl = ''
     inputs: FIleHandler = {
         files: {},
         maxSize: 2 * 1024 * 1024,
@@ -102,7 +145,18 @@ export class UkomRegisterComponent {
     }
 
     hadItemsLoading$ = new BehaviorSubject<boolean>(false)
-    imageUrl: string = ''
+    imageUrl = ''
+    isImageLoading = true
+
+    onLoad() {
+        this.isImageLoading = false
+    }
+
+    onError() {
+        this.isImageLoading = false
+        this.imageUrl = ''
+    }
+
     nonJFNIP: string
 
     isRegisterOpenLoading$ = new BehaviorSubject<boolean>(false)
@@ -110,6 +164,30 @@ export class UkomRegisterComponent {
     isPendidikanLoading$ = new BehaviorSubject<boolean>(false)
     isProvinsiLoading$ = new BehaviorSubject<boolean>(false)
     isLoading$: Observable<boolean>
+
+    jenisInstansiList = [
+        { value: 'KEMENTERIAN_PERDAGANGAN', label: 'Kementerian Perdagangan' },
+        {
+            value: 'KEMENTERIAN_PERINDUSTRIAN',
+            label: 'Kementerian Perindustrian',
+        },
+        { value: 'KEMENTERIAN_ESDM', label: 'Kementerian ESDM' },
+        {
+            value: 'KEMENTERIAN_KOORDINATOR_BIDANG_PANGAN',
+            label: 'Kementerian Koordinator Bidang Pangan',
+        },
+        { value: 'KEMENTERIAN_PERHUBUNGAN', label: 'Kementerian Perhubungan' },
+        { value: 'KEMENTERIAN_PERTANIAN', label: 'Kementerian Pertanian' },
+        {
+            value: 'BADAN_STANDARISASI_NASIONAL',
+            label: 'Badan Standarisasi Nasional',
+        },
+        { value: 'PEMERINTAH_PROVINSI', label: 'Pemerintah Provinsi' },
+        {
+            value: 'PEMERINTAH_KABUPATEN_KOTA',
+            label: 'Pemerintah Kabupaten/Kota',
+        },
+    ]
 
     constructor(
         private apiService: ApiService,
@@ -136,7 +214,6 @@ export class UkomRegisterComponent {
         this.getPendidikanList()
         this.getProvinsi()
 
-        this.handleFormInitialization()
         this.setupInstansiValidation()
         this.handleFetchDokumenPersyaratan()
         this.handleSubscribe()
@@ -221,65 +298,6 @@ export class UkomRegisterComponent {
                     isMengulang,
                 )
             })
-    }
-
-    handleFormInitialization() {
-        this.nonJFForm = new FormGroup({
-            // Informasi Pribadi
-            name: new FormControl('', Validators.required),
-            nip: new FormControl('', [
-                Validators.required,
-                Validators.pattern(/^\d{18}$/),
-            ]),
-            tanggalLahir: new FormControl('', Validators.required),
-            phone: new FormControl('', [
-                Validators.required,
-                Validators.pattern(/^\d{10,15}$/),
-            ]),
-            // Informasi Akun
-            email: new FormControl('', [Validators.required, Validators.email]),
-            password: new FormControl('', [
-                Validators.required,
-                Validators.minLength(8),
-            ]),
-            confirmPassword: new FormControl('', [
-                Validators.required,
-                this.passwordMatchValidator.bind(this),
-            ]),
-
-            // Informasi Jabatan & Unit Kerja
-            jenisInstansi: new FormControl('', Validators.required),
-            provinsiId: new FormControl('', Validators.required),
-            kabupatenKotaId: new FormControl('', Validators.required),
-            unitKerjaName: new FormControl('', Validators.required),
-            jabatanName: new FormControl('', Validators.required),
-            jenjangName: new FormControl(''),
-            pangkatCode: new FormControl('', Validators.required),
-
-            // Informasi Kenaikan Jabatan
-            jenisUkom: new FormControl('', Validators.required),
-            nextJabatanCode: new FormControl('', Validators.required),
-            nextJenjangCode: new FormControl('', Validators.required),
-            bidangJabatanCode: new FormControl(''),
-
-            // Dokumen Pendukung
-            noSuratUsulan: new FormControl('', Validators.required),
-            tglSuratUsulan: new FormControl('', Validators.required),
-
-            // Informasi Pendidikan
-            pendidikanTerakhirCode: new FormControl('', Validators.required),
-            jurusan: new FormControl('', Validators.required),
-
-            // Penilaian Kinerja Pegawai
-            predikatKinerja1Id: new FormControl('', Validators.required),
-            predikatKinerja2Id: new FormControl('', Validators.required),
-
-            isMengulang: new FormControl('', Validators.required),
-
-            tempatLahir: new FormControl('', Validators.required),
-            tmtJabatan: new FormControl('', Validators.required),
-            tmtPangkat: new FormControl('', Validators.required),
-        })
     }
 
     setupInstansiValidation() {
@@ -659,10 +677,6 @@ export class UkomRegisterComponent {
         }
     }
 
-    onChangeURL(url: SafeUrl) {
-        this.qrCodeDownloadLink = url
-    }
-
     submit() {
         this.nonJFParticipantUkom = new NonJFParticipantUkomTask(
             this.nonJFForm.value,
@@ -744,17 +758,33 @@ export class UkomRegisterComponent {
 
     downloadImage(nip: string) {
         fetch(this.imageUrl)
-            .then((response) => response.blob()) // Convert to Blob
+            .then((response) => response.blob())
             .then((blob) => {
                 const blobUrl = window.URL.createObjectURL(blob)
                 const a = document.createElement('a')
                 a.href = blobUrl
-                a.download = `${nip}-pendaftaran-ukom.jpg` // Set filename
+                a.download = `${nip}-pendaftaran-ukom.jpg`
                 document.body.appendChild(a)
-                a.click() // Auto-click to start download
+                a.click()
                 document.body.removeChild(a)
-                window.URL.revokeObjectURL(blobUrl) // Cleanup
+                window.URL.revokeObjectURL(blobUrl)
             })
-            .catch((error) => console.error('Download failed:', error))
+            .catch((error) => {
+                console.error('Download failed:', error)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengunduh gambar QR Code, silahkan coba lagi',
+                )
+            })
+    }
+
+    isCopied = false
+    copyToClipboard(text: string) {
+        navigator.clipboard.writeText(text).then(() => {
+            this.isCopied = true
+            setTimeout(() => {
+                this.isCopied = false
+            }, 2000)
+        })
     }
 }
