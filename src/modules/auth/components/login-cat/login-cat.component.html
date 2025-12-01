@@ -17,13 +17,13 @@
                                         Silahkan isi data dibawah untuk masuk
                                     </p>
                                 </div>
-                                <div *ngIf="loginMessage$ | async as loginMessage">
-                                    <div *ngIf="loginMessage.status !== ''" class="alert" [ngClass]="
-                      loginMessage.status === 'error'
+                                <div *ngIf="loginMessage()">
+                                    <div *ngIf="loginMessage().status !== ''" class="alert" [ngClass]="
+                      loginMessage().status === 'error'
                         ? 'alert-danger'
                         : 'alert-success'
                     " role="alert">
-                                        {{ loginMessage.message }}
+                                        {{ loginMessage().message }}
                                     </div>
                                 </div>
                                 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="row g-3 needs-validation">
@@ -34,16 +34,13 @@
                                             <input type="text" name="nip" class="form-control" id="nip"
                                                 formControlName="nip" />
                                         </div>
-                                        <div class="text-danger" *ngIf="
-                        loginForm.get('nip').invalid &&
-                        loginForm.get('nip').touched
-                      ">
-                                            <small *ngIf="loginForm.get('nip').errors?.['required']">NIP perlu
-                                                diisi.</small>
-                                            <small *ngIf="loginForm.get('nip').errors?.['minlength']">NIP harus 18
-                                                karakter.</small>
-                                            <small *ngIf="loginForm.get('nip').errors?.['pattern']">NIP harus
-                                                angka.</small>
+                                        <div *ngIf="
+                                getErrorMessage(
+                                    'nip',
+                                    'NIP'
+                                ) as error
+                            " class="text-danger">
+                                            {{ error }}
                                         </div>
                                     </div>
 
@@ -58,46 +55,42 @@
                                                     [img]="isPasswordVisible ? Eye : EyeOff" [size]="16"
                                                     class="my-icon"></i-lucide></span>
                                         </div>
-                                        <div class="text-danger" *ngIf="
-                        loginForm.get('password').invalid &&
-                        loginForm.get('password').touched
-                      ">
-                                            <small *ngIf="loginForm.get('password').errors?.['required']">Password perlu
-                                                diisi.</small>
+                                        <div *ngIf="
+                                getErrorMessage(
+                                    'password',
+                                    'Password'
+                                ) as error
+                            " class="text-danger">
+                                            {{ error }}
                                         </div>
                                     </div>
 
                                     <div class="col-12">
                                         <div class="recaptcha-container">
-                                            <re-captcha [siteKey]="recaptchaSiteKey"
-                                                (resolved)="onCaptchaResolved($event)" formControlName="recaptcha"
+                                            <re-captcha [siteKey]="recaptchaSiteKey" formControlName="recaptcha"
                                                 [size]="'normal'"></re-captcha>
                                         </div>
                                         <div *ngIf="
-                        loginForm.get('recaptcha').invalid &&
-                        loginForm.get('recaptcha').touched
-                      " class="text-danger">
-                                            Please complete the reCAPTCHA.
+                                getErrorMessage(
+                                    'recaptcha',
+                                    'reCAPTCHA'
+                                ) as error
+                            " class="text-danger">
+                                            {{ error }}
                                         </div>
                                     </div>
 
                                     <div class="col-12">
-                                        <button *ngIf="!(isLoginLoading$ | async)" class="btn grad-button w-100"
-                                            type="submit" [disabled]="loginForm.invalid">
-                                            Masuk Sekarang
-                                        </button>
-                                        <button *ngIf="isLoginLoading$ | async" class="btn grad-button w-100" disabled>
-                                            <div class="spinner-border spinner-sm-custom" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                        </button>
-                                        <button class="btn grad-button-secondary w-100 mt-1"
-                                            (click)="backToLandingPage()">
+                                        <app-loading-button [disabled]="loginForm.invalid"
+                                            [isLoading]="isLoginLoading()" [label]="'Masuk Sekarang'"
+                                            [className]="'btn grad-button w-100'"
+                                            [type]="'submit'"></app-loading-button>
+                                        <a class="btn grad-button-secondary w-100 mt-1" [routerLink]="['/']">
                                             Kembali
-                                        </button>
+                                        </a>
                                     </div>
 
-                                    <a (click)="navigateTo('/login')" class="btn btn-link text-primary">Masuk halaman
+                                    <a [routerLink]="['/login']" class="btn btn-link text-primary">Masuk halaman
                                         Sijupri</a>
                                 </form>
                             </div>

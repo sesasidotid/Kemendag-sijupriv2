@@ -3,24 +3,20 @@ import { ApiService } from '../../base/services/api.service'
 import { Auth } from '../models/auth.model'
 import { catchError, map, Observable } from 'rxjs'
 import { AuthResponse } from '../models/auth-response.model'
-import { AlertService } from '../../base/services/alert.service'
 import { DeviceService } from '../../security/services/device.service'
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class AuthService {
     readonly BASE_PATH = '/oauth/token'
 
-    constructor (
+    constructor(
         private apiService: ApiService,
-        private alertService: AlertService,
-        private deviceService: DeviceService
+        private deviceService: DeviceService,
     ) {}
 
-    login (auth: Auth): Observable<AuthResponse> {
-        // auth.clientId = auth.applicationCode;
-        // auth.clientSecret = `${auth.applicationCode}P@ssw0rd`;
+    login(auth: Auth): Observable<AuthResponse> {
         auth.grantType = 'password'
         auth.channel_code = 'WEB'
         auth.deviceId = this.deviceService.getDeviceId()
@@ -28,23 +24,17 @@ export class AuthService {
         return this.apiService
             .auth(this.BASE_PATH, auth, {
                 Authorization:
-                    'Basic c2lqdXByaS13ZWI6c2lqdXByaS13ZWJQQHNzdzByZA=='
+                    'Basic c2lqdXByaS13ZWI6c2lqdXByaS13ZWJQQHNzdzByZA==',
             })
             .pipe(
                 map((response: any) => new AuthResponse(response)),
-                catchError(error => {
-                    console.error('Error login', error)
-                    const errMsg =
-                        error?.error?.message || 'Terjadi kesalahan saat login'
-                    this.alertService.showToast('Error', errMsg)
+                catchError((error) => {
                     throw error
-                })
+                }),
             )
     }
 
-    loginCAT (auth: Auth): Observable<AuthResponse> {
-        // auth.clientId = auth.applicationCode;
-        // auth.clientSecret = `${auth.applicationCode}P@ssw0rd`;
+    loginCAT(auth: Auth): Observable<AuthResponse> {
         auth.grantType = 'password'
         auth.channel_code = 'WEB'
         auth.deviceId = this.deviceService.getDeviceId()
@@ -52,17 +42,13 @@ export class AuthService {
         return this.apiService
             .auth(this.BASE_PATH, auth, {
                 Authorization:
-                    'Basic c2l1a29tLXBhcnRpY2lwYW50OnNpdWtvbS1wYXJ0aWNpcGFudFBAc3N3MHJk'
+                    'Basic c2l1a29tLXBhcnRpY2lwYW50OnNpdWtvbS1wYXJ0aWNpcGFudFBAc3N3MHJk',
             })
             .pipe(
                 map((response: any) => new AuthResponse(response)),
-                catchError(error => {
-                    console.error('Error login', error)
-                    const errMsg =
-                        error?.error?.message || 'Terjadi kesalahan saat login'
-                    this.alertService.showToast('Error', errMsg)
+                catchError((error) => {
                     throw error
-                })
+                }),
             )
     }
 }

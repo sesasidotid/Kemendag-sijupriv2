@@ -25,6 +25,13 @@ export const routes: Routes = [
             ).then((m) => m.LoginCatComponent),
     },
     {
+        path: 'forget-password',
+        loadComponent: () =>
+            import(
+                '../modules/auth/components/forgot-password/forgot-password.component'
+            ).then((m) => m.ForgotPasswordComponent),
+    },
+    {
         path: 'forgot_password',
         loadComponent: () =>
             import(

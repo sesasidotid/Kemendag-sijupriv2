@@ -1,23 +1,26 @@
-import { Component, ViewChild } from '@angular/core'
-import { ApplicationService } from '../../../security/services/application.service'
-import { Application } from '../../../security/models/application.mode'
+import { Component, inject, signal, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import {
-    FormControl,
-    FormGroup,
     FormsModule,
     Validators,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormBuilder,
 } from '@angular/forms'
 import { Auth } from '../../models/auth.model'
 import { AuthService } from '../../services/auth.service'
 import { AuthResponse } from '../../models/auth-response.model'
 import { LoginContext } from '../../../base/commons/login-context'
-import { Router } from '@angular/router'
+import { Router, RouterModule } from '@angular/router'
 import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
-import { BehaviorSubject } from 'rxjs'
-import { RecaptchaModule, RecaptchaComponent } from 'ng-recaptcha'
+import {
+    RecaptchaModule,
+    RecaptchaComponent,
+    RecaptchaFormsModule,
+} from 'ng-recaptcha'
 import { environment } from '../../../../environments/environment'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { finalize } from 'rxjs'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-login-cat',
     standalone: true,
@@ -26,119 +29,104 @@ import { environment } from '../../../../environments/environment'
         FormsModule,
         ReactiveFormsModule,
         LucideAngularModule,
-        RecaptchaModule
+        RecaptchaModule,
+        RecaptchaFormsModule,
+        RouterModule,
+        LoadingButtonComponent,
     ],
     templateUrl: './login-cat.component.html',
-    styleUrl: './login-cat.component.scss'
+    styleUrl: './login-cat.component.scss',
 })
 export class LoginCatComponent {
     @ViewChild(RecaptchaComponent) recaptcha: RecaptchaComponent
+    auth: Auth
+    isPasswordVisible: boolean = false
+
+    isLoginLoading = signal(false)
+    loginMessage = signal({
+        status: '',
+        message: '',
+    })
+    recaptchaSiteKey = environment.recaptcha.siteKey
 
     readonly Eye = Eye
     readonly EyeOff = EyeOff
 
-    loginMessage$ = new BehaviorSubject<{ status: string; message: string }>({
-        status: '',
-        message: ''
-    })
-    isLoginLoading$ = new BehaviorSubject<boolean>(false)
-    auth: Auth = new Auth()
-    authResponse: AuthResponse
+    authService = inject(AuthService)
+    router = inject(Router)
+    formBuilder = inject(FormBuilder)
+    formValidationService = inject(FormValidationService)
 
-    loginForm!: FormGroup
-    isPasswordVisible: boolean = false
-    applicationList: Application[]
-
-    recaptchaSiteKey = environment.recaptcha.siteKey
-
-    constructor (
-        private applicationServce: ApplicationService,
-        private authService: AuthService,
-        private router: Router
-    ) {}
-
-    backToLandingPage () {
-        if (LoginContext.isLogin()) {
-            this.router.navigate(['/'])
-        }
-        this.router.navigate([''])
-    }
-
-    navigateTo (path: string) {
-        this.router.navigate([path])
-    }
-
-    ngOnInit () {
-        this.isLoginLoading$.next(false)
-        this.getApplicationList()
-        this.loginForm = new FormGroup({
-            nip: new FormControl('', [
+    loginForm = this.formBuilder.group({
+        nip: [
+            '',
+            [
                 Validators.required,
                 Validators.pattern('^[0-9]+$'),
                 Validators.minLength(18),
-                Validators.maxLength(18)
-            ]),
-            password: new FormControl('', [Validators.required]),
-            recaptcha: new FormControl(null, [Validators.required])
+                Validators.maxLength(18),
+            ],
+        ],
+        password: ['', [Validators.required]],
+        recaptcha: [null as string | null, [Validators.required]],
+    })
+
+    constructor() {}
+
+    ngOnInit() {
+        if (LoginContext.isLogin()) {
+            this.router.navigate(['/'])
+        }
+    }
+
+    getErrorMessage(controlName: string, label: string): string | null {
+        const control = this.loginForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label,
+        )
+    }
+
+    togglePasswordVisibility(): void {
+        this.isPasswordVisible = !this.isPasswordVisible
+    }
+
+    onSubmit() {
+        this.isLoginLoading.set(true)
+        this.auth = new Auth({
+            username: this.loginForm.value.nip,
+            password: this.loginForm.value.password,
         })
-    }
 
-    getApplicationList () {
-        this.applicationServce.findAll().subscribe({
-            next: (applicationList: Application[]) => {
-                this.applicationList = applicationList
-                // this.auth.applicationCode = this.applicationList[0].code;
-            }
-        })
-    }
-
-    onCaptchaResolved (token: string) {
-        this.loginForm.get('recaptcha').setValue(token)
-    }
-
-    togglePasswordVisibility (): void {
-        this.isPasswordVisible = !this.isPasswordVisible // Toggle the visibility
-    }
-
-    onSubmit () {
-        this.isLoginLoading$.next(true)
-        if (this.loginForm.valid) {
-            console.log(this.loginForm.value)
-            this.auth.username = this.loginForm.value.nip
-            this.auth.password = this.loginForm.value.password
-
-            this.authService.loginCAT(this.auth).subscribe({
+        this.authService
+            .loginCAT(this.auth)
+            .pipe(
+                finalize(() => {
+                    this.isLoginLoading.set(false)
+                }),
+            )
+            .subscribe({
                 next: (authResponse: AuthResponse) => {
-                    this.authResponse = authResponse
-                    LoginContext.storeContextLocalStorage(this.authResponse)
-                    this.loginMessage$.next({
+                    LoginContext.storeContextLocalStorage(authResponse)
+                    this.loginMessage.set({
                         status: 'success',
-                        message: 'Login berhasil, tunggu sebentar...'
+                        message: 'Login berhasil, tunggu sebentar...',
                     })
-                },
-                complete: () => {
-                    this.isLoginLoading$.next(false)
                     setTimeout(() => {
-                        this.router.navigate(['']).then(() => {
-                            window.location.reload()
-                        })
+                        window.location.reload()
                     }, 1500)
                 },
-                error: error => {
-                    this.isLoginLoading$.next(false)
-                    console.log('error', error)
-                    this.loginMessage$.next({
+                error: (error) => {
+                    console.log(error)
+                    this.loginMessage.set({
                         status: 'error',
-                        message: 'Login gagal, tolong coba lagi.'
+                        message: 'Login gagal, tolong coba lagi.',
                     })
 
-                    if (this.recaptcha) {
-                        this.recaptcha.reset()
-                    }
-
                     this.loginForm.get('recaptcha')?.setValue(null)
-                }
+                    this.loginForm.get('password')?.setValue('')
+                },
             })
-        }
     }
 }

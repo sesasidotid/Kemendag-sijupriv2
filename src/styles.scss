@@ -22,3 +22,14 @@
     width: 19px !important;
     height: 19px !important;
 }
+
+.grad-button {
+  color: white !important;
+  background: linear-gradient(45deg, #2967be, #49ab49) !important;
+  border: none !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, #49ab49, #2967be) !important;
+  }
+}
