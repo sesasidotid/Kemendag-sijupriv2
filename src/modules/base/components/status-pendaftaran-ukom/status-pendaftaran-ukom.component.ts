@@ -57,7 +57,6 @@ export enum JenisUkomEnum {
         EmptyStateComponent,
         LandingPageComponent,
         FileHandlerComponent,
-        FilePreviewComponent,
         UkomGradeTableComponent,
         ReplaceUkomWordPipe,
     ],
@@ -599,15 +598,7 @@ export class StatusPendaftaranUkomComponent {
         return grouped
     }
 
-    // handleStepClick (clickedStep: number) {
-    //     this.currentUkomStep$.subscribe(step => {
-    //         if (clickedStep <= step) {
-    //             this.ukomStep$.next(clickedStep)
-    //         }
-    //     })
-    // }
     handleStepClick(clickedStep: number) {
-        // Get the current value directly without subscribing
         if (clickedStep <= this.currentUkomStep$.value) {
             this.ukomStep$.next(clickedStep)
         }
