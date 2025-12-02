@@ -1,194 +1,160 @@
-import { Component, OnInit } from '@angular/core'
-import { ApiService } from '../../modules/base/services/api.service'
+import { Participant } from './../../modules/ukom/models/cat/participant.model'
+import { Component, effect, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { LoginContext } from '../../modules/base/commons/login-context'
-import { RoomUkom } from '../../modules/ukom/models/cat/roomukom'
+import { RoomUkom } from '../../modules/ukom/models/cat/room-ukom.model'
 import { CATQuestions } from '../../modules/ukom/models/cat/cat-questions'
-import { PesertaUkom } from '../../modules/ukom/models/peserta-ukom.model'
 import { HandlerService } from '../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../modules/base/services/confirmation.service'
-import { ConfirmationDialogComponent } from '../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
-import { Router } from '@angular/router'
+import { Router, RouterModule } from '@angular/router'
 import {
     BehaviorSubject,
     combineLatest,
-    filter,
+    EMPTY,
     finalize,
     map,
     Observable,
     Subject,
     switchMap,
-    take,
     takeUntil,
-    tap,
-    throwError
 } from 'rxjs'
 import { ReactiveFormsModule } from '@angular/forms'
 import { HostListener } from '@angular/core'
 import { ExamAttendance } from '../../modules/ukom/models/cat/exam-attendance'
+import { CatService } from '@/modules/ukom/services/cat.service'
+import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
+import { CatExamSecurityService } from './cat-exam-security.service'
+import { CatExamTimerService } from './cat-exam-timer.service'
+import { CatAnswerService } from './cat-answer.service'
+import { DisableRightClickDirective } from './disable-right-click.directive'
+import { DisableKeyboardShortcutsDirective } from './disable-keyboard-shortcuts.directive'
+import { FullscreenEnforcementDirective } from './fullscreen-enforcement.directive'
+
 @Component({
     selector: 'app-cat-page',
     standalone: true,
-    imports: [CommonModule, ConfirmationDialogComponent, ReactiveFormsModule],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        DisableRightClickDirective,
+        DisableKeyboardShortcutsDirective,
+        FullscreenEnforcementDirective,
+        RouterModule,
+    ],
     templateUrl: './cat-page.component.html',
-    styleUrl: './cat-page.component.scss'
+    styleUrl: './cat-page.component.scss',
 })
 export class CatPageComponent {
-    data: CATQuestions = new CATQuestions()
-    cat: string = 'CAT'
-    room_id: string = ''
-    roomUkom: RoomUkom = new RoomUkom()
-    pesertaUkom: PesertaUkom = new PesertaUkom()
-    examAttendance: ExamAttendance = new ExamAttendance()
+    // Services
+    catService = inject(CatService)
+    private participantService = inject(UkomParticipantService)
+    private handler = inject(HandlerService)
+    private confirmationService = inject(ConfirmationService)
+    private router = inject(Router)
 
-    currentPage: number = 1
-    totalQuestions: number = 0
-    selectedAnswer: { [questionId: string]: string } = {}
-    savedAnswer: { [questionId: string]: string } = {}
+    // Feature services
+    securityService = inject(CatExamSecurityService)
+    private timerService = inject(CatExamTimerService)
+    private answerService = inject(CatAnswerService)
 
+    // Constants
+    readonly EXAM_TYPE = 'CAT'
+    readonly userID = LoginContext.getUserId()
+
+    // Data models
+    data = new CATQuestions()
+    roomUkom = new RoomUkom()
+    pesertaUkom = new Participant()
+    examAttendance = new ExamAttendance()
+
+    // Exam state
     examEndTime: Date | null = null
-    remainingTime: string = ''
-    remainingSeconds: number = 0
     isSubmitted$ = new BehaviorSubject<boolean>(false)
-    showWarning: boolean = false
-    warningCountdown: number = 30
+    isLoadingRoomUkom$ = new BehaviorSubject<boolean>(false)
 
-    private warningInterval: any
-    private countdownInterval: any
-    private isInside = true
-    private destroy$ = new Subject<void>()
+    // Computed & reactive properties from services
+    currentPage = this.answerService.currentPage
+    totalQuestions = this.answerService.totalQuestions
+    selectedAnswer = this.answerService.selectedAnswer
+    savedAnswer = this.answerService.savedAnswer
+    flaggedQuestions = this.answerService.flaggedQuestions
+    isSavingAnswer$ = this.answerService.isSavingAnswer$
+    isSubmittingAnswer$ = this.answerService.isSubmittingAnswer$
 
-    isSavingAnswer$ = new BehaviorSubject<boolean>(false)
-    isSubmittingAnswer$ = new BehaviorSubject<boolean>(false)
-    isLoadingRoomUkom$ = new BehaviorSubject<boolean>(true)
+    remainingTime = this.timerService.remainingTime
+    remainingSeconds = this.timerService.remainingSeconds
 
+    showWarning = this.securityService.showWarning
+    violationCount = this.securityService.violationCount
+    violationPanelOpen = false
+    private violationPanelPinned = false
+    private violationAutoCloseTimer?: ReturnType<typeof setTimeout>
+
+    // Combined loading state
     isLoading$: Observable<boolean>
 
-    constructor(
-        private api: ApiService,
-        private handler: HandlerService,
-        private confirmationService: ConfirmationService,
-        private router: Router
-    ) {
+    private destroy$ = new Subject<void>()
+
+    constructor() {
         this.isLoading$ = combineLatest([this.isLoadingRoomUkom$]).pipe(
-            map(loadings => loadings.some(isLoading => isLoading))
+            map((loadings) => loadings.some((isLoading) => isLoading)),
         )
     }
 
     ngOnInit() {
+        // Initialize security measures
+        this.securityService.initializeSecurity(() => this.submitAnswer(false))
+
+        // Load exam data
         this.getRoomUkom()
-        this.enterFullScreen()
+
+        // Hide warning when exam is submitted
         this.isSubmitted$
             .pipe(takeUntil(this.destroy$))
-            .subscribe(submitted => {
+            .subscribe((submitted) => {
                 if (submitted) {
-                    this.showWarning = false
+                    this.showWarning.set(false)
                 }
             })
-    }
-
-    @HostListener('document:visibilitychange', [])
-    handleVisibilityChange() {
-        if (document.hidden) {
-        }
-    }
-
-    @HostListener('document:mousemove', ['$event'])
-    onMouseMove(event: MouseEvent) {
-        if (this.isSubmitted$.value) return
-
-        const inside = this.isMouseInsideExamArea(event)
-
-        if (inside !== this.isInside) {
-            this.isInside = inside
-
-            if (!inside) {
-                this.showWarning = true
-                this.startWarningCountdown()
-            } else {
-                this.showWarning = false
-                this.resetWarningCountdown()
-            }
-        }
-    }
-
-    isMouseInsideExamArea(event: MouseEvent): boolean {
-        const examArea = document.querySelector('.parent') as HTMLElement
-        if (!examArea) return false
-
-        const rect = examArea.getBoundingClientRect()
-        return (
-            event.clientX >= rect.left &&
-            event.clientX <= rect.right &&
-            event.clientY >= rect.top &&
-            event.clientY <= rect.bottom
-        )
-    }
-
-    startWarningCountdown() {
-        if (this.warningInterval) {
-            clearInterval(this.warningInterval)
-        }
-
-        this.warningCountdown = 30
-        this.warningInterval = setInterval(() => {
-            this.warningCountdown--
-            if (this.warningCountdown <= 0) {
-                clearInterval(this.warningInterval)
-
-                this.handler.handleAlert(
-                    'Info',
-                    'Anda telah tidak aktif terlalu lama. Ujian akan disubmit secara otomatis.'
-                )
-                this.submitAnswer(false)
-            }
-        }, 1000)
-    }
-
-    resetWarningCountdown() {
-        if (this.warningInterval) {
-            clearInterval(this.warningInterval)
-        }
-        this.warningCountdown = 30
-    }
-
-    onBlur() {
-        this.enterFullScreen()
-    }
-
-    enterFullScreen() {
-        const elem = document.documentElement as HTMLElement & {
-            mozRequestFullScreen?: () => Promise<void>
-            webkitRequestFullscreen?: () => Promise<void>
-            msRequestFullscreen?: () => Promise<void>
-        }
-
-        const requestFullScreen =
-            elem.requestFullscreen ||
-            elem.mozRequestFullScreen ||
-            elem.webkitRequestFullscreen ||
-            elem.msRequestFullscreen
-
-        if (requestFullScreen) {
-            requestFullScreen.call(elem).catch(err => {
-                console.error('Failed to enter fullscreen:', err)
-            })
-        } else {
-            console.warn('Fullscreen API is not supported in this browser.')
-        }
     }
 
     ngOnDestroy() {
         this.destroy$.next()
         this.destroy$.complete()
-
-        if (this.countdownInterval) {
-            clearInterval(this.countdownInterval)
-        }
-        if (this.warningInterval) {
-            clearInterval(this.warningInterval)
-        }
+        this.securityService.cleanup()
+        this.timerService.cleanup()
+        this.clearViolationAutoClose()
     }
+
+    // ========== Host Listeners for Security ==========
+
+    @HostListener('window:beforeunload')
+    onBeforeUnload() {
+        this.securityService.markUnloading()
+    }
+
+    @HostListener('document:visibilitychange', [])
+    handleVisibilityChange() {
+        this.securityService.handleVisibilityChange()
+    }
+
+    @HostListener('document:mousemove', ['$event'])
+    onMouseMove(event: MouseEvent) {
+        this.securityService.handleMouseMove(event, this.isSubmitted$.value)
+    }
+
+    @HostListener('window:blur', [])
+    onBlur() {
+        this.securityService.handleBlur()
+        this.securityService.enterFullScreen()
+    }
+
+    @HostListener('document:fullscreenchange', [])
+    handleFullscreenChange() {
+        this.securityService.handleFullscreenExit()
+    }
+
+    // ========== Navigation Methods ==========
 
     backToHome() {
         this.router.navigate(['/'])
@@ -196,7 +162,8 @@ export class CatPageComponent {
 
     backWithConfirmation() {
         const title = 'Konfirmasi Kembali'
-        const message = 'Apakah Anda yakin ingin kembali? Semua jawaban akan disimpan.'
+        const message =
+            'Apakah Anda yakin ingin kembali? Semua jawaban akan disimpan.'
 
         this.confirmationService.open(false, title, message).subscribe({
             next: ({ confirmed }) => {
@@ -204,279 +171,234 @@ export class CatPageComponent {
                     this.router.navigate(['/'])
                 }
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error during confirmation:', err)
-            }
+            },
         })
     }
 
-    startCountdown() {
-        if (
-            !this.examEndTime ||
-            !this.examAttendance?.startAt ||
-            !this.examAttendance?.duration
-        )
-            return
+    // ========== Question Navigation ==========
 
-        const startTime = new Date(this.examAttendance.startAt).getTime()
-        const durationMs = this.examAttendance.duration * 60 * 60 * 1000
-        const calculatedEndTime = startTime + durationMs
-        const hardEndTime = this.examEndTime.getTime()
-        const effectiveEndTime = Math.min(calculatedEndTime, hardEndTime)
-
-        const now = new Date().getTime()
-        const initialTimeLeft = effectiveEndTime - now
-
-        if (initialTimeLeft <= 0) {
-            this.remainingTime = '00:00:00'
-            this.remainingSeconds = 0
-            this.submitAnswer(false)
-            return
-        }
-
-        this.remainingTime = this.formatTime(initialTimeLeft)
-        this.remainingSeconds = Math.floor(initialTimeLeft / 1000)
-
-        if (this.countdownInterval) {
-            clearInterval(this.countdownInterval)
-        }
-
-        this.countdownInterval = setInterval(() => {
-            const now = new Date().getTime()
-            const timeLeft = effectiveEndTime - now
-
-            if (timeLeft <= 0) {
-                clearInterval(this.countdownInterval)
-                this.remainingTime = '00:00:00'
-                this.remainingSeconds = 0
-                this.submitAnswer(false)
-                this.handler.handleAlert(
-                    'Info',
-                    'Waktu ujian telah habis. Jawaban akan disimpan secara otomatis.'
-                )
-            } else {
-                this.remainingTime = this.formatTime(timeLeft)
-                this.remainingSeconds = Math.floor(timeLeft / 1000)
-            }
-        }, 1000)
+    navigateToPage(page: number) {
+        this.answerService.navigateToPage(page)
     }
 
-    formatTime(ms: number): string {
-        const totalSeconds = Math.floor(ms / 1000)
-        const hours = Math.floor(totalSeconds / 3600)
-        const minutes = Math.floor((totalSeconds % 3600) / 60)
-        const seconds = totalSeconds % 60
-        return `${this.padZero(hours)}:${this.padZero(minutes)}:${this.padZero(
-            seconds
-        )}`
+    toggleFlag(questionId: string) {
+        this.answerService.toggleFlag(questionId)
     }
 
-    padZero(num: number): string {
-        return num < 10 ? `0${num}` : `${num}`
+    isFlagged(questionId: string): boolean {
+        return this.answerService.isFlagged(questionId)
     }
+
+    // ========== Answer Management ==========
+
+    selectAnswer(questionId: string, choiceId: string) {
+        this.answerService.selectAnswer(questionId, choiceId)
+    }
+
+    onSaveButtonClick(questionId: string) {
+        this.answerService
+            .saveAnswer(questionId, this.pesertaUkom.id)
+            .subscribe({
+                next: () => {},
+                error: (err) => {
+                    console.error('Error saving answer:', err)
+                },
+            })
+    }
+
+    submitAfterSave(questionId: string) {
+        this.answerService
+            .saveAndSubmitExam(
+                questionId,
+                this.pesertaUkom.id,
+                this.EXAM_TYPE,
+                this.roomUkom.id,
+            )
+            .subscribe({
+                next: () => {
+                    this.securityService.clearViolations()
+                    this.isSubmitted$.next(true)
+                    this.router.navigate(['/'])
+                },
+                error: (err) => {
+                    console.error('Error submitting exam:', err)
+                },
+            })
+    }
+
+    submitAnswer(openDialog: boolean = true) {
+        this.answerService
+            .submitExam(this.EXAM_TYPE, this.roomUkom.id, openDialog)
+            .subscribe({
+                next: () => {
+                    this.securityService.clearViolations()
+                    this.isSubmitted$.next(true)
+                    this.router.navigate(['/'])
+                },
+                error: (err) => {
+                    console.error('Error submitting exam:', err)
+                    this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
+                },
+            })
+    }
+
+    // ========== Data Loading ==========
+    // ========== Data Loading ==========
 
     getRoomUkom() {
         this.isLoadingRoomUkom$.next(true)
-        this.api
-            .getData(
-                `/api/v1/participant_ukom/nip/${LoginContext.getUserId().replace(
-                    'PU-',
-                    ''
-                )}`
-            )
+        const nip = this.userID.replace('PU-', '')
+
+        this.participantService
+            .getParticipantUkom(nip)
             .pipe(
-                switchMap((response: any) => {
-                    this.roomUkom = new RoomUkom(response.roomUkomDto)
-                    this.room_id = response.roomUkomDto.id
-                    this.pesertaUkom = response
+                switchMap((participantUkom) => {
+                    this.pesertaUkom = participantUkom
+                    this.roomUkom = participantUkom.roomUkomDto
 
-                    if (response.roomUkomDto.examScheduleDtoList) {
-                        const catSchedule =
-                            response.roomUkomDto.examScheduleDtoList.find(
-                                (e: any) => e.examTypeCode === 'CAT'
-                            )
+                    const catSchedule =
+                        participantUkom.roomUkomDto?.examScheduleDtoList?.find(
+                            (e) => e.examTypeCode === this.EXAM_TYPE,
+                        )
 
-                        if (catSchedule?.endTime) {
-                            const serverTimezoneOffset = '+07:00'
-
-                            const endTimeString = `${catSchedule.endTime.replace(
-                                ' ',
-                                'T'
-                            )}${serverTimezoneOffset}`
-                            this.examEndTime = new Date(endTimeString)
-                        } else {
-                            console.warn(
-                                'CAT exam end time not found in schedule list.'
-                            )
-                            this.handler.handleAlert(
-                                'Error',
-                                'Informasi waktu berakhir ujian CAT tidak ditemukan.'
-                            )
-                            this.isSubmitted$.next(true)
-                        }
+                    if (!catSchedule?.endTime) {
+                        this.handler.handleAlert(
+                            'Error',
+                            'Informasi waktu berakhir ujian CAT tidak ditemukan.',
+                        )
+                        this.isSubmitted$.next(true)
+                        return EMPTY
                     }
 
-                    const roomId = response.roomUkomDto.id
-                    const participantId = response.id
-                    const examTypeCode = 'CAT'
+                    this.examEndTime = this.catService.parseServerDate(
+                        catSchedule.endTime,
+                    )
 
-                    return this.api.getData(
-                        `/api/v1/exam_attendance/${examTypeCode}/${roomId}/${participantId}`
+                    return this.catService.getExamAttendance(
+                        this.EXAM_TYPE,
+                        participantUkom.roomUkomDto.id,
+                        participantUkom.id,
                     )
                 }),
-                finalize(() => {
-                    this.isLoadingRoomUkom$.next(false)
-                })
+                finalize(() => this.isLoadingRoomUkom$.next(false)),
             )
             .subscribe({
-                next: (attendanceResponse: ExamAttendance) => {
-                    this.examAttendance = new ExamAttendance(attendanceResponse)
-
+                next: (attendance) => {
+                    this.examAttendance = attendance
                     if (this.examAttendance.startAt) {
-                        const serverTimezoneOffset = '+07:00'
-                        const startAtString = `${this.examAttendance.startAt.replace(
-                            ' ',
-                            'T'
-                        )}${serverTimezoneOffset}`
-                        this.examAttendance.startAt = new Date(
-                            startAtString
-                        ).toISOString()
+                        this.examAttendance.startAt = this.catService
+                            .parseServerDate(this.examAttendance.startAt)
+                            .toISOString()
                     }
-                    this.startCountdown()
 
+                    // Start timer
+                    if (this.examEndTime) {
+                        this.timerService.startCountdown(
+                            this.examEndTime,
+                            this.examAttendance.startAt,
+                            this.examAttendance.duration,
+                            () => this.submitAnswer(false),
+                        )
+                    }
+
+                    // Load questions
                     this.getQuestion()
                 },
-                error: err => {
-                    console.error('Error:', err)
+                error: () => {
                     this.handler.handleAlert(
                         'Error',
-                        'Gagal mengambil data kehadiran'
+                        'Gagal mengambil data kehadiran, silahkan refresh halaman atau hubungi panitia',
                     )
-                }
+                },
             })
     }
 
     getQuestion() {
-        this.api
-            .getData(`/api/v1/exam/page/CAT/${this.room_id}?limit=1000&page=1`)
-            .subscribe({
-                next: (response: any) => {
-                    this.data.data = response.data
-                    this.totalQuestions = this.data.data.length
-
-                    this.data.data.forEach((question: any) => {
-                        if (question.answerDto?.id) {
-                            this.savedAnswer[question.id] =
-                                question.answerDto.answerChoice
-                            this.selectedAnswer[question.id] =
-                                question.answerDto.answerChoice
-                        }
-                    })
-                },
-                error: err => {
-                    if (err.error.message === `Exam's already ended`) {
-                        this.isSubmitted$.next(true)
-                    } else {
-                        this.handler.handleAlert(
-                            'Error',
-                            'Gagal mengambil pertanyaan'
-                        )
-                    }
-                }
-            })
-    }
-
-    navigateToPage(page: number) {
-        if (page > 0 && page <= this.totalQuestions) {
-            this.currentPage = page
-        }
-    }
-
-    selectAnswer(questionId: string, choiceId: string) {
-        this.selectedAnswer[questionId] = choiceId
-    }
-
-    onSaveButtonClick(questionId: string) {
-        this.saveAnswer(questionId).subscribe({
-            next: () => { },
-            error: err => { }
-        })
-    }
-
-    saveAnswer(questionId: string): Observable<any> {
-        const selectedChoiceId = this.selectedAnswer[questionId]
-        if (!selectedChoiceId) {
-            console.warn('No answer selected for question:', questionId)
-            return throwError(() => new Error('No answer selected'))
-        }
-
-        const payload = {
-            answer_choice: selectedChoiceId,
-            participant_id: this.pesertaUkom.id,
-            question_id: questionId
-        }
-
-        this.isSavingAnswer$.next(true)
-
-        return this.api.postData('/api/v1/exam/answer', payload).pipe(
-            tap(response => {
-                this.savedAnswer[questionId] = selectedChoiceId
-                if (this.currentPage < this.totalQuestions) {
-                    this.navigateToPage(this.currentPage + 1)
-                }
-            }),
-            finalize(() => this.isSavingAnswer$.next(false))
-        )
-    }
-
-    submitAfterSave(questionId: string) {
-        this.saveAnswer(questionId).subscribe({
-            next: () => {
-                this.submitAnswer(true)
+        this.answerService.loadQuestions(this.roomUkom.id).subscribe({
+            next: (response: any) => {
+                this.data.data = response.data
             },
-            error: err => {
-                console.error('Error saving answer before submit:', err)
-                this.handler.handleAlert(
-                    'Error',
-                    'Gagal menyimpan jawaban, tidak dapat submit.'
-                )
-            }
+            error: (err) => {
+                if (err.error.message === `Exam's already ended`) {
+                    this.isSubmitted$.next(true)
+                } else {
+                    this.handler.handleAlert(
+                        'Error',
+                        'Gagal mengambil pertanyaan',
+                    )
+                }
+            },
         })
     }
 
-    submitAnswer(open_dialog: boolean = true) {
-        const payload = {
-            examTypeCode: 'CAT',
-            roomUkomId: this.room_id
+    formatRemaining() {
+        let total = this.remainingSeconds()
+
+        const days = Math.floor(total / 86400)
+        total %= 86400
+
+        const hours = Math.floor(total / 3600)
+        total %= 3600
+
+        const minutes = Math.floor(total / 60)
+        const seconds = total % 60
+
+        return { days, hours, minutes, seconds }
+    }
+
+    padTime(value: number) {
+        const safeValue = Math.max(0, value)
+        return safeValue.toString().padStart(2, '0')
+    }
+
+    toggleViolationPanel() {
+        if (this.violationPanelOpen && this.violationPanelPinned) {
+            this.closeViolationPanel()
+            return
         }
 
-        const performSubmission = () => {
-            this.isSubmittingAnswer$.next(true)
-            this.api.postData('/api/v1/exam/finish', payload).subscribe({
-                next: response => {
-                    this.handler.handleAlert(
-                        'Success',
-                        'Jawaban berhasil disimpan'
-                    )
-                    this.router.navigate(['/'])
-                    this.isSubmitted$.next(true)
-                    this.isSubmittingAnswer$.next(false)
-                },
-                error: err => {
-                    this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
-                    this.isSubmittingAnswer$.next(false)
-                }
-            })
-        }
-
-        if (open_dialog) {
-            this.confirmationService.open(false).subscribe({
-                next: ({ confirmed }) => {
-                    if (confirmed) performSubmission()
-                }
-            })
+        if (this.violationPanelOpen) {
+            this.violationPanelPinned = false
+            this.closeViolationPanel()
         } else {
-            performSubmission()
+            this.violationPanelPinned = true
+            this.openViolationPanel(false)
         }
+    }
+
+    closeViolationPanel() {
+        this.clearViolationAutoClose()
+        this.violationPanelOpen = false
+        this.violationPanelPinned = false
+    }
+
+    private openViolationPanel(auto = false) {
+        this.violationPanelOpen = true
+        this.clearViolationAutoClose()
+
+        if (auto) {
+            this.violationAutoCloseTimer = setTimeout(() => {
+                if (!this.violationPanelPinned) {
+                    this.violationPanelOpen = false
+                }
+                this.clearViolationAutoClose()
+            }, 5000)
+        }
+    }
+
+    private clearViolationAutoClose() {
+        if (this.violationAutoCloseTimer) {
+            clearTimeout(this.violationAutoCloseTimer)
+            this.violationAutoCloseTimer = undefined
+        }
+    }
+
+    remainingViolations() {
+        return Math.max(
+            0,
+            this.securityService.MAX_VIOLATIONS - this.violationCount(),
+        )
     }
 }

@@ -16,7 +16,7 @@ export class RoomUkom extends Serializable {
     examEndAt: string = undefined
     examScheduleDtoList: ExamScheduleDtoList[] = []
 
-    constructor (object?: { [key: string]: any }) {
+    constructor(object?: { [key: string]: any }) {
         super()
         if (object) this.fromObject(object)
     }

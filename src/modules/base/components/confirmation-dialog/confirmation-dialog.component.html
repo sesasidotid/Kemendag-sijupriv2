@@ -42,8 +42,7 @@
                 <button type="button" class="btn-close" aria-label="Close" (click)="close(false)"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-3">
-                    {{ message }} </p>
+                <p class="mb-3 pre-space">{{ message }}</p>
 
                 <div *ngIf="isCommentEnabled" class="mb-3">
                     <label for="commentTextarea" class="form-label fw-semibold">{{ commentLabel }}</label>

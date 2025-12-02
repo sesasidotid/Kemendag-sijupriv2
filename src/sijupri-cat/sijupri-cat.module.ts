@@ -5,7 +5,7 @@ import { routes } from './sijupri-cat.routes'
 import { RouterModule } from '@angular/router'
 
 @NgModule({
-  declarations: [],
-  imports: [CommonModule, RouterModule.forChild(routes)]
+    declarations: [],
+    imports: [CommonModule, RouterModule.forChild(routes)],
 })
 export class SijupriCAtModule {}

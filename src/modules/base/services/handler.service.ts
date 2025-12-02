@@ -125,8 +125,8 @@ export class HandlerService {
         }
     }
 
-    handleAlert(subject: Subject, message: string) {
-        this.alertService.showToast(subject, message)
+    handleAlert(subject: Subject, message: string, timer?: number) {
+        this.alertService.showToast(subject, message, timer)
     }
 
     handleNavigate(...path: string[]) {

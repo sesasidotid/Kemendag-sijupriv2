@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { LoginContext } from './../../modules/base/commons/login-context'
 import { Component, AfterViewInit, ElementRef } from '@angular/core'
-import { RoomUkom } from '../../modules/ukom/models/cat/roomukom'
+import { RoomUkom } from '../../modules/ukom/models/cat/room-ukom.model'
 import { ApiService } from '../../modules/base/services/api.service'
 import { Router } from '@angular/router'
 import { HandlerService } from '../../modules/base/services/handler.service'
@@ -15,7 +15,7 @@ import {
     switchMap,
     tap,
     combineLatest,
-    finalize
+    finalize,
 } from 'rxjs'
 import { ConfirmationService } from '../../modules/base/services/confirmation.service'
 import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
@@ -31,9 +31,14 @@ declare var bootstrap: any
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, ModalComponent, EmptyStateComponent, LoadingButtonComponent],
+    imports: [
+        CommonModule,
+        ModalComponent,
+        EmptyStateComponent,
+        LoadingButtonComponent,
+    ],
     templateUrl: './dashboard.component.html',
-    styleUrl: './dashboard.component.scss'
+    styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements AfterViewInit {
     roomUkom: RoomUkom = new RoomUkom()
@@ -57,12 +62,12 @@ export class DashboardComponent implements AfterViewInit {
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         private elRef: ElementRef,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
     ) {
         this.isLoading$ = combineLatest([
             this.isRoomLoading$,
-            this.isExamTypeLoading$
-        ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
+            this.isExamTypeLoading$,
+        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
     }
 
     ngOnInit() {
@@ -80,21 +85,23 @@ export class DashboardComponent implements AfterViewInit {
     getExamType(): Observable<ExamType[]> {
         this.isExamTypeLoading$.next(true)
         return this.apiService.getData('/api/v1/exam_type').pipe(
-            map((response: any[]) => response.map(item => new ExamType(item))),
+            map((response: any[]) =>
+                response.map((item) => new ExamType(item)),
+            ),
             tap((examTypes: ExamType[]) => {
                 this.examType = examTypes
             }),
-            catchError(error => {
+            catchError((error) => {
                 console.error('Failed to fetch exam types:', error)
                 this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mengambil jenis ujian'
+                    'Gagal mengambil jenis ujian',
                 )
                 return of([])
             }),
             finalize(() => {
                 this.isExamTypeLoading$.next(false)
-            })
+            }),
         )
     }
 
@@ -103,21 +110,21 @@ export class DashboardComponent implements AfterViewInit {
             return of([]) // return empty observable if not ready
         }
 
-        const requests = this.examType.map(type => {
+        const requests = this.examType.map((type) => {
             const examCode = type.code
             return this.apiService
                 .getData(
-                    `/api/v1/exam_grade/${examCode}/${this.participant_id}`
+                    `/api/v1/exam_grade/${examCode}/${this.participant_id}`,
                 )
                 .pipe(
-                    catchError(error => {
+                    catchError((error) => {
                         console.error(
                             `Failed to fetch score for ${examCode}:`,
-                            error
+                            error,
                         )
                         return of(null)
                     }),
-                    map(response => {
+                    map((response) => {
                         let scoreInstance: any
                         switch (examCode) {
                             case 'CAT':
@@ -130,24 +137,24 @@ export class DashboardComponent implements AfterViewInit {
                                 scoreInstance = response
                         }
                         return { examCode, scoreInstance }
-                    })
+                    }),
                 )
         })
 
         return forkJoin(requests).pipe(
-            tap(results => {
-                results.forEach(result => {
+            tap((results) => {
+                results.forEach((result) => {
                     if (result && result.examCode) {
                         this.scoreMap[result.examCode] = result.scoreInstance
                     }
                 })
-            })
+            }),
         )
     }
 
     initializeTooltips() {
         const tooltipTriggerList = this.elRef.nativeElement.querySelectorAll(
-            '[data-bs-toggle="tooltip"]'
+            '[data-bs-toggle="tooltip"]',
         )
         tooltipTriggerList.forEach((tooltipTriggerEl: any) => {
             new bootstrap.Tooltip(tooltipTriggerEl)
@@ -172,13 +179,13 @@ export class DashboardComponent implements AfterViewInit {
             document.exitFullscreen()
         } else if ((document as any).mozCancelFullScreen) {
             /* Firefox */
-            ; (document as any).mozCancelFullScreen()
+            ;(document as any).mozCancelFullScreen()
         } else if ((document as any).webkitExitFullscreen) {
             /* Chrome, Safari, and Opera */
-            ; (document as any).webkitExitFullscreen()
+            ;(document as any).webkitExitFullscreen()
         } else if ((document as any).msExitFullscreen) {
             /* IE/Edge */
-            ; (document as any).msExitFullscreen()
+            ;(document as any).msExitFullscreen()
         }
     }
 
@@ -195,7 +202,7 @@ export class DashboardComponent implements AfterViewInit {
             const [hour, minute, second] = timePart.split(':').map(Number)
 
             return new Date(
-                Date.UTC(year, month - 1, day, hour - 7, minute, second)
+                Date.UTC(year, month - 1, day, hour - 7, minute, second),
             )
         }
 
@@ -218,80 +225,83 @@ export class DashboardComponent implements AfterViewInit {
                 finalize(() => {
                     this.isRoomLoading$.next(false)
                 }),
-                map(() => { })
+                map(() => {}),
             )
     }
 
     startExam(room_ukom_id: string, exam_type_code: string) {
-        let title: string;
-        let message: string;
-        let commentLabel: string | undefined;
-        let placeholder: string | undefined;
-        let withComment: boolean;
+        let title: string
+        let message: string
+        let commentLabel: string | undefined
+        let placeholder: string | undefined
+        let withComment: boolean
 
         if (exam_type_code === 'CAT') {
-            withComment = true;
-            title = 'Konfirmasi Mulai Ujian CAT';
-            message = 'Anda akan memulai ujian CAT ini. Silakan masukkan kode ujian untuk melanjutkan. Pastikan semua persiapan sudah selesai.';
-            commentLabel = 'Kode Ujian';
-            placeholder = 'Masukkan kode ujian di sini...';
+            withComment = true
+            title = 'Konfirmasi Mulai Ujian CAT'
+            message =
+                'Anda akan memulai ujian CAT ini. Silakan masukkan kode ujian untuk melanjutkan. Pastikan semua persiapan sudah selesai.'
+            commentLabel = 'Kode Ujian'
+            placeholder = 'Masukkan kode ujian di sini...'
         } else {
-            withComment = false;
+            withComment = false
         }
-        this.confirmationService.open(
-            withComment,
-            title,
-            message,
-            commentLabel,
-            undefined, // confirmButtonText (uses default 'Yakin')
-            undefined, // cancelButtonText (uses default 'Batal')
-            placeholder, // Pass the conditional placeholder
-        ).subscribe({
-            next: response => {
-                if (!response.confirmed) {
-                    return
-                }
+        this.confirmationService
+            .open(
+                withComment,
+                title,
+                message,
+                commentLabel,
+                undefined, // confirmButtonText (uses default 'Yakin')
+                undefined, // cancelButtonText (uses default 'Batal')
+                placeholder, // Pass the conditional placeholder
+            )
+            .subscribe({
+                next: (response) => {
+                    if (!response.confirmed) {
+                        return
+                    }
 
-                if (exam_type_code === 'CAT') {
-                    this.isStartCATLoading$.next(true)
-                }
-                if (exam_type_code === 'MAKALAH') {
-                    this.isMakalahLoading$.next(true)
-                }
+                    if (exam_type_code === 'CAT') {
+                        this.isStartCATLoading$.next(true)
+                    }
+                    if (exam_type_code === 'MAKALAH') {
+                        this.isMakalahLoading$.next(true)
+                    }
 
-                this.apiService
-                    .postData('/api/v1/exam/start', {
-                        examTypeCode: exam_type_code,
-                        roomUkomId: room_ukom_id,
-                        secret_key: response.comment ?? undefined
-                    })
-                    .pipe(
-                        finalize(() => {
-                            this.isStartCATLoading$.next(false)
-                            this.isMakalahLoading$.next(false)
+                    this.apiService
+                        .postData('/api/v1/exam/start', {
+                            examTypeCode: exam_type_code,
+                            roomUkomId: room_ukom_id,
+                            secret_key: response.comment ?? undefined,
                         })
-                    )
-                    .subscribe({
-                        next: (response: any) => {
-                            if (exam_type_code) {
-                                this.router.navigate([
-                                    `/${exam_type_code.toLowerCase()}`
-                                ])
-                            }
-                        },
-                        error: err => {
-                            if (err.error.message == 'Invalid Secret') {
-                                this.handlerService.handleAlert(
-                                    'Error',
-                                    'Kode ujian yang dimasukkan tidak valid.'
-                                )
-                            } else {
-                                this.handlerService.handleException(err)
-                            }
-                        }
-                    })
-            }
-        })
+                        .pipe(
+                            finalize(() => {
+                                this.isStartCATLoading$.next(false)
+                                this.isMakalahLoading$.next(false)
+                            }),
+                        )
+                        .subscribe({
+                            next: (response: any) => {
+                                if (exam_type_code) {
+                                    this.router.navigate([
+                                        `/${exam_type_code.toLowerCase()}`,
+                                    ])
+                                }
+                            },
+                            error: (err) => {
+                                if (err.error.message == 'Invalid Secret') {
+                                    this.handlerService.handleAlert(
+                                        'Error',
+                                        'Kode ujian yang dimasukkan tidak valid.',
+                                    )
+                                } else {
+                                    this.handlerService.handleException(err)
+                                }
+                            },
+                        })
+                },
+            })
     }
 
     toggleModal() {
@@ -306,14 +316,14 @@ export class DashboardComponent implements AfterViewInit {
         if (!answerDto) {
             this.handlerService.handleAlert(
                 'Error',
-                'Tidak ada file yang tersedia untuk ditampilkan.'
+                'Tidak ada file yang tersedia untuk ditampilkan.',
             )
             return
         }
 
         this.filePreviewService.open(
             answerDto.answerUpload,
-            answerDto.answerUploadUrl
+            answerDto.answerUploadUrl,
         )
     }
 
@@ -332,7 +342,7 @@ export class DashboardComponent implements AfterViewInit {
                         name: kompetensi.kompetensiName || '-',
                         items: [],
                         total: 0,
-                        correct: 0
+                        correct: 0,
                     }
                 }
 
@@ -342,7 +352,7 @@ export class DashboardComponent implements AfterViewInit {
 
                 return acc
             },
-            {}
+            {},
         )
 
         return Object.values(grouped).map((group: any) => ({
@@ -350,13 +360,13 @@ export class DashboardComponent implements AfterViewInit {
             percentage:
                 group.total > 0
                     ? Math.round((group.correct / group.total) * 100)
-                    : 0
+                    : 0,
         }))
     }
 
     getCorrectAnswer(question: any): string {
         const correctChoice = question.multipleChoiceDtoList.find(
-            (choice: any) => choice.correct
+            (choice: any) => choice.correct,
         )
         return correctChoice ? correctChoice.choiceId : ''
     }
@@ -383,7 +393,7 @@ export class DashboardComponent implements AfterViewInit {
         return kompetensi.questionDtoList.filter(
             (question: any) =>
                 question.answerDto?.answerChoice ===
-                this.getCorrectAnswer(question)
+                this.getCorrectAnswer(question),
         ).length
     }
 

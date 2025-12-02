@@ -12,6 +12,7 @@ import {
 import { NonJFParticipantUkomTask } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
 import { Task } from '@/modules/workflow/models/task.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
+import { Participant } from '../models/cat/participant.model'
 @Injectable({
     providedIn: 'root',
 })
@@ -32,7 +33,7 @@ export class UkomParticipantService {
                 compressed_file,
             })
             .pipe(
-                map((): void => void 0), // success = just void
+                map((): void => void 0),
                 catchError((error) => {
                     console.error(error)
                     return throwError(() => error) // propagate failure
@@ -57,7 +58,6 @@ export class UkomParticipantService {
             .getData(`${this.BASE_PATH}/latest/${nip}`)
             .pipe(
                 map((response) => {
-                    // if there’s an id, registration NOT allowed
                     return !response.id
                 }),
                 catchError((error) => {
@@ -124,5 +124,9 @@ export class UkomParticipantService {
                 )
                 onSuccess?.()
             })
+    }
+
+    getParticipantUkom(nip: string): Observable<Participant> {
+        return this.apiService.getData(`/api/v1/participant_ukom/nip/${nip}`)
     }
 }

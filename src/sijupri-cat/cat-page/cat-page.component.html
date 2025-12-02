@@ -1,138 +1,233 @@
-<div *ngIf="isLoading$ | async; else content" class="d-flex justify-content-center my-5">
-    <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
-
-<ng-template #content>
-    <div *ngIf="isSubmitted$ | async; else hadItem">
-        <div class="countdown-notification"></div>
-
-        <div class="container">
-            <section class="section min-vh-100 d-flex flex-column align-items-center justify-content-center">
-                <p class="countdown-message">
-                    Anda sudah mengerjakan CAT. Silahkan tunggu hingga waktu CAT
-                    selesai untuk melihat skor :
-                </p>
-                <div [class.warning]="remainingSeconds < 300" [class.danger]="remainingSeconds < 60"
-                    class="countdown-timer">
-                    {{ remainingTime }}
-                </div>
-
-                <button class="btn btn-primary btn-lg mt-3 return-button" (click)="backToHome()">
-                    Kembali
-                </button>
-            </section>
-        </div>
-    </div>
-
-    <ng-template #hadItem>
-        <div class="parent">
-            <div class="row w-100" *ngIf="data.data.length > 0">
-                <div class="col-8 d-flex flex-column card mb-10 pb-4 question-container">
-                    <button class="btn btn-secondary btn-sm mt-4 b-w-fit" (click)="backWithConfirmation()">
-                        Kembali
-                    </button>
-
-                    <div class="text-center mb-4">
-                        <img *ngIf="data.data[currentPage - 1]?.attachmentUrl"
-                            [src]="data.data[currentPage - 1]?.attachmentUrl" alt="Question Image"
-                            class="img-fluid rounded shadow img-custom-300 object-cover" />
-                    </div>
-
-                    <p class="fs-5 mb-4 question-text">
-                        <span class="question-number">No {{ currentPage }}.</span>
-                        {{ data.data[currentPage - 1]?.question }}
-                    </p>
-
-                    <div *ngFor="
-                            let choice of data.data[currentPage - 1]
-                                ?.multipleChoiceDtoList
-                        " class="mb-3">
-                        <label class="d-flex align-items-center gap-2">
-                            <input type="radio" [value]="choice.choiceId" name="answer" [checked]="
-                                    selectedAnswer[
-                                        data.data[currentPage - 1]?.id
-                                    ] === choice.choiceId
-                                " (change)="
-                                    selectAnswer(
-                                        data.data[currentPage - 1]?.id,
-                                        choice.choiceId
-                                    )
-                                " />
-                            <span>{{ choice.choiceValue }}</span>
-                        </label>
-                    </div>
-
-                    <ng-container *ngIf="isSavingAnswer$ | async; else noSavingLoading">
-                        <button class="btn btn-primary" disabled *ngIf="currentPage !== totalQuestions">
-                            <div class="spinner-border spinner-sm-custom" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </button>
-                    </ng-container>
-
-                    <ng-template #noSavingLoading>
-                        <button (click)="
-                                onSaveButtonClick(
-                                    data.data[currentPage - 1]?.id
-                                )
-                            " class="btn btn-primary mb-1">
-                            Simpan
-                        </button>
-                    </ng-template>
-
-                    <ng-container *ngIf="
-                            isSubmittingAnswer$ | async;
-                            else noSubmitLoading
-                        ">
-                        <button class="btn btn-success" disabled>
-                            <div class="spinner-border spinner-sm-custom" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </button>
-                    </ng-container>
-
-                    <ng-template #noSubmitLoading>
-                        <button *ngIf="currentPage === totalQuestions" (click)="
-                                submitAfterSave(data.data[currentPage - 1]?.id)
-                            " class="btn btn-success">
-                            Simpan dan Selesai
-                        </button>
-                    </ng-template>
-                </div>
-
-                <div class="col-4 d-flex flex-column px-16">
-                    <div class="card shadow-sm p-2 flex-grow-1">
-                        <div [class.warning]="remainingSeconds < 300" [class.danger]="remainingSeconds < 60"
-                            class="countdown-timer">
-                            {{ remainingTime }}
-                        </div>
-
-                        <div class="row justify-content-center">
-                            <button *ngFor="
-        let q of [].constructor(totalQuestions);
-        let i = index
-    " (click)="navigateToPage(i + 1)" [class.bg-primary]="currentPage === i + 1"
-                                [class.text-white]="currentPage === i + 1"
-                                [class.bg-success]="savedAnswer[data.data[i]?.id]"
-                                class="btn btn-light col-auto text-center m-1 btn-square-50">
-                                {{ i + 1 }}
-                            </button>
-                        </div>
-                    </div>
+<div class="root-cat" appDisableRightClick appDisableKeyboardShortcuts appFullscreenEnforcement>
+    <ng-container *ngIf="isLoading$ | async; else content">
+        <div class="card parent">
+            <div class="d-flex justify-content-center my-5">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
         </div>
+    </ng-container>
+
+    <ng-template #content>
+        <ng-container *ngIf="isSubmitted$ | async; else hadItem">
+            <div class="card parent">
+                <div class="d-flex flex-column flex-lg-row align-items-center justify-content-between w-100 gap-4">
+                    <div class="container max-w-50ch order-2 order-lg-1 text-center text-lg-start">
+                        <p class="text-uppercase text-primary fw-semibold mb-2 small tracking-wide">
+                            Terima kasih
+                        </p>
+                        <h2 class="fw-bold mb-3">
+                            Anda sudah menyelesaikan CAT
+                        </h2>
+                        <p class="mb-4">
+                            Mohon menunggu hingga waktu pengerjaan berakhir. Setelah waktu habis, skor Anda akan
+                            ditampilkan otomatis.
+                        </p>
+
+                        <div class="countdown-wrapper p-4 rounded-3 border" [class.warning]="remainingSeconds() < 300"
+                            [class.danger]="remainingSeconds() < 60">
+                            <ng-container *ngIf="formatRemaining() as remaining">
+                                <div
+                                    class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 countdown-grid">
+                                    <div *ngIf="remaining.days > 0" class="countdown-segment text-center">
+                                        <div class="display-6 fw-bold">{{ padTime(remaining.days) }}</div>
+                                        <small class="text-uppercase text-muted">Hari</small>
+                                    </div>
+                                    <div *ngIf="remaining.days > 0 || remaining.hours > 0"
+                                        class="countdown-segment text-center">
+                                        <div class="display-6 fw-bold">{{ padTime(remaining.hours) }}</div>
+                                        <small class="text-uppercase text-muted">Jam</small>
+                                    </div>
+                                    <div *ngIf="remaining.days > 0 || remaining.hours > 0 || remaining.minutes > 0"
+                                        class="countdown-segment text-center">
+                                        <div class="display-6 fw-bold">{{ padTime(remaining.minutes) }}</div>
+                                        <small class="text-uppercase text-muted">Menit</small>
+                                    </div>
+                                    <div class="countdown-segment text-center">
+                                        <div class="display-6 fw-bold">{{ padTime(remaining.seconds) }}</div>
+                                        <small class="text-uppercase text-muted">Detik</small>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <button class="btn btn-primary mt-4" [routerLink]="['/']">
+                            Kembali
+                        </button>
+                    </div>
+
+                    <div class="order-1 order-lg-2 flex-grow-1">
+                        <img src="assets/binbot/binbot-smiling.webp" alt="Ilustrasi pengerjaan selesai"
+                            class="img-fluid illustration-size" />
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-template #hadItem>
+            <div class="parent">
+                <div class="exam-layout" *ngIf="data.data.length > 0">
+                    <section class="card question-pane">
+                        <div class="question-scroll">
+                            <div
+                                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-4">
+                                <button class="btn btn-secondary btn-sm b-w-fit" (click)="backWithConfirmation()">
+                                    Kembali
+                                </button>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="form-check form-switch mb-0 d-flex align-items-center">
+                                        <input class="form-check-input" type="checkbox" role="switch"
+                                            id="flexSwitchCheckDefault"
+                                            [checked]="isFlagged(data.data[currentPage() - 1]?.id)"
+                                            (change)="toggleFlag(data.data[currentPage() - 1]?.id)">
+                                        <label class="form-check-label fw-semibold text-warning ms-2"
+                                            for="flexSwitchCheckDefault">Ragu-ragu</label>
+                                    </div>
+                                    <div class="vr"></div>
+                                    <div class="text-muted fw-semibold">Soal {{ currentPage() }} dari {{
+                                        totalQuestions() }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mb-4">
+                                <img *ngIf="data.data[currentPage() - 1]?.attachmentUrl"
+                                    [src]="data.data[currentPage() - 1]?.attachmentUrl" alt="Question Image"
+                                    class="img-fluid rounded shadow img-custom-300 object-cover" />
+                            </div>
+
+                            <p class="fs-5 mb-4 question-text">
+                                <span class="question-number">No {{ currentPage() }}.</span>
+                                {{ data.data[currentPage() - 1]?.question }}
+                            </p>
+
+                            <div *ngFor="
+                                let choice of data.data[currentPage() - 1]?.multipleChoiceDtoList
+                            " class="mb-3">
+                                <label class="d-flex align-items-center gap-2">
+                                    <input type="radio" [value]="choice.choiceId" name="answer" [checked]="
+                                        selectedAnswer()[data.data[currentPage() - 1]?.id] === choice.choiceId
+                                    " (change)="
+                                        selectAnswer(
+                                            data.data[currentPage() - 1]?.id,
+                                            choice.choiceId
+                                        )
+                                    " />
+                                    <span>{{ choice.choiceValue }}</span>
+                                </label>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <ng-container *ngIf="isSavingAnswer$ | async; else noSavingLoading">
+                                    <button class="btn btn-primary" disabled>
+                                        <div class="spinner-border spinner-sm-custom" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </button>
+                                </ng-container>
+
+                                <ng-template #noSavingLoading>
+                                    <button (click)="
+                                        onSaveButtonClick(
+                                            data.data[currentPage() - 1]?.id
+                                        )
+                                    " class="btn btn-primary">
+                                        Simpan
+                                    </button>
+                                </ng-template>
+
+                                <ng-container *ngIf="
+                                    isSubmittingAnswer$ | async;
+                                    else noSubmitLoading
+                                ">
+                                    <button class="btn btn-success" disabled>
+                                        <div class="spinner-border spinner-sm-custom" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </button>
+                                </ng-container>
+
+                                <ng-template #noSubmitLoading>
+                                    <button *ngIf="currentPage() === totalQuestions()" (click)="
+                                        submitAfterSave(data.data[currentPage() - 1]?.id)
+                                    " class="btn btn-success">
+                                        Simpan dan Selesai
+                                    </button>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </section>
+
+                    <aside class="card navigation-pane">
+                        <div class="navigation-scroll">
+                            <div class="countdown-wrapper">
+                                <div [class.warning]="remainingSeconds() < 300" [class.danger]="remainingSeconds() < 60"
+                                    class="countdown-timer w-100 justify-content-center">
+                                    {{ remainingTime() }}
+                                </div>
+                            </div>
+
+                            <div class="question-nav-grid">
+                                <button *ngFor="
+        let q of [].constructor(totalQuestions());
+        let i = index
+    " (click)="navigateToPage(i + 1)" [class.bg-primary]="currentPage() === i + 1"
+                                    [class.text-white]="currentPage() === i + 1"
+                                    [class.bg-success]="savedAnswer()[data.data[i]?.id] && !isFlagged(data.data[i]?.id)"
+                                    [class.bg-warning]="isFlagged(data.data[i]?.id)" class="btn btn-light nav-item-btn">
+                                    {{ i + 1 }}
+                                </button>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </ng-template>
     </ng-template>
 
-    <div *ngIf="showWarning" class="warning-message">
-        <p>
-            Mouse harus berada di dalam area ujian. Kembalikan mouse dalam waktu
-            {{ warningCountdown }} detik. Jika tidak, ujian akan dianggap
-            selesai.
-        </p>
+    <div *ngIf="showWarning()" class="warning-message">
+        Mouse terdeteksi keluar dari area ujian. Kembalikan dalam {{ securityService.warningCountdown() }} detik
+        untuk
+        menghindari penghentian ujian.
     </div>
-</ng-template>
 
-<app-confirmation-dialog></app-confirmation-dialog>
+    <ng-container *ngIf="!(isSubmitted$ | async)">
+        <button type="button" class="violation-tab"
+            [class.warning]="violationCount() > 0 && violationCount() < securityService.MAX_VIOLATIONS"
+            [class.danger]="violationCount() >= securityService.MAX_VIOLATIONS" (click)="toggleViolationPanel()">
+            <!-- <span class="tab-title">Pelanggaran</span> -->
+            <span class="tab-count">{{ violationCount() }}</span>
+        </button>
+
+        <div class="violation-sidebar" [class.open]="violationPanelOpen">
+            <div class="violation-sidebar__header">
+                <div>
+                    <p class="text-uppercase small text-muted mb-1">Pelanggaran</p>
+                    <h5 class="mb-0">{{ violationCount() }} / {{ securityService.MAX_VIOLATIONS }}</h5>
+                </div>
+                <button type="button" class="btn btn-sm btn-link text-decoration-none" (click)="closeViolationPanel()">
+                    Tutup
+                </button>
+            </div>
+
+            <p class="small text-muted mb-3">
+                Ikuti panduan berikut agar ujian berjalan lancar:
+            </p>
+
+            <ul class="violation-rules small mb-0">
+                <li>Fokus pada jendela ujian dan hindari berpindah tab atau aplikasi.</li>
+                <li>Jangan menggunakan pintasan keyboard yang dilarang (Alt+Tab, Print Screen, dll).</li>
+                <li>Pastikan kursor tetap berada di area ujian selama pengerjaan.</li>
+                <li>Jika perlu izin pengawas, gunakan tombol kembali/resmi, bukan menutup paksa.</li>
+            </ul>
+
+            <div class="violation-status mt-3">
+                Sisa toleransi: <strong>{{ remainingViolations() }}</strong> pelanggaran
+            </div>
+        </div>
+
+        <div class="violation-sidebar__backdrop" *ngIf="violationPanelOpen" (click)="closeViolationPanel()">
+        </div>
+    </ng-container>
+</div>
