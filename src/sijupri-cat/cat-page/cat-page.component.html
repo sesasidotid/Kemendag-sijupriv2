@@ -1,4 +1,4 @@
-<div class="root-cat" appDisableRightClick appDisableKeyboardShortcuts>
+<div class="root-cat" appDisableRightClick appDisableKeyboardShortcuts translate="no">
     <ng-container *ngIf="isLoading$ | async; else content">
         <div class="card parent">
             <div class="d-flex justify-content-center my-5">
@@ -264,6 +264,41 @@
                     </svg>
                     Aktifkan Fullscreen
                 </button>
+            </div>
+        </div>
+    </ng-container>
+    <!-- Translation Detected Overlay -->
+    <ng-container *ngIf="securityService.isTranslated()">
+        <div class="fullscreen-overlay translation-overlay">
+            <div class="fullscreen-overlay__content">
+                <div class="fullscreen-overlay__icon text-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 8l6 6"></path>
+                        <path d="M4 14h6l2-2h8.5a2.5 2.5 0 0 0 0-5h-19"></path>
+                        <path d="M2 5h12"></path>
+                        <path d="M7 2h1"></path>
+                        <path d="M22 22l-5-10-5 10"></path>
+                        <path d="M14 18h6"></path>
+                    </svg>
+                </div>
+                <h2 class="fullscreen-overlay__title">Terjemahan Browser Terdeteksi</h2>
+                <p class="fullscreen-overlay__message">
+                    Sistem mendeteksi bahwa browser Anda sedang menerjemahkan halaman ini.
+                    Fitur ini dapat mengganggu fungsi ujian.
+                </p>
+                <p class="fullscreen-overlay__warning">
+                    <strong>Mohon matikan fitur terjemahan otomatis</strong> pada browser Anda untuk melanjutkan ujian.
+                </p>
+                <div class="alert alert-light text-start d-inline-block mt-3">
+                    <small>
+                        <strong>Cara mematikan di Chrome:</strong><br>
+                        1. Klik ikon Google Translate di address bar (sebelah kanan).<br>
+                        2. Klik titik tiga (opsi lainnya).<br>
+                        3. Pilih "Jangan pernah terjemahkan situs ini".<br>
+                        4. Refresh halaman jika diperlukan.
+                    </small>
+                </div>
             </div>
         </div>
     </ng-container>

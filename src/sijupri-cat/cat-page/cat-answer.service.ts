@@ -123,7 +123,11 @@ export class CatAnswerService {
     /**
      * Save a single answer to the backend
      */
-    saveAnswer(questionId: string, participantId: string): Observable<any> {
+    saveAnswer(
+        questionId: string,
+        participantId: string,
+        isUncertain: boolean = false,
+    ): Observable<any> {
         const currentSelected = this.selectedAnswer()
         const selectedChoiceId = currentSelected[questionId]
 
@@ -136,6 +140,7 @@ export class CatAnswerService {
             answer_choice: selectedChoiceId,
             participant_id: participantId,
             question_id: questionId,
+            isUncertain: isUncertain,
         }
 
         this.isSavingAnswer$.next(true)
@@ -231,7 +236,9 @@ Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
         roomUkomId: string,
     ): Observable<any> {
         return new Observable((observer) => {
-            this.saveAnswer(questionId, participantId).subscribe({
+            // Check if currently flagged
+            const isUncertain = this.isFlagged(questionId)
+            this.saveAnswer(questionId, participantId, isUncertain).subscribe({
                 next: () => {
                     this.submitExam(examTypeCode, roomUkomId, true).subscribe({
                         next: (result) => observer.next(result),
@@ -263,5 +270,14 @@ Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
         this.isSavingAnswer$.next(false)
         this.isSubmittingAnswer$.next(false)
         localStorage.removeItem(this.FLAGGED_KEY)
+    }
+
+    /**
+     * Fetch the state of the exam (e.g. uncertain flags)
+     */
+    fetchExamState(examTypeCode: string, roomUkomId: string): Observable<any> {
+        return this.api.getData(
+            `/api/v1/exam/state/${examTypeCode}/${roomUkomId}`,
+        )
     }
 }

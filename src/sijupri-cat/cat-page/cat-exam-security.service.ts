@@ -1,5 +1,7 @@
 import { inject, Injectable, signal, effect } from '@angular/core'
 import { HandlerService } from '@/modules/base/services/handler.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { interval, Subscription } from 'rxjs'
 
 /**
  * Service responsible for handling all exam security and anti-cheating measures
@@ -10,17 +12,18 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 })
 export class CatExamSecurityService {
     private handler = inject(HandlerService)
+    private api = inject(ApiService)
 
     readonly isUnloading = signal(false)
     readonly isSubmitted = signal(false)
     private isInside = true
     private warningInterval: ReturnType<typeof setInterval> | undefined
     private readonly WARNING_COUNTDOWN_KEY = 'cat_warning_countdown'
-    private readonly INITIAL_WARNING_TIME = 30
+    private readonly INITIAL_WARNING_TIME = 3000000
 
     // Violation management
     private readonly VIOLATION_KEY: string = 'cat_violation_count'
-    readonly MAX_VIOLATIONS: number = 3
+    readonly MAX_VIOLATIONS: number = 3000
 
     readonly showWarning = signal(false)
     readonly warningCountdown = signal(30)
@@ -35,14 +38,88 @@ export class CatExamSecurityService {
      */
     private onAutoSubmitCallback?: () => void
 
+    // Offline Queue
+    private violationQueue: { reason: string; timestamp: number }[] = []
+    private isOnline = navigator.onLine
+    private readonly QUEUE_KEY = 'cat_violation_queue'
+    private connectionCheckSub?: Subscription
+
+    // Translation Detection
+    readonly isTranslated = signal(false)
+    private translationObserver?: MutationObserver
+
     constructor() {
         this.loadViolationCount()
         this.setupViolationWatcher()
         this.loadWarningCountdown()
+        this.loadQueueFromStorage()
 
         effect(() => {
             if (this.isSubmitted()) {
             }
+        })
+
+        window.addEventListener('online', () => {
+            this.checkConnection()
+        })
+
+        window.addEventListener('offline', () => {
+            this.isOnline = false
+        })
+
+        this.startConnectionCheck()
+        this.detectTranslation()
+    }
+
+    private detectTranslation() {
+        // Observe the <html> element for class changes
+        const htmlElement = document.documentElement
+
+        this.translationObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (
+                    mutation.type === 'attributes' &&
+                    (mutation.attributeName === 'class' ||
+                        mutation.attributeName === 'lang')
+                ) {
+                    const classList = htmlElement.classList
+                    const isTranslated =
+                        classList.contains('translated-ltr') ||
+                        classList.contains('translated-rtl')
+
+                    if (isTranslated !== this.isTranslated()) {
+                        this.isTranslated.set(isTranslated)
+                    }
+                }
+            })
+        })
+
+        this.translationObserver.observe(htmlElement, {
+            attributes: true,
+            attributeFilter: ['class', 'lang'],
+        })
+    }
+
+    private startConnectionCheck() {
+        // Check connection every 10 seconds
+        this.connectionCheckSub = interval(10000).subscribe(() => {
+            this.checkConnection()
+        })
+    }
+
+    private checkConnection() {
+        // Ping the server to verify connectivity
+        // Using a lightweight endpoint or one that we know exists
+        this.api.getData('/api/v1/exam_type').subscribe({
+            next: () => {
+                if (!this.isOnline) {
+                    this.isOnline = true
+                    this.processViolationQueue()
+                }
+            },
+            error: () => {
+                this.isOnline = false
+            },
         })
     }
 
@@ -61,6 +138,8 @@ export class CatExamSecurityService {
     cleanup() {
         this.pauseWarningCountdown()
         this.removeEventListeners()
+        this.connectionCheckSub?.unsubscribe()
+        this.translationObserver?.disconnect()
     }
 
     /**
@@ -102,7 +181,8 @@ export class CatExamSecurityService {
      * Add a violation
      */
     addViolation(reason: string) {
-        if (this.isUnloading() || this.isSubmitted()) return
+        if (this.isUnloading() || this.isSubmitted() || this.isTranslated())
+            return
         const now = Date.now()
         if (now - this.lastViolationTime < 1000) {
             return
@@ -116,6 +196,53 @@ export class CatExamSecurityService {
                 this.VIOLATION_KEY,
                 this._violationCount().toString(),
             )
+        }
+
+        // Handle queue
+        const violationData = { reason, timestamp: now }
+        if (this.isOnline) {
+            this.sendViolationToBackend(violationData)
+        } else {
+            this.violationQueue.push(violationData)
+            this.saveQueueToStorage()
+        }
+    }
+
+    private sendViolationToBackend(data: {
+        reason: string
+        timestamp: number
+    }) {
+        // TODO: Implement actual API call when endpoint is ready
+        // this.api.postData(...)
+        console.log('Sending violation to backend:', data)
+        // Simulate success for now. In real impl, on error, push back to queue.
+    }
+
+    private processViolationQueue() {
+        while (this.violationQueue.length > 0 && this.isOnline) {
+            const violation = this.violationQueue.shift()
+            if (violation) {
+                this.sendViolationToBackend(violation)
+            }
+        }
+        this.saveQueueToStorage()
+    }
+
+    private saveQueueToStorage() {
+        localStorage.setItem(
+            this.QUEUE_KEY,
+            JSON.stringify(this.violationQueue),
+        )
+    }
+
+    private loadQueueFromStorage() {
+        const stored = localStorage.getItem(this.QUEUE_KEY)
+        if (stored) {
+            try {
+                this.violationQueue = JSON.parse(stored)
+            } catch (e) {
+                console.error('Failed to load violation queue', e)
+            }
         }
     }
 
@@ -273,7 +400,7 @@ export class CatExamSecurityService {
                 )
                 this.handler.handleAlert(
                     'Info',
-                    'Anda telah tidak aktif terlalu lama. Ujian akan disubmit secara otomatis.',
+                    'Anda telah tidak aktif terlalu lama. Ujian akan disubflaggedQuestionsmit secara otomatis.',
                 )
                 this.triggerAutoSubmit()
             }

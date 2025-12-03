@@ -180,6 +180,14 @@ export class CatPageComponent {
 
     toggleFlag(questionId: string) {
         this.answerService.toggleFlag(questionId)
+        const isFlagged = this.answerService.isFlagged(questionId)
+
+        // Save the flag state to backend
+        this.answerService
+            .saveAnswer(questionId, this.pesertaUkom.id, isFlagged)
+            .subscribe({
+                error: (err) => console.error('Failed to save flag state', err),
+            })
     }
 
     isFlagged(questionId: string): boolean {
@@ -193,8 +201,9 @@ export class CatPageComponent {
     }
 
     onSaveButtonClick(questionId: string) {
+        const isFlagged = this.answerService.isFlagged(questionId)
         this.answerService
-            .saveAnswer(questionId, this.pesertaUkom.id)
+            .saveAnswer(questionId, this.pesertaUkom.id, isFlagged)
             .subscribe({
                 next: () => {},
                 error: (err) => {
@@ -312,21 +321,41 @@ export class CatPageComponent {
     }
 
     getQuestion() {
-        this.answerService.loadQuestions(this.roomUkom.id).subscribe({
-            next: (response: any) => {
-                this.data = response.data
-            },
-            error: (err) => {
-                if (err.error.message === `Exam's already ended`) {
-                    this.securityService.markSubmitted()
-                } else {
-                    this.handler.handleAlert(
-                        'Error',
-                        'Gagal mengambil pertanyaan',
+        this.answerService
+            .loadQuestions(this.roomUkom.id)
+            .pipe(
+                switchMap((response: any) => {
+                    this.data = response.data
+                    return this.answerService.fetchExamState(
+                        this.EXAM_TYPE,
+                        this.roomUkom.id,
                     )
-                }
-            },
-        })
+                }),
+            )
+            .subscribe({
+                next: (states: any[]) => {
+                    // Update flagged questions based on state
+                    const flagged = new Set<string>()
+                    if (Array.isArray(states)) {
+                        states.forEach((s) => {
+                            if (s.is_uncertain) {
+                                flagged.add(s.questionId)
+                            }
+                        })
+                    }
+                    this.answerService.flaggedQuestions.set(flagged)
+                },
+                error: (err) => {
+                    if (err.error.message === `Exam's already ended`) {
+                        this.securityService.markSubmitted()
+                    } else {
+                        this.handler.handleAlert(
+                            'Error',
+                            'Gagal mengambil pertanyaan',
+                        )
+                    }
+                },
+            })
     }
 
     formatRemaining() {
