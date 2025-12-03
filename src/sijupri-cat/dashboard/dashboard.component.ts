@@ -1,32 +1,39 @@
 import { CommonModule } from '@angular/common'
 import { LoginContext } from './../../modules/base/commons/login-context'
-import { Component, AfterViewInit, ElementRef } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { RoomUkom } from '../../modules/ukom/models/cat/room-ukom.model'
 import { ApiService } from '../../modules/base/services/api.service'
 import { Router } from '@angular/router'
 import { HandlerService } from '../../modules/base/services/handler.service'
 import {
-    catchError,
     forkJoin,
     interval,
     map,
     Observable,
     of,
-    switchMap,
     tap,
     combineLatest,
     finalize,
+    concatMap,
+    catchError,
 } from 'rxjs'
 import { ConfirmationService } from '../../modules/base/services/confirmation.service'
-import { CATSchore } from '../../modules/ukom/models/cat/cat-schore'
+import { CATScore } from '../../modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '../../modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../modules/base/components/empty-state/empty-state.component'
-import { ExamType } from '../../modules/ukom/models/exam-type'
+import { ExamType } from '../../modules/ukom/models/exam-type.model'
 import { MakalahScore } from '../../modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../modules/base/services/file-preview.service'
 import { LoadingButtonComponent } from '../../modules/base/components/loading-button/loading-button.component'
-declare var bootstrap: any
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
+import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
+import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
+import { Participant } from '@/modules/ukom/models/cat/participant.model'
+import { ExamService } from '@/modules/ukom/services/exam.service'
+import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
+import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-competency.model'
+import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 
 @Component({
     selector: 'app-dashboard',
@@ -40,95 +47,96 @@ declare var bootstrap: any
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements AfterViewInit {
-    roomUkom: RoomUkom = new RoomUkom()
-    now: number = Date.now()
-    currentDate = new Date()
-    participant_id: string = ''
-    isModalOpen$ = new BehaviorSubject<boolean>(false)
-    groupedKompetensi: any[] = []
+export class DashboardComponent {
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
+    participantService = inject(UkomParticipantService)
+    examGradeService = inject(ExamGradeService)
+    examService = inject(ExamService)
+
+    isModalOpen = signal(false)
+
+    roomUkom = new RoomUkom()
     examType: ExamType[] = []
-    scoreMap: Record<string, any> = {}
+
+    scoreMap: Record<string, ScoreValue | null> = {}
 
     isRoomLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
-    isExamTypeLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isStartCATLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isMakalahLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isLoading$: Observable<boolean>
 
     constructor(
-        private apiService: ApiService,
         private router: Router,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private elRef: ElementRef,
         private filePreviewService: FilePreviewService,
     ) {
-        this.isLoading$ = combineLatest([
-            this.isRoomLoading$,
-            this.isExamTypeLoading$,
-        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
-    }
-
-    ngOnInit() {
-        this.getExamType()
-            .pipe(switchMap(() => this.getRoomUkom()))
-            .subscribe()
-        this.updateCurrentTime()
-        this.exitFullScreen()
-    }
-
-    ngAfterViewInit() {
-        this.initializeTooltips()
-    }
-
-    getExamType(): Observable<ExamType[]> {
-        this.isExamTypeLoading$.next(true)
-        return this.apiService.getData('/api/v1/exam_type').pipe(
-            map((response: any[]) =>
-                response.map((item) => new ExamType(item)),
-            ),
-            tap((examTypes: ExamType[]) => {
-                this.examType = examTypes
-            }),
-            catchError((error) => {
-                console.error('Failed to fetch exam types:', error)
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengambil jenis ujian',
-                )
-                return of([])
-            }),
-            finalize(() => {
-                this.isExamTypeLoading$.next(false)
-            }),
+        this.isLoading$ = combineLatest([this.isRoomLoading$]).pipe(
+            map((loadings) => loadings.some((isLoading) => isLoading)),
         )
     }
 
-    getAllScores(): Observable<any> {
-        if (!this.examType?.length || !this.participant_id) {
-            return of([]) // return empty observable if not ready
-        }
+    ngOnInit() {
+        this.loadExams()
+    }
 
-        const requests = this.examType.map((type) => {
+    loadExams() {
+        const userId = LoginContext.getUserId().replace('PU-', '')
+
+        this.isRoomLoading$.next(true)
+        this.participantService
+            .getParticipantUkom(userId)
+            .pipe(
+                tap((response) => {
+                    this.roomUkom = response.roomUkomDto
+                }),
+
+                concatMap((participant) =>
+                    this.getExamType().pipe(
+                        map((examType) => ({ participant, examType })),
+                    ),
+                ),
+
+                concatMap(({ participant, examType }) =>
+                    this.getAllScores(participant, examType),
+                ),
+
+                finalize(() => this.isRoomLoading$.next(false)),
+            )
+            .subscribe()
+    }
+
+    getExamType() {
+        return this.ukomMiscellaneousService
+            .getExamType()
+            .pipe(tap((examType) => (this.examType = examType)))
+    }
+
+    getAllScores(participant: Participant, examType: ExamType[]) {
+        if (!participant || !examType) return of([])
+
+        const requests = examType.map((type) => {
             const examCode = type.code
-            return this.apiService
-                .getData(
-                    `/api/v1/exam_grade/${examCode}/${this.participant_id}`,
-                )
+
+            return this.examGradeService
+                .getExamGradeByCodeAndParticipantId(examCode, participant.id)
                 .pipe(
-                    catchError((error) => {
-                        console.error(
-                            `Failed to fetch score for ${examCode}:`,
-                            error,
-                        )
-                        return of(null)
+                    catchError((err) => {
+                        if (err.status === 404) {
+                            // Expected missing score → return null, but don't error
+                            return of({ examCode, scoreInstance: null })
+                        }
+
+                        // Any unexpected error should NOT break forkJoin
+                        console.error(`Unexpected error for ${examCode}`, err)
+                        return of({ examCode, scoreInstance: null })
                     }),
                     map((response) => {
-                        let scoreInstance: any
+                        let scoreInstance
+
                         switch (examCode) {
                             case 'CAT':
-                                scoreInstance = new CATSchore(response)
+                                scoreInstance = new CATScore(response)
                                 break
                             case 'MAKALAH':
                                 scoreInstance = new MakalahScore(response)
@@ -136,6 +144,7 @@ export class DashboardComponent implements AfterViewInit {
                             default:
                                 scoreInstance = response
                         }
+
                         return { examCode, scoreInstance }
                     }),
                 )
@@ -144,27 +153,12 @@ export class DashboardComponent implements AfterViewInit {
         return forkJoin(requests).pipe(
             tap((results) => {
                 results.forEach((result) => {
-                    if (result && result.examCode) {
+                    if (result?.examCode) {
                         this.scoreMap[result.examCode] = result.scoreInstance
                     }
                 })
             }),
         )
-    }
-
-    initializeTooltips() {
-        const tooltipTriggerList = this.elRef.nativeElement.querySelectorAll(
-            '[data-bs-toggle="tooltip"]',
-        )
-        tooltipTriggerList.forEach((tooltipTriggerEl: any) => {
-            new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    }
-
-    updateCurrentTime() {
-        interval(1000).subscribe(() => {
-            this.now = Date.now()
-        })
     }
 
     getAbsoluteUrl(url: string): string {
@@ -174,27 +168,8 @@ export class DashboardComponent implements AfterViewInit {
         return url
     }
 
-    exitFullScreen() {
-        if (document.exitFullscreen) {
-            document.exitFullscreen()
-        } else if ((document as any).mozCancelFullScreen) {
-            /* Firefox */
-            ;(document as any).mozCancelFullScreen()
-        } else if ((document as any).webkitExitFullscreen) {
-            /* Chrome, Safari, and Opera */
-            ;(document as any).webkitExitFullscreen()
-        } else if ((document as any).msExitFullscreen) {
-            /* IE/Edge */
-            ;(document as any).msExitFullscreen()
-        }
-    }
-
-    // canStartExam (startTime: string, endTime: string): boolean {
-    //     const now = this.currentDate
-    //     return new Date(startTime) <= now && now <= new Date(endTime)
-    // }
     canStartExam(startTime: string, endTime: string): boolean {
-        const now = this.currentDate
+        const now = new Date()
 
         const toGMT7 = (dateStr: string): Date => {
             const [datePart, timePart] = dateStr.split(' ')
@@ -209,34 +184,14 @@ export class DashboardComponent implements AfterViewInit {
         return toGMT7(startTime) <= now && now <= toGMT7(endTime)
     }
 
-    getRoomUkom(): Observable<void> {
-        const userId = LoginContext.getUserId().replace('PU-', '')
-
-        this.isRoomLoading$.next(true)
-
-        return this.apiService
-            .getData(`/api/v1/participant_ukom/nip/${userId}`)
-            .pipe(
-                tap((response: any) => {
-                    this.roomUkom = new RoomUkom(response.roomUkomDto)
-                    this.participant_id = response.id
-                }),
-                switchMap(() => this.getAllScores()),
-                finalize(() => {
-                    this.isRoomLoading$.next(false)
-                }),
-                map(() => {}),
-            )
-    }
-
-    startExam(room_ukom_id: string, exam_type_code: string) {
+    startExam(roomUkomId: string, examTypeCode: string) {
         let title: string
         let message: string
         let commentLabel: string | undefined
         let placeholder: string | undefined
         let withComment: boolean
 
-        if (exam_type_code === 'CAT') {
+        if (examTypeCode === 'CAT') {
             withComment = true
             title = 'Konfirmasi Mulai Ujian CAT'
             message =
@@ -246,6 +201,7 @@ export class DashboardComponent implements AfterViewInit {
         } else {
             withComment = false
         }
+
         this.confirmationService
             .open(
                 withComment,
@@ -257,24 +213,18 @@ export class DashboardComponent implements AfterViewInit {
                 placeholder, // Pass the conditional placeholder
             )
             .subscribe({
-                next: (response) => {
-                    if (!response.confirmed) {
-                        return
-                    }
+                next: ({ confirmed, comment }) => {
+                    if (!confirmed) return
 
-                    if (exam_type_code === 'CAT') {
+                    if (examTypeCode === 'CAT') {
                         this.isStartCATLoading$.next(true)
                     }
-                    if (exam_type_code === 'MAKALAH') {
+                    if (examTypeCode === 'MAKALAH') {
                         this.isMakalahLoading$.next(true)
                     }
 
-                    this.apiService
-                        .postData('/api/v1/exam/start', {
-                            examTypeCode: exam_type_code,
-                            roomUkomId: room_ukom_id,
-                            secret_key: response.comment ?? undefined,
-                        })
+                    this.examService
+                        .startExam(examTypeCode, roomUkomId, comment)
                         .pipe(
                             finalize(() => {
                                 this.isStartCATLoading$.next(false)
@@ -282,10 +232,10 @@ export class DashboardComponent implements AfterViewInit {
                             }),
                         )
                         .subscribe({
-                            next: (response: any) => {
-                                if (exam_type_code) {
+                            next: () => {
+                                if (examTypeCode) {
                                     this.router.navigate([
-                                        `/${exam_type_code.toLowerCase()}`,
+                                        `/${examTypeCode.toLowerCase()}`,
                                     ])
                                 }
                             },
@@ -305,14 +255,22 @@ export class DashboardComponent implements AfterViewInit {
     }
 
     toggleModal() {
-        this.isModalOpen$.next(!this.isModalOpen$.value)
+        this.isModalOpen.set(!this.isModalOpen())
     }
 
-    viewFile() {
-        const answerDto =
-            this.scoreMap['MAKALAH']?.questionDtoList[0]?.answerDto
+    viewUploadedMakalah() {
+        const rawScore = this.scoreMap['MAKALAH']
 
-        console.log('Answer DTO:', this.scoreMap['MAKALAH'])
+        if (!(rawScore instanceof MakalahScore)) {
+            this.handlerService.handleAlert(
+                'Error',
+                'Tidak ada file yang tersedia untuk ditampilkan.',
+            )
+            return
+        }
+
+        const answerDto = rawScore.questionDtoList[0]?.answerDto
+
         if (!answerDto) {
             this.handlerService.handleAlert(
                 'Error',
@@ -327,35 +285,41 @@ export class DashboardComponent implements AfterViewInit {
         )
     }
 
-    getGroupedCompetencies(): any[] {
-        if (!this.scoreMap['CAT']?.kompetensiIndikatorDtoList) {
+    getGroupedCompetencies() {
+        const rawScore = this.scoreMap['CAT']
+
+        if (!rawScore) return []
+
+        if (!(rawScore instanceof CATScore)) {
             return []
         }
 
-        // Group by kompetensiId
-        const grouped = this.scoreMap['CAT'].kompetensiIndikatorDtoList.reduce(
-            (acc: any, kompetensi: any) => {
-                const key = kompetensi.kompetensiId || 'default'
+        type GroupResult = {
+            name: string
+            items: typeof rawScore.kompetensiIndikatorDtoList
+            total: number
+            correct: number
+        }
 
-                if (!acc[key]) {
-                    acc[key] = {
-                        name: kompetensi.kompetensiName || '-',
-                        items: [],
-                        total: 0,
-                        correct: 0,
-                    }
+        const grouped = rawScore.kompetensiIndikatorDtoList.reduce(
+            (acc, kompetensi) => {
+                const key = kompetensi.kompetensiId
+                acc[key] ??= {
+                    name: kompetensi.kompetensiName ?? '-',
+                    items: [],
+                    total: 0,
+                    correct: 0,
                 }
-
                 acc[key].items.push(kompetensi)
-                acc[key].total += kompetensi.questionDtoList?.length || 0
+                acc[key].total += kompetensi.questionDtoList?.length ?? 0
                 acc[key].correct += this.getCorrectAnswersCount(kompetensi)
 
                 return acc
             },
-            {},
+            {} as Record<string, GroupResult>,
         )
 
-        return Object.values(grouped).map((group: any) => ({
+        return Object.values(grouped).map((group) => ({
             ...group,
             percentage:
                 group.total > 0
@@ -364,40 +328,26 @@ export class DashboardComponent implements AfterViewInit {
         }))
     }
 
-    getCorrectAnswer(question: any): string {
+    getCorrectAnswer(question: CATQuestions): string {
         const correctChoice = question.multipleChoiceDtoList.find(
-            (choice: any) => choice.correct,
+            (choice) => choice.correct,
         )
         return correctChoice ? correctChoice.choiceId : ''
     }
 
-    getCompetencyPercentage(kompetensi: any): number {
-        if (
-            !kompetensi.questionDtoList ||
-            kompetensi.questionDtoList.length === 0
-        ) {
-            return 0
-        }
-
-        const correctAnswers = this.getCorrectAnswersCount(kompetensi)
-        const totalQuestions = kompetensi.questionDtoList.length
-
-        return Math.round((correctAnswers / totalQuestions) * 100)
-    }
-
-    getCorrectAnswersCount(kompetensi: any): number {
+    getCorrectAnswersCount(kompetensi: CATIndicatorCompetency): number {
         if (!kompetensi.questionDtoList) {
             return 0
         }
 
         return kompetensi.questionDtoList.filter(
-            (question: any) =>
+            (question) =>
                 question.answerDto?.answerChoice ===
                 this.getCorrectAnswer(question),
         ).length
     }
 
-    getWrongAnswersCount(kompetensi: any): number {
+    getWrongAnswersCount(kompetensi: CATIndicatorCompetency): number {
         if (!kompetensi.questionDtoList) {
             return 0
         }

@@ -21,13 +21,13 @@ import {
 } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
-import { CATSchore } from '../../../modules/ukom/models/cat/cat-schore'
+import { CATScore } from '../../../modules/ukom/models/cat/cat-score'
 import { Router } from '@angular/router'
 import { DataDokumenUkom } from '../../../modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { HandlerService } from '../../../modules/base/services/handler.service'
-import { ExamType } from '../../../modules/ukom/models/exam-type'
+import { ExamType } from '../../../modules/ukom/models/exam-type.model'
 import { MakalahScore } from '../../../modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
@@ -229,7 +229,7 @@ export class UkomTaskDetailComponent implements OnDestroy {
                                     let scoreInstance: any
                                     switch (examCode) {
                                         case 'CAT':
-                                            scoreInstance = new CATSchore(
+                                            scoreInstance = new CATScore(
                                                 response,
                                             )
                                             break

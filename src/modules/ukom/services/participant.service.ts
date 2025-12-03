@@ -127,6 +127,6 @@ export class UkomParticipantService {
     }
 
     getParticipantUkom(nip: string): Observable<Participant> {
-        return this.apiService.getData(`/api/v1/participant_ukom/nip/${nip}`)
+        return this.apiService.getData(`${this.BASE_PATH}/nip/${nip}`)
     }
 }

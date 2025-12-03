@@ -1,59 +1,22 @@
 import { Serializable } from '../../../base/commons/serializable'
-
+import { CATChoice } from './cat-choice.model'
+import { CATAnswer } from './cat-answer.model'
 export class CATQuestions extends Serializable {
-  currentPage: number = undefined
-  data: Daum[] = []
-  firstPageUrl: string = undefined
-  from: number = undefined
-  lastPage: number = undefined
-  lastPageUrl: string = undefined
-  links: Link[] = []
-  nextPageUrl: any = undefined
-  path: string = undefined
-  perPage: number = undefined
-  prevPageUrl: string = undefined
-  to: number = undefined
-  total: number = undefined
+    id: string = undefined
+    question: string = undefined
+    type: string = undefined
+    fileAttachment: string | null = undefined
+    attachment: string | null = undefined
+    attachmentUrl: string | null = undefined
+    moduleId: string = undefined
+    associationId: string | null = undefined
+    association: string | null = undefined
+    groupId: string | null = undefined
+    multipleChoiceDtoList: CATChoice[] = []
+    answerDto: CATAnswer = undefined
 
-  constructor (object?: { [key: string]: any }) {
-    super()
-    if (object) this.fromObject(object)
-  }
-}
-
-export interface Daum {
-  id: string
-  question: string
-  type: string
-  fileAttachment: any
-  attachment: any
-  attachmentUrl: any
-  moduleId: string
-  associationId: any
-  association: any
-  groupId: any
-  multipleChoiceDtoList: MultipleChoiceDtoList[]
-  answerDto: AnswerDto
-}
-
-export interface MultipleChoiceDtoList {
-  choiceId: string
-  choiceValue: string
-  correct: any
-  questionId: string
-}
-
-export interface AnswerDto {
-  id: string
-  answer: any
-  participantId: string
-  questionId: string
-  questionType: any
-  question: any
-}
-
-export interface Link {
-  url?: string
-  label: string
-  active: boolean
+    constructor(object?: { [key: string]: any }) {
+        super()
+        if (object) this.fromObject(object)
+    }
 }

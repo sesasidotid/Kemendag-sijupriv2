@@ -60,7 +60,7 @@ export class CatPageComponent {
     readonly userID = LoginContext.getUserId()
 
     // Data models
-    data = new CATQuestions()
+    data: CATQuestions[] = []
     roomUkom = new RoomUkom()
     pesertaUkom = new Participant()
     examAttendance = new ExamAttendance()
@@ -314,7 +314,7 @@ export class CatPageComponent {
     getQuestion() {
         this.answerService.loadQuestions(this.roomUkom.id).subscribe({
             next: (response: any) => {
-                this.data.data = response.data
+                this.data = response.data
             },
             error: (err) => {
                 if (err.error.message === `Exam's already ended`) {

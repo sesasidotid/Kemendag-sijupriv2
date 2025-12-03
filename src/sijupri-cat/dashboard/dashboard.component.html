@@ -105,7 +105,7 @@
                                             scoreMap['MAKALAH']?.score !==
                                                 undefined)" [isLoading]="isMakalahLoading$ | async"
                                     [label]="'Upload Makalah'"></app-loading-button>
-                                <button class="btn btn-success " (click)="viewFile()" *ngIf="
+                                <button class="btn btn-success " (click)="viewUploadedMakalah()" *ngIf="
                                         scoreMap['MAKALAH']?.score !== null &&
                                         scoreMap['MAKALAH']?.score !== undefined
                                     ">
@@ -127,8 +127,7 @@
     </section>
 </ng-template>
 
-<app-modal *ngIf="isModalOpen$ | async" [title]="'Hasil Ujian'" (toggle)="toggleModal()" [size]="'lg'"
-    [enableFooter]="false">
+<app-modal *ngIf="isModalOpen()" [title]="'Hasil Ujian'" (toggle)="toggleModal()" [size]="'lg'" [enableFooter]="false">
     <ng-container>
         <div class="total-score-container">
             <div class="total-score-value">
@@ -151,90 +150,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Sub-competencies -->
-            <!-- <div class="row">
-                <div
-                    *ngFor="let kompetensi of competencyGroup.items"
-                    class="col-md-6 mb-3"
-                >
-                    <div class="card">
-                        <div
-                            class="card-header d-flex justify-content-between align-items-center"
-                        >
-                            <h5 class="mb-0">{{ kompetensi.name }}</h5>
-                            <span
-                                class="badge"
-                                [ngClass]="{
-                                    'bg-success':
-                                        getCompetencyPercentage(kompetensi) >=
-                                        70,
-                                    'bg-warning':
-                                        getCompetencyPercentage(kompetensi) >=
-                                            50 &&
-                                        getCompetencyPercentage(kompetensi) <
-                                            70,
-                                    'bg-danger':
-                                        getCompetencyPercentage(kompetensi) < 50
-                                }"
-                            >
-                                {{ getCompetencyPercentage(kompetensi) }}%
-                            </span>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Pertanyaan</th>
-                                            <th>Jawaban</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr
-                                            *ngFor="
-                                                let question of kompetensi.questionDtoList
-                                            "
-                                            [ngClass]="{
-                                                'table-success':
-                                                    question.answerDto
-                                                        ?.answerChoice ===
-                                                    getCorrectAnswer(question),
-                                                'table-danger':
-                                                    question.answerDto
-                                                        ?.answerChoice !==
-                                                    getCorrectAnswer(question)
-                                            }"
-                                        >
-                                            <td>{{ question.question }}</td>
-                                            <td>
-                                                {{
-                                                    question.answerDto
-                                                        ?.answerChoice
-                                                }}
-                                            </td>
-                                            <td>
-                                                <span>
-                                                    {{
-                                                        question.answerDto
-                                                            ?.answerChoice ===
-                                                        getCorrectAnswer(
-                                                            question
-                                                        )
-                                                            ? 'Benar'
-                                                            : 'Salah'
-                                                    }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
     </ng-container>
 </app-modal>

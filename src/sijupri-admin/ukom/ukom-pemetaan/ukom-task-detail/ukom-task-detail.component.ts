@@ -20,12 +20,12 @@ import {
 } from 'rxjs'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
-import { CATSchore } from '../../../../modules/ukom/models/cat/cat-schore'
+import { CATScore } from '../../../../modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
 import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { ExamType } from '../../../../modules/ukom/models/exam-type'
+import { ExamType } from '../../../../modules/ukom/models/exam-type.model'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { MakalahScore } from '../../../../modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
@@ -55,7 +55,7 @@ export class UkomTaskDetailComponent {
     jabatan: Jabatan = new Jabatan()
     jenjang: Jenjang = new Jenjang()
     pangkat: Pangkat = new Pangkat()
-    CATSchore: CATSchore = new CATSchore()
+    CATScore: CATScore = new CATScore()
     dataDokumenUkom: DataDokumenUkom[] = []
 
     ukomDetail = new UkomTaskDetail()
@@ -192,7 +192,7 @@ export class UkomTaskDetailComponent {
                                             switch (examCode) {
                                                 case 'CAT':
                                                     scoreInstance =
-                                                        new CATSchore(response)
+                                                        new CATScore(response)
                                                     break
                                                 case 'MAKALAH':
                                                     scoreInstance =

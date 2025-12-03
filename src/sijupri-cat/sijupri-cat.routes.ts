@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router'
 import { authGuard } from '../modules/base/guards/auth.guard'
-import { RouteLoader } from '../modules/base/commons/route-loader'
 import { catExamGuard } from './cat-page/cat-exam.guard'
 
 export const routes: Routes = [

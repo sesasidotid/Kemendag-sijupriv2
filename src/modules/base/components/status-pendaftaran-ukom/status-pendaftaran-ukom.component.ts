@@ -27,12 +27,12 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
 import { EmptyStateComponent } from '../empty-state/empty-state.component'
 import { LandingPageComponent } from '../../../landing-page/landing-page.component'
-import { CATSchore } from '../../../../modules/ukom/models/cat/cat-schore'
+import { CATScore } from '../../../ukom/models/cat/cat-score'
 import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { HandlerService } from '../../services/handler.service'
-import { ExamType } from '../../../ukom/models/exam-type'
+import { ExamType } from '../../../ukom/models/exam-type.model'
 import { PredikatKinerja } from '../../../maintenance/models/predikat-kinerja.model'
 import { MakalahScore } from '../../../ukom/models/cat/makalah-score'
 import { FilePreviewService } from '../../services/file-preview.service'
@@ -77,7 +77,7 @@ export class StatusPendaftaranUkomComponent {
     profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
     finishTask: UkomTaskDetail = new UkomTaskDetail()
-    CATSchore: CATSchore = new CATSchore()
+    CATScore: CATScore = new CATScore()
     isCATModalOpen$ = new BehaviorSubject<boolean>(false)
     dataDokumenUkom: DataDokumenUkom[] = []
 
@@ -478,7 +478,7 @@ export class StatusPendaftaranUkomComponent {
                                     let scoreInstance: any
                                     switch (examCode) {
                                         case 'CAT':
-                                            scoreInstance = new CATSchore(
+                                            scoreInstance = new CATScore(
                                                 response,
                                             )
                                             break

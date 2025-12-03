@@ -67,7 +67,7 @@
 
         <ng-template #hadItem>
             <div class="parent">
-                <div class="exam-layout" *ngIf="data.data.length > 0">
+                <div class="exam-layout" *ngIf="data.length > 0">
                     <section class="card question-pane">
                         <div class="question-scroll">
                             <div
@@ -79,8 +79,8 @@
                                     <div class="form-check form-switch mb-0 d-flex align-items-center">
                                         <input class="form-check-input" type="checkbox" role="switch"
                                             id="flexSwitchCheckDefault"
-                                            [checked]="isFlagged(data.data[currentPage() - 1]?.id)"
-                                            (change)="toggleFlag(data.data[currentPage() - 1]?.id)">
+                                            [checked]="isFlagged(data[currentPage() - 1]?.id)"
+                                            (change)="toggleFlag(data[currentPage() - 1]?.id)">
                                         <label class="form-check-label fw-semibold text-warning ms-2"
                                             for="flexSwitchCheckDefault">Ragu-ragu</label>
                                     </div>
@@ -92,25 +92,25 @@
                             </div>
 
                             <div class="text-center mb-4">
-                                <img *ngIf="data.data[currentPage() - 1]?.attachmentUrl"
-                                    [src]="data.data[currentPage() - 1]?.attachmentUrl" alt="Question Image"
+                                <img *ngIf="data[currentPage() - 1]?.attachmentUrl"
+                                    [src]="data[currentPage() - 1]?.attachmentUrl" alt="Question Image"
                                     class="img-fluid rounded shadow img-custom-300 object-cover" />
                             </div>
 
                             <p class="fs-5 mb-4 question-text">
                                 <span class="question-number">No {{ currentPage() }}.</span>
-                                {{ data.data[currentPage() - 1]?.question }}
+                                {{ data[currentPage() - 1]?.question }}
                             </p>
 
                             <div *ngFor="
-                                let choice of data.data[currentPage() - 1]?.multipleChoiceDtoList
+                                let choice of data[currentPage() - 1]?.multipleChoiceDtoList
                             " class="mb-3">
                                 <label class="d-flex align-items-center gap-2">
                                     <input type="radio" [value]="choice.choiceId" name="answer" [checked]="
-                                        selectedAnswer()[data.data[currentPage() - 1]?.id] === choice.choiceId
+                                        selectedAnswer()[data[currentPage() - 1]?.id] === choice.choiceId
                                     " (change)="
                                         selectAnswer(
-                                            data.data[currentPage() - 1]?.id,
+                                            data[currentPage() - 1]?.id,
                                             choice.choiceId
                                         )
                                     " />
@@ -130,7 +130,7 @@
                                 <ng-template #noSavingLoading>
                                     <button (click)="
                                         onSaveButtonClick(
-                                            data.data[currentPage() - 1]?.id
+                                            data[currentPage() - 1]?.id
                                         )
                                     " class="btn btn-primary">
                                         Simpan
@@ -150,7 +150,7 @@
 
                                 <ng-template #noSubmitLoading>
                                     <button *ngIf="currentPage() === totalQuestions()" (click)="
-                                        submitAfterSave(data.data[currentPage() - 1]?.id)
+                                        submitAfterSave(data[currentPage() - 1]?.id)
                                     " class="btn btn-success">
                                         Simpan dan Selesai
                                     </button>
@@ -174,8 +174,8 @@
         let i = index
     " (click)="navigateToPage(i + 1)" [class.bg-primary]="currentPage() === i + 1"
                                     [class.text-white]="currentPage() === i + 1"
-                                    [class.bg-success]="savedAnswer()[data.data[i]?.id] && !isFlagged(data.data[i]?.id)"
-                                    [class.bg-warning]="isFlagged(data.data[i]?.id)" class="btn btn-light nav-item-btn">
+                                    [class.bg-success]="savedAnswer()[data[i]?.id] && !isFlagged(data[i]?.id)"
+                                    [class.bg-warning]="isFlagged(data[i]?.id)" class="btn btn-light nav-item-btn">
                                     {{ i + 1 }}
                                 </button>
                             </div>
