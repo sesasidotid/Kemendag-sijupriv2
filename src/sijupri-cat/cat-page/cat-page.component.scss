@@ -31,6 +31,12 @@
     }
 }
 
+@media print {
+  body {
+    display: none;
+  }
+}
+
 // .exam-layout {
 //     display: flex;
 //     flex-direction: column;
@@ -101,7 +107,7 @@
     border: none;
     border-radius: 999px 0 0 999px;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
-    z-index: 1040;
+    z-index: 40;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -144,7 +150,7 @@
     background: #fff;
     box-shadow: -10px 0 30px rgba(15, 23, 42, 0.2);
     padding: 24px;
-    z-index: 1050;
+    z-index: 50;
     transition: right 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -198,7 +204,7 @@
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.35);
-    z-index: 1045;
+    z-index: 45;
 }
 
 /* Sticky question container */
@@ -302,7 +308,7 @@ label {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    z-index: 200;
     text-align: center;
 }
 
@@ -382,4 +388,173 @@ label {
 .root-cat {
   width: 100%;
   height: 100%;
+}
+
+/* Fullscreen Security Overlay */
+.fullscreen-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fullscreen-overlay__content {
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    border-radius: 24px;
+    padding: 48px 40px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.fullscreen-overlay__icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 96px;
+    height: 96px;
+    background: linear-gradient(135deg, #1976d2, #42a5f5);
+    border-radius: 50%;
+    margin-bottom: 24px;
+    color: #ffffff;
+    box-shadow: 
+        0 8px 24px rgba(25, 118, 210, 0.4),
+        0 0 0 8px rgba(25, 118, 210, 0.1);
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.fullscreen-overlay__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+}
+
+.fullscreen-overlay__message {
+    font-size: 1.125rem;
+    color: #4b5563;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.fullscreen-overlay__warning {
+    font-size: 1rem;
+    color: #d97706;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    border-left: 4px solid #f59e0b;
+    text-align: left;
+    line-height: 1.6;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+
+    strong {
+        color: #92400e;
+    }
+}
+
+.fullscreen-overlay__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+    padding: 14px 32px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1976d2, #42a5f5);
+    border: none;
+    color: #ffffff;
+    box-shadow: 
+        0 4px 16px rgba(25, 118, 210, 0.4),
+        0 0 0 0 rgba(25, 118, 210, 0);
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 
+            0 8px 24px rgba(25, 118, 210, 0.5),
+            0 0 0 3px rgba(25, 118, 210, 0.2);
+        background: linear-gradient(135deg, #1565c0, #1976d2);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    svg {
+        flex-shrink: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .fullscreen-overlay__content {
+        padding: 32px 24px;
+    }
+
+    .fullscreen-overlay__icon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+
+        svg {
+            width: 48px;
+            height: 48px;
+        }
+    }
+
+    .fullscreen-overlay__title {
+        font-size: 1.5rem;
+    }
+
+    .fullscreen-overlay__message {
+        font-size: 1rem;
+    }
+
+    .fullscreen-overlay__button {
+        font-size: 1rem;
+        padding: 12px 24px;
+    }
 }

@@ -14,9 +14,9 @@ import {
     finalize,
     map,
     Observable,
+    startWith,
     Subject,
     switchMap,
-    takeUntil,
 } from 'rxjs'
 import { ReactiveFormsModule } from '@angular/forms'
 import { HostListener } from '@angular/core'
@@ -28,7 +28,6 @@ import { CatExamTimerService } from './cat-exam-timer.service'
 import { CatAnswerService } from './cat-answer.service'
 import { DisableRightClickDirective } from './disable-right-click.directive'
 import { DisableKeyboardShortcutsDirective } from './disable-keyboard-shortcuts.directive'
-import { FullscreenEnforcementDirective } from './fullscreen-enforcement.directive'
 
 @Component({
     selector: 'app-cat-page',
@@ -38,7 +37,6 @@ import { FullscreenEnforcementDirective } from './fullscreen-enforcement.directi
         ReactiveFormsModule,
         DisableRightClickDirective,
         DisableKeyboardShortcutsDirective,
-        FullscreenEnforcementDirective,
         RouterModule,
     ],
     templateUrl: './cat-page.component.html',
@@ -69,7 +67,6 @@ export class CatPageComponent {
 
     // Exam state
     examEndTime: Date | null = null
-    isSubmitted$ = new BehaviorSubject<boolean>(false)
     isLoadingRoomUkom$ = new BehaviorSubject<boolean>(false)
 
     // Computed & reactive properties from services
@@ -86,36 +83,34 @@ export class CatPageComponent {
 
     showWarning = this.securityService.showWarning
     violationCount = this.securityService.violationCount
+    isFullscreen = this.securityService.isFullscreen
+    isSubmitted = this.securityService.isSubmitted
     violationPanelOpen = false
     private violationPanelPinned = false
     private violationAutoCloseTimer?: ReturnType<typeof setTimeout>
 
-    // Combined loading state
     isLoading$: Observable<boolean>
 
     private destroy$ = new Subject<void>()
 
     constructor() {
-        this.isLoading$ = combineLatest([this.isLoadingRoomUkom$]).pipe(
-            map((loadings) => loadings.some((isLoading) => isLoading)),
-        )
+        this.isLoading$ = combineLatest([
+            this.isLoadingRoomUkom$.pipe(startWith(true)),
+        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
     }
 
     ngOnInit() {
-        // Initialize security measures
         this.securityService.initializeSecurity(() => this.submitAnswer(false))
 
         // Load exam data
         this.getRoomUkom()
 
         // Hide warning when exam is submitted
-        this.isSubmitted$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((submitted) => {
-                if (submitted) {
-                    this.showWarning.set(false)
-                }
-            })
+        effect(() => {
+            if (this.isSubmitted() === true) {
+                this.showWarning.set(false)
+            }
+        })
     }
 
     ngOnDestroy() {
@@ -140,13 +135,13 @@ export class CatPageComponent {
 
     @HostListener('document:mousemove', ['$event'])
     onMouseMove(event: MouseEvent) {
-        this.securityService.handleMouseMove(event, this.isSubmitted$.value)
+        //disable for now, waiting the confirmation from the client, want to use double mechanism of violation count and cursor position, or just violation count
+        // this.securityService.handleMouseMove(event)
     }
 
     @HostListener('window:blur', [])
     onBlur() {
         this.securityService.handleBlur()
-        this.securityService.enterFullScreen()
     }
 
     @HostListener('document:fullscreenchange', [])
@@ -219,7 +214,8 @@ export class CatPageComponent {
             .subscribe({
                 next: () => {
                     this.securityService.clearViolations()
-                    this.isSubmitted$.next(true)
+                    this.securityService.markSubmitted()
+                    this.securityService.exitFullScreen()
                     this.router.navigate(['/'])
                 },
                 error: (err) => {
@@ -234,7 +230,7 @@ export class CatPageComponent {
             .subscribe({
                 next: () => {
                     this.securityService.clearViolations()
-                    this.isSubmitted$.next(true)
+                    this.securityService.markSubmitted()
                     this.router.navigate(['/'])
                 },
                 error: (err) => {
@@ -268,7 +264,7 @@ export class CatPageComponent {
                             'Error',
                             'Informasi waktu berakhir ujian CAT tidak ditemukan.',
                         )
-                        this.isSubmitted$.next(true)
+                        this.securityService.markSubmitted()
                         return EMPTY
                     }
 
@@ -322,7 +318,7 @@ export class CatPageComponent {
             },
             error: (err) => {
                 if (err.error.message === `Exam's already ended`) {
-                    this.isSubmitted$.next(true)
+                    this.securityService.markSubmitted()
                 } else {
                     this.handler.handleAlert(
                         'Error',

@@ -11,15 +11,16 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 export class CatExamSecurityService {
     private handler = inject(HandlerService)
 
-    private isUnloading = false
+    readonly isUnloading = signal(false)
+    readonly isSubmitted = signal(false)
     private isInside = true
     private warningInterval: ReturnType<typeof setInterval> | undefined
     private readonly WARNING_COUNTDOWN_KEY = 'cat_warning_countdown'
-    private readonly INITIAL_WARNING_TIME = 30000
+    private readonly INITIAL_WARNING_TIME = 30
 
     // Violation management
     private readonly VIOLATION_KEY: string = 'cat_violation_count'
-    readonly MAX_VIOLATIONS: number = 3000
+    readonly MAX_VIOLATIONS: number = 3
 
     readonly showWarning = signal(false)
     readonly warningCountdown = signal(30)
@@ -27,6 +28,8 @@ export class CatExamSecurityService {
     readonly violationCount = this._violationCount.asReadonly()
     private lastViolationReason = signal<string>('')
     private lastViolationTime = 0
+    private _isFullscreen = signal(false)
+    readonly isFullscreen = this._isFullscreen.asReadonly()
     /**
      * Callbacks for security events
      */
@@ -36,6 +39,11 @@ export class CatExamSecurityService {
         this.loadViolationCount()
         this.setupViolationWatcher()
         this.loadWarningCountdown()
+
+        effect(() => {
+            if (this.isSubmitted()) {
+            }
+        })
     }
 
     /**
@@ -94,6 +102,7 @@ export class CatExamSecurityService {
      * Add a violation
      */
     addViolation(reason: string) {
+        if (this.isUnloading() || this.isSubmitted()) return
         const now = Date.now()
         if (now - this.lastViolationTime < 1000) {
             return
@@ -144,6 +153,25 @@ export class CatExamSecurityService {
     }
 
     /**
+     * Request exit fullscreen mode
+     */
+    exitFullScreen() {
+        const exit =
+            document.exitFullscreen ||
+            (document as any).mozCancelFullScreen ||
+            (document as any).webkitExitFullscreen ||
+            (document as any).msExitFullscreen
+
+        if (exit) {
+            exit.call(document).catch((err: any) => {
+                console.error('Failed to exit fullscreen:', err)
+            })
+        } else {
+            console.warn('Fullscreen API is not supported in this browser.')
+        }
+    }
+
+    /**
      * Watch for violation threshold and trigger auto-submit
      * This effect runs automatically whenever violationCount changes
      */
@@ -161,7 +189,7 @@ export class CatExamSecurityService {
             } else if (currentViolations > 0 && reason) {
                 this.handler.handleAlert(
                     'Warning',
-                    `Peringatan: ${reason}. Pelanggaran ${currentViolations}/${this.MAX_VIOLATIONS}.`,
+                    `${reason}. Pelanggaran ${currentViolations}/${this.MAX_VIOLATIONS}.`,
                     10000,
                 )
             }
@@ -173,8 +201,6 @@ export class CatExamSecurityService {
      * Only adds violation - the effect will handle alerts and auto-submit
      */
     handleVisibilityChange() {
-        if (this.isUnloading) return
-
         if (document.hidden) {
             this.addViolation(
                 'Anda meninggalkan halaman ujian (berpindah tab/window)',
@@ -194,15 +220,15 @@ export class CatExamSecurityService {
     /**
      * Handle mouse movement to detect if user is leaving exam area
      */
-    handleMouseMove(event: MouseEvent, isSubmitted: boolean) {
-        if (isSubmitted) return
+    handleMouseMove(event: MouseEvent) {
+        if (this.isSubmitted() || this.isSubmitted()) return
 
         const inside = this.isMouseInsideExamArea(event)
 
         if (inside !== this.isInside) {
             this.isInside = inside
 
-            if (!inside) {
+            if (!inside && this.isFullscreen()) {
                 this.showWarning.set(true)
                 this.startWarningCountdown()
             } else {
@@ -258,10 +284,13 @@ export class CatExamSecurityService {
         // Check if we're actually exiting fullscreen (not entering it)
         // document.fullscreenElement is null when NOT in fullscreen
         if (!document.fullscreenElement) {
+            this._isFullscreen.set(false)
+
             this.addViolation(
                 'Anda keluar dari fullscreen, mohon tetap berada dalam model fullscreen saat waktu ujian berlangsung',
             )
-            this.enterFullScreen()
+        } else {
+            this._isFullscreen.set(true)
         }
         // If document.fullscreenElement exists, user is entering fullscreen - no violation needed
     }
@@ -280,7 +309,14 @@ export class CatExamSecurityService {
      * Mark that page is unloading
      */
     markUnloading() {
-        this.isUnloading = true
+        this.isUnloading.set(true)
+    }
+
+    /**
+     * Mark that exam is submitted
+     */
+    markSubmitted() {
+        this.isSubmitted.set(true)
     }
 
     /**

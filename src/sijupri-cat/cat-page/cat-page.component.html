@@ -1,4 +1,4 @@
-<div class="root-cat" appDisableRightClick appDisableKeyboardShortcuts appFullscreenEnforcement>
+<div class="root-cat" appDisableRightClick appDisableKeyboardShortcuts>
     <ng-container *ngIf="isLoading$ | async; else content">
         <div class="card parent">
             <div class="d-flex justify-content-center my-5">
@@ -10,7 +10,7 @@
     </ng-container>
 
     <ng-template #content>
-        <ng-container *ngIf="isSubmitted$ | async; else hadItem">
+        <ng-container *ngIf="isSubmitted(); else hadItem">
             <div class="card parent">
                 <div class="d-flex flex-column flex-lg-row align-items-center justify-content-between w-100 gap-4">
                     <div class="container max-w-50ch order-2 order-lg-1 text-center text-lg-start">
@@ -192,7 +192,7 @@
         menghindari penghentian ujian.
     </div>
 
-    <ng-container *ngIf="!(isSubmitted$ | async)">
+    <ng-container *ngIf="!isSubmitted()">
         <button type="button" class="violation-tab"
             [class.warning]="violationCount() > 0 && violationCount() < securityService.MAX_VIOLATIONS"
             [class.danger]="violationCount() >= securityService.MAX_VIOLATIONS" (click)="toggleViolationPanel()">
@@ -227,7 +227,44 @@
             </div>
         </div>
 
+
         <div class="violation-sidebar__backdrop" *ngIf="violationPanelOpen" (click)="closeViolationPanel()">
+        </div>
+    </ng-container>
+
+    <!-- Fullscreen Security Overlay -->
+    <ng-container *ngIf="!isFullscreen() && !isSubmitted() && !(isLoading$ | async)">
+        <div class=" fullscreen-overlay">
+            <div class="fullscreen-overlay__content">
+                <div class="fullscreen-overlay__icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                        </path>
+                    </svg>
+                </div>
+                <h2 class="fullscreen-overlay__title">Mode Fullscreen Diperlukan</h2>
+                <p class="fullscreen-overlay__message">
+                    Demi keamanan dan integritas ujian, Anda diwajibkan untuk tetap dalam mode fullscreen selama ujian
+                    berlangsung.
+                </p>
+                <p class="fullscreen-overlay__warning">
+                    <strong>Peringatan:</strong> Keluar dari fullscreen dihitung sebagai pelanggaran. Anda memiliki
+                    <strong>{{ remainingViolations() }}</strong> toleransi pelanggaran tersisa.
+                </p>
+                <button class="btn btn-primary btn-lg fullscreen-overlay__button"
+                    (click)="securityService.enterFullScreen()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="me-2">
+                        <path
+                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                        </path>
+                    </svg>
+                    Aktifkan Fullscreen
+                </button>
+            </div>
         </div>
     </ng-container>
 </div>
