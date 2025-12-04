@@ -115,11 +115,9 @@ export class UkomExamCatComponent {
     }
 
     getQuestionCountForIndicator(indicatorId: string): number {
-        //TODO : update when backend ready
-        // return this.questCheckedList.filter(
-        //     q => q.association_id === indicatorId,
-        // ).length
-        return 1
+        return this.questCheckedList.filter(
+            (q) => q.questionGroup?.associationId === indicatorId,
+        ).length
     }
 
     toArray(keys: IterableIterator<string>) {
@@ -154,9 +152,18 @@ export class UkomExamCatComponent {
             )
             .pipe(
                 map((response) =>
-                    response.map(
-                        (question: UkomQuestion) => new UkomQuestion(question),
-                    ),
+                    response.map((question: UkomQuestion) => {
+                        const q = new UkomQuestion(question)
+                        if (!q.questionGroup) {
+                            q.questionGroup = {
+                                associationId: competencyIndicatorId,
+                            } as any
+                        } else {
+                            q.questionGroup.associationId =
+                                competencyIndicatorId
+                        }
+                        return q
+                    }),
                 ),
             )
 
@@ -199,7 +206,7 @@ export class UkomExamCatComponent {
     onQuestionSelect(question: UkomQuestion) {
         if (question.checked) {
             if (!this.questCheckedList.some((q) => q.id === question.id)) {
-                this.questCheckedList.push(question)
+                this.questCheckedList = [...this.questCheckedList, question]
                 this.listQuestion$ = this.listQuestion$.pipe(
                     map((questions) => {
                         return questions.map((q: UkomQuestion) => {
@@ -216,7 +223,10 @@ export class UkomExamCatComponent {
                 (q) => q.id === question.id,
             )
             if (index > -1) {
-                this.questCheckedList.splice(index, 1)
+                this.questCheckedList = [
+                    ...this.questCheckedList.slice(0, index),
+                    ...this.questCheckedList.slice(index + 1),
+                ]
                 this.listQuestion$ = this.listQuestion$.pipe(
                     map((questions) => {
                         return questions.map((q: UkomQuestion) => {
@@ -253,6 +263,8 @@ export class UkomExamCatComponent {
             .subscribe({
                 next: (res: any) => {
                     this.listSavedQuestion = res.data || []
+                    // Merge saved questions with current selection
+                    this.questCheckedList = [...this.listSavedQuestion]
                 },
             })
     }
@@ -304,7 +316,7 @@ export class UkomExamCatComponent {
             question.checked = true
         })
 
-        this.questCheckedList.push(...selectedQuestions)
+        this.questCheckedList = [...this.questCheckedList, ...selectedQuestions]
 
         this.listQuestion$ = this.listQuestion$.pipe(
             map((questions) => {
@@ -378,9 +390,17 @@ export class UkomExamCatComponent {
                 )
                 .toPromise()
                 .then((response) => {
-                    const questions = response.map(
-                        (question: any) => new UkomQuestion(question),
-                    )
+                    const questions = response.map((question: any) => {
+                        const q = new UkomQuestion(question)
+                        if (!q.questionGroup) {
+                            q.questionGroup = {
+                                associationId: indikator.id,
+                            } as any
+                        } else {
+                            q.questionGroup.associationId = indikator.id
+                        }
+                        return q
+                    })
                     this.allAvailableQuestions.push(...questions)
                 })
                 .catch((err) => {
@@ -432,7 +452,10 @@ export class UkomExamCatComponent {
             const selectedQuestions = shuffled.slice(0, this.randomCount)
 
             // Add selected questions to checked list
-            this.questCheckedList.push(...selectedQuestions)
+            this.questCheckedList = [
+                ...this.questCheckedList,
+                ...selectedQuestions,
+            ]
 
             this.handlerService.handleAlert(
                 'Success',
@@ -477,7 +500,6 @@ export class UkomExamCatComponent {
                                 'Berhasil menambahkan pertanyaan',
                             )
                             this.getListPertanyaan()
-                            this.questCheckedList = []
                             this.submitLoading$.next(false)
                         },
                         error: (err: any) => {
