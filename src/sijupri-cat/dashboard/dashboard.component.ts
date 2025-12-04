@@ -2,12 +2,10 @@ import { CommonModule } from '@angular/common'
 import { LoginContext } from './../../modules/base/commons/login-context'
 import { Component, inject, signal } from '@angular/core'
 import { RoomUkom } from '../../modules/ukom/models/cat/room-ukom.model'
-import { ApiService } from '../../modules/base/services/api.service'
 import { Router } from '@angular/router'
 import { HandlerService } from '../../modules/base/services/handler.service'
 import {
     forkJoin,
-    interval,
     map,
     Observable,
     of,
@@ -34,6 +32,7 @@ import { ExamService } from '@/modules/ukom/services/exam.service'
 import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
 import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-competency.model'
 import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
+import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedule.pipe'
 
 @Component({
     selector: 'app-dashboard',
@@ -43,6 +42,7 @@ import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
         ModalComponent,
         EmptyStateComponent,
         LoadingButtonComponent,
+        FormatExamSchedulePipe,
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
@@ -54,6 +54,7 @@ export class DashboardComponent {
     examService = inject(ExamService)
 
     isModalOpen = signal(false)
+    initialOpenAccordion = signal<string | null>(null)
 
     roomUkom = new RoomUkom()
     examType: ExamType[] = []
@@ -157,6 +158,8 @@ export class DashboardComponent {
                         this.scoreMap[result.examCode] = result.scoreInstance
                     }
                 })
+                // Set which accordion should be initially open
+                this.setInitialOpenAccordion()
             }),
         )
     }
@@ -356,5 +359,40 @@ export class DashboardComponent {
             kompetensi.questionDtoList.length -
             this.getCorrectAnswersCount(kompetensi)
         )
+    }
+
+    /**
+     * Determine which accordion should be initially open
+     * Opens the first exam that hasn't been completed yet
+     */
+    setInitialOpenAccordion() {
+        if (!this.roomUkom?.examScheduleDtoList?.length) {
+            this.initialOpenAccordion.set(null)
+            return
+        }
+
+        // Find first exam that hasn't been completed
+        for (const exam of this.roomUkom.examScheduleDtoList) {
+            const score = this.scoreMap[exam.examTypeCode]
+            const isCompleted =
+                score?.score !== null && score?.score !== undefined
+
+            if (!isCompleted) {
+                this.initialOpenAccordion.set(exam.examTypeCode)
+                return
+            }
+        }
+
+        // If all exams are completed, open the first one
+        this.initialOpenAccordion.set(
+            this.roomUkom.examScheduleDtoList[0].examTypeCode,
+        )
+    }
+
+    /**
+     * Check if an accordion should be initially open
+     */
+    isInitiallyOpen(examTypeCode: string): boolean {
+        return this.initialOpenAccordion() === examTypeCode
     }
 }

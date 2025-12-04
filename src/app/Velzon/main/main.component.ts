@@ -8,8 +8,6 @@ import {
     RouterOutlet,
     ActivatedRoute,
 } from '@angular/router'
-import { ConfirmationDialogComponent } from '../../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
-import { FilePreviewComponent } from '../../../modules/base/components/file-preview/file-preview.component'
 import { Tab, TabService } from '../../../modules/base/services/tab.service'
 import { Subscription } from 'rxjs'
 import { CommonModule } from '@angular/common'
@@ -25,8 +23,6 @@ import { LoginContext } from '../../../modules/base/commons/login-context'
         SideBarComponent,
         FooterComponent,
         RouterOutlet,
-        // ConfirmationDialogComponent,
-        // FilePreviewComponent,
     ],
     templateUrl: './main.component.html',
     styleUrl: './main.component.scss',
