@@ -289,6 +289,15 @@ export const routes: Routes = [
                                     ).then((m) => m.UkomClassDetailComponent),
                             },
                             {
+                                path: ':id/add-ukom-schedule',
+                                loadComponent: () =>
+                                    import(
+                                        '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
+                                    ).then(
+                                        (m) => m.UkomExamScheduleAddComponent,
+                                    ),
+                            },
+                            {
                                 path: 'detail-participant/:id',
                                 loadComponent: () =>
                                     import(

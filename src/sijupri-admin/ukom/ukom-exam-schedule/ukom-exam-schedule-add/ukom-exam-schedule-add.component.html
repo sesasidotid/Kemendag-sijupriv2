@@ -1,4 +1,7 @@
 <section>
+    <button class="btn btn-sm btn-outline-secondary mb-3" (click)="goBack()">
+        <i class="mdi mdi-chevron-left"></i> Kembali
+    </button>
     <form [formGroup]="examScheduleForm" (ngSubmit)="submit()">
         <div formArrayName="schedules">
             <div *ngFor="let schedule of schedules.controls; let i = index" [formGroupName]="i">

@@ -9,7 +9,7 @@ import {
 import { ApiService } from '../../services/api.service'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
-import { RouterLink, ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Pagable } from '../../commons/pagable/pagable'
 import { HttpClient } from '@angular/common/http'
 import { Subscription } from 'rxjs'
@@ -30,6 +30,7 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
     paginator: any
     onLoad: boolean = false
     enablePagination: boolean = true
+    private lastFilterState: { [key: string]: any } = {}
     private queryParamsSubscription: Subscription
 
     constructor(
@@ -73,6 +74,26 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
         if (changes['refresh'] && !changes['refresh'].isFirstChange()) {
             this.loadData()
         }
+    }
+
+    private filtersChanged(): boolean {
+        if (!this.pagable.filterList) return false
+
+        let changed = false
+
+        this.pagable.filterList.forEach((filter) => {
+            const oldValue = this.lastFilterState[filter.key]
+            const newValue = filter.value
+
+            if (oldValue !== newValue) {
+                changed = true
+            }
+
+            // update last state
+            this.lastFilterState[filter.key] = newValue
+        })
+
+        return changed
     }
 
     isSearchExist() {
@@ -123,6 +144,9 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     updateQueryParams() {
+        if (this.filtersChanged()) {
+            this.page = 1
+        }
         const queryParams: any = {
             page: this.page,
             limit: this.limit,
@@ -307,28 +331,6 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
         this.fetchData()
     }
 
-    //   toggleSort (columnProperty: string): void {
-    //     const column = this.pagable.primaryColumnList.find(
-    //       col => col.property === columnProperty
-    //     )
-    //     if (column && column.dynamic) {
-    //       return
-    //     }
-
-    //     switch (this.sortOrder[columnProperty]) {
-    //       case '':
-    //         this.sortOrder[columnProperty] = 'asc'
-    //         break
-    //       case 'asc':
-    //         this.sortOrder[columnProperty] = 'desc'
-    //         break
-    //       case 'desc':
-    //         this.sortOrder[columnProperty] = ''
-    //         break
-    //     }
-
-    //     this.fetchData()
-    //   }
     toggleSort(columnProperty: string): void {
         const column = this.pagable.primaryColumnList.find(
             (col) => col.property === columnProperty,

@@ -1,11 +1,18 @@
 <ng-container *ngIf="(tab$ | async) === 0">
-    <div *ngIf="isLoading$ | async; else kelasHadItem" class="d-flex justify-content-center my-5">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+    <ng-container *ngIf="isLoading$ | async; else kelasHadItem">
+        <div class="card parent">
+            <div class="d-flex justify-content-center my-5">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
         </div>
-    </div>
+    </ng-container>
 
     <ng-template #kelasHadItem>
+        <button class="btn btn-sm btn-outline-secondary mb-3" (click)="goBack()">
+            <i class="mdi mdi-chevron-left"></i> Kembali
+        </button>
         <div>
             <div class="row mb-3">
                 <label for="" class="col-sm-2 col-form-label fw-bold">Nama Kelas</label>
@@ -94,6 +101,6 @@
     </ng-template>
 </ng-container>
 
-<ng-container *ngIf="(tab$ | async) === 1">
+<!-- <ng-container *ngIf="(tab$ | async) === 1">
     <app-ukom-exam-schedule-add (changeTabActive)="handleTabChange(0)"></app-ukom-exam-schedule-add>
-</ng-container>
+</ng-container> -->

@@ -168,6 +168,7 @@ export class UkomFormulaListComponent {
                         .withField('Jenjang', 'text')
                         .build(),
                 )
+                .withQueryParams()
                 .build(),
         )
     }

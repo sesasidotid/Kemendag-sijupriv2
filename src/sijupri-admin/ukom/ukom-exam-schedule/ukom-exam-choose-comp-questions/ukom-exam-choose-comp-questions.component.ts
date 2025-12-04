@@ -73,9 +73,11 @@ export class UkomExamChooseCompQuestionsComponent {
 
     back() {
         this.router.navigate(
-            [`/ukom/ukom-room-list/${this.roomUkomDetail.id}`],
+            [
+                `/ukom/ukom-room-list/${this.roomUkomDetail.id}/add-ukom-schedule`,
+            ],
             {
-                state: { openTab: 1 },
+                replaceUrl: true,
             },
         )
     }

@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Output } from '@angular/core'
+import { CommonModule, Location } from '@angular/common'
+import { Component, EventEmitter, inject, Output } from '@angular/core'
 import { LucideAngularModule, FilePlus } from 'lucide-angular'
 import {
     FormBuilder,
@@ -8,28 +8,27 @@ import {
     FormsModule,
     ReactiveFormsModule,
     Validators,
-    FormArray
+    FormArray,
 } from '@angular/forms'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
-import { Router, RouterLink, ActivatedRoute } from '@angular/router'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { ExamScheduleUkom } from '../../../../modules/ukom/models/schedule.model'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { Router, ActivatedRoute } from '@angular/router'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ExamScheduleUkom } from '@/modules/ukom/models/schedule.model'
+import { HandlerService } from '@/modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { RoomUkomDetail } from '../../../../modules/ukom/models/room-ukom-detail'
-import { first, map } from 'rxjs/operators'
-import { JenisUkom } from '../../../../modules/ukom/models/jenis-ukom'
+import { map } from 'rxjs/operators'
+import { JenisUkom } from '@/modules/ukom/models/jenis-ukom'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PageFilterBuilder,
-    PrimaryColumnBuilder
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
-import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
+    PrimaryColumnBuilder,
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
+import { TabService } from '@/modules/base/services/tab.service'
 
 @Component({
     selector: 'app-ukom-exam-schedule-add',
@@ -42,12 +41,11 @@ import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-wakt
         PagableComponent,
     ],
     templateUrl: './ukom-exam-schedule-add.component.html',
-    styleUrl: './ukom-exam-schedule-add.component.scss'
+    styleUrl: './ukom-exam-schedule-add.component.scss',
 })
 export class UkomExamScheduleAddComponent {
-    @Output() changeTabActive: EventEmitter<any> = new EventEmitter()
-
-    tab$ = new BehaviorSubject<number | null>(0)
+    location = inject(Location)
+    tabService = inject(TabService)
 
     examScheduleForm: FormGroup
     submitLoading$ = new BehaviorSubject<boolean>(false)
@@ -71,19 +69,49 @@ export class UkomExamScheduleAddComponent {
         private handlerService: HandlerService,
         private activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
-        private formValidationService: FormValidationService
-    ) { }
+        private formValidationService: FormValidationService,
+    ) {}
 
     ngOnInit() {
-        this.activatedRoute.paramMap.subscribe(params => {
+        this.activatedRoute.paramMap.subscribe((params) => {
             this.id = params.get('id')
         })
+        this.initTabs()
         this.handleFormInit()
         this.handlePagable()
         this.getJenisUkomList()
         this.loadDefaultScheduleData()
     }
 
+    initTabs() {
+        this.tabService
+            .addTab({
+                label: 'Detail Kelas',
+                icon: 'mdi-list-box',
+                onClick: () => this.handleTabChange(),
+            })
+            .addTab({
+                label: 'Tambah Jadwal UKom',
+                icon: 'mdi-plus-circle',
+                isActive: true,
+                onClick: () => {},
+            })
+    }
+
+    handleTabChange() {
+        this.router.navigate(['../'], {
+            relativeTo: this.activatedRoute,
+            replaceUrl: true,
+        })
+    }
+
+    goBack() {
+        if (window.history.length > 1) {
+            this.location.back()
+        } else {
+            this.router.navigate(['/'])
+        }
+    }
     loadDefaultScheduleData() {
         this.loadingDefaultData$.next(true)
 
@@ -95,7 +123,7 @@ export class UkomExamScheduleAddComponent {
                         this.schedules.removeAt(0)
                     }
                     if (response && response.length > 0) {
-                        response.forEach(schedule => {
+                        response.forEach((schedule) => {
                             let durationInMinutes = null
 
                             if (
@@ -103,31 +131,31 @@ export class UkomExamScheduleAddComponent {
                                 schedule.duration
                             ) {
                                 durationInMinutes = Math.round(
-                                    schedule.duration * 60
+                                    schedule.duration * 60,
                                 )
                             }
 
                             const scheduleGroup = this.fb.group({
                                 start_time: [
                                     schedule.startTime,
-                                    Validators.required
+                                    Validators.required,
                                 ],
                                 end_time: [
                                     schedule.endTime,
-                                    Validators.required
+                                    Validators.required,
                                 ],
                                 exam_type_code: [
                                     schedule.examTypeCode || '',
-                                    Validators.required
+                                    Validators.required,
                                 ],
                                 duration: [
                                     durationInMinutes || null,
-                                    this.catValidator()
+                                    this.catValidator(),
                                 ],
                                 secret_key: [
                                     schedule.secretKey || '',
-                                    this.catValidator()
-                                ]
+                                    this.catValidator(),
+                                ],
                             })
                             this.schedules.push(scheduleGroup)
                         })
@@ -137,11 +165,11 @@ export class UkomExamScheduleAddComponent {
 
                     this.loadingDefaultData$.next(false)
                 },
-                error: error => {
+                error: (error) => {
                     console.error('Error loading default schedule data:', error)
                     this.addSchedule()
                     this.loadingDefaultData$.next(false)
-                }
+                },
             })
     }
 
@@ -167,38 +195,38 @@ export class UkomExamScheduleAddComponent {
 
     handleFormInit() {
         this.examScheduleForm = this.fb.group({
-            schedules: this.fb.array([], [Validators.required])
+            schedules: this.fb.array([], [Validators.required]),
         })
     }
 
     handlePagable() {
         this.pagable = new PagableBuilder(
-            `/api/v1/exam_schedule/room/${this.id}`
+            `/api/v1/exam_schedule/room/${this.id}`,
         )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Waktu Mulai', (data: any) => {
                         const formattedDate = this.tanggalWaktuPipe.transform(
-                            data.startTime
+                            data.startTime,
                         )
 
                         return formattedDate
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Waktu selesai', (data: any) => {
                         const formattedDate = this.tanggalWaktuPipe.transform(
-                            data.endTime
+                            data.endTime,
                         )
 
                         return formattedDate
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build()
+                new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build(),
             )
 
             .addPrimaryColumn(
@@ -210,22 +238,23 @@ export class UkomExamScheduleAddComponent {
                             return '-'
                         }
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Secret Key', 'secretKey').build())
+                new PrimaryColumnBuilder('Secret Key', 'secretKey').build(),
+            )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((item: any) => {
                         this.router.navigate(
                             [
-                                `ukom/ukom-room-list/${this.id}/competence/${item.id}`
+                                `ukom/ukom-room-list/${this.id}/competence/${item.id}`,
                             ],
-                            { queryParams: { type_ukom: item.examTypeCode } }
+                            { queryParams: { type_ukom: item.examTypeCode } },
                         )
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .build()
     }
@@ -234,12 +263,12 @@ export class UkomExamScheduleAddComponent {
         this.jenisUkomList$ = this.apiService
             .getData(`/api/v1/exam_type`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
                         (jenisUkom: { [key: string]: any }) =>
-                            new JenisUkom(jenisUkom)
-                    )
-                )
+                            new JenisUkom(jenisUkom),
+                    ),
+                ),
             )
     }
 
@@ -248,7 +277,7 @@ export class UkomExamScheduleAddComponent {
         return this.formValidationService.getErrorMessage(
             control,
             controlName,
-            label
+            label,
         )
     }
 
@@ -259,7 +288,7 @@ export class UkomExamScheduleAddComponent {
         return this.formValidationService.getErrorMessage(
             control,
             controlName,
-            label
+            label,
         )
     }
 
@@ -273,12 +302,12 @@ export class UkomExamScheduleAddComponent {
             end_time: ['', Validators.required],
             exam_type_code: ['', Validators.required],
             duration: [null, this.catValidator()],
-            secret_key: [null, this.catValidator()]
+            secret_key: [null, this.catValidator()],
         })
 
         scheduleGroup
             .get('exam_type_code')
-            ?.valueChanges.subscribe(examType => {
+            ?.valueChanges.subscribe((examType) => {
                 const durationControl = scheduleGroup.get('duration')
                 const secretKeyControl = scheduleGroup.get('secret_key')
 
@@ -300,16 +329,16 @@ export class UkomExamScheduleAddComponent {
 
     getAvailableExamTypes(selectedCode: string): Observable<JenisUkom[]> {
         return this.jenisUkomList$.pipe(
-            map(jenisUkomList => {
+            map((jenisUkomList) => {
                 const selectedCodes = this.schedules.value.map(
-                    (schedule: any) => schedule.exam_type_code
+                    (schedule: any) => schedule.exam_type_code,
                 )
                 return jenisUkomList.filter(
-                    jenisUkom =>
+                    (jenisUkom) =>
                         !selectedCodes.includes(jenisUkom.code) ||
-                        jenisUkom.code === selectedCode
+                        jenisUkom.code === selectedCode,
                 )
-            })
+            }),
         )
     }
 
@@ -323,48 +352,46 @@ export class UkomExamScheduleAddComponent {
     }
 
     generateSecretKey(index: number): void {
-        const scheduleGroup = this.schedules.at(index);
-        if (!scheduleGroup) return;
+        const scheduleGroup = this.schedules.at(index)
+        if (!scheduleGroup) return
 
-        const examType = scheduleGroup.get('exam_type_code')?.value;
+        const examType = scheduleGroup.get('exam_type_code')?.value
         if (examType !== 'CAT') {
             this.handlerService.handleAlert(
                 'Warning',
-                'Hanya ujian dengan jenis CAT yang memerlukan secret key.'
-            );
-            return;
+                'Hanya ujian dengan jenis CAT yang memerlukan secret key.',
+            )
+            return
         }
 
         const randomKey = Array(6)
             .fill(0)
             .map(() => Math.random().toString(36).charAt(2))
-            .join('');
+            .join('')
 
-        scheduleGroup.get('secret_key')?.setValue(randomKey);
+        scheduleGroup.get('secret_key')?.setValue(randomKey)
     }
-
-
 
     submit(): void {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 this.submitLoading$.next(true)
                 this.examScheduleData.id = this.id
 
                 const examTypeCodes = this.schedules.value.map(
-                    (schedule: any) => schedule.exam_type_code
+                    (schedule: any) => schedule.exam_type_code,
                 )
                 const hasDuplicate = examTypeCodes.some(
                     (value: any, index: any) =>
-                        examTypeCodes.indexOf(value) !== index
+                        examTypeCodes.indexOf(value) !== index,
                 )
 
                 if (hasDuplicate) {
                     this.handlerService.handleAlert(
                         'Error',
-                        'Jenis UKOM tidak boleh sama'
+                        'Jenis UKOM tidak boleh sama',
                     )
                     this.submitLoading$.next(false)
                     return
@@ -378,11 +405,11 @@ export class UkomExamScheduleAddComponent {
                         ) {
                             return {
                                 ...schedule,
-                                duration: (schedule.duration / 60).toFixed(2)
+                                duration: (schedule.duration / 60).toFixed(2),
                             }
                         }
                         return schedule
-                    }
+                    },
                 )
 
                 this.examScheduleData.examScheduleDtoList = scheduleData
@@ -393,20 +420,20 @@ export class UkomExamScheduleAddComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil disimpan'
+                                'Data berhasil disimpan',
                             )
                             this.handleRefreshToggle()
                             this.submitLoading$.next(false)
                         },
-                        error: error => {
+                        error: (error) => {
                             this.handlerService.handleAlert(
                                 'Error',
-                                error.error.message
+                                error.error.message,
                             )
                             this.submitLoading$.next(false)
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

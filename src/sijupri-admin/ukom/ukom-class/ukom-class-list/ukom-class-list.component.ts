@@ -1,25 +1,18 @@
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { CommonModule } from '@angular/common'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
-import {
-    BehaviorSubject,
-    distinctUntilChanged,
-    map,
-    of,
-    startWith,
-    tap
-} from 'rxjs'
+import { BehaviorSubject, distinctUntilChanged, map } from 'rxjs'
 import { UkomClassAddComponent } from '../ukom-class-add/ukom-class-add.component'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
@@ -31,7 +24,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
@@ -47,12 +40,12 @@ import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-wakt
         ModalComponent,
         FormsModule,
         ReactiveFormsModule,
-        TanggalWaktuIndoPipe
     ],
     templateUrl: './ukom-class-list.component.html',
-    styleUrl: './ukom-class-list.component.scss'
+    styleUrl: './ukom-class-list.component.scss',
 })
 export class UkomClassListComponent {
+    route = inject(ActivatedRoute)
     tab$ = new BehaviorSubject<number | null>(0)
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
@@ -70,16 +63,16 @@ export class UkomClassListComponent {
     bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
-    constructor (
+    constructor(
         private tabService: TabService,
         private router: Router,
         private handlerService: HandlerService,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
+        private formValidationService: FormValidationService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handleTabService()
         this.handlePagable()
         this.handleFormInit()
@@ -91,8 +84,8 @@ export class UkomClassListComponent {
         this.handleBidangJabatanValidation()
     }
 
-    handleBidangJabatanValidation () {
-        this.bidangJabatanList$.subscribe(bidangJabatanList => {
+    handleBidangJabatanValidation() {
+        this.bidangJabatanList$.subscribe((bidangJabatanList) => {
             const control = this.editRoomUkomForm.get('bidang_jabatan_code')
             if (!control) return
 
@@ -100,7 +93,7 @@ export class UkomClassListComponent {
                 ? [control.validator]
                 : []
             const isRequiredAlreadySet = currentValidators.some(
-                v => v === Validators.required
+                (v) => v === Validators.required,
             )
 
             if (bidangJabatanList.length > 0 && !isRequiredAlreadySet) {
@@ -113,37 +106,37 @@ export class UkomClassListComponent {
         })
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.editRoomUkomForm.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable$.next(
             new PagableBuilder('/api/v1/room_ukom/search')
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Nama', 'name').build()
+                    new PrimaryColumnBuilder('Nama', 'name').build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder(
                         'Kuota Peserta',
-                        'participantQuota'
-                    ).build()
+                        'participantQuota',
+                    ).build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
                         .withDynamicValue('Mulai', (data: RoomUkom) => {
                             const formattedDate =
                                 this.tanggalWaktuPipe.transform(
-                                    data.examStartAt
+                                    data.examStartAt,
                                 )
 
                             return formattedDate
                         })
-                        .build()
+                        .build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
@@ -153,24 +146,24 @@ export class UkomClassListComponent {
 
                             return formattedDate
                         })
-                        .build()
+                        .build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
                         .withDynamicValue(
                             'Jabatan',
-                            (data: any) => this.jabatanMap[data.jabatanCode]
+                            (data: any) => this.jabatanMap[data.jabatanCode],
                         )
-                        .build()
+                        .build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
                         .withDynamicValue(
                             'Jenjang',
                             (data: any) =>
-                                this.jenjangMap[data.jenjangCode] || ''
+                                this.jenjangMap[data.jenjangCode] || '',
                         )
-                        .build()
+                        .build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
@@ -178,19 +171,17 @@ export class UkomClassListComponent {
                             'Bidang Jabatan',
                             (data: any) =>
                                 this.bidangJabatanMap[data.bidangJabatanCode] ||
-                                ''
+                                '',
                         )
-                        .build()
+                        .build(),
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
                         .setAction((ukom: any) => {
-                            this.router.navigate([
-                                `ukom/ukom-room-list/${ukom.id}`
-                            ])
+                            this.goToDetail(ukom.id)
                         }, 'info')
                         .withIcon('detail')
-                        .build()
+                        .build(),
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
@@ -200,34 +191,41 @@ export class UkomClassListComponent {
                             this.getListJenjang()
                         }, 'primary')
                         .withIcon('update')
-                        .build()
+                        .build(),
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
                         .setAction(
                             (ukom: any) => this.deleteClass(ukom),
-                            'danger'
+                            'danger',
                         )
                         .withIcon('danger')
-                        .build()
+                        .build(),
                 )
                 .addFilter(
                     new PageFilterBuilder('like')
                         .setProperty('name')
                         .withField('Nama', 'text')
-                        .build()
+                        .build(),
                 )
-                .build()
+                .withQueryParams()
+                .build(),
         )
     }
 
-    handleSubscribe () {
+    goToDetail(roomId: string) {
+        this.router.navigate([`${roomId}`], {
+            relativeTo: this.route,
+        })
+    }
+
+    handleSubscribe() {
         this.editRoomUkomForm
             .get('jabatan_code')
             ?.valueChanges.pipe(distinctUntilChanged())
-            .subscribe(jabatanCode => {
+            .subscribe((jabatanCode) => {
                 const bidangJabatanControl = this.editRoomUkomForm.get(
-                    'bidang_jabatan_code'
+                    'bidang_jabatan_code',
                 )
                 bidangJabatanControl?.reset()
 
@@ -237,22 +235,22 @@ export class UkomClassListComponent {
             })
     }
 
-    getBidangJabatanByJabatanCode (jabatanCode: string): void {
+    getBidangJabatanByJabatanCode(jabatanCode: string): void {
         this.apiService
             .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
             .pipe(
                 map((res: any) =>
                     Array.isArray(res)
-                        ? res.map(item => new BidangJabatan(item))
-                        : []
-                )
+                        ? res.map((item) => new BidangJabatan(item))
+                        : [],
+                ),
             )
-            .subscribe(list => {
+            .subscribe((list) => {
                 this.bidangJabatanListSubject.next(list)
             })
     }
 
-    deleteClass (ukom: any) {
+    deleteClass(ukom: any) {
         this.confirmationService.open(false).subscribe({
             next: (result: any) => {
                 if (result) {
@@ -264,7 +262,7 @@ export class UkomClassListComponent {
                             next: () => {
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Data berhasil dihapus'
+                                    'Data berhasil dihapus',
                                 )
 
                                 this.refreshPagableData()
@@ -273,23 +271,23 @@ export class UkomClassListComponent {
                                 if (err.error.code == 'UKM-00001') {
                                     this.handlerService.handleAlert(
                                         'Error',
-                                        'Gagal menghapus kelas. Kelas memiliki jadwal ujian'
+                                        'Gagal menghapus kelas. Kelas memiliki jadwal ujian',
                                     )
                                     return
                                 }
 
                                 this.handlerService.handleAlert(
                                     'Error',
-                                    'Gagal menghapus data'
+                                    'Gagal menghapus data',
                                 )
-                            }
+                            },
                         })
                 }
-            }
+            },
         })
     }
 
-    handleFormInit () {
+    handleFormInit() {
         this.editRoomUkomForm = new FormGroup({
             id: new FormControl(''),
             name: new FormControl('', Validators.required),
@@ -299,21 +297,21 @@ export class UkomClassListComponent {
             participant_quota: new FormControl('', Validators.required),
             vid_call_link: new FormControl('', Validators.required),
             exam_start_at: new FormControl('', Validators.required),
-            exam_end_at: new FormControl('', Validators.required)
+            exam_end_at: new FormControl('', Validators.required),
         })
     }
 
-    refreshPagableData () {
+    refreshPagableData() {
         const currentPagable = this.pagable$.value
 
         const updatedPagable = {
             ...currentPagable,
-            limit: 10
+            limit: 10,
         }
         this.pagable$.next(updatedPagable)
     }
 
-    handleTabService () {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -323,16 +321,16 @@ export class UkomClassListComponent {
                 label: 'Daftar Kelas',
                 isActive: true,
                 icon: 'mdi-list-box',
-                onClick: () => this.handleTabChange(0)
+                onClick: () => this.handleTabChange(0),
             })
             .addTab({
                 label: 'Tambah Kelas',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1)
+                onClick: () => this.handleTabChange(1),
             })
     }
 
-    setDefaultFormValues (data: any) {
+    setDefaultFormValues(data: any) {
         this.editRoomUkomForm.patchValue({
             id: data.id || '',
             name: data.name || '',
@@ -342,15 +340,15 @@ export class UkomClassListComponent {
             participant_quota: data.participantQuota || '',
             vid_call_link: data.vidCallLink || '',
             exam_start_at: data.examStartAt || '',
-            exam_end_at: data.examEndAt || ''
+            exam_end_at: data.examEndAt || '',
         })
     }
 
-    getListJenjang () {
+    getListJenjang() {
         this.apiService.getData(`/api/v1/jenjang`).subscribe({
             next: (response: any) => {
                 const jenjangs = response.map(
-                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang),
                 )
 
                 jenjangs.forEach((jenjang: any) => {
@@ -358,21 +356,21 @@ export class UkomClassListComponent {
                 })
 
                 this.fixedJenjangList$ = new BehaviorSubject(
-                    jenjangs
+                    jenjangs,
                 ).asObservable()
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching jenjang data:', err)
-            }
+            },
         })
     }
 
-    getBidangJabatan () {
+    getBidangJabatan() {
         this.apiService.getData(`/api/v1/bidang_jabatan`).subscribe({
             next: (response: any) => {
                 const bidangJabatans = response.map(
                     (bidangJabatan: { [key: string]: any }) =>
-                        new BidangJabatan(bidangJabatan)
+                        new BidangJabatan(bidangJabatan),
                 )
 
                 bidangJabatans.forEach((bidangJabatan: any) => {
@@ -380,17 +378,17 @@ export class UkomClassListComponent {
                         bidangJabatan.name
                 })
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching jenjang data:', err)
-            }
+            },
         })
     }
 
-    getJenjang () {
+    getJenjang() {
         this.apiService.getData(`/api/v1/jenjang/`).subscribe({
             next: (response: any) => {
                 const jenjangs = response.map(
-                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang),
                 )
 
                 jenjangs.forEach((jenjang: any) => {
@@ -399,17 +397,17 @@ export class UkomClassListComponent {
 
                 this.jenjangList$ = new BehaviorSubject(jenjangs).asObservable()
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching jenjang data:', err)
-            }
+            },
         })
     }
 
-    getJabatan () {
+    getJabatan() {
         this.apiService.getData(`/api/v1/jabatan`).subscribe({
             next: (response: any) => {
                 const jabatans = response.map(
-                    (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
+                    (jabatan: { [key: string]: any }) => new Jabatan(jabatan),
                 )
 
                 jabatans.forEach((jabatan: any) => {
@@ -418,26 +416,26 @@ export class UkomClassListComponent {
 
                 this.jabatanList$ = new BehaviorSubject(jabatans).asObservable()
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching jabatan data:', err)
-            }
+            },
         })
     }
 
-    handleRefreshToggle () {
+    handleRefreshToggle() {
         this.refreshToggle = !this.refreshToggle
     }
 
-    toggleModal () {
+    toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    handleTabChange (tab?: number) {
+    handleTabChange(tab?: number) {
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }
 
-    submit () {
+    submit() {
         const payload = {
             id: this.editRoomUkomForm.value.id,
             name: this.editRoomUkomForm.value.name,
@@ -448,36 +446,36 @@ export class UkomClassListComponent {
             participant_quota: this.editRoomUkomForm.value.participant_quota,
             vid_call_link: this.editRoomUkomForm.value.vid_call_link,
             exam_start_at: this.editRoomUkomForm.value.exam_start_at,
-            exam_end_at: this.editRoomUkomForm.value.exam_end_at
+            exam_end_at: this.editRoomUkomForm.value.exam_end_at,
         }
 
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 this.submitLoading$.next(true)
 
                 this.apiService
                     .putData('/api/v1/room_ukom', payload)
                     .subscribe({
-                        next: response => {
+                        next: (response) => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil mengubah data'
+                                'Berhasil mengubah data',
                             )
                             this.handleRefreshToggle()
                             this.toggleModal()
                             this.submitLoading$.next(false)
                         },
-                        error: error => {
+                        error: (error) => {
                             console.log('error', error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal mengubah data'
+                                'Gagal mengubah data',
                             )
                             this.submitLoading$.next(false)
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

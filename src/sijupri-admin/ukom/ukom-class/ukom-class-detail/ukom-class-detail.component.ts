@@ -1,31 +1,25 @@
 import { Component } from '@angular/core'
-import { ApiService } from '../../../../modules/base/services/api.service'
+import { ApiService } from '@/modules/base/services/api.service'
 import { CommonModule, Location } from '@angular/common'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import { ActivatedRoute } from '@angular/router'
-import { RoomUkomDetail } from '../../../../modules/ukom/models/room-ukom-detail'
+import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 import { combineLatest, finalize, Observable } from 'rxjs'
 import { map, take, BehaviorSubject } from 'rxjs'
 import { Router } from '@angular/router'
-import { TabService } from '../../../../modules/base/services/tab.service'
-import { UkomExamScheduleAddComponent } from '../../ukom-exam-schedule/ukom-exam-schedule-add/ukom-exam-schedule-add.component'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
+import { TabService } from '@/modules/base/services/tab.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { TanggalIndoPipe } from '@/modules/base/pipes/tanggal-indo.pipe'
 @Component({
     selector: 'app-ukom-class-detail',
     standalone: true,
-    imports: [
-        PagableComponent,
-        CommonModule,
-        UkomExamScheduleAddComponent,
-        TanggalIndoPipe,
-    ],
+    imports: [PagableComponent, CommonModule, TanggalIndoPipe],
     templateUrl: './ukom-class-detail.component.html',
     styleUrl: './ukom-class-detail.component.scss',
 })
@@ -60,15 +54,13 @@ export class UkomClassDetailComponent {
             this.getDetailKelas()
         })
         this.handleTabService()
+    }
 
-        const navigationState = this.location.getState() as {
-            openTab?: number
-        } | null
-
-        if (navigationState && navigationState.openTab) {
-            if (navigationState.openTab === 1) {
-                this.handleTabChange(1)
-            }
+    goBack() {
+        if (window.history.length > 1) {
+            this.location.back()
+        } else {
+            this.router.navigate(['/'])
         }
     }
 
@@ -111,27 +103,25 @@ export class UkomClassDetailComponent {
     }
 
     handleTabService() {
-        // if (this.tabService.getTabsLength() > 0) {
-        //     this.tabService.clearTabs()
-        // }
-
         this.tabService
             .addTab({
                 label: 'Detail Kelas',
                 icon: 'mdi-list-box',
                 isActive: true,
-                onClick: () => this.handleTabChange(0),
+                onClick: () => {},
             })
             .addTab({
                 label: 'Tambah Jadwal UKom',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1),
+                onClick: () => this.handleTabChange(),
             })
     }
 
-    handleTabChange(tab?: number) {
-        this.tab$.next(tab)
-        this.tabService.changeTabActive(tab)
+    handleTabChange() {
+        this.router.navigate([`add-ukom-schedule`], {
+            relativeTo: this.activatedRoute,
+            replaceUrl: true,
+        })
     }
 
     getDetailKelas() {
