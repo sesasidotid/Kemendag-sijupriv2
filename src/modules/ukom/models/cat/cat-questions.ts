@@ -13,7 +13,7 @@ export class CATQuestions extends Serializable {
     association: string | null = undefined
     groupId: string | null = undefined
     multipleChoiceDtoList: CATChoice[] = []
-    answerDto: CATAnswer = undefined
+    answerDto: CATAnswer | null = undefined
 
     constructor(object?: { [key: string]: any }) {
         super()

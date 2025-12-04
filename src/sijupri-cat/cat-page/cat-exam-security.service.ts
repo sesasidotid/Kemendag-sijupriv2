@@ -2,6 +2,7 @@ import { inject, Injectable, signal, effect } from '@angular/core'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ApiService } from '@/modules/base/services/api.service'
 import { interval, Subscription } from 'rxjs'
+import { environment } from '@/environments/environment'
 
 /**
  * Service responsible for handling all exam security and anti-cheating measures
@@ -72,8 +73,8 @@ export class CatExamSecurityService {
     }
 
     private detectTranslation() {
-        // Observe the <html> element for class changes
         const htmlElement = document.documentElement
+        const initialLang = htmlElement.getAttribute('lang')
 
         this.translationObserver = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -83,9 +84,13 @@ export class CatExamSecurityService {
                         mutation.attributeName === 'lang')
                 ) {
                     const classList = htmlElement.classList
+                    const currentLang = htmlElement.getAttribute('lang')
+
+                    // Check both Chromium and Firefox methods
                     const isTranslated =
                         classList.contains('translated-ltr') ||
-                        classList.contains('translated-rtl')
+                        classList.contains('translated-rtl') ||
+                        (currentLang !== initialLang && currentLang !== null)
 
                     if (isTranslated !== this.isTranslated()) {
                         this.isTranslated.set(isTranslated)
@@ -212,10 +217,19 @@ export class CatExamSecurityService {
         reason: string
         timestamp: number
     }) {
-        // TODO: Implement actual API call when endpoint is ready
-        // this.api.postData(...)
+        // TODO : Implement actual API call
         console.log('Sending violation to backend:', data)
-        // Simulate success for now. In real impl, on error, push back to queue.
+        // this.api.postData('/api/v1/exam/violation', data).subscribe({
+        //     next: () => {
+        //         console.log('Violation sent successfully:', data)
+        //     },
+        //     error: (err) => {
+        //         console.error('Failed to send violation:', err)
+        //         // Push back to queue on error
+        //         this.violationQueue.push(data)
+        //         this.saveQueueToStorage()
+        //     },
+        // })
     }
 
     private processViolationQueue() {
@@ -475,5 +489,52 @@ export class CatExamSecurityService {
     clearViolations() {
         this.clearViolationCount()
         this.clearWarningCountdown()
+    }
+
+    /**
+     * Send a beacon when user closes the tab
+     * Uses navigator.sendBeacon for reliable delivery even as page unloads
+     * This is treated as a violation
+     */
+    sendTabCloseBeacon(
+        examTypeCode: string,
+        roomUkomId: string,
+        participantId: string,
+    ): void {
+        const reason = 'Menutup tab ujian'
+        const timestamp = Date.now()
+
+        //TODO: implement the actual API endpoint
+        // Add to violation count locally
+        if (this._violationCount() < this.MAX_VIOLATIONS) {
+            this._violationCount.update((count) => count + 1)
+            localStorage.setItem(
+                this.VIOLATION_KEY,
+                this._violationCount().toString(),
+            )
+        }
+
+        // Send via beacon since normal requests may be cancelled during unload
+        const url = `${environment.apiBaseUrl}/api/v1/exam/violation`
+
+        const payload = {
+            reason,
+            timestamp,
+            examTypeCode,
+            roomUkomId,
+            participantId,
+        }
+
+        const blob = new Blob([JSON.stringify(payload)], {
+            type: 'application/json',
+        })
+
+        const queued = navigator.sendBeacon(url, blob)
+
+        if (!queued) {
+            // Fallback: save to queue for next session
+            this.violationQueue.push({ reason, timestamp })
+            this.saveQueueToStorage()
+        }
     }
 }

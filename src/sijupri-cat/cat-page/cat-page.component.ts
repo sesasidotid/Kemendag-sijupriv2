@@ -123,8 +123,21 @@ export class CatPageComponent {
 
     // ========== Host Listeners for Security ==========
 
-    @HostListener('window:beforeunload')
-    onBeforeUnload() {
+    @HostListener('window:beforeunload', ['$event'])
+    onBeforeUnload(event: BeforeUnloadEvent) {
+        // Check if this is a tab close (not a reload)
+        const isReload =
+            (event.currentTarget as Window)?.performance?.navigation?.type === 1
+
+        if (!isReload && !this.isSubmitted()) {
+            // User is closing the tab - send beacon
+            this.securityService.sendTabCloseBeacon(
+                this.EXAM_TYPE,
+                this.roomUkom.id,
+                this.pesertaUkom.id,
+            )
+        }
+
         this.securityService.markUnloading()
     }
 
@@ -135,8 +148,7 @@ export class CatPageComponent {
 
     @HostListener('document:mousemove', ['$event'])
     onMouseMove(event: MouseEvent) {
-        //disable for now, waiting the confirmation from the client, want to use double mechanism of violation count and cursor position, or just violation count
-        // this.securityService.handleMouseMove(event)
+        this.securityService.handleMouseMove(event)
     }
 
     @HostListener('window:blur', [])
@@ -148,8 +160,6 @@ export class CatPageComponent {
     handleFullscreenChange() {
         this.securityService.handleFullscreenExit()
     }
-
-    // ========== Navigation Methods ==========
 
     backToHome() {
         this.router.navigate(['/'])
@@ -180,14 +190,6 @@ export class CatPageComponent {
 
     toggleFlag(questionId: string) {
         this.answerService.toggleFlag(questionId)
-        const isFlagged = this.answerService.isFlagged(questionId)
-
-        // Save the flag state to backend
-        this.answerService
-            .saveAnswer(questionId, this.pesertaUkom.id, isFlagged)
-            .subscribe({
-                error: (err) => console.error('Failed to save flag state', err),
-            })
     }
 
     isFlagged(questionId: string): boolean {
@@ -324,7 +326,7 @@ export class CatPageComponent {
         this.answerService
             .loadQuestions(this.roomUkom.id)
             .pipe(
-                switchMap((response: any) => {
+                switchMap((response) => {
                     this.data = response.data
                     return this.answerService.fetchExamState(
                         this.EXAM_TYPE,
@@ -333,17 +335,22 @@ export class CatPageComponent {
                 }),
             )
             .subscribe({
-                next: (states: any[]) => {
-                    // Update flagged questions based on state
-                    const flagged = new Set<string>()
+                next: (states) => {
+                    const localFlags = new Set(
+                        this.answerService.flaggedQuestions(),
+                    )
+
                     if (Array.isArray(states)) {
                         states.forEach((s) => {
-                            if (s.is_uncertain) {
-                                flagged.add(s.questionId)
+                            if (s.isUncertain) {
+                                localFlags.add(s.questionId)
                             }
                         })
                     }
-                    this.answerService.flaggedQuestions.set(flagged)
+
+                    this.answerService.flaggedQuestions.set(localFlags)
+                    // Save merged flags to localStorage
+                    this.answerService.saveFlaggedToLocalStorage()
                 },
                 error: (err) => {
                     if (err.error.message === `Exam's already ended`) {

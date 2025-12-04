@@ -4,6 +4,9 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { BehaviorSubject, Observable, throwError } from 'rxjs'
 import { finalize, tap } from 'rxjs/operators'
+import { PaginationWrapper } from '@/modules/base/models/pagination.model'
+import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
+import { CATAnswerState } from '@/modules/ukom/models/cat/cat-answer-state.model'
 
 /**
  * Service responsible for managing exam answers, question navigation, and submission
@@ -34,11 +37,13 @@ export class CatAnswerService {
     /**
      * Load questions and initialize answer tracking
      */
-    loadQuestions(roomUkomId: string): Observable<any> {
+    loadQuestions(
+        roomUkomId: string,
+    ): Observable<PaginationWrapper<CATQuestions>> {
         return this.api
             .getData(`/api/v1/exam/page/CAT/${roomUkomId}?limit=1000&page=1`)
             .pipe(
-                tap((response: any) => {
+                tap((response) => {
                     const questions = response.data || []
                     this.totalQuestions.set(questions.length)
 
@@ -113,6 +118,13 @@ export class CatAnswerService {
     }
 
     /**
+     * Public method to save flagged questions to localStorage
+     */
+    saveFlaggedToLocalStorage() {
+        this.saveFlaggedQuestions()
+    }
+
+    /**
      * Select an answer for a question
      */
     selectAnswer(questionId: string, choiceId: string) {
@@ -127,13 +139,13 @@ export class CatAnswerService {
         questionId: string,
         participantId: string,
         isUncertain: boolean = false,
-    ): Observable<any> {
+    ): Observable<void> {
         const currentSelected = this.selectedAnswer()
         const selectedChoiceId = currentSelected[questionId]
 
         if (!selectedChoiceId) {
             console.warn('No answer selected for question:', questionId)
-            return throwError(() => new Error('No answer selected'))
+            return throwError(() => new Error('Soal belum dijawab'))
         }
 
         const payload = {
@@ -169,13 +181,13 @@ export class CatAnswerService {
         examTypeCode: string,
         roomUkomId: string,
         openDialog: boolean = true,
-    ): Observable<any> {
+    ): Observable<void> {
         const payload = {
             examTypeCode,
             roomUkomId,
         }
 
-        const performSubmission = (): Observable<any> => {
+        const performSubmission = (): Observable<void> => {
             this.isSubmittingAnswer$.next(true)
             return this.api.postData('/api/v1/exam/finish', payload).pipe(
                 tap(() => {
@@ -234,7 +246,7 @@ Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
         participantId: string,
         examTypeCode: string,
         roomUkomId: string,
-    ): Observable<any> {
+    ): Observable<void> {
         return new Observable((observer) => {
             // Check if currently flagged
             const isUncertain = this.isFlagged(questionId)
@@ -248,10 +260,19 @@ Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
                 },
                 error: (err) => {
                     console.error('Error saving answer before submit:', err)
-                    this.handler.handleAlert(
-                        'Error',
-                        'Gagal menyimpan jawaban, tidak dapat submit.',
-                    )
+                    if (err.message === 'Soal belum dijawab') {
+                        console.warn('User didn’t select an answer:', err)
+                        this.handler.handleAlert(
+                            'Warning',
+                            'Silakan pilih jawaban terlebih dahulu',
+                        )
+                    } else {
+                        console.error('Error saving answer before submit:', err)
+                        this.handler.handleAlert(
+                            'Error',
+                            'Gagal menyimpan jawaban, tidak dapat submit.',
+                        )
+                    }
                     observer.error(err)
                 },
             })
@@ -275,7 +296,10 @@ Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
     /**
      * Fetch the state of the exam (e.g. uncertain flags)
      */
-    fetchExamState(examTypeCode: string, roomUkomId: string): Observable<any> {
+    fetchExamState(
+        examTypeCode: string,
+        roomUkomId: string,
+    ): Observable<CATAnswerState[]> {
         return this.api.getData(
             `/api/v1/exam/state/${examTypeCode}/${roomUkomId}`,
         )
