@@ -1,55 +1,53 @@
-<div *ngIf="isLoading$ | async; else ukomExamContent" class="d-flex justify-content-center my-5">
-    <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
+<ng-container *ngIf="isLoading$ | async; else ukomExamContent">
+    <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
-</div>
+</ng-container>
 
 <ng-template #ukomExamContent>
     <button class="btn btn-sm btn-outline-secondary mb-3" (click)="back()">
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
 
-    <section>
-        <div class="row mb-3">
-            <label for="" class="col-sm-2 col-form-label fw-bold">Nama Kelas</label>
-            <div class="col-sm-10 pt-2">
-                <p>: {{ roomUkomDetail.name }}</p>
+    <section class="py-2 d-flex flex-column gap-4">
+        <div>
+            <label class="form-label text-muted">Nama Kelas</label>
+            <div class="fs-5 fw-semibold">
+                {{ roomUkomDetail.name }}
             </div>
         </div>
 
-        <div class="row mb-3">
-            <label for="name" class="col-sm-2 col-form-label fw-bold">
-                Waktu Mulai
-            </label>
-            <div class="col-sm-10 pt-2">
-                <p>: {{ examDetail.startTime | tanggalWaktuIndo }}</p>
+        <div>
+            <label class="form-label text-muted">Waktu Mulai</label>
+            <div class="fs-5 fw-semibold">
+                {{ examDetail.startTime | tanggalWaktuIndo }}
             </div>
         </div>
 
-        <div class="row mb-3">
-            <label for="name" class="col-sm-2 col-form-label fw-bold">
-                Waktu Selesai
-            </label>
-            <div class="col-sm-10 pt-2">
-                <p>: {{ examDetail.endTime | tanggalWaktuIndo }}</p>
+        <div>
+            <label class="form-label text-muted">Waktu Selesai</label>
+            <div class="fs-5 fw-semibold">
+                {{ examDetail.endTime | tanggalWaktuIndo }}
             </div>
         </div>
 
-        <div class="row mb-3">
-            <label for="name" class="col-sm-2 col-form-label fw-bold">
-                Jenis Ujian
-            </label>
-            <div class="col-sm-10 pt-2">
-                <p>: {{ examDetail.examTypeCode }}</p>
+        <div>
+            <label class="form-label text-muted">Jenis Ujian</label>
+            <div class="fs-5 fw-semibold">
+                {{ examDetail.examTypeCode }}
             </div>
         </div>
     </section>
 
-    <ng-container *ngIf="type_ukom === 'CAT'">
-        <app-ukom-exam-cat [room_ukom_detail]="roomUkomDetail" [exam_detail]="examDetail"></app-ukom-exam-cat>
+
+
+    <ng-container *ngIf="typeUkom === 'CAT'">
+        <app-ukom-exam-cat [roomUkomDetail]="roomUkomDetail" [examDetail]="examDetail"></app-ukom-exam-cat>
     </ng-container>
 
-    <ng-container *ngIf="type_ukom === 'MAKALAH'">
+    <ng-container *ngIf="typeUkom === 'MAKALAH'">
         <app-ukom-exam-makalah [room_ukom_detail]="roomUkomDetail" [exam_detail]="examDetail"></app-ukom-exam-makalah>
     </ng-container>
 </ng-template>

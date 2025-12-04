@@ -1,10 +1,4 @@
 <div class="modal show d-block" tabindex="-1" aria-modal="true" role="dialog">
-    <!-- <div
-  class="modal show d-block d-flex align-items-center justify-content-center"
-  tabindex="-1"
-  aria-modal="true"
-  role="dialog"
-> -->
     <div class="modal-dialog modal-dialog-centered" [ngClass]="{
       'modal-sm-custom': size === 'sm',
       'modal-md-custom': size === 'md',
@@ -17,7 +11,6 @@
                 <button type="button" class="btn-close" aria-label="Close" (click)="toggleModal()"></button>
             </div>
             <div class="modal-body">
-                <!-- Content from parent component will be injected here -->
                 <ng-content></ng-content>
             </div>
             <div *ngIf="enableFooter" class="modal-footer">

@@ -17,7 +17,13 @@
   margin: auto; /* Ensures centering */
 }
 
-/* Make sure modal content adjusts */
-// .modal-content {
-//   padding: 20px;
-// }
+.modal-content {
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}

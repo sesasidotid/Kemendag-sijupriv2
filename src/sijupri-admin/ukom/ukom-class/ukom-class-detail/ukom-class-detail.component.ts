@@ -4,7 +4,7 @@ import { CommonModule, Location } from '@angular/common'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
@@ -24,10 +24,10 @@ import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pip
         PagableComponent,
         CommonModule,
         UkomExamScheduleAddComponent,
-        TanggalIndoPipe
+        TanggalIndoPipe,
     ],
     templateUrl: './ukom-class-detail.component.html',
-    styleUrl: './ukom-class-detail.component.scss'
+    styleUrl: './ukom-class-detail.component.scss',
 })
 export class UkomClassDetailComponent {
     id: string
@@ -39,21 +39,21 @@ export class UkomClassDetailComponent {
     isDetailKelasLoading$ = new BehaviorSubject<boolean>(false)
     isLoading$: Observable<boolean>
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private tabService: TabService,
-        private location: Location
+        private location: Location,
     ) {
         this.isLoading$ = combineLatest([this.isDetailKelasLoading$]).pipe(
-            map(loadings => loadings.some(isLoading => isLoading))
+            map((loadings) => loadings.some((isLoading) => isLoading)),
         )
     }
 
-    ngOnInit () {
-        this.activatedRoute.paramMap.pipe(take(1)).subscribe(params => {
+    ngOnInit() {
+        this.activatedRoute.paramMap.pipe(take(1)).subscribe((params) => {
             this.id = params.get('id')
 
             this.handlePagable()
@@ -72,14 +72,14 @@ export class UkomClassDetailComponent {
         }
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder(
-            `/api/v1/participant_ukom/room/${this.id}`
+            `/api/v1/participant_ukom/room/${this.id}`,
         )
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Email', 'email').build()
+                new PrimaryColumnBuilder('Email', 'email').build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
@@ -95,22 +95,22 @@ export class UkomClassDetailComponent {
                                 return data.jenisUkom
                         }
                     })
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((data: any) => {
                         this.router.navigate([
-                            `/ukom/ukom-room-list/detail-participant/${data.id}`
+                            `/ukom/ukom-room-list/detail-participant/${data.id}`,
                         ])
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .build()
     }
 
-    handleTabService () {
+    handleTabService() {
         // if (this.tabService.getTabsLength() > 0) {
         //     this.tabService.clearTabs()
         // }
@@ -120,39 +120,39 @@ export class UkomClassDetailComponent {
                 label: 'Detail Kelas',
                 icon: 'mdi-list-box',
                 isActive: true,
-                onClick: () => this.handleTabChange(0)
+                onClick: () => this.handleTabChange(0),
             })
             .addTab({
                 label: 'Tambah Jadwal UKom',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1)
+                onClick: () => this.handleTabChange(1),
             })
     }
 
-    handleTabChange (tab?: number) {
+    handleTabChange(tab?: number) {
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }
 
-    getDetailKelas () {
+    getDetailKelas() {
         this.isDetailKelasLoading$.next(true)
         this.apiService
             .getData(`/api/v1/room_ukom/${this.id}`)
             .pipe(
                 finalize(() => {
                     this.isDetailKelasLoading$.next(false)
-                })
+                }),
             )
             .subscribe({
-                next: res => {
+                next: (res) => {
                     this.detailKelas = res
                 },
-                error: err => {
+                error: (err) => {
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal mengambil detail kelas UKOM'
+                        'Gagal mengambil detail kelas UKOM',
                     )
-                }
+                },
             })
     }
 }

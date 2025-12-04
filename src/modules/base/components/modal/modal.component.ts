@@ -6,7 +6,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
     standalone: true,
     templateUrl: './modal.component.html',
     styleUrl: './modal.component.scss',
-    imports: [CommonModule]
+    imports: [CommonModule],
 })
 export class ModalComponent {
     @Input() title: string = ''
@@ -15,11 +15,11 @@ export class ModalComponent {
     @Output() saveEvent = new EventEmitter<void>()
     @Input() size: 'sm' | 'md' | 'lg' | '' = ''
 
-    toggleModal () {
+    toggleModal() {
         this.toggle.emit()
     }
 
-    save () {
+    save() {
         this.saveEvent.emit()
     }
 }

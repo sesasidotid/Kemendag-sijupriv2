@@ -1,22 +1,24 @@
 import { HandlerService } from './../../../../modules/base/services/handler.service'
 import { RoomUkomDetail } from './../../../../modules/ukom/models/room-ukom-detail'
-import { Component } from '@angular/core'
-import { ApiService } from '../../../../modules/base/services/api.service'
+import { Component, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ExamDetail } from '../../../../modules/ukom/models/exam_detail'
-import { CommonModule, Location } from '@angular/common'
+import { CommonModule } from '@angular/common'
 import {
     BehaviorSubject,
     combineLatest,
     map,
     take,
     Observable,
-    finalize
+    finalize,
+    tap,
 } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { UkomExamCatComponent } from '../ukom-exam-cat/ukom-exam-cat.component'
 import { UkomExamMakalahComponent } from '../ukom-exam-makalah/ukom-exam-makalah.component'
 import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
+import { UkomRoomService } from '@/modules/ukom/services/ukom-room.service'
+import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
     standalone: true,
@@ -25,107 +27,110 @@ import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-wakt
         FormsModule,
         UkomExamCatComponent,
         UkomExamMakalahComponent,
-        TanggalWaktuIndoPipe
+        TanggalWaktuIndoPipe,
     ],
     templateUrl: './ukom-exam-choose-comp-questions.component.html',
-    styleUrl: './ukom-exam-choose-comp-questions.component.scss'
+    styleUrl: './ukom-exam-choose-comp-questions.component.scss',
 })
 export class UkomExamChooseCompQuestionsComponent {
-    roomUkomDetail: RoomUkomDetail = new RoomUkomDetail()
-    examDetail: ExamDetail = new ExamDetail()
-    room_ukom_id: string
-    type_ukom: string
+    ukomRoomService = inject(UkomRoomService)
+    ukomExamScheduleService = inject(UkomExamScheduleService)
+    roomUkomDetail = new RoomUkomDetail()
+    examDetail = new ExamDetail()
 
+    typeUkom: string
     isLoadingRoomDetail$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
-
     isLoadingExamDetail$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
 
     isLoading$: Observable<boolean>
 
-    constructor (
-        private apiService: ApiService,
+    constructor(
         private activatedRoute: ActivatedRoute,
         private handlerService: HandlerService,
-        private location: Location,
-        private router: Router
+        private router: Router,
     ) {
         this.isLoading$ = combineLatest([
             this.isLoadingRoomDetail$,
-            this.isLoadingExamDetail$
-        ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
+            this.isLoadingExamDetail$,
+        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
     }
 
-    ngOnInit () {
+    ngOnInit() {
         combineLatest([
             this.activatedRoute.paramMap.pipe(take(1)),
-            this.activatedRoute.queryParamMap.pipe(take(1))
+            this.activatedRoute.queryParamMap.pipe(take(1)),
         ]).subscribe(([paramMap, queryParamMap]) => {
-            this.room_ukom_id = paramMap.get('roomid')
-            this.type_ukom = queryParamMap.get('type_ukom')
+            const roomId = paramMap.get('roomid')
+            const typeUkom = queryParamMap.get('type_ukom')
 
-            this.getRoomDetail()
-            this.getExamDetail()
+            this.typeUkom = typeUkom
+            this.getRoomDetail(roomId)
+            this.getExamDetail(roomId, typeUkom)
         })
     }
 
-    back () {
-        // this.location.back()
-        this.router.navigate([`/ukom/ukom-room-list/${this.room_ukom_id}`], {
-            state: { openTab: 1 }
-        })
+    back() {
+        this.router.navigate(
+            [`/ukom/ukom-room-list/${this.roomUkomDetail.id}`],
+            {
+                state: { openTab: 1 },
+            },
+        )
     }
 
-    getRoomDetail () {
+    getRoomDetail(roomId: string) {
         this.isLoadingRoomDetail$.next(true)
-        this.apiService
-            .getData(`/api/v1/room_ukom/${this.room_ukom_id}`)
+        this.ukomRoomService
+            .getRoomDetailByRoomId(roomId)
             .pipe(
                 finalize(() => {
                     this.isLoadingRoomDetail$.next(false)
-                })
+                }),
             )
             .subscribe({
-                next: (res: RoomUkomDetail) => {
+                next: (res) => {
                     this.roomUkomDetail = res
                 },
-                error: (err: any) => {
+                error: (err) => {
                     console.error(err)
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal mendapatkan detail ruang UKOM'
+                        'Gagal mendapatkan detail ruang UKOM',
                     )
-                }
+                },
             })
     }
-    getExamDetail () {
+    getExamDetail(roomId: string, typeUkom: string) {
         this.isLoadingExamDetail$.next(true)
-        this.apiService
-            .getData(`/api/v1/exam_schedule/room/${this.room_ukom_id}`)
+        this.ukomExamScheduleService
+            .getExamDetailByRoomID(roomId)
             .pipe(
                 finalize(() => {
                     this.isLoadingExamDetail$.next(false)
-                })
+                }),
             )
             .subscribe({
-                next: (res: ExamDetail) => {
+                next: (res) => {
                     if (Array.isArray(res)) {
                         this.examDetail = res.find(
                             (exam: ExamDetail) =>
-                                exam.examTypeCode === this.type_ukom
+                                exam.examTypeCode === typeUkom,
                         )
+                    } else if (res instanceof ExamDetail) {
+                        this.examDetail = res
                     } else {
                         this.examDetail = null
                     }
                 },
-                error: (err: any) => {
+                error: (err) => {
                     console.error(err)
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal mendapatkan detail ujian'
+                        'Gagal mendapatkan detail ujian',
                     )
-                }
+                },
             })
     }
 }

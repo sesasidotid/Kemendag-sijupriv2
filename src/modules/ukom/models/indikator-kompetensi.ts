@@ -1,14 +1,14 @@
 import { Serializable } from '../../base/commons/serializable'
+import { KompetensiUkom } from './kompetensi'
 
 export class IndikatorKompetensiUkom extends Serializable {
     id: string = undefined
-    kompetensi_id: string = undefined
-    kompetensiId: string = undefined
     name: string = undefined
     code: string = undefined
-    kompetensi: any = undefined
+    kompetensiId: string = undefined
+    kompetensi: KompetensiUkom = undefined
 
-    constructor (object?: { [key: string]: any }) {
+    constructor(object?: { [key: string]: any }) {
         super()
         if (object) this.fromObject(object)
     }

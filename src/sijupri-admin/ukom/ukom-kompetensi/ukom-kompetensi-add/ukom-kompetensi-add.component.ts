@@ -6,18 +6,17 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject, of } from 'rxjs'
-import { Router, RouterLink } from '@angular/router'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { KompetensiUkom } from '../../../../modules/ukom/models/kompetensi'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { distinctUntilChanged, map, startWith, tap } from 'rxjs/operators'
+import { distinctUntilChanged, map } from 'rxjs/operators'
 import { Pangkat } from '../../../../modules/maintenance/models/pangkat.model'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
@@ -29,10 +28,10 @@ import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jab
         CommonModule,
         ReactiveFormsModule,
         FormsModule,
-        LucideAngularModule
+        LucideAngularModule,
     ],
     templateUrl: './ukom-kompetensi-add.component.html',
-    styleUrl: './ukom-kompetensi-add.component.scss'
+    styleUrl: './ukom-kompetensi-add.component.scss',
 })
 export class UkomKompetensiAddComponent {
     @Output() changeTabActive: EventEmitter<any> = new EventEmitter()
@@ -40,7 +39,7 @@ export class UkomKompetensiAddComponent {
     kompetensiForm: FormGroup
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
-    kompetensiData: KompetensiUkom = new KompetensiUkom()
+    kompetensiData = new KompetensiUkom()
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
     pangkatList$: Observable<Pangkat[]>
@@ -48,29 +47,28 @@ export class UkomKompetensiAddComponent {
     private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
     bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
 
-    constructor (
+    constructor(
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private formValidationService: FormValidationService
+        private formValidationService: FormValidationService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handleFormInit()
         this.getJabatanList()
-        // this.getListJenjang()
         this.handleSubscribe()
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.kompetensiForm.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    handleFormInit () {
+    handleFormInit() {
         this.kompetensiForm = new FormGroup({
             code: new FormControl('', Validators.required),
             name: new FormControl('', Validators.required),
@@ -78,21 +76,20 @@ export class UkomKompetensiAddComponent {
             description: new FormControl('', Validators.required),
             jabatan_code: new FormControl('', Validators.required),
             jenjang_code: new FormControl('', Validators.required),
-            bidang_jabatan_code: new FormControl('')
+            bidang_jabatan_code: new FormControl(''),
         })
     }
 
-    handleSubscribe () {
-        // this.handleBidangJabatanValidation()
+    handleSubscribe() {
         const bidangJabatanControl = this.kompetensiForm.get(
-            'bidang_jabatan_code'
+            'bidang_jabatan_code',
         )
         const jenjangControl = this.kompetensiForm.get('jenjang_code')
         const jabatanControl = this.kompetensiForm.get('jabatan_code')
 
         jabatanControl?.valueChanges
             .pipe(distinctUntilChanged())
-            .subscribe(jabatanCode => {
+            .subscribe((jabatanCode) => {
                 bidangJabatanControl?.reset()
                 jenjangControl?.reset()
                 jenjangControl?.patchValue('')
@@ -104,65 +101,53 @@ export class UkomKompetensiAddComponent {
             })
     }
 
-    getJabatanList () {
+    getJabatanList() {
         this.jabatanList$ = this.apiService
             .getData(`/api/v1/jabatan`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
                         (jabatan: { [key: string]: any }) =>
-                            new Jabatan(jabatan)
-                    )
-                )
+                            new Jabatan(jabatan),
+                    ),
+                ),
             )
 
-        this.jabatanList$.forEach(jabatanList => {
+        this.jabatanList$.forEach((jabatanList) => {
             console.log(jabatanList)
         })
     }
 
-    // getListJenjang () {
-    //     this.jenjangList$ = this.apiService
-    //         .getData(`/api/v1/jenjang`)
-    //         .pipe(
-    //             map(response =>
-    //                 response.map(
-    //                     (jenjang: { [key: string]: any }) =>
-    //                         new Jenjang(jenjang)
-    //                 )
-    //             )
-    //         )
-    // }
-    getListJenjang (jabatanCode: string) {
+    getListJenjang(jabatanCode: string) {
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
                         (jenjang: { [key: string]: any }) =>
-                            new Jenjang(jenjang)
-                    )
-                )
+                            new Jenjang(jenjang),
+                    ),
+                ),
             )
     }
 
-    getBidangJabatanByJabatanCode (jabatanCode: string): void {
+    getBidangJabatanByJabatanCode(jabatanCode: string): void {
         this.apiService
             .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
             .pipe(
                 map((res: any) =>
                     Array.isArray(res)
-                        ? res.map(item => new BidangJabatan(item))
-                        : []
-                )
+                        ? res.map((item) => new BidangJabatan(item))
+                        : [],
+                ),
             )
-            .subscribe(list => {
+            .subscribe((list) => {
                 this.bidangJabatanListSubject.next(list)
             })
     }
 
-    handleBidangJabatanValidation () {
-        this.bidangJabatanList$.subscribe(bidangJabatanList => {
+    handleBidangJabatanValidation() {
+        this.bidangJabatanList$.subscribe((bidangJabatanList) => {
             const control = this.kompetensiForm.get('bidang_jabatan_code')
             if (!control) return
 
@@ -170,7 +155,7 @@ export class UkomKompetensiAddComponent {
                 ? [control.validator]
                 : []
             const isRequiredAlreadySet = currentValidators.some(
-                v => v === Validators.required
+                (v) => v === Validators.required,
             )
 
             if (bidangJabatanList.length > 0 && !isRequiredAlreadySet) {
@@ -183,9 +168,9 @@ export class UkomKompetensiAddComponent {
         })
     }
 
-    submit () {
+    submit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 this.kompetensiData.code =
@@ -196,12 +181,13 @@ export class UkomKompetensiAddComponent {
                     this.kompetensiForm.get('level')?.value
                 this.kompetensiData.description =
                     this.kompetensiForm.get('description')?.value
-                this.kompetensiData.jabatan_code =
+                this.kompetensiData.jabatanCode =
                     this.kompetensiForm.get('jabatan_code')?.value
-                this.kompetensiData.jenjang_code =
+                this.kompetensiData.jenjangCode =
                     this.kompetensiForm.get('jenjang_code')?.value
-                this.kompetensiData.bidang_jabatan_code =
-                    this.kompetensiForm.get('bidang_jabatan_code')?.value
+                this.kompetensiData.bidangJabatanCode = this.kompetensiForm.get(
+                    'bidang_jabatan_code',
+                )?.value
 
                 this.apiService
                     .postData(`/api/v1/kompetensi`, this.kompetensiData)
@@ -209,7 +195,7 @@ export class UkomKompetensiAddComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil disimpan'
+                                'Data berhasil disimpan',
                             )
 
                             this.kompetensiForm.reset()
@@ -217,11 +203,11 @@ export class UkomKompetensiAddComponent {
                         error: () => {
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Data gagal disimpan'
+                                'Data gagal disimpan',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }
