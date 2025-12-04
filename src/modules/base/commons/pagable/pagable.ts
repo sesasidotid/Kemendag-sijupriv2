@@ -8,6 +8,7 @@ export class Pagable {
     filterList: PageFilter[] = []
     limit: number = 10
     enablePagination: boolean = true
+    useQueryParams: boolean = false
 
     constructor(
         endpoint?: string,
@@ -15,7 +16,8 @@ export class Pagable {
         actionColumnList?: PageColumn[],
         filterList?: PageFilter[],
         enablePagination: boolean = true,
-        limit: number = 10
+        limit: number = 10,
+        useQueryParams: boolean = false,
     ) {
         this.endpoint = endpoint
         this.primaryColumnList = primaryColumnList
@@ -23,5 +25,6 @@ export class Pagable {
         this.filterList = filterList
         this.enablePagination = enablePagination
         this.limit = limit
+        this.useQueryParams = useQueryParams
     }
 }

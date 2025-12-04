@@ -21,8 +21,6 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(req).pipe(
         catchError((error) => {
-            // console.log('interceptor', error);
-
             const currentRoute = router.url
             const shouldIgnore = IGNORE_LOGOUT_ROUTES.some((route) =>
                 currentRoute.startsWith(route),
@@ -37,12 +35,10 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                     LoginContext.getApplicationCode() === 'siukom-participant'
                 ) {
                     router.navigate(['/login-cat']).then(() => {
-                        console.log('reload')
                         window.location.reload()
                     })
                 } else {
                     router.navigate(['/login']).then(() => {
-                        console.log('reload')
                         window.location.reload()
                     })
                 }

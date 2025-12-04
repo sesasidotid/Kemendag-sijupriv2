@@ -28,7 +28,7 @@ import { FilePreviewService } from '../../../modules/base/services/file-preview.
     standalone: true,
     imports: [CommonModule, FormsModule, FileHandlerComponent],
     templateUrl: './jf-task-detail.component.html',
-    styleUrl: './jf-task-detail.component.scss'
+    styleUrl: './jf-task-detail.component.scss',
 })
 export class JfTaskDetailComponent {
     nip: string
@@ -51,11 +51,11 @@ export class JfTaskDetailComponent {
         private converterService: ConverterService,
         private jfService: JfService,
         private sanitizer: DomSanitizer,
-        private filePreviewService: FilePreviewService
-    ) { }
+        private filePreviewService: FilePreviewService,
+    ) {}
 
     ngOnInit() {
-        this.activatedRoute.paramMap.subscribe(params => {
+        this.activatedRoute.paramMap.subscribe((params) => {
             this.nip = params.get('id')
         })
         this.getJF()
@@ -72,20 +72,20 @@ export class JfTaskDetailComponent {
     }
 
     fetchPhotoProfile() {
-        console.log('Fetching photo profile')
         this.apiService.getPhotoProfile(this.nip).subscribe({
-            next: blob => {
+            next: (blob) => {
                 if (blob.size === 0) {
                     this.profileImageSrc = 'assets/no-profile.jpg'
                     return
                 }
                 const objectUrl = URL.createObjectURL(blob)
-                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+                this.profileImageSrc =
+                    this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching profile image', err)
                 this.profileImageSrc = 'assets/no-profile.jpg'
-            }
+            },
         })
     }
 
@@ -97,15 +97,15 @@ export class JfTaskDetailComponent {
                 this.pendingTaskList = pendingTaskList
                 this.pendingTaskloading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.error('Error fetching data', error)
                 this.alertService.showToast(
                     'Error',
-                    'Gagal mendapatkan data verifikasi user JF!'
+                    'Gagal mendapatkan data verifikasi user JF!',
                 )
 
                 this.pendingTaskloading$.next(false)
-            }
+            },
         })
     }
 
@@ -127,34 +127,46 @@ export class JfTaskDetailComponent {
                     next: (objectTask: ObjectTask) => {
                         switch (pendingTask.workflowName) {
                             case 'jf_task':
-                                pendingTask['object'] = new JF(objectTask.object)
+                                pendingTask['object'] = new JF(
+                                    objectTask.object,
+                                )
                                 break
                             case 'rw_pendidikan_task':
-                                pendingTask['object'] = new RWPendidikan(objectTask.object)
+                                pendingTask['object'] = new RWPendidikan(
+                                    objectTask.object,
+                                )
                                 break
                             case 'rw_pangkat_task':
-                                pendingTask['object'] = new RWPangkat(objectTask.object)
+                                pendingTask['object'] = new RWPangkat(
+                                    objectTask.object,
+                                )
                                 break
                             case 'rw_jabatan_task':
-                                pendingTask['object'] = new RWJabatan(objectTask.object)
+                                pendingTask['object'] = new RWJabatan(
+                                    objectTask.object,
+                                )
                                 break
                             case 'rw_kompetensi_task':
-                                pendingTask['object'] = new RWKompetensi(objectTask.object)
+                                pendingTask['object'] = new RWKompetensi(
+                                    objectTask.object,
+                                )
                                 break
                             case 'rw_sertifikasi_task':
-                                pendingTask['object'] = new RWSertifikasi(objectTask.object)
+                                pendingTask['object'] = new RWSertifikasi(
+                                    objectTask.object,
+                                )
                                 break
                         }
                         this.detailTaskloading$.next(false)
                     },
-                    error: error => {
+                    error: (error) => {
                         console.error('Error fetching data', error)
                         this.alertService.showToast(
                             'Error',
-                            'Gagal mendapatkan data detail task!'
+                            'Gagal mendapatkan data detail task!',
                         )
                         this.detailTaskloading$.next(false)
-                    }
+                    },
                 })
         }
     }
@@ -162,10 +174,10 @@ export class JfTaskDetailComponent {
     openConfirmationDialog(
         pendingTask: PendingTask,
         taskAction: string,
-        withComment: boolean = false
+        withComment: boolean = false,
     ) {
         this.confirmationService.open(withComment).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 pendingTask['taskAction'] = taskAction
@@ -173,7 +185,7 @@ export class JfTaskDetailComponent {
                     pendingTask.remark = result.comment
                 }
                 this.submit(pendingTask)
-            }
+            },
         })
     }
 
@@ -187,7 +199,7 @@ export class JfTaskDetailComponent {
 
     getJF() {
         this.jfService.findByNip(this.nip).subscribe({
-            next: (jf: JF) => (this.jf = jf)
+            next: (jf: JF) => (this.jf = jf),
         })
     }
 
@@ -197,32 +209,40 @@ export class JfTaskDetailComponent {
         task.id = pendingTask.id
         task.taskAction = pendingTask.taskAction
         task.remark = pendingTask.remark ?? null
-        console.log(task.taskAction)
 
         this.apiService
             .postData(
                 `/api/v1/${pendingTask.workflowName.replace('_task', '')}/task/submit`,
-                task
+                task,
             )
             .subscribe({
                 next: () => {
                     if (task.taskAction == 'approve') {
-                        this.alertService.showToast('Success', 'Berhasil menyetujui!')
+                        this.alertService.showToast(
+                            'Success',
+                            'Berhasil menyetujui!',
+                        )
                     } else {
-                        this.alertService.showToast('Success', 'Berhasil menolak!')
+                        this.alertService.showToast(
+                            'Success',
+                            'Berhasil menolak!',
+                        )
                     }
                     this.submitTaskLoading$.next(false)
                     this.getTaskDetail()
                 },
-                error: error => {
+                error: (error) => {
                     console.error('Error fetching data', error)
                     this.submitTaskLoading$.next(false)
                     if (task.taskAction == 'approve') {
-                        this.alertService.showToast('Error', 'Gagal menyetujui!')
+                        this.alertService.showToast(
+                            'Error',
+                            'Gagal menyetujui!',
+                        )
                     } else {
                         this.alertService.showToast('Error', 'Gagal menolak!')
                     }
-                }
+                },
             })
     }
 }

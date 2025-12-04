@@ -1,19 +1,18 @@
 import { Component, OnInit, Input } from '@angular/core'
 import { FilePreviewService } from '../../services/file-preview.service'
-import { SafeUrlPipe } from '../../pipes/safe-url.pipe'
 import { CommonModule } from '@angular/common'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 
 @Component({
     selector: 'app-file-preview',
     standalone: true,
-    imports: [CommonModule, SafeUrlPipe],
+    imports: [CommonModule],
     templateUrl: './file-preview.component.html',
     styleUrl: './file-preview.component.scss',
 })
 export class FilePreviewComponent implements OnInit {
     fileName: string = ''
-    fileSource: string = ''
+    fileSource: SafeResourceUrl | null = null
     showModal: boolean = false
 
     constructor(
@@ -65,11 +64,9 @@ export class FilePreviewComponent implements OnInit {
             finalUrl = `${finalUrl}${cacheSeparator}_cache=${Date.now()}`
         }
 
-        this.fileSource = this.sanitizer.bypassSecurityTrustResourceUrl(
-            finalUrl,
-        ) as string
+        this.fileSource =
+            this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl)
 
-        console.log('Final URL:', this.fileSource)
         this.showModal = true
     }
 

@@ -1,22 +1,22 @@
 import { Component } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { Router } from '@angular/router'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { ApiService } from '../../../../modules/base/services/api.service'
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { ApiService } from '@/modules/base/services/api.service'
 import { UkomRejectedListComponent } from '../ukom-rejected-list/ukom-rejected-list.component'
-import { TabService } from '../../../../modules/base/services/tab.service'
+import { TabService } from '@/modules/base/services/tab.service'
 import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { PageFilter } from '@/modules/base/commons/pagable/page-filter'
+import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
 import { UkomExportVerifikasiComponent } from '../ukom-export-verifikasi/ukom-export-verifikasi.component'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
@@ -62,6 +62,7 @@ export class UkomListComponent {
                 label: 'Rekapitulasi Lolos Verifikasi',
                 icon: 'mdi-list-box',
                 onClick: () => this.tabService.changeTabActive(0),
+                isActive: true,
             })
             .addTab({
                 label: 'Rekapitulasi Tidak Lolos Verifikasi',
@@ -73,8 +74,6 @@ export class UkomListComponent {
                 icon: 'mdi-export',
                 onClick: () => this.tabService.changeTabActive(2),
             })
-
-        setTimeout(() => this.tabService.changeTabActive(0), 0)
     }
 
     handlePagable() {
@@ -159,6 +158,7 @@ export class UkomListComponent {
                     ])
                     .build(),
             )
+            .withQueryParams()
             .build()
 
         this.pagable$.next(pagable)

@@ -9,6 +9,7 @@ export class PagableBuilder {
     private filterList: PageFilter[] = []
     private limit: number = 10
     private enablePagination: boolean = true
+    private useQueryParams: boolean = false
 
     constructor(endpoint: string) {
         this.endpoint = endpoint
@@ -39,6 +40,11 @@ export class PagableBuilder {
         return this
     }
 
+    withQueryParams() {
+        this.useQueryParams = true
+        return this
+    }
+
     build(): Pagable {
         return new Pagable(
             this.endpoint,
@@ -46,7 +52,8 @@ export class PagableBuilder {
             this.actionColumnList,
             this.filterList,
             this.enablePagination,
-            this.limit
+            this.limit,
+            this.useQueryParams,
         )
     }
 }
@@ -60,7 +67,7 @@ export class PageFilterBuilder {
     private clause: string
     private clauses: any = {
         equal: 'eq_',
-        like: 'like_'
+        like: 'like_',
     }
 
     constructor(clause: 'equal' | 'like') {
@@ -69,7 +76,7 @@ export class PageFilterBuilder {
 
     withField(
         lable: string,
-        fieldType: 'text' | 'date' | 'select'
+        fieldType: 'text' | 'date' | 'select',
     ): PageFilterBuilder {
         this.lable = lable
         this.fieldType = fieldType
@@ -82,7 +89,7 @@ export class PageFilterBuilder {
     }
 
     setOptionList(
-        optionList: { label: string; value: string | number | boolean }[]
+        optionList: { label: string; value: string | number | boolean }[],
     ): PageFilterBuilder {
         this.optionList = optionList
         return this
@@ -91,13 +98,13 @@ export class PageFilterBuilder {
     setOptionListFromObjectList(
         objectList: any[],
         labelProperty: string,
-        valueProperty: string
+        valueProperty: string,
     ): PageFilterBuilder {
         this.optionList = []
-        objectList.forEach(object => {
+        objectList.forEach((object) => {
             this.optionList.push({
                 label: object[labelProperty],
-                value: object[valueProperty]
+                value: object[valueProperty],
             })
         })
         return this
@@ -105,9 +112,9 @@ export class PageFilterBuilder {
 
     setProperty(
         property: string,
-        parentsProperty: string[] = []
+        parentsProperty: string[] = [],
     ): PageFilterBuilder {
-        parentsProperty.forEach(pProp => {
+        parentsProperty.forEach((pProp) => {
             this.property = `${pProp}|` + this.property
         })
         this.property = this.property + property
@@ -121,7 +128,7 @@ export class PageFilterBuilder {
             fieldType: this.fieldType,
             value: this.value,
             key: `${this.clauses[this.clause]}${this.property}`,
-            optionList: this.optionList
+            optionList: this.optionList,
         })
     }
 }
@@ -139,7 +146,7 @@ export class PrimaryColumnBuilder {
         if (label) {
             this.label = label
             if (parentsProperty)
-                parentsProperty.forEach(pProp => {
+                parentsProperty.forEach((pProp) => {
                     this.property = `${pProp}|` + property
                 })
             if (property && parentsProperty === undefined) {
@@ -159,11 +166,11 @@ export class PrimaryColumnBuilder {
     withPropertyValue(
         label: string,
         property: string,
-        parentsProperty?: string[]
+        parentsProperty?: string[],
     ): PrimaryColumnBuilder {
         this.label = label
         if (parentsProperty)
-            parentsProperty.forEach(pProp => {
+            parentsProperty.forEach((pProp) => {
                 this.property = `${pProp}|` + this.property
             })
         this.property = this.property + property
@@ -172,7 +179,7 @@ export class PrimaryColumnBuilder {
     }
 
     withDefaultValue(
-        defaultValue: string | number | boolean | null = null
+        defaultValue: string | number | boolean | null = null,
     ): PrimaryColumnBuilder {
         this.defaultValue = defaultValue
         return this
@@ -188,7 +195,9 @@ export class PrimaryColumnBuilder {
         return this
     }
 
-    withCellStyle(fn: (row: any) => Record<string, string>): PrimaryColumnBuilder {
+    withCellStyle(
+        fn: (row: any) => Record<string, string>,
+    ): PrimaryColumnBuilder {
         this.cellStyle = fn
         return this
     }
@@ -202,7 +211,7 @@ export class PrimaryColumnBuilder {
             defaultValue: this.defaultValue,
             sortable: this.sortable,
             cellClass: this.cellClass,
-            cellStyle: this.cellStyle
+            cellStyle: this.cellStyle,
         })
     }
 }
@@ -222,12 +231,12 @@ export class ActionColumnBuilder {
         download: 'ri-download-line',
         navigate: 'ri-external-link-line',
         upload: 'ri-upload-line',
-        password: 'ri-lock-2-line'
+        password: 'ri-lock-2-line',
     }
 
     setAction(
         process: Function,
-        color: 'primary' | 'success' | 'info' | 'danger' | 'warning'
+        color: 'primary' | 'success' | 'info' | 'danger' | 'warning',
     ): ActionColumnBuilder {
         this.process = process
         this.color = color
@@ -248,7 +257,7 @@ export class ActionColumnBuilder {
             | 'download'
             | 'navigate'
             | 'upload'
-            | 'password'
+            | 'password',
     ): ActionColumnBuilder {
         this.icon = this.icons[icon]
         return this
@@ -272,7 +281,7 @@ export class ActionColumnBuilder {
             icon: this.icon,
             color: this.color,
             inactive: this.inactive,
-            inputType: this.inputType || 'button'
+            inputType: this.inputType || 'button',
         })
     }
 }

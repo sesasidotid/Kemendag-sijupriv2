@@ -1,18 +1,26 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
+import {
+    Component,
+    Input,
+    OnChanges,
+    SimpleChanges,
+    OnInit,
+    OnDestroy,
+} from '@angular/core'
 import { ApiService } from '../../services/api.service'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
-import { RouterLink } from '@angular/router'
+import { RouterLink, ActivatedRoute, Router } from '@angular/router'
 import { Pagable } from '../../commons/pagable/pagable'
 import { HttpClient } from '@angular/common/http'
+import { Subscription } from 'rxjs'
 @Component({
     selector: 'app-pagable',
     standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './pagable.component.html',
-    styleUrls: ['./pagable.component.scss']
+    styleUrls: ['./pagable.component.scss'],
 })
-export class PagableComponent implements OnChanges {
+export class PagableComponent implements OnChanges, OnInit, OnDestroy {
     @Input() pagable!: Pagable
     @Input() refresh!: boolean
 
@@ -22,20 +30,48 @@ export class PagableComponent implements OnChanges {
     paginator: any
     onLoad: boolean = false
     enablePagination: boolean = true
+    private queryParamsSubscription: Subscription
 
-    constructor(private apiService: ApiService, private http: HttpClient) { }
+    constructor(
+        private apiService: ApiService,
+        private http: HttpClient,
+        private route: ActivatedRoute,
+        private router: Router,
+    ) {}
+
+    ngOnInit() {
+        if (this.pagable.useQueryParams) {
+            this.queryParamsSubscription = this.route.queryParams.subscribe(
+                (params) => {
+                    this.parseQueryParams(params)
+                    this.loadData()
+                },
+            )
+        }
+    }
+
+    ngOnDestroy() {
+        if (this.queryParamsSubscription) {
+            this.queryParamsSubscription.unsubscribe()
+        }
+    }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['pagable']) {
-            this.pagable.primaryColumnList.forEach(column => {
-                this.sortOrder[column.property] = ''
+            this.pagable.primaryColumnList.forEach((column) => {
+                if (!(column.property in this.sortOrder)) {
+                    this.sortOrder[column.property] = ''
+                }
             })
-            this.limit = this.pagable.limit
-            this.fetchData()
+
+            if (!this.pagable.useQueryParams) {
+                this.limit = this.pagable.limit
+                this.loadData()
+            }
         }
 
         if (changes['refresh'] && !changes['refresh'].isFirstChange()) {
-            this.fetchData()
+            this.loadData()
         }
     }
 
@@ -79,12 +115,96 @@ export class PagableComponent implements OnChanges {
     }
 
     fetchData(): void {
+        if (this.pagable.useQueryParams) {
+            this.updateQueryParams()
+        } else {
+            this.loadData()
+        }
+    }
+
+    updateQueryParams() {
+        const queryParams: any = {
+            page: this.page,
+            limit: this.limit,
+        }
+
+        for (const property in this.sortOrder) {
+            if (this.sortOrder[property] !== '') {
+                queryParams[`${this.sortOrder[property]}_${property}`] = true
+            } else {
+                queryParams[`asc_${property}`] = null
+                queryParams[`desc_${property}`] = null
+            }
+        }
+
+        if (this.pagable.filterList) {
+            this.pagable.filterList.forEach((filter) => {
+                if (filter.value) {
+                    queryParams[filter.key] = filter.value
+                } else {
+                    queryParams[filter.key] = null
+                }
+            })
+        }
+
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: queryParams,
+            queryParamsHandling: 'merge',
+        })
+    }
+
+    parseQueryParams(params: any) {
+        if (params['page']) {
+            this.page = Number(params['page'])
+        } else {
+            this.page = 1
+        }
+
+        if (params['limit']) {
+            this.limit = Number(params['limit'])
+        } else {
+            this.limit = this.pagable.limit
+        }
+
+        // Reset sort order
+        for (const property in this.sortOrder) {
+            this.sortOrder[property] = ''
+        }
+
+        for (const key in params) {
+            if (key.startsWith('asc_') && params[key] === 'true') {
+                const prop = key.substring(4)
+                if (this.sortOrder.hasOwnProperty(prop)) {
+                    this.sortOrder[prop] = 'asc'
+                }
+            } else if (key.startsWith('desc_') && params[key] === 'true') {
+                const prop = key.substring(5)
+                if (this.sortOrder.hasOwnProperty(prop)) {
+                    this.sortOrder[prop] = 'desc'
+                }
+            }
+        }
+
+        if (this.pagable.filterList) {
+            this.pagable.filterList.forEach((filter) => {
+                if (params[filter.key]) {
+                    filter.value = params[filter.key]
+                } else {
+                    filter.value = ''
+                }
+            })
+        }
+    }
+
+    loadData(): void {
         this.onLoad = true
 
         let query = ''
         const hasExistingQuery = this.pagable.endpoint.includes('?')
-        query += `${hasExistingQuery ? '&' : '?'}page=${this.page}&limit=${this.limit
-            }`
+        query += `${hasExistingQuery ? '&' : '?'}page=${this.page}&limit=${
+            this.limit
+        }`
 
         for (const property in this.sortOrder) {
             if (this.sortOrder[property] !== '') {
@@ -93,7 +213,7 @@ export class PagableComponent implements OnChanges {
         }
 
         if (this.pagable.filterList) {
-            this.pagable.filterList.forEach(filter => {
+            this.pagable.filterList.forEach((filter) => {
                 if (filter.value) {
                     query += `&${filter.key}=${filter.value}`
                 }
@@ -137,7 +257,7 @@ export class PagableComponent implements OnChanges {
                     response &&
                     typeof response === 'object' &&
                     'data' in response &&
-                    ('lastPage' in response)
+                    'lastPage' in response
 
                 if (hasPagination) {
                     this.enablePagination = true
@@ -152,12 +272,10 @@ export class PagableComponent implements OnChanges {
                         this.paginator.data.roomUkomDto.examScheduleDtoList
                 }
             },
-            error: e => {
+            error: (e) => {
                 console.error('Error fetching data', e)
-            }
+            },
         })
-
-
     }
 
     getPropertyValue(object: any, property: string): any {
@@ -166,7 +284,7 @@ export class PagableComponent implements OnChanges {
 
     getPropertyUrlValue(
         object: any,
-        urlDefinition: { path: string; property?: string }
+        urlDefinition: { path: string; property?: string },
     ): string {
         if (urlDefinition.property) {
             return `${urlDefinition.path}/${object[urlDefinition.property]}`
@@ -213,7 +331,7 @@ export class PagableComponent implements OnChanges {
     //   }
     toggleSort(columnProperty: string): void {
         const column = this.pagable.primaryColumnList.find(
-            col => col.property === columnProperty
+            (col) => col.property === columnProperty,
         )
 
         // Check if the column is sortable

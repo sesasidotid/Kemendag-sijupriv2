@@ -118,7 +118,7 @@ export class LoginCatComponent {
                     }, 1500)
                 },
                 error: (error) => {
-                    console.log(error)
+                    console.error(error)
                     this.loginMessage.set({
                         status: 'error',
                         message: 'Login gagal, tolong coba lagi.',

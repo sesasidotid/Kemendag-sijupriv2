@@ -4,7 +4,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
@@ -21,7 +21,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { map, filter } from 'rxjs/operators'
 import { Observable, of, Subject } from 'rxjs'
@@ -36,10 +36,10 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
         ModalComponent,
         FormsModule,
         ReactiveFormsModule,
-        ConfirmationDialogComponent
+        ConfirmationDialogComponent,
     ],
     templateUrl: './ukom-formula-list.component.html',
-    styleUrl: './ukom-formula-list.component.scss'
+    styleUrl: './ukom-formula-list.component.scss',
 })
 export class UkomFormulaListComponent {
     pagable$ = new BehaviorSubject<Pagable | null>(null)
@@ -57,8 +57,8 @@ export class UkomFormulaListComponent {
         private router: Router,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private formValidationService: FormValidationService
-    ) { }
+        private formValidationService: FormValidationService,
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -68,7 +68,11 @@ export class UkomFormulaListComponent {
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.editFormulaForm.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.editFormulaForm.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handlePagable() {
@@ -76,43 +80,61 @@ export class UkomFormulaListComponent {
             new PagableBuilder('/api/v1/ukom_formula/search')
 
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Jabatan', 'jabatanName').build()
+                    new PrimaryColumnBuilder('Jabatan', 'jabatanName').build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Jenjang', 'jenjangName').build()
+                    new PrimaryColumnBuilder('Jenjang', 'jenjangName').build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('CAT', 'catPercentage').build()
+                    new PrimaryColumnBuilder('CAT', 'catPercentage').build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Wawancara', 'wawancaraPercentage').build()
+                    new PrimaryColumnBuilder(
+                        'Wawancara',
+                        'wawancaraPercentage',
+                    ).build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Seminar', 'seminarPercentage').build()
+                    new PrimaryColumnBuilder(
+                        'Seminar',
+                        'seminarPercentage',
+                    ).build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Praktik', 'praktikPercentage').build()
+                    new PrimaryColumnBuilder(
+                        'Praktik',
+                        'praktikPercentage',
+                    ).build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Portofolio', 'portofolioPercentage').build()
+                    new PrimaryColumnBuilder(
+                        'Portofolio',
+                        'portofolioPercentage',
+                    ).build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('UKT', 'uktPercentage').build()
+                    new PrimaryColumnBuilder('UKT', 'uktPercentage').build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('UKMS', 'ukmskPercentage').build()
+                    new PrimaryColumnBuilder('UKMS', 'ukmskPercentage').build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder(
                         'Ambang Batas Nilai',
-                        'gradeThreshold'
-                    ).build()
+                        'gradeThreshold',
+                    ).build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Ambang Batas UKT', 'uktThreshold').build()
+                    new PrimaryColumnBuilder(
+                        'Ambang Batas UKT',
+                        'uktThreshold',
+                    ).build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Ambang Batas UKMSK', 'jpmThreshold').build()
+                    new PrimaryColumnBuilder(
+                        'Ambang Batas UKMSK',
+                        'jpmThreshold',
+                    ).build(),
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
@@ -122,29 +144,31 @@ export class UkomFormulaListComponent {
                             this.toggleModal()
                         }, 'primary')
                         .withIcon('update')
-                        .build()
+                        .build(),
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
                         .setAction((data: any) => {
-                            this.router.navigate([`ukom/ukom-formula/${data.id}`])
+                            this.router.navigate([
+                                `ukom/ukom-formula/${data.id}`,
+                            ])
                         }, 'info')
                         .withIcon('detail')
-                        .build()
+                        .build(),
                 )
                 .addFilter(
                     new PageFilterBuilder('like')
                         .setProperty('jabatan|name')
                         .withField('Jabatan', 'text')
-                        .build()
+                        .build(),
                 )
                 .addFilter(
                     new PageFilterBuilder('like')
                         .setProperty('Jenjang|name')
                         .withField('Jenjang', 'text')
-                        .build()
+                        .build(),
                 )
-                .build()
+                .build(),
         )
     }
 
@@ -160,7 +184,7 @@ export class UkomFormulaListComponent {
             ukmsk_percentage: new FormControl('', Validators.required),
             grade_threshold: new FormControl('', Validators.required),
             ukt_threshold: new FormControl('', Validators.required),
-            jpm_threshold: new FormControl('', Validators.required)
+            jpm_threshold: new FormControl('', Validators.required),
         })
     }
 
@@ -178,7 +202,7 @@ export class UkomFormulaListComponent {
             ukmsk_percentage: data.ukmskPercentage ?? '',
             grade_threshold: data.gradeThreshold ?? '',
             ukt_threshold: data.uktThreshold ?? '',
-            jpm_threshold: data.jpmThreshold ?? ''
+            jpm_threshold: data.jpmThreshold ?? '',
         })
     }
 
@@ -194,14 +218,15 @@ export class UkomFormulaListComponent {
         this.jabatanList$ = this.apiService
             .getData(`/api/v1/jabatan`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
-                        (jabatan: { [key: string]: any }) => new Jabatan(jabatan)
-                    )
-                )
+                        (jabatan: { [key: string]: any }) =>
+                            new Jabatan(jabatan),
+                    ),
+                ),
             )
 
-        this.jabatanList$.forEach(data => {
+        this.jabatanList$.forEach((data) => {
             console.log('jabatan', data)
         })
     }
@@ -210,13 +235,14 @@ export class UkomFormulaListComponent {
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
-                        (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
-                    )
-                )
+                        (jenjang: { [key: string]: any }) =>
+                            new Jenjang(jenjang),
+                    ),
+                ),
             )
-        this.jenjangList$.forEach(data => {
+        this.jenjangList$.forEach((data) => {
             console.log('jenjang', data)
         })
     }
@@ -224,41 +250,50 @@ export class UkomFormulaListComponent {
     submit() {
         this.confirmationService.open(false).subscribe({
             next: (response: { confirmed: boolean }) => {
-                if (!response.confirmed) return;
-                this.isLoading$.next(true);
+                if (!response.confirmed) return
+                this.isLoading$.next(true)
 
                 const payload = {
                     id: this.editFormulaForm.value.id,
                     cat_percentage: this.editFormulaForm.value.cat_percentage,
-                    wawancara_percentage: this.editFormulaForm.value.wawancara_percentage,
-                    seminar_percentage: this.editFormulaForm.value.seminar_percentage,
-                    praktik_percentage: this.editFormulaForm.value.praktik_percentage,
-                    portofolio_percentage: this.editFormulaForm.value.portofolio_percentage,
+                    wawancara_percentage:
+                        this.editFormulaForm.value.wawancara_percentage,
+                    seminar_percentage:
+                        this.editFormulaForm.value.seminar_percentage,
+                    praktik_percentage:
+                        this.editFormulaForm.value.praktik_percentage,
+                    portofolio_percentage:
+                        this.editFormulaForm.value.portofolio_percentage,
                     ukt_percentage: this.editFormulaForm.value.ukt_percentage,
-                    ukmsk_percentage: this.editFormulaForm.value.ukmsk_percentage,
+                    ukmsk_percentage:
+                        this.editFormulaForm.value.ukmsk_percentage,
                     grade_threshold: this.editFormulaForm.value.grade_threshold,
                     ukt_threshold: this.editFormulaForm.value.ukt_threshold,
-                    jpm_threshold: this.editFormulaForm.value.jpm_threshold
-                };
+                    jpm_threshold: this.editFormulaForm.value.jpm_threshold,
+                }
 
-                this.apiService.putData('/api/v1/ukom_formula', payload).subscribe({
-                    next: () => {
-                        this.isLoading$.next(false);
-                        this.handlerService.handleAlert('Success', 'Data berhasil disimpan');
-                        this.toggleModal();
-                        this.handleRefreshToggle();
-                    },
-                    error: error => {
-                        this.isLoading$.next(false);
-                        console.log('error', error.error.message);
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengubah data, silahkan coba lagi'
-                        );
-                    }
-                });
-            }
-        });
+                this.apiService
+                    .putData('/api/v1/ukom_formula', payload)
+                    .subscribe({
+                        next: () => {
+                            this.isLoading$.next(false)
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Data berhasil disimpan',
+                            )
+                            this.toggleModal()
+                            this.handleRefreshToggle()
+                        },
+                        error: (error) => {
+                            this.isLoading$.next(false)
+                            console.log('error', error.error.message)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengubah data, silahkan coba lagi',
+                            )
+                        },
+                    })
+            },
+        })
     }
-
 }

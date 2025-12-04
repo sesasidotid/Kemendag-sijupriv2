@@ -5,6 +5,6 @@ import { QRCodeModule } from 'angularx-qrcode'
 @NgModule({
     declarations: [],
     imports: [CommonModule, QRCodeModule],
-    providers: [HttpClientModule]
+    providers: [HttpClientModule],
 })
-export class BaseModule { }
+export class BaseModule {}

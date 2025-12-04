@@ -18,7 +18,7 @@ import { FormsModule } from '@angular/forms'
     standalone: true,
     imports: [CommonModule, EmptyStateComponent, ModalComponent, FormsModule],
     templateUrl: './top-bar.component.html',
-    styleUrl: './top-bar.component.scss'
+    styleUrl: './top-bar.component.scss',
 })
 export class TopBarComponent {
     id: string
@@ -36,13 +36,13 @@ export class TopBarComponent {
     notificationMessageGroupList: NotificationMessage[] = []
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     submitLoading$ = new BehaviorSubject<boolean>(false)
-    passwordsMatch = true;
+    passwordsMatch = true
 
     formData = {
         userId: '',
         oldPassword: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
     }
 
     constructor(
@@ -52,7 +52,7 @@ export class TopBarComponent {
         private el: ElementRef,
         private sanitizer: DomSanitizer,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
     ) {
         this.id = LoginContext.getUserId()
         this.name = LoginContext.getName()
@@ -67,7 +67,8 @@ export class TopBarComponent {
     }
 
     checkPasswordMatch() {
-        this.passwordsMatch = this.formData.password === this.formData.confirmPassword;
+        this.passwordsMatch =
+            this.formData.password === this.formData.confirmPassword
     }
 
     toggleModal() {
@@ -76,28 +77,29 @@ export class TopBarComponent {
 
     fetchPhotoProfile() {
         this.apiService.getPhotoProfile(this.id).subscribe({
-            next: blob => {
+            next: (blob) => {
                 if (blob.size === 0) {
                     this.profileImageSrc = 'assets/no-profile.jpg'
                     return
                 }
 
                 const objectUrl = URL.createObjectURL(blob)
-                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+                this.profileImageSrc =
+                    this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching profile image', err)
                 this.profileImageSrc = 'assets/no-profile.jpg'
-            }
+            },
         })
     }
 
     ngAfterViewInit() {
         const tabElement = this.el.nativeElement.querySelector(
-            '#notificationItemsTab'
+            '#notificationItemsTab',
         )
         const dropdownButton = this.el.nativeElement.querySelector(
-            '#page-header-notifications-dropdown'
+            '#page-header-notifications-dropdown',
         )
 
         dropdownButton.addEventListener('shown.bs.dropdown', () => {
@@ -115,125 +117,148 @@ export class TopBarComponent {
     }
 
     getNotificationPersonal() {
-        this.apiService.getData(`/api/v1/notification_message/personal`).subscribe({
-            next: (response: any) => {
-                this.notificationMessagePersonalList = response.map(
-                    (notificationMessage: { [key: string]: any }) => {
-                        const notificationMessagePersonal = new NotificationMessage(
-                            notificationMessage
-                        )
-                        notificationMessagePersonal.age = this.calculateAge(
-                            notificationMessagePersonal.dateCreated
-                        )
-                        return notificationMessagePersonal
-                    }
-                )
-            }
-        })
+        this.apiService
+            .getData(`/api/v1/notification_message/personal`)
+            .subscribe({
+                next: (response: any) => {
+                    this.notificationMessagePersonalList = response.map(
+                        (notificationMessage: { [key: string]: any }) => {
+                            const notificationMessagePersonal =
+                                new NotificationMessage(notificationMessage)
+                            notificationMessagePersonal.age = this.calculateAge(
+                                notificationMessagePersonal.dateCreated,
+                            )
+                            return notificationMessagePersonal
+                        },
+                    )
+                },
+            })
     }
 
     getNotificationGroup() {
-        this.apiService.getData(`/api/v1/notification_message/group`).subscribe({
-            next: (response: any) => {
-                this.notificationMessageGroupList = response.map(
-                    (notificationMessage: { [key: string]: any }) => {
-                        const notificationMessageGroup = new NotificationMessage(
-                            notificationMessage
-                        )
-                        notificationMessageGroup.age = this.calculateAge(
-                            notificationMessageGroup.dateCreated
-                        )
-                        return notificationMessageGroup
-                    }
-                )
-            }
-        })
+        this.apiService
+            .getData(`/api/v1/notification_message/group`)
+            .subscribe({
+                next: (response: any) => {
+                    this.notificationMessageGroupList = response.map(
+                        (notificationMessage: { [key: string]: any }) => {
+                            const notificationMessageGroup =
+                                new NotificationMessage(notificationMessage)
+                            notificationMessageGroup.age = this.calculateAge(
+                                notificationMessageGroup.dateCreated,
+                            )
+                            return notificationMessageGroup
+                        },
+                    )
+                },
+            })
     }
 
     toggelSidebar() {
         const windowSize = this.document.documentElement.clientWidth
 
         if (windowSize > 767) {
-            this.document.querySelector('.hamburger-icon')?.classList.toggle('open')
+            this.document
+                .querySelector('.hamburger-icon')
+                ?.classList.toggle('open')
         }
 
         // For collapse horizontal menu
         if (
-            this.document.documentElement.getAttribute('data-layout') === 'horizontal'
+            this.document.documentElement.getAttribute('data-layout') ===
+            'horizontal'
         ) {
             this.document.body.classList.toggle('menu')
         }
 
         // For collapse vertical menu
         if (
-            this.document.documentElement.getAttribute('data-layout') === 'vertical'
+            this.document.documentElement.getAttribute('data-layout') ===
+            'vertical'
         ) {
             if (windowSize <= 1025 && windowSize > 767) {
                 this.document.body.classList.remove('vertical-sidebar-enable')
-                this.document.documentElement.getAttribute('data-sidebar-size') === 'sm'
-                    ? this.document.documentElement.setAttribute('data-sidebar-size', '')
+                this.document.documentElement.getAttribute(
+                    'data-sidebar-size',
+                ) === 'sm'
+                    ? this.document.documentElement.setAttribute(
+                          'data-sidebar-size',
+                          '',
+                      )
                     : this.document.documentElement.setAttribute(
-                        'data-sidebar-size',
-                        'sm'
-                    )
+                          'data-sidebar-size',
+                          'sm',
+                      )
             } else if (windowSize > 1025) {
                 this.document.body.classList.remove('vertical-sidebar-enable')
-                this.document.documentElement.getAttribute('data-sidebar-size') === 'lg'
+                this.document.documentElement.getAttribute(
+                    'data-sidebar-size',
+                ) === 'lg'
                     ? this.document.documentElement.setAttribute(
-                        'data-sidebar-size',
-                        'sm'
-                    )
+                          'data-sidebar-size',
+                          'sm',
+                      )
                     : this.document.documentElement.setAttribute(
-                        'data-sidebar-size',
-                        'lg'
-                    )
+                          'data-sidebar-size',
+                          'lg',
+                      )
             } else if (windowSize <= 767) {
                 this.document.body.classList.add('vertical-sidebar-enable')
-                this.document.documentElement.setAttribute('data-sidebar-size', 'lg')
+                this.document.documentElement.setAttribute(
+                    'data-sidebar-size',
+                    'lg',
+                )
             }
         }
 
         // Semibox menu
         if (
-            this.document.documentElement.getAttribute('data-layout') === 'semibox'
+            this.document.documentElement.getAttribute('data-layout') ===
+            'semibox'
         ) {
             if (windowSize > 767) {
                 if (
                     this.document.documentElement.getAttribute(
-                        'data-sidebar-visibility'
+                        'data-sidebar-visibility',
                     ) === 'show'
                 ) {
-                    this.document.documentElement.getAttribute('data-sidebar-size') ===
-                        'lg'
+                    this.document.documentElement.getAttribute(
+                        'data-sidebar-size',
+                    ) === 'lg'
                         ? this.document.documentElement.setAttribute(
-                            'data-sidebar-size',
-                            'sm'
-                        )
+                              'data-sidebar-size',
+                              'sm',
+                          )
                         : this.document.documentElement.setAttribute(
-                            'data-sidebar-size',
-                            'lg'
-                        )
+                              'data-sidebar-size',
+                              'lg',
+                          )
                 } else {
-                    ; (
+                    ;(
                         this.document.getElementById(
-                            'sidebar-visibility-show'
+                            'sidebar-visibility-show',
                         ) as HTMLElement
                     )?.click()
                     this.document.documentElement.setAttribute(
                         'data-sidebar-size',
-                        this.document.documentElement.getAttribute('data-sidebar-size') ||
-                        ''
+                        this.document.documentElement.getAttribute(
+                            'data-sidebar-size',
+                        ) || '',
                     )
                 }
             } else if (windowSize <= 767) {
                 this.document.body.classList.add('vertical-sidebar-enable')
-                this.document.documentElement.setAttribute('data-sidebar-size', 'lg')
+                this.document.documentElement.setAttribute(
+                    'data-sidebar-size',
+                    'lg',
+                )
             }
         }
 
         // Two column menu
         if (
-            this.document.documentElement.getAttribute('data-layout') === 'twocolumn'
+            this.document.documentElement.getAttribute('data-layout') ===
+            'twocolumn'
         ) {
             this.document.body.classList.toggle('twocolumn-panel')
         }
@@ -241,12 +266,10 @@ export class TopBarComponent {
     logOut() {
         if (LoginContext.getApplicationCode() === 'siukom-participant') {
             this.router.navigate(['/login-cat']).then(() => {
-                console.log('reload')
                 window.location.reload()
             })
         } else {
             this.router.navigate(['/login']).then(() => {
-                console.log('reload')
                 window.location.reload()
             })
         }
@@ -261,7 +284,7 @@ export class TopBarComponent {
     private calculateAge(dateCreated: string): string {
         const now = new Date()
         const diffInSeconds = Math.floor(
-            (now.getTime() - new Date(dateCreated).getTime()) / 1000
+            (now.getTime() - new Date(dateCreated).getTime()) / 1000,
         )
 
         if (diffInSeconds < 60) {
@@ -295,14 +318,15 @@ export class TopBarComponent {
         if (!this.checkNotificationsDeleteId(notificationId)) {
             this.notificationsDeleteId$.next([
                 ...this.notificationsDeleteId$.value,
-                notificationId
+                notificationId,
             ])
         } else {
             this.notificationsDeleteId$.next(
-                this.notificationsDeleteId$.value.filter(id => id !== notificationId)
+                this.notificationsDeleteId$.value.filter(
+                    (id) => id !== notificationId,
+                ),
             )
         }
-        // console.log(this.notificationsDeleteId$.value.length);
     }
 
     handleCheckAllClicked() {
@@ -314,8 +338,8 @@ export class TopBarComponent {
         } else {
             this.notificationsDeleteId$.next(
                 this.notificationMessagePersonalList.map(
-                    notification => notification.id
-                )
+                    (notification) => notification.id,
+                ),
             )
         }
     }
@@ -324,63 +348,66 @@ export class TopBarComponent {
         if (this.notificationsDeleteId$.value.length === 1) {
             this.apiService
                 .deleteData(
-                    `/api/v1/notification_message/${this.notificationsDeleteId$.value[0]}`
+                    `/api/v1/notification_message/${this.notificationsDeleteId$.value[0]}`,
                 )
                 .subscribe({
                     next: (response: any) => {
                         this.notificationsDeleteId$.next([])
                         this.getNotificationPersonal()
-                    }
+                    },
                 })
         } else {
             this.apiService
                 .postData('/api/v1/notification_message/delete', {
-                    idList: this.notificationsDeleteId$.value
+                    idList: this.notificationsDeleteId$.value,
                 })
                 .subscribe({
                     next: (response: any) => {
                         this.notificationsDeleteId$.next([])
                         this.getNotificationPersonal()
-                    }
+                    },
                 })
         }
     }
 
     onSubmit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) {
                     return
                 }
-                console.log(this.formData)
 
                 this.submitLoading$.next(true)
-                this.apiService.putData(`/api/v1/password`, this.formData).subscribe({
-                    next: result => {
-                        this.submitLoading$.next(false)
-                        this.toggleModal()
-                        this.handlerService.handleAlert(
-                            'Success',
-                            'Password berhasil diubah'
-                        )
-                        setTimeout(() => { this.logOut() }, 2000)
-                    },
-                    error: err => {
-                        this.submitLoading$.next(false)
-                        if (err.error.code === 'PSS-00001') {
+                this.apiService
+                    .putData(`/api/v1/password`, this.formData)
+                    .subscribe({
+                        next: (result) => {
+                            this.submitLoading$.next(false)
+                            this.toggleModal()
                             this.handlerService.handleAlert(
-                                'Error',
-                                'Gagal mengubah password, paassword lama salah'
+                                'Success',
+                                'Password berhasil diubah',
                             )
-                        } else {
-                            this.handlerService.handleAlert(
-                                'Error',
-                                'Gagal mengubah password'
-                            )
-                        }
-                    }
-                })
-            }
+                            setTimeout(() => {
+                                this.logOut()
+                            }, 2000)
+                        },
+                        error: (err) => {
+                            this.submitLoading$.next(false)
+                            if (err.error.code === 'PSS-00001') {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal mengubah password, paassword lama salah',
+                                )
+                            } else {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal mengubah password',
+                                )
+                            }
+                        },
+                    })
+            },
         })
     }
 }

@@ -1,16 +1,15 @@
 import { ConfirmationService } from './../../../modules/base/services/confirmation.service'
 import { Component } from '@angular/core'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
-import { Router, RouterLink } from '@angular/router'
+import { Router } from '@angular/router'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { TabService } from '../../../modules/base/services/tab.service'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { BehaviorSubject } from 'rxjs'
@@ -24,15 +23,14 @@ import { ForcePasswordFormComponent } from '../../../modules/base/components/for
     selector: 'app-user-instansi-list',
     standalone: true,
     imports: [
-        RouterLink,
         ModalComponent,
         PagableComponent,
         UserInstansiUpdateComponent,
         CommonModule,
-        ForcePasswordFormComponent
+        ForcePasswordFormComponent,
     ],
     templateUrl: './user-instansi-list.component.html',
-    styleUrl: './user-instansi-list.component.scss'
+    styleUrl: './user-instansi-list.component.scss',
 })
 export class UserInstansiListComponent {
     pagable: Pagable
@@ -43,25 +41,25 @@ export class UserInstansiListComponent {
 
     isModalPasswordOpen$ = new BehaviorSubject<boolean>(false)
     userId: string
-    constructor (
+    constructor(
         private tabService: TabService,
         private router: Router,
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handlePagable()
         this.handleTabService()
     }
 
-    toggleRefresh () {
+    toggleRefresh() {
         this.refresh = !this.refresh
         this.toggleModal()
     }
 
-    handleTabService () {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -71,33 +69,34 @@ export class UserInstansiListComponent {
                 label: 'Daftar User Instansi',
                 isActive: true,
                 icon: 'mdi-list-box',
-                onClick: () => this.router.navigate(['/siap/user-instansi'])
+                onClick: () => this.router.navigate(['/siap/user-instansi']),
             })
             .addTab({
                 label: 'Tambah User Instansi',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.router.navigate(['/siap/user-instansi/add'])
+                onClick: () =>
+                    this.router.navigate(['/siap/user-instansi/add']),
             })
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/user_instansi/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Nama', 'name', ['user']).build()
+                new PrimaryColumnBuilder('Nama', 'name', ['user']).build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Email', 'email', ['user']).build()
+                new PrimaryColumnBuilder('Email', 'email', ['user']).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((data: any) => {
                         this.router.navigate([
-                            `/siap/user-instansi/${data.nip}`
+                            `/siap/user-instansi/${data.nip}`,
                         ])
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -106,7 +105,7 @@ export class UserInstansiListComponent {
                         this.selectedUserInstansi = data
                     }, 'primary')
                     .withIcon('update')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -114,7 +113,7 @@ export class UserInstansiListComponent {
                         this.handleDelete(data.nip)
                     }, 'danger')
                     .withIcon('danger')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -123,40 +122,41 @@ export class UserInstansiListComponent {
                         this.togglePasswordModal()
                     }, 'warning')
                     .withIcon('password')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('nip')
                     .withField('NIP', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('name', ['user'])
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('email', ['user'])
                     .withField('Email', 'text')
-                    .build()
+                    .build(),
             )
+            .withQueryParams()
             .build()
     }
 
-    getDetailInstansi (instansiId: string) {
+    getDetailInstansi(instansiId: string) {
         this.apiService.getData(`/api/v1/instansi/${instansiId}`).subscribe({
             next: (data: any) => {
                 this.detailInstansi = data
-            }
+            },
         })
     }
 
-    handleDelete (userNip: string) {
+    handleDelete(userNip: string) {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 this.apiService
                     .deleteData(`/api/v1/user_instansi/${userNip}`)
@@ -164,29 +164,26 @@ export class UserInstansiListComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menghapus user instansi.'
+                                'Berhasil menghapus user instansi.',
                             )
-                            //   setTimeout(() => {
-                            //     window.location.reload()
-                            //   }, 100)
                             this.refresh = !this.refresh
                         },
-                        error: error => {
+                        error: (error) => {
                             console.log('error', error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menghapus data user instansi'
+                                'Gagal menghapus data user instansi',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
-    toggleModal () {
+    toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
-    togglePasswordModal () {
+    togglePasswordModal() {
         this.isModalPasswordOpen$.next(!this.isModalPasswordOpen$.value)
     }
 }

@@ -1,11 +1,15 @@
 {
-    "plugins": ["prettier-plugin-tailwindcss"],
+    "plugins": [
+        "prettier-plugin-tailwindcss"
+    ],
     "printWidth": 80,
     "tabWidth": 4,
     "semi": false,
     "overrides": [
         {
-            "files": ["*.html"],
+            "files": [
+                "*.html"
+            ],
             "options": {
                 "parser": "html"
             }
