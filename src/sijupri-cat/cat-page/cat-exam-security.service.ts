@@ -3,6 +3,7 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 import { ApiService } from '@/modules/base/services/api.service'
 import { interval, Subscription } from 'rxjs'
 import { environment } from '@/environments/environment'
+import { SystemConfig } from '@/modules/base/models/system-config.model'
 
 /**
  * Service responsible for handling all exam security and anti-cheating measures
@@ -19,12 +20,14 @@ export class CatExamSecurityService {
     readonly isSubmitted = signal(false)
     private isInside = true
     private warningInterval: ReturnType<typeof setInterval> | undefined
-    private readonly WARNING_COUNTDOWN_KEY = 'cat_warning_countdown'
-    private readonly INITIAL_WARNING_TIME = 3000000
+    private INITIAL_WARNING_TIME = 30
 
     // Violation management
-    private readonly VIOLATION_KEY: string = 'cat_violation_count'
-    readonly MAX_VIOLATIONS: number = 3000
+    MAX_VIOLATIONS: number = 10
+
+    examScheduleId: string | undefined
+    private mouseAwayStartTime: number | undefined
+    private currentMouseAwayDuration = 0
 
     readonly showWarning = signal(false)
     readonly warningCountdown = signal(30)
@@ -39,10 +42,7 @@ export class CatExamSecurityService {
      */
     private onAutoSubmitCallback?: () => void
 
-    // Offline Queue
-    private violationQueue: { reason: string; timestamp: number }[] = []
     private isOnline = navigator.onLine
-    private readonly QUEUE_KEY = 'cat_violation_queue'
     private connectionCheckSub?: Subscription
 
     // Translation Detection
@@ -50,15 +50,7 @@ export class CatExamSecurityService {
     private translationObserver?: MutationObserver
 
     constructor() {
-        this.loadViolationCount()
         this.setupViolationWatcher()
-        this.loadWarningCountdown()
-        this.loadQueueFromStorage()
-
-        effect(() => {
-            if (this.isSubmitted()) {
-            }
-        })
 
         window.addEventListener('online', () => {
             this.checkConnection()
@@ -105,7 +97,51 @@ export class CatExamSecurityService {
         })
     }
 
+    setExamScheduleId(id: string) {
+        this.examScheduleId = id
+        this.loadSystemConfig()
+    }
+
+    setInitialState(violationCount: number, mouseAwayDuration: number) {
+        this._violationCount.set(violationCount)
+        this.currentMouseAwayDuration = mouseAwayDuration
+
+        const remaining = Math.max(
+            0,
+            this.INITIAL_WARNING_TIME - this.currentMouseAwayDuration,
+        )
+        this.warningCountdown.set(remaining)
+    }
+
+    private loadSystemConfig() {
+        this.api.getData('/api/v1/sys_conf/UKM_MAUSE_AWAY_TIMEOUT').subscribe({
+            next: (res: SystemConfig) => {
+                if (res && res.value) {
+                    this.INITIAL_WARNING_TIME = parseInt(res.value, 10)
+                    // Recalculate countdown based on stored duration
+                    const remaining = Math.max(
+                        0,
+                        this.INITIAL_WARNING_TIME -
+                            this.currentMouseAwayDuration,
+                    )
+                    this.warningCountdown.set(remaining)
+                }
+            },
+        })
+
+        this.api.getData('/api/v1/sys_conf/UKM_MAX_VIOLATION').subscribe({
+            next: (res: SystemConfig) => {
+                if (res && res.value) {
+                    this.MAX_VIOLATIONS = parseInt(res.value, 10)
+                }
+            },
+        })
+    }
+
     private startConnectionCheck() {
+        if (this.isSubmitted()) {
+            return
+        }
         // Check connection every 10 seconds
         this.connectionCheckSub = interval(10000).subscribe(() => {
             this.checkConnection()
@@ -119,7 +155,6 @@ export class CatExamSecurityService {
             next: () => {
                 if (!this.isOnline) {
                     this.isOnline = true
-                    this.processViolationQueue()
                 }
             },
             error: () => {
@@ -148,38 +183,10 @@ export class CatExamSecurityService {
     }
 
     /**
-     * Load warning countdown from localStorage
-     */
-    private loadWarningCountdown() {
-        const stored = localStorage.getItem(this.WARNING_COUNTDOWN_KEY)
-        const value = stored ? parseInt(stored, 10) : this.INITIAL_WARNING_TIME
-        this.warningCountdown.set(value)
-    }
-
-    /**
-     * Save warning countdown to localStorage
-     */
-    private saveWarningCountdown() {
-        localStorage.setItem(
-            this.WARNING_COUNTDOWN_KEY,
-            this.warningCountdown().toString(),
-        )
-    }
-
-    /**
      * Clear warning countdown from localStorage (call after successful submission)
      */
     clearWarningCountdown() {
-        localStorage.removeItem(this.WARNING_COUNTDOWN_KEY)
         this.warningCountdown.set(this.INITIAL_WARNING_TIME)
-    }
-
-    /**
-     * Load violation count from localStorage
-     */
-    private loadViolationCount() {
-        const stored = localStorage.getItem(this.VIOLATION_KEY)
-        this._violationCount.set(stored ? parseInt(stored, 10) : 0)
     }
 
     /**
@@ -197,74 +204,37 @@ export class CatExamSecurityService {
 
         if (this._violationCount() < this.MAX_VIOLATIONS) {
             this._violationCount.update((count) => count + 1)
-            localStorage.setItem(
-                this.VIOLATION_KEY,
-                this._violationCount().toString(),
-            )
         }
 
-        // Handle queue
-        const violationData = { reason, timestamp: now }
         if (this.isOnline) {
-            this.sendViolationToBackend(violationData)
-        } else {
-            this.violationQueue.push(violationData)
-            this.saveQueueToStorage()
+            this.sendViolation(reason)
         }
     }
 
-    private sendViolationToBackend(data: {
-        reason: string
-        timestamp: number
-    }) {
-        // TODO : Implement actual API call
-        console.log('Sending violation to backend:', data)
-        // this.api.postData('/api/v1/exam/violation', data).subscribe({
-        //     next: () => {
-        //         console.log('Violation sent successfully:', data)
-        //     },
-        //     error: (err) => {
-        //         console.error('Failed to send violation:', err)
-        //         // Push back to queue on error
-        //         this.violationQueue.push(data)
-        //         this.saveQueueToStorage()
-        //     },
-        // })
-    }
+    private sendViolation(reason: string) {
+        if (!this.examScheduleId) return
 
-    private processViolationQueue() {
-        while (this.violationQueue.length > 0 && this.isOnline) {
-            const violation = this.violationQueue.shift()
-            if (violation) {
-                this.sendViolationToBackend(violation)
-            }
-        }
-        this.saveQueueToStorage()
-    }
-
-    private saveQueueToStorage() {
-        localStorage.setItem(
-            this.QUEUE_KEY,
-            JSON.stringify(this.violationQueue),
-        )
-    }
-
-    private loadQueueFromStorage() {
-        const stored = localStorage.getItem(this.QUEUE_KEY)
-        if (stored) {
-            try {
-                this.violationQueue = JSON.parse(stored)
-            } catch (e) {
-                console.error('Failed to load violation queue', e)
-            }
-        }
+        this.api
+            .postData(`/api/v1/exam/violation/${this.examScheduleId}`, {
+                remark: reason,
+            })
+            .subscribe({
+                next: () => {},
+                error: (err) => {
+                    if (
+                        err.error?.message === 'VIOLATION_LIMIT_REACHED' ||
+                        err.error === 'VIOLATION_LIMIT_REACHED'
+                    ) {
+                        this.triggerAutoSubmit()
+                    }
+                },
+            })
     }
 
     /**
      * Clear all violations from localStorage
      */
     private clearViolationCount() {
-        localStorage.removeItem(this.VIOLATION_KEY)
         this._violationCount.set(0)
     }
 
@@ -362,7 +332,7 @@ export class CatExamSecurityService {
      * Handle mouse movement to detect if user is leaving exam area
      */
     handleMouseMove(event: MouseEvent) {
-        if (this.isSubmitted() || this.isSubmitted()) return
+        if (this.isSubmitted()) return
 
         const inside = this.isMouseInsideExamArea(event)
 
@@ -399,13 +369,13 @@ export class CatExamSecurityService {
      * Start warning countdown when user is outside exam area
      */
     private startWarningCountdown() {
+        this.mouseAwayStartTime = Date.now()
         if (this.warningInterval) {
             clearInterval(this.warningInterval)
         }
 
         this.warningInterval = setInterval(() => {
             this.warningCountdown.update((count) => count - 1)
-            this.saveWarningCountdown()
 
             if (this.warningCountdown() <= 0) {
                 clearInterval(this.warningInterval)
@@ -414,8 +384,17 @@ export class CatExamSecurityService {
                 )
                 this.handler.handleAlert(
                     'Info',
-                    'Anda telah tidak aktif terlalu lama. Ujian akan disubflaggedQuestionsmit secara otomatis.',
+                    'Anda telah tidak aktif terlalu lama. Ujian akan disubmit secara otomatis.',
                 )
+                // Send mouse away duration before submitting
+                if (this.mouseAwayStartTime) {
+                    const duration = Math.round(
+                        (Date.now() - this.mouseAwayStartTime) / 1000,
+                    )
+                    if (duration > 0) {
+                        this.sendMouseAway(duration)
+                    }
+                }
                 this.triggerAutoSubmit()
             }
         }, 1000)
@@ -440,10 +419,43 @@ export class CatExamSecurityService {
      * Does NOT reset the countdown - preserves the current value
      */
     private pauseWarningCountdown() {
+        if (this.mouseAwayStartTime) {
+            const duration = Math.round(
+                (Date.now() - this.mouseAwayStartTime) / 1000,
+            )
+            if (duration > 0) {
+                this.sendMouseAway(duration)
+            }
+            this.mouseAwayStartTime = undefined
+        }
+
         if (this.warningInterval) {
             clearInterval(this.warningInterval)
         }
-        this.saveWarningCountdown()
+    }
+
+    private sendMouseAway(numOfSecods: number) {
+        if (!this.examScheduleId) return
+        this.currentMouseAwayDuration += numOfSecods
+        this.api
+            .postData(`/api/v1/exam/mouse_away/${this.examScheduleId}`, {
+                numOfSecods,
+            })
+            .subscribe({
+                next: () => {},
+                error: (err) => {
+                    if (
+                        err.error?.message === 'VIOLATION_LIMIT_REACHED' ||
+                        err.error === 'VIOLATION_LIMIT_REACHED'
+                    ) {
+                        this.handler.handleAlert(
+                            'Error',
+                            'Batas waktu mouse di luar area ujian telah habis. Ujian akan disubmit otomatis.',
+                        )
+                        this.triggerAutoSubmit()
+                    }
+                },
+            })
     }
 
     /**
@@ -504,25 +516,18 @@ export class CatExamSecurityService {
         const reason = 'Menutup tab ujian'
         const timestamp = Date.now()
 
-        //TODO: implement the actual API endpoint
         // Add to violation count locally
         if (this._violationCount() < this.MAX_VIOLATIONS) {
             this._violationCount.update((count) => count + 1)
-            localStorage.setItem(
-                this.VIOLATION_KEY,
-                this._violationCount().toString(),
-            )
         }
 
+        if (!this.examScheduleId) return
+
         // Send via beacon since normal requests may be cancelled during unload
-        const url = `${environment.apiBaseUrl}/api/v1/exam/violation`
+        const url = `${environment.apiBaseUrl}/api/v1/exam/violation/${this.examScheduleId}`
 
         const payload = {
             reason,
-            timestamp,
-            examTypeCode,
-            roomUkomId,
-            participantId,
         }
 
         const blob = new Blob([JSON.stringify(payload)], {
@@ -530,11 +535,5 @@ export class CatExamSecurityService {
         })
 
         const queued = navigator.sendBeacon(url, blob)
-
-        if (!queued) {
-            // Fallback: save to queue for next session
-            this.violationQueue.push({ reason, timestamp })
-            this.saveQueueToStorage()
-        }
     }
 }

@@ -60,7 +60,8 @@ export class UkomClassDetailComponent {
         if (window.history.length > 1) {
             this.location.back()
         } else {
-            this.router.navigate(['/'])
+            // this.router.navigate(['/'])
+            this.router.navigate(['../', { relativeTo: this.activatedRoute }])
         }
     }
 

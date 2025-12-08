@@ -109,7 +109,7 @@ export class UkomExamScheduleAddComponent {
         if (window.history.length > 1) {
             this.location.back()
         } else {
-            this.router.navigate(['/'])
+            this.router.navigate(['../', { relativeTo: this.activatedRoute }])
         }
     }
     loadDefaultScheduleData() {
@@ -380,22 +380,22 @@ export class UkomExamScheduleAddComponent {
                 this.submitLoading$.next(true)
                 this.examScheduleData.id = this.id
 
-                const examTypeCodes = this.schedules.value.map(
-                    (schedule: any) => schedule.exam_type_code,
-                )
-                const hasDuplicate = examTypeCodes.some(
-                    (value: any, index: any) =>
-                        examTypeCodes.indexOf(value) !== index,
-                )
+                // const examTypeCodes = this.schedules.value.map(
+                //     (schedule: any) => schedule.exam_type_code,
+                // )
+                // const hasDuplicate = examTypeCodes.some(
+                //     (value: any, index: any) =>
+                //         examTypeCodes.indexOf(value) !== index,
+                // )
 
-                if (hasDuplicate) {
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Jenis UKOM tidak boleh sama',
-                    )
-                    this.submitLoading$.next(false)
-                    return
-                }
+                // if (hasDuplicate) {
+                //     this.handlerService.handleAlert(
+                //         'Error',
+                //         'Jenis UKOM tidak boleh sama',
+                //     )
+                //     this.submitLoading$.next(false)
+                //     return
+                // }
 
                 const scheduleData = this.schedules.value.map(
                     (schedule: any) => {

@@ -1,40 +1,38 @@
-import { HandlerService } from './../../modules/base/services/handler.service'
-import { ConfirmationService } from './../../modules/base/services/confirmation.service'
-import { ApiService } from './../../modules/base/services/api.service'
-import { FIleHandler } from './../../modules/base/commons/file-handler/file-handler'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import {
     Component,
     EventEmitter,
     Input,
     Output,
     SimpleChanges,
-    ViewChild
+    ViewChild,
 } from '@angular/core'
-import { FileHandlerComponent } from '../../modules/base/components/file-handler/file-handler.component'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { FormBuilder, Validators } from '@angular/forms'
-import { UkomQuestion } from '../../modules/ukom/models/ukom-question'
+import { UkomQuestion } from '@/modules/ukom/models/ukom-question'
 import {
     BehaviorSubject,
     combineLatest,
-    concatMap,
-    delay,
     filter,
     finalize,
     map,
     Observable,
     switchMap,
     take,
-    tap
+    tap,
 } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { Router } from '@angular/router'
-import { MakalahAnswer } from '../../modules/ukom/models/cat/makalah-answer'
+import { MakalahAnswer } from '@/modules/ukom/models/cat/makalah-answer'
 @Component({
     selector: 'app-ukom-makalah',
     standalone: true,
     imports: [FileHandlerComponent, CommonModule],
     templateUrl: './ukom-makalah.component.html',
-    styleUrl: './ukom-makalah.component.scss'
+    styleUrl: './ukom-makalah.component.scss',
 })
 export class UkomMakalahComponent {
     @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
@@ -47,12 +45,12 @@ export class UkomMakalahComponent {
     answer: MakalahAnswer = new MakalahAnswer()
 
     makalah_form = this.fb.group({
-        file_answer_upload: ['', Validators.required]
+        file_answer_upload: ['', Validators.required],
     })
 
     inputs: FIleHandler = {
         files: {
-            file_answer_upload: { label: 'File Makalah' }
+            file_answer_upload: { label: 'File Makalah' },
         },
         allowedTypes: [{ label: 'pdf', type: 'application/pdf' }],
         maxSize: 2 * 1024 * 1024,
@@ -60,60 +58,60 @@ export class UkomMakalahComponent {
             switch (key) {
                 case 'file_answer_upload':
                     this.makalah_form.patchValue({
-                        file_answer_upload: base64Data
+                        file_answer_upload: base64Data,
                     })
                     break
             }
-        }
+        },
     }
 
     isSubmitLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-        false
+        false,
     )
     isLoadingAnswerFile$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(true)
     isQuestionLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-        true
+        true,
     )
     isFinished: boolean = false
     isLoading$: Observable<boolean>
 
-    constructor (
+    constructor(
         private fb: FormBuilder,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private router: Router
+        private router: Router,
     ) {
         this.isLoading$ = combineLatest([
             this.isLoadingAnswerFile$,
-            this.isQuestionLoading$
-        ]).pipe(map(loadings => loadings.some(isLoading => isLoading)))
+            this.isQuestionLoading$,
+        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
     }
 
-    ngOnChanges (changes: SimpleChanges): void {
+    ngOnChanges(changes: SimpleChanges): void {
         if ((changes['room_id'] || changes['participant_id']) && this.room_id) {
             this.getQuestion()
             this.getAnswerFile()
         }
     }
 
-    clearFilesName () {
+    clearFilesName() {
         if (this.fileHandler) {
             this.fileHandler.clearFileName()
         }
     }
 
-    getAnswerFile () {
+    getAnswerFile() {
         this.isLoadingAnswerFile$.next(true)
         this.apiService
             .getData(
-                `/api/v1/exam/page/MAKALAH/${this.room_id}?page=1&limit=10`
+                `/api/v1/exam/page/MAKALAH/${this.room_id}?page=1&limit=10`,
             )
             .pipe(
                 finalize(() => {
                     this.isLoadingAnswerFile$.next(false)
-                })
+                }),
             )
             .subscribe({
                 next: (res: any) => {
@@ -142,35 +140,35 @@ export class UkomMakalahComponent {
                         }
                     }
                 },
-                error: err => {
+                error: (err) => {
                     if (err.error.message === `Exam's already ended`) {
                         this.isFinished = true
                     } else {
                         console.error('Error fetching answer file:', err)
                         this.handlerService.handleAlert(
                             'Error',
-                            'Gagal mengambil file jawaban makalah'
+                            'Gagal mengambil file jawaban makalah',
                         )
                     }
-                }
+                },
             })
     }
 
-    backToHome () {
+    backToHome() {
         this.router.navigate(['/'])
     }
 
-    getQuestion () {
+    getQuestion() {
         this.isQuestionLoading$.next(true)
         this.apiService
             .postData(
                 `/api/v1/room_ukom/search/MAKALAH/${this.room_id}?limit=1000`,
-                {}
+                {},
             )
             .pipe(
                 finalize(() => {
                     this.isQuestionLoading$.next(false)
-                })
+                }),
             )
             .subscribe({
                 next: (res: any) => {
@@ -178,17 +176,17 @@ export class UkomMakalahComponent {
                         this.question = res.data[0]
                     }
                 },
-                error: err => {
+                error: (err) => {
                     console.error('Error fetching question:', err)
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal mengambil soal makalah'
+                        'Gagal mengambil soal makalah',
                     )
-                }
+                },
             })
     }
 
-    onSubmit () {
+    onSubmit() {
         this.confirmationService
             .open(false)
             .pipe(
@@ -201,43 +199,31 @@ export class UkomMakalahComponent {
                         participant_id: this.participant_id,
                         question_id: this.question.id,
                         file_answer_upload:
-                            this.makalah_form.value.file_answer_upload
+                            this.makalah_form.value.file_answer_upload,
                     }
                     return this.apiService.postData(
                         '/api/v1/exam/answer',
-                        payload
+                        payload,
                     )
                 }),
-
-                // concatMap(() => {
-                //     const finishPayload = {
-                //         examTypeCode: 'MAKALAH',
-                //         roomUkomId: this.room_id
-                //     }
-                //     return this.apiService.postData(
-                //         '/api/v1/exam/finish',
-                //         finishPayload
-                //     )
-                // }),
-
-                finalize(() => this.isSubmitLoading$.next(false))
+                finalize(() => this.isSubmitLoading$.next(false)),
             )
             .subscribe({
                 next: () => {
                     this.afterSubmit.emit()
                     this.handlerService.handleAlert(
                         'Success',
-                        'Makalah berhasil disimpan'
+                        'Makalah berhasil disimpan',
                     )
                     this.makalah_form.reset()
                     this.clearFilesName()
                 },
-                error: error => {
+                error: () => {
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal menyimpan makalah'
+                        'Gagal menyimpan makalah',
                     )
-                }
+                },
             })
     }
 }

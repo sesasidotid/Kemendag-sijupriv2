@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common'
-import { LoginContext } from './../../modules/base/commons/login-context'
+import { LoginContext } from '@/modules/base/commons/login-context'
 import { Component, inject, signal } from '@angular/core'
-import { RoomUkom } from '../../modules/ukom/models/cat/room-ukom.model'
+import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { Router } from '@angular/router'
-import { HandlerService } from '../../modules/base/services/handler.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
 import {
     forkJoin,
     map,
@@ -15,15 +15,15 @@ import {
     concatMap,
     catchError,
 } from 'rxjs'
-import { ConfirmationService } from '../../modules/base/services/confirmation.service'
-import { CATScore } from '../../modules/ukom/models/cat/cat-score'
-import { ModalComponent } from '../../modules/base/components/modal/modal.component'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { CATScore } from '@/modules/ukom/models/cat/cat-score'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { BehaviorSubject } from 'rxjs'
-import { EmptyStateComponent } from '../../modules/base/components/empty-state/empty-state.component'
-import { ExamType } from '../../modules/ukom/models/exam-type.model'
-import { MakalahScore } from '../../modules/ukom/models/cat/makalah-score'
-import { FilePreviewService } from '../../modules/base/services/file-preview.service'
-import { LoadingButtonComponent } from '../../modules/base/components/loading-button/loading-button.component'
+import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
+import { ExamType } from '@/modules/ukom/models/exam-type.model'
+import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
+import { FilePreviewService } from '@/modules/base/services/file-preview.service'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
@@ -187,7 +187,11 @@ export class DashboardComponent {
         return toGMT7(startTime) <= now && now <= toGMT7(endTime)
     }
 
-    startExam(roomUkomId: string, examTypeCode: string) {
+    startExam(
+        roomUkomId: string,
+        examTypeCode: string,
+        examScheduleId: string,
+    ) {
         let title: string
         let message: string
         let commentLabel: string | undefined
@@ -227,7 +231,12 @@ export class DashboardComponent {
                     }
 
                     this.examService
-                        .startExam(examTypeCode, roomUkomId, comment)
+                        .startExam(
+                            examTypeCode,
+                            roomUkomId,
+                            examScheduleId,
+                            comment,
+                        )
                         .pipe(
                             finalize(() => {
                                 this.isStartCATLoading$.next(false)

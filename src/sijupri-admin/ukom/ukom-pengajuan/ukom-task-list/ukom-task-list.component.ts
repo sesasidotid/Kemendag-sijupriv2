@@ -1,30 +1,25 @@
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { Router } from '@angular/router'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { TabService } from '../../../../modules/base/services/tab.service'
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { TabService } from '@/modules/base/services/tab.service'
 import { BehaviorSubject, finalize } from 'rxjs'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { PageFilter } from '../../../../modules/base/commons/pagable/page-filter'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
+import { ApiService } from '@/modules/base/services/api.service'
+import { PageFilter } from '@/modules/base/commons/pagable/page-filter'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
 import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
 import { UkomTaskService } from '@/modules/ukom/services/ukom-task.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
-import {
-    ParticipantObject,
-    PendingTask,
-    UkomFlowId,
-} from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
+import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
 @Component({
     selector: 'app-ukom-task-list',
     standalone: true,
@@ -48,37 +43,16 @@ export class UkomTaskListComponent {
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private jenisUkomService: JenisUkomService,
         public jenjangService: JenjangService,
         private ukomTaskService: UkomTaskService,
     ) {}
 
     ngOnInit() {
-        // const navigation = history.state
         this.getJabatanList()
         this.jenjangService.fetchJenjang()
         this.handlePagable()
-
-        // if (navigation.tabIndex && navigation.menu == 'pengajuan-ukom') {
-        //     this.tabIndex.next(parseInt(navigation.tabIndex))
-        //     this.handleBackFromDetail(this.tabIndex.value)
-        // }
         this.handleTabService()
     }
-
-    // handleBackFromDetail(tabIndex: number) {
-    //     if (tabIndex == 0) {
-    //         this.handlePagableTabChange('ukom_flow_1', 0)
-    //     }
-
-    //     if (tabIndex == 1) {
-    //         this.handlePagableTabChange('ukom_flow_2', 1)
-    //     }
-
-    //     if (tabIndex == 2) {
-    //         this.handlePagableTabChange('rejected', 2)
-    //     }
-    // }
 
     handleDeleteTask(instanceId: string) {
         this.confirmationService.open(false).subscribe({
@@ -219,6 +193,7 @@ export class UkomTaskListComponent {
                         ])
                         .build(),
                 )
+                .withQueryParams()
                 .build(),
         )
     }
@@ -284,47 +259,6 @@ export class UkomTaskListComponent {
                   }),
               ]
     }
-
-    // updateFilterOptions() {
-    //     let updatedPagable
-    //     const currentPagable = this.pagable$.value
-
-    //     const existingFilterList = currentPagable.filterList.map((item) =>
-    //         item.key === 'like_nextJabatanName'
-    //             ? {
-    //                 ...item,
-    //                 optionList: this.jabatanList.map((jabatan) => ({
-    //                     label: jabatan.name,
-    //                     value: jabatan.name,
-    //                 })),
-    //             }
-    //             : item,
-    //     )
-
-    //     const filterList = existingFilterList.some(
-    //         (item) => item.key === 'like_nextJabatanName',
-    //     )
-    //         ? existingFilterList
-    //         : [
-    //             ...existingFilterList,
-    //             new PageFilter({
-    //                 label: 'Jabatan Yang Dituju',
-    //                 fieldType: 'select',
-    //                 key: 'like_nextJabatanName',
-    //                 value: '',
-    //                 optionList: this.jabatanList.map((jabatan) => ({
-    //                     label: jabatan.name,
-    //                     value: jabatan.name,
-    //                 })),
-    //             }),
-    //         ]
-
-    //     updatedPagable = {
-    //         ...currentPagable,
-    //         filterList,
-    //     }
-    //     this.pagable$.next(updatedPagable)
-    // }
 
     getJabatanList() {
         this.apiService.getData('/api/v1/jabatan').subscribe({

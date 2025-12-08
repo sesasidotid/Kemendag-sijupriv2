@@ -1,3 +1,4 @@
+import { PaginationWrapper } from './../../base/models/pagination.model'
 import { Injectable } from '@angular/core'
 import { ApiService } from '@/modules/base/services/api.service'
 import {
@@ -13,6 +14,7 @@ import { NonJFParticipantUkomTask } from '@/modules/ukom/models/ukom-registratio
 import { Task } from '@/modules/workflow/models/task.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { Participant } from '../models/cat/participant.model'
+import { ParticipantHistoryTask } from '../models/ukom-module-refactor/participant-history-task.model'
 @Injectable({
     providedIn: 'root',
 })
@@ -128,5 +130,39 @@ export class UkomParticipantService {
 
     getParticipantUkom(nip: string): Observable<Participant> {
         return this.apiService.getData(`${this.BASE_PATH}/nip/${nip}`)
+    }
+
+    deleteTaskById(id: string): Observable<void> {
+        return this.apiService.deleteData(`${this.BASE_PATH}/${id}`)
+    }
+
+    searchTask(
+        limit?: number,
+        page?: number,
+        extraParams?: Record<string, any>,
+    ): Observable<PaginationWrapper<ParticipantHistoryTask>> {
+        const params: Record<string, any> = {}
+
+        if (limit !== undefined) params['limit'] = limit
+        if (page !== undefined) params['page'] = page
+
+        // Merge caller-supplied extra params
+        if (extraParams) {
+            Object.assign(params, extraParams)
+        }
+
+        // Convert params object to query string
+        const queryString = Object.keys(params)
+            .map(
+                (key) =>
+                    `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`,
+            )
+            .join('&')
+
+        const fullPath = queryString
+            ? `${this.BASE_PATH}/search?${queryString}`
+            : `${this.BASE_PATH}/search`
+
+        return this.apiService.getData(fullPath)
     }
 }

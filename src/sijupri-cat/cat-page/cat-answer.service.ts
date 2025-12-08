@@ -38,10 +38,10 @@ export class CatAnswerService {
      * Load questions and initialize answer tracking
      */
     loadQuestions(
-        roomUkomId: string,
+        examScheduleId: string,
     ): Observable<PaginationWrapper<CATQuestions>> {
         return this.api
-            .getData(`/api/v1/exam/page/CAT/${roomUkomId}?limit=1000&page=1`)
+            .getData(`/api/v1/exam/page/${examScheduleId}?limit=1000&page=1`)
             .pipe(
                 tap((response) => {
                     const questions = response.data || []
@@ -139,6 +139,7 @@ export class CatAnswerService {
         questionId: string,
         participantId: string,
         isUncertain: boolean = false,
+        examScheduleId: string,
     ): Observable<void> {
         const currentSelected = this.selectedAnswer()
         const selectedChoiceId = currentSelected[questionId]
@@ -157,21 +158,23 @@ export class CatAnswerService {
 
         this.isSavingAnswer$.next(true)
 
-        return this.api.postData('/api/v1/exam/answer', payload).pipe(
-            tap(() => {
-                const currentSaved = this.savedAnswer()
-                this.savedAnswer.set({
-                    ...currentSaved,
-                    [questionId]: selectedChoiceId,
-                })
+        return this.api
+            .postData(`/api/v1/exam/answer/${examScheduleId}`, payload)
+            .pipe(
+                tap(() => {
+                    const currentSaved = this.savedAnswer()
+                    this.savedAnswer.set({
+                        ...currentSaved,
+                        [questionId]: selectedChoiceId,
+                    })
 
-                // Auto-navigate to next question if not on last question
-                if (this.currentPage() < this.totalQuestions()) {
-                    this.navigateToPage(this.currentPage() + 1)
-                }
-            }),
-            finalize(() => this.isSavingAnswer$.next(false)),
-        )
+                    // Auto-navigate to next question if not on last question
+                    if (this.currentPage() < this.totalQuestions()) {
+                        this.navigateToPage(this.currentPage() + 1)
+                    }
+                }),
+                finalize(() => this.isSavingAnswer$.next(false)),
+            )
     }
 
     /**
@@ -180,11 +183,13 @@ export class CatAnswerService {
     submitExam(
         examTypeCode: string,
         roomUkomId: string,
+        examScheduleId: string,
         openDialog: boolean = true,
     ): Observable<void> {
         const payload = {
             examTypeCode,
             roomUkomId,
+            examScheduleId,
         }
 
         const performSubmission = (): Observable<void> => {
@@ -246,13 +251,24 @@ Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
         participantId: string,
         examTypeCode: string,
         roomUkomId: string,
+        examScheduleId: string,
     ): Observable<void> {
         return new Observable((observer) => {
             // Check if currently flagged
             const isUncertain = this.isFlagged(questionId)
-            this.saveAnswer(questionId, participantId, isUncertain).subscribe({
+            this.saveAnswer(
+                questionId,
+                participantId,
+                isUncertain,
+                examScheduleId,
+            ).subscribe({
                 next: () => {
-                    this.submitExam(examTypeCode, roomUkomId, true).subscribe({
+                    this.submitExam(
+                        examTypeCode,
+                        roomUkomId,
+                        examScheduleId,
+                        true,
+                    ).subscribe({
                         next: (result) => observer.next(result),
                         error: (err) => observer.error(err),
                         complete: () => observer.complete(),

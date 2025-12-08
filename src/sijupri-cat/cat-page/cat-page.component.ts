@@ -1,11 +1,11 @@
-import { Participant } from './../../modules/ukom/models/cat/participant.model'
+import { Participant } from '@/modules/ukom/models/cat/participant.model'
 import { Component, effect, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { LoginContext } from '../../modules/base/commons/login-context'
-import { RoomUkom } from '../../modules/ukom/models/cat/room-ukom.model'
-import { CATQuestions } from '../../modules/ukom/models/cat/cat-questions'
-import { HandlerService } from '../../modules/base/services/handler.service'
-import { ConfirmationService } from '../../modules/base/services/confirmation.service'
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
+import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { Router, RouterModule } from '@angular/router'
 import {
     BehaviorSubject,
@@ -20,7 +20,7 @@ import {
 } from 'rxjs'
 import { ReactiveFormsModule } from '@angular/forms'
 import { HostListener } from '@angular/core'
-import { ExamAttendance } from '../../modules/ukom/models/cat/exam-attendance'
+import { ExamAttendance } from '@/modules/ukom/models/cat/exam-attendance'
 import { CatService } from '@/modules/ukom/services/cat.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { CatExamSecurityService } from './cat-exam-security.service'
@@ -97,20 +97,20 @@ export class CatPageComponent {
         this.isLoading$ = combineLatest([
             this.isLoadingRoomUkom$.pipe(startWith(true)),
         ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
+
+        effect(
+            () => {
+                if (this.isSubmitted()) {
+                    this.showWarning.set(false)
+                }
+            },
+            { allowSignalWrites: true },
+        )
     }
 
     ngOnInit() {
         this.securityService.initializeSecurity(() => this.submitAnswer(false))
-
-        // Load exam data
         this.getRoomUkom()
-
-        // Hide warning when exam is submitted
-        effect(() => {
-            if (this.isSubmitted() === true) {
-                this.showWarning.set(false)
-            }
-        })
     }
 
     ngOnDestroy() {
@@ -161,10 +161,6 @@ export class CatPageComponent {
         this.securityService.handleFullscreenExit()
     }
 
-    backToHome() {
-        this.router.navigate(['/'])
-    }
-
     backWithConfirmation() {
         const title = 'Konfirmasi Kembali'
         const message =
@@ -205,11 +201,17 @@ export class CatPageComponent {
     onSaveButtonClick(questionId: string) {
         const isFlagged = this.answerService.isFlagged(questionId)
         this.answerService
-            .saveAnswer(questionId, this.pesertaUkom.id, isFlagged)
+            .saveAnswer(
+                questionId,
+                this.pesertaUkom.id,
+                isFlagged,
+                this.securityService.examScheduleId,
+            )
             .subscribe({
                 next: () => {},
                 error: (err) => {
                     console.error('Error saving answer:', err)
+                    this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
                 },
             })
     }
@@ -221,6 +223,7 @@ export class CatPageComponent {
                 this.pesertaUkom.id,
                 this.EXAM_TYPE,
                 this.roomUkom.id,
+                this.securityService.examScheduleId,
             )
             .subscribe({
                 next: () => {
@@ -231,13 +234,19 @@ export class CatPageComponent {
                 },
                 error: (err) => {
                     console.error('Error submitting exam:', err)
+                    this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
                 },
             })
     }
 
     submitAnswer(openDialog: boolean = true) {
         this.answerService
-            .submitExam(this.EXAM_TYPE, this.roomUkom.id, openDialog)
+            .submitExam(
+                this.EXAM_TYPE,
+                this.roomUkom.id,
+                this.securityService.examScheduleId,
+                openDialog,
+            )
             .subscribe({
                 next: () => {
                     this.securityService.clearViolations()
@@ -251,7 +260,6 @@ export class CatPageComponent {
             })
     }
 
-    // ========== Data Loading ==========
     // ========== Data Loading ==========
 
     getRoomUkom() {
@@ -270,6 +278,10 @@ export class CatPageComponent {
                             (e) => e.examTypeCode === this.EXAM_TYPE,
                         )
 
+                    if (catSchedule?.id) {
+                        this.securityService.setExamScheduleId(catSchedule.id)
+                    }
+
                     if (!catSchedule?.endTime) {
                         this.handler.handleAlert(
                             'Error',
@@ -284,8 +296,7 @@ export class CatPageComponent {
                     )
 
                     return this.catService.getExamAttendance(
-                        this.EXAM_TYPE,
-                        participantUkom.roomUkomDto.id,
+                        catSchedule.id,
                         participantUkom.id,
                     )
                 }),
@@ -299,6 +310,11 @@ export class CatPageComponent {
                             .parseServerDate(this.examAttendance.startAt)
                             .toISOString()
                     }
+
+                    this.securityService.setInitialState(
+                        this.examAttendance.violationCount || 0,
+                        this.examAttendance.mouseAwayCount || 0,
+                    )
 
                     // Start timer
                     if (this.examEndTime) {
@@ -324,7 +340,7 @@ export class CatPageComponent {
 
     getQuestion() {
         this.answerService
-            .loadQuestions(this.roomUkom.id)
+            .loadQuestions(this.securityService.examScheduleId)
             .pipe(
                 switchMap((response) => {
                     this.data = response.data

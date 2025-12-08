@@ -13,11 +13,13 @@ export class ExamService {
     startExam(
         examTypeCode: string,
         roomUkomId: string,
+        examScheduleId: string,
         secretKey: string | undefined,
     ) {
         return this.apiService.postData(`${this.BASE_PATH}/start`, {
             examTypeCode: examTypeCode,
             roomUkomId: roomUkomId,
+            examScheduleId: examScheduleId,
             secret_key: secretKey,
         })
     }

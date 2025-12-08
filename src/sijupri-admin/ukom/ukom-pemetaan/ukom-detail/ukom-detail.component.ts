@@ -1,5 +1,5 @@
 import { ConfirmationService } from './../../../../modules/base/services/confirmation.service'
-import { Component } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import {
     ActionColumnBuilder,
     PagableBuilder,
@@ -10,8 +10,8 @@ import { PagableComponent } from '../../../../modules/base/components/pagable/pa
 import { LoginContext } from '../../../../modules/base/commons/login-context'
 import { ActivatedRoute, Router } from '@angular/router'
 import { JF } from '../../../../modules/siap/models/jf.model'
-import { BehaviorSubject } from 'rxjs'
-import { CommonModule } from '@angular/common'
+import { BehaviorSubject, finalize, map, Observable } from 'rxjs'
+import { CommonModule, Location } from '@angular/common'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { DomSanitizer } from '@angular/platform-browser'
 import { SafeUrl } from '@angular/platform-browser'
@@ -19,6 +19,9 @@ import { FilePreviewService } from '../../../../modules/base/services/file-previ
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { ParticipantHistoryTask } from '@/modules/ukom/models/ukom-module-refactor/participant-history-task.model'
+import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
+import { JfService } from '@/modules/siap/services/jf.service'
 @Component({
     selector: 'app-ukom-detail',
     standalone: true,
@@ -27,12 +30,16 @@ import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.servi
     styleUrl: './ukom-detail.component.scss',
 })
 export class UkomDetailComponent {
-    pagable: Pagable
-    jf: JF = new JF()
-    jfLoading$ = new BehaviorSubject<boolean>(false)
+    participantService = inject(UkomParticipantService)
+    jfService = inject(JfService)
+    router = inject(Router)
+    location = inject(Location)
 
-    id: string
-    isBanned: boolean = false
+    jfLoading = signal(false)
+    pagable: Pagable
+    jf = new JF()
+
+    isBanned: boolean
     bannedDue: string = ''
     profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
@@ -51,7 +58,6 @@ export class UkomDetailComponent {
 
     constructor(
         private activatedRoute: ActivatedRoute,
-        private router: Router,
         private apiService: ApiService,
         private sanitizer: DomSanitizer,
         private filePreviewService: FilePreviewService,
@@ -62,24 +68,34 @@ export class UkomDetailComponent {
 
     ngOnInit() {
         this.activatedRoute.paramMap.subscribe((params) => {
-            this.id = params.get('id')
+            const id = params.get('id')
+            if (!id) return
+
+            this.handlePagable(id)
+
+            this.isUserBanned(id).subscribe((result) => {
+                this.isBanned = result.banned
+                this.bannedDue = result.until
+
+                if (result.isJF) {
+                    this.getJF(id)
+                }
+            })
         })
-        this.handlePagable()
-        this.getJF()
-        this.isUserBanned()
     }
 
-    handlePagable() {
-        this.pagable = new PagableBuilder(
-            `/api/v1/participant_ukom/all/${this.id}`,
-        )
+    handlePagable(id: string) {
+        this.pagable = new PagableBuilder(`/api/v1/participant_ukom/all/${id}`)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Ukom', (data: any) => {
-                        return this.jenisUkomService.getLabelByValue(
-                            data.jenisUkom,
-                        )
-                    })
+                    .withDynamicValue(
+                        'Jenis Ukom',
+                        (data: ParticipantHistoryTask) => {
+                            return this.jenisUkomService.getLabelByValue(
+                                data.jenisUkom,
+                            )
+                        },
+                    )
                     .build(),
             )
             .addPrimaryColumn(
@@ -87,9 +103,9 @@ export class UkomDetailComponent {
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((ukom: any) => {
+                    .setAction((ukom: ParticipantHistoryTask) => {
                         this.router.navigate([
-                            `/ukom/ukom-list/detail/${ukom.id}`,
+                            `/ukom/ukom-list/${ukom.nip}/${ukom.id}`,
                         ])
                     }, 'info')
                     .withIcon('detail')
@@ -97,7 +113,7 @@ export class UkomDetailComponent {
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((ukom: any) => {
+                    .setAction((ukom: ParticipantHistoryTask) => {
                         this.handleDeleteTask(ukom.id)
                     }, 'danger')
                     .withIcon('danger')
@@ -113,24 +129,21 @@ export class UkomDetailComponent {
                     return
                 }
 
-                this.apiService
-                    .deleteData(`/api/v1/participant_ukom/${id} `)
-                    .subscribe({
-                        next: (res) => {
-                            this.handlerService.handleAlert(
-                                'Success',
-                                'Data berhasil dihapus',
-                            )
-                            this.refresh = !this.refresh
-                        },
-                        error: (err) => {
-                            this.handlerService.handleAlert(
-                                'Error',
-                                'Data gagal dihapus',
-                            )
-                            this.refresh = !this.refresh
-                        },
-                    })
+                this.participantService.deleteTaskById(id).subscribe({
+                    next: () => {
+                        this.handlerService.handleAlert(
+                            'Success',
+                            'Data berhasil dihapus',
+                        )
+                        this.refresh = !this.refresh
+                    },
+                    error: () => {
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'Data gagal dihapus',
+                        )
+                    },
+                })
             },
         })
     }
@@ -139,15 +152,17 @@ export class UkomDetailComponent {
         this.filePreviewService.open(fileName, fileSource)
     }
 
-    getJF() {
-        this.jfLoading$.next(true)
+    getJF(id: string) {
+        this.jfLoading.set(true)
 
-        this.apiService.getData(`/api/v1/jf/${this.id}`).subscribe({
-            next: (response: any) => {
-                this.jf = new JF(response)
-                this.jfLoading$.next(false)
-            },
-        })
+        this.jfService
+            .findByNip(id)
+            .pipe(finalize(() => this.jfLoading.set(false)))
+            .subscribe({
+                next: (jf) => {
+                    this.jf = jf
+                },
+            })
     }
 
     fetchPhotoProfile() {
@@ -161,27 +176,30 @@ export class UkomDetailComponent {
                 this.profileImageSrc =
                     this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
-            error: (err) => {
-                console.error('Error fetching profile image', err)
-                this.profileImageSrc = 'assets/no-profile.jpg'
-            },
         })
     }
 
-    back() {
-        history.back()
+    goBack() {
+        if (window.history.length > 1) {
+            this.location.back()
+        } else {
+            this.router.navigate(['../', { relativeTo: this.activatedRoute }])
+        }
     }
 
-    isUserBanned() {
-        this.apiService
-            .getData(
-                `/api/v1/participant_ukom/search?limit=100&eq_nip=${this.id}`,
-            )
-            .subscribe({
-                next: (response: any) => {
-                    this.isBanned = response.data[0].ukomBan != null
-                    this.bannedDue = response.data[0].ukomBan?.until
-                },
-            })
+    isUserBanned(
+        id: string,
+    ): Observable<{ isJF: boolean; banned: boolean; until?: string }> {
+        return this.participantService.searchTask(1, 1, { eq_nip: id }).pipe(
+            map((response) => {
+                const data = response.data[0]
+                const isJf = data.participantStatus == 'jf'
+                return {
+                    isJF: isJf,
+                    banned: data.ukomBan != null,
+                    until: data.ukomBan?.until,
+                }
+            }),
+        )
     }
 }

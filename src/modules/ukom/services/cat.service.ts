@@ -12,12 +12,11 @@ export class CatService {
     apiService = inject(ApiService)
 
     getExamAttendance(
-        examType: string,
-        roomId: string,
+        examScheduleId: string,
         participantId: string,
     ): Observable<ExamAttendance> {
         return this.apiService.getData(
-            `/api/v1/exam_attendance/${examType}/${roomId}/${participantId}`,
+            `/api/v1/exam_attendance/${examScheduleId}/${participantId}`,
         )
     }
 

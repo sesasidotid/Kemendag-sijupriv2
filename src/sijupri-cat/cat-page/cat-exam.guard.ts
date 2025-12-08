@@ -20,7 +20,7 @@ export const catExamGuard: CanActivateFn = (route, state) => {
 
     // Check if user is logged in
     if (!userId) {
-        router.navigate(['/auth/login'])
+        router.navigate(['/login'])
         return false
     }
 
@@ -35,7 +35,6 @@ export const catExamGuard: CanActivateFn = (route, state) => {
                 return false
             }
 
-            // Check if CAT exam schedule exists
             const catSchedule =
                 participant.roomUkomDto?.examScheduleDtoList?.find(
                     (e) => e.examTypeCode === 'CAT',

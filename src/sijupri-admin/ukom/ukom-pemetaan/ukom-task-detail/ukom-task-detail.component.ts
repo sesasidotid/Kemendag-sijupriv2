@@ -1,9 +1,9 @@
-import { Component } from '@angular/core'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
-import { Pangkat } from '../../../../modules/maintenance/models/pangkat.model'
-import { CommonModule } from '@angular/common'
-import { ActivatedRoute } from '@angular/router'
+import { Component, inject } from '@angular/core'
+import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
+import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
+import { Pangkat } from '@/modules/maintenance/models/pangkat.model'
+import { CommonModule, Location } from '@angular/common'
+import { ActivatedRoute, Router } from '@angular/router'
 import {
     BehaviorSubject,
     catchError,
@@ -17,22 +17,23 @@ import {
     finalize,
     filter,
     EMPTY,
+    startWith,
 } from 'rxjs'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
-import { CATScore } from '../../../../modules/ukom/models/cat/cat-score'
-import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
-import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { ExamType } from '../../../../modules/ukom/models/exam-type.model'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { MakalahScore } from '../../../../modules/ukom/models/cat/makalah-score'
-import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { LoadingButtonComponent } from '../../../../modules/base/components/loading-button/loading-button.component'
-import { TanggalIndoPipe } from '../../../../modules/base/pipes/tanggal-indo.pipe'
-import { ForcePasswordFormComponent } from '../../../../modules/base/components/force-password-form/force-password-form.component'
+import { ApiService } from '@/modules/base/services/api.service'
+import { UkomTaskDetail } from '@/modules/ukom/models/ukom-task-detail.modal'
+import { CATScore } from '@/modules/ukom/models/cat/cat-score'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
+import { DataDokumenUkom } from '@/modules/ukom/models/data-dukung'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
+import { ExamType } from '@/modules/ukom/models/exam-type.model'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
+import { FilePreviewService } from '@/modules/base/services/file-preview.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { TanggalIndoPipe } from '@/modules/base/pipes/tanggal-indo.pipe'
+import { ForcePasswordFormComponent } from '@/modules/base/components/force-password-form/force-password-form.component'
 import { PredikatKinerjaService } from '@/modules/maintenance/services/predikat-kinerja.service'
 import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
 @Component({
@@ -45,12 +46,13 @@ import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom
         LoadingButtonComponent,
         TanggalIndoPipe,
         ForcePasswordFormComponent,
-        // UkomTaskDetailComponentPengajuan,
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss',
 })
 export class UkomTaskDetailComponent {
+    router = inject(Router)
+    location = inject(Location)
     participant_ukom_id: string
     jabatan: Jabatan = new Jabatan()
     jenjang: Jenjang = new Jenjang()
@@ -59,7 +61,7 @@ export class UkomTaskDetailComponent {
     dataDokumenUkom: DataDokumenUkom[] = []
 
     ukomDetail = new UkomTaskDetail()
-    ukomDetailLoading$ = new BehaviorSubject<boolean>(false)
+    ukomDetailLoading$ = new BehaviorSubject<boolean>(true)
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     unitKerjaName: string | null = null
 
@@ -81,10 +83,7 @@ export class UkomTaskDetailComponent {
 
     scoreMap: Record<string, any> = {}
 
-    isPredikatKerjaLoading$: BehaviorSubject<boolean> = new BehaviorSubject(
-        false,
-    )
-    isAllSchoreLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
+    isAllSchoreLoading$ = new BehaviorSubject<boolean>(true)
     isLoading$: Observable<boolean>
 
     isDeleteExamScoreLoading$ = new BehaviorSubject<boolean>(false)
@@ -101,7 +100,6 @@ export class UkomTaskDetailComponent {
     ) {
         this.isLoading$ = combineLatest([
             this.isAllSchoreLoading$,
-            this.isPredikatKerjaLoading$,
             this.ukomDetailLoading$,
         ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
     }
@@ -362,10 +360,13 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    back() {
-        history.back()
+    goBack() {
+        if (window.history.length > 1) {
+            this.location.back()
+        } else {
+            this.router.navigate(['../', { relativeTo: this.activatedRoute }])
+        }
     }
-
     viewFile() {
         const answerDto =
             this.scoreMap['MAKALAH']?.questionDtoList[0]?.answerDto

@@ -138,7 +138,7 @@
                                                 (scoreMap['CAT']?.score !== null && scoreMap['CAT']?.score !== undefined)" [label]="'Mulai'" [className]="'btn btn-primary'"
                                         *ngIf="canStartExam(exam.startTime, exam.endTime) &&
                                                 (scoreMap['CAT']?.score === null || scoreMap['CAT']?.score === undefined)"
-                                        (clicked)="startExam(exam.roomUkomId, exam.examTypeCode)">
+                                        (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)">
                                     </app-loading-button>
 
                                     <button class="btn btn-success"
@@ -153,7 +153,7 @@
                                                 scoreMap['MAKALAH']?.score == null ||
                                                 scoreMap['MAKALAH']?.score === undefined"
                                         [className]="'btn btn-primary'"
-                                        (clicked)="startExam(exam.roomUkomId, exam.examTypeCode)"
+                                        (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
                                         [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
                                                 (scoreMap['MAKALAH']?.score !== null && scoreMap['MAKALAH']?.score !== undefined)" [isLoading]="isMakalahLoading$ | async"
                                         [label]="'Upload Makalah'">
