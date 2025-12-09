@@ -251,10 +251,6 @@ export const routes: Routes = [
                         ],
                     },
                     Pertanyaan: {
-                        // components: () =>
-                        //     import(
-                        //         './ukom/ukom-question/ukom-pertanyaan-list/ukom-question-list.component'
-                        //     ).then((m) => m.UkomQuestionListComponent),
                         components: () =>
                             import(
                                 './ukom/ukom-question/ukom-question-import/ukom-question-import.component'

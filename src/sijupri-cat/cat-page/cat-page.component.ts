@@ -6,7 +6,7 @@ import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { Router, RouterModule } from '@angular/router'
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
     BehaviorSubject,
     combineLatest,
@@ -17,6 +17,7 @@ import {
     startWith,
     Subject,
     switchMap,
+    take,
 } from 'rxjs'
 import { ReactiveFormsModule } from '@angular/forms'
 import { HostListener } from '@angular/core'
@@ -49,6 +50,7 @@ export class CatPageComponent {
     private handler = inject(HandlerService)
     private confirmationService = inject(ConfirmationService)
     private router = inject(Router)
+    private activateRoute = inject(ActivatedRoute)
 
     // Feature services
     securityService = inject(CatExamSecurityService)
@@ -58,6 +60,9 @@ export class CatPageComponent {
     // Constants
     readonly EXAM_TYPE = 'CAT'
     readonly userID = LoginContext.getUserId()
+
+    // Params
+    examScheduleId: string
 
     // Data models
     data: CATQuestions[] = []
@@ -109,8 +114,13 @@ export class CatPageComponent {
     }
 
     ngOnInit() {
-        this.securityService.initializeSecurity(() => this.submitAnswer(false))
-        this.getRoomUkom()
+        this.activateRoute.paramMap.pipe(take(1)).subscribe((params) => {
+            this.examScheduleId = params.get('examScheduleId')
+            this.securityService.initializeSecurity(() =>
+                this.submitAnswer(false),
+            )
+            this.getRoomUkom()
+        })
     }
 
     ngOnDestroy() {
@@ -275,11 +285,13 @@ export class CatPageComponent {
 
                     const catSchedule =
                         participantUkom.roomUkomDto?.examScheduleDtoList?.find(
-                            (e) => e.examTypeCode === this.EXAM_TYPE,
+                            (e) => e.id === this.examScheduleId,
                         )
 
                     if (catSchedule?.id) {
-                        this.securityService.setExamScheduleId(catSchedule.id)
+                        this.securityService.setExamScheduleId(
+                            this.examScheduleId,
+                        )
                     }
 
                     if (!catSchedule?.endTime) {

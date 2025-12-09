@@ -318,61 +318,52 @@
                 </div>
             </div>
 
-            <ng-container *ngIf="scoreMap | keyvalue as entries">
-                <ng-container *ngFor="let e of entries">
-                    <ng-container *ngIf="e.value !== null">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="m-0">
-                                    <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
-                                    Detail UKom
-                                </h5>
+            <div class="card" *ngIf="(scoreMap | keyvalue)?.length > 0 && hasNonNullScores()">
+                <div class="card-header">
+                    <h5 class="m-0">
+                        <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
+                        Detail UKom
+                    </h5>
+                </div>
+
+                <div class="list-group">
+                    <ng-container *ngFor="let exam of participant.roomUkomDto?.examScheduleDtoList">
+                        <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
+                            *ngIf="scoreMap[exam.id] !== null && scoreMap[exam.id] !== undefined && exam.examTypeCode === 'CAT'">
+
+                            <div>
+                                <h5 class="m-0">CAT</h5>
                             </div>
 
-                            <div class="list-group">
-                                <ng-container *ngFor="let exam of participant.roomUkomDto?.examScheduleDtoList">
-                                    <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
-                                        *ngIf="scoreMap[exam.id]?.id && exam.examTypeCode === 'CAT'">
+                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
+                                <button class="btn btn-success" (click)="toggleModal(exam.id)">
+                                    Lihat Nilai
+                                </button>
+                                <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async" [type]="'button'"
+                                    label="Hapus Nilai" [className]="'btn btn-danger'"
+                                    (clicked)="deleteExamScore(scoreMap[exam.id]?.id)">
+                                </app-loading-button>
+                            </div>
+                        </div>
 
-                                        <div>
-                                            <h5 class="m-0">CAT</h5>
-                                        </div>
-
-                                        <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                            <button class="btn btn-success" (click)="toggleModal(exam.id)">
-                                                Lihat Nilai
-                                            </button>
-                                            <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async"
-                                                [type]="'button'" label="Hapus Nilai" [className]="'btn btn-danger'"
-                                                (clicked)="deleteExamScore(scoreMap[exam.id]?.id)">
-                                            </app-loading-button>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="list-group-item d-flex justify-content-between align-items-center"
-                                        *ngIf="scoreMap[exam.id]?.id && exam.examTypeCode === 'MAKALAH'">
-                                        <div>
-                                            <h5 class="m-0">Makalah</h5>
-                                        </div>
-                                        <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                            <button class="btn btn-success" (click)="viewFile(exam.id)">
-                                                Lihat Makalah
-                                            </button>
-                                            <app-loading-button [isLoading]="
-                                            isDeleteExamScoreLoading$ | async
-                                        " [type]="'button'" label="Hapus Makalah" [className]="'btn btn-danger'"
-                                                (clicked)="
-                                            deleteExamScore(scoreMap[exam.id]?.id)
-                                        "></app-loading-button>
-                                        </div>
-                                    </div>
-                                </ng-container>
+                        <div class="list-group-item d-flex justify-content-between align-items-center"
+                            *ngIf="scoreMap[exam.id] !== null && scoreMap[exam.id] !== undefined && exam.examTypeCode === 'MAKALAH'">
+                            <div>
+                                <h5 class="m-0">Makalah</h5>
+                            </div>
+                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
+                                <button class="btn btn-success" (click)="viewFile(exam.id)">
+                                    Lihat Makalah
+                                </button>
+                                <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async" [type]="'button'"
+                                    label="Hapus Makalah" [className]="'btn btn-danger'"
+                                    (clicked)="deleteExamScore(scoreMap[exam.id]?.id)">
+                                </app-loading-button>
                             </div>
                         </div>
                     </ng-container>
-                </ng-container>
-            </ng-container>
+                </div>
+            </div>
         </div>
     </div>
 </ng-template>

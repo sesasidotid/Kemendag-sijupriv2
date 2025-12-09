@@ -169,7 +169,7 @@ export class UkomTaskDetailComponent {
                                 result.scoreInstance
                         }
                     })
-                    console.log('scoreMap', this.scoreMap)
+                    console.log(this.scoreMap)
                 }),
             )
             .subscribe()
@@ -224,6 +224,12 @@ export class UkomTaskDetailComponent {
 
     getScoreByExamId(examId: string): ScoreValue | null {
         return this.scoreMap[examId] || null
+    }
+
+    hasNonNullScores(): boolean {
+        return Object.values(this.scoreMap).some(
+            (score) => score !== null && score !== undefined,
+        )
     }
 
     transformInstansiName(value: string): string {

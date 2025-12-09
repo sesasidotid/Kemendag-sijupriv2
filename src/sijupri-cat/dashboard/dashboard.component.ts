@@ -242,7 +242,7 @@ export class DashboardComponent {
                             next: () => {
                                 if (examTypeCode) {
                                     this.router.navigate([
-                                        `/${examTypeCode.toLowerCase()}`,
+                                        `/${examTypeCode.toLowerCase()}/${examScheduleId}`,
                                     ])
                                 }
                             },

@@ -63,11 +63,12 @@ export class UkomExamChooseCompQuestionsComponent {
             this.activatedRoute.queryParamMap.pipe(take(1)),
         ]).subscribe(([paramMap, queryParamMap]) => {
             const roomId = paramMap.get('roomid')
+            const examId = paramMap.get('id')
             const typeUkom = queryParamMap.get('type_ukom')
 
             this.typeUkom = typeUkom
             this.getRoomDetail(roomId)
-            this.getExamDetail(roomId, typeUkom)
+            this.getExamDetail(roomId, examId)
         })
     }
 
@@ -104,7 +105,8 @@ export class UkomExamChooseCompQuestionsComponent {
                 },
             })
     }
-    getExamDetail(roomId: string, typeUkom: string) {
+
+    getExamDetail(roomId: string, examId: string) {
         this.isLoadingExamDetail$.next(true)
         this.ukomExamScheduleService
             .getExamSchedulesRoomID(roomId)
@@ -117,8 +119,7 @@ export class UkomExamChooseCompQuestionsComponent {
                 next: (res) => {
                     if (Array.isArray(res)) {
                         this.examDetail = res.find(
-                            (exam: ExamDetail) =>
-                                exam.examTypeCode === typeUkom,
+                            (exam: ExamDetail) => exam.id === examId,
                         )
                     } else if (res instanceof ExamDetail) {
                         this.examDetail = res

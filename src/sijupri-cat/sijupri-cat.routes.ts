@@ -20,7 +20,7 @@ export const routes: Routes = [
                     ),
             },
             {
-                path: 'makalah',
+                path: 'makalah/:examScheduleId',
                 loadComponent: () =>
                     import('./makalah-page/makalah-page.component').then(
                         (m) => m.MakalahPageComponent,
@@ -29,7 +29,7 @@ export const routes: Routes = [
         ],
     },
     {
-        path: 'cat',
+        path: 'cat/:examScheduleId',
         loadComponent: () =>
             import('./cat-page/cat-page.component').then(
                 (m) => m.CatPageComponent,
