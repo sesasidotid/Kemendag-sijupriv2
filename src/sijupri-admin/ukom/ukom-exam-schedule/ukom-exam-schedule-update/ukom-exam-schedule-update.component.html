@@ -1,0 +1,60 @@
+<form [formGroup]="examScheduleForm">
+    <div class="row mb-3">
+        <label class="col-sm-3 col-form-label fw-bold">Waktu Mulai <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+            <input type="datetime-local" formControlName="startTime" class="form-control" />
+            <div class="text-danger" *ngIf="getError('startTime', 'Waktu Mulai') as error">
+                {{ error }}
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label class="col-sm-3 col-form-label fw-bold">Waktu Selesai <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+            <input type="datetime-local" formControlName="endTime" class="form-control" />
+            <div class="text-danger" *ngIf="getError('endTime', 'Waktu Selesai') as error">
+                {{ error }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label class="col-sm-3 col-form-label fw-bold">Durasi <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+            <div class="input-group">
+                <input type="number" formControlName="duration" class="form-control" placeholder="Masukkan durasi"
+                    min="1" />
+                <span class="input-group-text">menit</span>
+            </div>
+            <div class="text-danger" *ngIf="getError('duration', 'Durasi') as error">
+                {{ error }}
+            </div>
+            <small class="form-text text-muted">
+                Durasi ujian CAT dalam menit
+            </small>
+        </div>
+    </div>
+
+    <div class="row mb-3" *ngIf="isCatExamType()">
+        <label class="col-sm-3 col-form-label fw-bold">Secret Key <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+            <div class="input-group">
+                <input type="text" class="form-control" formControlName="secretKey"
+                    placeholder="Auto-generated secret key" />
+                <button type="button" class="btn btn-outline-secondary" (click)="generateSecretKey()"
+                    title="Generate secret key">
+                    <i class="mdi mdi-shuffle-variant"></i>
+                </button>
+            </div>
+            <div class=" text-danger" *ngIf="getError('secretKey', 'Secret Key') as error">
+                {{ error }}
+            </div>
+            <small class="form-text text-muted">Klik ikon untuk menghasilkan kunci acak yang
+                aman.</small>
+        </div>
+    </div>
+</form>
+<div class="d-flex justify-content-end gap-1">
+    <app-loading-button [isLoading]="submitLoading()" [type]="'button'" [disabled]="examScheduleForm.invalid"
+        (click)="submit()" [label]="'Simpan'" [className]="'btn btn-primary'"></app-loading-button>
+</div>

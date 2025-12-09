@@ -50,18 +50,9 @@ export class CatExamSecurityService {
     private translationObserver?: MutationObserver
 
     constructor() {
-        this.setupViolationWatcher()
-
-        window.addEventListener('online', () => {
-            this.checkConnection()
-        })
-
-        window.addEventListener('offline', () => {
-            this.isOnline = false
-        })
-
-        this.startConnectionCheck()
         this.detectTranslation()
+        this.setupViolationWatcher()
+        this.startConnectionCheck()
     }
 
     private detectTranslation() {

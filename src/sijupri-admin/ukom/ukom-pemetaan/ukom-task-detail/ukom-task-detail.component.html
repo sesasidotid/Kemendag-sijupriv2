@@ -12,18 +12,19 @@
 
 <ng-template #ukomHadItem>
     <div class="row">
-        <div class="col-lg-12 mt-3 text-end">
-            <button class="btn btn-primary btn-sm mb-2" (click)="toggleUpdatePasswordModal()">
+        <div class="text-end">
+            <button class="btn btn-primary mb-3 " (click)="toggleUpdatePasswordModal()">
                 <i class="mdi mdi-lock-reset me-1"></i>
                 Lupa password akun UKom? <strong>Reset di sini</strong>
             </button>
         </div>
-        <div class="col-lg-12">
+
+        <div class="">
             <div class="card">
                 <div class="card-header align-items-center d-flex">
-                    <h5 class="m-0">
+                    <h4 class="m-0">
                         <i class="mdi mdi-account me-2"></i>Detail Peserta UKom
-                    </h5>
+                    </h4>
                 </div>
 
                 <div class="card-body">
@@ -306,7 +307,7 @@
             </div>
 
             <!-- Dokumen Pendaftaran -->
-            <div class="card detail-jf" *ngIf="dataDokumenUkom.length > 0">
+            <div class="card" *ngIf="dataDokumenUkom.length > 0">
                 <div class="card-header">
                     <h5 class="m-0">
                         <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen Pendaftaran UKom
@@ -317,56 +318,56 @@
                 </div>
             </div>
 
-
-            <div class="card detail-jf" *ngIf="scoreMap | keyvalue as entries">
+            <ng-container *ngIf="scoreMap | keyvalue as entries">
                 <ng-container *ngIf="entries.length > 0">
-                    <div class="card-header" *ngIf="hasVisibleUkomDetails">
-                        <h5 class="m-0">
-                            <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
-                            Detail UKom
-                        </h5>
-                    </div>
-
-                    <div class="list-group">
-                        <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
-                            *ngIf="scoreMap['CAT'].id">
-
-                            <div>
-                                <h5 class="m-0">CAT</h5>
-                            </div>
-
-                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                <button class="btn btn-success" (click)="toggleModal()">
-                                    Lihat Nilai
-                                </button>
-                                <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async" [type]="'button'"
-                                    label="Hapus Nilai" [className]="'btn btn-danger'"
-                                    (clicked)="deleteExamScore(scoreMap['CAT'].id)">
-                                </app-loading-button>
-                            </div>
-
+                    <div class="card">
+                        <div class="card-header" *ngIf="hasVisibleUkomDetails">
+                            <h5 class="m-0">
+                                <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
+                                Detail UKom
+                            </h5>
                         </div>
 
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
+                                *ngIf="scoreMap['CAT'].id">
 
-                        <div class="list-group-item d-flex justify-content-between align-items-center"
-                            *ngIf="scoreMap['MAKALAH'].id">
-                            <div>
-                                <h5 class="m-0">Makalah</h5>
+                                <div>
+                                    <h5 class="m-0">CAT</h5>
+                                </div>
+
+                                <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
+                                    <button class="btn btn-success" (click)="toggleModal()">
+                                        Lihat Nilai
+                                    </button>
+                                    <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async"
+                                        [type]="'button'" label="Hapus Nilai" [className]="'btn btn-danger'"
+                                        (clicked)="deleteExamScore(scoreMap['CAT'].id)">
+                                    </app-loading-button>
+                                </div>
                             </div>
-                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                <button class="btn btn-success" (click)="viewFile()">
-                                    Lihat Makalah
-                                </button>
-                                <app-loading-button [isLoading]="
+
+
+                            <div class="list-group-item d-flex justify-content-between align-items-center"
+                                *ngIf="scoreMap['MAKALAH'].id">
+                                <div>
+                                    <h5 class="m-0">Makalah</h5>
+                                </div>
+                                <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
+                                    <button class="btn btn-success" (click)="viewFile()">
+                                        Lihat Makalah
+                                    </button>
+                                    <app-loading-button [isLoading]="
                                         isDeleteExamScoreLoading$ | async
                                     " [type]="'button'" label="Hapus Makalah" [className]="'btn btn-danger'" (clicked)="
                                         deleteExamScore(scoreMap['MAKALAH'].id)
                                     "></app-loading-button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </ng-container>
-            </div>
+            </ng-container>
         </div>
     </div>
 </ng-template>

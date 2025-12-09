@@ -107,7 +107,7 @@ export class UkomExamChooseCompQuestionsComponent {
     getExamDetail(roomId: string, typeUkom: string) {
         this.isLoadingExamDetail$.next(true)
         this.ukomExamScheduleService
-            .getExamDetailByRoomID(roomId)
+            .getExamSchedulesRoomID(roomId)
             .pipe(
                 finalize(() => {
                     this.isLoadingExamDetail$.next(false)

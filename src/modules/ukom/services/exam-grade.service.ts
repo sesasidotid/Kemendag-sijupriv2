@@ -17,4 +17,13 @@ export class ExamGradeService {
             `${this.BASE_PATH}/${examCode}/${participantId}`,
         )
     }
+
+    getExamGradeByExamScheduleIdAndParticipantId(
+        examScheduleId: string,
+        participantId: string,
+    ) {
+        return this.apiService.getData(
+            `${this.BASE_PATH}/${examScheduleId}/${participantId}`,
+        )
+    }
 }

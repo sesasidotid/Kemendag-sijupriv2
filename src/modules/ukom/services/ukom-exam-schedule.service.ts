@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
 import { ApiService } from '@/modules/base/services/api.service'
-import { ExamDetail } from '../models/exam_detail'
-
+import { CreateExamScheduleRequest } from '../models/exam-schedule/create-exam-schedule-request.model'
+import { UpdateExamScheduleRequest } from '../models/exam-schedule/update-exam-schedule-request.model'
+import { ExamSchedule } from '../models/exam-schedule/exam-schedule.model'
 @Injectable({
     providedIn: 'root',
 })
@@ -12,7 +13,21 @@ export class UkomExamScheduleService {
 
     constructor() {}
 
-    getExamDetailByRoomID(roomId: string): Observable<ExamDetail> {
+    getExamSchedulesRoomID(roomId: string): Observable<ExamSchedule> {
         return this.apiService.getData(`${this.API_BASE_URL}/room/${roomId}`)
+    }
+
+    createExamSchedule(body: CreateExamScheduleRequest) {
+        return this.apiService.postData(this.API_BASE_URL, body)
+    }
+
+    updateExamSchedule(body: UpdateExamScheduleRequest) {
+        return this.apiService.putData(this.API_BASE_URL, body)
+    }
+
+    deleteExamScheduleById(examScheduleId: string) {
+        return this.apiService.deleteData(
+            `${this.API_BASE_URL}/${examScheduleId}`,
+        )
     }
 }
