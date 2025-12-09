@@ -55,6 +55,7 @@ export class DashboardComponent {
 
     isModalOpen = signal(false)
     initialOpenAccordion = signal<string | null>(null)
+    selectedExamId = signal<string | null>(null)
 
     roomUkom = new RoomUkom()
     examType: ExamType[] = []
@@ -91,17 +92,7 @@ export class DashboardComponent {
                 tap((response) => {
                     this.roomUkom = response.roomUkomDto
                 }),
-
-                concatMap((participant) =>
-                    this.getExamType().pipe(
-                        map((examType) => ({ participant, examType })),
-                    ),
-                ),
-
-                concatMap(({ participant, examType }) =>
-                    this.getAllScores(participant, examType),
-                ),
-
+                concatMap((participant) => this.getAllScores(participant)),
                 finalize(() => this.isRoomLoading$.next(false)),
             )
             .subscribe()
@@ -113,52 +104,56 @@ export class DashboardComponent {
             .pipe(tap((examType) => (this.examType = examType)))
     }
 
-    getAllScores(participant: Participant, examType: ExamType[]) {
-        if (!participant || !examType) return of([])
+    getAllScores(participant: Participant) {
+        if (!participant) return of([])
 
-        const requests = examType.map((type) => {
-            const examCode = type.code
+        const requests = participant.roomUkomDto.examScheduleDtoList.map(
+            (examSchedule) => {
+                return this.examGradeService
+                    .getExamGradeByExamScheduleIdAndParticipantId(
+                        examSchedule.id,
+                        participant.id,
+                    )
+                    .pipe(
+                        catchError((err) => {
+                            if (err.status === 404) {
+                                return of(null)
+                            }
 
-            return this.examGradeService
-                .getExamGradeByCodeAndParticipantId(examCode, participant.id)
-                .pipe(
-                    catchError((err) => {
-                        if (err.status === 404) {
-                            // Expected missing score → return null, but don't error
-                            return of({ examCode, scoreInstance: null })
-                        }
+                            return of(null)
+                        }),
+                        map((response) => {
+                            let scoreInstance: ScoreValue | null = null
 
-                        // Any unexpected error should NOT break forkJoin
-                        console.error(`Unexpected error for ${examCode}`, err)
-                        return of({ examCode, scoreInstance: null })
-                    }),
-                    map((response) => {
-                        let scoreInstance
+                            if (response) {
+                                switch (examSchedule.examTypeCode) {
+                                    case 'CAT':
+                                        scoreInstance = new CATScore(response)
+                                        break
+                                    case 'MAKALAH':
+                                        scoreInstance = new MakalahScore(
+                                            response,
+                                        )
+                                        break
+                                    default:
+                                        scoreInstance = response
+                                }
+                            }
 
-                        switch (examCode) {
-                            case 'CAT':
-                                scoreInstance = new CATScore(response)
-                                break
-                            case 'MAKALAH':
-                                scoreInstance = new MakalahScore(response)
-                                break
-                            default:
-                                scoreInstance = response
-                        }
-
-                        return { examCode, scoreInstance }
-                    }),
-                )
-        })
+                            return { examSchedule, scoreInstance }
+                        }),
+                    )
+            },
+        )
 
         return forkJoin(requests).pipe(
             tap((results) => {
                 results.forEach((result) => {
-                    if (result?.examCode) {
-                        this.scoreMap[result.examCode] = result.scoreInstance
+                    if (result?.examSchedule?.id) {
+                        this.scoreMap[result.examSchedule.id] =
+                            result.scoreInstance
                     }
                 })
-                // Set which accordion should be initially open
                 this.setInitialOpenAccordion()
             }),
         )
@@ -268,10 +263,18 @@ export class DashboardComponent {
 
     toggleModal() {
         this.isModalOpen.set(!this.isModalOpen())
+        if (!this.isModalOpen()) {
+            this.selectedExamId.set(null)
+        }
     }
 
-    viewUploadedMakalah() {
-        const rawScore = this.scoreMap['MAKALAH']
+    openScoreModal(examId: string) {
+        this.selectedExamId.set(examId)
+        this.toggleModal()
+    }
+
+    viewUploadedMakalah(examId: string) {
+        const rawScore = this.scoreMap[examId]
 
         if (!(rawScore instanceof MakalahScore)) {
             this.handlerService.handleAlert(
@@ -298,7 +301,10 @@ export class DashboardComponent {
     }
 
     getGroupedCompetencies() {
-        const rawScore = this.scoreMap['CAT']
+        const examId = this.selectedExamId()
+        if (!examId) return []
+
+        const rawScore = this.scoreMap[examId]
 
         if (!rawScore) return []
 
@@ -382,26 +388,24 @@ export class DashboardComponent {
 
         // Find first exam that hasn't been completed
         for (const exam of this.roomUkom.examScheduleDtoList) {
-            const score = this.scoreMap[exam.examTypeCode]
+            const score = this.scoreMap[exam.id]
             const isCompleted =
                 score?.score !== null && score?.score !== undefined
 
             if (!isCompleted) {
-                this.initialOpenAccordion.set(exam.examTypeCode)
+                this.initialOpenAccordion.set(exam.id)
                 return
             }
         }
 
         // If all exams are completed, open the first one
-        this.initialOpenAccordion.set(
-            this.roomUkom.examScheduleDtoList[0].examTypeCode,
-        )
+        this.initialOpenAccordion.set(this.roomUkom.examScheduleDtoList[0].id)
     }
 
     /**
      * Check if an accordion should be initially open
      */
-    isInitiallyOpen(examTypeCode: string): boolean {
-        return this.initialOpenAccordion() === examTypeCode
+    isInitiallyOpen(examId: string): boolean {
+        return this.initialOpenAccordion() === examId
     }
 }

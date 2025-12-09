@@ -26,7 +26,7 @@ export class RwKinerjaService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -39,7 +39,7 @@ export class RwKinerjaService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -54,7 +54,7 @@ export class RwKinerjaService {
                 }),
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )
@@ -64,7 +64,7 @@ export class RwKinerjaService {
         return this.apiService.postData(`${this.BASE_PATH}/task`, user).pipe(
             catchError((error) => {
                 console.error('Error save RWKinerja', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -74,7 +74,7 @@ export class RwKinerjaService {
         return this.apiService.putData(`${this.BASE_PATH}/task`, user).pipe(
             catchError((error) => {
                 console.error('Error update RWKinerja', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -86,7 +86,7 @@ export class RwKinerjaService {
             .pipe(
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )

@@ -39,7 +39,7 @@ export class JabatanService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -52,7 +52,7 @@ export class JabatanService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )

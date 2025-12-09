@@ -26,7 +26,7 @@ export class JfService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -58,7 +58,7 @@ export class JfService {
                 }),
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )
@@ -78,7 +78,7 @@ export class JfService {
         return this.apiService.putData(`${this.BASE_PATH}/task`, user).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -90,7 +90,7 @@ export class JfService {
             .pipe(
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )
@@ -105,7 +105,7 @@ export class JfService {
                 }),
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )
@@ -123,7 +123,7 @@ export class JfService {
                 }),
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )
@@ -133,7 +133,7 @@ export class JfService {
         return this.apiService.deleteData(`${this.BASE_PATH}/${nip}`).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )

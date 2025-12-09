@@ -27,7 +27,7 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 
 import { Jenjang } from '../../../modules/maintenance/models/jenjang.modle'
 import { Router } from '@angular/router'
-import { first } from 'rxjs/operators';
+import { first } from 'rxjs/operators'
 import { LoadingButtonComponent } from '../../../modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-formasi-task-detail',
@@ -38,10 +38,10 @@ import { LoadingButtonComponent } from '../../../modules/base/components/loading
         FileHandlerComponent,
         LucideAngularModule,
         ReactiveFormsModule,
-        LoadingButtonComponent
+        LoadingButtonComponent,
     ],
     templateUrl: './formasi-task-detail.component.html',
-    styleUrl: './formasi-task-detail.component.scss'
+    styleUrl: './formasi-task-detail.component.scss',
 })
 export class FormasiTaskDetailComponent {
     pendingTask: PendingTask = new PendingTask()
@@ -66,7 +66,7 @@ export class FormasiTaskDetailComponent {
         JB7: 'Penguji Mutu Barang',
         JB8: 'Pengawas Kemetrologian',
         JB10: 'Pengamat Tera',
-        JB11: 'Penera'
+        JB11: 'Penera',
     }
 
     isFl2Loading$ = new BehaviorSubject<boolean>(false)
@@ -78,7 +78,7 @@ export class FormasiTaskDetailComponent {
 
     inputs: FIleHandler = {
         files: {
-            question_template: { label: 'Surat Undangan' }
+            question_template: { label: 'Surat Undangan' },
         },
         maxSize: 2 * 1024 * 1024,
         allowedTypes: [{ type: 'application/pdf' }],
@@ -86,19 +86,19 @@ export class FormasiTaskDetailComponent {
             key: string,
             source: string,
             base64Data: string,
-            label: string
+            label: string,
         ) => {
             switch (key) {
                 case 'question_template':
                     this.waktuInput.fileUndangan = base64Data
                     break
             }
-        }
+        },
     }
 
     inputsFileRekomendasi: FIleHandler = {
         files: {
-            file_rekomendasi: { label: 'File Rekomendasi Formasi' }
+            file_rekomendasi: { label: 'File Rekomendasi Formasi' },
         },
         maxSize: 2 * 1024 * 1024,
         allowedTypes: [{ type: 'application/pdf' }],
@@ -106,14 +106,14 @@ export class FormasiTaskDetailComponent {
             key: string,
             source: string,
             base64Data: string,
-            label: string
+            label: string,
         ) => {
             switch (key) {
                 case 'file_rekomendasi':
                     this.fileRekomendasi = base64Data
                     break
             }
-        }
+        },
     }
 
     flow3Form: FormGroup
@@ -127,14 +127,13 @@ export class FormasiTaskDetailComponent {
         private filePreviewService: FilePreviewService,
         private handlerService: HandlerService,
         private fb: FormBuilder,
-        private router: Router
-    ) { }
+        private router: Router,
+    ) {}
 
     ngOnInit() {
-        this.activatedRoute.paramMap
-            .subscribe(params => {
-                this.unit_kerja_id = params.get('id');
-            });
+        this.activatedRoute.paramMap.subscribe((params) => {
+            this.unit_kerja_id = params.get('id')
+        })
 
         this.handleFormInit()
         this.getListJenjang()
@@ -142,12 +141,12 @@ export class FormasiTaskDetailComponent {
     }
 
     isUndanganFileMissing(): boolean {
-        return !this.waktuInput?.fileUndangan;
+        return !this.waktuInput?.fileUndangan
     }
 
     handleFormInit() {
         this.waktuPelaksanaanForm = new FormGroup({
-            waktuPelaksanaan: new FormControl('', Validators.required)
+            waktuPelaksanaan: new FormControl('', Validators.required),
         })
 
         this.flow3Form = this.fb.group({})
@@ -172,43 +171,48 @@ export class FormasiTaskDetailComponent {
             //   .getData(`/api/v1/pending_task/${this.pendingTaskId}`)
             .getData(`/api/v1/formasi/task/unit_kerja/${this.unit_kerja_id}`)
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.pendingTask = new PendingTask(response)
                     this.formasiRequest = new FormasiRequest(
-                        this.pendingTask.objectTask.object
+                        this.pendingTask.objectTask.object,
                         // this.pendingTask
                     )
 
                     this.prevPendingTask = new PrevPendingTask(
-                        this.pendingTask.objectTask.prevObject
+                        this.pendingTask.objectTask.prevObject,
                     )
 
                     if (this.formasiRequest.unitKerjaId) {
                         this.getUnitKerja(this.formasiRequest.unitKerjaId)
                     }
 
-                    this.findApproveDokumen(this.prevPendingTask.formasiDokumenList)
+                    this.findApproveDokumen(
+                        this.prevPendingTask.formasiDokumenList,
+                    )
                     this.getPendingFormasi(this.pendingTask.objectId)
 
-                    console.log('pendingTa222sk', this.formasiRequest.formasiDokumenList)
+                    console.log(
+                        'pendingTa222sk',
+                        this.formasiRequest.formasiDokumenList,
+                    )
                     //   for (const formasiDokumen of this.formasiRequest.formasiDokumenList) {
                     //     formasiDokumen.dokumenStatus = 'APPROVE'
                     //   }
                 },
-                error: error => {
+                error: (error) => {
                     console.error('Error fetching data', error)
 
-                    //   this.alertService.showToast('Error', error.message)
+                    //   this.alertService.showToast('Error', error.error.message)
                     //   throw error
-                }
+                },
             })
     }
 
     preventMinus(event: KeyboardEvent) {
         if (event.key === '-' || event.key === 'e') {
-          event.preventDefault();
+            event.preventDefault()
         }
-      }
+    }
 
     initializeForm() {
         console.log('formasiList', this.formasiList)
@@ -217,19 +221,18 @@ export class FormasiTaskDetailComponent {
                 const controlName = `formasi_${i}_${j}`
                 this.flow3Form.addControl(
                     controlName,
-                    new FormControl(
-                      formasi.pembulatan || '0',
-                      [Validators.pattern(/^\d+$/)]
-                    )
-                  );
+                    new FormControl(formasi.pembulatan || '0', [
+                        Validators.pattern(/^\d+$/),
+                    ]),
+                )
             })
         })
     }
 
     getTotalRekapitulasi(): number {
         let total = 0
-        this.formasiList.forEach(item => {
-            item.formasiResultDtoList.forEach(formasi => {
+        this.formasiList.forEach((item) => {
+            item.formasiResultDtoList.forEach((formasi) => {
                 total += formasi.pembulatan || 0
             })
         })
@@ -250,32 +253,32 @@ export class FormasiTaskDetailComponent {
 
     getListJenjang() {
         this.apiService.getData(`/api/v1/jenjang`).subscribe({
-            next: res => {
+            next: (res) => {
                 this.JenjangList = res.map(
-                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang)
+                    (jenjang: { [key: string]: any }) => new Jenjang(jenjang),
                 )
-            }
+            },
         })
     }
 
     findJenjangName(jenjangCode: string): string {
         const jenjang = this.JenjangList.find(
-            jenjang => jenjang.code === jenjangCode
+            (jenjang) => jenjang.code === jenjangCode,
         )
         return jenjang?.name || ''
     }
 
     findApproveDokumen(dokumenFormasiList: any[]) {
         this.prevApprovedTask = dokumenFormasiList.filter(
-            dokumen => dokumen.dokumenStatus === 'APPROVE'
+            (dokumen) => dokumen.dokumenStatus === 'APPROVE',
         )
         console.log('prevApprovedTask', this.prevApprovedTask)
     }
 
     isDocumentApproved(dokumenPersyaratanId: string): boolean {
         return this.prevApprovedTask.some(
-            approvedDokumen =>
-                approvedDokumen.dokumenPersyaratanId === dokumenPersyaratanId
+            (approvedDokumen) =>
+                approvedDokumen.dokumenPersyaratanId === dokumenPersyaratanId,
         )
     }
 
@@ -283,16 +286,16 @@ export class FormasiTaskDetailComponent {
         console.log('aaaa232', unitKerjaId)
 
         this.apiService.getData(`/api/v1/unit_kerja/${unitKerjaId}`).subscribe({
-            next: response => {
+            next: (response) => {
                 console.log('aaaa', this.unitKerja)
 
                 this.unitKerja = new UnitKerja(response)
             },
-            error: error => {
+            error: (error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
-            }
+            },
         })
     }
 
@@ -301,20 +304,21 @@ export class FormasiTaskDetailComponent {
             .getData(`/api/v1/formasi_detail/formasi/${formasi_id}`)
             //   .getData(`/api/v1/formasi_detail/jabatan_list`)
             .subscribe({
-                next: response => {
+                next: (response) => {
                     console.log('n', response)
                     this.formasiList = response.map(
-                        (formasi: { [key: string]: any }) => new Formasi(formasi)
+                        (formasi: { [key: string]: any }) =>
+                            new Formasi(formasi),
                     )
                     this.initializeForm()
 
                     console.log('b', this.formasiList)
                 },
-                error: error => {
+                error: (error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
-                }
+                },
             })
     }
 
@@ -329,7 +333,7 @@ export class FormasiTaskDetailComponent {
                 this.formasiRequest.fileRekomendasi = reader.result as string
             }
 
-            reader.onerror = error => {
+            reader.onerror = (error) => {
                 console.error('Error: ', error)
             }
         }
@@ -361,18 +365,18 @@ export class FormasiTaskDetailComponent {
         if (!isApprove) {
             const rejectedDokumenUkomList =
                 this.formasiRequest.formasiDokumenList.filter(
-                    dokumen => dokumen.dokumenStatus === 'REJECT'
+                    (dokumen) => dokumen.dokumenStatus === 'REJECT',
                 )
 
             if (rejectedDokumenUkomList.length > 0) {
                 this.task.object = {
-                    formasi_dokumen_list: rejectedDokumenUkomList
+                    formasi_dokumen_list: rejectedDokumenUkomList,
                 }
             }
         }
 
         this.confirmationService.open(!isApprove).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 this.isFl2Loading$.next(true)
@@ -385,51 +389,56 @@ export class FormasiTaskDetailComponent {
                             this.isFl2Loading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil disimpan'
+                                'Data berhasil disimpan',
                             )
                             setTimeout(() => {
                                 window.location.reload()
                             }, 1000)
                         },
-                        error: error => {
+                        error: (error) => {
                             this.isFl2Loading$.next(false)
                             console.error('Error fetching data', error)
-                            this.handlerService.handleAlert('Error', 'Gagal mengirim data')
-                        }
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengirim data',
+                            )
+                        },
                     })
-            }
+            },
         })
     }
 
     submitFl3() {
-        
-
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
-                const formasiDetailDtoList = this.formasiList.map((item, i) => ({
-                    id: item.id,
-                    formasiResultDtoList: item.formasiResultDtoList.map((formasi, j) => {
-                      const controlValue = this.flow3Form.get(`formasi_${i}_${j}`)?.value ?? '0';
-                      return {
-                        id: formasi.id,
-                        result: controlValue.toString()
-                      };
-                    })
-                  }));
-                  
-                  
-        
+                const formasiDetailDtoList = this.formasiList.map(
+                    (item, i) => ({
+                        id: item.id,
+                        formasiResultDtoList: item.formasiResultDtoList.map(
+                            (formasi, j) => {
+                                const controlValue =
+                                    this.flow3Form.get(`formasi_${i}_${j}`)
+                                        ?.value ?? '0'
+                                return {
+                                    id: formasi.id,
+                                    result: controlValue.toString(),
+                                }
+                            },
+                        ),
+                    }),
+                )
+
                 const payload = {
                     id: this.pendingTask.id,
                     taskAction: 'approve',
                     object: {
-                        id: this.pendingTask.objectId, 
-                        formasiDetailDtoList: formasiDetailDtoList
-                    }
+                        id: this.pendingTask.objectId,
+                        formasiDetailDtoList: formasiDetailDtoList,
+                    },
                 }
-                
+
                 this.isFl3Loading$.next(true)
                 this.apiService
                     .postData(`/api/v1/formasi/task/submit`, payload)
@@ -438,25 +447,28 @@ export class FormasiTaskDetailComponent {
                             this.isFl3Loading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil disimpan'
+                                'Data berhasil disimpan',
                             )
                             setTimeout(() => {
                                 window.location.reload()
                             }, 1000)
                         },
-                        error: error => {
+                        error: (error) => {
                             this.isFl3Loading$.next(false)
                             console.error('Error fetching data', error)
-                            this.handlerService.handleAlert('Error', 'Gagal mengirim data')
-                        }
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengirim data',
+                            )
+                        },
                     })
-            }
+            },
         })
     }
 
     submitFl5() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 this.isF15Loading$.next(true)
 
@@ -464,8 +476,8 @@ export class FormasiTaskDetailComponent {
                     id: this.pendingTask.id,
                     task_action: 'approve',
                     object: {
-                        fileRekomendasi: this.fileRekomendasi
-                    }
+                        fileRekomendasi: this.fileRekomendasi,
+                    },
                 }
                 this.apiService
                     .postData(`/api/v1/formasi/task/submit`, payload)
@@ -474,17 +486,20 @@ export class FormasiTaskDetailComponent {
                             this.isF15Loading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil disimpan'
+                                'Data berhasil disimpan',
                             )
                             this.router.navigate(['/formasi/formasi-task-list'])
                         },
-                        error: error => {
+                        error: (error) => {
                             this.isF15Loading$.next(false)
                             console.error('Error fetching data', error)
-                            this.handlerService.handleAlert('Error', 'Gagal mengirim data')
-                        }
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengirim data',
+                            )
+                        },
                     })
-            }
+            },
         })
     }
 

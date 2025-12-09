@@ -27,7 +27,7 @@ export class RwKompetensiService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -41,7 +41,7 @@ export class RwKompetensiService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -55,7 +55,7 @@ export class RwKompetensiService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -70,7 +70,7 @@ export class RwKompetensiService {
                 }),
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )
@@ -80,7 +80,7 @@ export class RwKompetensiService {
         return this.apiService.postData(`${this.BASE_PATH}/task`, user).pipe(
             catchError((error) => {
                 console.error('Error save RWKompetensi', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -90,7 +90,7 @@ export class RwKompetensiService {
         return this.apiService.putData(`${this.BASE_PATH}/task`, user).pipe(
             catchError((error) => {
                 console.error('Error update RWKompetensi', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -102,7 +102,7 @@ export class RwKompetensiService {
             .pipe(
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )

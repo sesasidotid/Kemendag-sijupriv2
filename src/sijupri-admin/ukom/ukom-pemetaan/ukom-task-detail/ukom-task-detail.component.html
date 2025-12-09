@@ -39,7 +39,7 @@
                                 <label class="form-label">Status Pendaftar</label>
                                 <p class="border-bottom">
                                     {{
-                                    ukomDetail.participantStatus == 'jf'
+                                    participant.participantStatus == 'jf'
                                     ? 'JF Perdagangan'
                                     : 'Non-JF Perdagangan'
                                     }}
@@ -51,7 +51,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Nama Lengkap</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.name ?? '-' }}
+                                    {{ participant.name ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -60,7 +60,7 @@
                             <div class="mb-3">
                                 <label class="form-label">NIP</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.nip ?? '-' }}
+                                    {{ participant.nip ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -69,7 +69,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Nomor Whatsapp</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.phone ?? '-' }}
+                                    {{ participant.phone ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -78,7 +78,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.email ?? '-' }}
+                                    {{ participant.email ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -87,7 +87,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Lahir</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.tanggalLahir | tanggalIndo }}
+                                    {{ participant.tanggalLahir | tanggalIndo }}
                                 </p>
                             </div>
                         </div>
@@ -98,8 +98,8 @@
                                 <p class="border-bottom">
                                     {{
                                     calculateAge(
-                                    ukomDetail.tanggalLahir,
-                                    ukomDetail.tglSuratUsulan
+                                    participant.tanggalLahir,
+                                    participant.tglSuratUsulan
                                     )
                                     }}
                                 </p>
@@ -124,7 +124,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Program Studi/Jurusan</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.jurusan ?? '-' }}
+                                    {{ participant.jurusan ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -135,7 +135,7 @@
                                 <p class="border-bottom">
                                     {{
                                     transformInstansiName(
-                                    ukomDetail.jenisInstansi
+                                    participant.jenisInstansi
                                     ) ?? '-'
                                     }}
                                 </p>
@@ -166,16 +166,16 @@
 
                         <div [ngClass]="{
                                 'col-lg-6':
-                                    ukomDetail.jenisInstansi !=
+                                    participant.jenisInstansi !=
                                     'PEMERINTAH_PROVINSI',
                                 'col-lg-12':
-                                    ukomDetail.jenisInstansi ==
+                                    participant.jenisInstansi ==
                                     'PEMERINTAH_PROVINSI'
                             }">
                             <div class="mb-3">
                                 <label class="form-label">Unit Kerja</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.unitKerjaName ?? '-' }}
+                                    {{ participant.unitKerjaName ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -184,7 +184,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Jabatan</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.jabatanName ?? '-' }}
+                                    {{ participant.jabatanName ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -193,7 +193,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Jabatan Yang Dituju</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.nextJabatanName ?? '-' }}
+                                    {{ participant.nextJabatanName ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -202,7 +202,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenjang</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.jenjangName ?? '-' }}
+                                    {{ participant.jenjangName ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -211,7 +211,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenjang Yang Dituju</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.nextJenjangName ?? '-' }}
+                                    {{ participant.nextJenjangName ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -220,7 +220,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Pangkat</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.pangkatName ?? '-' }}
+                                    {{ participant.pangkatName ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -244,7 +244,7 @@
                                 <label class="form-label">Jenis UKom</label>
                                 <p class="border-bottom">
                                     {{
-                                    getJenisUkomLabel(ukomDetail.jenisUkom)
+                                    jenisUkomService.getLabelByValue(participant.jenisUkom)
                                     }}
                                 </p>
                             </div>
@@ -255,7 +255,7 @@
                                 <label class="form-label">Status Pendaftaran</label>
                                 <p class="border-bottom">
                                     {{
-                                    ukomDetail.isMengulang
+                                    participant.isMengulang
                                     ? 'Mengulang'
                                     : 'Baru'
                                     }}
@@ -267,7 +267,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Nomor Surat Usulan</label>
                                 <p class="border-bottom">
-                                    {{ ukomDetail.noSuratUsulan ?? '-' }}
+                                    {{ participant.noSuratUsulan ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -277,7 +277,7 @@
                                 <label class="form-label">Tanggal Surat Usulan</label>
                                 <p class="border-bottom">
                                     {{
-                                    ukomDetail.tglSuratUsulan | tanggalIndo
+                                    participant.tglSuratUsulan | tanggalIndo
                                     }}
                                 </p>
                             </div>
@@ -319,53 +319,58 @@
             </div>
 
             <ng-container *ngIf="scoreMap | keyvalue as entries">
-                <ng-container *ngIf="entries.length > 0">
-                    <div class="card">
-                        <div class="card-header" *ngIf="hasVisibleUkomDetails">
-                            <h5 class="m-0">
-                                <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
-                                Detail UKom
-                            </h5>
-                        </div>
-
-                        <div class="list-group">
-                            <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
-                                *ngIf="scoreMap['CAT'].id">
-
-                                <div>
-                                    <h5 class="m-0">CAT</h5>
-                                </div>
-
-                                <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                    <button class="btn btn-success" (click)="toggleModal()">
-                                        Lihat Nilai
-                                    </button>
-                                    <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async"
-                                        [type]="'button'" label="Hapus Nilai" [className]="'btn btn-danger'"
-                                        (clicked)="deleteExamScore(scoreMap['CAT'].id)">
-                                    </app-loading-button>
-                                </div>
+                <ng-container *ngFor="let e of entries">
+                    <ng-container *ngIf="e.value !== null">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="m-0">
+                                    <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
+                                    Detail UKom
+                                </h5>
                             </div>
 
+                            <div class="list-group">
+                                <ng-container *ngFor="let exam of participant.roomUkomDto?.examScheduleDtoList">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
+                                        *ngIf="scoreMap[exam.id]?.id && exam.examTypeCode === 'CAT'">
 
-                            <div class="list-group-item d-flex justify-content-between align-items-center"
-                                *ngIf="scoreMap['MAKALAH'].id">
-                                <div>
-                                    <h5 class="m-0">Makalah</h5>
-                                </div>
-                                <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                    <button class="btn btn-success" (click)="viewFile()">
-                                        Lihat Makalah
-                                    </button>
-                                    <app-loading-button [isLoading]="
-                                        isDeleteExamScoreLoading$ | async
-                                    " [type]="'button'" label="Hapus Makalah" [className]="'btn btn-danger'" (clicked)="
-                                        deleteExamScore(scoreMap['MAKALAH'].id)
-                                    "></app-loading-button>
-                                </div>
+                                        <div>
+                                            <h5 class="m-0">CAT</h5>
+                                        </div>
+
+                                        <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
+                                            <button class="btn btn-success" (click)="toggleModal(exam.id)">
+                                                Lihat Nilai
+                                            </button>
+                                            <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async"
+                                                [type]="'button'" label="Hapus Nilai" [className]="'btn btn-danger'"
+                                                (clicked)="deleteExamScore(scoreMap[exam.id]?.id)">
+                                            </app-loading-button>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="list-group-item d-flex justify-content-between align-items-center"
+                                        *ngIf="scoreMap[exam.id]?.id && exam.examTypeCode === 'MAKALAH'">
+                                        <div>
+                                            <h5 class="m-0">Makalah</h5>
+                                        </div>
+                                        <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
+                                            <button class="btn btn-success" (click)="viewFile(exam.id)">
+                                                Lihat Makalah
+                                            </button>
+                                            <app-loading-button [isLoading]="
+                                            isDeleteExamScoreLoading$ | async
+                                        " [type]="'button'" label="Hapus Makalah" [className]="'btn btn-danger'"
+                                                (clicked)="
+                                            deleteExamScore(scoreMap[exam.id]?.id)
+                                        "></app-loading-button>
+                                        </div>
+                                    </div>
+                                </ng-container>
                             </div>
                         </div>
-                    </div>
+                    </ng-container>
                 </ng-container>
             </ng-container>
         </div>
@@ -377,7 +382,7 @@
     <ng-container>
         <div class="total-score-container">
             <div class="total-score-value">
-                {{ scoreMap['CAT']?.score | number: '1.2-2' }}
+                {{ selectedExamId ? (getScoreByExamId(selectedExamId)?.score | number: '1.2-2') : '-' }}
             </div>
         </div>
 
@@ -475,5 +480,5 @@
 
 <app-modal *ngIf="isToggleUpdatePasswordModal$ | async" [title]="'Update Password '"
     (toggle)="toggleUpdatePasswordModal()" [enableFooter]="false">
-    <app-force-password-form [userId]="ukomDetail.userId" (passwordUpdated)="toggleUpdatePasswordModal()" />
+    <app-force-password-form [userId]="participant.userId" (passwordUpdated)="toggleUpdatePasswordModal()" />
 </app-modal>

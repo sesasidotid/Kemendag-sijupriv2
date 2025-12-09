@@ -25,7 +25,7 @@ export class ProvinsiService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -38,7 +38,7 @@ export class ProvinsiService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -48,7 +48,7 @@ export class ProvinsiService {
         this.apiService.postData(this.BASE_PATH, provinsi).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -58,7 +58,7 @@ export class ProvinsiService {
         this.apiService.putData(this.BASE_PATH, provinsi).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -68,7 +68,7 @@ export class ProvinsiService {
         this.apiService.deleteData(`${this.BASE_PATH}/${id}`).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )

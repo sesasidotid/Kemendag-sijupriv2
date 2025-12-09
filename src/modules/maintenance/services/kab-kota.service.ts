@@ -24,7 +24,7 @@ export class KabKotaService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -37,7 +37,7 @@ export class KabKotaService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -58,7 +58,7 @@ export class KabKotaService {
                 }),
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.message)
+                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )
@@ -68,7 +68,7 @@ export class KabKotaService {
         this.apiService.postData(this.BASE_PATH, kabKota).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -78,7 +78,7 @@ export class KabKotaService {
         this.apiService.putData(this.BASE_PATH, kabKota).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -88,7 +88,7 @@ export class KabKotaService {
         this.apiService.deleteData(`${this.BASE_PATH}/${id}`).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
+                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )

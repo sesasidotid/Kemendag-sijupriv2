@@ -44,86 +44,17 @@
 
         <!-- Exam Schedule -->
         <ng-container *ngIf="roomUkom?.examScheduleDtoList.length > 0; else emptyState">
-            <!-- <div class="list-group">
-                <div class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-sm"
-                    *ngFor="let exam of roomUkom.examScheduleDtoList">
-                    <div>
-                        <h5>{{ exam.examTypeCode }}</h5>
-                        <p>
-                            {{ exam.startTime | formatExamSchedule: exam.endTime }}
-                        </p>
-                    </div>
-                    <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                        <ng-container *ngIf="exam.examTypeCode === 'CAT'">
-                            <app-loading-button [isLoading]="isStartCATLoading$ | async" [disabled]="!canStartExam(
-                                            exam.startTime,
-                                            exam.endTime
-                                        ) ||
-                                        (scoreMap['CAT']?.score !== null &&
-                                            scoreMap['CAT']?.score !==
-                                                undefined)" [label]="'Mulai'" [className]="'btn btn-primary'" *ngIf="
-                                        canStartExam(
-                                            exam.startTime,
-                                            exam.endTime
-                                        ) &&
-                                        (scoreMap['CAT']?.score === null ||
-                                            scoreMap['CAT']?.score ===
-                                                undefined)
-                                    " (clicked)="startExam(
-                                            exam.roomUkomId,
-                                            exam.examTypeCode
-                                        )"></app-loading-button>
-
-                            <button class="btn btn-success" *ngIf="
-                                        scoreMap['CAT']?.score !== null &&
-                                        scoreMap['CAT']?.score !== undefined
-                                    " (click)="toggleModal()">
-                                Lihat Nilai
-                            </button>
-                        </ng-container>
-
-                        <ng-container *ngIf="exam.examTypeCode === 'MAKALAH'">
-                            <app-loading-button *ngIf="
-                                        canStartExam(
-                                            exam.startTime,
-                                            exam.endTime
-                                        ) ||
-                                        scoreMap['MAKALAH']?.score == null ||
-                                            scoreMap['MAKALAH']?.score ===
-                                                undefined
-                                    " [className]="'btn btn-primary'" (clicked)=" startExam(
-                                            exam.roomUkomId,
-                                            exam.examTypeCode
-                                        )" [disabled]="!canStartExam(
-                                            exam.startTime,
-                                            exam.endTime
-                                        ) ||
-                                        (scoreMap['MAKALAH']?.score !== null &&
-                                            scoreMap['MAKALAH']?.score !==
-                                                undefined)" [isLoading]="isMakalahLoading$ | async"
-                                [label]="'Upload Makalah'"></app-loading-button>
-                            <button class="btn btn-success " (click)="viewUploadedMakalah()" *ngIf="
-                                        scoreMap['MAKALAH']?.score !== null &&
-                                        scoreMap['MAKALAH']?.score !== undefined
-                                    ">
-                                Lihat Makalah
-                            </button>
-                        </ng-container>
-                    </div>
-                </div>
-            </div> -->
             <div class="accordion" id="examAccordion">
                 <div class="accordion-item" *ngFor="let exam of roomUkom.examScheduleDtoList; let i = index">
                     <h2 class="accordion-header" [id]="'heading' + i">
-                        <button class="accordion-button" [class.collapsed]="!isInitiallyOpen(exam.examTypeCode)"
-                            type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i"
-                            [attr.aria-expanded]="isInitiallyOpen(exam.examTypeCode)"
-                            [attr.aria-controls]="'collapse' + i">
+                        <button class="accordion-button" [class.collapsed]="!isInitiallyOpen(exam.id)" type="button"
+                            data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i"
+                            [attr.aria-expanded]="isInitiallyOpen(exam.id)" [attr.aria-controls]="'collapse' + i">
                             {{ exam.examTypeCode }}
                         </button>
                     </h2>
                     <div [id]="'collapse' + i" class="accordion-collapse collapse"
-                        [class.show]="isInitiallyOpen(exam.examTypeCode)" [attr.aria-labelledby]="'heading' + i"
+                        [class.show]="isInitiallyOpen(exam.id)" [attr.aria-labelledby]="'heading' + i"
                         data-bs-parent="#examAccordion">
                         <div class="accordion-body">
                             <p>
@@ -135,32 +66,31 @@
                                 <ng-container *ngIf="exam.examTypeCode === 'CAT'">
                                     <app-loading-button [isLoading]="isStartCATLoading$ | async"
                                         [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
-                                                (scoreMap['CAT']?.score !== null && scoreMap['CAT']?.score !== undefined)" [label]="'Mulai'" [className]="'btn btn-primary'"
+                                                (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)" [label]="'Mulai'" [className]="'btn btn-primary'"
                                         *ngIf="canStartExam(exam.startTime, exam.endTime) &&
-                                                (scoreMap['CAT']?.score === null || scoreMap['CAT']?.score === undefined)"
+                                                (scoreMap[exam.id]?.score === null || scoreMap[exam.id]?.score === undefined)"
                                         (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)">
                                     </app-loading-button>
 
                                     <button class="btn btn-success"
-                                        *ngIf="scoreMap['CAT']?.score !== null && scoreMap['CAT']?.score !== undefined"
-                                        (click)="toggleModal()">
+                                        *ngIf="scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined"
+                                        (click)="openScoreModal(exam.id)">
                                         Lihat Nilai
                                     </button>
                                 </ng-container>
 
                                 <ng-container *ngIf="exam.examTypeCode === 'MAKALAH'">
                                     <app-loading-button *ngIf="canStartExam(exam.startTime, exam.endTime) ||
-                                                scoreMap['MAKALAH']?.score == null ||
-                                                scoreMap['MAKALAH']?.score === undefined"
-                                        [className]="'btn btn-primary'"
+                                                scoreMap[exam.id]?.score == null ||
+                                                scoreMap[exam.id]?.score === undefined" [className]="'btn btn-primary'"
                                         (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
                                         [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
-                                                (scoreMap['MAKALAH']?.score !== null && scoreMap['MAKALAH']?.score !== undefined)" [isLoading]="isMakalahLoading$ | async"
+                                                (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)" [isLoading]="isMakalahLoading$ | async"
                                         [label]="'Upload Makalah'">
                                     </app-loading-button>
 
-                                    <button class="btn btn-success" (click)="viewUploadedMakalah()"
-                                        *ngIf="scoreMap['MAKALAH']?.score !== null && scoreMap['MAKALAH']?.score !== undefined">
+                                    <button class="btn btn-success" (click)="viewUploadedMakalah(exam.id)"
+                                        *ngIf="scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined">
                                         Lihat Makalah
                                     </button>
                                 </ng-container>
@@ -186,7 +116,7 @@
     <ng-container>
         <div class="total-score-container">
             <div class="total-score-value">
-                {{ scoreMap['CAT']?.score | number: '1.2-2' }}
+                {{ scoreMap[selectedExamId()]?.score | number: '1.2-2' }}
             </div>
         </div>
 

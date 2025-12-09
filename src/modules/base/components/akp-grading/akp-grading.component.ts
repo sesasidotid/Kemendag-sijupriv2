@@ -177,7 +177,10 @@ export class AKPGradingComponent {
                         window.location.reload()
                     },
                     error: (error) => {
-                        this.alertService.showToast('Error', error.message)
+                        this.alertService.showToast(
+                            'Error',
+                            error.error.message,
+                        )
                     },
                 })
         }

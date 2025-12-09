@@ -39,7 +39,7 @@ export class AkpTaskService {
             .pipe(
                 catchError((error) => {
                     console.error('error', error)
-                    // this.alertService.showToast('Error', error.message);
+                    // this.alertService.showToast('Error', error.error.message);
                     throw error
                 }),
             )
@@ -53,7 +53,7 @@ export class AkpTaskService {
                     return new AKPByReviewer(response)
                 }),
                 catchError((error) => {
-                    // this.alertService.showToast('Error', error.message);
+                    // this.alertService.showToast('Error', error.error.message);
                     throw error
                 }),
             )
@@ -67,7 +67,7 @@ export class AkpTaskService {
                     return new AKPByPersonal(response)
                 }),
                 catchError((error) => {
-                    // this.alertService.showToast('Error', error.message);
+                    // this.alertService.showToast('Error', error.error.message);
                     throw error
                 }),
             )
