@@ -13,7 +13,6 @@ import { CommonModule } from '@angular/common'
 import {
   FormControl,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms'
