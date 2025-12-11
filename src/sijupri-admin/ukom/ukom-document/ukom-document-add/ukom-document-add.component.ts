@@ -10,12 +10,6 @@ import {
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { Observable } from 'rxjs'
-import { finalize, map } from 'rxjs/operators'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { UkomDocumentService } from '@/modules/ukom/services/document.service'
 import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
@@ -80,7 +74,6 @@ export class UkomDocumentAddComponent {
     }
 
     submit() {
-        console.log(this.documentForm.value)
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
@@ -88,7 +81,7 @@ export class UkomDocumentAddComponent {
                 this.documentData = new DokumenUkom(this.documentForm.value)
                 this.documentService.createDocument(this.documentData, () => {
                     this.documentForm.reset()
-                    this.created.emit()
+                    // this.created.emit()
                 })
             },
         })

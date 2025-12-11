@@ -1,27 +1,12 @@
-<form (submit)="submit()">
-    <div class="col-lg-12">
-        <div class="row">
-            <app-file-handler [inputs]="inputs"></app-file-handler>
-            <a
-                class="link d-block mt-3"
-                href="#"
-                (click)="downloadTemplate(); $event.preventDefault()"
-            >
-                <span class="mdi mdi-download"></span>
-                Download template file nilai ukom
-            </a>
-        </div>
-    </div>
-    <div class="row text-center">
-        <div class="col-12">
-            <button
-                type="submit"
-                class="btn btn-success float-end"
-                (click)="submit()"
-                [disabled]="file_grade === '' || file_grade === undefined"
-            >
-                Import
-            </button>
-        </div>
-    </div>
-</form>
+<div class="row">
+    <app-file-handler [inputs]="inputs"></app-file-handler>
+    <a class="link d-block mt-3" href="#" (click)="downloadTemplate(); $event.preventDefault()">
+        <span class="mdi mdi-download"></span>
+        Download template file nilai ukom
+    </a>
+</div>
+<div class="row text-end">
+    <app-loading-button [isLoading]="uploadLoading()" [className]="'btn btn-primary' " [label]="'Import'"
+        [disabled]="file_grade === '' || file_grade === undefined" (clicked)="submit()" [type]="'button'">
+    </app-loading-button>
+</div>

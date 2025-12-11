@@ -33,22 +33,9 @@
             </div>
         </div>
 
-        <div class="row text-center">
-            <div class="col-12">
-                <ng-container *ngIf="isLoading$ | async; else noLoading">
-                    <button class="btn btn-success float-end" disabled>
-                        <div class="spinner-border spinner-sm-custom" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </button>
-                </ng-container>
-                <ng-template #noLoading>
-                    <button type="button" (click)="submit()" class="btn btn-success float-end"
-                        [disabled]="exportGradeForm.invalid || (isLoading$ | async)">
-                        Export
-                    </button>
-                </ng-template>
-            </div>
+        <div class="row text-end">
+            <app-loading-button [isLoading]="isLoading$ | async" [disabled]="exportGradeForm.invalid" [label]="'Export'"
+                [type]="'button'" [className]="'btn btn-primary'" (clicked)="submit()"></app-loading-button>
         </div>
     </form>
 </div>

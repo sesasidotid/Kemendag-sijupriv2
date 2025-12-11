@@ -104,9 +104,9 @@
         </label>
     </div>
 
-    <div class="d-flex justify-content-end">
+    <div class="text-end">
         <app-loading-button [isLoading]="documentService.updateDocumentLoading$ | async" [label]="'Update'"
-            [disabled]="form.invalid" [type]="'submit'">
+            [disabled]="form.invalid" [type]="'submit'" [className]="'btn btn-primary'">
         </app-loading-button>
     </div>
 </form>

@@ -35,19 +35,10 @@
             </div>
         </div>
 
-        <!-- <button (click)="submit()" class="btn btn-primary w-100">Update</button> -->
-        <ng-container *ngIf="isLoading$ | async; else noLoading">
-            <button class="btn btn-primary w-100" disabled>
-                <div class="spinner-border spinner-sm-custom" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </button>
-        </ng-container>
-        <ng-template #noLoading>
-            <button type="button" (click)="submit()" class="btn btn-primary w-100"
-                [disabled]="editExaminerForm.invalid || (isLoading$ | async)">
-                Simpan
-            </button>
-        </ng-template>
+        <div class="text-end">
+            <app-loading-button [isLoading]="isLoading$ | async" [disabled]="editExaminerForm.invalid"
+                [className]="'btn btn-primary'" [label]="'Simpan'" [type]="'button'"
+                (clicked)="submit()"></app-loading-button>
+        </div>
     </form>
 </app-modal>

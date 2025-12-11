@@ -30,6 +30,7 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
 import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
 import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
 import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-ukom-class-list',
     standalone: true,
@@ -40,6 +41,7 @@ import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-wakt
         ModalComponent,
         FormsModule,
         ReactiveFormsModule,
+        LoadingButtonComponent
     ],
     templateUrl: './ukom-class-list.component.html',
     styleUrl: './ukom-class-list.component.scss',

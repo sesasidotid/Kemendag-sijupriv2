@@ -19,6 +19,7 @@ import { Observable } from 'rxjs'
 import { distinctUntilChanged, finalize, map } from 'rxjs/operators'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 
 @Component({
     selector: 'app-ukom-class-add',
@@ -27,7 +28,8 @@ import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jab
         CommonModule,
         FormsModule,
         LucideAngularModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        LoadingButtonComponent
     ],
     templateUrl: './ukom-class-add.component.html',
     styleUrl: './ukom-class-add.component.scss'

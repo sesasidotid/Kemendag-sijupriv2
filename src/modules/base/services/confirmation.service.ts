@@ -1,60 +1,24 @@
-// import { Injectable } from '@angular/core'
-// import { Subject } from 'rxjs'
-// import { ConfirmationDialogComponent } from '../components/confirmation-dialog/confirmation-dialog.component'
-
-// @Injectable({
-//     providedIn: 'root'
-// })
-// export class ConfirmationService {
-//     private confirmSubject = new Subject<{
-//         confirmed: boolean
-//         comment?: string
-//     }>()
-//     private confirmationDialogComponent!: ConfirmationDialogComponent // Store a reference to the component
-
-//     constructor() { }
-
-//     // Set the component reference when the component is initialized
-//     setConfirmationDialogComponent(component: ConfirmationDialogComponent) {
-//         this.confirmationDialogComponent = component
-//     }
-
-//     // Open the dialog by calling the component's open method
-//     open(withComment: boolean = false) {
-//         this.confirmSubject = new Subject()
-//         this.confirmationDialogComponent.open(withComment) // Call the component's open method
-//         return this.confirmSubject.asObservable()
-//     }
-
-//     // Use this to emit when the dialog is confirmed
-//     confirm(confirmed: boolean, comment?: string) {
-//         this.confirmSubject.next({ confirmed, comment })
-//         this.confirmSubject.complete()
-//     }
-// }
-
-
-import { Injectable } from '@angular/core';
-import { Subject, Observable, Subscription } from 'rxjs'; // Import Observable for better typing
-import { ConfirmationDialogComponent } from '../components/confirmation-dialog/confirmation-dialog.component';
+import { Injectable } from '@angular/core'
+import { Subject, Observable } from 'rxjs'
+import { ConfirmationDialogComponent } from '../components/confirmation-dialog/confirmation-dialog.component'
 
 interface ConfirmationResult {
-    confirmed: boolean;
-    comment?: string;
+    confirmed: boolean
+    comment?: string
 }
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class ConfirmationService {
-    private confirmSubject!: Subject<ConfirmationResult>; // Initialize with type
-    private confirmationDialogComponent!: ConfirmationDialogComponent; // Store a reference to the component
+    private confirmSubject!: Subject<ConfirmationResult> // Initialize with type
+    private confirmationDialogComponent!: ConfirmationDialogComponent // Store a reference to the component
 
-    constructor() { }
+    constructor() {}
 
     // Set the component reference when the component is initialized
     setConfirmationDialogComponent(component: ConfirmationDialogComponent) {
-        this.confirmationDialogComponent = component;
+        this.confirmationDialogComponent = component
     }
 
     /**
@@ -78,25 +42,49 @@ export class ConfirmationService {
         cancelButtonText?: string,
         placeholder?: string,
     ): Observable<ConfirmationResult> {
-        this.confirmSubject = new Subject<ConfirmationResult>();
+        this.confirmSubject = new Subject<ConfirmationResult>()
 
-        this.confirmationDialogComponent.open(
-            withComment,
-            title,
-            message,
-            commentLabel,
-            confirmButtonText,
-            cancelButtonText,
-            placeholder
-        );
-        return this.confirmSubject.asObservable();
+        // Check if the component reference is available
+        if (!this.confirmationDialogComponent) {
+            console.error(
+                'ConfirmationDialogComponent is not initialized. Make sure <app-confirmation-dialog> is present in the template.',
+            )
+            // Emit a cancelled result immediately
+            setTimeout(() => {
+                this.confirmSubject.next({ confirmed: false })
+                this.confirmSubject.complete()
+            })
+            return this.confirmSubject.asObservable()
+        }
+
+        try {
+            this.confirmationDialogComponent.open(
+                withComment,
+                title,
+                message,
+                commentLabel,
+                confirmButtonText,
+                cancelButtonText,
+                placeholder,
+            )
+        } catch (error) {
+            console.error('Error opening confirmation dialog:', error)
+            // Emit a cancelled result if opening fails
+            setTimeout(() => {
+                this.confirmSubject.next({ confirmed: false })
+                this.confirmSubject.complete()
+            })
+        }
+
+        return this.confirmSubject.asObservable()
     }
 
     // Use this to emit when the dialog is confirmed
     confirm(confirmed: boolean, comment?: string) {
-        if (this.confirmSubject) { // Ensure subject exists before emitting
-            this.confirmSubject.next({ confirmed, comment });
-            this.confirmSubject.complete();
+        if (this.confirmSubject) {
+            // Ensure subject exists before emitting
+            this.confirmSubject.next({ confirmed, comment })
+            this.confirmSubject.complete()
         }
     }
 }

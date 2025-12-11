@@ -1,10 +1,10 @@
-<!-- <app-pagable [pagable]="pagable"></app-pagable> -->
 <ng-container *ngIf="(currentFlow | async) as cf">
     <ng-container *ngIf="cf === flowId.UkomFlowId3 || cf === flowId.UkomFlowId4">
         <div class="d-flex justify-content-end mb-3">
             <app-loading-button [isLoading]="finalizeLoading" [label]="'Selesaikan Tugas Tertunda'"
                 [className]="'btn btn-primary'" [icon]="'mdi-check'" (clicked)="finalizePendingTask()" />
         </div>
-    </ng-container></ng-container>
+    </ng-container>
+</ng-container>
 
 <app-pagable [pagable]="pagable$ | async" [refresh]="refresh"></app-pagable>

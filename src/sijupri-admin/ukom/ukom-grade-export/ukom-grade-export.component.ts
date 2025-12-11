@@ -7,7 +7,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
@@ -18,18 +18,19 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { BehaviorSubject } from 'rxjs'
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 
 @Component({
     selector: 'app-ukom-grade-export',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, PagableComponent],
+    imports: [CommonModule, ReactiveFormsModule, PagableComponent, LoadingButtonComponent],
     templateUrl: './ukom-grade-export.component.html',
-    styleUrl: './ukom-grade-export.component.scss'
+    styleUrl: './ukom-grade-export.component.scss',
 })
 export class UkomGradeExportComponent {
     @ViewChild(PagableComponent) pagableComponent!: PagableComponent
@@ -40,47 +41,47 @@ export class UkomGradeExportComponent {
     refresh: boolean = false
     isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
 
-    constructor (
+    constructor(
         private router: Router,
         private tabService: TabService,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private formValidationService: FormValidationService
+        private formValidationService: FormValidationService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handleFormInit()
         this.handlePagable()
         this.handleTabService()
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.exportGradeForm.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    handleFormInit () {
+    handleFormInit() {
         this.exportGradeForm = new FormGroup({
             dateFrom: new FormControl('', [Validators.required]),
             dateTo: new FormControl('', [Validators.required]),
-            fileType: new FormControl('', [Validators.required])
+            fileType: new FormControl('', [Validators.required]),
         })
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/report/search')
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Nama', 'fileName').build()
+                new PrimaryColumnBuilder('Nama', 'fileName').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tipe', 'fileType').build()
+                new PrimaryColumnBuilder('Tipe', 'fileType').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'status').build()
+                new PrimaryColumnBuilder('Status', 'status').build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -91,7 +92,7 @@ export class UkomGradeExportComponent {
                     .addInactiveCondition((report: any) => {
                         return report.status == 'FAILED'
                     })
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -99,13 +100,13 @@ export class UkomGradeExportComponent {
                         this.handleDeleteReport(report)
                     }, 'danger')
                     .withIcon('danger')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('fileName')
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
@@ -113,40 +114,40 @@ export class UkomGradeExportComponent {
                     .withField('Tipe', 'select')
                     .setOptionList([
                         { label: 'Excel', value: 'xlsx' },
-                        { label: 'CSV', value: 'csv' }
+                        { label: 'CSV', value: 'csv' },
                     ])
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
                     .setProperty('reportId')
                     .withDefaultValue(this.reportId)
-                    .build()
+                    .build(),
             )
             .setLimit(5)
             .build()
     }
 
-    handleDownloadReport (report: any) {
+    handleDownloadReport(report: any) {
         this.apiService
             .postDownload(
                 '/api/v1/report/download',
                 { id: report.id, bucketId: 'report' },
-                report.fileName
+                report.fileName,
             )
             .subscribe({
                 next: () =>
                     this.handlerService.handleAlert(
                         'Success',
-                        'File di download'
+                        'File di download',
                     ),
-                error: error => this.handlerService.handleException(error)
+                error: (error) => this.handlerService.handleException(error),
             })
     }
 
-    handleDeleteReport (report: any) {
+    handleDeleteReport(report: any) {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 this.apiService
                     .deleteData(`/api/v1/report/${report.id}`)
@@ -154,18 +155,18 @@ export class UkomGradeExportComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'File berhasil dihapus'
+                                'File berhasil dihapus',
                             )
                             this.pagableComponent.fetchData()
                         },
-                        error: error =>
-                            this.handlerService.handleException(error)
+                        error: (error) =>
+                            this.handlerService.handleException(error),
                     })
-            }
+            },
         })
     }
 
-    handleTabService () {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -175,25 +176,25 @@ export class UkomGradeExportComponent {
                 label: 'List Nilai Ukom',
                 isActive: false,
                 icon: 'mdi-list-box',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`])
+                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`]),
             })
             .addTab({
                 label: 'Import Nilai',
                 isActive: false,
                 icon: 'mdi-plus-circle',
                 onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/import`])
+                    this.router.navigate([`/ukom/ukom-grade-list/import`]),
             })
             .addTab({
                 label: 'Export Nilai',
                 isActive: true,
                 icon: 'mdi-export',
                 onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/export`])
+                    this.router.navigate([`/ukom/ukom-grade-list/export`]),
             })
     }
 
-    submit () {
+    submit() {
         this.exportGradeForm.markAllAsTouched()
 
         if (!this.exportGradeForm.valid) {
@@ -203,7 +204,7 @@ export class UkomGradeExportComponent {
         }
 
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) {
                     return
                 }
@@ -217,7 +218,7 @@ export class UkomGradeExportComponent {
 
                 reportGenerate.parameter = {
                     dateFrom: this.exportGradeForm.value.dateFrom,
-                    dateTo: this.exportGradeForm.value.dateTo
+                    dateTo: this.exportGradeForm.value.dateTo,
                 }
 
                 this.apiService
@@ -227,20 +228,20 @@ export class UkomGradeExportComponent {
                             this.refresh = !this.refresh
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil mengexport data'
+                                'Berhasil mengexport data',
                             )
                             this.isLoading$.next(false)
                         },
-                        error: error => {
+                        error: (error) => {
                             console.error('Error generating report', error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal mengexport data. Silahkan Coba Lagi'
+                                'Gagal mengexport data. Silahkan Coba Lagi',
                             )
                             this.isLoading$.next(false)
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

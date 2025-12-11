@@ -8,25 +8,19 @@ import {
     Validators,
     AbstractControl,
     ValidationErrors,
-    FormControl
+    FormControl,
 } from '@angular/forms'
 import { UserService } from '../../../security/services/user.service'
 import { CommonModule } from '@angular/common'
 import { FormValidationService } from '../../../base/services/form-validation.service'
 import { BehaviorSubject, finalize } from 'rxjs'
 import { HandlerService } from '../../services/handler.service'
-import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component'
 @Component({
     selector: 'app-force-password-form',
     standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        ConfirmationDialogComponent
-    ],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule],
     templateUrl: './force-password-form.component.html',
-    styleUrl: './force-password-form.component.scss'
+    styleUrl: './force-password-form.component.scss',
 })
 export class ForcePasswordFormComponent {
     @Input() userId!: string
@@ -37,24 +31,24 @@ export class ForcePasswordFormComponent {
     form: FormGroup
     isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
 
-    constructor (
+    constructor(
         private fb: FormBuilder,
         private userService: UserService,
         private formValidationService: FormValidationService,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
     ) {
         this.form = this.fb.group({
             password: ['', [Validators.required, Validators.minLength(8)]],
             confirmPassword: [
                 '',
-                [Validators.required, this.passwordMatchValidator.bind(this)]
-            ]
+                [Validators.required, this.passwordMatchValidator.bind(this)],
+            ],
         })
     }
 
-    passwordMatchValidator (
-        control: FormControl
+    passwordMatchValidator(
+        control: FormControl,
     ): { [key: string]: boolean } | null {
         if (this.form) {
             const password = this.form.get('password')?.value
@@ -66,15 +60,15 @@ export class ForcePasswordFormComponent {
         return null
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.form.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    submitForm () {
+    submitForm() {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
@@ -86,13 +80,13 @@ export class ForcePasswordFormComponent {
                     .pipe(
                         finalize(() => {
                             this.isLoading$.next(false)
-                        })
+                        }),
                     )
                     .subscribe({
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil memperbarui kata sandi.'
+                                'Berhasil memperbarui kata sandi.',
                             )
                             this.passwordUpdated.emit()
                             this.form.reset()
@@ -100,15 +94,15 @@ export class ForcePasswordFormComponent {
                         error: () => {
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal memperbarui kata sandi.'
+                                'Gagal memperbarui kata sandi.',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
-    cancel () {
+    cancel() {
         this.form.reset()
         this.cancelled.emit()
     }

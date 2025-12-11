@@ -96,25 +96,9 @@
             </div>
         </div>
 
-        <ng-container *ngIf="isLoading$ | async; else noLoading">
-            <button class="btn btn-primary w-100" disabled>
-                <div class="spinner-border spinner-sm-custom" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </button></ng-container>
-        <ng-template #noLoading>
-            <button (click)="submit()" [disabled]="!editFormulaForm.valid" class="btn btn-primary w-100">
-                Update
-            </button>
-        </ng-template>
-        <!-- <button
-      (click)="submit()"
-      [disabled]="!editFormulaForm.valid"
-      class="btn btn-primary w-100"
-    >
-      Update
-    </button> -->
+        <div class="text-end">
+            <app-loading-button [isLoading]="isLoading$ | async" [disabled]="editFormulaForm.invalid" [label]="'Update'"
+                [className]="'btn btn-primary'" [type]="'button'" (clicked)="submit()"></app-loading-button>
+        </div>
     </form>
 </app-modal>
-
-<app-confirmation-dialog></app-confirmation-dialog>

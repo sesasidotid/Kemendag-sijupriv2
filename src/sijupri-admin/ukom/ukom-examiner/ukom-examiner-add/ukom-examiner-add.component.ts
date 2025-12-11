@@ -14,6 +14,7 @@ import { Router, RouterLink } from '@angular/router'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { ExaminerUkom } from '../../../../modules/ukom/models/examiner.model'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 
 @Component({
     selector: 'app-ukom-examiner-add',
@@ -22,7 +23,8 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
         CommonModule,
         FormsModule,
         LucideAngularModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        LoadingButtonComponent
     ],
     templateUrl: './ukom-examiner-add.component.html',
     styleUrl: './ukom-examiner-add.component.scss'

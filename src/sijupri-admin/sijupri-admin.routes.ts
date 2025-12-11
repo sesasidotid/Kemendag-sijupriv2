@@ -197,11 +197,11 @@ export const routes: Routes = [
                     },
                 },
                 UKom: {
-                    'Data Dukung UKom': {
+                    Pertanyaan: {
                         components: () =>
                             import(
-                                './ukom/ukom-document/ukom-document-list/ukom-document-list.component'
-                            ).then((m) => m.UkomDocumentListComponent),
+                                './ukom/ukom-question/ukom-question-import/ukom-question-import.component'
+                            ).then((m) => m.UkomQuestionImportComponent),
                     },
                     'Rekapitulasi Hasil Verifikasi Ukom': {
                         components: () =>
@@ -250,11 +250,33 @@ export const routes: Routes = [
                             },
                         ],
                     },
-                    Pertanyaan: {
+                    'Nilai Ukom': {
                         components: () =>
                             import(
-                                './ukom/ukom-question/ukom-question-import/ukom-question-import.component'
-                            ).then((m) => m.UkomQuestionImportComponent),
+                                './ukom/ukom-grade-list/ukom-grade-list.component'
+                            ).then((m) => m.UkomGradeListComponent),
+                        routes: [
+                            {
+                                path: 'import',
+                                loadComponent: () =>
+                                    import(
+                                        './ukom/ukom-grade-import/ukom-grade-import.component'
+                                    ).then((m) => m.UkomGradeImportComponent),
+                            },
+                            {
+                                path: 'export',
+                                loadComponent: () =>
+                                    import(
+                                        './ukom/ukom-grade-export/ukom-grade-export.component'
+                                    ).then((m) => m.UkomGradeExportComponent),
+                            },
+                        ],
+                    },
+                    'Data Dukung UKom': {
+                        components: () =>
+                            import(
+                                './ukom/ukom-document/ukom-document-list/ukom-document-list.component'
+                            ).then((m) => m.UkomDocumentListComponent),
                     },
                     'Rumus UKom': {
                         components: () =>
@@ -320,28 +342,6 @@ export const routes: Routes = [
                             import(
                                 './ukom/ukom-examiner/ukom-examiner-list/ukom-examiner-list.component'
                             ).then((m) => m.UkomExaminerListComponent),
-                    },
-                    'Nilai Ukom': {
-                        components: () =>
-                            import(
-                                './ukom/ukom-grade-list/ukom-grade-list.component'
-                            ).then((m) => m.UkomGradeListComponent),
-                        routes: [
-                            {
-                                path: 'import',
-                                loadComponent: () =>
-                                    import(
-                                        './ukom/ukom-grade-import/ukom-grade-import.component'
-                                    ).then((m) => m.UkomGradeImportComponent),
-                            },
-                            {
-                                path: 'export',
-                                loadComponent: () =>
-                                    import(
-                                        './ukom/ukom-grade-export/ukom-grade-export.component'
-                                    ).then((m) => m.UkomGradeExportComponent),
-                            },
-                        ],
                     },
                     'Syarat Pendaftaran': {
                         components: () =>

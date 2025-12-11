@@ -1,15 +1,14 @@
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { CommonModule } from '@angular/common'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
-import { FileHandlerService } from '@/modules/base/services/file-handler.service'
 import { UkomModulesService } from '@/modules/ukom/services/ukom-modules.service'
-import { Component, ViewChild } from '@angular/core'
+import { Component, ViewChild, inject } from '@angular/core'
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ExamType } from '@/modules/ukom/models/exam-type.model'
-import { finalize, map, Observable } from 'rxjs'
-import { ApiService } from '@/modules/base/services/api.service'
+import { finalize, Observable } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ImportQuestionRequest } from '@/modules/ukom/models/ukom-module-refactor/import-question-request.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
@@ -27,6 +26,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
     styleUrl: './ukom-question-import.component.scss',
 })
 export class UkomQuestionImportComponent {
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
     @ViewChild(FileHandlerComponent) fileHandlerComponent!: FileHandlerComponent
     examTypeCode = new FormControl('', Validators.required)
     base64FileQuestion = ''
@@ -55,19 +55,12 @@ export class UkomQuestionImportComponent {
         private ukomModulesService: UkomModulesService,
         private formValidationService: FormValidationService,
         private handlerService: HandlerService,
-        private apiService: ApiService,
         private confirmationService: ConfirmationService,
-    ) {
-        this.examTypeList$ = this.apiService
-            .getData('/api/v1/exam_type')
-            .pipe(
-                map((response: ExamType[]) =>
-                    response.map((examType) => new ExamType(examType)),
-                ),
-            )
-    }
+    ) {}
 
-    ngOnInit() {}
+    ngOnInit() {
+        this.examTypeList$ = this.ukomMiscellaneousService.getExamType()
+    }
 
     getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
@@ -78,10 +71,12 @@ export class UkomQuestionImportComponent {
     }
 
     handleDownloadTemplate() {
+        
         this.ukomModulesService
             .downloadTemplate(this.examTypeCode.value)
             .subscribe({
                 error: (err) => {
+                    console.error(err)
                     this.handlerService.handleAlert(
                         'Error',
                         'Gagal mengunduh template pertanyaan',
@@ -117,6 +112,7 @@ export class UkomQuestionImportComponent {
                             this.base64FileQuestion = ''
                         },
                         error: (err) => {
+                            console.error(err)
                             this.handlerService.handleAlert(
                                 'Error',
                                 'Gagal mengimpor pertanyaan',

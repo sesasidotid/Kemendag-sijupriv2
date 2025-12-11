@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, input, signal, ViewChild } from '@angular/core'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
@@ -9,59 +9,70 @@ import { FIleHandler } from '../../../modules/base/commons/file-handler/file-han
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { Router } from '@angular/router'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { finalize } from 'rxjs'
 
 @Component({
     selector: 'app-ukom-grade-import',
     standalone: true,
-    imports: [CommonModule, FormsModule, FileHandlerComponent],
+    imports: [
+        CommonModule,
+        FormsModule,
+        FileHandlerComponent,
+        LoadingButtonComponent,
+    ],
     templateUrl: './ukom-grade-import.component.html',
-    styleUrl: './ukom-grade-import.component.scss'
+    styleUrl: './ukom-grade-import.component.scss',
 })
 export class UkomGradeImportComponent {
+    @ViewChild(FileHandlerComponent)
+    fileHandler!: FileHandlerComponent
+
+    uploadLoading = signal(false)
     ukomList: Ukom[] = []
     file_grade: string = ''
 
     inputs: FIleHandler = {
         files: {
-            file_grade: { label: 'File Nilai Ukom' }
+            file_grade: { label: 'File Nilai Ukom' },
         },
         allowedTypes: [
             { label: 'xls', type: 'application/vnd.ms-excel' },
             {
                 label: 'xlsx',
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            }
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            },
         ],
 
         listen: (
             key: string,
             source: string,
             base64Data: string,
-            label: string
+            label: string,
         ) => {
             switch (key) {
                 case 'file_grade':
                     this.file_grade = base64Data
                     break
             }
-        }
+        },
     }
 
-    constructor (
+    constructor(
         private router: Router,
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private tabService: TabService
+        private tabService: TabService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         setTimeout(() => {
             this.handleTabService()
         }, 0)
     }
 
-    handleTabService () {
+    handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
         }
@@ -71,62 +82,71 @@ export class UkomGradeImportComponent {
                 label: 'List Nilai Ukom',
                 isActive: false,
                 icon: 'mdi-list-box',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`])
+                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`]),
             })
             .addTab({
                 label: 'Import Nilai',
                 isActive: true,
                 icon: 'mdi-plus-circle',
                 onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/import`])
+                    this.router.navigate([`/ukom/ukom-grade-list/import`]),
             })
             .addTab({
                 label: 'Export Nilai',
                 isActive: false,
                 icon: 'mdi-export',
                 onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/export`])
+                    this.router.navigate([`/ukom/ukom-grade-list/export`]),
             })
     }
 
-    downloadTemplate () {
+    downloadTemplate() {
         this.apiService
             .getDownload(`/api/v1/exam_grade/download`, 'template_grade.xlsx')
             .subscribe({
-                error: error =>
+                error: (err) => {
+                    console.error(err)
                     this.handlerService.handleAlert(
                         'Error',
-                        'Gagal mengunduh template'
+                        'Gagal mengunduh template',
                     )
+                },
             })
     }
 
-    submit () {
+    resetInput() {
+        this.file_grade = ''
+        this.fileHandler.clearFileName()
+    }
+    submit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
+
+                this.uploadLoading.set(true)
 
                 this.apiService
                     .postData('/api/v1/exam_grade/upload', {
-                        file_grade: this.file_grade
+                        file_grade: this.file_grade,
                     })
+                    .pipe(finalize(() => this.uploadLoading.set(false)))
                     .subscribe({
                         next: () => {
-                            this.router.navigate([`/ukom/ukom-grade-list`])
+                            this.resetInput()
                             this.handlerService.handleAlert(
                                 'Info',
-                                'Data berhasil diimport'
+                                'Data berhasil diimport',
                             )
                         },
-                        error: error => {
-                            console.log(error)
+                        error: (error) => {
+                            console.error(error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal mengimport data'
+                                'Gagal mengimport data',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

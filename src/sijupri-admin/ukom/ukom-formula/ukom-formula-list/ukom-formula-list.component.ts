@@ -15,7 +15,6 @@ import { ModalComponent } from '../../../../modules/base/components/modal/modal.
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { ConfirmationDialogComponent } from '../../../../modules/base/components/confirmation-dialog/confirmation-dialog.component'
 import {
     FormControl,
     FormGroup,
@@ -27,6 +26,7 @@ import { map, filter } from 'rxjs/operators'
 import { Observable, of, Subject } from 'rxjs'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-ukom-formula-list',
     standalone: true,
@@ -36,7 +36,7 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
         ModalComponent,
         FormsModule,
         ReactiveFormsModule,
-        ConfirmationDialogComponent,
+        LoadingButtonComponent
     ],
     templateUrl: './ukom-formula-list.component.html',
     styleUrl: './ukom-formula-list.component.scss',

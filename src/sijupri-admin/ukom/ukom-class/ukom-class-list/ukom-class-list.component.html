@@ -6,7 +6,7 @@
 </ng-container>
 
 <app-modal *ngIf="isModalOpen$ | async" [title]="'Update Kelas'" (toggle)="toggleModal()" [enableFooter]="false"
-    [size]="'lg'">
+    [size]="'md'">
     <form [formGroup]="editRoomUkomForm">
         <div class="mb-3">
             <label for="name" class="form-label">Nama <span class="text-danger">*</span></label>
@@ -131,7 +131,12 @@
             </div>
         </div>
 
-        <ng-container *ngIf="submitLoading$ | async; else noLoading">
+        <div class="text-end">
+            <app-loading-button [isLoading]="submitLoading$ | async" [disabled]="editRoomUkomForm.invalid"
+                [className]="'btn btn-primary'" [label]="'Simpan'" [type]="'button'"
+                (clicked)="submit()"></app-loading-button>
+        </div>
+        <!-- <ng-container *ngIf="submitLoading$ | async; else noLoading">
             <button class="btn btn-primary w-100" disabled>
                 <div class="spinner-border spinner-sm-custom" role="status">
                     <span class="visually-hidden">Loading...</span>
@@ -139,11 +144,11 @@
             </button>
         </ng-container>
         <ng-template #noLoading>
-            <button type="button" class="btn btn-primary w-100" [disabled]="
+            <button type="button" class="btn btn-primary" [disabled]="
                     editRoomUkomForm.invalid || (submitLoading$ | async)
                 " (click)="submit()">
                 Simpan
             </button>
-        </ng-template>
+        </ng-template> -->
     </form>
 </app-modal>

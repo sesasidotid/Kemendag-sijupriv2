@@ -16,7 +16,7 @@ export class UkomModulesService {
     }
 
     downloadTemplate(examTypeCode: string): Observable<void> {
-        return this.apiService.getData(
+        return this.apiService.getDownload(
             `${this.BASE_PATH}/download/${examTypeCode}`,
         )
     }

@@ -1,11 +1,10 @@
-import { JenisKelamin } from '../../../../modules/maintenance/models/jenis-kelamin.model'
 import { Component } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
@@ -14,7 +13,6 @@ import { TabService } from '../../../../modules/base/services/tab.service'
 import { Router, RouterLink } from '@angular/router'
 import { UkomExaminerAddComponent } from '../ukom-examiner-add/ukom-examiner-add.component'
 import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
@@ -23,8 +21,9 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 @Component({
     selector: 'app-ukom-examiner-list',
     standalone: true,
@@ -34,10 +33,11 @@ import {
         UkomExaminerAddComponent,
         ModalComponent,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        LoadingButtonComponent
     ],
     templateUrl: './ukom-examiner-list.component.html',
-    styleUrl: './ukom-examiner-list.component.scss'
+    styleUrl: './ukom-examiner-list.component.scss',
 })
 export class UkomExaminerListComponent {
     tab$ = new BehaviorSubject<number | null>(0)
@@ -53,8 +53,8 @@ export class UkomExaminerListComponent {
         private router: Router,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
-        private apiService: ApiService
-    ) { }
+        private apiService: ApiService,
+    ) {}
 
     ngOnInit() {
         this.handleTabService()
@@ -72,19 +72,19 @@ export class UkomExaminerListComponent {
                 label: 'Daftar Examiner',
                 isActive: true,
                 icon: 'mdi-list-box',
-                onClick: () => this.handleTabChange(0)
+                onClick: () => this.handleTabChange(0),
             })
             .addTab({
                 label: 'Tambah Examiner',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1)
+                onClick: () => this.handleTabChange(1),
             })
     }
 
     handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/examiner_ukom/search')
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Nama', 'name', ['user']).build()
+                new PrimaryColumnBuilder('Nama', 'name', ['user']).build(),
             )
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(
@@ -93,13 +93,13 @@ export class UkomExaminerListComponent {
                         data.jenisKelaminCode === 'M'
                             ? 'Pria'
                             : data.jenisKelaminCode === 'F'
-                                ? 'Wanita'
-                                : data.jenisKelaminCode
+                              ? 'Wanita'
+                              : data.jenisKelaminCode,
                     )
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'status', ['user']).build()
+                new PrimaryColumnBuilder('Status', 'status', ['user']).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -108,16 +108,15 @@ export class UkomExaminerListComponent {
                         this.toggleModal()
                     }, 'primary')
                     .withIcon('update')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('name', ['user'])
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             .build()
-
     }
 
     handleFormInit() {
@@ -125,7 +124,7 @@ export class UkomExaminerListComponent {
             id: new FormControl(''),
             name: new FormControl('', Validators.required),
             nip: new FormControl('', Validators.required),
-            jenis_kelamin_code: new FormControl('', Validators.required)
+            jenis_kelamin_code: new FormControl('', Validators.required),
         })
     }
     setDefaultFormValues(data: any) {
@@ -134,10 +133,9 @@ export class UkomExaminerListComponent {
             id: data.id || '',
             name: data.user.name || '',
             nip: data.nip || '',
-            jenis_kelamin_code: data.jenisKelaminCode || ''
+            jenis_kelamin_code: data.jenisKelaminCode || '',
         })
     }
-
 
     handleTabChange(tab?: number) {
         console.log('tab', tab)
@@ -158,34 +156,39 @@ export class UkomExaminerListComponent {
             id: this.editExaminerForm.value.id,
             name: this.editExaminerForm.value.name,
             nip: this.editExaminerForm.value.nip,
-            jenis_kelamin_code: this.editExaminerForm.value.jenis_kelamin_code
+            jenis_kelamin_code: this.editExaminerForm.value.jenis_kelamin_code,
         }
 
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 this.isLoading$.next(true)
-                this.apiService.putData('/api/v1/examiner_ukom', payload).subscribe({
-                    next: response => {
-                        this.handlerService.handleAlert(
-                            'Success',
-                            'Berhasil menambahkan data'
-                        )
-                        this.handleRefreshToggle()
-                        this.toggleModal()
-                        this.isLoading$.next(false)
-                        // setTimeout(() => {
-                        //   window.location.reload()
-                        // }, 1000)
-                    },
-                    error: error => {
-                        console.log('error', error)
-                        this.isLoading$.next(false)
-                        this.handlerService.handleAlert('Error', 'Gagal mengubah data')
-                    }
-                })
-            }
+                this.apiService
+                    .putData('/api/v1/examiner_ukom', payload)
+                    .subscribe({
+                        next: (response) => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil menambahkan data',
+                            )
+                            this.handleRefreshToggle()
+                            this.toggleModal()
+                            this.isLoading$.next(false)
+                            // setTimeout(() => {
+                            //   window.location.reload()
+                            // }, 1000)
+                        },
+                        error: (error) => {
+                            console.log('error', error)
+                            this.isLoading$.next(false)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengubah data',
+                            )
+                        },
+                    })
+            },
         })
     }
 }

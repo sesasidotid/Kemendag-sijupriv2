@@ -125,7 +125,7 @@
 
     <div class="d-flex justify-content-end">
         <app-loading-button [isLoading]="ukomRegistrationRuleService.createRuleLoading$ | async" [label]="'Simpan'"
-            [disabled]="form.invalid" [type]="'submit'">
+            [disabled]="form.invalid" [type]="'submit'" [className]="'btn btn-primary'">
         </app-loading-button>
     </div>
 </form>
