@@ -162,7 +162,6 @@ export class CatExamSecurityService {
         const queue = await this.queueService.getQueue(this.examScheduleId)
         if (!queue) return
 
-        // Send all pending violations
         if (queue.violations.length > 0) {
             const violations = [...queue.violations]
             for (const violation of violations) {
@@ -170,7 +169,6 @@ export class CatExamSecurityService {
             }
         }
 
-        // Send all pending mouse away durations
         if (queue.mouseAwayDurations.length > 0) {
             const mouseAwayDurations = [...queue.mouseAwayDurations]
             for (const mouseAway of mouseAwayDurations) {
@@ -289,7 +287,6 @@ export class CatExamSecurityService {
                 })
                 .subscribe({
                     next: () => {
-                        // Successfully sent, remove from queue
                         if (this.examScheduleId) {
                             this.queueService.removeViolations(
                                 this.examScheduleId,
@@ -456,34 +453,25 @@ export class CatExamSecurityService {
         }
 
         this.warningInterval = setInterval(() => {
-            this.warningCountdown.update((count) => {
-                const newCount = count - 1
-                // Update currentMouseAwayDuration as countdown decrements
-                this.currentMouseAwayDuration++
-                return newCount
-            })
+            this.warningCountdown.update((count) => count - 1)
 
             if (this.warningCountdown() <= 0) {
                 clearInterval(this.warningInterval)
-                // this.lastViolationReason.set(
-                //     'Mouse keluar dari area ujian terlalu lama',
-                // )
-                // Send final mouse away duration - backend will trigger auto-submit via error response
                 if (this.mouseAwayStartTime) {
-                    const duration = Math.round(
+                    const duration = Math.floor(
                         (Date.now() - this.mouseAwayStartTime) / 1000,
                     )
                     if (duration > 0) {
                         this.sendMouseAway(duration)
+                        this.currentMouseAwayDuration += duration
                     }
+                    this.mouseAwayStartTime = undefined
                 }
             }
         }, 1000)
     }
 
     handleFullscreenExit() {
-        // Check if we're actually exiting fullscreen (not entering it)
-        // document.fullscreenElement is null when NOT in fullscreen
         if (!document.fullscreenElement) {
             this._isFullscreen.set(false)
 
@@ -493,30 +481,27 @@ export class CatExamSecurityService {
         } else {
             this._isFullscreen.set(true)
         }
-        // If document.fullscreenElement exists, user is entering fullscreen - no violation needed
     }
+
     /**
      * Pause warning countdown (when user returns to exam area)
      * Does NOT reset the countdown - preserves the current value
      */
     private pauseWarningCountdown() {
-        if (this.mouseAwayStartTime) {
-            const duration = Math.round(
-                (Date.now() - this.mouseAwayStartTime) / 1000,
-            )
-            // Only send if duration is at least 1 second to prevent desynchronization
-            // from sub-second mouse movements
-            if (duration >= 1) {
-                this.sendMouseAway(duration)
-                // No need to manually decrement warningCountdown here
-                // The interval already handles the countdown decrement in real-time
-                // and updates currentMouseAwayDuration
-            }
-            this.mouseAwayStartTime = undefined
-        }
-
         if (this.warningInterval) {
             clearInterval(this.warningInterval)
+        }
+
+        if (this.mouseAwayStartTime) {
+            const duration = Math.floor(
+                (Date.now() - this.mouseAwayStartTime) / 1000,
+            )
+
+            if (duration >= 1) {
+                this.sendMouseAway(duration)
+                this.currentMouseAwayDuration += duration
+            }
+            this.mouseAwayStartTime = undefined
         }
     }
 
@@ -525,7 +510,6 @@ export class CatExamSecurityService {
         remark: string = 'Cursor keluar area ujian',
     ) {
         if (!this.examScheduleId) return
-        this.currentMouseAwayDuration += numOfSeconds
         this.api
             .postData(`/api/v1/exam/mouse_away/${this.examScheduleId}`, {
                 numOfSeconds: numOfSeconds,
@@ -643,7 +627,6 @@ export class CatExamSecurityService {
     clearViolations() {
         this.clearViolationCount()
         this.clearWarningCountdown()
-        // Clear IndexedDB queue for this exam
         if (this.examScheduleId) {
             this.queueService.clearQueue(this.examScheduleId)
         }
