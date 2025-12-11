@@ -117,7 +117,7 @@ export class CatPageComponent {
         this.activateRoute.paramMap.pipe(take(1)).subscribe((params) => {
             this.examScheduleId = params.get('examScheduleId')
             this.securityService.initializeSecurity(() =>
-                this.submitAnswer(false),
+                this.handleFinishExam(),
             )
             this.getRoomUkom()
         })
@@ -135,19 +135,6 @@ export class CatPageComponent {
 
     @HostListener('window:beforeunload', ['$event'])
     onBeforeUnload(event: BeforeUnloadEvent) {
-        // Check if this is a tab close (not a reload)
-        const isReload =
-            (event.currentTarget as Window)?.performance?.navigation?.type === 1
-
-        if (!isReload && !this.isSubmitted()) {
-            // User is closing the tab - send beacon
-            this.securityService.sendTabCloseBeacon(
-                this.EXAM_TYPE,
-                this.roomUkom.id,
-                this.pesertaUkom.id,
-            )
-        }
-
         this.securityService.markUnloading()
     }
 
@@ -226,6 +213,13 @@ export class CatPageComponent {
             })
     }
 
+    handleFinishExam() {
+        this.securityService.clearViolations()
+        this.securityService.markSubmitted()
+        this.securityService.exitFullScreen()
+        this.router.navigate(['/'])
+    }
+
     submitAfterSave(questionId: string) {
         this.answerService
             .saveAndSubmitExam(
@@ -261,6 +255,7 @@ export class CatPageComponent {
                 next: () => {
                     this.securityService.clearViolations()
                     this.securityService.markSubmitted()
+                    this.securityService.exitFullScreen()
                     this.router.navigate(['/'])
                 },
                 error: (err) => {
