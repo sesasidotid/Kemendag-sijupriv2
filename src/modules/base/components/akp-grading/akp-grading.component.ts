@@ -28,7 +28,6 @@ interface Option {
     selector: 'app-akp-grading',
     standalone: true,
     imports: [
-        RouterLink,
         ReactiveFormsModule,
         CommonModule,
         EmptyStateComponent,

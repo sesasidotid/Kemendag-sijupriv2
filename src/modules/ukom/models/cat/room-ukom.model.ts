@@ -28,4 +28,5 @@ export interface ExamScheduleDtoList {
     endTime: string
     examTypeCode: string
     roomUkomId: string
+    duration: number
 }

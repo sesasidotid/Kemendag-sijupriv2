@@ -12,3 +12,13 @@ export class ExamType extends Serializable {
         if (object) this.fromObject(object)
     }
 }
+
+export enum ExamTypeCategory {
+    CAT = 'CAT',
+    WAWANCARA = 'WAWANCARA',
+    SEMINAR = 'SEMINAR',
+    PRAKTIK = 'PRAKTIK',
+    MAKALA = 'MAKALA',
+    PORTOFOLIO = 'PORTOFOLIO',
+    MAKALAH = 'MAKALAH',
+}

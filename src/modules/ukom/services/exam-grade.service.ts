@@ -11,14 +11,14 @@ export class ExamGradeService {
     apiService = inject(ApiService)
     constructor() {}
 
-    getExamGradeByCodeAndParticipantId(
-        examCode: string,
-        participantId: string,
-    ) {
-        return this.apiService.getData(
-            `${this.BASE_PATH}/${examCode}/${participantId}`,
-        )
-    }
+    // getExamGradeByCodeAndParticipantId(
+    //     examCode: string,
+    //     participantId: string,
+    // ) {
+    //     return this.apiService.getData(
+    //         `${this.BASE_PATH}/${examCode}/${participantId}`,
+    //     )
+    // }
 
     getExamGradeByExamScheduleIdAndParticipantId(
         examScheduleId: string,

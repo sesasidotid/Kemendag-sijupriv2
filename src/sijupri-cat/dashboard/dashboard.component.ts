@@ -33,6 +33,7 @@ import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
 import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-competency.model'
 import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedule.pipe'
+import { ExamDurationPipe } from '@/modules/ukom/pipes/exam-duration.pipe'
 
 @Component({
     selector: 'app-dashboard',
@@ -43,6 +44,7 @@ import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedul
         EmptyStateComponent,
         LoadingButtonComponent,
         FormatExamSchedulePipe,
+        ExamDurationPipe,
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',

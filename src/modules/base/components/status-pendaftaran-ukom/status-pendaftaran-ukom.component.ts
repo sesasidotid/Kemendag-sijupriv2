@@ -1,4 +1,3 @@
-import { FilePreviewComponent } from './../file-preview/file-preview.component'
 import { Component } from '@angular/core'
 import { UkomTaskDetail } from '../../../ukom/models/ukom-task-detail.modal'
 import {
@@ -28,7 +27,6 @@ import { SafeUrl } from '@angular/platform-browser'
 import { EmptyStateComponent } from '../empty-state/empty-state.component'
 import { LandingPageComponent } from '../../../landing-page/landing-page.component'
 import { CATScore } from '../../../ukom/models/cat/cat-score'
-import { DataDokumenUkom } from '../../../../modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { HandlerService } from '../../services/handler.service'
@@ -41,6 +39,8 @@ import { UkomGrade } from '../../../ukom/models/ukom-grade'
 import { UkomGradeTableComponent } from '../ukom-grade-table/ukom-grade-table.component'
 import { KinerjaService } from '@/modules/complement/services/kinerja.service'
 import { ReplaceUkomWordPipe } from '../../pipes/replace-ukom-word.pipe'
+import { NonJFParticipant } from '@/modules/base/models/nonjf-participant.model'
+import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
@@ -76,10 +76,10 @@ export class StatusPendaftaranUkomComponent {
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
 
-    finishTask: UkomTaskDetail = new UkomTaskDetail()
+    finishTask = new UkomTaskDetail()
     CATScore: CATScore = new CATScore()
     isCATModalOpen$ = new BehaviorSubject<boolean>(false)
-    dataDokumenUkom: DataDokumenUkom[] = []
+    dataDokumenUkom: DokumenUkom[] = []
 
     fileHandlerData: FIleHandler = {
         files: {},
@@ -176,7 +176,6 @@ export class StatusPendaftaranUkomComponent {
                     if (this.key) {
                         this.getPendingTask(this.key)
                     } else {
-                        console.error('No ID found in route parameters')
                         this.handlerService.handleAlert(
                             'Error',
                             'ID tidak ditemukan dalam parameter route',
@@ -340,13 +339,13 @@ export class StatusPendaftaranUkomComponent {
         return predikat ? predikat.name : '-'
     }
 
-    getPendingTask(key: string): void {
+    getPendingTask(key: string) {
         this.isLoadingPendingTask$.next(true)
 
         this.apiService
             .getData(`/api/v1/participant_ukom_detail?key=${key}`)
             .pipe(
-                tap((response: any) => {
+                tap((response: NonJFParticipant) => {
                     this.getPendidikanList(response.data.pendidikanTerakhirCode)
                     if (response.data.provinsiId) {
                         this.getProvinsiNameByCode(response.data.provinsiId)
@@ -369,9 +368,9 @@ export class StatusPendaftaranUkomComponent {
                     )
                     this.participantId = response.data.id
                 }),
-                tap((response: any) => {
+                tap((response: NonJFParticipant) => {
                     if (response.status === 'pending') {
-                        this.registrationStatus = 'pending'
+                        this.registrationStatus = response.status
                         this.pendingTask = response.data
 
                         const step =
@@ -388,7 +387,7 @@ export class StatusPendaftaranUkomComponent {
                     }
 
                     if (response.status === 'finish') {
-                        this.registrationStatus = 'finish'
+                        this.registrationStatus = response.status
                         this.finishTask = response.data
                         this.dataDokumenUkom = response.data.documentUkomList
                         this.mapDokumenUkom()
@@ -396,9 +395,9 @@ export class StatusPendaftaranUkomComponent {
                     }
 
                     if (response.status === 'failed') {
-                        this.registrationStatus = 'failed'
+                        this.registrationStatus = response.status
                         this.finishTask = response.data
-                        this.dataDokumenUkom = response.data.dokumenUkomList
+                        this.dataDokumenUkom = response.data.documentUkomList
                         this.mapDokumenUkom()
                     }
                 }),

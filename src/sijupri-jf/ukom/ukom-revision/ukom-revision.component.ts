@@ -67,26 +67,27 @@ export class UkomRevisionComponent {
     constructor(
         private confirmationService: ConfirmationService,
         public ukomParticipantService: UkomParticipantService,
-    ) { }
+    ) {}
 
     ngOnInit() {
         this.loadRejectedDokumen()
     }
 
     loadRejectedDokumen() {
-        if (!this.pendingTask?.dokumenUkomList?.length) return
+        if (!this.pendingTask?.documentUkomList?.length) return
 
-        this.rejectedDokumen = this.pendingTask.dokumenUkomList
-            .filter(d => d.dokumenStatus.toLowerCase() === 'reject')
+        this.rejectedDokumen = this.pendingTask.documentUkomList.filter(
+            (d) => d.dokumenStatus.toLowerCase() === 'reject',
+        )
 
         this.inputs.files = Object.fromEntries(
-            this.rejectedDokumen.map(d => [
+            this.rejectedDokumen.map((d) => [
                 d.dokumenPersyaratanId,
                 {
                     label: d.dokumenPersyaratanName || 'Unknown Document',
                     remark: d.remark,
-                }
-            ])
+                },
+            ]),
         )
     }
 
@@ -118,16 +119,18 @@ export class UkomRevisionComponent {
             if (this.detectedDokumen.hasOwnProperty(key)) {
                 const detected = this.detectedDokumen[key]
 
-                const existingDokumen = this.pendingTask.dokumenUkomList.find(
+                const existingDokumen = this.pendingTask.documentUkomList.find(
                     (dokumen) => dokumen.dokumenPersyaratanId === key,
                 )
 
                 if (existingDokumen) {
                     const newDoc = {
                         dokumenFile: detected.base64,
-                        dokumenPersyaratanName: `${this.jf.nip
-                            }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName
-                            }`,
+                        dokumenPersyaratanName: `${
+                            this.jf.nip
+                        }_dokumenPersyaratanUkom_${Date.now()}_${
+                            existingDokumen.dokumenPersyaratanName
+                        }`,
                         dokumenPersyaratanId:
                             existingDokumen.dokumenPersyaratanId,
                     }

@@ -21,7 +21,6 @@ import { Task } from '@/modules/workflow/models/task.model'
 import { NonJFParticipantUkomTask } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
 import { PangkatService } from '@/modules/maintenance/services/pangkat.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
-import { DokumenUkomList } from '@/modules/ukom/models/ukom-task-detail.modal'
 import { LoadingButtonComponent } from '../loading-button/loading-button.component'
 import { FormValidationService } from '../../services/form-validation.service'
 import { JenisInstansiService } from '@/modules/complement/services/jenis-instansi.service'
@@ -31,6 +30,7 @@ import { ProvinsiService } from '@/modules/maintenance/services/provinsi.service
 import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 import { Provinsi } from '@/modules/maintenance/models/provinsi.model'
 import { KabKota } from '@/modules/maintenance/models/kab-kota.model'
+import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
 @Component({
     selector: 'app-nonjf-revisi-ukom',
     standalone: true,
@@ -50,7 +50,7 @@ export class NonjfRevisiUkomComponent {
     @Input() pendingTask = new UkomTaskDetail()
     @Input() key: string = ''
     revisedDokumen = new Task()
-    rejectedDokumen: DokumenUkomList[] = []
+    rejectedDokumen: DokumenUkom[] = []
     detectedDokumen: Record<
         string,
         {
@@ -99,7 +99,7 @@ export class NonjfRevisiUkomComponent {
         public pendidikanService: PendidikanService,
         private provinsiService: ProvinsiService,
         private kabKotaService: KabKotaService,
-    ) { }
+    ) {}
 
     ngOnInit() {
         this.initForm()
@@ -121,7 +121,6 @@ export class NonjfRevisiUkomComponent {
             this.showForm = true
         }
     }
-
 
     getErrorMessage(controlName: string, label: string): string | null {
         const control = this.updateNonJFForm.get(controlName)
@@ -240,19 +239,20 @@ export class NonjfRevisiUkomComponent {
     }
 
     loadRejectedDokumen() {
-        if (!this.pendingTask?.dokumenUkomList?.length) return
+        if (!this.pendingTask?.documentUkomList?.length) return
 
-        this.rejectedDokumen = this.pendingTask.dokumenUkomList
-            .filter(d => d.dokumenStatus.toLowerCase() === 'reject')
+        this.rejectedDokumen = this.pendingTask.documentUkomList.filter(
+            (d) => d.dokumenStatus.toLowerCase() === 'reject',
+        )
 
         this.inputs.files = Object.fromEntries(
-            this.rejectedDokumen.map(d => [
+            this.rejectedDokumen.map((d) => [
                 d.dokumenPersyaratanId,
                 {
                     label: d.dokumenPersyaratanName || 'Unknown Document',
                     remark: d.remark,
-                }
-            ])
+                },
+            ]),
         )
     }
 
@@ -273,7 +273,6 @@ export class NonjfRevisiUkomComponent {
         })
     }
 
-
     onSave() {
         if (!Array.isArray(this.pesertaUkom.dokumenUkomList)) {
             this.pesertaUkom.dokumenUkomList = []
@@ -285,15 +284,16 @@ export class NonjfRevisiUkomComponent {
             if (this.detectedDokumen.hasOwnProperty(key)) {
                 const detected = this.detectedDokumen[key]
 
-                const existingDokumen = this.pendingTask.dokumenUkomList.find(
+                const existingDokumen = this.pendingTask.documentUkomList.find(
                     (dokumen) => dokumen.dokumenPersyaratanId === key,
                 )
 
                 if (existingDokumen) {
                     const newDoc = {
                         dokumenFile: detected.base64,
-                        dokumenPersyaratanName: `${this.pendingTask.nip
-                            }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName}`,
+                        dokumenPersyaratanName: `${
+                            this.pendingTask.nip
+                        }_dokumenPersyaratanUkom_${Date.now()}_${existingDokumen.dokumenPersyaratanName}`,
                         dokumenPersyaratanId:
                             existingDokumen.dokumenPersyaratanId,
                     }

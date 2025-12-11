@@ -1,5 +1,6 @@
 import { Serializable } from '@/modules/base/commons/serializable'
 import { RoomUkom } from './room-ukom.model'
+import { DokumenUkom } from '../ukom-registration-refactored/document.model'
 
 export class Participant extends Serializable {
     id: string = undefined
@@ -72,6 +73,7 @@ export class Participant extends Serializable {
     ukomBanDto: any = undefined
     roomUkomDto: RoomUkom = undefined
 
+    documentUkomList: DokumenUkom[] = undefined
     constructor(object?: { [key: string]: any }) {
         super()
 

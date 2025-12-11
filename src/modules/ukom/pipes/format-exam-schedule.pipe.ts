@@ -19,9 +19,6 @@ export class FormatExamSchedulePipe implements PipeTransform {
         const startTime = this.datePipe.transform(startDate, 'HH.mm')
         const endTime = this.datePipe.transform(endDate, 'HH.mm')
 
-        const durationMs = endDate.getTime() - startDate.getTime()
-        const durationMinutes = Math.floor(durationMs / 60000)
-
-        return `${dateString}, pukul : ${startTime} - ${endTime} ( Durasi : ${durationMinutes} menit )`
+        return `${dateString}, pukul : ${startTime} - ${endTime}`
     }
 }

@@ -1,3 +1,19 @@
 {
-    "console-ninja.enabled": false
+    "console-ninja.enabled": false,
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/dist/**": true,
+        "**/out/**": true,
+        "**/.git/**": true
+    },
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/out": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true
+    },
+    "angular.language-service.tsconfig": "tsconfig.vscode.json"
 }

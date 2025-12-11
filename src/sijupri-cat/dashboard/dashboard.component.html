@@ -8,7 +8,6 @@
 
 <ng-template #dashboardContent>
     <section>
-        <!-- Room Information -->
         <div class="card shadow-sm border-0 mb-4" *ngIf="roomUkom.id">
             <div class="card-body">
                 <h3 class="card-title mb-2 fw-semibold text-primary">
@@ -42,7 +41,6 @@
             </div>
         </div>
 
-        <!-- Exam Schedule -->
         <ng-container *ngIf="roomUkom?.examScheduleDtoList.length > 0; else emptyState">
             <div class="accordion" id="examAccordion">
                 <div class="accordion-item" *ngFor="let exam of roomUkom.examScheduleDtoList; let i = index">
@@ -59,7 +57,8 @@
                         <div class="accordion-body">
                             <p>
                                 <strong>Jadwal:</strong>
-                                {{ exam.startTime | formatExamSchedule: exam.endTime }}
+                                {{ exam.startTime | formatExamSchedule: exam.endTime }} (Durasi:
+                                {{ exam.duration | examDuration}})
                             </p>
 
                             <div class="d-flex align-items-end gap-2 flex-sm-row flex-column">

@@ -27,7 +27,7 @@ export class AuthService {
                     'Basic c2lqdXByaS13ZWI6c2lqdXByaS13ZWJQQHNzdzByZA==',
             })
             .pipe(
-                map((response: any) => new AuthResponse(response)),
+                map((response) => new AuthResponse(response)),
                 catchError((error) => {
                     throw error
                 }),
@@ -45,7 +45,25 @@ export class AuthService {
                     'Basic c2l1a29tLXBhcnRpY2lwYW50OnNpdWtvbS1wYXJ0aWNpcGFudFBAc3N3MHJk',
             })
             .pipe(
-                map((response: any) => new AuthResponse(response)),
+                map((response) => new AuthResponse(response)),
+                catchError((error) => {
+                    throw error
+                }),
+            )
+    }
+
+    loginExaminer(auth: Auth): Observable<AuthResponse> {
+        auth.grantType = 'password'
+        auth.channel_code = 'WEB'
+        auth.deviceId = this.deviceService.getDeviceId()
+
+        return this.apiService
+            .auth(this.BASE_PATH, auth, {
+                Authorization:
+                    'Basic c2l1a29tLWV4YW1pbmVyOnNpdWtvbS1leGFtaW5lclBAc3N3MHJk',
+            })
+            .pipe(
+                map((response) => new AuthResponse(response)),
                 catchError((error) => {
                     throw error
                 }),
