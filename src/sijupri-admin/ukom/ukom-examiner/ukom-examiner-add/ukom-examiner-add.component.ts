@@ -1,20 +1,21 @@
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Output } from '@angular/core'
+import { Component, EventEmitter, inject, Output } from '@angular/core'
 import { LucideAngularModule } from 'lucide-angular'
 import {
     FormControl,
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { BehaviorSubject } from 'rxjs'
-import { Router, RouterLink } from '@angular/router'
+import { BehaviorSubject, finalize } from 'rxjs'
+import { Router } from '@angular/router'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { ExaminerUkom } from '../../../../modules/ukom/models/examiner.model'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
 
 @Component({
     selector: 'app-ukom-examiner-add',
@@ -24,12 +25,13 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         FormsModule,
         LucideAngularModule,
         ReactiveFormsModule,
-        LoadingButtonComponent
+        LoadingButtonComponent,
     ],
     templateUrl: './ukom-examiner-add.component.html',
-    styleUrl: './ukom-examiner-add.component.scss'
+    styleUrl: './ukom-examiner-add.component.scss',
 })
 export class UkomExaminerAddComponent {
+    formValidationService = inject(FormValidationService)
     @Output() changeTabActive: EventEmitter<any> = new EventEmitter()
 
     examinerForm: FormGroup
@@ -37,18 +39,27 @@ export class UkomExaminerAddComponent {
 
     examinerData: ExaminerUkom = new ExaminerUkom()
 
-    constructor (
+    constructor(
         private confirmationService: ConfirmationService,
         private router: Router,
         private apiService: ApiService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handleFormInit()
     }
 
-    handleFormInit () {
+    getErrorMessage(controlName: string, label: string): string | null {
+        const control = this.examinerForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label,
+        )
+    }
+
+    handleFormInit() {
         this.examinerForm = new FormGroup({
             name: new FormControl('', Validators.required),
             nip: new FormControl('', Validators.required),
@@ -56,13 +67,13 @@ export class UkomExaminerAddComponent {
             password: new FormControl('', [Validators.required]),
             confirmPassword: new FormControl('', [
                 Validators.required,
-                this.passwordMatchValidator.bind(this)
-            ])
+                this.passwordMatchValidator.bind(this),
+            ]),
         })
     }
 
-    passwordMatchValidator (
-        control: FormControl
+    passwordMatchValidator(
+        control: FormControl,
     ): { [key: string]: boolean } | null {
         if (this.examinerForm) {
             const password = this.examinerForm.get('password')?.value
@@ -74,10 +85,12 @@ export class UkomExaminerAddComponent {
         return null
     }
 
-    submit () {
+    submit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
+
+                this.submitLoading$.next(true)
 
                 this.examinerData.name = this.examinerForm.get('name').value
                 this.examinerData.nip = this.examinerForm.get('nip').value
@@ -86,31 +99,27 @@ export class UkomExaminerAddComponent {
                 this.examinerData.password =
                     this.examinerForm.get('password').value
 
-                console.log('examinerData', this.examinerData)
-
                 this.apiService
                     .postData('/api/v1/examiner_ukom', this.examinerData)
+                    .pipe(finalize(() => this.submitLoading$.next(false)))
                     .subscribe({
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Data berhasil disimpan'
+                                'Berhasil membuat penguji baru',
                             )
-                            this.changeTabActive.emit(0)
-                            this.submitLoading$.next(false)
+                            this.examinerForm.reset()
+                            // this.changeTabActive.emit(0)
                         },
-                        error: () => {
+                        error: (err) => {
+                            console.error(err)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Data gagal disimpan'
+                                'Gagal membuat penguji baru',
                             )
-                            this.submitLoading$.next(false)
                         },
-                        complete: () => {
-                            this.router.navigate(['/ukom/ukom-examiner-list'])
-                        }
                     })
-            }
+            },
         })
     }
 }

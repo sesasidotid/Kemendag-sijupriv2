@@ -1,10 +1,10 @@
 import { Component, inject, signal, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import {
-    FormsModule,
-    Validators,
-    ReactiveFormsModule,
     FormBuilder,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators,
 } from '@angular/forms'
 import { Auth } from '../../models/auth.model'
 import { AuthService } from '../../services/auth.service'
@@ -13,14 +13,15 @@ import { LoginContext } from '../../../base/commons/login-context'
 import { Router, RouterModule } from '@angular/router'
 import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
 import {
-    RecaptchaModule,
     RecaptchaComponent,
     RecaptchaFormsModule,
+    RecaptchaModule,
 } from 'ng-recaptcha'
-import { environment } from '../../../../environments/environment'
+import { environment } from '@/environments/environment'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { finalize } from 'rxjs'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+
 @Component({
     selector: 'app-login-cat',
     standalone: true,
@@ -48,6 +49,7 @@ export class LoginCatComponent {
         message: '',
     })
     recaptchaSiteKey = environment.recaptcha.siteKey
+    selectedRole = signal<'participant' | 'examiner'>('participant')
 
     readonly Eye = Eye
     readonly EyeOff = EyeOff
@@ -92,6 +94,11 @@ export class LoginCatComponent {
         this.isPasswordVisible = !this.isPasswordVisible
     }
 
+    selectRole(role: 'participant' | 'examiner'): void {
+        this.selectedRole.set(role)
+        this.loginMessage.set({ status: '', message: '' })
+    }
+
     onSubmit() {
         this.isLoginLoading.set(true)
         this.auth = new Auth({
@@ -99,8 +106,12 @@ export class LoginCatComponent {
             password: this.loginForm.value.password,
         })
 
-        this.authService
-            .loginCAT(this.auth)
+        const loginObservable =
+            this.selectedRole() === 'examiner'
+                ? this.authService.loginExaminer(this.auth)
+                : this.authService.loginCAT(this.auth)
+
+        loginObservable
             .pipe(
                 finalize(() => {
                     this.isLoginLoading.set(false)

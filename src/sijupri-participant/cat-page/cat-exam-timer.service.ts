@@ -31,7 +31,7 @@ export class CatExamTimerService {
     ) {
         this.onTimeExpiredCallback = onTimeExpired
 
-        if (!examEndTime || !startAt || !duration) {
+        if (!examEndTime || !startAt || duration == null) {
             console.error('Missing required parameters for countdown')
             return
         }
@@ -51,6 +51,8 @@ export class CatExamTimerService {
             this.triggerTimeExpired()
             return
         }
+
+        //test copilot
 
         this.remainingTime.set(this.formatTime(initialTimeLeft))
         this.remainingSeconds.set(Math.floor(initialTimeLeft / 1000))

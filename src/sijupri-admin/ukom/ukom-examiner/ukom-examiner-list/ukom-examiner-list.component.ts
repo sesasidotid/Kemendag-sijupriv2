@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
@@ -10,7 +10,7 @@ import { PagableComponent } from '../../../../modules/base/components/pagable/pa
 import { CommonModule } from '@angular/common'
 import { BehaviorSubject } from 'rxjs'
 import { TabService } from '../../../../modules/base/services/tab.service'
-import { Router, RouterLink } from '@angular/router'
+import { Router } from '@angular/router'
 import { UkomExaminerAddComponent } from '../ukom-examiner-add/ukom-examiner-add.component'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
@@ -24,6 +24,8 @@ import {
     Validators,
 } from '@angular/forms'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+
 @Component({
     selector: 'app-ukom-examiner-list',
     standalone: true,
@@ -34,13 +36,13 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         ModalComponent,
         FormsModule,
         ReactiveFormsModule,
-        LoadingButtonComponent
+        LoadingButtonComponent,
     ],
     templateUrl: './ukom-examiner-list.component.html',
     styleUrl: './ukom-examiner-list.component.scss',
 })
 export class UkomExaminerListComponent {
-    tab$ = new BehaviorSubject<number | null>(0)
+    formValidationService = inject(FormValidationService)
     pagable: Pagable
     refreshToggle: boolean = false
 
@@ -49,7 +51,7 @@ export class UkomExaminerListComponent {
     isLoading$ = new BehaviorSubject<boolean>(false)
 
     constructor(
-        private tabService: TabService,
+        public tabService: TabService,
         private router: Router,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
@@ -62,6 +64,15 @@ export class UkomExaminerListComponent {
         this.handlePagable()
     }
 
+    getErrorMessage(controlName: string, label: string): string | null {
+        const control = this.editExaminerForm.get(controlName)
+        return this.formValidationService.getErrorMessage(
+            control,
+            controlName,
+            label,
+        )
+    }
+
     handleTabService() {
         if (this.tabService.getTabsLength() > 0) {
             this.tabService.clearTabs()
@@ -69,13 +80,13 @@ export class UkomExaminerListComponent {
 
         this.tabService
             .addTab({
-                label: 'Daftar Examiner',
+                label: 'Daftar Penguji',
                 isActive: true,
                 icon: 'mdi-list-box',
                 onClick: () => this.handleTabChange(0),
             })
             .addTab({
-                label: 'Tambah Examiner',
+                label: 'Tambah Penguji',
                 icon: 'mdi-plus-circle',
                 onClick: () => this.handleTabChange(1),
             })
@@ -127,6 +138,7 @@ export class UkomExaminerListComponent {
             jenis_kelamin_code: new FormControl('', Validators.required),
         })
     }
+
     setDefaultFormValues(data: any) {
         console.log('data', data)
         this.editExaminerForm.patchValue({
@@ -138,8 +150,6 @@ export class UkomExaminerListComponent {
     }
 
     handleTabChange(tab?: number) {
-        console.log('tab', tab)
-        this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
     }
 

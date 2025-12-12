@@ -51,6 +51,7 @@ export class CatExamSecurityService {
     // Translation Detection
     readonly isTranslated = signal(false)
     private translationObserver?: MutationObserver
+
     private isMouseTrackingReady = false
 
     constructor() {
@@ -291,6 +292,7 @@ export class CatExamSecurityService {
                             this.queueService.removeViolations(
                                 this.examScheduleId,
                                 1,
+
                             )
                         }
                         resolve()

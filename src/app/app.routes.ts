@@ -129,8 +129,16 @@ function getMenus() {
             return {
                 path: '',
                 loadChildren: () =>
-                    import('../sijupri-cat/sijupri-cat.module').then(
+                    import('@/sijupri-participant/sijupri-cat.module').then(
                         (m) => m.SijupriCAtModule,
+                    ),
+            }
+        case 'siukom-examiner':
+            return {
+                path: '',
+                loadChildren: () =>
+                    import('@/sijupri-examiner/sijupri-examiner.module').then(
+                        (m) => m.SijupriExaminerModule,
                     ),
             }
         default:
