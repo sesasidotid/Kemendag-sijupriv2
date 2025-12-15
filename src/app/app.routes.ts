@@ -129,16 +129,16 @@ function getMenus() {
             return {
                 path: '',
                 loadChildren: () =>
-                    import('@/siukom-participant/sijupri-cat.module').then(
-                        (m) => m.SijupriCAtModule,
+                    import('@/siukom-participant/siukom-cat.module').then(
+                        (m) => m.SiukomCatModule,
                     ),
             }
         case 'siukom-examiner':
             return {
                 path: '',
                 loadChildren: () =>
-                    import('@/siukom-examiner/sijupri-examiner.module').then(
-                        (m) => m.SijupriExaminerModule,
+                    import('@/siukom-examiner/siukom-examiner.module').then(
+                        (m) => m.SiukomExaminerModule,
                     ),
             }
         default:

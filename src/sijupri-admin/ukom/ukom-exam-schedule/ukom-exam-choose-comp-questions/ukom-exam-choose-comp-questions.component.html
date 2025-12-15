@@ -11,43 +11,47 @@
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
 
-    <section class="d-flex flex-column gap-4 py-2">
-        <div>
-            <label class="form-label text-muted">Nama Kelas</label>
-            <div class="fs-5 fw-semibold">{{ roomUkomDetail.name }}</div>
-        </div>
-
-        <div>
-            <label class="form-label text-muted">Waktu Mulai</label>
-            <div class="fs-5 fw-semibold">
-                {{ examDetail.startTime | tanggalWaktuIndo }}
+    <section class="d-flex flex-column gap-4">
+        <section class="d-flex flex-column gap-4">
+            <div>
+                <label class="form-label text-muted">Nama Kelas</label>
+                <div class="fs-5 fw-semibold">{{ roomUkomDetail.name }}</div>
             </div>
-        </div>
 
-        <div>
-            <label class="form-label text-muted">Waktu Selesai</label>
-            <div class="fs-5 fw-semibold">
-                {{ examDetail.endTime | tanggalWaktuIndo }}
+            <div>
+                <label class="form-label text-muted">Waktu Mulai</label>
+                <div class="fs-5 fw-semibold">
+                    {{ examDetail.startTime | tanggalWaktuIndo }}
+                </div>
             </div>
-        </div>
 
-        <div>
-            <label class="form-label text-muted">Jenis Ujian</label>
-            <div class="fs-5 fw-semibold">{{ examDetail.examTypeCode }}</div>
-        </div>
+            <div>
+                <label class="form-label text-muted">Waktu Selesai</label>
+                <div class="fs-5 fw-semibold">
+                    {{ examDetail.endTime | tanggalWaktuIndo }}
+                </div>
+            </div>
+
+            <div>
+                <label class="form-label text-muted">Jenis Ujian</label>
+                <div class="fs-5 fw-semibold">
+                    {{ examDetail.examTypeCode }}
+                </div>
+            </div>
+        </section>
+
+        <ng-container *ngIf="typeUkom === 'CAT'">
+            <app-ukom-exam-cat
+                [roomUkomDetail]="roomUkomDetail"
+                [examDetail]="examDetail"
+            ></app-ukom-exam-cat>
+        </ng-container>
+
+        <ng-container *ngIf="typeUkom === 'MAKALAH'">
+            <app-ukom-exam-makalah
+                [roomUkomDetail]="roomUkomDetail"
+                [examDetail]="examDetail"
+            ></app-ukom-exam-makalah>
+        </ng-container>
     </section>
-
-    <ng-container *ngIf="typeUkom === 'CAT'">
-        <app-ukom-exam-cat
-            [roomUkomDetail]="roomUkomDetail"
-            [examDetail]="examDetail"
-        ></app-ukom-exam-cat>
-    </ng-container>
-
-    <ng-container *ngIf="typeUkom === 'MAKALAH'">
-        <app-ukom-exam-makalah
-            [roomUkomDetail]="roomUkomDetail"
-            [examDetail]="examDetail"
-        ></app-ukom-exam-makalah>
-    </ng-container>
 </ng-template>

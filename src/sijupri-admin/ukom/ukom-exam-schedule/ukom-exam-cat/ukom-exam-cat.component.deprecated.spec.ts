@@ -11,7 +11,7 @@ describe('UkomExamCatComponent', () => {
       imports: [UkomExamCatComponent]
     })
     .compileComponents();
-
+    
     fixture = TestBed.createComponent(UkomExamCatComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
