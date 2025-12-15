@@ -7,8 +7,10 @@ export class CreateExamScheduleRequest extends Serializable {
     examTypeCode: string = undefined
     duration: number = undefined
     secretKey: string | undefined = undefined
+    participantIdList: string[] = []
+    examinerIdList: string[] = []
 
-    constructor(object: { [key: string]: string | number }) {
+    constructor(object: { [key: string]: any }) {
         super()
         if (object) this.fromObject(object)
     }

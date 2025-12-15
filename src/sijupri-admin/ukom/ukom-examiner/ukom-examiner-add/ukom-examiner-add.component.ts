@@ -8,12 +8,12 @@ import {
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { BehaviorSubject, finalize } from 'rxjs'
 import { Router } from '@angular/router'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { ExaminerUkom } from '../../../../modules/ukom/models/examiner.model'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
+import { HandlerService } from '@/modules/base/services/handler.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 
@@ -94,7 +94,7 @@ export class UkomExaminerAddComponent {
 
                 this.examinerData.name = this.examinerForm.get('name').value
                 this.examinerData.nip = this.examinerForm.get('nip').value
-                this.examinerData.jenis_kelamin_code =
+                this.examinerData.jenisKelaminCode =
                     this.examinerForm.get('jenis_kelamin_code').value
                 this.examinerData.password =
                     this.examinerForm.get('password').value

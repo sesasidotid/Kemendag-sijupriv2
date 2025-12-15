@@ -1,24 +1,24 @@
-import { HandlerService } from './../../../../modules/base/services/handler.service'
-import { RoomUkomDetail } from './../../../../modules/ukom/models/room-ukom-detail'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 import { Component, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ExamDetail } from '../../../../modules/ukom/models/exam_detail'
 import { CommonModule } from '@angular/common'
 import {
     BehaviorSubject,
     combineLatest,
-    map,
-    take,
-    Observable,
     finalize,
-    tap,
+    map,
+    Observable,
+    take,
 } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { UkomExamCatComponent } from '../ukom-exam-cat/ukom-exam-cat.component'
 import { UkomExamMakalahComponent } from '../ukom-exam-makalah/ukom-exam-makalah.component'
-import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
+import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { UkomRoomService } from '@/modules/ukom/services/ukom-room.service'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
     standalone: true,
@@ -36,7 +36,7 @@ export class UkomExamChooseCompQuestionsComponent {
     ukomRoomService = inject(UkomRoomService)
     ukomExamScheduleService = inject(UkomExamScheduleService)
     roomUkomDetail = new RoomUkomDetail()
-    examDetail = new ExamDetail()
+    examDetail = new ExamSchedule()
 
     typeUkom: string
     isLoadingRoomDetail$: BehaviorSubject<boolean> =
@@ -117,15 +117,7 @@ export class UkomExamChooseCompQuestionsComponent {
             )
             .subscribe({
                 next: (res) => {
-                    if (Array.isArray(res)) {
-                        this.examDetail = res.find(
-                            (exam: ExamDetail) => exam.id === examId,
-                        )
-                    } else if (res instanceof ExamDetail) {
-                        this.examDetail = res
-                    } else {
-                        this.examDetail = null
-                    }
+                    this.examDetail = res.find((exam) => exam.id === examId)
                 },
                 error: (err) => {
                     console.error(err)

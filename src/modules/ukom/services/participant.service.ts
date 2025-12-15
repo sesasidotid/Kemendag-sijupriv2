@@ -4,17 +4,18 @@ import { ApiService } from '@/modules/base/services/api.service'
 import {
     BehaviorSubject,
     catchError,
+    finalize,
     map,
     Observable,
     of,
     throwError,
-    finalize,
 } from 'rxjs'
 import { NonJFParticipantUkomTask } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
 import { Task } from '@/modules/workflow/models/task.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { Participant } from '../models/cat/participant.model'
 import { ParticipantHistoryTask } from '../models/ukom-module-refactor/participant-history-task.model'
+
 @Injectable({
     providedIn: 'root',
 })
@@ -169,5 +170,11 @@ export class UkomParticipantService {
             : `${this.BASE_PATH}/search`
 
         return this.apiService.getData(fullPath)
+    }
+
+    getParticipantListByRoomUkomId(
+        roomUkomId: string,
+    ): Observable<Participant[]> {
+        return this.apiService.getData(`${this.BASE_PATH}/room/${roomUkomId}`)
     }
 }

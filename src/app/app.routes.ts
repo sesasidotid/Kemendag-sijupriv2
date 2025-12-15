@@ -129,7 +129,7 @@ function getMenus() {
             return {
                 path: '',
                 loadChildren: () =>
-                    import('@/sijupri-participant/sijupri-cat.module').then(
+                    import('@/siukom-participant/sijupri-cat.module').then(
                         (m) => m.SijupriCAtModule,
                     ),
             }
@@ -137,7 +137,7 @@ function getMenus() {
             return {
                 path: '',
                 loadChildren: () =>
-                    import('@/sijupri-examiner/sijupri-examiner.module').then(
+                    import('@/siukom-examiner/sijupri-examiner.module').then(
                         (m) => m.SijupriExaminerModule,
                     ),
             }

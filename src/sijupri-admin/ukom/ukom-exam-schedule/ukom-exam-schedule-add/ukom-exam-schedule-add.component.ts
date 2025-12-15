@@ -1,6 +1,6 @@
 import { CommonModule, Location } from '@angular/common'
-import { Component, inject, signal, ViewChild } from '@angular/core'
-import { LucideAngularModule, FilePlus } from 'lucide-angular'
+import { Component, inject, OnInit, signal } from '@angular/core'
+import { FilePlus, LucideAngularModule } from 'lucide-angular'
 import {
     FormBuilder,
     FormControl,
@@ -11,12 +11,12 @@ import {
 } from '@angular/forms'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { Router, ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { CreateExamScheduleRequest } from '@/modules/ukom/models/exam-schedule/create-exam-schedule-request.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { finalize } from 'rxjs/operators'
+import { finalize, map } from 'rxjs/operators'
 import { JenisUkom } from '@/modules/ukom/models/jenis-ukom'
 import {
     ActionColumnBuilder,
@@ -33,6 +33,17 @@ import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.
 import { DurationPipe } from '@/modules/base/pipes/duration.pipe'
 import { UkomExamScheduleUpdateComponent } from '../ukom-exam-schedule-update/ukom-exam-schedule-update.component'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import {
+    MultiSelectComponent,
+    MultiSelectOption,
+} from '@/modules/base/components/multi-select'
+import {
+    MultiSelectApiComponent,
+    MultiSelectApiParams,
+} from '@/modules/base/components/multi-select-api'
+import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
+import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
+
 @Component({
     selector: 'app-ukom-exam-schedule-add',
     standalone: true,
@@ -45,11 +56,13 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         UkomExamScheduleUpdateComponent,
         ModalComponent,
         LoadingButtonComponent,
+        MultiSelectComponent,
+        MultiSelectApiComponent,
     ],
     templateUrl: './ukom-exam-schedule-add.component.html',
     styleUrl: './ukom-exam-schedule-add.component.scss',
 })
-export class UkomExamScheduleAddComponent {
+export class UkomExamScheduleAddComponent implements OnInit {
     isUpdateModalOpen = false
     selectedExamSchedule: ExamSchedule
 
@@ -57,6 +70,8 @@ export class UkomExamScheduleAddComponent {
     tabService = inject(TabService)
     ukomExamScheduleService = inject(UkomExamScheduleService)
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
+    participantService = inject(UkomParticipantService)
+    examinerService = inject(UkomExaminerService)
     durationPipe = inject(DurationPipe)
 
     examScheduleForm: FormGroup
@@ -70,6 +85,8 @@ export class UkomExamScheduleAddComponent {
     refresh: boolean = false
 
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
+
+    participants: MultiSelectOption[] = []
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -86,9 +103,57 @@ export class UkomExamScheduleAddComponent {
         this.activatedRoute.paramMap.subscribe((params) => {
             this.id = params.get('id')
             this.initPagable()
+            this.getParticipantListOptions()
         })
         this.initTabs()
         this.initForm()
+    }
+
+    getParticipantListOptions() {
+        this.participantService
+            .getParticipantListByRoomUkomId(this.id)
+            .pipe(
+                map((participants) =>
+                    participants.map((p) => ({
+                        id: p.id,
+                        label: `${p.name} (${p.nip})`,
+                    })),
+                ),
+            )
+            .subscribe({
+                next: (options) => {
+                    this.participants = options
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat daftar peserta',
+                    )
+                },
+            })
+    }
+
+    fetchExaminers = (params: MultiSelectApiParams): Observable<any> => {
+        // Extract search value from dynamic param
+        const searchName = params['like_user|name'] || ''
+
+        return this.examinerService
+            .searchExaminer(params.limit, params.page, searchName)
+            .pipe(
+                map((response) => {
+                    if (response && response.data) {
+                        return {
+                            ...response,
+                            data: response.data.map((examiner) => ({
+                                id: examiner.id,
+                                label: examiner.user?.name || examiner.id,
+                            })),
+                        }
+                    }
+                    return response
+                }),
+            )
     }
 
     initTabs() {
@@ -140,6 +205,25 @@ export class UkomExamScheduleAddComponent {
         }
     }
 
+    examinerRequiredWhenNotCat() {
+        return (control: FormControl) => {
+            if (!control.parent) {
+                return null
+            }
+
+            const examType = control.parent.get('examTypeCode')?.value
+
+            if (
+                examType !== 'CAT' &&
+                (!control.value || control.value.length === 0)
+            ) {
+                return { required: true }
+            }
+
+            return null
+        }
+    }
+
     initForm() {
         this.examScheduleForm = this.fb.group({
             startTime: ['', Validators.required],
@@ -147,18 +231,23 @@ export class UkomExamScheduleAddComponent {
             examTypeCode: ['', Validators.required],
             duration: ['', Validators.required],
             secretKey: [null, this.catValidator()],
+            participantIdList: [null],
+            examinerIdList: [null, this.examinerRequiredWhenNotCat()],
         })
 
         this.examScheduleForm
             .get('examTypeCode')
             ?.valueChanges.subscribe((examType) => {
                 const secretKeyControl = this.examScheduleForm.get('secretKey')
+                const examinerControl =
+                    this.examScheduleForm.get('examinerIdList')
 
                 if (examType !== 'CAT') {
                     secretKeyControl?.setValue(null)
                 }
 
                 secretKeyControl?.updateValueAndValidity()
+                examinerControl?.updateValueAndValidity()
             })
     }
 
@@ -299,6 +388,13 @@ export class UkomExamScheduleAddComponent {
                 if (!result.confirmed) return
 
                 this.submitLoading.set(true)
+
+                if (
+                    this.examScheduleForm.getError('examTypeCode')?.value ===
+                    'CAT'
+                ) {
+                    this.examScheduleForm.get('examinerIdList').setValue([])
+                }
 
                 const request = new CreateExamScheduleRequest(
                     this.examScheduleForm.value,

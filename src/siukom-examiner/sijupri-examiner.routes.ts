@@ -5,7 +5,7 @@ export const routes: Routes = [
     {
         path: '',
         loadComponent: () =>
-            import('../sijupri-examiner/home/home.component').then(
+            import('@/siukom-examiner/home/home.component').then(
                 (m) => m.HomeComponent,
             ),
         canActivate: [authGuard],

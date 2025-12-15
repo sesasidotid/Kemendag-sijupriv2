@@ -71,7 +71,7 @@ export class Participant extends Serializable {
     unitKerjaName: string = undefined
     userId: string = undefined
     ukomBanDto: any = undefined
-    roomUkomDto: RoomUkom = undefined
+    roomUkomDto: RoomUkom | undefined = undefined
 
     documentUkomList: DokumenUkom[] = undefined
     constructor(object?: { [key: string]: any }) {

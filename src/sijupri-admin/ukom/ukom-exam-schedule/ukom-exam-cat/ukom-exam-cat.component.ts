@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges } from '@angular/core'
+import { Component, inject, Input, SimpleChanges } from '@angular/core'
 import { IndikatorKompetensiUkom } from '@/modules/ukom/models/indikator-kompetensi'
 import {
     BehaviorSubject,
@@ -14,13 +14,12 @@ import { ApiService } from '@/modules/base/services/api.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
-import { ExamDetail } from '@/modules/ukom/models/exam_detail'
 import { CommonModule } from '@angular/common'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { FormsModule } from '@angular/forms'
-import { inject } from '@angular/core'
 import { UkomRoomService } from '@/modules/ukom/services/ukom-room.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 
 @Component({
     selector: 'app-ukom-exam-cat',
@@ -36,7 +35,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
 })
 export class UkomExamCatComponent {
     @Input() roomUkomDetail: RoomUkomDetail
-    @Input() examDetail: ExamDetail
+    @Input() examDetail: ExamSchedule
 
     ukomRoomService = inject(UkomRoomService)
     IndikatorKompetensiUkom: IndikatorKompetensiUkom[] = []

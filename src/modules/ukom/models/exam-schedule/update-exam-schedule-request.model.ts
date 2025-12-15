@@ -4,9 +4,10 @@ export class UpdateExamScheduleRequest extends Serializable {
     id: string = undefined
     startTime: string = undefined
     endTime: string = undefined
-    examTypeCode: string = undefined
     duration: number = undefined
     secretKey: string | undefined = undefined
+    participantIdList: string[] = []
+    examinerIdList: string[] = []
 
     constructor(object: { [key: string]: string | number }) {
         super()

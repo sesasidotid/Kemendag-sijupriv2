@@ -5,49 +5,86 @@
     <form [formGroup]="examScheduleForm" (ngSubmit)="submit()">
         <div>
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label fw-bold">Waktu Mulai <span class="text-danger">*</span></label>
+                <label class="col-sm-2 col-form-label fw-bold"
+                    >Waktu Mulai <span class="text-danger">*</span></label
+                >
                 <div class="col-sm-10">
-                    <input type="datetime-local" formControlName="startTime" class="form-control" />
-                    <div class="text-danger" *ngIf="getError('startTime', 'Waktu Mulai')">
+                    <input
+                        type="datetime-local"
+                        formControlName="startTime"
+                        class="form-control"
+                    />
+                    <div
+                        class="text-danger"
+                        *ngIf="getError('startTime', 'Waktu Mulai')"
+                    >
                         {{ getError('startTime', 'Waktu Mulai') }}
                     </div>
                 </div>
             </div>
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label fw-bold">Waktu Selesai <span class="text-danger">*</span></label>
+                <label class="col-sm-2 col-form-label fw-bold"
+                    >Waktu Selesai <span class="text-danger">*</span></label
+                >
                 <div class="col-sm-10">
-                    <input type="datetime-local" formControlName="endTime" class="form-control" />
-                    <div class="text-danger" *ngIf="getError('endTime', 'Waktu Selesai')">
+                    <input
+                        type="datetime-local"
+                        formControlName="endTime"
+                        class="form-control"
+                    />
+                    <div
+                        class="text-danger"
+                        *ngIf="getError('endTime', 'Waktu Selesai')"
+                    >
                         {{ getError('endTime', 'Waktu Selesai') }}
                     </div>
                 </div>
             </div>
+
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label fw-bold">Jenis UKom <span class="text-danger">*</span></label>
+                <label class="col-sm-2 col-form-label fw-bold"
+                    >Jenis UKom <span class="text-danger">*</span></label
+                >
                 <div class="col-sm-10">
                     <select formControlName="examTypeCode" class="form-select">
                         <option value="" disabled selected hidden>
                             Pilih Jenis UKom
                         </option>
-                        <option *ngFor="let jenisUkom of jenisUkomList$ | async" [value]="jenisUkom.code">
+                        <option
+                            *ngFor="let jenisUkom of jenisUkomList$ | async"
+                            [value]="jenisUkom.code"
+                        >
                             {{ jenisUkom.name }}
                         </option>
                     </select>
-                    <div class="text-danger" *ngIf="getError('examTypeCode', 'Jenis UKom')">
+                    <div
+                        class="text-danger"
+                        *ngIf="getError('examTypeCode', 'Jenis UKom')"
+                    >
                         {{ getError('examTypeCode', 'Jenis UKom') }}
                     </div>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label fw-bold">Durasi <span class="text-danger">*</span></label>
+                <label class="col-sm-2 col-form-label fw-bold"
+                    >Durasi <span class="text-danger">*</span></label
+                >
                 <div class="col-sm-10">
                     <div class="input-group">
-                        <input type="number" formControlName="duration" class="form-control"
-                            placeholder="Masukkan durasi" min="1" />
+                        <input
+                            type="number"
+                            formControlName="duration"
+                            class="form-control"
+                            placeholder="Masukkan durasi"
+                            min="1"
+                        />
                         <span class="input-group-text">menit</span>
                     </div>
-                    <div class="text-danger" *ngIf="getError('duration', 'Durasi')">
+                    <div
+                        class="text-danger"
+                        *ngIf="getError('duration', 'Durasi')"
+                    >
                         {{ getError('duration', 'Durasi') }}
                     </div>
                     <small class="form-text text-muted">
@@ -57,38 +94,100 @@
             </div>
 
             <div class="row mb-3" *ngIf="isCatExamType()">
-                <label class="col-sm-2 col-form-label fw-bold">Secret Key <span class="text-danger">*</span></label>
+                <label class="col-sm-2 col-form-label fw-bold"
+                    >Secret Key <span class="text-danger">*</span></label
+                >
                 <div class="col-sm-10">
                     <div class="input-group">
-                        <input type="text" class="form-control" formControlName="secretKey"
-                            placeholder="Auto-generated secret key" />
-                        <button type="button" class="btn btn-outline-secondary" (click)="generateSecretKey()"
-                            title="Generate secret key">
+                        <input
+                            type="text"
+                            class="form-control"
+                            formControlName="secretKey"
+                            placeholder="Auto-generated secret key"
+                        />
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            (click)="generateSecretKey()"
+                            title="Generate secret key"
+                        >
                             <i class="mdi mdi-shuffle-variant"></i>
                         </button>
                     </div>
-                    <div class=" text-danger" *ngIf="getError('secretKey', 'Secret Key')">
+                    <div
+                        class="text-danger"
+                        *ngIf="getError('secretKey', 'Secret Key')"
+                    >
                         {{ getError('secretKey', 'Secret Key') }}
                     </div>
-                    <small class="form-text text-muted">Klik ikon untuk menghasilkan kunci acak yang
-                        aman.</small>
+                    <small class="form-text text-muted"
+                        >Klik ikon untuk menghasilkan kunci acak yang
+                        aman.</small
+                    >
                 </div>
             </div>
 
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label fw-bold">Peserta</label>
+                <div class="col-sm-10">
+                    <app-multi-select
+                        [options]="participants"
+                        formControlName="participantIdList"
+                        placeholder="Pilih Peserta"
+                    ></app-multi-select>
+                    <small class="form-text text-muted"
+                        >Kosongkan jika ingin seluruh perseta ikut ujian.
+                    </small>
+                </div>
+            </div>
+
+            <div class="row mb-3" *ngIf="!isCatExamType()">
+                <label class="col-sm-2 col-form-label fw-bold"
+                    >Penguji <span class="text-danger">*</span>
+                </label>
+                <div class="col-sm-10">
+                    <app-multi-select-api
+                        [fetchFunction]="fetchExaminers"
+                        [searchParamName]="'like_user|name'"
+                        formControlName="examinerIdList"
+                        placeholder="Pilih Penguji"
+                        searchPlaceholder="Cari penguji..."
+                        [pageSize]="20"
+                    ></app-multi-select-api>
+                    <div
+                        class="text-danger"
+                        *ngIf="getError('examinerIdList', 'Penguji') as error"
+                    >
+                        {{ error}}
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="d-flex mb-3 justify-content-end gap-1">
-            <app-loading-button [isLoading]="submitLoading()" [disabled]="examScheduleForm.invalid" [label]="'Simpan'"
-                [className]="'btn btn-primary'" [type]="'submit'"></app-loading-button>
+        <div class="d-flex justify-content-end mb-3 gap-1">
+            <app-loading-button
+                [isLoading]="submitLoading()"
+                [disabled]="examScheduleForm.invalid"
+                [label]="'Simpan'"
+                [className]="'btn btn-primary'"
+                [type]="'submit'"
+            ></app-loading-button>
         </div>
     </form>
     <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
 
     <ng-container *ngIf="isUpdateModalOpen">
-        <app-modal [title]="'Edit Jadwal Ujian'" (toggle)="isUpdateModalOpen = !isUpdateModalOpen" [size]="'lg'"
-            [enableFooter]="false">
-            <app-ukom-exam-schedule-update [examSchedule]="selectedExamSchedule"
-                (refresh)="refresh = !refresh; isUpdateModalOpen = false"></app-ukom-exam-schedule-update>
+        <app-modal
+            [title]="'Edit Jadwal Ujian'"
+            (toggle)="isUpdateModalOpen = !isUpdateModalOpen"
+            [size]="'lg'"
+            [enableFooter]="false"
+        >
+            <app-ukom-exam-schedule-update
+                [examScheduleId]="selectedExamSchedule.id"
+                [roomUkomId]="id"
+                (refresh)="refresh = !refresh; isUpdateModalOpen = false"
+            ></app-ukom-exam-schedule-update>
         </app-modal>
     </ng-container>
 </section>
