@@ -35,7 +35,7 @@
     <label class="fw-bold p-0">Daftar Indikator Kompetensi</label>
 
     <ng-container *ngIf="groupedIndicators.size > 0; else noKompetensi">
-        <ng-container
+        <div
             *ngFor="
                     let kompetensiName of toArray(groupedIndicators.keys())
                 "
@@ -50,43 +50,41 @@
                     "
                 class="card mb-2 p-3"
             >
-                <div class="d-flex justify-content-between align-items-center">
-                    <label class="col-form-label fw-bold"
-                        >Indikator {{ i + 1 }}</label
-                    >
-                    <div class="d-flex align-items-center gap-2">
-                        <small class="text-muted"
-                            >Tersedia: {{
-                            getAvailableQuestionCount(indikator.id) }}</small
-                        >
-                        <label
-                            for="question-count-{{ indikator.id }}"
-                            class="mb-0 text-nowrap"
-                        >
-                            Jumlah:
-                        </label>
-                        <input
-                            type="number"
-                            id="question-count-{{ indikator.id }}"
-                            class="form-control form-control-sm"
-                            [value]="getQuestionCount(indikator.id)"
-                            (input)="setQuestionCount(indikator.id, $any($event.target).value)"
-                            [max]="getAvailableQuestionCount(indikator.id)"
-                            min="0"
-                            placeholder="0"
-                            style="max-width: 80px"
-                        />
-                        <span
-                            *ngIf="getQuestionCount(indikator.id) > 0"
-                            class="badge bg-primary ms-1"
-                        >
-                            {{ getQuestionCount(indikator.id) }}
-                        </span>
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="fw-bold"> Indikator {{ i + 1 }} </span>
+
+                    <div class="d-flex flex-column align-items-end">
+                        <div class="d-flex align-items-center gap-2">
+                            <label
+                                for="question-count-{{ indikator.id }}"
+                                class="mb-0 text-nowrap"
+                            >
+                                Jumlah:
+                            </label>
+
+                            <input
+                                type="number"
+                                id="question-count-{{ indikator.id }}"
+                                class="form-control form-control-sm"
+                                style="max-width: 80px"
+                                [value]="getQuestionCount(indikator.id)"
+                                (input)="setQuestionCount(indikator.id, $any($event.target).value)"
+                                [max]="getAvailableQuestionCount(indikator.id)"
+                                min="0"
+                                placeholder="0"
+                            />
+                        </div>
+
+                        <small class="text-muted mt-1">
+                            {{ getQuestionCount(indikator.id) || 0 }} / {{
+                            getAvailableQuestionCount(indikator.id) }}
+                        </small>
                     </div>
                 </div>
+
                 <p class="mb-2">{{ indikator.name }}</p>
             </div>
-        </ng-container>
+        </div>
 
         <div class="hstack justify-content-end align-items-center gap-2">
             <app-loading-button

@@ -208,7 +208,7 @@ export class UkomExamCatComponent {
         })
 
         this.confirmationService.open(false).subscribe({
-            next: (res: any) => {
+            next: (res) => {
                 if (!res.confirmed) return
 
                 this.submitLoading$.next(true)
@@ -228,22 +228,13 @@ export class UkomExamCatComponent {
                             )
                         },
                         error: (err: any) => {
-                            console.error('Error:', err)
+                            console.error(err)
                             this.handlerService.handleAlert(
                                 'Error',
-                                err?.error?.message ||
-                                    'Gagal mengkonfigurasi pertanyaan',
+                                'Gagal mengkonfigurasi pertanyaan',
                             )
                         },
                     })
-            },
-            error: (err: any) => {
-                console.error('Error:', err)
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengkonfigurasi pertanyaan',
-                )
-                this.submitLoading$.next(false)
             },
         })
     }

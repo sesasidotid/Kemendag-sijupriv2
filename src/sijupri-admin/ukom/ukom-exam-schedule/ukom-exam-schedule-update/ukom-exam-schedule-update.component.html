@@ -59,7 +59,7 @@
                 {{ error }}
             </div>
             <small class="form-text text-muted">
-                Durasi ujian CAT dalam menit
+                Durasi ujian dalam menit
             </small>
         </div>
     </div>
@@ -105,12 +105,9 @@
                 formControlName="participantIdList"
                 placeholder="Pilih Peserta"
             ></app-multi-select>
-            <div
-                class="text-danger"
-                *ngIf="getError('participantIdList', 'Peserta') as error"
-            >
-                {{ error }}
-            </div>
+            <small class="form-text text-muted"
+                >Kosongkan jika ingin seluruh perseta ikut ujian.
+            </small>
         </div>
     </div>
 
