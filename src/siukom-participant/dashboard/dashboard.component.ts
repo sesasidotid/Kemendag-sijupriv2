@@ -5,20 +5,20 @@ import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import {
+    BehaviorSubject,
+    catchError,
+    combineLatest,
+    concatMap,
+    finalize,
     forkJoin,
     map,
     Observable,
     of,
     tap,
-    combineLatest,
-    finalize,
-    concatMap,
-    catchError,
 } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { CATScore } from '@/modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
-import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { ExamType } from '@/modules/ukom/models/exam-type.model'
 import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
@@ -84,17 +84,45 @@ export class DashboardComponent {
         this.loadExams()
     }
 
+    // loadExams() {
+    //     const userId = LoginContext.getUserId().replace('PU-', '')
+    //
+    //     this.isRoomLoading$.next(true)
+    //     this.participantService
+    //         .getParticipantUkom(userId)
+    //         .pipe(
+    //             tap((response) => {
+    //                 this.roomUkom = response.roomUkomDto
+    //             }),
+    //             concatMap((participant) => this.getAllScores(participant)),
+    //             finalize(() => this.isRoomLoading$.next(false)),
+    //         )
+    //         .subscribe()
+    // }
     loadExams() {
         const userId = LoginContext.getUserId().replace('PU-', '')
 
         this.isRoomLoading$.next(true)
+
         this.participantService
             .getParticipantUkom(userId)
             .pipe(
                 tap((response) => {
-                    this.roomUkom = response.roomUkomDto
+                    const roomUkom = response.roomUkomDto
+
+                    roomUkom.examScheduleDtoList = [
+                        ...roomUkom.examScheduleDtoList,
+                    ].sort(
+                        (a, b) =>
+                            new Date(a.startTime.replace(' ', 'T')).getTime() -
+                            new Date(b.startTime.replace(' ', 'T')).getTime(),
+                    )
+
+                    this.roomUkom = roomUkom
                 }),
+
                 concatMap((participant) => this.getAllScores(participant)),
+
                 finalize(() => this.isRoomLoading$.next(false)),
             )
             .subscribe()
