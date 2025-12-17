@@ -84,21 +84,6 @@ export class DashboardComponent {
         this.loadExams()
     }
 
-    // loadExams() {
-    //     const userId = LoginContext.getUserId().replace('PU-', '')
-    //
-    //     this.isRoomLoading$.next(true)
-    //     this.participantService
-    //         .getParticipantUkom(userId)
-    //         .pipe(
-    //             tap((response) => {
-    //                 this.roomUkom = response.roomUkomDto
-    //             }),
-    //             concatMap((participant) => this.getAllScores(participant)),
-    //             finalize(() => this.isRoomLoading$.next(false)),
-    //         )
-    //         .subscribe()
-    // }
     loadExams() {
         const userId = LoginContext.getUserId().replace('PU-', '')
 

@@ -3,16 +3,15 @@ import { TopBarComponent } from '../top-bar/top-bar.component'
 import { SideBarComponent } from '../side-bar/side-bar.component'
 import { FooterComponent } from '../footer/footer.component'
 import {
-    Router,
-    NavigationEnd,
-    RouterOutlet,
     ActivatedRoute,
-    RouterEvent,
+    NavigationEnd,
+    Router,
+    RouterOutlet,
 } from '@angular/router'
 import { Tab, TabService } from '../../../modules/base/services/tab.service'
 import { Subscription } from 'rxjs'
 import { CommonModule } from '@angular/common'
-import { filter, map, tap } from 'rxjs/operators'
+import { filter } from 'rxjs/operators'
 import { LoginContext } from '../../../modules/base/commons/login-context'
 
 @Component({
@@ -46,9 +45,6 @@ export class MainComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.tabService.tabs$.subscribe((tabs) => {
-            console.log(tabs)
-        })
         const initialRoute = this.getActiveRoute(this.activatedRoute)
         this.updateRouteData(initialRoute)
         this.buildRouteTrail(initialRoute)

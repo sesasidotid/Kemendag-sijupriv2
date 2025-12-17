@@ -1,6 +1,12 @@
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
-import { Component, inject, Input, SimpleChanges } from '@angular/core'
+import {
+    Component,
+    inject,
+    Input,
+    OnChanges,
+    SimpleChanges,
+} from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { BehaviorSubject, finalize, forkJoin, Observable } from 'rxjs'
 import { FormsModule } from '@angular/forms'
@@ -19,7 +25,7 @@ import { ExamConfigRequest } from '@/modules/ukom/models/exam-config/exam-config
     templateUrl: './ukom-exam-cat.component.html',
     styleUrl: './ukom-exam-cat.component.scss',
 })
-export class UkomExamCatComponent {
+export class UkomExamCatComponent implements OnChanges {
     @Input() roomUkomDetail: RoomUkomDetail
     @Input() examDetail: ExamSchedule
 
@@ -30,9 +36,7 @@ export class UkomExamCatComponent {
         false,
     )
 
-    // Map to store question count per indicator
     indicatorQuestionCounts: Map<string, number> = new Map()
-    // Map to store available question count per indicator
     indicatorAvailableQuestions: Map<string, number> = new Map()
 
     constructor(
@@ -227,7 +231,7 @@ export class UkomExamCatComponent {
                                 'Pertanyaan berhasil dikonfigurasi dan di-shuffle',
                             )
                         },
-                        error: (err: any) => {
+                        error: (err) => {
                             console.error(err)
                             this.handlerService.handleAlert(
                                 'Error',
