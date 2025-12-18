@@ -1,4 +1,4 @@
-import { Component, inject, signal, ViewChild } from '@angular/core'
+import { Component, effect, inject, signal, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import {
     FormBuilder,
@@ -60,20 +60,36 @@ export class LoginCatComponent {
     formValidationService = inject(FormValidationService)
 
     loginForm = this.formBuilder.group({
-        nip: [
-            '',
-            [
-                Validators.required,
-                Validators.pattern('^[0-9]+$'),
-                Validators.minLength(18),
-                Validators.maxLength(18),
-            ],
-        ],
+        nip: [''],
         password: ['', [Validators.required]],
         recaptcha: [null as string | null, [Validators.required]],
     })
 
-    constructor() {}
+    private participantNipValidators = [
+        Validators.required,
+        Validators.pattern('^[0-9]+$'),
+        Validators.minLength(18),
+        Validators.maxLength(18),
+    ]
+
+    private examinerNipValidators = [Validators.required]
+
+    constructor() {
+        effect(() => {
+            const role = this.selectedRole()
+            const nipControl = this.loginForm.get('nip')
+
+            if (!nipControl) return
+
+            if (role === 'participant') {
+                nipControl.setValidators(this.participantNipValidators)
+            } else {
+                nipControl.setValidators(this.examinerNipValidators)
+            }
+
+            nipControl.updateValueAndValidity({ emitEvent: false })
+        })
+    }
 
     ngOnInit() {
         if (LoginContext.isLogin()) {

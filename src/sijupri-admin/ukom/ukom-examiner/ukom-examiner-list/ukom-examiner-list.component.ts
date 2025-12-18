@@ -97,7 +97,9 @@ export class UkomExaminerListComponent {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Nama', 'name', ['user']).build(),
             )
-            .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Username', 'nip').build(),
+            )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jenis Kelamin', (data: any) =>
@@ -135,17 +137,16 @@ export class UkomExaminerListComponent {
             id: new FormControl(''),
             name: new FormControl('', Validators.required),
             nip: new FormControl('', Validators.required),
-            jenis_kelamin_code: new FormControl('', Validators.required),
+            jenisKelaminCode: new FormControl('', Validators.required),
         })
     }
 
     setDefaultFormValues(data: any) {
-        console.log('data', data)
         this.editExaminerForm.patchValue({
             id: data.id || '',
             name: data.user.name || '',
             nip: data.nip || '',
-            jenis_kelamin_code: data.jenisKelaminCode || '',
+            jenisKelaminCode: data.jenisKelaminCode || '',
         })
     }
 
@@ -166,7 +167,7 @@ export class UkomExaminerListComponent {
             id: this.editExaminerForm.value.id,
             name: this.editExaminerForm.value.name,
             nip: this.editExaminerForm.value.nip,
-            jenis_kelamin_code: this.editExaminerForm.value.jenis_kelamin_code,
+            jenisKelaminCode: this.editExaminerForm.value.jenisKelaminCode,
         }
 
         this.confirmationService.open(false).subscribe({

@@ -35,21 +35,21 @@
         </div>
 
         <div class="mb-3">
-            <label for="jenis_kelamin_code" class="form-label"
+            <label for="jenisKelaminCode" class="form-label"
                 >Jenis Kelamin <span class="text-danger">*</span></label
             >
             <select
-                id="jenis_kelamin_code"
+                id="jenisKelaminCode"
                 class="form-select"
-                name="jenis_kelamin_code"
-                formControlName="jenis_kelamin_code"
+                name="jenisKelaminCode"
+                formControlName="jenisKelaminCode"
             >
                 <option [value]="'F'">Wanita</option>
                 <option [value]="'M'">Pria</option>
             </select>
             <div
                 *ngIf="getErrorMessage(
-                                    'jenis_kelamin_code',
+                                    'jenisKelaminCode',
                                     'Jenis Kelamin'
                                 ) as error
                             "

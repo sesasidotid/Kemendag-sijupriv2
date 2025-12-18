@@ -1,5 +1,4 @@
 import { Serializable } from '@/modules/base/commons/serializable'
-import { ExamShuffleConfigurationDtoList } from '@/modules/ukom/models/exam-config/exam-config-request.model'
 
 export class ExamConfigModel extends Serializable {
     id: string = undefined
@@ -9,4 +8,12 @@ export class ExamConfigModel extends Serializable {
         super()
         if (object) this.fromObject(object)
     }
+}
+
+interface ExamShuffleConfigurationDtoList {
+    id: string
+    examConfigurationId: string
+    numOfQuestion: number
+    kompetensiIndikatorId: string
+    kompetensiIndikatorName: string
 }

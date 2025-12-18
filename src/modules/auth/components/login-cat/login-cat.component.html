@@ -33,7 +33,7 @@
                                 </div>
 
                                 <!-- Role Selector -->
-                                <div class="d-flex justify-content-center">
+                                <div class="d-flex justify-content-center mb-3">
                                     <div
                                         class="btn-group role-selector"
                                         role="group"
@@ -82,28 +82,27 @@
                                     class="row g-3 needs-validation"
                                 >
                                     <div class="col-12">
-                                        <label for="nip" class="form-label"
-                                            >NIP
-                                            <span class="text-danger"
-                                                >*</span
-                                            ></label
-                                        >
+                                        <label for="nip" class="form-label">
+                                            {{ selectedRole() === 'participant'
+                                            ? 'NIP' : 'Username' }}
+                                            <span class="text-danger">*</span>
+                                        </label>
+
                                         <div class="input-group has-validation">
                                             <input
                                                 type="text"
-                                                name="nip"
                                                 class="form-control"
                                                 id="nip"
                                                 formControlName="nip"
+                                                [placeholder]="
+        selectedRole() === 'participant'
+            ? 'Masukkan NIP'
+            : 'Masukkan Username'
+    "
                                             />
                                         </div>
                                         <div
-                                            *ngIf="
-                                getErrorMessage(
-                                    'nip',
-                                    'NIP'
-                                ) as error
-                            "
+                                            *ngIf="getErrorMessage('nip', selectedRole() === 'participant' ? 'NIP' : 'Username') as error"
                                             class="text-danger"
                                         >
                                             {{ error }}
@@ -203,4 +202,3 @@
         </section>
     </div>
 </main>
-<!-- End #main -->

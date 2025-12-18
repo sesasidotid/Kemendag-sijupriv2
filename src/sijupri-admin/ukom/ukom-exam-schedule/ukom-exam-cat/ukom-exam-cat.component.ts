@@ -17,6 +17,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ExamConfigService } from '@/modules/ukom/services/exam-config.service'
 import { ExamConfigRequest } from '@/modules/ukom/models/exam-config/exam-config-request.model'
+import { ExamConfigModel } from '@/modules/ukom/models/exam-config/exam-config.model'
 
 @Component({
     selector: 'app-ukom-exam-cat',
@@ -57,6 +58,8 @@ export class UkomExamCatComponent implements OnChanges {
                     this.groupIndicators()
                     this.initializeQuestionCounts()
                     this.fetchAvailableQuestionsCount()
+                    // Fetch existing config and pre-fill counts
+                    this.fetchExistingExamConfig()
                 },
                 error: () => {
                     this.handlerService.handleAlert(
@@ -170,6 +173,39 @@ export class UkomExamCatComponent implements OnChanges {
         }`
 
         return this.apiService.getData(url)
+    }
+
+    private fetchExistingExamConfig(): void {
+        const url = `/api/v1/exam_config/exam_schedule/${this.examDetail.id}`
+
+        this.apiService.getData(url).subscribe({
+            next: (config: ExamConfigModel) => {
+                if (
+                    config &&
+                    config.examShuffleConfigurationDtoList &&
+                    config.examShuffleConfigurationDtoList.length > 0
+                ) {
+                    // Config exists, pre-fill the question counts
+                    this.preFillQuestionCounts(config)
+                }
+            },
+            error: (err) => {
+                console.error(err)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengambil konfigurasi ujian yang ada',
+                )
+            },
+        })
+    }
+
+    private preFillQuestionCounts(config: ExamConfigModel): void {
+        config.examShuffleConfigurationDtoList.forEach((item) => {
+            this.indicatorQuestionCounts.set(
+                item.kompetensiIndikatorId,
+                item.numOfQuestion,
+            )
+        })
     }
 
     clearAllSelection() {

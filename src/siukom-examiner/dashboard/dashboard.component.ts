@@ -47,7 +47,7 @@ export class DashboardComponent implements OnInit {
             startTime: '2025-12-18 10:01:00',
             endTime: '2025-12-18 19:01:00',
             duration: 0.25,
-            examTypeCode: ExamTypeCategory.CAT,
+            examTypeCode: ExamTypeCategory.SEMINAR,
             roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
             secretKey: '1',
         }),
@@ -184,6 +184,7 @@ export class DashboardComponent implements OnInit {
             PRAKTIK: 'Praktik',
             WAWANCARA: 'Wawancara',
             MAKALAH: 'Makalah',
+            SEMINAR: 'Seminar',
         }
 
         return displayNames[examTypeCode] || examTypeCode

@@ -63,7 +63,7 @@ export class UkomExaminerAddComponent {
         this.examinerForm = new FormGroup({
             name: new FormControl('', Validators.required),
             nip: new FormControl('', Validators.required),
-            jenis_kelamin_code: new FormControl('', Validators.required),
+            jenisKelaminCode: new FormControl('', Validators.required),
             password: new FormControl('', [Validators.required]),
             confirmPassword: new FormControl('', [
                 Validators.required,
@@ -95,7 +95,7 @@ export class UkomExaminerAddComponent {
                 this.examinerData.name = this.examinerForm.get('name').value
                 this.examinerData.nip = this.examinerForm.get('nip').value
                 this.examinerData.jenisKelaminCode =
-                    this.examinerForm.get('jenis_kelamin_code').value
+                    this.examinerForm.get('jenisKelaminCode').value
                 this.examinerData.password =
                     this.examinerForm.get('password').value
 
