@@ -5,12 +5,18 @@
                 <!-- LOGO -->
                 <a href="/">
                     <div class="navbar-brand-box horizontal-logo">
-                        <img src="assets/logo/kemendag-logo-light.png" width="100" />
+                        <img
+                            src="assets/logo/kemendag-logo-light.png"
+                            width="100"
+                        />
                     </div>
                 </a>
-                <button (click)="toggelSidebar()" type="button"
-                    class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger"
-                    id="topnav-hamburger-icon">
+                <button
+                    (click)="toggelSidebar()"
+                    type="button"
+                    class="btn btn-sm fs-16 header-item vertical-menu-btn topnav-hamburger px-3"
+                    id="topnav-hamburger-icon"
+                >
                     <span class="hamburger-icon">
                         <span></span>
                         <span></span>
@@ -19,23 +25,39 @@
                 </button>
             </div>
             <div class="d-flex align-items-center">
-                <div class="dropdown topbar-head-dropdown ms-1 header-item" id="notificationDropdown">
-                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
-                        id="page-header-notifications-dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-                        aria-haspopup="true" aria-expanded="false">
+                <div
+                    class="dropdown topbar-head-dropdown header-item ms-1"
+                    id="notificationDropdown"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                        id="page-header-notifications-dropdown"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                    >
                         <i class="bx bx-bell fs-22"></i>
                         <span
-                            class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">{{
-                            notificationMessagePersonalList.length
-                            }}<span class="visually-hidden">unread messages</span></span>
+                            class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger"
+                            >{{ notificationMessagePersonalList.length }}<span
+                                class="visually-hidden"
+                                >unread messages</span
+                            ></span
+                        >
                     </button>
-                    <div class="dropdown-menu dropdown-menu-lg w-xl dropdown-menu-end p-0"
-                        aria-labelledby="page-header-notifications-dropdown">
+                    <div
+                        class="dropdown-menu dropdown-menu-lg w-xl dropdown-menu-end p-0"
+                        aria-labelledby="page-header-notifications-dropdown"
+                    >
                         <div class="dropdown-head card-bg rounded-top">
                             <div class="p-3">
                                 <div class="row align-items-center">
                                     <div class="col">
-                                        <h6 class="m-0 fs-16 fw-semibold text-white">
+                                        <h6
+                                            class="fs-16 fw-semibold m-0 text-white"
+                                        >
                                             Notifikasi & Pengumuman
                                         </h6>
                                     </div>
@@ -44,13 +66,20 @@
                                             {{notificationMessagePersonalList.length}} New</span>
                                     </div> -->
                                     <div class="col-auto">
-                                        <button class="btn trash-button me-2" (click)="handleCheckAllClicked()">
+                                        <button
+                                            class="btn trash-button me-2"
+                                            (click)="handleCheckAllClicked()"
+                                        >
                                             <i class="mdi mdi-check fs-16"></i>
                                         </button>
-                                        <button class="btn trash-button" [disabled]="
+                                        <button
+                                            class="btn trash-button"
+                                            [disabled]="
                                                 (notificationsDeleteId$ | async)
                                                     .length === 0
-                                            " (click)="handleDeleteClicked()">
+                                            "
+                                            (click)="handleDeleteClicked()"
+                                        >
                                             <i class="mdi mdi-delete fs-16"></i>
                                         </button>
                                     </div>
@@ -58,19 +87,37 @@
                             </div>
 
                             <div class="px-2 pt-2">
-                                <ul class="nav nav-tabs dropdown-tabs nav-tabs-custom" data-dropdown-tabs="true"
-                                    id="notificationItemsTab" role="tablist">
-                                    <li class="nav-item waves-effect waves-light">
-                                        <a class="nav-link active" data-bs-toggle="tab" href="#all-noti-tab" role="tab"
-                                            aria-selected="true">
+                                <ul
+                                    class="nav nav-tabs dropdown-tabs nav-tabs-custom"
+                                    data-dropdown-tabs="true"
+                                    id="notificationItemsTab"
+                                    role="tablist"
+                                >
+                                    <li
+                                        class="nav-item waves-effect waves-light"
+                                    >
+                                        <a
+                                            class="nav-link active"
+                                            data-bs-toggle="tab"
+                                            href="#all-noti-tab"
+                                            role="tab"
+                                            aria-selected="true"
+                                        >
                                             Notifikasi ({{
                                             notificationMessagePersonalList.length
                                             }})
                                         </a>
                                     </li>
-                                    <li class="nav-item waves-effect waves-light">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#messages-tab" role="tab"
-                                            aria-selected="false">
+                                    <li
+                                        class="nav-item waves-effect waves-light"
+                                    >
+                                        <a
+                                            class="nav-link"
+                                            data-bs-toggle="tab"
+                                            href="#messages-tab"
+                                            role="tab"
+                                            aria-selected="false"
+                                        >
                                             Pengumuman
                                         </a>
                                     </li>
@@ -78,134 +125,220 @@
                             </div>
                         </div>
 
-                        <div class="tab-content position-relative" id="notificationItemsTabContent">
-                            <div class="tab-pane fade show active py-2 ps-2" id="all-noti-tab" role="tabpanel"
-                                aria-labelledby="all-noti-tab">
-                                <div data-simplebar class="pe-2 max-h-300">
-                                    <div *ngIf="
+                        <div
+                            class="tab-content position-relative"
+                            id="notificationItemsTabContent"
+                        >
+                            <div
+                                class="tab-pane fade show active py-2 ps-2"
+                                id="all-noti-tab"
+                                role="tabpanel"
+                                aria-labelledby="all-noti-tab"
+                            >
+                                <div data-simplebar class="max-h-300 pe-2">
+                                    <div
+                                        *ngIf="
                                             notificationMessagePersonalList.length >
                                                 0;
                                             else noNotifPersonal
-                                        ">
-                                        <div *ngFor="
+                                        "
+                                    >
+                                        <div
+                                            *ngFor="
                                                 let notificationMessage of notificationMessagePersonalList
-                                            " class="text-reset notification-item d-block dropdown-item">
+                                            "
+                                            class="text-reset notification-item d-block dropdown-item"
+                                        >
                                             <div class="d-flex">
                                                 <div class="flex-grow-1">
                                                     <!-- <a href="#!" class="stretched-link"> -->
-                                                    <h6 class="mt-0 mb-1 fs-13 fw-semibold">
+                                                    <h6
+                                                        class="fs-13 fw-semibold mb-1 mt-0"
+                                                    >
                                                         {{
                                                         notificationMessage.title
-                                                        }}<i *ngIf="
+                                                        }}<i
+                                                            *ngIf="
                                                                 notificationMessage.read ===
                                                                 0
-                                                            " class="mdi mdi-circle-medium text-secondary fs-16"></i>
+                                                            "
+                                                            class="mdi mdi-circle-medium text-secondary fs-16"
+                                                        ></i>
                                                     </h6>
                                                     <!-- </a> -->
-                                                    <div class="fs-13 text-muted">
+                                                    <div
+                                                        class="fs-13 text-muted"
+                                                    >
                                                         <p class="mb-1">
                                                             {{
                                                             notificationMessage.body
                                                             }}
                                                         </p>
                                                     </div>
-                                                    <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                        <span><i class="mdi mdi-clock-outline"></i>{{
+                                                    <p
+                                                        class="fs-11 fw-medium text-uppercase text-muted mb-0"
+                                                    >
+                                                        <span
+                                                            ><i
+                                                                class="mdi mdi-clock-outline"
+                                                            ></i
+                                                            >{{
                                                             notificationMessage.age
-                                                            }}</span>
+                                                            }}</span
+                                                        >
                                                     </p>
                                                 </div>
-                                                <div class="px-2 fs-15">
-                                                    <div class="form-check notification-check">
-                                                        <input class="form-check-input" type="checkbox" (click)="
+                                                <div class="fs-15 px-2">
+                                                    <div
+                                                        class="form-check notification-check"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="checkbox"
+                                                            (click)="
                                                                 handleCheckClicked(
                                                                     notificationMessage.id
                                                                 )
-                                                            " id="messages-notification-check01" [checked]="
+                                                            "
+                                                            id="messages-notification-check01"
+                                                            [checked]="
                                                                 checkNotificationsDeleteId(
                                                                     notificationMessage.id
                                                                 )
-                                                            " />
-                                                        <label class="form-check-label"
-                                                            for="messages-notification-check01"></label>
+                                                            "
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="messages-notification-check01"
+                                                        ></label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <ng-template #noNotifPersonal>
-                                        <app-empty-state [title]="'Belum ada notifikasi'" [icon]="'mdi mdi-bell-off'"
+                                        <app-empty-state
+                                            [title]="'Belum ada notifikasi'"
+                                            [icon]="'mdi mdi-bell-off'"
                                             [description]="
                                                 'Saat ini tidak ada notifikasi yang dapat ditampilkan.'
-                                            "></app-empty-state>
+                                            "
+                                        ></app-empty-state>
                                     </ng-template>
                                 </div>
                             </div>
-                            <div class="tab-pane fade py-2 ps-2" id="messages-tab" role="tabpanel"
-                                aria-labelledby="messages-tab">
-                                <div data-simplebar class="pe-2 max-h-300">
-                                    <div *ngIf="
+                            <div
+                                class="tab-pane fade py-2 ps-2"
+                                id="messages-tab"
+                                role="tabpanel"
+                                aria-labelledby="messages-tab"
+                            >
+                                <div data-simplebar class="max-h-300 pe-2">
+                                    <div
+                                        *ngIf="
                                             notificationMessageGroupList.length >
                                                 0;
                                             else noNotifGroup
-                                        ">
-                                        <div *ngFor="
+                                        "
+                                    >
+                                        <div
+                                            *ngFor="
                                                 let notificationMessage of notificationMessageGroupList
-                                            " class="text-reset notification-item d-block dropdown-item">
+                                            "
+                                            class="text-reset notification-item d-block dropdown-item"
+                                        >
                                             <div class="d-flex">
                                                 <div class="flex-grow-1">
-                                                    <a href="#!" class="stretched-link">
-                                                        <h6 class="mt-0 mb-1 fs-13 fw-semibold">
+                                                    <a
+                                                        href="#!"
+                                                        class="stretched-link"
+                                                    >
+                                                        <h6
+                                                            class="fs-13 fw-semibold mb-1 mt-0"
+                                                        >
                                                             {{
                                                             notificationMessage.title
                                                             }}
                                                         </h6>
                                                     </a>
-                                                    <div class="fs-13 text-muted">
+                                                    <div
+                                                        class="fs-13 text-muted"
+                                                    >
                                                         <p class="mb-1">
                                                             {{
                                                             notificationMessage.body
                                                             }}
                                                         </p>
                                                     </div>
-                                                    <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                        <i class="mdi mdi-clock-outline"></i>
+                                                    <p
+                                                        class="fs-11 fw-medium text-uppercase text-muted mb-0"
+                                                    >
+                                                        <i
+                                                            class="mdi mdi-clock-outline"
+                                                        ></i>
                                                         {{
                                                         notificationMessage.age
                                                         }}
                                                     </p>
                                                 </div>
-                                                <div class="px-2 fs-15">
-                                                    <div class="form-check notification-check">
-                                                        <input class="form-check-input" type="checkbox" value=""
-                                                            id="messages-notification-check01" />
-                                                        <label class="form-check-label"
-                                                            for="messages-notification-check01"></label>
+                                                <div class="fs-15 px-2">
+                                                    <div
+                                                        class="form-check notification-check"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="checkbox"
+                                                            value=""
+                                                            id="messages-notification-check01"
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="messages-notification-check01"
+                                                        ></label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <ng-template #noNotifGroup>
-                                        <app-empty-state [title]="'Belum ada notifikasi'" [icon]="'mdi mdi-bell-off'"
+                                        <app-empty-state
+                                            [title]="'Belum ada notifikasi'"
+                                            [icon]="'mdi mdi-bell-off'"
                                             [description]="
                                                 'Saat ini tidak ada notifikasi yang dapat ditampilkan.'
-                                            "></app-empty-state>
+                                            "
+                                        ></app-empty-state>
                                     </ng-template>
                                 </div>
                             </div>
-                            <div class="tab-pane fade p-4" id="alerts-tab" role="tabpanel" aria-labelledby="alerts-tab">
-                            </div>
+                            <div
+                                class="tab-pane fade p-4"
+                                id="alerts-tab"
+                                role="tabpanel"
+                                aria-labelledby="alerts-tab"
+                            ></div>
 
-                            <div class="notification-actions" id="notification-actions">
-                                <div class="d-flex text-muted justify-content-center">
+                            <div
+                                class="notification-actions"
+                                id="notification-actions"
+                            >
+                                <div
+                                    class="d-flex text-muted justify-content-center"
+                                >
                                     Select
-                                    <div id="select-content" class="text-body fw-semibold px-1">
+                                    <div
+                                        id="select-content"
+                                        class="text-body fw-semibold px-1"
+                                    >
                                         0
                                     </div>
                                     Result
-                                    <button type="button" class="btn btn-link link-danger p-0 ms-3"
-                                        data-bs-toggle="modal" data-bs-target="#removeNotificationModal">
+                                    <button
+                                        type="button"
+                                        class="btn btn-link link-danger ms-3 p-0"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#removeNotificationModal"
+                                    >
                                         Remove
                                     </button>
                                 </div>
@@ -215,21 +348,34 @@
                 </div>
 
                 <div class="dropdown ms-sm-3 header-item topbar-user">
-                    <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
+                    <button
+                        type="button"
+                        class="btn"
+                        id="page-header-user-dropdown"
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                    >
                         <span class="d-flex align-items-center">
-                            <img class="rounded-circle header-profile-user" [src]="profileImageSrc"
-                                alt="Header Avatar" />
+                            <img
+                                class="rounded-circle header-profile-user"
+                                [src]="profileImageSrc"
+                                alt="Header Avatar"
+                            />
 
-                            <span class="text-start ms-xl-2">
-                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ name }}</span>
-
+                            <span class="ms-xl-2 text-start">
+                                <span
+                                    class="d-none d-xl-inline-block fw-medium user-name-text ms-1"
+                                    >{{ name }}</span
+                                >
                             </span>
                         </span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
-                        <h6 class="dropdown-header dropdown-header-lg">{{name}}</h6>
+                        <h6 class="dropdown-header dropdown-header-lg">
+                            {{name}}
+                        </h6>
                         <h6 class="dropdown-header">NIP : {{id}}</h6>
 
                         <!-- <a class="dropdown-item" href="pages-profile"><i
@@ -253,39 +399,88 @@
                                 class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span
                                 class="align-middle">Settings</span></a> -->
 
-                        <a class="dropdown-item cursor-pointer" *ngIf="role.length > 0" (click)="profile()"><i
-                                class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle">Pengaturan</span></a>
-                        <a class="dropdown-item cursor-pointer" *ngIf="role.length > 0" (click)="toggleModal()"><i
-                                class="mdi mdi-account-cog-outline text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle">Ganti Password</span></a>
-                        <a class="dropdown-item cursor-pointer" (click)="logOut()"><i
-                                class="bx bx-power-off font-size-16 align-middle me-1"></i>
+                        <a
+                            class="dropdown-item cursor-pointer"
+                            *ngIf="role.length > 0"
+                            (click)="profile()"
+                            ><i
+                                class="mdi mdi-cog-outline text-muted fs-16 me-1 align-middle"
+                            ></i>
+                            <span class="align-middle">Pengaturan</span></a
+                        >
+                        <a
+                            class="dropdown-item cursor-pointer"
+                            *ngIf="role.length > 0"
+                            (click)="toggleModal()"
+                            ><i
+                                class="mdi mdi-account-cog-outline text-muted fs-16 me-1 align-middle"
+                            ></i>
+                            <span class="align-middle">Ganti Password</span></a
+                        >
+                        <a
+                            class="dropdown-item cursor-pointer"
+                            (click)="logOut()"
+                            ><i
+                                class="bx bx-power-off font-size-16 me-1 align-middle"
+                            ></i>
                             <span key="t-logout">Keluar</span>
                         </a>
-                        <form id="logout-form" action="" method="POST" class="d-none"></form>
+                        <form
+                            id="logout-form"
+                            action=""
+                            method="POST"
+                            class="d-none"
+                        ></form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <app-modal *ngIf="isModalOpen$ | async" [title]="'Ganti Password'" (toggle)="toggleModal()" [enableFooter]="false">
+    <app-modal
+        *ngIf="isModalOpen$ | async"
+        [title]="'Ganti Password'"
+        (toggle)="toggleModal()"
+        [enableFooter]="false"
+    >
         <form (ngSubmit)="onSubmit()" #passwordForm="ngForm">
             <div class="mb-3">
-                <label for="oldPassword" class="form-label">Password Lama <span class="text-danger">*</span></label>
-                <input id="oldPassword" type="password" name="oldPassword" [(ngModel)]="formData.oldPassword" required
-                    class="form-control" #oldPassword="ngModel" />
-                <div *ngIf="oldPassword.invalid && oldPassword.touched" class="text-danger">
+                <label for="oldPassword" class="form-label"
+                    >Password Lama <span class="text-danger">*</span></label
+                >
+                <input
+                    id="oldPassword"
+                    type="password"
+                    name="oldPassword"
+                    [(ngModel)]="formData.oldPassword"
+                    required
+                    class="form-control"
+                    #oldPassword="ngModel"
+                />
+                <div
+                    *ngIf="oldPassword.invalid && oldPassword.touched"
+                    class="text-danger"
+                >
                     Password lama wajib diisi
                 </div>
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label">Password Baru <span class="text-danger">*</span></label>
-                <input id="password" type="password" name="password" [(ngModel)]="formData.password" required
-                    class="form-control" #password="ngModel" />
-                <div *ngIf="password.invalid && password.touched" class="text-danger">
+                <label for="password" class="form-label"
+                    >Password Baru <span class="text-danger">*</span></label
+                >
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    [(ngModel)]="formData.password"
+                    required
+                    class="form-control"
+                    #password="ngModel"
+                />
+                <div
+                    *ngIf="password.invalid && password.touched"
+                    class="text-danger"
+                >
                     Password baru wajib diisi
                 </div>
             </div>
@@ -294,34 +489,40 @@
                 <label for="confirmPassword" class="form-label">
                     Konfirmasi Password Baru <span class="text-danger">*</span>
                 </label>
-                <input id="confirmPassword" type="password" name="confirmPassword"
-                    [(ngModel)]="formData.confirmPassword" required class="form-control" #confirmPassword="ngModel"
-                    (input)="checkPasswordMatch()" />
-                <div *ngIf="confirmPassword.invalid && confirmPassword.touched" class="text-danger">
+                <input
+                    id="confirmPassword"
+                    type="password"
+                    name="confirmPassword"
+                    [(ngModel)]="formData.confirmPassword"
+                    required
+                    class="form-control"
+                    #confirmPassword="ngModel"
+                    (input)="checkPasswordMatch()"
+                />
+                <div
+                    *ngIf="confirmPassword.invalid && confirmPassword.touched"
+                    class="text-danger"
+                >
                     Konfirmasi password wajib diisi
                 </div>
-                <div *ngIf="!passwordsMatch && confirmPassword.touched" class="text-danger">
+                <div
+                    *ngIf="!passwordsMatch && confirmPassword.touched"
+                    class="text-danger"
+                >
                     Password baru dan konfirmasi password harus sama
                 </div>
             </div>
 
-            <ng-container *ngIf="submitLoading$ | async; else noLoading">
-                <button class="btn btn-primary w-100" disabled>
-                    <div class="spinner-border spinner-sm-custom" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </button>
-            </ng-container>
-
-            <ng-template #noLoading>
-                <button type="submit" class="btn btn-primary w-100" [disabled]="
-                        !passwordForm.valid ||
-                        !passwordsMatch ||
-                        (submitLoading$ | async)
-                    ">
-                    Simpan
-                </button>
-            </ng-template>
+            <div class="text-end">
+                <app-loading-button
+                    [isLoading]="submitLoading$ | async"
+                    [disabled]="passwordForm.invalid ||
+                        !passwordsMatch"
+                    [type]="'submit'"
+                    [label]="'Simpan'"
+                    [className]="'btn btn-primary'"
+                ></app-loading-button>
+            </div>
         </form>
     </app-modal>
 </header>

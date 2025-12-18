@@ -2,7 +2,7 @@ import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellan
 import { CommonModule } from '@angular/common'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { UkomModulesService } from '@/modules/ukom/services/ukom-modules.service'
-import { Component, ViewChild, inject } from '@angular/core'
+import { Component, inject, ViewChild } from '@angular/core'
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
@@ -71,7 +71,6 @@ export class UkomQuestionImportComponent {
     }
 
     handleDownloadTemplate() {
-        
         this.ukomModulesService
             .downloadTemplate(this.examTypeCode.value)
             .subscribe({
@@ -96,8 +95,6 @@ export class UkomQuestionImportComponent {
                     exam_type: this.examTypeCode.value,
                     file_question: this.base64FileQuestion,
                 })
-
-                console.log('b', body)
 
                 this.ukomModulesService
                     .saveBulk(body)

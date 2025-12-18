@@ -1,0 +1,125 @@
+<!-- Welcome Section -->
+<div class="welcome-section mb-4">
+    <h1 class="welcome-title">👋 Selamat Datang, Bapak/Ibu</h1>
+    <p class="current-date">Hari ini: {{ formattedCurrentDate() }}</p>
+</div>
+
+<!-- Ongoing Exam Section (Most Important) -->
+<div
+    *ngIf="ongoingExam()"
+    class="exam-card exam-card-ongoing mb-4"
+    role="alert"
+>
+    <div class="exam-status-badge">
+        <span class="status-dot status-dot-ongoing"></span>
+        <span class="status-text">SEDANG BERLANGSUNG</span>
+    </div>
+
+    <div class="exam-content">
+        <h2 class="exam-title">{{ ongoingExam()!.displayName }}</h2>
+        <div class="exam-schedule">
+            <i class="ri-calendar-line me-2"></i>
+            {{ formatDateRange( ongoingExam()!.schedule.startTime,
+            ongoingExam()!.schedule.endTime ) }}
+        </div>
+    </div>
+
+    <button
+        class="btn-primary-action"
+        (click)="enterExam(ongoingExam()!.schedule.id)"
+    >
+        MASUK UJIAN SEKARANG
+    </button>
+</div>
+
+<!-- Empty State for No Ongoing Exam -->
+<div *ngIf="!ongoingExam()" class="exam-card exam-card-empty mb-4">
+    <div class="empty-state">
+        <i class="ri-checkbox-circle-line empty-icon"></i>
+        <p class="empty-text">Tidak ada ujian yang sedang berlangsung</p>
+    </div>
+</div>
+
+<!-- Upcoming Exams Section -->
+<div *ngIf="upcomingExams().length > 0" class="mb-4">
+    <h3 class="section-title">
+        <span class="status-dot status-dot-upcoming"></span>
+        UJIAN TERDEKAT
+    </h3>
+
+    <div class="exam-list">
+        <div
+            *ngFor="let exam of upcomingExams().slice(0, 2)"
+            class="exam-card exam-card-upcoming"
+        >
+            <div class="exam-content">
+                <h4 class="exam-title-secondary">{{ exam.displayName }}</h4>
+                <div class="exam-schedule">
+                    <i class="ri-calendar-line me-2"></i>
+                    {{ formatDateRange( exam.schedule.startTime,
+                    exam.schedule.endTime ) }}
+                </div>
+            </div>
+
+            <button
+                class="btn-secondary-action"
+                (click)="viewExamDetail(exam.schedule.id)"
+            >
+                LIHAT DETAIL
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Completed Exams Section (Collapsible) -->
+<div *ngIf="completedExams().length > 0" class="mb-4">
+    <div class="section-header" (click)="toggleCompletedExams()">
+        <h3 class="section-title">
+            <span class="status-dot status-dot-completed"></span>
+            UJIAN SELESAI ({{ completedExams().length }})
+        </h3>
+        <i
+            class="toggle-icon"
+            [class.ri-arrow-down-s-line]="!showCompletedExams()"
+            [class.ri-arrow-up-s-line]="showCompletedExams()"
+        ></i>
+    </div>
+
+    <div *ngIf="showCompletedExams()" class="exam-list animate-slide-down">
+        <div
+            *ngFor="let exam of completedExams()"
+            class="exam-card exam-card-completed"
+        >
+            <div class="exam-content">
+                <h4 class="exam-title-secondary">{{ exam.displayName }}</h4>
+                <div class="exam-schedule">
+                    <i class="ri-calendar-line me-2"></i>
+                    {{ formatDateRange( exam.schedule.startTime,
+                    exam.schedule.endTime ) }}
+                </div>
+                <div class="exam-completed-badge">
+                    <i class="ri-check-line me-1"></i>
+                    Sudah selesai
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Empty State for No Schedules -->
+<div
+    *ngIf="
+                !ongoingExam() &&
+                upcomingExams().length === 0 &&
+                completedExams().length === 0
+            "
+    class="exam-card exam-card-empty"
+>
+    <div class="empty-state">
+        <i class="ri-inbox-line empty-icon"></i>
+        <h3 class="empty-title">Belum ada jadwal ujian</h3>
+        <p class="empty-description">
+            Silakan hubungi admin untuk informasi lebih lanjut
+        </p>
+    </div>
+</div>

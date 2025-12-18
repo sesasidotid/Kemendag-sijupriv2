@@ -34,6 +34,7 @@ import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-
 import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedule.pipe'
 import { ExamDurationPipe } from '@/modules/ukom/pipes/exam-duration.pipe'
+import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
 
 @Component({
     selector: 'app-dashboard',
@@ -45,6 +46,7 @@ import { ExamDurationPipe } from '@/modules/ukom/pipes/exam-duration.pipe'
         LoadingButtonComponent,
         FormatExamSchedulePipe,
         ExamDurationPipe,
+        PrettyNamePipe,
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',

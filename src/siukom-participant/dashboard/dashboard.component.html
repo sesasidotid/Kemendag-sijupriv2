@@ -68,7 +68,7 @@
                             [attr.aria-expanded]="isInitiallyOpen(exam.id)"
                             [attr.aria-controls]="'collapse' + i"
                         >
-                            {{ exam.examTypeCode }}
+                            {{ exam.examTypeCode | prettyName}}
                             <span class="fw-bold ms-1"
                                 >(Durasi: {{ exam.duration |
                                 examDuration}})</span

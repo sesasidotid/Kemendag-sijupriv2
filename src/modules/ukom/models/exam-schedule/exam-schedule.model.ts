@@ -11,10 +11,10 @@ export class ExamSchedule extends Serializable {
     roomUkomId: string = undefined
     duration: number = undefined
     secretKey: string | null = undefined
-    participantScheduleList: ParticipantScheduleList[] | undefined = undefined
-    examinerScheduleList: ExaminerScheduleList[] | undefined = undefined
+    participantScheduleList: ParticipantScheduleList[] | undefined = []
+    examinerScheduleList: ExaminerScheduleList[] | undefined = []
 
-    constructor(object?: { [key: string]: string | number }) {
+    constructor(object?: Partial<ExamSchedule>) {
         super()
         if (object) this.fromObject(object)
     }

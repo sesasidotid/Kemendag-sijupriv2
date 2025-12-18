@@ -1,0 +1,242 @@
+import { CommonModule } from '@angular/common'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
+import { Router } from '@angular/router'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+
+type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
+
+interface GroupedExam {
+    schedule: ExamSchedule
+    status: ExamStatus
+    displayName: string
+}
+
+@Component({
+    selector: 'app-dashboard',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './dashboard.component.html',
+    styleUrl: './dashboard.component.scss',
+})
+export class DashboardComponent implements OnInit {
+    private router = inject(Router)
+
+    // Dummy data - replace with actual API call
+    private schedules = signal<ExamSchedule[]>([
+        new ExamSchedule({
+            id: '36c814b0-653f-4474-99b4-827731aa57d3',
+            startTime: '2025-12-16 13:55:00',
+            endTime: '2025-12-16 23:55:00',
+            duration: 0.38,
+            examTypeCode: ExamTypeCategory.WAWANCARA,
+            roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
+            secretKey: null,
+        }),
+        new ExamSchedule({
+            id: '5e2f4d2e-5f4b-4c3a-9f7e-2d3b6c8e9f0a',
+            startTime: '2025-12-19 10:01:00',
+            endTime: '2025-12-20 10:01:00',
+            duration: 2,
+            examTypeCode: ExamTypeCategory.MAKALAH,
+            roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
+            secretKey: null,
+        }),
+        new ExamSchedule({
+            id: '84f3d3af-7836-4426-8337-50426596b835',
+            startTime: '2025-12-18 10:01:00',
+            endTime: '2025-12-18 19:01:00',
+            duration: 0.25,
+            examTypeCode: ExamTypeCategory.CAT,
+            roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
+            secretKey: '1',
+        }),
+        new ExamSchedule({
+            id: 'abc123-completed',
+            startTime: '2025-12-16 08:00:00',
+            endTime: '2025-12-16 12:00:00',
+            duration: 4,
+            examTypeCode: ExamTypeCategory.PRAKTIK,
+            roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
+            secretKey: null,
+        }),
+    ])
+
+    currentDate = signal(new Date())
+    showCompletedExams = signal(false)
+
+    // Computed values
+    groupedExams = computed(() => this.groupExamsByStatus())
+
+    ongoingExam = computed(
+        () => this.groupedExams().find((e) => e.status === 'ongoing') || null,
+    )
+
+    upcomingExams = computed(() =>
+        this.groupedExams().filter((e) => e.status === 'upcoming'),
+    )
+
+    completedExams = computed(() =>
+        this.groupedExams().filter((e) => e.status === 'completed'),
+    )
+
+    // Format current date for display
+    formattedCurrentDate = computed(() => {
+        const date = this.currentDate()
+        const days = [
+            'Minggu',
+            'Senin',
+            'Selasa',
+            'Rabu',
+            'Kamis',
+            'Jumat',
+            'Sabtu',
+        ]
+        const months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'Mei',
+            'Jun',
+            'Jul',
+            'Agu',
+            'Sep',
+            'Okt',
+            'Nov',
+            'Des',
+        ]
+
+        const dayName = days[date.getDay()]
+        const day = date.getDate()
+        const month = months[date.getMonth()]
+        const year = date.getFullYear()
+
+        return `${dayName}, ${day} ${month} ${year}`
+    })
+
+    ngOnInit(): void {
+        // Update current time every minute
+        setInterval(() => {
+            this.currentDate.set(new Date())
+        }, 60000)
+    }
+
+    private groupExamsByStatus(): GroupedExam[] {
+        const now = this.currentDate()
+        const grouped: GroupedExam[] = []
+
+        this.schedules().forEach((schedule) => {
+            const startTime = this.parseDateTime(schedule.startTime)
+            const endTime = this.parseDateTime(schedule.endTime)
+
+            let status: ExamStatus
+            if (now >= startTime && now <= endTime) {
+                status = 'ongoing'
+            } else if (now < startTime) {
+                status = 'upcoming'
+            } else {
+                status = 'completed'
+            }
+
+            grouped.push({
+                schedule,
+                status,
+                displayName: this.getExamDisplayName(schedule.examTypeCode),
+            })
+        })
+
+        // Sort: ongoing first, then upcoming by start time, then completed by end time desc
+        return grouped.sort((a, b) => {
+            if (a.status === 'ongoing' && b.status !== 'ongoing') return -1
+            if (a.status !== 'ongoing' && b.status === 'ongoing') return 1
+
+            if (a.status === 'upcoming' && b.status === 'upcoming') {
+                return (
+                    this.parseDateTime(a.schedule.startTime).getTime() -
+                    this.parseDateTime(b.schedule.startTime).getTime()
+                )
+            }
+
+            if (a.status === 'completed' && b.status === 'completed') {
+                return (
+                    this.parseDateTime(b.schedule.endTime).getTime() -
+                    this.parseDateTime(a.schedule.endTime).getTime()
+                )
+            }
+
+            return 0
+        })
+    }
+
+    private parseDateTime(dateTimeStr: string): Date {
+        // Convert "2025-12-16 13:55:00" to Date object
+        const [datePart, timePart] = dateTimeStr.split(' ')
+        const [year, month, day] = datePart.split('-').map(Number)
+        const [hour, minute, second] = timePart.split(':').map(Number)
+
+        return new Date(year, month - 1, day, hour, minute, second)
+    }
+
+    private getExamDisplayName(examTypeCode: string): string {
+        const displayNames: Record<string, string> = {
+            CAT: 'CAT',
+            PRAKTIK: 'Praktik',
+            WAWANCARA: 'Wawancara',
+            MAKALAH: 'Makalah',
+        }
+
+        return displayNames[examTypeCode] || examTypeCode
+    }
+
+    formatDateRange(startTime: string, endTime: string): string {
+        const start = this.parseDateTime(startTime)
+        const end = this.parseDateTime(endTime)
+
+        const months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'Mei',
+            'Jun',
+            'Jul',
+            'Agu',
+            'Sep',
+            'Okt',
+            'Nov',
+            'Des',
+        ]
+
+        if (
+            start.getDate() === end.getDate() &&
+            start.getMonth() === end.getMonth()
+        ) {
+            return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()}, ${this.formatTime(start)} - ${this.formatTime(end)}`
+        }
+
+        return `${start.getDate()}-${end.getDate()} ${months[start.getMonth()]} ${start.getFullYear()}`
+    }
+
+    private formatTime(date: Date): string {
+        const hours = date.getHours().toString().padStart(2, '0')
+        const minutes = date.getMinutes().toString().padStart(2, '0')
+        return `${hours}:${minutes}`
+    }
+
+    enterExam(examId: string): void {
+        // TODO: Navigate to exam page or perform exam entry logic
+        console.log('Entering exam:', examId)
+        // this.router.navigate(['/examiner/exam', examId])
+    }
+
+    viewExamDetail(examId: string): void {
+        // TODO: Navigate to exam detail page
+        console.log('Viewing exam detail:', examId)
+        // this.router.navigate(['/examiner/exam', examId, 'detail'])
+    }
+
+    toggleCompletedExams(): void {
+        this.showCompletedExams.update((value) => !value)
+    }
+}

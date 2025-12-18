@@ -12,5 +12,14 @@ export const routes: Routes = [
         data: {
             title: 'Home',
         },
+        children: [
+            {
+                path: '',
+                loadComponent: () =>
+                    import('./dashboard/dashboard.component').then(
+                        (m) => m.DashboardComponent,
+                    ),
+            },
+        ],
     },
 ]

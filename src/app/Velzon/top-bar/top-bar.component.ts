@@ -8,15 +8,21 @@ import { ApiService } from '../../../modules/base/services/api.service'
 import { NotificationMessage } from '../../../modules/notification/models/notification-message.model'
 import { BehaviorSubject } from 'rxjs'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
-import { DomSanitizer } from '@angular/platform-browser'
-import { SafeUrl } from '@angular/platform-browser'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { FormsModule } from '@angular/forms'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 
 @Component({
     selector: 'app-top-bar',
     standalone: true,
-    imports: [CommonModule, EmptyStateComponent, ModalComponent, FormsModule],
+    imports: [
+        CommonModule,
+        EmptyStateComponent,
+        ModalComponent,
+        FormsModule,
+        LoadingButtonComponent,
+    ],
     templateUrl: './top-bar.component.html',
     styleUrl: './top-bar.component.scss',
 })
