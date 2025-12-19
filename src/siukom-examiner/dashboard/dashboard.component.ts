@@ -1,8 +1,16 @@
 import { CommonModule } from '@angular/common'
-import { Component, computed, inject, OnInit, signal } from '@angular/core'
+import {
+    Component,
+    computed,
+    effect,
+    inject,
+    OnInit,
+    signal,
+} from '@angular/core'
 import { Router } from '@angular/router'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { Participant } from '@/modules/ukom/models/cat/participant.model'
 
 type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
 
@@ -10,6 +18,7 @@ interface GroupedExam {
     schedule: ExamSchedule
     status: ExamStatus
     displayName: string
+    participantCount: number
 }
 
 @Component({
@@ -22,16 +31,36 @@ interface GroupedExam {
 export class DashboardComponent implements OnInit {
     private router = inject(Router)
 
+    // Participant list management
+    showParticipantList = signal<string | null>(null)
+    selectedExamForParticipants = signal<GroupedExam | null>(null)
+
     // Dummy data - replace with actual API call
     private schedules = signal<ExamSchedule[]>([
         new ExamSchedule({
             id: '36c814b0-653f-4474-99b4-827731aa57d3',
-            startTime: '2025-12-16 13:55:00',
-            endTime: '2025-12-16 23:55:00',
-            duration: 0.38,
+            startTime: '2025-12-19 03:55:00',
+            endTime: '2025-12-19 23:55:00',
+            duration: 0.5,
             examTypeCode: ExamTypeCategory.WAWANCARA,
             roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
             secretKey: null,
+            participantScheduleList: [
+                {
+                    id: 'psl-1',
+                    participantId: 'participant-1',
+                    examScheduleId: '36c814b0-653f-4474-99b4-827731aa57d3',
+                    participantUkom: new Participant({
+                        id: 'participant-1',
+                        name: 'Budi Santoso',
+                        nip: '198501012010011001',
+                        nextJabatanName: 'Penera',
+                        nextJenjangName: 'Ahli Utama',
+                        bidangJabatanName: 'Metrologi',
+                        jenisUkom: 'PERPINDAHAN_JABATAN',
+                    }),
+                },
+            ],
         }),
         new ExamSchedule({
             id: '5e2f4d2e-5f4b-4c3a-9f7e-2d3b6c8e9f0a',
@@ -41,6 +70,36 @@ export class DashboardComponent implements OnInit {
             examTypeCode: ExamTypeCategory.MAKALAH,
             roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
             secretKey: null,
+            participantScheduleList: [
+                {
+                    id: 'psl-4',
+                    participantId: 'participant-4',
+                    examScheduleId: '5e2f4d2e-5f4b-4c3a-9f7e-2d3b6c8e9f0a',
+                    participantUkom: new Participant({
+                        id: 'participant-4',
+                        name: 'Dewi Lestari',
+                        nip: '198805102012012004',
+                        nextJabatanName: 'Pranata Perdagangan',
+                        nextJenjangName: 'Ahli Madya',
+                        bidangJabatanName: 'Perdagangan',
+                        jenisUkom: 'KENAIKAN_JENJANG',
+                    }),
+                },
+                {
+                    id: 'psl-5',
+                    participantId: 'participant-5',
+                    examScheduleId: '5e2f4d2e-5f4b-4c3a-9f7e-2d3b6c8e9f0a',
+                    participantUkom: new Participant({
+                        id: 'participant-5',
+                        name: 'Rudi Hartono',
+                        nip: '199105252016011005',
+                        nextJabatanName: 'Pengawas Perdagangan',
+                        nextJenjangName: 'Ahli Pertama',
+                        bidangJabatanName: 'Pengawasan',
+                        jenisUkom: 'PERPINDAHAN_JABATAN',
+                    }),
+                },
+            ],
         }),
         new ExamSchedule({
             id: '84f3d3af-7836-4426-8337-50426596b835',
@@ -50,6 +109,22 @@ export class DashboardComponent implements OnInit {
             examTypeCode: ExamTypeCategory.SEMINAR,
             roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
             secretKey: '1',
+            participantScheduleList: [
+                {
+                    id: 'psl-6',
+                    participantId: 'participant-6',
+                    examScheduleId: '84f3d3af-7836-4426-8337-50426596b835',
+                    participantUkom: new Participant({
+                        id: 'participant-6',
+                        name: 'Rina Wati',
+                        nip: '198612152013012006',
+                        nextJabatanName: 'Penera',
+                        nextJenjangName: 'Ahli Madya',
+                        bidangJabatanName: 'Kemetrologian',
+                        jenisUkom: 'KENAIKAN_JENJANG',
+                    }),
+                },
+            ],
         }),
         new ExamSchedule({
             id: 'abc123-completed',
@@ -59,6 +134,36 @@ export class DashboardComponent implements OnInit {
             examTypeCode: ExamTypeCategory.PRAKTIK,
             roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
             secretKey: null,
+            participantScheduleList: [
+                {
+                    id: 'psl-7',
+                    participantId: 'participant-7',
+                    examScheduleId: 'abc123-completed',
+                    participantUkom: new Participant({
+                        id: 'participant-7',
+                        name: 'Agus Setiawan',
+                        nip: '198408202014011007',
+                        nextJabatanName: 'Auditor',
+                        nextJenjangName: 'Ahli Utama',
+                        bidangJabatanName: 'Pengawasan',
+                        jenisUkom: 'KENAIKAN_JENJANG',
+                    }),
+                },
+                {
+                    id: 'psl-8',
+                    participantId: 'participant-8',
+                    examScheduleId: 'abc123-completed',
+                    participantUkom: new Participant({
+                        id: 'participant-8',
+                        name: 'Maya Sari',
+                        nip: '199207302017012008',
+                        nextJabatanName: 'Analis Kebijakan',
+                        nextJenjangName: 'Ahli Muda',
+                        bidangJabatanName: 'Kebijakan Publik',
+                        jenisUkom: 'PERPINDAHAN_JABATAN',
+                    }),
+                },
+            ],
         }),
     ])
 
@@ -68,8 +173,8 @@ export class DashboardComponent implements OnInit {
     // Computed values
     groupedExams = computed(() => this.groupExamsByStatus())
 
-    ongoingExam = computed(
-        () => this.groupedExams().find((e) => e.status === 'ongoing') || null,
+    ongoingExam = computed(() =>
+        this.groupedExams().filter((e) => e.status === 'ongoing'),
     )
 
     upcomingExams = computed(() =>
@@ -115,6 +220,14 @@ export class DashboardComponent implements OnInit {
         return `${dayName}, ${day} ${month} ${year}`
     })
 
+    constructor() {
+        effect(() => {
+            console.log('Grouped Exams Updated:', this.groupedExams())
+            console.log('Ongoing Exam:', this.ongoingExam())
+            console.log('Upcoming Exams:', this.upcomingExams())
+            console.log('Completed Exams:', this.completedExams())
+        })
+    }
     ngOnInit(): void {
         // Update current time every minute
         setInterval(() => {
@@ -143,6 +256,7 @@ export class DashboardComponent implements OnInit {
                 schedule,
                 status,
                 displayName: this.getExamDisplayName(schedule.examTypeCode),
+                participantCount: schedule.participantScheduleList?.length || 0,
             })
         })
 
@@ -239,5 +353,32 @@ export class DashboardComponent implements OnInit {
 
     toggleCompletedExams(): void {
         this.showCompletedExams.update((value) => !value)
+    }
+
+    toggleParticipantList(examId: string, exam: GroupedExam): void {
+        if (this.showParticipantList() === examId) {
+            this.showParticipantList.set(null)
+            this.selectedExamForParticipants.set(null)
+        } else {
+            this.showParticipantList.set(examId)
+            this.selectedExamForParticipants.set(exam)
+        }
+    }
+
+    isParticipantListVisible(examId: string): boolean {
+        return this.showParticipantList() === examId
+    }
+
+    getJenisUkomDisplay(jenisUkom: string): string {
+        const displayNames: Record<string, string> = {
+            PERPINDAHAN_JABATAN: 'Perpindahan Jabatan',
+            KENAIKAN_JENJANG: 'Kenaikan Jenjang',
+            INPASSING: 'Inpassing',
+        }
+        return displayNames[jenisUkom] || jenisUkom
+    }
+
+    getParticipants(exam: GroupedExam) {
+        return exam.schedule.participantScheduleList || []
     }
 }

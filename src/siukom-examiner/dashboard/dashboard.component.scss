@@ -69,7 +69,7 @@
 
     i {
         font-size: 20px;
-        color: #667eea;
+        color: #0d6efd;
     }
 }
 
@@ -284,7 +284,7 @@
 }
 
 .animate-slide-down {
-    animation: slideDown 0.3s ease-out;
+    animation: slideDown 0.6s ease-out;
 }
 
 @keyframes slideDown {
@@ -369,7 +369,7 @@ button,
 // Focus states for keyboard navigation
 button:focus-visible,
 .section-header:focus-visible {
-    outline: 3px solid #667eea;
+    outline: 3px solid #0d6efd;
     outline-offset: 2px;
 }
 
@@ -392,6 +392,239 @@ button:focus-visible,
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+// ============================================
+// SECTION 9: PARTICIPANT LIST STYLES
+// ============================================
+
+// Participant count badge
+.participant-count-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #0d6efd;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: clamp(14px, 2.5vw, 16px);
+    font-weight: 600;
+    margin-top: 0.75rem;
+
+    i {
+        font-size: 18px;
+    }
+}
+
+// Small secondary button for toggling participant list
+.btn-secondary-small {
+    width: 100%;
+    background: white;
+    color: #0d6efd;
+    border: 2px solid #0d6efd;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: clamp(14px, 2.5vw, 16px);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+
+    i {
+        font-size: 18px;
+    }
+
+    &:hover {
+        background: #0d6efd;
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    &:focus-visible {
+        outline: 3px solid #0d6efd;
+        outline-offset: 2px;
+    }
+}
+
+// Participant list container
+.participant-list-container {
+    background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+    border: 2px solid #0d6efd;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+
+    @media (max-width: 576px) {
+        padding: 1rem;
+    }
+}
+
+.participant-list-title {
+    font-size: clamp(18px, 3.5vw, 20px);
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e2e8f0;
+
+    i {
+        font-size: 22px;
+        color: #0d6efd;
+    }
+}
+
+// Participant cards grid
+.participant-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+// Individual participant card - Elder friendly design
+.participant-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+    @media (max-width: 576px) {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+
+// Participant number badge
+.participant-number {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    //background: linear-gradient(135deg, #0d6efd 0%, #764ba2 100%);
+    background: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(18px, 3.5vw, 22px);
+    font-weight: 700;
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+
+    @media (max-width: 576px) {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+// Participant information
+.participant-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.participant-name {
+    font-size: clamp(18px, 3.5vw, 20px);
+    font-weight: 700;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+
+    i {
+        color: #0d6efd;
+        font-size: 22px;
+    }
+}
+
+// Participant detail row - Large font for elder users
+.participant-detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: clamp(15px, 3vw, 17px);
+    line-height: 1.6;
+    padding: 0.25rem 0;
+
+    @media (max-width: 576px) {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #4a5568;
+    min-width: 140px;
+
+    @media (max-width: 576px) {
+        min-width: auto;
+    }
+}
+
+.detail-value {
+    color: #2d3748;
+    font-weight: 500;
+    flex: 1;
+}
+
+// Participant badge for jenis ukom
+.participant-badge {
+    display: inline-flex;
+    align-items: center;
+    //background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    background: #48bb78;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: clamp(13px, 2.5vw, 15px);
+    font-weight: 600;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+    box-shadow: 0 2px 6px rgba(72, 187, 120, 0.3);
+}
+
+// Empty state for no participants
+.no-participants {
+    text-align: center;
+    padding: 2rem;
+    color: #718096;
+    font-size: clamp(16px, 3vw, 18px);
+
+    i {
+        font-size: 48px;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+    }
+}
+
+// Responsive adjustments for participant list
+@media (max-width: 768px) {
+    .participant-list-container {
+        padding: 1rem;
+    }
+
+    .participant-card {
+        padding: 1rem;
+    }
+
+    .participant-number {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
     }
 }
 
