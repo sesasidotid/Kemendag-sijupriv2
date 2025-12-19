@@ -21,4 +21,5 @@ export enum ExamTypeCategory {
     MAKALA = 'MAKALA',
     PORTOFOLIO = 'PORTOFOLIO',
     MAKALAH = 'MAKALAH',
+    STUDI_KASUS = 'STUDI_KASUS',
 }

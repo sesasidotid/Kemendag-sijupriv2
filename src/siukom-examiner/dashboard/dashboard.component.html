@@ -107,7 +107,7 @@
 
         <button
             class="btn-primary-action"
-            (click)="enterExam(exam.schedule.id)"
+            (click)="enterExam(exam.schedule.id, exam.schedule.examTypeCode)"
         >
             MASUK UJIAN SEKARANG
         </button>
@@ -115,7 +115,7 @@
 </div>
 
 <!-- Empty State for No Ongoing Exam -->
-<div *ngIf="!ongoingExam()" class="exam-card exam-card-empty mb-4">
+<div *ngIf="ongoingExam().length == 0" class="exam-card exam-card-empty mb-4">
     <div class="empty-state">
         <i class="ri-checkbox-circle-line empty-icon"></i>
         <p class="empty-text">Tidak ada ujian yang sedang berlangsung</p>

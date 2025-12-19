@@ -1,0 +1,243 @@
+$primary-color: #2c3e50;
+$text-color: #333;
+$border-color: #d1d5db;
+$bg-color: #f9fafb;
+$card-bg: #ffffff;
+$link-color: #2563eb;
+$score-color: #4f46e5;
+
+.case-study-container {
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: $text-color;
+  background-color: $bg-color;
+  min-height: 100vh;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 2rem;
+  
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    font-size: 1.1rem;
+    color: #6b7280;
+  }
+}
+
+.action-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.btn-answer {
+  background-color: #fff;
+  border: 2px solid $score-color;
+  color: $score-color;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background-color: $score-color;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.assessment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 5rem; // Space for sticky footer
+}
+
+.assessment-card {
+  background: $card-bg;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: #f8fafc;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid $border-color;
+
+  .item-number {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b7280;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .aspect-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .aspect-desc {
+    font-size: 1rem;
+    color: #4b5563;
+    margin: 0;
+  }
+}
+
+.card-body {
+  padding: 2rem;
+  display: flex;
+  gap: 3rem;
+  flex-wrap: wrap;
+
+  .score-section {
+    flex: 0 0 200px; // Fixed width for score
+  }
+
+  .note-section {
+    flex: 1;
+    min-width: 300px;
+  }
+}
+
+.input-label {
+  display: block;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.score-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .score-input {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    color: $score-color;
+    padding: 0.5rem;
+    height: auto;
+  }
+
+  .score-suffix {
+    font-weight: 600;
+    color: #9ca3af;
+  }
+}
+
+.form-control {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+  background-color: #fff;
+  
+  &:focus {
+    outline: none;
+    border-color: $link-color;
+    box-shadow: 0 0 0 3px rgba($link-color, 0.1);
+  }
+}
+
+.form-footer {
+  position: sticky;
+  bottom: 0;
+  background: white; // Solid background for clarity
+  border-top: 1px solid $border-color;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  margin: 0 -2rem -2rem -2rem; // Negative margin to stretch full width of padded container
+}
+
+.final-score-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .label {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: $score-color;
+  }
+}
+
+.btn-submit {
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  padding: 1rem 3rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: lighten($primary-color, 10%);
+  }
+}
+
+@media (max-width: 600px) {
+  .case-study-container {
+    padding: 1rem;
+  }
+  .card-header, .card-body {
+    padding: 1.5rem;
+  }
+  .card-body {
+    flex-direction: column;
+    gap: 1.5rem;
+    
+    .score-section {
+      flex: 1;
+      width: 100%;
+    }
+  }
+  .form-footer {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+    margin: 0 -1rem -1rem -1rem; // Adjust for smaller container padding
+  }
+  .btn-submit {
+    width: 100%;
+  }
+}

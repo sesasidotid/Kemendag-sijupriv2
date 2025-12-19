@@ -1,0 +1,71 @@
+<div class="portfolio-container">
+    <div class="header-section">
+        <h1>Form Penilaian Portofolio</h1>
+        <div class="examiner-info">
+            <span class="label">Penguji:</span>
+            <span class="value">{{ examinerName }}</span>
+        </div>
+        <p class="subtitle">Silakan periksa dokumen bukti dan berikan penilaian untuk setiap kompetensi.</p>
+    </div>
+
+    <div class="portfolio-list">
+        <div class="portfolio-card" *ngFor="let item of portfolioItems; let i = index">
+
+            <!-- Competency Header -->
+            <div class="card-header">
+                <div class="competency-info">
+                    <span class="item-number">Kompetensi {{ item.id }}</span>
+                    <h2 class="competency-name">{{ item.competency }}</h2>
+                    <p class="aspect-text"><strong>Aspek Penilaian:</strong> {{ item.assessmentAspect }}</p>
+                </div>
+
+                <!-- Document Link -->
+                <button class="btn-document" (click)="openDocument(item.documentUrl)">
+                    📄 Lihat Dokumen: {{ item.documentName }} <span class="external-icon">↗</span>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <!-- Checklist Section -->
+                <div class="checklist-section">
+                    <div class="section-label">Checklist Validasi:</div>
+                    <div class="checklist-group">
+                        <label class="checkbox-card" [class.checked]="item.isValid">
+                            <input type="checkbox" [(ngModel)]="item.isValid">
+                            <span class="checkbox-label">Valid</span>
+                        </label>
+
+                        <label class="checkbox-card" [class.checked]="item.isAdequate">
+                            <input type="checkbox" [(ngModel)]="item.isAdequate">
+                            <span class="checkbox-label">Memadai</span>
+                        </label>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div class="status-badge" [class.competent]="isItemCompetent(item)"
+                        [class.not-competent]="!isItemCompetent(item)">
+                        Status: {{ isItemCompetent(item) ? 'DITERIMA (Nilai Masuk)' : 'BELUM DITERIMA' }}
+                    </div>
+                    <p class="small-hint" *ngIf="!isItemCompetent(item)">*Harus Valid DAN Memadai untuk mendapatkan
+                        nilai.</p>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="notes-section">
+                    <label [for]="'note-' + i" class="section-label">Catatan Penguji:</label>
+                    <textarea [id]="'note-' + i" rows="4" class="form-control" [(ngModel)]="item.examinerNote"
+                        placeholder="Tuliskan catatan terkait bukti portofolio ini...">
+          </textarea>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-actions">
+        <button class="btn-submit" (click)="submitAssessment()">
+            Simpan Penilaian Portofolio
+        </button>
+    </div>
+</div>

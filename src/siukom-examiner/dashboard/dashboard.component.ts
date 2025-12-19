@@ -1,16 +1,11 @@
 import { CommonModule } from '@angular/common'
-import {
-    Component,
-    computed,
-    effect,
-    inject,
-    OnInit,
-    signal,
-} from '@angular/core'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { Router } from '@angular/router'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
 
 type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
 
@@ -30,6 +25,8 @@ interface GroupedExam {
 })
 export class DashboardComponent implements OnInit {
     private router = inject(Router)
+    private jenisUkomService = inject(JenisUkomService)
+    private handlerService = inject(HandlerService)
 
     // Participant list management
     showParticipantList = signal<string | null>(null)
@@ -50,6 +47,56 @@ export class DashboardComponent implements OnInit {
                     id: 'psl-1',
                     participantId: 'participant-1',
                     examScheduleId: '36c814b0-653f-4474-99b4-827731aa57d3',
+                    participantUkom: new Participant({
+                        id: 'participant-1',
+                        name: 'Budi Santoso',
+                        nip: '198501012010011001',
+                        nextJabatanName: 'Penera',
+                        nextJenjangName: 'Ahli Utama',
+                        bidangJabatanName: 'Metrologi',
+                        jenisUkom: 'PERPINDAHAN_JABATAN',
+                    }),
+                },
+            ],
+        }),
+        new ExamSchedule({
+            id: 'exam-portofolio-001',
+            startTime: '2025-12-19 03:55:00',
+            endTime: '2025-12-19 23:55:00',
+            duration: 0.5,
+            examTypeCode: ExamTypeCategory.PORTOFOLIO,
+            roomUkomId: 'room-portofolio-001',
+            secretKey: null,
+            participantScheduleList: [
+                {
+                    id: 'psl-portofolio-001',
+                    participantId: 'participant-1',
+                    examScheduleId: 'exam-portofolio-001',
+                    participantUkom: new Participant({
+                        id: 'participant-1',
+                        name: 'Budi Santoso',
+                        nip: '198501012010011001',
+                        nextJabatanName: 'Penera',
+                        nextJenjangName: 'Ahli Utama',
+                        bidangJabatanName: 'Metrologi',
+                        jenisUkom: 'PERPINDAHAN_JABATAN',
+                    }),
+                },
+            ],
+        }),
+        new ExamSchedule({
+            id: 'exam-studi-kasus-001',
+            startTime: '2025-12-19 03:55:00',
+            endTime: '2025-12-19 23:55:00',
+            duration: 0.5,
+            examTypeCode: ExamTypeCategory.STUDI_KASUS,
+            roomUkomId: 'room-studi-kasus-001',
+            secretKey: null,
+            participantScheduleList: [
+                {
+                    id: 'psl-studi-kasus-001',
+                    participantId: 'participant-1',
+                    examScheduleId: 'exam-studi-kasus-001',
                     participantUkom: new Participant({
                         id: 'participant-1',
                         name: 'Budi Santoso',
@@ -103,8 +150,8 @@ export class DashboardComponent implements OnInit {
         }),
         new ExamSchedule({
             id: '84f3d3af-7836-4426-8337-50426596b835',
-            startTime: '2025-12-18 10:01:00',
-            endTime: '2025-12-18 19:01:00',
+            startTime: '2025-12-29 10:01:00',
+            endTime: '2025-12-30 19:01:00',
             duration: 0.25,
             examTypeCode: ExamTypeCategory.SEMINAR,
             roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
@@ -220,14 +267,7 @@ export class DashboardComponent implements OnInit {
         return `${dayName}, ${day} ${month} ${year}`
     })
 
-    constructor() {
-        effect(() => {
-            console.log('Grouped Exams Updated:', this.groupedExams())
-            console.log('Ongoing Exam:', this.ongoingExam())
-            console.log('Upcoming Exams:', this.upcomingExams())
-            console.log('Completed Exams:', this.completedExams())
-        })
-    }
+    constructor() {}
     ngOnInit(): void {
         // Update current time every minute
         setInterval(() => {
@@ -299,6 +339,8 @@ export class DashboardComponent implements OnInit {
             WAWANCARA: 'Wawancara',
             MAKALAH: 'Makalah',
             SEMINAR: 'Seminar',
+            PORTOFOLIO: 'Portofolio',
+            STUDI_KASUS: 'Studi Kasus',
         }
 
         return displayNames[examTypeCode] || examTypeCode
@@ -339,10 +381,28 @@ export class DashboardComponent implements OnInit {
         return `${hours}:${minutes}`
     }
 
-    enterExam(examId: string): void {
-        // TODO: Navigate to exam page or perform exam entry logic
-        console.log('Entering exam:', examId)
-        // this.router.navigate(['/examiner/exam', examId])
+    enterExam(examId: string, ukomType: ExamTypeCategory) {
+        switch (ukomType) {
+            case ExamTypeCategory.WAWANCARA:
+                this.router.navigate(['/interviews', examId])
+                break
+            case ExamTypeCategory.MAKALAH:
+            case ExamTypeCategory.SEMINAR:
+                this.router.navigate(['/seminar-paper', examId])
+                break
+            case ExamTypeCategory.PORTOFOLIO:
+                this.router.navigate(['/portfolio', examId])
+                break
+            case ExamTypeCategory.STUDI_KASUS:
+                this.router.navigate(['/study-case', examId])
+                break
+            default:
+                this.handlerService.handleAlert(
+                    'Warning',
+                    'Jenis Ukom tidak dikenali, Silahkan hubungi Admin',
+                )
+                break
+        }
     }
 
     viewExamDetail(examId: string): void {
@@ -370,12 +430,7 @@ export class DashboardComponent implements OnInit {
     }
 
     getJenisUkomDisplay(jenisUkom: string): string {
-        const displayNames: Record<string, string> = {
-            PERPINDAHAN_JABATAN: 'Perpindahan Jabatan',
-            KENAIKAN_JENJANG: 'Kenaikan Jenjang',
-            INPASSING: 'Inpassing',
-        }
-        return displayNames[jenisUkom] || jenisUkom
+        return this.jenisUkomService.getLabelByValue(jenisUkom) || jenisUkom
     }
 
     getParticipants(exam: GroupedExam) {

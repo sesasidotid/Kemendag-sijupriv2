@@ -20,6 +20,34 @@ export const routes: Routes = [
                         (m) => m.DashboardComponent,
                     ),
             },
+            {
+                path: 'interviews/:id',
+                loadComponent: () =>
+                    import('./wawancara/wawancara.component').then(
+                        (m) => m.WawancaraComponent,
+                    ),
+            },
+            {
+                path: 'seminar-paper/:id',
+                loadComponent: () =>
+                    import('./seminer-makalah/seminer-makalah.component').then(
+                        (m) => m.SeminerMakalahComponent,
+                    ),
+            },
+            {
+                path: 'portfolio/:id',
+                loadComponent: () =>
+                    import('./portofolio/portofolio.component').then(
+                        (m) => m.PortofolioComponent,
+                    ),
+            },
+            {
+                path: 'study-case/:id',
+                loadComponent: () =>
+                    import('./studi-kasus/studi-kasus.component').then(
+                        (m) => m.StudiKasusComponent,
+                    ),
+            },
         ],
     },
 ]

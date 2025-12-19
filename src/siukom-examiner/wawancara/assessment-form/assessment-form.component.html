@@ -1,0 +1,73 @@
+<div class="assessment-container">
+  <div class="header-section">
+    <h1>Form Penilaian Wawancara</h1>
+    <p>Silakan isi penilaian untuk setiap pertanyaan di bawah ini.</p>
+  </div>
+
+  <div class="question-list">
+    <div class="question-card" *ngFor="let question of questions; let i = index">
+      
+      <!-- Question Header -->
+      <div class="card-header">
+        <span class="question-number">Pertanyaan {{ question.id }}</span>
+        <h2 class="question-text">{{ question.text }}</h2>
+      </div>
+
+      <!-- Candidate Answer Section -->
+      <div class="form-group row-spacing">
+        <label [for]="'answer-' + i">Jawaban Peserta:</label>
+        <textarea 
+          [id]="'answer-' + i" 
+          rows="5" 
+          class="form-control large-textarea" 
+          [(ngModel)]="question.candidateAnswer" 
+          placeholder="Tuliskan jawaban peserta disini...">
+        </textarea>
+      </div>
+
+      <!-- Answer Key Link -->
+      <div class="row-spacing">
+        <div class="key-label">Kunci Jawaban:</div>
+        <a [href]="question.answerKeyUrl" target="_blank" class="action-link">
+          [ Lihat Kunci Jawaban ] <span class="external-icon">🔗</span>
+        </a>
+      </div>
+
+      <!-- Assessment Options -->
+      <div class="assessment-section row-spacing">
+        <div class="assessment-label">Penilaian:</div>
+        
+        <div class="radio-group">
+          <!-- Competent Option -->
+          <label class="radio-card competent-option" [class.selected]="question.assessment === 'competent'">
+            <input 
+              type="radio" 
+              [name]="'assessment-' + i" 
+              [(ngModel)]="question.assessment" 
+              value="competent">
+            <span class="radio-text">Kompeten</span>
+          </label>
+
+          <!-- Not Competent Option -->
+          <label class="radio-card incompetent-option" [class.selected]="question.assessment === 'not_competent'">
+            <input 
+              type="radio" 
+              [name]="'assessment-' + i" 
+              [(ngModel)]="question.assessment" 
+              value="not_competent">
+            <span class="radio-text">Tidak Kompeten</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+    </div>
+  </div>
+
+  <!-- Submit Button (Sticky Bottom or Bottom Block) -->
+  <div class="form-actions">
+    <button class="btn-submit" (click)="submitAssessment()" [disabled]="!isFormValid()">
+      Simpan Penilaian
+    </button>
+  </div>
+</div>

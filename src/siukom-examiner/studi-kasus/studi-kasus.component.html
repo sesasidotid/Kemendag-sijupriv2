@@ -1,0 +1,57 @@
+<div class="case-study-container">
+    <div class="header-section">
+        <h1>Form Penilaian Studi Kasus</h1>
+        <p>Berikan penilaian (0-100) dan catatan untuk setiap aspek analisis studi kasus peserta.</p>
+    </div>
+
+    <!-- Answer Link Section -->
+    <div class="action-section">
+        <button class="btn-answer" (click)="openAnswer()">
+            📝 Lihat Jawaban Peserta <span class="external-icon">↗</span>
+        </button>
+    </div>
+
+    <div class="assessment-list">
+        <div class="assessment-card" *ngFor="let item of assessmentItems; let i = index">
+
+            <!-- Aspect Header -->
+            <div class="card-header">
+                <span class="item-number">Aspek {{ item.id }}</span>
+                <h2 class="aspect-name">{{ item.aspect }}</h2>
+                <p class="aspect-desc">{{ item.description }}</p>
+            </div>
+
+            <div class="card-body">
+                <!-- Score Input -->
+                <div class="score-section">
+                    <label [for]="'score-' + i" class="input-label">Nilai (0-100):</label>
+                    <div class="score-input-wrapper">
+                        <input type="number" [id]="'score-' + i" class="form-control score-input"
+                            [(ngModel)]="item.score" (change)="validateScore(item)" min="0" max="100" placeholder="0">
+                        <span class="score-suffix">/ 100</span>
+                    </div>
+                </div>
+
+                <!-- Note Input -->
+                <div class="note-section">
+                    <label [for]="'note-' + i" class="input-label">Catatan Penilaian:</label>
+                    <textarea [id]="'note-' + i" rows="4" class="form-control" [(ngModel)]="item.note"
+                        placeholder="Tuliskan alasan penilaian dan masukan...">
+          </textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary & Submit -->
+    <div class="form-footer">
+        <div class="final-score-box">
+            <span class="label">Nilai Akhir:</span>
+            <span class="value">{{ finalScore }}</span>
+        </div>
+
+        <button class="btn-submit" (click)="submitAssessment()">
+            Simpan Penilaian Studi Kasus
+        </button>
+    </div>
+</div>

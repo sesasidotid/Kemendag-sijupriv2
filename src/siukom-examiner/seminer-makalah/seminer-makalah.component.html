@@ -1,0 +1,66 @@
+<div class="assessment-container">
+    <div class="header-section">
+        <h1>Form Penilaian Makalah</h1>
+        <p>Silakan isi penilaian catatan dan hasil untuk setiap komponen makalah.</p>
+        <div class="instruction-box">
+            <p class="instruction-text">ℹ️ Petunjuk: Silahkan kosongkan apabila anda tidak melakukan penilaian.</p>
+        </div>
+    </div>
+
+    <!-- Paper Link Section -->
+    <div class="paper-action-section">
+        <button class="btn-paper" (click)="openPaper()">
+            📄 Lihat Makalah Peserta <span class="external-icon">↗</span>
+        </button>
+    </div>
+
+    <div class="component-list">
+        <div class="component-card" *ngFor="let component of assessmentComponents; let i = index">
+
+            <!-- Component Header -->
+            <div class="card-header">
+                <span class="component-number">Komponen {{ component.id }}</span>
+                <h2 class="component-name">{{ component.name }}</h2>
+            </div>
+
+            <!-- Notes Section -->
+            <div class="form-group row-spacing">
+                <label [for]="'note-' + i">Catatan Penilaian:</label>
+                <textarea [id]="'note-' + i" rows="5" class="form-control large-textarea" [(ngModel)]="component.note"
+                    placeholder="Tuliskan catatan evaluasi disini...">
+        </textarea>
+            </div>
+
+            <!-- Assessment Options -->
+            <div class="assessment-section row-spacing">
+                <div class="assessment-label">Hasil Penilaian:</div>
+
+                <div class="radio-group">
+                    <!-- Competent Option -->
+                    <label class="radio-card competent-option" [class.selected]="component.assessment === 'competent'">
+                        <input type="radio" [name]="'assessment-' + i" [(ngModel)]="component.assessment"
+                            value="competent">
+                        <span class="radio-text">Kompeten</span>
+                    </label>
+
+                    <!-- Not Competent Option -->
+                    <label class="radio-card incompetent-option"
+                        [class.selected]="component.assessment === 'not_competent'">
+                        <input type="radio" [name]="'assessment-' + i" [(ngModel)]="component.assessment"
+                            value="not_competent">
+                        <span class="radio-text">Tidak Kompeten</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-actions">
+        <button class="btn-submit" (click)="submitAssessment()" [disabled]="!isFormValid()">
+            Simpan Penilaian Makalah
+        </button>
+    </div>
+</div>
