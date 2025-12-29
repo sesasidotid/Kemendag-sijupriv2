@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { LoginContext } from '@/modules/base/commons/login-context'
-import { Component, inject, signal } from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
@@ -51,7 +51,7 @@ import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {
+export class DashboardComponent implements  OnInit{
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
     participantService = inject(UkomParticipantService)
     examGradeService = inject(ExamGradeService)
@@ -62,8 +62,6 @@ export class DashboardComponent {
     selectedExamId = signal<string | null>(null)
 
     roomUkom = new RoomUkom()
-    examType: ExamType[] = []
-
     scoreMap: Record<string, ScoreValue | null> = {}
 
     isRoomLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
@@ -113,12 +111,6 @@ export class DashboardComponent {
                 finalize(() => this.isRoomLoading$.next(false)),
             )
             .subscribe()
-    }
-
-    getExamType() {
-        return this.ukomMiscellaneousService
-            .getExamType()
-            .pipe(tap((examType) => (this.examType = examType)))
     }
 
     getAllScores(participant: Participant) {
@@ -380,17 +372,6 @@ export class DashboardComponent {
                 question.answerDto?.answerChoice ===
                 this.getCorrectAnswer(question),
         ).length
-    }
-
-    getWrongAnswersCount(kompetensi: CATIndicatorCompetency): number {
-        if (!kompetensi.questionDtoList) {
-            return 0
-        }
-
-        return (
-            kompetensi.questionDtoList.length -
-            this.getCorrectAnswersCount(kompetensi)
-        )
     }
 
     /**

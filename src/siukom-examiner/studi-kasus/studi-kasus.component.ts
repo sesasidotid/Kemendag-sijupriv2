@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 
 interface CaseStudyItem {
     id: number
@@ -18,10 +20,25 @@ interface CaseStudyItem {
     styleUrls: ['./studi-kasus.component.scss'],
 })
 export class StudiKasusComponent implements OnInit {
+    handlerService = inject(HandlerService)
+    confirmationService = inject(ConfirmationService)
     caseStudyAnswerUrl: string = 'https://example.com/jawaban-studi-kasus.pdf' // Dummy URL
     assessmentItems: CaseStudyItem[] = []
 
     constructor() {}
+
+    get finalScore(): number {
+        const scoredItems = this.assessmentItems.filter(
+            (item) => item.score !== null,
+        )
+        if (scoredItems.length === 0) return 0
+
+        const total = scoredItems.reduce(
+            (sum, item) => sum + (item.score || 0),
+            0,
+        )
+        return Math.round(total / scoredItems.length)
+    }
 
     ngOnInit(): void {
         // Initialize with the 3 required aspects
@@ -55,19 +72,6 @@ export class StudiKasusComponent implements OnInit {
 
     openAnswer(): void {
         window.open(this.caseStudyAnswerUrl, '_blank')
-    }
-
-    get finalScore(): number {
-        const scoredItems = this.assessmentItems.filter(
-            (item) => item.score !== null,
-        )
-        if (scoredItems.length === 0) return 0
-
-        const total = scoredItems.reduce(
-            (sum, item) => sum + (item.score || 0),
-            0,
-        )
-        return Math.round(total / scoredItems.length)
     }
 
     validateScore(item: CaseStudyItem): void {

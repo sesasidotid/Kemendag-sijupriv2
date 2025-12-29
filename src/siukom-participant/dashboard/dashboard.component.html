@@ -7,164 +7,154 @@
 </ng-container>
 
 <ng-template #dashboardContent>
-    <section>
-        <div class="card mb-4 border-0 shadow-sm" *ngIf="roomUkom.id">
-            <div class="card-body">
-                <h3 class="card-title fw-semibold text-primary mb-2">
-                    {{ roomUkom.name }}
-                </h3>
+    <div *ngIf="roomUkom.id" class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+            <h3 class="card-title fw-semibold text-primary mb-2">
+                {{ roomUkom.name }}
+            </h3>
 
-                <ul class="list-unstyled mb-3">
-                    <li>
-                        <strong>Jabatan:</strong> {{ roomUkom.jabatanName }}
-                    </li>
-                    <li>
-                        <strong>Jenjang:</strong> {{ roomUkom.jenjangName }}
-                    </li>
-                    <li *ngIf="roomUkom.bidangJabatanName">
-                        <strong>Bidang Jabatan:</strong>
-                        {{ roomUkom.bidangJabatanName }}
-                    </li>
-                </ul>
+            <ul class="list-unstyled mb-3">
+                <li><strong>Jabatan:</strong> {{ roomUkom.jabatanName }}</li>
+                <li><strong>Jenjang:</strong> {{ roomUkom.jenjangName }}</li>
+                <li *ngIf="roomUkom.bidangJabatanName">
+                    <strong>Bidang Jabatan:</strong>
+                    {{ roomUkom.bidangJabatanName }}
+                </li>
+            </ul>
 
-                <p class="mb-0">
-                    <ng-container *ngIf="roomUkom.vidCallLink; else noLink">
-                        <a
-                            [href]="getAbsoluteUrl(roomUkom.vidCallLink)"
-                            target="_blank"
-                            class="text-decoration-none"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            [attr.title]="roomUkom.vidCallLink"
-                        >
-                            <span class="badge bg-primary">Join Zoom</span>
-                        </a>
-                    </ng-container>
-                    <ng-template #noLink>
-                        <span class="text-danger fst-italic"
-                            >Belum ada link Zoom</span
-                        >
-                    </ng-template>
-                </p>
-            </div>
-        </div>
-
-        <ng-container
-            *ngIf="roomUkom?.examScheduleDtoList.length > 0; else emptyState"
-        >
-            <div class="accordion" id="examAccordion">
-                <div
-                    class="accordion-item"
-                    *ngFor="let exam of roomUkom.examScheduleDtoList; let i = index"
-                >
-                    <h2 class="accordion-header" [id]="'heading' + i">
-                        <!--                        todo: bold the duration text-->
-                        <button
-                            class="accordion-button"
-                            [class.collapsed]="!isInitiallyOpen(exam.id)"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            [attr.data-bs-target]="'#collapse' + i"
-                            [attr.aria-expanded]="isInitiallyOpen(exam.id)"
-                            [attr.aria-controls]="'collapse' + i"
-                        >
-                            {{ exam.examTypeCode | prettyName}}
-                            <span class="fw-bold ms-1"
-                                >(Durasi: {{ exam.duration |
-                                examDuration}})</span
-                            >
-                        </button>
-                    </h2>
-                    <div
-                        [id]="'collapse' + i"
-                        class="accordion-collapse collapse"
-                        [class.show]="isInitiallyOpen(exam.id)"
-                        [attr.aria-labelledby]="'heading' + i"
-                        data-bs-parent="#examAccordion"
+            <p class="mb-0">
+                <ng-container *ngIf="roomUkom.vidCallLink; else noLink">
+                    <a
+                        [attr.title]="roomUkom.vidCallLink"
+                        [href]="getAbsoluteUrl(roomUkom.vidCallLink)"
+                        class="text-decoration-none"
+                        data-bs-placement="top"
+                        data-bs-toggle="tooltip"
+                        target="_blank"
                     >
-                        <div class="accordion-body">
-                            <p>
-                                <strong>Jadwal:</strong>
-                                {{ exam.startTime | formatExamSchedule:
-                                exam.endTime }}
-                            </p>
+                        <span class="badge bg-primary">Join Zoom</span>
+                    </a>
+                </ng-container>
+                <ng-template #noLink>
+                    <span class="text-danger fst-italic"
+                        >Belum ada link Zoom</span
+                    >
+                </ng-template>
+            </p>
+        </div>
+    </div>
 
-                            <div
-                                class="d-flex align-items-end flex-sm-row flex-column gap-2"
-                            >
-                                <ng-container
-                                    *ngIf="exam.examTypeCode === 'CAT'"
-                                >
-                                    <app-loading-button
-                                        [isLoading]="isStartCATLoading$ | async"
-                                        [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
-                                                (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
-                                        [label]="'Mulai'"
-                                        [className]="'btn btn-primary'"
-                                        *ngIf="canStartExam(exam.startTime, exam.endTime) &&
+    <ng-container
+        *ngIf="roomUkom?.examScheduleDtoList.length > 0; else emptyState"
+    >
+        <div class="accordion" id="examAccordion">
+            <div
+                *ngFor="let exam of roomUkom.examScheduleDtoList; let i = index"
+                class="accordion-item"
+            >
+                <h2 [id]="'heading' + i" class="accordion-header">
+                    <button
+                        [attr.aria-controls]="'collapse' + i"
+                        [attr.aria-expanded]="isInitiallyOpen(exam.id)"
+                        [attr.data-bs-target]="'#collapse' + i"
+                        [class.collapsed]="!isInitiallyOpen(exam.id)"
+                        class="accordion-button"
+                        data-bs-toggle="collapse"
+                        type="button"
+                    >
+                        {{ exam.examTypeCode | prettyName}}
+                        <span class="fw-bold ms-1"
+                            >(Durasi: {{ exam.duration | examDuration}})</span
+                        >
+                    </button>
+                </h2>
+                <div
+                    [attr.aria-labelledby]="'heading' + i"
+                    [class.show]="isInitiallyOpen(exam.id)"
+                    [id]="'collapse' + i"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#examAccordion"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            <strong>Jadwal:</strong>
+                            {{ exam.startTime | formatExamSchedule: exam.endTime
+                            }}
+                        </p>
+
+                        <div
+                            class="d-flex align-items-end flex-sm-row flex-column gap-2"
+                        >
+                            <ng-container *ngIf="exam.examTypeCode === 'CAT'">
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="canStartExam(exam.startTime, exam.endTime) &&
                                                 (scoreMap[exam.id]?.score === null || scoreMap[exam.id]?.score === undefined)"
-                                        (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                    >
-                                    </app-loading-button>
-
-                                    <button
-                                        class="btn btn-success"
-                                        *ngIf="scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined"
-                                        (click)="openScoreModal(exam.id)"
-                                    >
-                                        Lihat Nilai
-                                    </button>
-                                </ng-container>
-
-                                <ng-container
-                                    *ngIf="exam.examTypeCode === 'MAKALAH'"
+                                    [className]="'btn btn-primary'"
+                                    [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
+                                                (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
+                                    [isLoading]="isStartCATLoading$ | async"
+                                    [label]="'Mulai'"
                                 >
-                                    <app-loading-button
-                                        *ngIf="canStartExam(exam.startTime, exam.endTime) ||
+                                </app-loading-button>
+
+                                <button
+                                    (click)="openScoreModal(exam.id)"
+                                    *ngIf="scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined"
+                                    class="btn btn-success"
+                                >
+                                    Lihat Nilai
+                                </button>
+                            </ng-container>
+
+                            <ng-container
+                                *ngIf="exam.examTypeCode === 'MAKALAH'"
+                            >
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="canStartExam(exam.startTime, exam.endTime) ||
                                                 scoreMap[exam.id]?.score == null ||
                                                 scoreMap[exam.id]?.score === undefined"
-                                        [className]="'btn btn-primary'"
-                                        (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                        [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
+                                    [className]="'btn btn-primary'"
+                                    [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
                                                 (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
-                                        [isLoading]="isMakalahLoading$ | async"
-                                        [label]="'Upload Makalah'"
-                                    >
-                                    </app-loading-button>
+                                    [isLoading]="isMakalahLoading$ | async"
+                                    [label]="'Unggah Makalah'"
+                                >
+                                </app-loading-button>
 
-                                    <button
-                                        class="btn btn-success"
-                                        (click)="viewUploadedMakalah(exam.id)"
-                                        *ngIf="scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined"
-                                    >
-                                        Lihat Makalah
-                                    </button>
-                                </ng-container>
-                            </div>
+                                <button
+                                    (click)="viewUploadedMakalah(exam.id)"
+                                    *ngIf="scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined"
+                                    class="btn btn-success"
+                                >
+                                    Makalah berhasil diunggah
+                                </button>
+                            </ng-container>
                         </div>
                     </div>
                 </div>
             </div>
-        </ng-container>
+        </div>
+    </ng-container>
 
-        <ng-template #emptyState>
-            <section class="my-5">
-                <app-empty-state
-                    [title]="'Anda belum ada jadwal UKom'"
-                    [description]="'Panitia belum menetapkan jadwal ujian untuk Anda. Silahkan tunggu informasi selanjutnya.'"
-                >
-                </app-empty-state>
-            </section>
-        </ng-template>
-    </section>
+    <ng-template #emptyState>
+        <section class="my-5">
+            <app-empty-state
+                [description]="'Panitia belum menetapkan jadwal ujian untuk Anda. Silahkan tunggu informasi selanjutnya.'"
+                [title]="'Anda belum ada jadwal UKom'"
+            >
+            </app-empty-state>
+        </section>
+    </ng-template>
 </ng-template>
 
 <app-modal
-    *ngIf="isModalOpen()"
-    [title]="'Hasil Ujian'"
     (toggle)="toggleModal()"
-    [size]="'lg'"
+    *ngIf="isModalOpen()"
     [enableFooter]="false"
+    [size]="'lg'"
+    [title]="'Hasil Ujian'"
 >
     <ng-container>
         <div class="total-score-container">

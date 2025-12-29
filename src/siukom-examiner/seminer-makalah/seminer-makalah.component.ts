@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 
 interface AssessmentComponent {
     id: number
@@ -17,6 +19,8 @@ interface AssessmentComponent {
     styleUrls: ['./seminer-makalah.component.scss'],
 })
 export class SeminerMakalahComponent implements OnInit {
+    handlerService = inject(HandlerService)
+    confirmationService = inject(ConfirmationService)
     paperUrl: string = 'https://link-to-dummy-paper.pdf' // Dummy URL
     assessmentComponents: AssessmentComponent[] = []
 
@@ -77,10 +81,18 @@ export class SeminerMakalahComponent implements OnInit {
     }
 
     submitAssessment(): void {
-        const filledComponents = this.assessmentComponents.filter(
-            (c) => c.assessment || c.note,
-        )
-        console.log('Submitting Assessment:', filledComponents)
-        alert('Penilaian Seminar disimpan (Simulasi)')
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                const filledComponents = this.assessmentComponents.filter(
+                    (c) => c.assessment || c.note,
+                )
+                this.handlerService.handleAlert(
+                    'Success',
+                    'Penilaian Seminar disimpan (Simulasi)',
+                )
+            },
+        })
     }
 }

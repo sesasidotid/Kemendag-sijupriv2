@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 
 interface Question {
     id: number
@@ -18,6 +20,8 @@ interface Question {
     styleUrls: ['./assessment-form.component.scss'],
 })
 export class AssessmentFormComponent implements OnInit {
+    handlerService = inject(HandlerService)
+    confirmationService = inject(ConfirmationService)
     questions: Question[] = []
 
     constructor() {}
@@ -92,8 +96,16 @@ export class AssessmentFormComponent implements OnInit {
     }
 
     submitAssessment(): void {
-        // TODO: Implement API submission
-        console.log('Submitting Assessment:', this.questions)
-        alert('Penilaian disimpan (Simulasi)')
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.handlerService.handleAlert(
+                    'Success',
+                    'Penilaian wawancara berhasil disimpan.',
+                )
+                // TODO: Implement API submission
+            },
+        })
     }
 }

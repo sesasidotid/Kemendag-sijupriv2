@@ -1,4 +1,5 @@
 import { Serializable } from '../../../base/commons/serializable'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 
 export class RoomUkom extends Serializable {
     id: string = undefined
@@ -14,19 +15,10 @@ export class RoomUkom extends Serializable {
     vidCallLink: string = undefined
     examStartAt: string = undefined
     examEndAt: string = undefined
-    examScheduleDtoList: ExamScheduleDtoList[] = []
+    examScheduleDtoList: ExamSchedule[] | undefined | null = []
 
     constructor(object?: { [key: string]: any }) {
         super()
         if (object) this.fromObject(object)
     }
-}
-
-export interface ExamScheduleDtoList {
-    id: string
-    startTime: string
-    endTime: string
-    examTypeCode: string
-    roomUkomId: string
-    duration: number
 }

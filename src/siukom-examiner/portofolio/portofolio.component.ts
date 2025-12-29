@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 
 interface PortfolioItem {
     id: number
@@ -21,6 +23,9 @@ interface PortfolioItem {
     styleUrls: ['./portofolio.component.scss'],
 })
 export class PortofolioComponent implements OnInit {
+    handlerService = inject(HandlerService)
+    confirmationService = inject(ConfirmationService)
+
     examinerName: string = 'Budi Santoso, S.Kom., M.T.' // Dummy Examiner Name
     portfolioItems: PortfolioItem[] = []
 
@@ -99,7 +104,15 @@ export class PortofolioComponent implements OnInit {
     }
 
     submitAssessment(): void {
-        console.log('Submitting Portfolio Assessment:', this.portfolioItems)
-        alert('Penilaian Portofolio disimpan (Simulasi)')
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.handlerService.handleAlert(
+                    'Success',
+                    'Penilaian Portofolio disimpan (Simulasi)',
+                )
+            },
+        })
     }
 }
