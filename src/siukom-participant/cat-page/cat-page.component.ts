@@ -182,7 +182,36 @@ export class CatPageComponent {
     }
 
     toggleFlag(questionId: string) {
-        this.answerService.toggleFlag(questionId)
+        const currentSelected = this.answerService.selectedAnswer()
+        const selectedChoiceId = currentSelected[questionId]
+
+        // Check if answer is selected
+        if (!selectedChoiceId) {
+            this.handler.handleAlert(
+                'Warning',
+                'Silakan pilih jawaban terlebih dahulu sebelum menandai ragu-ragu'
+            )
+            return
+        }
+
+        // Save answer first, then toggle flag
+        const willBeFlagged = !this.answerService.isFlagged(questionId)
+        this.answerService
+            .saveAnswer(
+                questionId,
+                this.pesertaUkom.id,
+                willBeFlagged,
+                this.securityService.examScheduleId,
+            )
+            .subscribe({
+                next: () => {
+                    this.answerService.toggleFlag(questionId)
+                },
+                error: (err) => {
+                    console.error('Error saving answer while flagging:', err)
+                    this.handler.handleAlert('Error', 'Gagal menyimpan jawaban')
+                },
+            })
     }
 
     isFlagged(questionId: string): boolean {

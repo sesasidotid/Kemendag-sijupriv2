@@ -1,9 +1,4 @@
-<div
-    class="root-cat"
-    appDisableRightClick
-    appDisableKeyboardShortcuts
-    translate="no"
->
+<div class="root-cat" appDisableRightClick appDisableKeyboardShortcuts translate="no">
     <ng-container *ngIf="isLoading$ | async; else content">
         <div class="card parent">
             <div class="d-flex justify-content-center my-5">
@@ -17,15 +12,9 @@
     <ng-template #content>
         <ng-container *ngIf="isSubmitted(); else hadItem">
             <div class="card parent">
-                <div
-                    class="d-flex flex-column flex-lg-row align-items-center justify-content-between w-100 gap-4"
-                >
-                    <div
-                        class="max-w-50ch order-lg-1 text-lg-start container order-2 text-center"
-                    >
-                        <p
-                            class="text-uppercase text-primary fw-semibold small mb-2 tracking-wide"
-                        >
+                <div class="d-flex flex-column flex-lg-row align-items-center justify-content-between w-100 gap-4">
+                    <div class="max-w-50ch order-lg-1 text-lg-start container order-2 text-center">
+                        <p class="text-uppercase text-primary fw-semibold small mb-2 tracking-wide">
                             Terima kasih
                         </p>
                         <h2 class="fw-bold mb-3">
@@ -37,76 +26,49 @@
                             otomatis.
                         </p>
 
-                        <div
-                            class="countdown-wrapper rounded-3 border p-4"
-                            [class.warning]="remainingSeconds() < 300"
-                            [class.danger]="remainingSeconds() < 60"
-                        >
-                            <ng-container
-                                *ngIf="formatRemaining() as remaining"
-                            >
+                        <div class="countdown-wrapper rounded-3 border p-4" [class.warning]="remainingSeconds() < 300"
+                            [class.danger]="remainingSeconds() < 60">
+                            <ng-container *ngIf="formatRemaining() as remaining">
                                 <div
-                                    class="d-flex justify-content-center justify-content-lg-start countdown-grid flex-wrap gap-3"
-                                >
-                                    <div
-                                        *ngIf="remaining.days > 0"
-                                        class="countdown-segment text-center"
-                                    >
+                                    class="d-flex justify-content-center justify-content-lg-start countdown-grid flex-wrap gap-3">
+                                    <div *ngIf="remaining.days > 0" class="countdown-segment text-center">
                                         <div class="display-6 fw-bold">
                                             {{ padTime(remaining.days) }}
                                         </div>
-                                        <small class="text-uppercase text-muted"
-                                            >Hari</small
-                                        >
+                                        <small class="text-uppercase text-muted">Hari</small>
                                     </div>
-                                    <div
-                                        *ngIf="remaining.days > 0 || remaining.hours > 0"
-                                        class="countdown-segment text-center"
-                                    >
+                                    <div *ngIf="remaining.days > 0 || remaining.hours > 0"
+                                        class="countdown-segment text-center">
                                         <div class="display-6 fw-bold">
                                             {{ padTime(remaining.hours) }}
                                         </div>
-                                        <small class="text-uppercase text-muted"
-                                            >Jam</small
-                                        >
+                                        <small class="text-uppercase text-muted">Jam</small>
                                     </div>
-                                    <div
-                                        *ngIf="remaining.days > 0 || remaining.hours > 0 || remaining.minutes > 0"
-                                        class="countdown-segment text-center"
-                                    >
+                                    <div *ngIf="remaining.days > 0 || remaining.hours > 0 || remaining.minutes > 0"
+                                        class="countdown-segment text-center">
                                         <div class="display-6 fw-bold">
                                             {{ padTime(remaining.minutes) }}
                                         </div>
-                                        <small class="text-uppercase text-muted"
-                                            >Menit</small
-                                        >
+                                        <small class="text-uppercase text-muted">Menit</small>
                                     </div>
                                     <div class="countdown-segment text-center">
                                         <div class="display-6 fw-bold">
                                             {{ padTime(remaining.seconds) }}
                                         </div>
-                                        <small class="text-uppercase text-muted"
-                                            >Detik</small
-                                        >
+                                        <small class="text-uppercase text-muted">Detik</small>
                                     </div>
                                 </div>
                             </ng-container>
                         </div>
 
-                        <button
-                            class="btn btn-primary mt-4"
-                            [routerLink]="['/']"
-                        >
+                        <button class="btn btn-primary mt-4" [routerLink]="['/']">
                             Kembali
                         </button>
                     </div>
 
                     <div class="order-lg-2 flex-grow-1 order-1">
-                        <img
-                            src="assets/binbot/binbot-smiling.webp"
-                            alt="Ilustrasi pengerjaan selesai"
-                            class="img-fluid illustration-size"
-                        />
+                        <img src="assets/binbot/binbot-smiling.webp" alt="Ilustrasi pengerjaan selesai"
+                            class="img-fluid illustration-size" />
                     </div>
                 </div>
             </div>
@@ -118,31 +80,18 @@
                     <section class="card question-pane">
                         <div class="question-scroll">
                             <div
-                                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4 gap-3"
-                            >
-                                <button
-                                    class="btn btn-secondary btn-sm b-w-fit"
-                                    (click)="backWithConfirmation()"
-                                >
+                                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4 gap-3">
+                                <button class="btn btn-secondary btn-sm b-w-fit" (click)="backWithConfirmation()">
                                     Kembali
                                 </button>
                                 <div class="d-flex align-items-center gap-3">
-                                    <div
-                                        class="form-check form-switch d-flex align-items-center mb-0"
-                                    >
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            role="switch"
+                                    <div class="form-check form-switch d-flex align-items-center mb-0">
+                                        <input class="form-check-input" type="checkbox" role="switch"
                                             id="flexSwitchCheckDefault"
                                             [checked]="isFlagged(data[currentPage() - 1]?.id)"
-                                            (change)="toggleFlag(data[currentPage() - 1]?.id)"
-                                        />
-                                        <label
-                                            class="form-check-label fw-semibold text-warning ms-2"
-                                            for="flexSwitchCheckDefault"
-                                            >Ragu-ragu</label
-                                        >
+                                            (click)="toggleFlag(data[currentPage() - 1]?.id); $event.preventDefault()" />
+                                        <label class="form-check-label fw-semibold text-warning ms-2"
+                                            for="flexSwitchCheckDefault">Ragu-ragu</label>
                                     </div>
                                     <div class="vr"></div>
                                     <div class="text-muted fw-semibold">
@@ -153,101 +102,66 @@
                             </div>
 
                             <div class="mb-4 text-center">
-                                <img
-                                    *ngIf="data[currentPage() - 1]?.attachmentUrl"
-                                    [src]="data[currentPage() - 1]?.attachmentUrl"
-                                    alt="Question Image"
-                                    class="img-fluid img-custom-300 rounded object-cover shadow"
-                                />
+                                <img *ngIf="data[currentPage() - 1]?.attachmentUrl"
+                                    [src]="data[currentPage() - 1]?.attachmentUrl" alt="Question Image"
+                                    class="img-fluid img-custom-300 rounded object-cover shadow" />
                             </div>
 
                             <p class="fs-5 question-text mb-4">
-                                <span class="question-number"
-                                    >No {{ currentPage() }}.</span
-                                >
+                                <span class="question-number">No {{ currentPage() }}.</span>
                                 {{ data[currentPage() - 1]?.question }}
                             </p>
 
-                            <div
-                                *ngFor="
+                            <div *ngFor="
                                 let choice of data[currentPage() - 1]?.multipleChoiceDtoList
-                            "
-                                class="mb-3"
-                            >
+                            " class="mb-3">
                                 <label class="d-flex align-items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        [value]="choice.choiceId"
-                                        name="answer"
-                                        [checked]="
+                                    <input type="radio" [value]="choice.choiceId" name="answer" [checked]="
                                         selectedAnswer()[data[currentPage() - 1]?.id] === choice.choiceId
-                                    "
-                                        (change)="
+                                    " (change)="
                                         selectAnswer(
                                             data[currentPage() - 1]?.id,
                                             choice.choiceId
                                         )
-                                    "
-                                    />
+                                    " />
                                     <span>{{ choice.choiceValue }}</span>
                                 </label>
                             </div>
 
                             <div class="d-flex flex-wrap gap-2">
-                                <ng-container
-                                    *ngIf="isSavingAnswer$ | async; else noSavingLoading"
-                                >
+                                <ng-container *ngIf="isSavingAnswer$ | async; else noSavingLoading">
                                     <button class="btn btn-primary" disabled>
-                                        <div
-                                            class="spinner-border spinner-sm-custom"
-                                            role="status"
-                                        >
-                                            <span class="visually-hidden"
-                                                >Loading...</span
-                                            >
+                                        <div class="spinner-border spinner-sm-custom" role="status">
+                                            <span class="visually-hidden">Loading...</span>
                                         </div>
                                     </button>
                                 </ng-container>
 
                                 <ng-template #noSavingLoading>
-                                    <button
-                                        (click)="
+                                    <button (click)="
                                         onSaveButtonClick(
                                             data[currentPage() - 1]?.id
                                         )
-                                    "
-                                        class="btn btn-primary"
-                                    >
+                                    " class="btn btn-primary">
                                         Simpan
                                     </button>
                                 </ng-template>
 
-                                <ng-container
-                                    *ngIf="
+                                <ng-container *ngIf="
                                     isSubmittingAnswer$ | async;
                                     else noSubmitLoading
-                                "
-                                >
+                                ">
                                     <button class="btn btn-success" disabled>
-                                        <div
-                                            class="spinner-border spinner-sm-custom"
-                                            role="status"
-                                        >
-                                            <span class="visually-hidden"
-                                                >Loading...</span
-                                            >
+                                        <div class="spinner-border spinner-sm-custom" role="status">
+                                            <span class="visually-hidden">Loading...</span>
                                         </div>
                                     </button>
                                 </ng-container>
 
                                 <ng-template #noSubmitLoading>
-                                    <button
-                                        *ngIf="currentPage() === totalQuestions()"
-                                        (click)="
+                                    <button *ngIf="currentPage() === totalQuestions()" (click)="
                                         submitAfterSave(data[currentPage() - 1]?.id)
-                                    "
-                                        class="btn btn-success"
-                                    >
+                                    " class="btn btn-success">
                                         Simpan dan Selesai
                                     </button>
                                 </ng-template>
@@ -258,28 +172,20 @@
                     <aside class="card navigation-pane">
                         <div class="navigation-scroll">
                             <div class="countdown-wrapper">
-                                <div
-                                    [class.warning]="remainingSeconds() < 300"
-                                    [class.danger]="remainingSeconds() < 60"
-                                    class="countdown-timer w-100 justify-content-center"
-                                >
+                                <div [class.warning]="remainingSeconds() < 300" [class.danger]="remainingSeconds() < 60"
+                                    class="countdown-timer w-100 justify-content-center">
                                     {{ remainingTime() }}
                                 </div>
                             </div>
 
                             <div class="question-nav-grid">
-                                <button
-                                    *ngFor="
+                                <button *ngFor="
         let q of [].constructor(totalQuestions());
         let i = index
-    "
-                                    (click)="navigateToPage(i + 1)"
-                                    [class.bg-primary]="currentPage() === i + 1"
+    " (click)="navigateToPage(i + 1)" [class.bg-primary]="currentPage() === i + 1"
                                     [class.text-white]="currentPage() === i + 1"
                                     [class.bg-success]="savedAnswer()[data[i]?.id] && !isFlagged(data[i]?.id)"
-                                    [class.bg-warning]="isFlagged(data[i]?.id)"
-                                    class="btn btn-light nav-item-btn"
-                                >
+                                    [class.bg-warning]="isFlagged(data[i]?.id)" class="btn btn-light nav-item-btn">
                                     {{ i + 1 }}
                                 </button>
                             </div>
@@ -297,13 +203,9 @@
     </div>
 
     <ng-container *ngIf="!isSubmitted()">
-        <button
-            type="button"
-            class="violation-tab"
+        <button type="button" class="violation-tab"
             [class.warning]="violationCount() > 0 && violationCount() < securityService.MAX_VIOLATIONS"
-            [class.danger]="violationCount() >= securityService.MAX_VIOLATIONS"
-            (click)="toggleViolationPanel()"
-        >
+            [class.danger]="violationCount() >= securityService.MAX_VIOLATIONS" (click)="toggleViolationPanel()">
             <!-- <span class="tab-title">Pelanggaran</span> -->
             <span class="tab-count">{{ violationCount() }}</span>
         </button>
@@ -319,11 +221,7 @@
                         securityService.MAX_VIOLATIONS }}
                     </h5>
                 </div>
-                <button
-                    type="button"
-                    class="btn btn-sm btn-link text-decoration-none"
-                    (click)="closeViolationPanel()"
-                >
+                <button type="button" class="btn btn-sm btn-link text-decoration-none" (click)="closeViolationPanel()">
                     Tutup
                 </button>
             </div>
@@ -357,34 +255,19 @@
             </div>
         </div>
 
-        <div
-            class="violation-sidebar__backdrop"
-            *ngIf="violationPanelOpen"
-            (click)="closeViolationPanel()"
-        ></div>
+        <div class="violation-sidebar__backdrop" *ngIf="violationPanelOpen" (click)="closeViolationPanel()"></div>
     </ng-container>
 
     <!-- Fullscreen Security Overlay -->
-    <ng-container
-        *ngIf="!isFullscreen() && !isSubmitted() && !(isLoading$ | async)"
-    >
+    <ng-container *ngIf="!isFullscreen() && !isSubmitted() && !(isLoading$ | async)">
         <div class="fullscreen-overlay">
             <div class="fullscreen-overlay__content">
                 <div class="fullscreen-overlay__icon">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="64"
-                        height="64"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path
-                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
-                        ></path>
+                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                        </path>
                     </svg>
                 </div>
                 <h2 class="fullscreen-overlay__title">
@@ -400,25 +283,14 @@
                     <strong>{{ remainingViolations() }}</strong> toleransi
                     pelanggaran tersisa.
                 </p>
-                <button
-                    class="btn btn-primary btn-lg fullscreen-overlay__button"
-                    (click)="securityService.enterFullScreen()"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="me-2"
-                    >
+                <button class="btn btn-primary btn-lg fullscreen-overlay__button"
+                    (click)="securityService.enterFullScreen()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="me-2">
                         <path
-                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
-                        ></path>
+                            d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                        </path>
                     </svg>
                     Aktifkan Fullscreen
                 </button>
@@ -430,17 +302,8 @@
         <div class="fullscreen-overlay translation-overlay">
             <div class="fullscreen-overlay__content">
                 <div class="fullscreen-overlay__icon text-warning">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="64"
-                        height="64"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 8l6 6"></path>
                         <path d="M4 14h6l2-2h8.5a2.5 2.5 0 0 0 0-5h-19"></path>
                         <path d="M2 5h12"></path>
