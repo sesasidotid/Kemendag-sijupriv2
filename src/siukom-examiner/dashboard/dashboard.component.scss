@@ -74,11 +74,11 @@
 }
 
 // ============================================
-// SECTION 3: ONGOING EXAM (RED/PRIMARY)
+// SECTION 3: ONGOING EXAM (BLUE / PRIMARY)
 // ============================================
 .exam-card-ongoing {
-  border: 3px solid #e53e3e;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  border: 3px solid #0d6efd;
+  background: linear-gradient(135deg, #e7f1ff 0%, #ffffff 100%);
   //animation: pulse-border 2s ease-in-out infinite;
   position: relative;
   overflow: hidden;
@@ -90,24 +90,24 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #e53e3e 0%, #fc8181 100%);
+    background: linear-gradient(90deg, #0d6efd 0%, #6ea8fe 100%);
   }
 }
 
 @keyframes pulse-border {
   0%,
   100% {
-    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.3);
+    box-shadow: 0 4px 16px rgba(13, 110, 253, 0.3);
   }
   50% {
-    box-shadow: 0 8px 24px rgba(229, 62, 62, 0.5);
+    box-shadow: 0 8px 24px rgba(13, 110, 253, 0.5);
   }
 }
 
 .exam-status-badge {
   display: inline-flex;
   align-items: center;
-  background: #e53e3e;
+  background: #0d6efd;
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 50px;
@@ -139,11 +139,11 @@
 }
 
 // ============================================
-// SECTION 4: PRIMARY ACTION BUTTON
+// SECTION 4: PRIMARY ACTION BUTTON (BLUE)
 // ============================================
 .btn-primary-action {
   width: 100%;
-  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -154,17 +154,17 @@
   letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
   min-height: 64px;
 
   &:hover:not(:disabled) {
     //transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(229, 62, 62, 0.5);
-    background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.5);
+    background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%);
   }
 
   //&:active:not(:disabled) {
-  //    transform: translateY(0);
+  //  transform: translateY(0);
   //}
 
   &:disabled {
@@ -172,6 +172,7 @@
     cursor: not-allowed;
   }
 }
+
 
 // ============================================
 // SECTION 5: UPCOMING EXAMS (YELLOW/WARNING)

@@ -43,36 +43,13 @@ export class DashboardComponent implements OnInit {
     // Format current date for display
     formattedCurrentDate = computed(() => {
         const date = this.currentDate()
-        const days = [
-            'Minggu',
-            'Senin',
-            'Selasa',
-            'Rabu',
-            'Kamis',
-            'Jumat',
-            'Sabtu',
-        ]
-        const months = [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'Mei',
-            'Jun',
-            'Jul',
-            'Agu',
-            'Sep',
-            'Okt',
-            'Nov',
-            'Des',
-        ]
 
-        const dayName = days[date.getDay()]
-        const day = date.getDate()
-        const month = months[date.getMonth()]
-        const year = date.getFullYear()
-
-        return `${dayName}, ${day} ${month} ${year}`
+        return new Intl.DateTimeFormat('id-ID', {
+            weekday: 'long',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+        }).format(date)
     })
     private router = inject(Router)
     private jenisUkomService = inject(JenisUkomService)
@@ -81,8 +58,8 @@ export class DashboardComponent implements OnInit {
     private schedules = signal<ExamSchedule[]>([
         new ExamSchedule({
             id: '36c814b0-653f-4474-99b4-827731aa57d3',
-            startTime: '2025-12-24 03:55:00',
-            endTime: '2025-12-24 23:55:00',
+            startTime: '2025-12-30 10:30:00',
+            endTime: '2025-12-30 12:00:00',
             duration: 0.5,
             examTypeCode: ExamTypeCategory.WAWANCARA,
             roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
@@ -92,6 +69,7 @@ export class DashboardComponent implements OnInit {
                     id: 'psl-1',
                     participantId: 'participant-1',
                     examScheduleId: '36c814b0-653f-4474-99b4-827731aa57d3',
+                    personalSchedule: null,
                     participantUkom: new Participant({
                         id: 'participant-1',
                         name: 'Budi Santoso',
@@ -99,159 +77,6 @@ export class DashboardComponent implements OnInit {
                         nextJabatanName: 'Penera',
                         nextJenjangName: 'Ahli Utama',
                         bidangJabatanName: 'Metrologi',
-                        jenisUkom: 'PERPINDAHAN_JABATAN',
-                    }),
-                },
-            ],
-        }),
-        new ExamSchedule({
-            id: 'exam-portofolio-001',
-            startTime: '2025-12-24 03:55:00',
-            endTime: '2025-12-24 23:55:00',
-            duration: 0.5,
-            examTypeCode: ExamTypeCategory.PORTOFOLIO,
-            roomUkomId: 'room-portofolio-001',
-            secretKey: null,
-            participantScheduleList: [
-                {
-                    id: 'psl-portofolio-001',
-                    participantId: 'participant-1',
-                    examScheduleId: 'exam-portofolio-001',
-                    participantUkom: new Participant({
-                        id: 'participant-1',
-                        name: 'Budi Santoso',
-                        nip: '198501012010011001',
-                        nextJabatanName: 'Penera',
-                        nextJenjangName: 'Ahli Utama',
-                        bidangJabatanName: 'Metrologi',
-                        jenisUkom: 'PERPINDAHAN_JABATAN',
-                    }),
-                },
-            ],
-        }),
-        new ExamSchedule({
-            id: 'exam-studi-kasus-001',
-            startTime: '2025-12-24 03:55:00',
-            endTime: '2025-12-24 23:55:00',
-            duration: 0.5,
-            examTypeCode: ExamTypeCategory.STUDI_KASUS,
-            roomUkomId: 'room-studi-kasus-001',
-            secretKey: null,
-            participantScheduleList: [
-                {
-                    id: 'psl-studi-kasus-001',
-                    participantId: 'participant-1',
-                    examScheduleId: 'exam-studi-kasus-001',
-                    participantUkom: new Participant({
-                        id: 'participant-1',
-                        name: 'Budi Santoso',
-                        nip: '198501012010011001',
-                        nextJabatanName: 'Penera',
-                        nextJenjangName: 'Ahli Utama',
-                        bidangJabatanName: 'Metrologi',
-                        jenisUkom: 'PERPINDAHAN_JABATAN',
-                    }),
-                },
-            ],
-        }),
-        new ExamSchedule({
-            id: '5e2f4d2e-5f4b-4c3a-9f7e-2d3b6c8e9f0a',
-            startTime: '2025-12-24 10:01:00',
-            endTime: '2025-12-24 10:01:00',
-            duration: 2,
-            examTypeCode: ExamTypeCategory.MAKALAH,
-            roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
-            secretKey: null,
-            participantScheduleList: [
-                {
-                    id: 'psl-4',
-                    participantId: 'participant-4',
-                    examScheduleId: '5e2f4d2e-5f4b-4c3a-9f7e-2d3b6c8e9f0a',
-                    participantUkom: new Participant({
-                        id: 'participant-4',
-                        name: 'Dewi Lestari',
-                        nip: '198805102012012004',
-                        nextJabatanName: 'Pranata Perdagangan',
-                        nextJenjangName: 'Ahli Madya',
-                        bidangJabatanName: 'Perdagangan',
-                        jenisUkom: 'KENAIKAN_JENJANG',
-                    }),
-                },
-                {
-                    id: 'psl-5',
-                    participantId: 'participant-5',
-                    examScheduleId: '5e2f4d2e-5f4b-4c3a-9f7e-2d3b6c8e9f0a',
-                    participantUkom: new Participant({
-                        id: 'participant-5',
-                        name: 'Rudi Hartono',
-                        nip: '199105252016011005',
-                        nextJabatanName: 'Pengawas Perdagangan',
-                        nextJenjangName: 'Ahli Pertama',
-                        bidangJabatanName: 'Pengawasan',
-                        jenisUkom: 'PERPINDAHAN_JABATAN',
-                    }),
-                },
-            ],
-        }),
-        new ExamSchedule({
-            id: '84f3d3af-7836-4426-8337-50426596b835',
-            startTime: '2025-12-24 01:01:00',
-            endTime: '2025-12-24 23:01:00',
-            duration: 0.25,
-            examTypeCode: ExamTypeCategory.SEMINAR,
-            roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
-            secretKey: '1',
-            participantScheduleList: [
-                {
-                    id: 'psl-6',
-                    participantId: 'participant-6',
-                    examScheduleId: '84f3d3af-7836-4426-8337-50426596b835',
-                    participantUkom: new Participant({
-                        id: 'participant-6',
-                        name: 'Rina Wati',
-                        nip: '198612152013012006',
-                        nextJabatanName: 'Penera',
-                        nextJenjangName: 'Ahli Madya',
-                        bidangJabatanName: 'Kemetrologian',
-                        jenisUkom: 'KENAIKAN_JENJANG',
-                    }),
-                },
-            ],
-        }),
-        new ExamSchedule({
-            id: 'abc123-completed',
-            startTime: '2025-12-16 08:00:00',
-            endTime: '2025-12-16 12:00:00',
-            duration: 4,
-            examTypeCode: ExamTypeCategory.PRAKTIK,
-            roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
-            secretKey: null,
-            participantScheduleList: [
-                {
-                    id: 'psl-7',
-                    participantId: 'participant-7',
-                    examScheduleId: 'abc123-completed',
-                    participantUkom: new Participant({
-                        id: 'participant-7',
-                        name: 'Agus Setiawan',
-                        nip: '198408202014011007',
-                        nextJabatanName: 'Auditor',
-                        nextJenjangName: 'Ahli Utama',
-                        bidangJabatanName: 'Pengawasan',
-                        jenisUkom: 'KENAIKAN_JENJANG',
-                    }),
-                },
-                {
-                    id: 'psl-8',
-                    participantId: 'participant-8',
-                    examScheduleId: 'abc123-completed',
-                    participantUkom: new Participant({
-                        id: 'participant-8',
-                        name: 'Maya Sari',
-                        nip: '199207302017012008',
-                        nextJabatanName: 'Analis Kebijakan',
-                        nextJenjangName: 'Ahli Muda',
-                        bidangJabatanName: 'Kebijakan Publik',
                         jenisUkom: 'PERPINDAHAN_JABATAN',
                     }),
                 },
@@ -271,29 +96,33 @@ export class DashboardComponent implements OnInit {
         const start = this.parseDateTime(startTime)
         const end = this.parseDateTime(endTime)
 
-        const months = [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'Mei',
-            'Jun',
-            'Jul',
-            'Agu',
-            'Sep',
-            'Okt',
-            'Nov',
-            'Des',
-        ]
+        const dateFormatter = new Intl.DateTimeFormat('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+        })
+
+        const dayMonthFormatter = new Intl.DateTimeFormat('id-ID', {
+            day: 'numeric',
+            month: 'short',
+        })
 
         if (
             start.getDate() === end.getDate() &&
-            start.getMonth() === end.getMonth()
+            start.getMonth() === end.getMonth() &&
+            start.getFullYear() === end.getFullYear()
         ) {
-            return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()}, ${this.formatTime(start)} - ${this.formatTime(end)}`
+            return `${dateFormatter.format(start)}, ${this.formatTime(start)} - ${this.formatTime(end)}`
         }
 
-        return `${start.getDate()}-${end.getDate()} ${months[start.getMonth()]} ${start.getFullYear()}`
+        if (
+            start.getMonth() === end.getMonth() &&
+            start.getFullYear() === end.getFullYear()
+        ) {
+            return `${start.getDate()}–${end.getDate()} ${dayMonthFormatter.format(start).replace(start.getDate().toString(), '').trim()} ${start.getFullYear()}`
+        }
+
+        return `${dateFormatter.format(start)} - ${dateFormatter.format(end)}`
     }
 
     enterExam(examId: string, ukomType: ExamTypeCategory) {
@@ -354,6 +183,7 @@ export class DashboardComponent implements OnInit {
 
     private groupExamsByStatus(): GroupedExam[] {
         const now = this.currentDate()
+        console.log('now', now)
         const grouped: GroupedExam[] = []
 
         this.schedules().forEach((schedule) => {
@@ -406,7 +236,19 @@ export class DashboardComponent implements OnInit {
         const [year, month, day] = datePart.split('-').map(Number)
         const [hour, minute, second] = timePart.split(':').map(Number)
 
-        return new Date(year, month - 1, day, hour, minute, second)
+        // Create date as if it's UTC+7, then subtract 7 hours
+        const utcMillis = Date.UTC(
+            year,
+            month - 1,
+            day,
+            hour - 7,
+            minute,
+            second,
+        )
+
+        console.log('utcMillis', new Date(utcMillis))
+
+        return new Date(utcMillis)
     }
 
     private getExamDisplayName(examTypeCode: string): string {

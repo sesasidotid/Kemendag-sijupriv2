@@ -24,6 +24,7 @@ interface ParticipantScheduleList {
     id: string
     participantId: string
     examScheduleId: string
+    personalSchedule: string | null | undefined
     participantUkom: Participant
 }
 

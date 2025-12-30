@@ -1,24 +1,36 @@
-<div class="modal show d-block" tabindex="-1" aria-modal="true" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" [ngClass]="{
+<div aria-modal="true" class="modal show d-block" role="dialog" tabindex="-1">
+    <div
+        [ngClass]="{
       'modal-sm-custom': size === 'sm',
       'modal-md-custom': size === 'md',
       'modal-lg-custom': size === 'lg',
       '': size === ''
-    }">
+    }"
+        class="modal-dialog modal-dialog-centered"
+    >
         <div class="modal-content">
             <div class="modal-header bg-light pb-3">
                 <h5 class="modal-title">{{ title }}</h5>
-                <button type="button" class="btn-close" aria-label="Close" (click)="toggleModal()"></button>
+                <button
+                    (click)="toggleModal()"
+                    aria-label="Close"
+                    class="btn-close"
+                    type="button"
+                ></button>
             </div>
             <div class="modal-body">
                 <ng-content></ng-content>
             </div>
             <div *ngIf="enableFooter" class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="toggleModal()">
-                    Close
+                <button
+                    (click)="toggleModal()"
+                    class="btn btn-secondary"
+                    type="button"
+                >
+                    Tutup
                 </button>
-                <button type="button" class="btn btn-primary" (click)="save()">
-                    Save
+                <button (click)="save()" class="btn btn-primary" type="button">
+                    Simpan
                 </button>
             </div>
         </div>

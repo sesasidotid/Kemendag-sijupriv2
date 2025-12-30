@@ -1,0 +1,63 @@
+.reschedule-content {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.available-slots {
+    .slot-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 0.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        background-color: #fafafa;
+    }
+
+    .slot-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        background-color: #ffffff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+            transform: translateX(4px);
+        }
+
+        &.selected {
+            border-color: #198754;
+            background-color: #d1e7dd;
+            box-shadow: 0 2px 4px rgba(25, 135, 84, 0.2);
+        }
+
+        .slot-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            .slot-index {
+                font-size: 0.875rem;
+                color: #6c757d;
+                font-weight: 500;
+            }
+
+            .slot-time {
+                font-size: 0.95rem;
+                color: #212529;
+            }
+        }
+
+        .slot-check {
+            font-size: 1.5rem;
+        }
+    }
+}

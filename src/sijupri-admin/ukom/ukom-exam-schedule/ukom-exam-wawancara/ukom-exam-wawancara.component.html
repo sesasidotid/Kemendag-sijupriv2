@@ -1,0 +1,154 @@
+<div class="schedule-viewer-container">
+    <!-- Header -->
+    <div class="header-section mb-4">
+        <!-- Loading State -->
+        <div *ngIf="examScheduleDetailLoading()" class="py-5 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Memuat...</span>
+            </div>
+            <p class="mt-2">Memuat data jadwal...</p>
+        </div>
+
+        <!-- Schedule Summary -->
+        <div
+            *ngIf="!examScheduleDetailLoading() && mainSchedule()"
+            class="schedule-summary"
+        >
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                {{ scheduleSummary.total }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Total Slot</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-success">
+                                {{ scheduleSummary.occupied }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Terisi</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-info">
+                                {{ scheduleSummary.available }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Tersedia</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-danger bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-danger">
+                                {{ scheduleSummary.unavailable }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">
+                                Tidak Tersedia (20:00-06:00 WIB)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Info -->
+            <div class="alert alert-info mb-0 mt-3">
+                <i class="mdi mdi-information-slab-circle-outline me-2"></i>
+                <strong>Durasi per slot:</strong>
+                {{ mainSchedule()!.duration * 60 }} menit
+                <span class="badge bg-primary ms-1">
+                    Zona Waktu: WIB (UTC+7)
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AG Grid Table -->
+    <div
+        *ngIf="!examScheduleDetailLoading() && allSlots().length > 0"
+        class="grid-section"
+    >
+        <ag-grid-angular
+            (gridReady)="onGridReady($event)"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [paginationPageSize]="20"
+            [pagination]="true"
+            [rowData]="allSlots()"
+            [suppressCellFocus]="true"
+            class="ag-theme-alpine"
+            style="height: 600px; width: 100%"
+        >
+        </ag-grid-angular>
+
+        <!-- Legend -->
+        <div class="legend mt-3">
+            <div class="d-flex flex-wrap gap-3">
+                <div class="legend-item">
+                    <span
+                        class="legend-box"
+                        style="background-color: #d1e7dd"
+                    ></span>
+                    <span class="legend-label">Slot Terisi</span>
+                </div>
+                <div class="legend-item">
+                    <span
+                        class="legend-box"
+                        style="background-color: #f8f9fa"
+                    ></span>
+                    <span class="legend-label">Slot Tersedia</span>
+                </div>
+                <div class="legend-item">
+                    <span
+                        class="legend-box"
+                        style="background-color: #f8d7da"
+                    ></span>
+                    <span class="legend-label"
+                        >Tidak Tersedia (20:00-06:00 WIB)</span
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div
+        *ngIf="!examScheduleDetailLoading() && allSlots().length === 0 && mainSchedule()"
+        class="alert alert-warning text-center"
+    >
+        <i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i>
+        <h5>Tidak Ada Slot</h5>
+        <p class="mb-0">
+            Tidak ada slot waktu tersedia untuk konfigurasi jadwal ini.
+        </p>
+    </div>
+
+    <!-- No Data State -->
+    <div
+        *ngIf="!examScheduleDetailLoading() && !mainSchedule()"
+        class="alert alert-info text-center"
+    >
+        <i class="bi bi-info-circle fs-1 d-block mb-2"></i>
+        <h5>Tidak Ada Data Jadwal</h5>
+        <p class="mb-0">Silakan pilih jadwal ujian untuk melihat timetable.</p>
+    </div>
+</div>
+
+<!-- Reschedule Modal -->
+<app-reschedule-modal
+    (close)="closeRescheduleModal()"
+    (confirm)="confirmReschedule($event)"
+    *ngIf="showRescheduleModal() && selectedParticipant()"
+    [availableSlots]="availableSlotsForReschedule()"
+    [currentSlot]="currentParticipantSlot()"
+    [participant]="selectedParticipant()!"
+>
+</app-reschedule-modal>

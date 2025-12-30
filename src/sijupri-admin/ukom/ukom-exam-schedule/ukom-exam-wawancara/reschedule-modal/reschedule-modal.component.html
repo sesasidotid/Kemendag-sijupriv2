@@ -1,0 +1,75 @@
+<app-modal
+    (saveEvent)="onConfirm()"
+    (toggle)="onClose()"
+    [size]="'lg'"
+    [title]="'Atur Ulang Jadwal Peserta: ' + participant.participantName"
+>
+    <div class="reschedule-content">
+        <!-- Current Schedule Info -->
+        <div class="alert alert-info mb-3">
+            <strong>Jadwal Saat Ini:</strong>
+            <div *ngIf="currentSlot">
+                {{ slotService.formatDateTime(currentSlot.startTime) }} - {{
+                slotService.formatTimeSlot(currentSlot.endTime) }}
+            </div>
+            <div *ngIf="!currentSlot">
+                <em>Belum dijadwalkan</em>
+            </div>
+        </div>
+
+        <div class="alert alert-warning border">
+            <i
+                class="mdi mdi-information-slab-circle-outline text-warning me-2"
+            ></i>
+            <small
+                ><strong>Zona Waktu:</strong> Semua waktu ditampilkan dalam WIB
+                (Waktu Indonesia Barat / UTC+7)</small
+            >
+        </div>
+
+        <!-- Available Slots Selection -->
+        <div class="available-slots">
+            <h6 class="mb-3">Pilih Slot Waktu Baru:</h6>
+
+            <div
+                *ngIf="availableSlots.length === 0"
+                class="alert alert-warning"
+            >
+                Tidak ada slot tersedia. Semua slot sudah terisi atau tidak
+                tersedia.
+            </div>
+
+            <div *ngIf="availableSlots.length > 0" class="slot-list">
+                <div
+                    (click)="onSlotSelect(slot)"
+                    *ngFor="let slot of availableSlots"
+                    [class.selected]="isSlotSelected(slot)"
+                    class="slot-item"
+                >
+                    <div class="slot-info">
+                        <div class="slot-index">
+                            Slot #{{ slot.slotIndex + 1 }}
+                        </div>
+                        <div class="slot-time">
+                            <strong
+                                >{{ slotService.formatDateTime(slot.startTime)
+                                }}</strong
+                            >
+                            <span class="mx-2">→</span>
+                            {{ slotService.formatTimeSlot(slot.endTime) }}
+                        </div>
+                    </div>
+                    <div *ngIf="isSlotSelected(slot)" class="slot-check">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Validation Warning -->
+        <div *ngIf="!selectedSlot" class="alert alert-warning mt-3">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Silakan pilih slot waktu sebelum menyimpan.
+        </div>
+    </div>
+</app-modal>

@@ -35,4 +35,14 @@ export class UkomExamScheduleService {
     getExamScheduleDetailById(id: string): Observable<ExamSchedule> {
         return this.apiService.getData(`${this.API_BASE_URL}/detail/${id}`)
     }
+
+    updateParticipantScheduleById(
+        id: string,
+        personalSchedule: string | Date,
+    ): Observable<any> {
+        return this.apiService.putData(
+            `${this.API_BASE_URL}/participant_schedule/${id}`,
+            { personalSchedule },
+        )
+    }
 }

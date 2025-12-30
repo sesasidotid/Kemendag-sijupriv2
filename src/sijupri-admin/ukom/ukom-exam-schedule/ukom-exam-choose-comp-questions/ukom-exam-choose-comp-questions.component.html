@@ -7,7 +7,7 @@
 </ng-container>
 
 <ng-template #ukomExamContent>
-    <button class="btn btn-sm btn-outline-secondary mb-3" (click)="back()">
+    <button (click)="back()" class="btn btn-sm btn-outline-secondary mb-3">
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
 
@@ -42,16 +42,23 @@
 
         <ng-container *ngIf="typeUkom === 'CAT'">
             <app-ukom-exam-cat
-                [roomUkomDetail]="roomUkomDetail"
                 [examDetail]="examDetail"
+                [roomUkomDetail]="roomUkomDetail"
             ></app-ukom-exam-cat>
         </ng-container>
 
         <ng-container *ngIf="typeUkom === 'MAKALAH'">
             <app-ukom-exam-makalah
-                [roomUkomDetail]="roomUkomDetail"
                 [examDetail]="examDetail"
+                [roomUkomDetail]="roomUkomDetail"
             ></app-ukom-exam-makalah>
+        </ng-container>
+
+        <ng-container *ngIf="typeUkom === 'WAWANCARA'">
+            <app-ukom-exam-wawancara
+                [examDetail]="examDetail"
+                [roomUkomDetail]="roomUkomDetail"
+            ></app-ukom-exam-wawancara>
         </ng-container>
     </section>
 </ng-template>
