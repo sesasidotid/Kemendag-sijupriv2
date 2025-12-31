@@ -18,9 +18,7 @@ import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { UkomRoomService } from '@/modules/ukom/services/ukom-room.service'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
-import {
-    UkomExamWawancaraComponent
-} from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-wawancara/ukom-exam-wawancara.component'
+import { UkomExamWawancaraComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-wawancara/ukom-exam-wawancara.component'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -31,7 +29,7 @@ import {
         UkomExamCatComponent,
         UkomExamMakalahComponent,
         TanggalWaktuIndoPipe,
-        UkomExamWawancaraComponent
+        UkomExamWawancaraComponent,
     ],
     templateUrl: './ukom-exam-choose-comp-questions.component.html',
     styleUrl: './ukom-exam-choose-comp-questions.component.scss',

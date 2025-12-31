@@ -171,7 +171,7 @@ export class UkomExamWawancaraComponent implements OnInit {
         if (!validation.valid) {
             this.handlerService.handleAlert(
                 'Error',
-                validation.reason || 'Invalid reschedule',
+                validation.reason || 'Jadwal tidak valid.',
             )
             return
         }
@@ -184,7 +184,6 @@ export class UkomExamWawancaraComponent implements OnInit {
             examScheduleId: participant.examScheduleId,
         }
 
-        // TODO: Call backend API to persist the change
         this.performReschedule(request)
     }
 
