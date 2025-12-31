@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import {
     ActionColumnBuilder,
     PagableBuilder,
@@ -39,6 +39,7 @@ export class UkomTaskListComponent {
     finalizeLoading: boolean = false
     constructor(
         private router: Router,
+        private route: ActivatedRoute,
         private tabService: TabService,
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
@@ -48,10 +49,25 @@ export class UkomTaskListComponent {
     ) {}
 
     ngOnInit() {
+        this.syncTabWithUrl()
         this.getJabatanList()
         this.jenjangService.fetchJenjang()
         this.handlePagable()
         this.handleTabService()
+    }
+
+    syncTabWithUrl() {
+        const flowId = this.route.snapshot.queryParams['eq_flowId']
+        const flowToTabIndex: { [key: string]: number } = {
+            'ukom_flow_1': 0,
+            'ukom_flow_2': 1,
+            'ukom_flow_3': 2,
+            'ukom_flow_4': 3,
+        }
+        if (flowId && flowToTabIndex[flowId] !== undefined) {
+            this.tabIndex.next(flowToTabIndex[flowId])
+            this.currentFlow.next(flowId)
+        }
     }
 
     handleDeleteTask(instanceId: string) {
@@ -298,66 +314,30 @@ export class UkomTaskListComponent {
                 isActive: this.tabIndex.value == 1,
                 onClick: () => this.handlePagableTabChange('ukom_flow_2', 1),
             })
-            // .addTab({
-            //     label: 'Tidak Lolos Verifikasi',
-            //     icon: 'mdi-close',
-            //     isActive: this.tabIndex.value == 2,
-            //     onClick: () => this.handlePagableTabChange('rejected', 2),
-            // })
             .addTab({
                 label: 'Tidak Lolos Verifikasi',
                 icon: 'mdi-close',
-                isActive: this.tabIndex.value == 3,
+                isActive: this.tabIndex.value == 2,
                 onClick: () => this.handlePagableTabChange('ukom_flow_3', 2),
             })
             .addTab({
                 label: 'Lolos Verifikasi',
                 icon: 'mdi-check',
-                isActive: this.tabIndex.value == 4,
+                isActive: this.tabIndex.value == 3,
                 onClick: () => this.handlePagableTabChange('ukom_flow_4', 3),
             })
     }
 
     handlePagableTabChange(tab: string, tabIndex: number) {
-        const currentPagable = this.pagable$.value
-
-        let updatedPagable
-
-        if (tab === 'rejected') {
-            updatedPagable = {
-                ...currentPagable,
-                filterList: currentPagable.filterList.filter(
-                    (item) => item.key !== 'eq_flowId',
-                ),
-                endpoint: '/api/v1/participant_ukom/task/failed/search',
-            }
-        } else {
-            const existingFilterList = currentPagable.filterList.map((item) =>
-                item.key === 'eq_flowId' ? { ...item, value: tab } : item,
-            )
-
-            const filterList = currentPagable.filterList.some(
-                (item) => item.key === 'eq_flowId',
-            )
-                ? existingFilterList
-                : [
-                      ...existingFilterList,
-                      new PageFilter({
-                          key: 'eq_flowId',
-                          value: tab,
-                      }),
-                  ]
-
-            updatedPagable = {
-                ...currentPagable,
-                filterList,
-                endpoint: '/api/v1/participant_ukom/task/search',
-            }
-        }
-
         this.tabService.changeTabActive(tabIndex)
-        this.pagable$.next(updatedPagable)
         this.currentFlow.next(tab)
+
+        // Update URL directly - pagable.component's queryParams subscription will handle the fetch
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { eq_flowId: tab, page: 1 },
+            queryParamsHandling: 'merge',
+        })
     }
 
     finalizePendingTask() {

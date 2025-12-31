@@ -45,6 +45,12 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
             this.queryParamsSubscription = this.route.queryParams.subscribe(
                 (params) => {
                     this.parseQueryParams(params)
+                    // Sync lastFilterState after parsing to prevent false filter change detection
+                    if (this.pagable.filterList) {
+                        this.pagable.filterList.forEach((filter) => {
+                            this.lastFilterState[filter.key] = filter.value
+                        })
+                    }
                     this.loadData()
                 },
             )
@@ -65,10 +71,18 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
                 }
             })
 
+            // Sync lastFilterState with current filter values to prevent false filter change detection
+            if (this.pagable.filterList) {
+                this.pagable.filterList.forEach((filter) => {
+                    this.lastFilterState[filter.key] = filter.value
+                })
+            }
+
             if (!this.pagable.useQueryParams) {
                 this.limit = this.pagable.limit
                 this.loadData()
             }
+            // For useQueryParams=true, the queryParams subscription handles loading
         }
 
         if (changes['refresh'] && !changes['refresh'].isFirstChange()) {
@@ -214,9 +228,8 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
             this.pagable.filterList.forEach((filter) => {
                 if (params[filter.key]) {
                     filter.value = params[filter.key]
-                } else {
-                    filter.value = ''
                 }
+                // Keep existing/default value if param is not in URL
             })
         }
     }
