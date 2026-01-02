@@ -21,7 +21,7 @@ export const routes: Routes = [
                     ),
             },
             {
-                path: 'interviews/:id',
+                path: 'interviews/:id/:participantId',
                 loadComponent: () =>
                     import('./wawancara/wawancara.component').then(
                         (m) => m.WawancaraComponent,

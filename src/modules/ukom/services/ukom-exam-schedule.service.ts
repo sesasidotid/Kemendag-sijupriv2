@@ -45,4 +45,10 @@ export class UkomExamScheduleService {
             { personalSchedule },
         )
     }
+
+    getExamByExaminerId(examinerId: string): Observable<ExamSchedule[]> {
+        return this.apiService.getData(
+            `${this.API_BASE_URL}/examiner/${examinerId}`,
+        )
+    }
 }

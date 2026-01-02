@@ -3,9 +3,13 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { Router } from '@angular/router'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
-import { Participant } from '@/modules/ukom/models/cat/participant.model'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
+import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
+import { EMPTY, finalize, switchMap } from 'rxjs'
+import { ExamService } from '@/modules/ukom/services/exam.service'
 
 type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
 
@@ -24,6 +28,8 @@ interface GroupedExam {
     styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
+    examinerId = LoginContext.getUserId()
+    loadingExamSchedule = signal(false)
     // Participant list management
     showParticipantList = signal<string | null>(null)
     selectedExamForParticipants = signal<GroupedExam | null>(null)
@@ -54,35 +60,11 @@ export class DashboardComponent implements OnInit {
     private router = inject(Router)
     private jenisUkomService = inject(JenisUkomService)
     private handlerService = inject(HandlerService)
-    // Dummy data - replace with actual API call
-    private schedules = signal<ExamSchedule[]>([
-        new ExamSchedule({
-            id: '36c814b0-653f-4474-99b4-827731aa57d3',
-            startTime: '2025-12-30 10:30:00',
-            endTime: '2025-12-30 12:00:00',
-            duration: 0.5,
-            examTypeCode: ExamTypeCategory.WAWANCARA,
-            roomUkomId: 'b54e37a3-bcf9-4158-82f6-8b2fcc7103b0',
-            secretKey: null,
-            participantScheduleList: [
-                {
-                    id: 'psl-1',
-                    participantId: 'participant-1',
-                    examScheduleId: '36c814b0-653f-4474-99b4-827731aa57d3',
-                    personalSchedule: null,
-                    participantUkom: new Participant({
-                        id: 'participant-1',
-                        name: 'Budi Santoso',
-                        nip: '198501012010011001',
-                        nextJabatanName: 'Penera',
-                        nextJenjangName: 'Ahli Utama',
-                        bidangJabatanName: 'Metrologi',
-                        jenisUkom: 'PERPINDAHAN_JABATAN',
-                    }),
-                },
-            ],
-        }),
-    ])
+    private examScheduleService = inject(UkomExamScheduleService)
+    private examinerService = inject(UkomExaminerService)
+    private examService = inject(ExamService)
+
+    private schedules = signal<ExamSchedule[]>([])
 
     constructor() {}
     ngOnInit(): void {
@@ -90,6 +72,34 @@ export class DashboardComponent implements OnInit {
         setInterval(() => {
             this.currentDate.set(new Date())
         }, 60000)
+
+        this.fetchExaminerSchedule()
+    }
+
+    fetchExaminerSchedule(): void {
+        this.loadingExamSchedule.set(true)
+
+        this.examinerService
+            .searchExaminerV2({ userId: this.examinerId })
+            .pipe(
+                switchMap((res) => {
+                    const id = res.data[0]?.id
+                    return id
+                        ? this.examScheduleService.getExamByExaminerId(id)
+                        : EMPTY
+                }),
+                finalize(() => this.loadingExamSchedule.set(false)),
+            )
+            .subscribe({
+                next: (res) => this.schedules.set(res),
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat jadwal ujian. Silahkan coba lagi nanti.',
+                    )
+                },
+            })
     }
 
     formatDateRange(startTime: string, endTime: string): string {
@@ -125,10 +135,15 @@ export class DashboardComponent implements OnInit {
         return `${dateFormatter.format(start)} - ${dateFormatter.format(end)}`
     }
 
-    enterExam(examId: string, ukomType: ExamTypeCategory) {
+    enterExam(
+        examId: string,
+        ukomType: ExamTypeCategory,
+        participantId: string,
+    ) {
         switch (ukomType) {
             case ExamTypeCategory.WAWANCARA:
-                this.router.navigate(['/interviews', examId])
+                // this.startWawancaraExam(roomUkomId, examId)
+                this.router.navigate(['/interviews', examId, participantId])
                 break
             case ExamTypeCategory.MAKALAH:
             case ExamTypeCategory.SEMINAR:
@@ -181,9 +196,30 @@ export class DashboardComponent implements OnInit {
         return exam.schedule.participantScheduleList || []
     }
 
+    private startWawancaraExam(roomUkomId: string, examScheduleId: string) {
+        this.examService
+            .startExam(
+                ExamTypeCategory.WAWANCARA,
+                roomUkomId,
+                examScheduleId,
+                undefined,
+            )
+            .subscribe({
+                next: () => {
+                    this.router.navigate(['/interviews', examScheduleId])
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memulai ujian wawancara. Silahkan coba lagi.',
+                    )
+                },
+            })
+    }
+
     private groupExamsByStatus(): GroupedExam[] {
         const now = this.currentDate()
-        console.log('now', now)
         const grouped: GroupedExam[] = []
 
         this.schedules().forEach((schedule) => {

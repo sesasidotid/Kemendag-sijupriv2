@@ -4,159 +4,51 @@
     <p class="current-date">Hari ini: {{ formattedCurrentDate() }}</p>
 </div>
 
-<!-- Ongoing Exam Section (Most Important) -->
-<div *ngIf="ongoingExam().length > 0">
-    <div
-        *ngFor="let exam of ongoingExam()"
-        class="exam-card exam-card-ongoing mb-4"
-        role="alert"
-    >
-        <div class="exam-status-badge">
-            <span class="status-dot status-dot-ongoing"></span>
-            <span class="status-text">SEDANG BERLANGSUNG</span>
+<ng-container *ngIf="loadingExamSchedule(); else examListContent">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
         </div>
-
-        <div class="exam-content">
-            <h2 class="exam-title">{{ exam.displayName }}</h2>
-
-            <div class="exam-schedule">
-                <i class="ri-calendar-line me-2"></i>
-                {{ formatDateRange( exam.schedule.startTime,
-                exam.schedule.endTime ) }}
-            </div>
-
-            <div class="participant-count-badge">
-                <i class="ri-group-line me-2"></i>
-                {{ exam.participantCount }} Peserta
-            </div>
-        </div>
-
-        <button
-            class="btn-secondary-small mb-3"
-            (click)="toggleParticipantList(exam.schedule.id, exam)"
-        >
-            <i class="ri-user-line me-2"></i>
-            {{ isParticipantListVisible(exam.schedule.id) ? 'SEMBUNYIKAN' :
-            'LIHAT' }} DAFTAR PESERTA
-        </button>
-
-        <div
-            *ngIf="isParticipantListVisible(exam.schedule.id)"
-            class="participant-list-container animate-slide-down mb-3"
-        >
-            <h3 class="participant-list-title">
-                <i class="ri-file-list-3-line me-2"></i>
-                Daftar Peserta Ujian
-            </h3>
-
-            <div class="participant-cards">
-                <div
-                    *ngFor="
-                        let pSchedule of getParticipants(exam);
-                        let j = index
-                    "
-                    class="participant-card"
-                >
-                    <div class="participant-number">{{ j + 1 }}</div>
-
-                    <div class="participant-info">
-                        <div class="participant-name">
-                            <i class="ri-user-3-fill me-2"></i>
-                            {{ pSchedule.participantUkom.name }}
-                        </div>
-
-                        <div class="participant-detail">
-                            <span class="detail-label">NIP</span>
-                            <span class="detail-value">
-                                : {{ pSchedule.participantUkom.nip }}
-                            </span>
-                        </div>
-
-                        <div class="participant-detail">
-                            <span class="detail-label">Jabatan Tujuan</span>
-                            <span class="detail-value">
-                                : {{ pSchedule.participantUkom.nextJabatanName
-                                }}
-                            </span>
-                        </div>
-
-                        <div class="participant-detail">
-                            <span class="detail-label">Jenjang Tujuan</span>
-                            <span class="detail-value">
-                                : {{ pSchedule.participantUkom.nextJenjangName
-                                }}
-                            </span>
-                        </div>
-
-                        <div class="participant-detail">
-                            <span class="detail-label">Bidang</span>
-                            <span class="detail-value">
-                                : {{ pSchedule.participantUkom.bidangJabatanName
-                                }}
-                            </span>
-                        </div>
-
-                        <div class="participant-badge">
-                            {{ getJenisUkomDisplay(
-                            pSchedule.participantUkom.jenisUkom ) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <button
-            class="btn-primary-action"
-            (click)="enterExam(exam.schedule.id, exam.schedule.examTypeCode)"
-        >
-            MASUK UJIAN SEKARANG
-        </button>
+        <p class="mt-2">Memuat data jadwal...</p>
     </div>
-</div>
-
-<!-- Empty State for No Ongoing Exam -->
-<div *ngIf="ongoingExam().length == 0" class="exam-card exam-card-empty mb-4">
-    <div class="empty-state">
-        <i class="ri-checkbox-circle-line empty-icon"></i>
-        <p class="empty-text">Tidak ada ujian yang sedang berlangsung</p>
-    </div>
-</div>
-
-<!-- Upcoming Exams Section -->
-<div *ngIf="upcomingExams().length > 0" class="mb-4">
-    <h3 class="section-title">
-        <span class="status-dot status-dot-upcoming"></span>
-        UJIAN TERDEKAT
-    </h3>
-
-    <div class="exam-list">
+</ng-container>
+<ng-template #examListContent>
+    <!-- Ongoing Exam Section (Most Important) -->
+    <div *ngIf="ongoingExam().length > 0">
         <div
-            *ngFor="let exam of upcomingExams().slice(0, 2)"
-            class="exam-card exam-card-upcoming"
+            *ngFor="let exam of ongoingExam()"
+            class="exam-card exam-card-ongoing mb-4"
+            role="alert"
         >
+            <div class="exam-status-badge">
+                <span class="status-dot status-dot-ongoing"></span>
+                <span class="status-text">SEDANG BERLANGSUNG</span>
+            </div>
+
             <div class="exam-content">
-                <h4 class="exam-title-secondary">{{ exam.displayName }}</h4>
+                <h2 class="exam-title">{{ exam.displayName }}</h2>
+
                 <div class="exam-schedule">
                     <i class="ri-calendar-line me-2"></i>
                     {{ formatDateRange( exam.schedule.startTime,
                     exam.schedule.endTime ) }}
                 </div>
+
                 <div class="participant-count-badge">
                     <i class="ri-group-line me-2"></i>
-                    <span>{{ exam.participantCount }} Peserta</span>
+                    {{ exam.participantCount }} Peserta
                 </div>
             </div>
 
             <button
-                class="btn-secondary-small mb-3"
                 (click)="toggleParticipantList(exam.schedule.id, exam)"
+                class="btn-secondary-small mb-3"
             >
                 <i class="ri-user-line me-2"></i>
                 {{ isParticipantListVisible(exam.schedule.id) ? 'SEMBUNYIKAN' :
                 'LIHAT' }} DAFTAR PESERTA
             </button>
 
-            <!-- Participant List for Upcoming Exam -->
             <div
                 *ngIf="isParticipantListVisible(exam.schedule.id)"
                 class="participant-list-container animate-slide-down mb-3"
@@ -165,170 +57,304 @@
                     <i class="ri-file-list-3-line me-2"></i>
                     Daftar Peserta Ujian
                 </h3>
+
                 <div class="participant-cards">
                     <div
-                        *ngFor="let pSchedule of getParticipants(exam); let i = index"
+                        *ngFor="
+                        let pSchedule of getParticipants(exam);
+                        let j = index
+                    "
                         class="participant-card"
                     >
-                        <div class="participant-number">{{ i + 1 }}</div>
+                        <div class="participant-number">{{ j + 1 }}</div>
+
                         <div class="participant-info">
                             <div class="participant-name">
                                 <i class="ri-user-3-fill me-2"></i>
                                 {{ pSchedule.participantUkom.name }}
                             </div>
+
                             <div class="participant-detail">
-                                <span class="detail-label">NIP:</span>
-                                <span class="detail-value"
-                                    >{{ pSchedule.participantUkom.nip }}</span
-                                >
+                                <span class="detail-label">NIP</span>
+                                <span class="detail-value">
+                                    : {{ pSchedule.participantUkom.nip }}
+                                </span>
                             </div>
+
                             <div class="participant-detail">
-                                <span class="detail-label"
-                                    >Jabatan Tujuan:</span
-                                >
-                                <span class="detail-value"
-                                    >{{
-                                    pSchedule.participantUkom.nextJabatanName
-                                    }}</span
-                                >
+                                <span class="detail-label">Jabatan Tujuan</span>
+                                <span class="detail-value">
+                                    : {{
+                                    pSchedule.participantUkom.nextJabatanName }}
+                                </span>
                             </div>
+
                             <div class="participant-detail">
-                                <span class="detail-label">Jenjang:</span>
-                                <span class="detail-value"
-                                    >{{
-                                    pSchedule.participantUkom.nextJenjangName
-                                    }}</span
-                                >
+                                <span class="detail-label">Jenjang Tujuan</span>
+                                <span class="detail-value">
+                                    : {{
+                                    pSchedule.participantUkom.nextJenjangName }}
+                                </span>
                             </div>
+
                             <div class="participant-detail">
-                                <span class="detail-label">Bidang:</span>
-                                <span class="detail-value"
-                                    >{{
+                                <span class="detail-label">Bidang</span>
+                                <span class="detail-value">
+                                    : {{
                                     pSchedule.participantUkom.bidangJabatanName
-                                    }}</span
-                                >
+                                    }}
+                                </span>
                             </div>
+
                             <div class="participant-badge">
-                                {{
-                                getJenisUkomDisplay(pSchedule.participantUkom.jenisUkom)
-                                }}
+                                {{ getJenisUkomDisplay(
+                                pSchedule.participantUkom.jenisUkom ) }}
                             </div>
+                            <button
+                                (click)="enterExam(exam.schedule.id, exam.schedule.examTypeCode, pSchedule.participantId)"
+                                class="btn-primary-action"
+                            >
+                                MASUK UJIAN
+                            </button>
+
+                            <!--                            <button-->
+                            <!--                                (click)="enterExam(-->
+                            <!--                pSchedule.roomUkomId,-->
+                            <!--                pSchedule.scheduleId,-->
+                            <!--                pSchedule.examTypeCode-->
+                            <!--            )"-->
+                            <!--                                class="btn-primary-action btn-sm mt-3"-->
+                            <!--                            >-->
+                            <!--                                MASUK UJIAN-->
+                            <!--                            </button>-->
                         </div>
                     </div>
                 </div>
             </div>
-
-            <button
-                class="btn-secondary-action"
-                (click)="viewExamDetail(exam.schedule.id)"
-            >
-                LIHAT DETAIL
-            </button>
         </div>
     </div>
-</div>
 
-<!-- Completed Exams Section (Collapsible) -->
-<div *ngIf="completedExams().length > 0" class="mb-4">
-    <div class="section-header" (click)="toggleCompletedExams()">
+    <!-- Empty State for No Ongoing Exam -->
+    <div
+        *ngIf="ongoingExam().length == 0"
+        class="exam-card exam-card-empty mb-4"
+    >
+        <div class="empty-state">
+            <i class="ri-checkbox-circle-line empty-icon"></i>
+            <p class="empty-text">Tidak ada ujian yang sedang berlangsung</p>
+        </div>
+    </div>
+
+    <!-- Upcoming Exams Section -->
+    <div *ngIf="upcomingExams().length > 0" class="mb-4">
         <h3 class="section-title">
-            <span class="status-dot status-dot-completed"></span>
-            UJIAN SELESAI ({{ completedExams().length }})
+            <span class="status-dot status-dot-upcoming"></span>
+            UJIAN TERDEKAT
         </h3>
-        <i
-            class="toggle-icon"
-            [class.ri-arrow-down-s-line]="!showCompletedExams()"
-            [class.ri-arrow-up-s-line]="showCompletedExams()"
-        ></i>
+
+        <div class="exam-list">
+            <div
+                *ngFor="let exam of upcomingExams().slice(0, 2)"
+                class="exam-card exam-card-upcoming"
+            >
+                <div class="exam-content">
+                    <h4 class="exam-title-secondary">{{ exam.displayName }}</h4>
+                    <div class="exam-schedule">
+                        <i class="ri-calendar-line me-2"></i>
+                        {{ formatDateRange( exam.schedule.startTime,
+                        exam.schedule.endTime ) }}
+                    </div>
+                    <div class="participant-count-badge">
+                        <i class="ri-group-line me-2"></i>
+                        <span>{{ exam.participantCount }} Peserta</span>
+                    </div>
+                </div>
+
+                <button
+                    (click)="toggleParticipantList(exam.schedule.id, exam)"
+                    class="btn-secondary-small mb-3"
+                >
+                    <i class="ri-user-line me-2"></i>
+                    {{ isParticipantListVisible(exam.schedule.id) ?
+                    'SEMBUNYIKAN' : 'LIHAT' }} DAFTAR PESERTA
+                </button>
+
+                <!-- Participant List for Upcoming Exam -->
+                <div
+                    *ngIf="isParticipantListVisible(exam.schedule.id)"
+                    class="participant-list-container animate-slide-down mb-3"
+                >
+                    <h3 class="participant-list-title">
+                        <i class="ri-file-list-3-line me-2"></i>
+                        Daftar Peserta Ujian
+                    </h3>
+                    <div class="participant-cards">
+                        <div
+                            *ngFor="let pSchedule of getParticipants(exam); let i = index"
+                            class="participant-card"
+                        >
+                            <div class="participant-number">{{ i + 1 }}</div>
+                            <div class="participant-info">
+                                <div class="participant-name">
+                                    <i class="ri-user-3-fill me-2"></i>
+                                    {{ pSchedule.participantUkom.name }}
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label">NIP:</span>
+                                    <span class="detail-value"
+                                        >{{ pSchedule.participantUkom.nip
+                                        }}</span
+                                    >
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label"
+                                        >Jabatan Tujuan:</span
+                                    >
+                                    <span class="detail-value"
+                                        >{{
+                                        pSchedule.participantUkom.nextJabatanName
+                                        }}</span
+                                    >
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label">Jenjang:</span>
+                                    <span class="detail-value"
+                                        >{{
+                                        pSchedule.participantUkom.nextJenjangName
+                                        }}</span
+                                    >
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label">Bidang:</span>
+                                    <span class="detail-value"
+                                        >{{
+                                        pSchedule.participantUkom.bidangJabatanName
+                                        }}</span
+                                    >
+                                </div>
+                                <div class="participant-badge">
+                                    {{
+                                    getJenisUkomDisplay(pSchedule.participantUkom.jenisUkom)
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button
+                    (click)="viewExamDetail(exam.schedule.id)"
+                    class="btn-secondary-action"
+                >
+                    LIHAT DETAIL
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div *ngIf="showCompletedExams()" class="exam-list animate-slide-down">
-        <div
-            *ngFor="let exam of completedExams()"
-            class="exam-card exam-card-completed"
-        >
-            <div class="exam-content">
-                <h4 class="exam-title-secondary">{{ exam.displayName }}</h4>
-                <div class="exam-schedule">
-                    <i class="ri-calendar-line me-2"></i>
-                    {{ formatDateRange( exam.schedule.startTime,
-                    exam.schedule.endTime ) }}
-                </div>
-                <div class="participant-count-badge">
-                    <i class="ri-group-line me-2"></i>
-                    <span>{{ exam.participantCount }} Peserta</span>
-                </div>
-                <div class="exam-completed-badge">
-                    <i class="ri-check-line me-1"></i>
-                    Sudah selesai
-                </div>
-            </div>
+    <!-- Completed Exams Section (Collapsible) -->
+    <div *ngIf="completedExams().length > 0" class="mb-4">
+        <div (click)="toggleCompletedExams()" class="section-header">
+            <h3 class="section-title">
+                <span class="status-dot status-dot-completed"></span>
+                UJIAN SELESAI ({{ completedExams().length }})
+            </h3>
+            <i
+                [class.ri-arrow-down-s-line]="!showCompletedExams()"
+                [class.ri-arrow-up-s-line]="showCompletedExams()"
+                class="toggle-icon"
+            ></i>
+        </div>
 
-            <button
-                class="btn-secondary-small"
-                (click)="toggleParticipantList(exam.schedule.id, exam)"
-            >
-                <i class="ri-user-line me-2"></i>
-                {{ isParticipantListVisible(exam.schedule.id) ? 'SEMBUNYIKAN' :
-                'LIHAT' }} DAFTAR PESERTA
-            </button>
-
-            <!-- Participant List for Completed Exam -->
+        <div *ngIf="showCompletedExams()" class="exam-list animate-slide-down">
             <div
-                *ngIf="isParticipantListVisible(exam.schedule.id)"
-                class="participant-list-container animate-slide-down mt-3"
+                *ngFor="let exam of completedExams()"
+                class="exam-card exam-card-completed"
             >
-                <h3 class="participant-list-title">
-                    <i class="ri-file-list-3-line me-2"></i>
-                    Daftar Peserta Ujian
-                </h3>
-                <div class="participant-cards">
-                    <div
-                        *ngFor="let pSchedule of getParticipants(exam); let i = index"
-                        class="participant-card"
-                    >
-                        <div class="participant-number">{{ i + 1 }}</div>
-                        <div class="participant-info">
-                            <div class="participant-name">
-                                <i class="ri-user-3-fill me-2"></i>
-                                {{ pSchedule.participantUkom.name }}
-                            </div>
-                            <div class="participant-detail">
-                                <span class="detail-label">NIP:</span>
-                                <span class="detail-value"
-                                    >{{ pSchedule.participantUkom.nip }}</span
-                                >
-                            </div>
-                            <div class="participant-detail">
-                                <span class="detail-label"
-                                    >Jabatan Tujuan:</span
-                                >
-                                <span class="detail-value"
-                                    >{{
-                                    pSchedule.participantUkom.nextJabatanName
-                                    }}</span
-                                >
-                            </div>
-                            <div class="participant-detail">
-                                <span class="detail-label">Jenjang:</span>
-                                <span class="detail-value"
-                                    >{{
-                                    pSchedule.participantUkom.nextJenjangName
-                                    }}</span
-                                >
-                            </div>
-                            <div class="participant-detail">
-                                <span class="detail-label">Bidang:</span>
-                                <span class="detail-value"
-                                    >{{
-                                    pSchedule.participantUkom.bidangJabatanName
-                                    }}</span
-                                >
-                            </div>
-                            <div class="participant-badge">
-                                {{
-                                getJenisUkomDisplay(pSchedule.participantUkom.jenisUkom)
-                                }}
+                <div class="exam-content">
+                    <h4 class="exam-title-secondary">{{ exam.displayName }}</h4>
+                    <div class="exam-schedule">
+                        <i class="ri-calendar-line me-2"></i>
+                        {{ formatDateRange( exam.schedule.startTime,
+                        exam.schedule.endTime ) }}
+                    </div>
+                    <div class="participant-count-badge">
+                        <i class="ri-group-line me-2"></i>
+                        <span>{{ exam.participantCount }} Peserta</span>
+                    </div>
+                    <div class="exam-completed-badge">
+                        <i class="ri-check-line me-1"></i>
+                        Sudah selesai
+                    </div>
+                </div>
+
+                <button
+                    (click)="toggleParticipantList(exam.schedule.id, exam)"
+                    class="btn-secondary-small"
+                >
+                    <i class="ri-user-line me-2"></i>
+                    {{ isParticipantListVisible(exam.schedule.id) ?
+                    'SEMBUNYIKAN' : 'LIHAT' }} DAFTAR PESERTA
+                </button>
+
+                <!-- Participant List for Completed Exam -->
+                <div
+                    *ngIf="isParticipantListVisible(exam.schedule.id)"
+                    class="participant-list-container animate-slide-down mt-3"
+                >
+                    <h3 class="participant-list-title">
+                        <i class="ri-file-list-3-line me-2"></i>
+                        Daftar Peserta Ujian
+                    </h3>
+                    <div class="participant-cards">
+                        <div
+                            *ngFor="let pSchedule of getParticipants(exam); let i = index"
+                            class="participant-card"
+                        >
+                            <div class="participant-number">{{ i + 1 }}</div>
+                            <div class="participant-info">
+                                <div class="participant-name">
+                                    <i class="ri-user-3-fill me-2"></i>
+                                    {{ pSchedule.participantUkom.name }}
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label">NIP:</span>
+                                    <span class="detail-value"
+                                        >{{ pSchedule.participantUkom.nip
+                                        }}</span
+                                    >
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label"
+                                        >Jabatan Tujuan:</span
+                                    >
+                                    <span class="detail-value"
+                                        >{{
+                                        pSchedule.participantUkom.nextJabatanName
+                                        }}</span
+                                    >
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label">Jenjang:</span>
+                                    <span class="detail-value"
+                                        >{{
+                                        pSchedule.participantUkom.nextJenjangName
+                                        }}</span
+                                    >
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label">Bidang:</span>
+                                    <span class="detail-value"
+                                        >{{
+                                        pSchedule.participantUkom.bidangJabatanName
+                                        }}</span
+                                    >
+                                </div>
+                                <div class="participant-badge">
+                                    {{
+                                    getJenisUkomDisplay(pSchedule.participantUkom.jenisUkom)
+                                    }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -336,22 +362,22 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Empty State for No Schedules -->
-<div
-    *ngIf="
+    <!-- Empty State for No Schedules -->
+    <div
+        *ngIf="
                 !ongoingExam() &&
                 upcomingExams().length === 0 &&
                 completedExams().length === 0
             "
-    class="exam-card exam-card-empty"
->
-    <div class="empty-state">
-        <i class="ri-inbox-line empty-icon"></i>
-        <h3 class="empty-title">Belum ada jadwal ujian</h3>
-        <p class="empty-description">
-            Silakan hubungi admin untuk informasi lebih lanjut
-        </p>
+        class="exam-card exam-card-empty"
+    >
+        <div class="empty-state">
+            <i class="ri-inbox-line empty-icon"></i>
+            <h3 class="empty-title">Belum ada jadwal ujian</h3>
+            <p class="empty-description">
+                Silakan hubungi admin untuk informasi lebih lanjut
+            </p>
+        </div>
     </div>
-</div>
+</ng-template>

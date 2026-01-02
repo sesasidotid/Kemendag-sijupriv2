@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { ApiService } from '@/modules/base/services/api.service'
-import { inject } from '@angular/core'
+import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
+import { Observable } from 'rxjs'
 
 @Injectable({
     providedIn: 'root',
@@ -22,5 +23,24 @@ export class ExamService {
             examScheduleId: examScheduleId,
             secret_key: secretKey,
         })
+    }
+
+    getExamQuestionsByScheduleAndParticipant(
+        examScheduleId: string,
+        participantId: string,
+    ): Observable<any> {
+        return this.apiService.getData(
+            `${this.BASE_PATH}/page/examiner/${examScheduleId}/${participantId}`,
+        )
+    }
+
+    saveExamAnswersByExamScheduleId(
+        examScheduleId: string,
+        payload: SaveExamAnswerRequest,
+    ): Observable<any> {
+        return this.apiService.postData(
+            `${this.BASE_PATH}/answer/examiner/${examScheduleId}`,
+            payload,
+        )
     }
 }
