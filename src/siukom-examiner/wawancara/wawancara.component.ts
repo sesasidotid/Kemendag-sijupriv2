@@ -1,26 +1,31 @@
 import { Component, inject, OnInit, signal } from '@angular/core'
-import { AssessmentFormComponent } from '@/siukom-examiner/wawancara/assessment-form/assessment-form.component'
 import { ActivatedRoute } from '@angular/router'
 import { ExamService } from '@/modules/ukom/services/exam.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { finalize } from 'rxjs'
 import { CommonModule } from '@angular/common'
+import { FormsModule } from '@angular/forms'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
+import { WawancaraExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
 
 @Component({
     selector: 'app-wawancara',
     standalone: true,
-    imports: [CommonModule, AssessmentFormComponent],
+    imports: [CommonModule, FormsModule],
     templateUrl: './wawancara.component.html',
     styleUrl: './wawancara.component.scss',
 })
 export class WawancaraComponent implements OnInit {
-    examId: string | null
-    participantId: string | null
+    examId: string
+    participantId: string
 
     loadingQuestions = signal(false)
-
+    questions: ExamQuestion[] = []
+    answers = signal<Record<string, WawancaraExamAnswer>>({})
     private route = inject(ActivatedRoute)
     private handlerService = inject(HandlerService)
+    private confirmationService = inject(ConfirmationService)
     private examService = inject(ExamService)
 
     ngOnInit() {
@@ -35,11 +40,23 @@ export class WawancaraComponent implements OnInit {
             .getExamQuestionsByScheduleAndParticipant(
                 this.examId,
                 this.participantId,
+                { page: '1', limit: '1000' },
             )
             .pipe(finalize(() => this.loadingQuestions.set(false)))
             .subscribe({
                 next: (result) => {
-                    console.log(result)
+                    this.questions = result.data
+
+                    const initialAnswers: Record<string, WawancaraExamAnswer> =
+                        {}
+
+                    this.questions.forEach((q) => {
+                        initialAnswers[q.id] = new WawancaraExamAnswer({
+                            questionId: q.id,
+                        })
+                    })
+
+                    this.answers.set(initialAnswers)
                 },
                 error: (err) => {
                     console.error(err)
@@ -49,5 +66,25 @@ export class WawancaraComponent implements OnInit {
                     )
                 },
             })
+    }
+
+    isFormValid(): boolean {
+        return this.questions.every(
+            (q) => this.answers()[q.id]?.answerChoice !== undefined,
+        )
+    }
+
+    submitAssessment(): void {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.handlerService.handleAlert(
+                    'Success',
+                    'Penilaian wawancara berhasil disimpan.',
+                )
+                // TODO: Implement API submission
+            },
+        })
     }
 }

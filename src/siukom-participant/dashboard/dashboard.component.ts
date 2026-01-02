@@ -20,7 +20,6 @@ import { ConfirmationService } from '@/modules/base/services/confirmation.servic
 import { CATScore } from '@/modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
-import { ExamType } from '@/modules/ukom/models/exam-type.model'
 import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '@/modules/base/services/file-preview.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'

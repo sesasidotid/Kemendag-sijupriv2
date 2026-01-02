@@ -10,6 +10,7 @@ import { LoginContext } from '@/modules/base/commons/login-context'
 import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
 import { EMPTY, finalize, switchMap } from 'rxjs'
 import { ExamService } from '@/modules/ukom/services/exam.service'
+import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
 
 type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
 
@@ -19,6 +20,21 @@ interface GroupedExam {
     displayName: string
     participantCount: number
 }
+
+const MONTHS = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mei',
+    'Jun',
+    'Jul',
+    'Agu',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Des',
+]
 
 @Component({
     selector: 'app-dashboard',
@@ -33,7 +49,7 @@ export class DashboardComponent implements OnInit {
     // Participant list management
     showParticipantList = signal<string | null>(null)
     selectedExamForParticipants = signal<GroupedExam | null>(null)
-    currentDate = signal(new Date())
+    nowGmt7 = signal<string>(this.getNowGmt7String())
     showCompletedExams = signal(false)
     // Computed values
     groupedExams = computed(() => this.groupExamsByStatus())
@@ -48,15 +64,14 @@ export class DashboardComponent implements OnInit {
     )
     // Format current date for display
     formattedCurrentDate = computed(() => {
-        const date = this.currentDate()
+        const raw = this.nowGmt7()
+        const { year, month, day, hour, minute } = this.parseRawDate(raw)
 
-        return new Intl.DateTimeFormat('id-ID', {
-            weekday: 'long',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-        }).format(date)
+        return `${day} ${MONTHS[month - 1]} ${year}, ${hour
+            .toString()
+            .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
     })
+
     private router = inject(Router)
     private jenisUkomService = inject(JenisUkomService)
     private handlerService = inject(HandlerService)
@@ -66,11 +81,11 @@ export class DashboardComponent implements OnInit {
 
     private schedules = signal<ExamSchedule[]>([])
 
-    constructor() {}
     ngOnInit(): void {
-        // Update current time every minute
+        this.updateNowGmt7()
+
         setInterval(() => {
-            this.currentDate.set(new Date())
+            this.updateNowGmt7()
         }, 60000)
 
         this.fetchExaminerSchedule()
@@ -103,47 +118,47 @@ export class DashboardComponent implements OnInit {
     }
 
     formatDateRange(startTime: string, endTime: string): string {
-        const start = this.parseDateTime(startTime)
-        const end = this.parseDateTime(endTime)
+        const start = this.parseRawDate(startTime)
+        const end = this.parseRawDate(endTime)
 
-        const dateFormatter = new Intl.DateTimeFormat('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-        })
+        const formatDate = (d: typeof start) =>
+            `${d.day} ${MONTHS[d.month - 1]} ${d.year}`
 
-        const dayMonthFormatter = new Intl.DateTimeFormat('id-ID', {
-            day: 'numeric',
-            month: 'short',
-        })
+        const formatTime = (d: typeof start) =>
+            `${d.hour.toString().padStart(2, '0')}:${d.minute
+                .toString()
+                .padStart(2, '0')}`
 
+        // Same day
         if (
-            start.getDate() === end.getDate() &&
-            start.getMonth() === end.getMonth() &&
-            start.getFullYear() === end.getFullYear()
+            start.year === end.year &&
+            start.month === end.month &&
+            start.day === end.day
         ) {
-            return `${dateFormatter.format(start)}, ${this.formatTime(start)} - ${this.formatTime(end)}`
+            return `${formatDate(start)}, ${formatTime(start)} - ${formatTime(
+                end,
+            )} WIB`
         }
 
-        if (
-            start.getMonth() === end.getMonth() &&
-            start.getFullYear() === end.getFullYear()
-        ) {
-            return `${start.getDate()}–${end.getDate()} ${dayMonthFormatter.format(start).replace(start.getDate().toString(), '').trim()} ${start.getFullYear()}`
+        if (start.year === end.year && start.month === end.month) {
+            return `${start.day}–${end.day} ${MONTHS[start.month - 1]} ${
+                start.year
+            } WIB`
         }
 
-        return `${dateFormatter.format(start)} - ${dateFormatter.format(end)}`
+        // Different month or year (date-only)
+        return `${formatDate(start)} - ${formatDate(end)}`
     }
 
     enterExam(
+        participantId: string,
         examId: string,
         ukomType: ExamTypeCategory,
-        participantId: string,
+        roomUkomId: string,
     ) {
         switch (ukomType) {
             case ExamTypeCategory.WAWANCARA:
-                // this.startWawancaraExam(roomUkomId, examId)
-                this.router.navigate(['/interviews', examId, participantId])
+                this.startWawancaraExam(participantId, roomUkomId, examId)
                 break
             case ExamTypeCategory.MAKALAH:
             case ExamTypeCategory.SEMINAR:
@@ -196,17 +211,39 @@ export class DashboardComponent implements OnInit {
         return exam.schedule.participantScheduleList || []
     }
 
-    private startWawancaraExam(roomUkomId: string, examScheduleId: string) {
+    formatPersonalScheduleStart(startTime: string): string {
+        const { year, month, day, hour, minute } = this.parseRawDate(startTime)
+
+        return `${day} ${MONTHS[month - 1]} ${year}, ${hour
+            .toString()
+            .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+    }
+
+    private updateNowGmt7(): void {
+        this.nowGmt7.set(this.getNowGmt7String())
+    }
+
+    private startWawancaraExam(
+        participantId: string,
+        roomUkomId: string,
+        examScheduleId: string,
+    ) {
         this.examService
-            .startExam(
-                ExamTypeCategory.WAWANCARA,
-                roomUkomId,
-                examScheduleId,
-                undefined,
+            .startExamByExaminer(
+                new ExaminerExamStartRequest({
+                    participantId: participantId,
+                    examTypeCode: ExamTypeCategory.WAWANCARA,
+                    roomUkomId: roomUkomId,
+                    examScheduleId: examScheduleId,
+                }),
             )
             .subscribe({
                 next: () => {
-                    this.router.navigate(['/interviews', examScheduleId])
+                    this.router.navigate([
+                        '/interviews',
+                        examScheduleId,
+                        participantId,
+                    ])
                 },
                 error: (err) => {
                     console.error(err)
@@ -218,13 +255,32 @@ export class DashboardComponent implements OnInit {
             })
     }
 
+    private getNowGmt7String(): string {
+        const now = new Date() // ✅ system clock only
+
+        // Convert local time → UTC
+        const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000
+
+        // Add GMT+7 offset
+        const gmt7 = new Date(utcMillis + 7 * 60 * 60000)
+
+        const yyyy = gmt7.getFullYear()
+        const mm = (gmt7.getMonth() + 1).toString().padStart(2, '0')
+        const dd = gmt7.getDate().toString().padStart(2, '0')
+        const hh = gmt7.getHours().toString().padStart(2, '0')
+        const mi = gmt7.getMinutes().toString().padStart(2, '0')
+        const ss = gmt7.getSeconds().toString().padStart(2, '0')
+
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
+    }
+
     private groupExamsByStatus(): GroupedExam[] {
-        const now = this.currentDate()
+        const now = this.nowGmt7()
         const grouped: GroupedExam[] = []
 
         this.schedules().forEach((schedule) => {
-            const startTime = this.parseDateTime(schedule.startTime)
-            const endTime = this.parseDateTime(schedule.endTime)
+            const startTime = schedule.startTime
+            const endTime = schedule.endTime
 
             let status: ExamStatus
             if (now >= startTime && now <= endTime) {
@@ -243,48 +299,28 @@ export class DashboardComponent implements OnInit {
             })
         })
 
-        // Sort: ongoing first, then upcoming by start time, then completed by end time desc
         return grouped.sort((a, b) => {
             if (a.status === 'ongoing' && b.status !== 'ongoing') return -1
             if (a.status !== 'ongoing' && b.status === 'ongoing') return 1
 
             if (a.status === 'upcoming' && b.status === 'upcoming') {
-                return (
-                    this.parseDateTime(a.schedule.startTime).getTime() -
-                    this.parseDateTime(b.schedule.startTime).getTime()
-                )
+                return a.schedule.startTime.localeCompare(b.schedule.startTime)
             }
 
             if (a.status === 'completed' && b.status === 'completed') {
-                return (
-                    this.parseDateTime(b.schedule.endTime).getTime() -
-                    this.parseDateTime(a.schedule.endTime).getTime()
-                )
+                return b.schedule.endTime.localeCompare(a.schedule.endTime)
             }
 
             return 0
         })
     }
 
-    private parseDateTime(dateTimeStr: string): Date {
-        // Convert "2025-12-16 13:55:00" to Date object
+    private parseRawDate(dateTimeStr: string) {
         const [datePart, timePart] = dateTimeStr.split(' ')
         const [year, month, day] = datePart.split('-').map(Number)
         const [hour, minute, second] = timePart.split(':').map(Number)
 
-        // Create date as if it's UTC+7, then subtract 7 hours
-        const utcMillis = Date.UTC(
-            year,
-            month - 1,
-            day,
-            hour - 7,
-            minute,
-            second,
-        )
-
-        console.log('utcMillis', new Date(utcMillis))
-
-        return new Date(utcMillis)
+        return { year, month, day, hour, minute, second }
     }
 
     private getExamDisplayName(examTypeCode: string): string {
@@ -299,11 +335,5 @@ export class DashboardComponent implements OnInit {
         }
 
         return displayNames[examTypeCode] || examTypeCode
-    }
-
-    private formatTime(date: Date): string {
-        const hours = date.getHours().toString().padStart(2, '0')
-        const minutes = date.getMinutes().toString().padStart(2, '0')
-        return `${hours}:${minutes}`
     }
 }

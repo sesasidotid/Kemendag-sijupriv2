@@ -2,6 +2,10 @@ import { inject, Injectable } from '@angular/core'
 import { ApiService } from '@/modules/base/services/api.service'
 import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
 import { Observable } from 'rxjs'
+import { HttpParams } from '@angular/common/http'
+import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
+import { PaginationWrapper } from '@/modules/base/models/pagination.model'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 
 @Injectable({
     providedIn: 'root',
@@ -15,7 +19,7 @@ export class ExamService {
         examTypeCode: string,
         roomUkomId: string,
         examScheduleId: string,
-        secretKey: string | undefined,
+        secretKey?: string | undefined,
     ) {
         return this.apiService.postData(`${this.BASE_PATH}/start`, {
             examTypeCode: examTypeCode,
@@ -25,19 +29,37 @@ export class ExamService {
         })
     }
 
+    startExamByExaminer(payload: ExaminerExamStartRequest) {
+        return this.apiService.postData(
+            `${this.BASE_PATH}/examiner/start`,
+            payload,
+        )
+    }
+
     getExamQuestionsByScheduleAndParticipant(
         examScheduleId: string,
         participantId: string,
-    ): Observable<any> {
-        return this.apiService.getData(
-            `${this.BASE_PATH}/page/examiner/${examScheduleId}/${participantId}`,
-        )
+        queryParams?: Record<string, string>,
+    ): Observable<PaginationWrapper<ExamQuestion>> {
+        let params = new HttpParams()
+
+        if (queryParams) {
+            Object.entries(queryParams).forEach(([key, value]) => {
+                params = params.set(key, value)
+            })
+        }
+
+        const path =
+            `${this.BASE_PATH}/page/examiner/${examScheduleId}/${participantId}` +
+            (params.toString() ? `?${params.toString()}` : '')
+
+        return this.apiService.getData(path)
     }
 
     saveExamAnswersByExamScheduleId(
         examScheduleId: string,
         payload: SaveExamAnswerRequest,
-    ): Observable<any> {
+    ): Observable<unknown> {
         return this.apiService.postData(
             `${this.BASE_PATH}/answer/examiner/${examScheduleId}`,
             payload,

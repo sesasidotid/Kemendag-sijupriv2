@@ -1,6 +1,7 @@
 import { Serializable } from '../../../base/commons/serializable'
 import { CATChoice } from './cat-choice.model'
 import { CATAnswer } from './cat-answer.model'
+
 export class CATQuestions extends Serializable {
     id: string = undefined
     question: string = undefined

@@ -1,7 +1,8 @@
 <!-- Welcome Section -->
+<script src="dashboard.component.ts"></script>
 <div class="welcome-section mb-4">
     <h1 class="welcome-title">👋 Selamat Datang, Bapak/Ibu</h1>
-    <p class="current-date">Hari ini: {{ formattedCurrentDate() }}</p>
+    <p class="current-date">Hari ini: {{ formattedCurrentDate() }} (WIB)</p>
 </div>
 
 <ng-container *ngIf="loadingExamSchedule(); else examListContent">
@@ -31,7 +32,7 @@
                 <div class="exam-schedule">
                     <i class="ri-calendar-line me-2"></i>
                     {{ formatDateRange( exam.schedule.startTime,
-                    exam.schedule.endTime ) }}
+                    exam.schedule.endTime ) + ' (WIB)' }}
                 </div>
 
                 <div class="participant-count-badge">
@@ -75,34 +76,19 @@
                             </div>
 
                             <div class="participant-detail">
+                                <span class="detail-label"
+                                    >Waktu Pelaksanaan</span
+                                >
+                                <span class="detail-value">
+                                    : {{
+                                    formatPersonalScheduleStart(pSchedule.personalSchedule)
+                                    + ' (WIB)' }}
+                                </span>
+                            </div>
+                            <div class="participant-detail">
                                 <span class="detail-label">NIP</span>
                                 <span class="detail-value">
                                     : {{ pSchedule.participantUkom.nip }}
-                                </span>
-                            </div>
-
-                            <div class="participant-detail">
-                                <span class="detail-label">Jabatan Tujuan</span>
-                                <span class="detail-value">
-                                    : {{
-                                    pSchedule.participantUkom.nextJabatanName }}
-                                </span>
-                            </div>
-
-                            <div class="participant-detail">
-                                <span class="detail-label">Jenjang Tujuan</span>
-                                <span class="detail-value">
-                                    : {{
-                                    pSchedule.participantUkom.nextJenjangName }}
-                                </span>
-                            </div>
-
-                            <div class="participant-detail">
-                                <span class="detail-label">Bidang</span>
-                                <span class="detail-value">
-                                    : {{
-                                    pSchedule.participantUkom.bidangJabatanName
-                                    }}
                                 </span>
                             </div>
 
@@ -110,23 +96,18 @@
                                 {{ getJenisUkomDisplay(
                                 pSchedule.participantUkom.jenisUkom ) }}
                             </div>
+
                             <button
-                                (click)="enterExam(exam.schedule.id, exam.schedule.examTypeCode, pSchedule.participantId)"
-                                class="btn-primary-action"
+                                (click)="enterExam(
+                                            pSchedule.participantId,
+                                            exam.schedule.id,
+                                            exam.schedule.examTypeCode,
+                                            exam.schedule.roomUkomId
+                                        )"
+                                class="btn-primary-action btn-sm mt-3"
                             >
                                 MASUK UJIAN
                             </button>
-
-                            <!--                            <button-->
-                            <!--                                (click)="enterExam(-->
-                            <!--                pSchedule.roomUkomId,-->
-                            <!--                pSchedule.scheduleId,-->
-                            <!--                pSchedule.examTypeCode-->
-                            <!--            )"-->
-                            <!--                                class="btn-primary-action btn-sm mt-3"-->
-                            <!--                            >-->
-                            <!--                                MASUK UJIAN-->
-                            <!--                            </button>-->
                         </div>
                     </div>
                 </div>
@@ -162,7 +143,7 @@
                     <div class="exam-schedule">
                         <i class="ri-calendar-line me-2"></i>
                         {{ formatDateRange( exam.schedule.startTime,
-                        exam.schedule.endTime ) }}
+                        exam.schedule.endTime ) + ' (WIB) ' }}
                     </div>
                     <div class="participant-count-badge">
                         <i class="ri-group-line me-2"></i>
@@ -203,32 +184,6 @@
                                     <span class="detail-label">NIP:</span>
                                     <span class="detail-value"
                                         >{{ pSchedule.participantUkom.nip
-                                        }}</span
-                                    >
-                                </div>
-                                <div class="participant-detail">
-                                    <span class="detail-label"
-                                        >Jabatan Tujuan:</span
-                                    >
-                                    <span class="detail-value"
-                                        >{{
-                                        pSchedule.participantUkom.nextJabatanName
-                                        }}</span
-                                    >
-                                </div>
-                                <div class="participant-detail">
-                                    <span class="detail-label">Jenjang:</span>
-                                    <span class="detail-value"
-                                        >{{
-                                        pSchedule.participantUkom.nextJenjangName
-                                        }}</span
-                                    >
-                                </div>
-                                <div class="participant-detail">
-                                    <span class="detail-label">Bidang:</span>
-                                    <span class="detail-value"
-                                        >{{
-                                        pSchedule.participantUkom.bidangJabatanName
                                         }}</span
                                     >
                                 </div>
@@ -276,7 +231,7 @@
                     <div class="exam-schedule">
                         <i class="ri-calendar-line me-2"></i>
                         {{ formatDateRange( exam.schedule.startTime,
-                        exam.schedule.endTime ) }}
+                        exam.schedule.endTime ) + ' (WIB) ' }}
                     </div>
                     <div class="participant-count-badge">
                         <i class="ri-group-line me-2"></i>
@@ -321,32 +276,6 @@
                                     <span class="detail-label">NIP:</span>
                                     <span class="detail-value"
                                         >{{ pSchedule.participantUkom.nip
-                                        }}</span
-                                    >
-                                </div>
-                                <div class="participant-detail">
-                                    <span class="detail-label"
-                                        >Jabatan Tujuan:</span
-                                    >
-                                    <span class="detail-value"
-                                        >{{
-                                        pSchedule.participantUkom.nextJabatanName
-                                        }}</span
-                                    >
-                                </div>
-                                <div class="participant-detail">
-                                    <span class="detail-label">Jenjang:</span>
-                                    <span class="detail-value"
-                                        >{{
-                                        pSchedule.participantUkom.nextJenjangName
-                                        }}</span
-                                    >
-                                </div>
-                                <div class="participant-detail">
-                                    <span class="detail-label">Bidang:</span>
-                                    <span class="detail-value"
-                                        >{{
-                                        pSchedule.participantUkom.bidangJabatanName
                                         }}</span
                                     >
                                 </div>
