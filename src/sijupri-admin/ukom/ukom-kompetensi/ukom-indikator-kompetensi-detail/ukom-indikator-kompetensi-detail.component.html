@@ -1,21 +1,21 @@
-<div
-    *ngIf="isLoading$ | async; else indikatorKompetensiContent"
-    class="d-flex justify-content-center my-5"
->
-    <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
+<button (click)="onBack()" class="btn btn-sm btn-outline-secondary mb-3">
+    <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
 
-<ng-template #indikatorKompetensiContent
-    ><button class="btn btn-sm btn-outline-secondary mb-3" (click)="onBack()">
-        <i class="mdi mdi-chevron-left"></i> Kembali
-    </button>
+<ng-container *ngIf="isLoading$ | async; else indikatorKompetensiContent">
+    <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #indikatorKompetensiContent>
     <div class="card">
         <div class="card-header">
             <h5 class="m-0">
                 <i class="mdi mdi-certificate me-2"></i> Informasi Indikator
-                Komptensi
+                Kompetensi
             </h5>
         </div>
         <div class="card-body">
@@ -36,34 +36,107 @@
         </div>
     </div>
 
-    <section *ngIf="questionsList.length > 0" class="">
-        <div class="card border-0">
-            <div class="row question-container mb-3 pb-2">
-                <label for="" class="p-0 fw-bold">Daftar Pertanyaan</label>
-                <div class="col-sm-12 mt-2">
-                    <ng-container
-                        *ngFor="let pertanyaan of questionsList; index as i"
+    <!-- Questions by Module Type -->
+    <section *ngIf="getTotalQuestions() > 0" class="mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="m-0">
+                    <i class="mdi mdi-comment-question-outline me-2"></i> Daftar
+                    Pertanyaan ({{ getTotalQuestions() }} total)
+                </h5>
+            </div>
+            <div class="card-body">
+                <ng-container *ngFor="let moduleType of moduleTypes">
+                    <div
+                        *ngIf="getQuestionsForModule(moduleType).length > 0"
+                        class="mb-4"
                     >
-                        <div class="row card">
+                        <div class="card border">
                             <div
-                                class="d-flex justify-content-between align-items-center mb-2"
+                                class="card-header bg-light d-flex justify-content-between align-items-center"
                             >
-                                <label for="" class="col-form-label fw-bold"
-                                    >Pertanyaan {{ i + 1 }}</label
-                                >
-                                <a
-                                    class="btn btn-sm btn-soft-danger"
-                                    (click)="deleteQuestion(pertanyaan.id)"
-                                    >Hapus</a
+                                <h6 class="m-0">
+                                    <i class="mdi mdi-folder-outline me-2"></i>
+                                    {{ getModuleDisplayName(moduleType) }}
+                                </h6>
+                                <span class="badge bg-primary rounded-pill"
+                                    >{{ getQuestionsForModule(moduleType).length
+                                    }} Pertanyaan</span
                                 >
                             </div>
-
-                            <div class="col">
-                                <p>{{ pertanyaan.question }}</p>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush">
+                                    <ng-container
+                                        *ngFor="
+                                            let pertanyaan of getQuestionsForModule(
+                                                moduleType
+                                            );
+                                            index as i
+                                        "
+                                    >
+                                        <div
+                                            class="list-group-item border-bottom px-0 py-3"
+                                        >
+                                            <div
+                                                class="d-flex justify-content-between align-items-start mb-2"
+                                            >
+                                                <div class="d-flex gap-2">
+                                                    <span
+                                                        class="badge bg-secondary"
+                                                        >{{ i + 1 }}</span
+                                                    >
+                                                    <span
+                                                        [class]="
+                                                            getQuestionTypeBadgeClass(
+                                                                pertanyaan.type
+                                                            )
+                                                        "
+                                                    >
+                                                        {{ getQuestionTypeLabel(
+                                                        pertanyaan.type ) }}
+                                                    </span>
+                                                </div>
+                                                <button
+                                                    (click)="
+                                                        deleteQuestion(
+                                                            pertanyaan.id
+                                                        )
+                                                    "
+                                                    class="btn btn-sm btn-soft-danger"
+                                                >
+                                                    <i
+                                                        class="mdi mdi-delete-outline"
+                                                    ></i>
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                            <div class="ms-4">
+                                                <p class="mb-0">
+                                                    {{ pertanyaan.question }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
                             </div>
                         </div>
-                    </ng-container>
-                </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </section>
+
+    <!-- No Questions Message -->
+    <section *ngIf="getTotalQuestions() === 0" class="mt-4">
+        <div class="card">
+            <div class="card-body py-5 text-center">
+                <i
+                    class="mdi mdi-comment-question-outline text-muted"
+                    style="font-size: 3rem"
+                ></i>
+                <p class="text-muted mb-0 mt-3">
+                    Belum ada pertanyaan untuk indikator kompetensi ini
+                </p>
             </div>
         </div>
     </section>

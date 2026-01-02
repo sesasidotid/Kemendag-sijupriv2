@@ -1,26 +1,22 @@
-import { Component, Input, SimpleChanges } from '@angular/core'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { KompetensiUkom } from '../../../../modules/ukom/models/kompetensi'
-import {
-    ReactiveFormsModule,
-    FormBuilder,
-    FormGroup,
-    Validators
-} from '@angular/forms'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { IndikatorKompetensiUkom } from '../../../../modules/ukom/models/indikator-kompetensi'
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core'
+import { ApiService } from '@/modules/base/services/api.service'
+import { KompetensiUkom } from '@/modules/ukom/models/kompetensi'
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { IndikatorKompetensiUkom } from '@/modules/ukom/models/indikator-kompetensi'
 import { CommonModule } from '@angular/common'
 import { BehaviorSubject } from 'rxjs'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+
 @Component({
     selector: 'app-ukom-indikator-kompetensi-add',
     standalone: true,
     imports: [ReactiveFormsModule, CommonModule],
     templateUrl: './ukom-indikator-kompetensi-add.component.html',
-    styleUrl: './ukom-indikator-kompetensi-add.component.scss'
+    styleUrl: './ukom-indikator-kompetensi-add.component.scss',
 })
-export class UkomIndikatorKompetensiAddComponent {
+export class UkomIndikatorKompetensiAddComponent implements OnChanges {
     @Input() kompetensi: KompetensiUkom = new KompetensiUkom()
 
     isSubmitLoading$ = new BehaviorSubject<boolean>(false)
@@ -28,46 +24,46 @@ export class UkomIndikatorKompetensiAddComponent {
     indikatorKompetensiForm = this.fb.group({
         code: ['', [Validators.required]],
         name: ['', [Validators.required, Validators.minLength(3)]],
-        kompetensi_id: ['', Validators.required]
+        kompetensiId: ['', Validators.required],
     })
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private fb: FormBuilder,
         private formValidationService: FormValidationService,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
     ) {}
 
-    ngOnInit (): void {}
+    ngOnInit(): void {}
 
-    ngOnChanges (changes: SimpleChanges): void {
+    ngOnChanges(changes: SimpleChanges): void {
         if (changes['kompetensi'] && this.kompetensi?.id) {
             this.loadData()
         }
     }
 
-    loadData (): void {
+    loadData(): void {
         this.indikatorKompetensiForm.patchValue({
-            kompetensi_id: this.kompetensi.id
+            kompetensiId: this.kompetensi.id,
         })
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.indikatorKompetensiForm.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    onSubmit (): void {
+    onSubmit(): void {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
 
                 const payload = new IndikatorKompetensiUkom(
-                    this.indikatorKompetensiForm.value
+                    this.indikatorKompetensiForm.value,
                 )
 
                 this.isSubmitLoading$.next(true)
@@ -78,7 +74,7 @@ export class UkomIndikatorKompetensiAddComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menambahkan indikator kompetensi'
+                                'Berhasil menambahkan indikator kompetensi',
                             )
 
                             this.indikatorKompetensiForm.reset()
@@ -86,19 +82,19 @@ export class UkomIndikatorKompetensiAddComponent {
 
                             this.isSubmitLoading$.next(false)
                         },
-                        error: err => {
+                        error: (err) => {
                             console.error(
                                 'Error adding indikator kompetensi:',
-                                err
+                                err,
                             )
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menambahkan indikator kompetensi'
+                                'Gagal menambahkan indikator kompetensi',
                             )
                             this.isSubmitLoading$.next(false)
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }
