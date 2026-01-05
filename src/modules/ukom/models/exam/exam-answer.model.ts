@@ -2,7 +2,8 @@ import { Serializable } from '@/modules/base/commons/serializable'
 
 abstract class BaseExamAnswer extends Serializable {
     answerText: string | undefined = undefined
-
+    participantId: string = undefined
+    questionId: string = undefined
     protected constructor() {
         super()
     }
@@ -18,7 +19,6 @@ export class MakalahExamAnswer extends BaseExamAnswer {
 }
 
 export class WawancaraExamAnswer extends BaseExamAnswer {
-    questionId!: string
     answerChoice: string | undefined = undefined
 
     constructor(object?: Partial<WawancaraExamAnswer>) {
@@ -27,6 +27,20 @@ export class WawancaraExamAnswer extends BaseExamAnswer {
     }
 }
 
+export interface ExamAnswerDto {
+    id?: string
+    participantId: string
+    questionId: string
+    answerText?: string | null
+    score?: number | null
+    answerChoice?: string | null
+    answerUpload?: string | null
+    answerUploadUrl?: string | null
+    questionType?: string | null
+    question?: string | null
+    isUncertain?: boolean | null
+}
+
 export interface SaveExamAnswerRequest {
-    answerDtoList: BaseExamAnswer[]
+    answerDtoList: ExamAnswerDto[]
 }

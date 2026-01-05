@@ -1,21 +1,16 @@
 import { CommonModule } from '@angular/common'
 import { LoginContext } from '@/modules/base/commons/login-context'
-import { Component, inject, OnInit, signal } from '@angular/core'
+import {
+    Component,
+    inject,
+    OnInit,
+    signal,
+    WritableSignal,
+} from '@angular/core'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import {
-    BehaviorSubject,
-    catchError,
-    combineLatest,
-    concatMap,
-    finalize,
-    forkJoin,
-    map,
-    Observable,
-    of,
-    tap,
-} from 'rxjs'
+import { catchError, concatMap, finalize, forkJoin, map, of, tap } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { CATScore } from '@/modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
@@ -34,6 +29,7 @@ import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedule.pipe'
 import { ExamDurationPipe } from '@/modules/ukom/pipes/exam-duration.pipe'
 import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-dashboard',
@@ -50,7 +46,7 @@ import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements  OnInit{
+export class DashboardComponent implements OnInit {
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
     participantService = inject(UkomParticipantService)
     examGradeService = inject(ExamGradeService)
@@ -63,21 +59,18 @@ export class DashboardComponent implements  OnInit{
     roomUkom = new RoomUkom()
     scoreMap: Record<string, ScoreValue | null> = {}
 
-    isRoomLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
-    isStartCATLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
-    isMakalahLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
-    isLoading$: Observable<boolean>
+    roomLoading = signal(false)
+    startCATLoading = signal(false)
+    startMakalahLoading = signal(false)
+    startWawancaraLoading = signal(false)
+    protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor(
         private router: Router,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         private filePreviewService: FilePreviewService,
-    ) {
-        this.isLoading$ = combineLatest([this.isRoomLoading$]).pipe(
-            map((loadings) => loadings.some((isLoading) => isLoading)),
-        )
-    }
+    ) {}
 
     ngOnInit() {
         this.loadExams()
@@ -85,8 +78,7 @@ export class DashboardComponent implements  OnInit{
 
     loadExams() {
         const userId = LoginContext.getUserId().replace('PU-', '')
-
-        this.isRoomLoading$.next(true)
+        this.roomLoading.set(true)
 
         this.participantService
             .getParticipantUkom(userId)
@@ -107,7 +99,7 @@ export class DashboardComponent implements  OnInit{
 
                 concatMap((participant) => this.getAllScores(participant)),
 
-                finalize(() => this.isRoomLoading$.next(false)),
+                finalize(() => this.roomLoading.set(false)),
             )
             .subscribe()
     }
@@ -135,10 +127,10 @@ export class DashboardComponent implements  OnInit{
 
                             if (response) {
                                 switch (examSchedule.examTypeCode) {
-                                    case 'CAT':
+                                    case ExamTypeCategory.CAT:
                                         scoreInstance = new CATScore(response)
                                         break
-                                    case 'MAKALAH':
+                                    case ExamTypeCategory.MAKALAH:
                                         scoreInstance = new MakalahScore(
                                             response,
                                         )
@@ -201,7 +193,7 @@ export class DashboardComponent implements  OnInit{
         let placeholder: string | undefined
         let withComment: boolean
 
-        if (examTypeCode === 'CAT') {
+        if (examTypeCode === ExamTypeCategory.CAT) {
             withComment = true
             title = 'Konfirmasi Mulai Ujian CAT'
             message =
@@ -226,12 +218,21 @@ export class DashboardComponent implements  OnInit{
                 next: ({ confirmed, comment }) => {
                     if (!confirmed) return
 
-                    if (examTypeCode === 'CAT') {
-                        this.isStartCATLoading$.next(true)
+                    const EXAM_ROUTE_MAP: Record<string, string> = {
+                        CAT: 'cat',
+                        MAKALAH: 'seminar-paper',
+                        WAWANCARA: 'interviews',
                     }
-                    if (examTypeCode === 'MAKALAH') {
-                        this.isMakalahLoading$.next(true)
+
+                    const LOADING_MAP: Record<
+                        string,
+                        WritableSignal<boolean>
+                    > = {
+                        CAT: this.startCATLoading,
+                        MAKALAH: this.startMakalahLoading,
+                        WAWANCARA: this.startWawancaraLoading,
                     }
+                    LOADING_MAP[examTypeCode]?.set(true)
 
                     this.examService
                         .startExam(
@@ -242,17 +243,23 @@ export class DashboardComponent implements  OnInit{
                         )
                         .pipe(
                             finalize(() => {
-                                this.isStartCATLoading$.next(false)
-                                this.isMakalahLoading$.next(false)
+                                LOADING_MAP[examTypeCode]?.set(false)
                             }),
                         )
                         .subscribe({
                             next: () => {
-                                if (examTypeCode) {
-                                    this.router.navigate([
-                                        `/${examTypeCode.toLowerCase()}/${examScheduleId}`,
-                                    ])
+                                const route = EXAM_ROUTE_MAP[examTypeCode]
+
+                                if (!route) {
+                                    this.handlerService.handleAlert(
+                                        'Error',
+                                        `Jenis ujian tidak diketahui: ${examTypeCode}`,
+                                    )
+                                    return
                                 }
+                                this.router.navigate([
+                                    `/${route}/${examScheduleId}`,
+                                ])
                             },
                             error: (err) => {
                                 if (err.error.message == 'Invalid Secret') {

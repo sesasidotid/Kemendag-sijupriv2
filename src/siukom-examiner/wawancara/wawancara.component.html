@@ -1,3 +1,7 @@
+<button (click)="backToDashboard()" class="btn-back">
+    <span class="icon">←</span>
+    Kembali ke Dashboard
+</button>
 <ng-container *ngIf="loadingQuestions(); else questionForm">
     <div class="py-5 text-center">
         <div class="spinner-border text-primary" role="status">
@@ -63,6 +67,7 @@
                             class="radio-card competent-option"
                         >
                             <input
+                                (ngModelChange)="scheduleAutoSave()"
                                 [(ngModel)]="answers()[question.id].answerChoice"
                                 [name]="'assessment-' + i"
                                 type="radio"
@@ -77,6 +82,7 @@
                             class="radio-card incompetent-option"
                         >
                             <input
+                                (ngModelChange)="scheduleAutoSave()"
                                 [(ngModel)]="answers()[question.id].answerChoice"
                                 [name]="'assessment-' + i"
                                 type="radio"
@@ -93,13 +99,24 @@
 
         <!-- Submit Button (Sticky Bottom or Bottom Block) -->
         <div class="form-actions">
-            <button
-                (click)="submitAssessment()"
-                [disabled]="!isFormValid()"
-                class="btn-submit"
-            >
-                Simpan Penilaian
-            </button>
+            <ng-container *ngIf="submitQuestionLoading(); else noLoading">
+                <button [disabled]="true" class="btn-submit">
+                    <div class="spinner-border spinner-sm-custom" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </button>
+            </ng-container>
+
+            <ng-template #noLoading>
+                <button
+                    (click)="submitAssessment()"
+                    [disabled]="!isFormValid()"
+                    class="btn-submit"
+                    type="button"
+                >
+                    Simpan Penilaian
+                </button>
+            </ng-template>
         </div>
     </div>
 </ng-template>

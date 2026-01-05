@@ -1,4 +1,4 @@
-<ng-container *ngIf="isLoading$ | async; else dashboardContent">
+<ng-container *ngIf="roomLoading(); else dashboardContent">
     <div class="d-flex justify-content-center my-5">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -85,7 +85,9 @@
                         <div
                             class="d-flex align-items-end flex-sm-row flex-column gap-2"
                         >
-                            <ng-container *ngIf="exam.examTypeCode === 'CAT'">
+                            <ng-container
+                                *ngIf="exam.examTypeCode === ExamTypeCategory.CAT"
+                            >
                                 <app-loading-button
                                     (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
                                     *ngIf="canStartExam(exam.startTime, exam.endTime) &&
@@ -93,7 +95,7 @@
                                     [className]="'btn btn-primary'"
                                     [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
                                                 (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
-                                    [isLoading]="isStartCATLoading$ | async"
+                                    [isLoading]="startCATLoading()"
                                     [label]="'Mulai'"
                                 >
                                 </app-loading-button>
@@ -108,7 +110,7 @@
                             </ng-container>
 
                             <ng-container
-                                *ngIf="exam.examTypeCode === 'MAKALAH'"
+                                *ngIf="exam.examTypeCode === ExamTypeCategory.MAKALAH"
                             >
                                 <app-loading-button
                                     (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
@@ -118,7 +120,7 @@
                                     [className]="'btn btn-primary'"
                                     [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
                                                 (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
-                                    [isLoading]="isMakalahLoading$ | async"
+                                    [isLoading]="startMakalahLoading()"
                                     [label]="'Unggah Makalah'"
                                 >
                                 </app-loading-button>

@@ -95,11 +95,11 @@ export class UkomExamScheduleAddComponent implements OnInit {
         private activatedRoute: ActivatedRoute,
         private fb: FormBuilder,
         private formValidationService: FormValidationService,
-    ) {
-        this.jenisUkomList$ = this.ukomMiscellaneousService.getExamType()
-    }
+    ) {}
 
     ngOnInit() {
+        this.jenisUkomList$ = this.ukomMiscellaneousService.getExamType()
+
         this.activatedRoute.paramMap.subscribe((params) => {
             this.id = params.get('id')
             this.initPagable()

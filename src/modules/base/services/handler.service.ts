@@ -54,11 +54,6 @@ interface ErrorEntry {
     providedIn: 'root',
 })
 export class HandlerService {
-    constructor(
-        private alertService: AlertService,
-        private router: Router,
-    ) {}
-
     private errorMessages: Record<string, ErrorEntry> = {
         // RCD codes
         'RCD-00001': { subject: 'Info', message: 'Data tidak ditemukan' },
@@ -106,6 +101,11 @@ export class HandlerService {
         },
         'UEL-00009': { subject: 'Info', message: 'Registrasi sudah ada' },
     }
+
+    constructor(
+        private alertService: AlertService,
+        private router: Router,
+    ) {}
 
     handleException(error: any) {
         const code = error?.error?.code

@@ -65,4 +65,23 @@ export class ExamService {
             payload,
         )
     }
+
+    getExamQuestionByScheduleId(
+        examScheduleId: string,
+        queryParams?: Record<string, string>,
+    ): Observable<PaginationWrapper<ExamQuestion>> {
+        let params = new HttpParams()
+
+        if (queryParams) {
+            Object.entries(queryParams).forEach(([key, value]) => {
+                params = params.set(key, value)
+            })
+        }
+
+        const path =
+            `${this.BASE_PATH}/page/${examScheduleId}` +
+            (params.toString() ? `?${params.toString()}` : '')
+
+        return this.apiService.getData(path)
+    }
 }

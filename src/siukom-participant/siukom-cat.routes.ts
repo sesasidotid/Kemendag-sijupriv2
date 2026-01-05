@@ -20,10 +20,17 @@ export const routes: Routes = [
                     ),
             },
             {
-                path: 'makalah/:examScheduleId',
+                path: 'seminar-paper/:examScheduleId',
                 loadComponent: () =>
                     import('./makalah-page/makalah-page.component').then(
                         (m) => m.MakalahPageComponent,
+                    ),
+            },
+            {
+                path: 'interviews/:examScheduleId',
+                loadComponent: () =>
+                    import('./wawancara-page/wawancara-page.component').then(
+                        (m) => m.WawancaraPageComponent,
                     ),
             },
         ],

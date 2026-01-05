@@ -5,28 +5,29 @@ import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import {
     Component,
     EventEmitter,
+    inject,
     Input,
+    OnInit,
     Output,
-    SimpleChanges,
+    signal,
     ViewChild,
 } from '@angular/core'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { FormBuilder, Validators } from '@angular/forms'
-import { UkomQuestion } from '@/modules/ukom/models/ukom-question'
 import {
     BehaviorSubject,
-    combineLatest,
     filter,
     finalize,
-    map,
     Observable,
     switchMap,
     take,
     tap,
 } from 'rxjs'
 import { CommonModule } from '@angular/common'
-import { Router } from '@angular/router'
-import { MakalahAnswer } from '@/modules/ukom/models/cat/makalah-answer'
+import { ActivatedRoute, Router } from '@angular/router'
+import { ExamService } from '@/modules/ukom/services/exam.service'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
+
 @Component({
     selector: 'app-ukom-makalah',
     standalone: true,
@@ -34,16 +35,14 @@ import { MakalahAnswer } from '@/modules/ukom/models/cat/makalah-answer'
     templateUrl: './ukom-makalah.component.html',
     styleUrl: './ukom-makalah.component.scss',
 })
-export class UkomMakalahComponent {
+export class UkomMakalahComponent implements OnInit {
     @ViewChild(FileHandlerComponent) fileHandler!: FileHandlerComponent
 
     @Input() participant_id: string
     @Input() room_id: string
     @Output() afterSubmit = new EventEmitter<void>()
 
-    question: UkomQuestion = new UkomQuestion()
-    answer: MakalahAnswer = new MakalahAnswer()
-
+    question: ExamQuestion
     makalah_form = this.fb.group({
         file_answer_upload: ['', Validators.required],
     })
@@ -68,13 +67,11 @@ export class UkomMakalahComponent {
     isSubmitLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
         false,
     )
-    isLoadingAnswerFile$: BehaviorSubject<boolean> =
-        new BehaviorSubject<boolean>(true)
-    isQuestionLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-        true,
-    )
-    isFinished: boolean = false
+    questionLoading = signal(false)
     isLoading$: Observable<boolean>
+    examScheduleId: string
+    examService = inject(ExamService)
+    private route = inject(ActivatedRoute)
 
     constructor(
         private fb: FormBuilder,
@@ -82,18 +79,13 @@ export class UkomMakalahComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private router: Router,
-    ) {
-        this.isLoading$ = combineLatest([
-            this.isLoadingAnswerFile$,
-            this.isQuestionLoading$,
-        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
-    }
+    ) {}
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if ((changes['room_id'] || changes['participant_id']) && this.room_id) {
+    ngOnInit() {
+        this.route.paramMap.subscribe((params) => {
+            this.examScheduleId = params.get('examScheduleId')
             this.getQuestion()
-            this.getAnswerFile()
-        }
+        })
     }
 
     clearFilesName() {
@@ -102,78 +94,23 @@ export class UkomMakalahComponent {
         }
     }
 
-    getAnswerFile() {
-        this.isLoadingAnswerFile$.next(true)
-        this.apiService
-            .getData(
-                `/api/v1/exam/page/MAKALAH/${this.room_id}?page=1&limit=10`,
-            )
-            .pipe(
-                finalize(() => {
-                    this.isLoadingAnswerFile$.next(false)
-                }),
-            )
-            .subscribe({
-                next: (res: any) => {
-                    if (
-                        res.data &&
-                        res.data.length > 0 &&
-                        res.data[0].answerDto
-                    ) {
-                        this.answer = new MakalahAnswer(res)
-                        const answerDto = this.answer.data[0].answerDto
-
-                        if (
-                            answerDto.answerUpload &&
-                            answerDto.answerUploadUrl
-                        ) {
-                            this.inputs.files['file_answer_upload'].fileName =
-                                answerDto.answerUpload
-                            this.inputs.files['file_answer_upload'].source =
-                                answerDto.answerUploadUrl
-
-                            if (this.fileHandler) {
-                                this.fileHandler.fileNames[
-                                    'file_answer_upload'
-                                ] = answerDto.answerUpload
-                            }
-                        }
-                    }
-                },
-                error: (err) => {
-                    if (err.error.message === `Exam's already ended`) {
-                        this.isFinished = true
-                    } else {
-                        console.error('Error fetching answer file:', err)
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengambil file jawaban makalah',
-                        )
-                    }
-                },
-            })
-    }
-
-    backToHome() {
-        this.router.navigate(['/'])
-    }
-
     getQuestion() {
-        this.isQuestionLoading$.next(true)
-        this.apiService
-            .postData(
-                `/api/v1/room_ukom/search/MAKALAH/${this.room_id}?limit=1000`,
-                {},
-            )
+        this.questionLoading.set(true)
+        this.examService
+            .getExamQuestionByScheduleId(this.examScheduleId, {
+                limit: '1000',
+                page: '1',
+            })
             .pipe(
                 finalize(() => {
-                    this.isQuestionLoading$.next(false)
+                    this.questionLoading.set(false)
                 }),
             )
             .subscribe({
-                next: (res: any) => {
+                next: (res) => {
                     if (res.data && res.data.length > 0) {
                         this.question = res.data[0]
+                        this.getAnswerFile(this.question)
                     }
                 },
                 error: (err) => {
@@ -186,6 +123,25 @@ export class UkomMakalahComponent {
             })
     }
 
+    getAnswerFile(question: ExamQuestion) {
+        const answerDto = question.answerDto
+        if (answerDto.answerUpload && answerDto.answerUploadUrl) {
+            this.inputs.files['file_answer_upload'].fileName =
+                answerDto.answerUpload
+            this.inputs.files['file_answer_upload'].source =
+                answerDto.answerUploadUrl
+
+            if (this.fileHandler) {
+                this.fileHandler.fileNames['file_answer_upload'] =
+                    answerDto.answerUpload
+            }
+        }
+    }
+
+    backToDashboard() {
+        this.router.navigate(['/'])
+    }
+
     onSubmit() {
         this.confirmationService
             .open(false)
@@ -193,7 +149,6 @@ export class UkomMakalahComponent {
                 take(1),
                 filter(({ confirmed }) => confirmed),
                 tap(() => this.isSubmitLoading$.next(true)),
-
                 switchMap(() => {
                     const payload = {
                         participant_id: this.participant_id,
@@ -202,7 +157,7 @@ export class UkomMakalahComponent {
                             this.makalah_form.value.file_answer_upload,
                     }
                     return this.apiService.postData(
-                        '/api/v1/exam/answer',
+                        `/api/v1/exam/answer/${this.examScheduleId}`,
                         payload,
                     )
                 }),

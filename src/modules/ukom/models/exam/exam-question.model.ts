@@ -1,6 +1,7 @@
 import { Serializable } from '@/modules/base/commons/serializable'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { CATChoice } from '@/modules/ukom/models/cat/cat-choice.model'
+import { ExamAnswerDto } from '@/modules/ukom/models/exam/exam-answer.model'
 
 export class ExamQuestion extends Serializable {
     id: string = undefined
@@ -16,7 +17,7 @@ export class ExamQuestion extends Serializable {
     weight: number | null | undefined = undefined
     parentQuestionId: string | null | undefined = undefined
     multipleChoiceDtoList: CATChoice[] = undefined
-    answerDto: unknown | null = undefined
+    answerDto: ExamAnswerDto | null = undefined
     kompetensiIndikatorId: string | null | undefined = undefined
     kompetensiIndikatorName: string | null | undefined = undefined
 
