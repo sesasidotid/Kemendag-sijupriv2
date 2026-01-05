@@ -425,6 +425,13 @@ export class UkomExamScheduleAddComponent implements OnInit {
                         },
                         error: (err) => {
                             console.error(err)
+                            if (err.error.code === 'ESS-00001') {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Jumlah slot waktu tidak mencukupi untuk semua peserta',
+                                )
+                                return
+                            }
                             this.handlerService.handleAlert(
                                 'Error',
                                 'Gagal membuat jadwal ujian',

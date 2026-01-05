@@ -25,7 +25,8 @@ import { RescheduleModalComponent } from './reschedule-modal/reschedule-modal.co
  * - Enforces business rules:
  *   - No overlapping slots
  *   - Must be within main schedule
- *   - No scheduling during 20:00-06:00
+ *   - Automatically skips 12:00-13:00 (lunch break) - resumes at 13:00
+ *   - Automatically skips 20:00-06:00 (night hours) - resumes at 06:00
  */
 @Component({
     selector: 'app-ukom-exam-wawancara',
@@ -82,10 +83,9 @@ export class UkomExamWawancaraComponent implements OnInit {
         const slots = this.allSlots()
         const total = slots.length
         const occupied = slots.filter((s) => s.isOccupied).length
-        const unavailable = slots.filter((s) => s.isUnavailable).length
-        const available = total - occupied - unavailable
+        const available = total - occupied
 
-        return { total, occupied, unavailable, available }
+        return { total, occupied, unavailable: 0, available }
     }
 
     ngOnInit(): void {
@@ -219,20 +219,10 @@ export class UkomExamWawancaraComponent implements OnInit {
                 flex: 1,
                 valueGetter: (params) => {
                     const slot = params.data as ScheduleSlot
-                    if (slot.isUnavailable) {
-                        return '⛔ Tidak Tersedia (20:00-06:00 WIB)'
-                    }
                     return slot.participantSchedule?.participantName || '—'
                 },
                 cellStyle: (params) => {
                     const slot = params.data as ScheduleSlot
-                    if (slot.isUnavailable) {
-                        return {
-                            backgroundColor: '#f8d7da',
-                            color: '#721c24',
-                            fontStyle: 'italic',
-                        }
-                    }
                     if (slot.isOccupied) {
                         return { backgroundColor: '#d1e7dd' }
                     }
@@ -254,15 +244,11 @@ export class UkomExamWawancaraComponent implements OnInit {
                 cellClass: 'text-center',
                 valueGetter: (params) => {
                     const slot = params.data as ScheduleSlot
-                    if (slot.isUnavailable) return 'Tidak Tersedia'
                     if (slot.isOccupied) return 'Terisi'
                     return 'Tersedia'
                 },
                 cellStyle: (params) => {
                     const slot = params.data as ScheduleSlot
-                    if (slot.isUnavailable) {
-                        return { color: '#dc3545', fontWeight: '500' }
-                    }
                     if (slot.isOccupied) {
                         return { color: '#198754', fontWeight: '500' }
                     }
@@ -275,14 +261,14 @@ export class UkomExamWawancaraComponent implements OnInit {
                 cellClass: 'text-center',
                 cellRenderer: (params: any) => {
                     const slot = params.data as ScheduleSlot
-                    if (slot.isUnavailable || !slot.isOccupied) {
+                    if (!slot.isOccupied) {
                         return '—'
                     }
                     return `<button class="btn btn-sm btn-primary">Atur Ulang</button>`
                 },
                 onCellClicked: (params) => {
                     const slot = params.data as ScheduleSlot
-                    if (slot.isOccupied && !slot.isUnavailable) {
+                    if (slot.isOccupied) {
                         this.openRescheduleModal(slot)
                     }
                 },
