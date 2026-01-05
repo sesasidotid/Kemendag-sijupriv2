@@ -162,7 +162,7 @@ export class DashboardComponent implements OnInit {
                 break
             case ExamTypeCategory.MAKALAH:
             case ExamTypeCategory.SEMINAR:
-                this.router.navigate(['/seminar-paper', examId])
+                this.router.navigate(['/seminar-paper', examId, participantId])
                 break
             case ExamTypeCategory.PORTOFOLIO:
                 this.router.navigate(['/portfolio', examId])
@@ -208,6 +208,7 @@ export class DashboardComponent implements OnInit {
     }
 
     getParticipants(exam: GroupedExam) {
+        console.log('exam participants', exam)
         return exam.schedule.participantScheduleList || []
     }
 
@@ -217,6 +218,12 @@ export class DashboardComponent implements OnInit {
         return `${day} ${MONTHS[month - 1]} ${year}, ${hour
             .toString()
             .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+    }
+
+    getParticipantScheduleTime(pSchedule: any, exam: GroupedExam): string {
+        const time = pSchedule.personalSchedule ?? exam.schedule.startTime
+
+        return this.formatPersonalScheduleStart(time) + ' (WIB)'
     }
 
     private updateNowGmt7(): void {

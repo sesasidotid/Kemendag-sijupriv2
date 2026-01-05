@@ -28,7 +28,7 @@ export const routes: Routes = [
                     ),
             },
             {
-                path: 'seminar-paper/:id',
+                path: 'seminar-paper/:id/:participantId',
                 loadComponent: () =>
                     import('./seminer-makalah/seminer-makalah.component').then(
                         (m) => m.SeminerMakalahComponent,

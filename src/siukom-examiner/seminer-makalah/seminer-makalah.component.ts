@@ -1,15 +1,17 @@
-import { Component, inject, OnInit } from '@angular/core'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-
-interface AssessmentComponent {
-    id: number
-    name: string
-    note: string
-    assessment?: 'competent' | 'not_competent'
-}
+import { ActivatedRoute, Router } from '@angular/router'
+import { ExamService } from '@/modules/ukom/services/exam.service'
+import { finalize } from 'rxjs'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
+import {
+    MakalahExamAnswer,
+    SaveExamAnswerRequest,
+} from '@/modules/ukom/models/exam/exam-answer.model'
+import { SeminarMakalahDraftService } from '@/siukom-examiner/seminer-makalah/seminer-makalah-draft.service'
 
 @Component({
     selector: 'app-seminer-makalah',
@@ -21,63 +23,109 @@ interface AssessmentComponent {
 export class SeminerMakalahComponent implements OnInit {
     handlerService = inject(HandlerService)
     confirmationService = inject(ConfirmationService)
-    paperUrl: string = 'https://link-to-dummy-paper.pdf' // Dummy URL
-    assessmentComponents: AssessmentComponent[] = []
+
+    examScheduleId: string
+    participantId: string
+    loadingQuestions = signal(false)
+    participantAnswer = signal<ExamQuestion | null>(null)
+    questions = signal<ExamQuestion[]>([])
+    answers = signal<Record<string, MakalahExamAnswer>>({})
+    submitQuestionLoading = signal(false)
+
+    paperUrl = computed(() => {
+        const answer = this.participantAnswer()
+        return answer?.answerDto?.answerUploadUrl ?? null
+    })
+
+    private route = inject(ActivatedRoute)
+    private router = inject(Router)
+    private examService = inject(ExamService)
+    private handlerServive = inject(HandlerService)
+    private draftService = inject(SeminarMakalahDraftService)
+    private saveTimeout: number | undefined
 
     constructor() {}
 
     ngOnInit(): void {
-        // Dummy Data
-        this.assessmentComponents = [
-            {
-                id: 1,
-                name: 'Sistematika Penulisan',
-                note: '',
-            },
-            {
-                id: 2,
-                name: 'Kesesuaian Tema dengan Isi Makalah',
-                note: '',
-            },
-            {
-                id: 3,
-                name: 'Ketajaman Analisis Masalah',
-                note: '',
-            },
-            {
-                id: 4,
-                name: 'Inovasi dan Solusi yang Ditawarkan',
-                note: '',
-            },
-            {
-                id: 5,
-                name: 'Kelayakan Implementasi Gagasan',
-                note: '',
-            },
-            {
-                id: 6,
-                name: 'Kemampuan Mempertahankan Argumen',
-                note: '',
-            },
-        ]
+        this.examScheduleId = this.route.snapshot.paramMap.get('id')
+        this.participantId = this.route.snapshot.paramMap.get('participantId')
+        this.fetchQuestionsToGrade()
+    }
+
+    fetchQuestionsToGrade() {
+        this.loadingQuestions.set(true)
+
+        this.examService
+            .getExamQuestionsByScheduleAndParticipant(
+                this.examScheduleId,
+                this.participantId,
+                { page: '1', limit: '1000' },
+            )
+            .pipe(finalize(() => this.loadingQuestions.set(false)))
+            .subscribe({
+                next: async (result) => {
+                    const allQuestions = result.data
+
+                    const baseQuestion =
+                        allQuestions.find(
+                            (q) => q.parentQuestionId === null && q.answerDto,
+                        ) ?? null
+
+                    const examinerQuestions = baseQuestion
+                        ? allQuestions.filter(
+                              (q) => q.parentQuestionId === baseQuestion.id,
+                          )
+                        : []
+
+                    this.participantAnswer.set(baseQuestion)
+                    this.questions.set(examinerQuestions)
+
+                    const initialAnswers: Record<string, MakalahExamAnswer> = {}
+
+                    examinerQuestions.forEach((q) => {
+                        initialAnswers[q.id] = new MakalahExamAnswer({
+                            questionId: q.id,
+                        })
+                    })
+
+                    const draft = await this.draftService.load(
+                        this.examScheduleId,
+                        this.participantId,
+                    )
+
+                    if (draft) {
+                        this.answers.set(draft.answers)
+                    } else {
+                        this.answers.set(initialAnswers)
+                    }
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerServive.handleAlert(
+                        'Error',
+                        'Gagal mengambil data makalah peserta.',
+                    )
+                },
+            })
     }
 
     openPaper(): void {
-        window.open(this.paperUrl, '_blank')
+        if (this.paperUrl()) {
+            window.open(this.paperUrl(), '_blank')
+        } else {
+            this.handlerService.handleAlert(
+                'Info',
+                'Tidak ada file makalah untuk dibuka.',
+            )
+        }
     }
 
     isFormValid(): boolean {
-        // It's valid if all components have an assessment (or maybe not required if they can leave it empty?
-        // "Silahkan kosongkan apabila ada tidak melakukan penilaian" implies optionality.
-        // But typically for an assessment system, if they evaluate, they must complete it.
-        // Let's assume for now they must pick competent/not competent if they fill the note?
-        // User instruction: "Silahkan kosongkan apabila ada tidak melakukan penilaian"
-        // This might mean the user can skip the ENTIRE assessment if they are not the one assessing this part,
-        // OR they can skip specific rows.
-        // Let's assume validation is loose for now or only validates if they start interacting.
-        // Implementation: Check if AT LEAST ONE field is filled? Or just let them save.
-        // I will allow saving anytime for now, or maybe check if they filled at least one.
-        return true
+        return this.questions().every(
+            (q) =>
+                this.answers()[q.id]?.score !== undefined &&
+                this.answers()[q.id]?.score !== null,
+        )
     }
 
     submitAssessment(): void {
@@ -85,14 +133,59 @@ export class SeminerMakalahComponent implements OnInit {
             next: ({ confirmed }) => {
                 if (!confirmed) return
 
-                const filledComponents = this.assessmentComponents.filter(
-                    (c) => c.assessment || c.note,
-                )
-                this.handlerService.handleAlert(
-                    'Success',
-                    'Penilaian Seminar disimpan (Simulasi)',
-                )
+                this.submitQuestionLoading.set(true)
+
+                const payload: SaveExamAnswerRequest = {
+                    answerDtoList: Object.values(this.answers()).map(
+                        (answer) => ({
+                            ...answer,
+                            participantId: this.participantId,
+                        }),
+                    ),
+                }
+
+                this.examService
+                    .saveExamAnswersByExamScheduleId(
+                        this.examScheduleId,
+                        payload,
+                    )
+                    .pipe(finalize(() => this.submitQuestionLoading.set(false)))
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Penilaian makalah berhasil disimpan.',
+                            )
+                            this.draftService
+                                .remove(this.examScheduleId, this.participantId)
+                                .then(() => {
+                                    this.backToDashboard()
+                                })
+                        },
+                        error: (err) => {
+                            console.error(err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menyimpan penilaian makalah.',
+                            )
+                        },
+                    })
             },
         })
+    }
+
+    backToDashboard() {
+        this.router.navigate(['/'])
+    }
+
+    scheduleAutoSave() {
+        clearTimeout(this.saveTimeout)
+        this.saveTimeout = window.setTimeout(() => {
+            this.draftService.save(
+                this.examScheduleId,
+                this.participantId,
+                this.answers(),
+            )
+        }, 500)
     }
 }
