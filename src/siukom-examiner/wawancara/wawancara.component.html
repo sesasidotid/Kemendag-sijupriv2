@@ -11,112 +11,178 @@
     </div>
 </ng-container>
 <ng-template #questionForm>
-    <div class="assessment-container">
-        <div class="header-section">
-            <h1>Form Penilaian Wawancara</h1>
-            <p>Silakan isi penilaian untuk setiap pertanyaan di bawah ini.</p>
-        </div>
+    <!-- Start Exam Screen -->
+    <ng-container
+        *ngIf="!examStarted() && questions().length === 0; else examContent"
+    >
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Wawancara</h1>
+                <p>
+                    Klik tombol di bawah ini untuk memulai sesi penilaian
+                    wawancara peserta.
+                </p>
+            </div>
 
-        <div class="question-list">
-            <div
-                *ngFor="let question of questions; let i = index"
-                class="question-card"
-            >
-                <!-- Question Header -->
-                <div class="card-header">
-                    <span class="question-number"
-                        >{{ question.kompetensiIndikatorName }}</span
-                    >
-                    <h2 class="question-text">{{ question.question }}</h2>
-                </div>
-
-                <!-- Candidate Answer Section -->
-                <div class="form-group row-spacing">
-                    <label [for]="'answer-' + i">Jawaban Peserta:</label>
-                    <textarea
-                        [(ngModel)]="answers()[question.id].answerText"
-                        [id]="'answer-' + i"
-                        class="form-control large-textarea"
-                        placeholder="Tuliskan jawaban peserta disini..."
-                        rows="5"
-                    >
-                    </textarea>
-                </div>
-
-                <!-- Answer Key Link -->
-                <div class="row-spacing">
-                    <div class="key-label">Kunci Jawaban:</div>
-                    <a
-                        [href]="question.attachmentUrl"
-                        class="action-link"
-                        target="_blank"
-                    >
-                        [ Lihat Kunci Jawaban ]
-                        <span class="external-icon">🔗</span>
-                    </a>
-                </div>
-
-                <!-- Assessment Options -->
-                <div class="assessment-section row-spacing">
-                    <div class="assessment-label">Penilaian:</div>
-
-                    <div class="radio-group">
-                        <!-- Competent Option -->
-                        <label
-                            [class.selected]="answers()[question.id].answerChoice === 'competent'"
-                            class="radio-card competent-option"
+            <!-- Start Exam Button Section -->
+            <div class="form-actions">
+                <button
+                    (click)="startTheExam()"
+                    [disabled]="startExamLoading()"
+                    class="btn-submit"
+                >
+                    <ng-container *ngIf="startExamLoading(); else startText">
+                        <div
+                            class="spinner-border spinner-sm-custom"
+                            role="status"
                         >
-                            <input
-                                (ngModelChange)="scheduleAutoSave()"
-                                [(ngModel)]="answers()[question.id].answerChoice"
-                                [name]="'assessment-' + i"
-                                type="radio"
-                                value="competent"
-                            />
-                            <span class="radio-text">Kompeten</span>
-                        </label>
-
-                        <!-- Not Competent Option -->
-                        <label
-                            [class.selected]="answers()[question.id].answerChoice === 'not_competent'"
-                            class="radio-card incompetent-option"
-                        >
-                            <input
-                                (ngModelChange)="scheduleAutoSave()"
-                                [(ngModel)]="answers()[question.id].answerChoice"
-                                [name]="'assessment-' + i"
-                                type="radio"
-                                value="not_competent"
-                            />
-                            <span class="radio-text">Tidak Kompeten</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="divider"></div>
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </ng-container>
+                    <ng-template #startText> Mulai Ujian </ng-template>
+                </button>
             </div>
         </div>
+    </ng-container>
 
-        <!-- Submit Button (Sticky Bottom or Bottom Block) -->
-        <div class="form-actions">
-            <ng-container *ngIf="submitQuestionLoading(); else noLoading">
-                <button [disabled]="true" class="btn-submit">
-                    <div class="spinner-border spinner-sm-custom" role="status">
-                        <span class="visually-hidden">Loading...</span>
+    <ng-template #examContent>
+        <ng-container *ngIf="questions().length > 0; else noQuestions">
+            <div class="assessment-container">
+                <div class="header-section">
+                    <h1>Form Penilaian Wawancara</h1>
+                    <p>
+                        Silakan isi penilaian untuk setiap pertanyaan di bawah
+                        ini.
+                    </p>
+                </div>
+
+                <div class="question-list">
+                    <div
+                        *ngFor="let question of questions(); let i = index"
+                        class="question-card"
+                    >
+                        <!-- Question Header -->
+                        <div class="card-header">
+                            <span class="question-number"
+                                >{{ question.kompetensiIndikatorName }}</span
+                            >
+                            <h2 class="question-text">
+                                {{ question.question }}
+                            </h2>
+                        </div>
+
+                        <!-- Candidate Answer Section -->
+                        <div class="form-group row-spacing">
+                            <label [for]="'answer-' + i"
+                                >Jawaban Peserta:</label
+                            >
+                            <textarea
+                                (ngModelChange)="scheduleAutoSave()"
+                                [(ngModel)]="answers()[question.id].answerText"
+                                [id]="'answer-' + i"
+                                class="form-control large-textarea"
+                                placeholder="Tuliskan jawaban peserta disini..."
+                                rows="5"
+                            >
+                            </textarea>
+                        </div>
+
+                        <!-- Answer Key Link -->
+                        <div class="row-spacing">
+                            <div class="key-label">Kunci Jawaban:</div>
+                            <a
+                                [href]="question.attachmentUrl"
+                                class="action-link"
+                                target="_blank"
+                            >
+                                [ Lihat Kunci Jawaban ]
+                                <span class="external-icon">🔗</span>
+                            </a>
+                        </div>
+
+                        <!-- Assessment Options -->
+                        <div class="assessment-section row-spacing">
+                            <div class="assessment-label">Penilaian:</div>
+
+                            <div class="radio-group">
+                                <!-- Competent Option -->
+                                <label
+                                    [class.selected]="answers()[question.id].answerChoice === 'competent'"
+                                    class="radio-card competent-option"
+                                >
+                                    <input
+                                        (ngModelChange)="scheduleAutoSave()"
+                                        [(ngModel)]="answers()[question.id].answerChoice"
+                                        [name]="'assessment-' + i"
+                                        type="radio"
+                                        value="competent"
+                                    />
+                                    <span class="radio-text">Kompeten</span>
+                                </label>
+
+                                <!-- Not Competent Option -->
+                                <label
+                                    [class.selected]="answers()[question.id].answerChoice === 'not_competent'"
+                                    class="radio-card incompetent-option"
+                                >
+                                    <input
+                                        (ngModelChange)="scheduleAutoSave()"
+                                        [(ngModel)]="answers()[question.id].answerChoice"
+                                        [name]="'assessment-' + i"
+                                        type="radio"
+                                        value="not_competent"
+                                    />
+                                    <span class="radio-text"
+                                        >Tidak Kompeten</span
+                                    >
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
                     </div>
-                </button>
-            </ng-container>
+                </div>
 
-            <ng-template #noLoading>
-                <button
-                    (click)="submitAssessment()"
-                    [disabled]="!isFormValid()"
-                    class="btn-submit"
-                    type="button"
-                >
-                    Simpan Penilaian
+                <!-- Submit Button (Sticky Bottom or Bottom Block) -->
+                <div class="form-actions">
+                    <ng-container
+                        *ngIf="submitQuestionLoading(); else noLoading"
+                    >
+                        <button [disabled]="true" class="btn-submit">
+                            <div
+                                class="spinner-border spinner-sm-custom"
+                                role="status"
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </ng-container>
+
+                    <ng-template #noLoading>
+                        <button
+                            (click)="submitAssessment()"
+                            [disabled]="!isFormValid()"
+                            class="btn-submit"
+                            type="button"
+                        >
+                            Simpan Penilaian
+                        </button>
+                    </ng-template>
+                </div>
+            </div>
+        </ng-container>
+        <ng-template #noQuestions>
+            <div class="no-questions-container">
+                <div class="no-questions-icon">📝</div>
+                <h2>Pertanyaan Tidak Ditemukan</h2>
+                <p>
+                    Tidak ada pertanyaan yang tersedia untuk penilaian wawancara
+                    saat ini.
+                </p>
+                <button (click)="backToDashboard()" class="btn-back-secondary">
+                    Kembali ke Dashboard
                 </button>
-            </ng-template>
-        </div>
-    </div>
+            </div>
+        </ng-template>
+    </ng-template>
 </ng-template>

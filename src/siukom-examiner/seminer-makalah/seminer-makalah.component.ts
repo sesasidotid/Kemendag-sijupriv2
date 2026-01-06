@@ -36,6 +36,7 @@ export class SeminerMakalahComponent implements OnInit {
         const answer = this.participantAnswer()
         return answer?.answerDto?.answerUploadUrl ?? null
     })
+    examStarted = computed(() => !!this.paperUrl())
 
     private route = inject(ActivatedRoute)
     private router = inject(Router)
@@ -82,12 +83,14 @@ export class SeminerMakalahComponent implements OnInit {
 
                     const initialAnswers: Record<string, MakalahExamAnswer> = {}
 
+                    // Initialize answers
                     examinerQuestions.forEach((q) => {
                         initialAnswers[q.id] = new MakalahExamAnswer({
                             questionId: q.id,
                         })
                     })
 
+                    // Load draft first
                     const draft = await this.draftService.load(
                         this.examScheduleId,
                         this.participantId,
@@ -98,6 +101,29 @@ export class SeminerMakalahComponent implements OnInit {
                     } else {
                         this.answers.set(initialAnswers)
                     }
+
+                    // Prioritize server answers over draft
+                    const finalAnswers = { ...this.answers() }
+                    examinerQuestions.forEach((q) => {
+                        if (q.answerDto) {
+                            const hasScore =
+                                q.answerDto.score !== null &&
+                                q.answerDto.score !== undefined
+                            const hasAnswerText =
+                                q.answerDto.answerText !== null &&
+                                q.answerDto.answerText !== undefined &&
+                                q.answerDto.answerText.trim() !== ''
+
+                            if (hasScore || hasAnswerText) {
+                                finalAnswers[q.id] = new MakalahExamAnswer({
+                                    questionId: q.id,
+                                    answerText: q.answerDto.answerText || '',
+                                    score: q.answerDto.score,
+                                })
+                            }
+                        }
+                    })
+                    this.answers.set(finalAnswers)
                 },
                 error: (err) => {
                     console.error(err)

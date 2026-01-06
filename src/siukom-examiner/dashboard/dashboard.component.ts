@@ -158,7 +158,8 @@ export class DashboardComponent implements OnInit {
     ) {
         switch (ukomType) {
             case ExamTypeCategory.WAWANCARA:
-                this.startWawancaraExam(participantId, roomUkomId, examId)
+                // this.startWawancaraExam(participantId, roomUkomId, examId)
+                this.router.navigate(['/interviews', examId, participantId])
                 break
             case ExamTypeCategory.MAKALAH:
             case ExamTypeCategory.SEMINAR:

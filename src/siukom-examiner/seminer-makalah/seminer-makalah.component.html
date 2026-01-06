@@ -1,101 +1,114 @@
-<script src="seminer-makalah.component.ts"></script>
-<div class="assessment-container">
-    <div class="header-section">
-        <h1>Form Penilaian Makalah</h1>
-        <p>
-            Silakan isi penilaian catatan dan hasil untuk setiap komponen
-            makalah.
-        </p>
-        <div class="instruction-box">
-            <p class="instruction-text">
-                ℹ️ Petunjuk: Silahkan kosongkan apabila anda tidak melakukan
-                penilaian.
-            </p>
+<button (click)="backToDashboard()" class="btn-back">
+    <span class="icon">←</span>
+    Kembali ke Dashboard
+</button>
+<ng-container *ngIf="loadingQuestions(); else questionForm">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
         </div>
+        <p class="mt-2">Memuat form penilaian...</p>
     </div>
-
-    <!-- Paper Link Section -->
-    <div class="paper-action-section">
-        <button (click)="openPaper()" class="btn-paper">
-            📄 Lihat Makalah Peserta <span class="external-icon">↗</span>
-        </button>
-    </div>
-
-    <!-- Loading State -->
-    <div *ngIf="loadingQuestions()" class="loading-state">
-        <p>Memuat data penilaian...</p>
-    </div>
-
-    <!-- Empty State -->
-    <div
-        *ngIf="!loadingQuestions() && questions().length === 0"
-        class="empty-state"
-    >
-        <p>Tidak ada komponen penilaian yang tersedia.</p>
-    </div>
-
-    <div
-        *ngIf="!loadingQuestions() && questions().length > 0"
-        class="component-list"
-    >
-        <div
-            *ngFor="let question of questions(); let i = index"
-            class="component-card"
-        >
-            <!-- Component Header -->
-            <div class="card-header">
-                <h2 class="component-name">
-                    {{ question.kompetensiIndikatorName }}
-                </h2>
+</ng-container>
+<ng-template #questionForm>
+    <ng-container *ngIf="!examStarted();else examContent">
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Makalah</h1>
+                <p>
+                    Penilaian belum dapat dilakukan karena peserta belum
+                    mengunggah dokumen..
+                </p>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #examContent>
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Makalah</h1>
+                <p>
+                    Silakan isi penilaian catatan dan hasil untuk setiap
+                    komponen makalah.
+                </p>
+                <div class="instruction-box">
+                    <p class="instruction-text">
+                        ℹ️ Petunjuk: Silahkan kosongkan apabila anda tidak
+                        melakukan penilaian.
+                    </p>
+                </div>
             </div>
 
-            <!-- Notes Section -->
-            <div class="form-group row-spacing">
-                <label [for]="'note-' + i">Catatan Penilaian:</label>
-                <textarea
-                    (ngModelChange)="scheduleAutoSave()"
-                    [(ngModel)]="answers()[question.id].answerText"
-                    [id]="'note-' + i"
-                    class="form-control large-textarea"
-                    placeholder="Tuliskan catatan evaluasi disini..."
-                    rows="5"
+            <!-- Paper Link Section -->
+            <div class="paper-action-section">
+                <button (click)="openPaper()" class="btn-paper">
+                    📄 Lihat Makalah Peserta
+                    <span class="external-icon">↗</span>
+                </button>
+            </div>
+
+            <div class="question-list">
+                <div
+                    *ngFor="let question of questions(); let i = index"
+                    class="question-card"
                 >
-                </textarea>
+                    <!-- Component Header -->
+                    <div class="card-header">
+                        <span class="question-number"
+                            >{{ question.kompetensiIndikatorName }}</span
+                        >
+                        <h2 class="question-text">{{ question.question }}</h2>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="form-group row-spacing">
+                        <label [for]="'note-' + i">Catatan Penilaian:</label>
+                        <textarea
+                            (ngModelChange)="scheduleAutoSave()"
+                            [(ngModel)]="answers()[question.id].answerText"
+                            [id]="'note-' + i"
+                            class="form-control large-textarea"
+                            placeholder="Tuliskan catatan evaluasi disini..."
+                            rows="5"
+                        >
+                        </textarea>
+                    </div>
+
+                    <!-- Score Input Section -->
+                    <div class="form-group row-spacing">
+                        <label [for]="'score-' + i">Nilai:</label>
+                        <input
+                            (ngModelChange)="scheduleAutoSave()"
+                            [(ngModel)]="answers()[question.id].score"
+                            [id]="'score-' + i"
+                            class="form-control"
+                            min="0"
+                            placeholder="Masukkan nilai..."
+                            type="number"
+                        />
+                    </div>
+
+                    <div class="divider"></div>
+                </div>
             </div>
 
-            <!-- Score Input Section -->
-            <div class="form-group row-spacing">
-                <label [for]="'score-' + i">Nilai (Score):</label>
-                <input
-                    (ngModelChange)="scheduleAutoSave()"
-                    [(ngModel)]="answers()[question.id].score"
-                    [id]="'score-' + i"
-                    class="form-control"
-                    max="100"
-                    min="0"
-                    placeholder="Masukkan nilai..."
-                    type="number"
-                />
+            <!-- Submit Button -->
+            <div
+                *ngIf="!loadingQuestions() && questions().length > 0"
+                class="form-actions"
+            >
+                <button
+                    (click)="submitAssessment()"
+                    [disabled]="!isFormValid() || submitQuestionLoading()"
+                    class="btn-submit"
+                >
+                    <ng-container
+                        *ngIf="submitQuestionLoading(); else saveText"
+                    >
+                        Menyimpan...
+                    </ng-container>
+                    <ng-template #saveText> Simpan Penilaian</ng-template>
+                </button>
             </div>
-
-            <div class="divider"></div>
-        </div>
-    </div>
-
-    <!-- Submit Button -->
-    <div
-        *ngIf="!loadingQuestions() && questions().length > 0"
-        class="form-actions"
+        </div></ng-template
     >
-        <button
-            (click)="submitAssessment()"
-            [disabled]="!isFormValid() || submitQuestionLoading()"
-            class="btn-submit"
-        >
-            <ng-container *ngIf="submitQuestionLoading(); else saveText">
-                Menyimpan...
-            </ng-container>
-            <ng-template #saveText> Simpan Penilaian Makalah </ng-template>
-        </button>
-    </div>
-</div>
+</ng-template>
