@@ -43,6 +43,7 @@ import {
 } from '@/modules/base/components/multi-select-api'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-ukom-exam-schedule-add',
@@ -87,6 +88,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
     participants: MultiSelectOption[] = []
+    requiredValidator = Validators.required
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -229,7 +231,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
             startTime: ['', Validators.required],
             endTime: ['', Validators.required],
             examTypeCode: ['', Validators.required],
-            duration: ['', Validators.required],
+            duration: [''],
             secretKey: [null, this.catValidator()],
             participantIdList: [null],
             examinerIdList: [null, this.examinerRequiredWhenNotCat()],
@@ -241,13 +243,25 @@ export class UkomExamScheduleAddComponent implements OnInit {
                 const secretKeyControl = this.examScheduleForm.get('secretKey')
                 const examinerControl =
                     this.examScheduleForm.get('examinerIdList')
+                const durationControl = this.examScheduleForm.get('duration')
 
-                if (examType !== 'CAT') {
+                if (examType !== ExamTypeCategory.CAT) {
                     secretKeyControl?.setValue(null)
+                }
+
+                if (
+                    examType === ExamTypeCategory.CAT ||
+                    examType === ExamTypeCategory.WAWANCARA
+                ) {
+                    durationControl?.setValidators([Validators.required])
+                } else {
+                    durationControl?.clearValidators()
+                    durationControl?.setValue(null)
                 }
 
                 secretKeyControl?.updateValueAndValidity()
                 examinerControl?.updateValueAndValidity()
+                durationControl?.updateValueAndValidity()
             })
     }
 

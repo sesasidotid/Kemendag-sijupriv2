@@ -1,12 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { LoginContext } from '@/modules/base/commons/login-context'
-import {
-    Component,
-    inject,
-    OnInit,
-    signal,
-    WritableSignal,
-} from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
@@ -30,6 +24,7 @@ import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedul
 import { ExamDurationPipe } from '@/modules/ukom/pipes/exam-duration.pipe'
 import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { ExamTypeHandlerService } from './exam-type-handler.service'
 
 @Component({
     selector: 'app-dashboard',
@@ -51,6 +46,7 @@ export class DashboardComponent implements OnInit {
     participantService = inject(UkomParticipantService)
     examGradeService = inject(ExamGradeService)
     examService = inject(ExamService)
+    examTypeHandler = inject(ExamTypeHandlerService)
 
     isModalOpen = signal(false)
     initialOpenAccordion = signal<string | null>(null)
@@ -123,22 +119,11 @@ export class DashboardComponent implements OnInit {
                             return of(null)
                         }),
                         map((response) => {
-                            let scoreInstance: ScoreValue | null = null
-
-                            if (response) {
-                                switch (examSchedule.examTypeCode) {
-                                    case ExamTypeCategory.CAT:
-                                        scoreInstance = new CATScore(response)
-                                        break
-                                    case ExamTypeCategory.MAKALAH:
-                                        scoreInstance = new MakalahScore(
-                                            response,
-                                        )
-                                        break
-                                    default:
-                                        scoreInstance = response
-                                }
-                            }
+                            const scoreInstance =
+                                this.examTypeHandler.createScore(
+                                    examSchedule.examTypeCode as ExamTypeCategory,
+                                    response,
+                                )
 
                             return { examSchedule, scoreInstance }
                         }),
@@ -166,7 +151,7 @@ export class DashboardComponent implements OnInit {
         return url
     }
 
-    canStartExam(startTime: string, endTime: string): boolean {
+    canStartExam(startTime: string, endTime?: string): boolean {
         const now = new Date()
 
         const toGMT7 = (dateStr: string): Date => {
@@ -179,7 +164,16 @@ export class DashboardComponent implements OnInit {
             )
         }
 
-        return toGMT7(startTime) <= now && now <= toGMT7(endTime)
+        const start = toGMT7(startTime)
+
+        // If endTime is provided, check between start and end
+        if (endTime) {
+            const end = toGMT7(endTime)
+            return start <= now && now <= end
+        }
+
+        // If no endTime, treat startTime as personalSchedule
+        return start <= now
     }
 
     startExam(
@@ -187,52 +181,32 @@ export class DashboardComponent implements OnInit {
         examTypeCode: string,
         examScheduleId: string,
     ) {
-        let title: string
-        let message: string
-        let commentLabel: string | undefined
-        let placeholder: string | undefined
-        let withComment: boolean
-
-        if (examTypeCode === ExamTypeCategory.CAT) {
-            withComment = true
-            title = 'Konfirmasi Mulai Ujian CAT'
-            message =
-                'Anda akan memulai ujian CAT ini. Silakan masukkan kode ujian untuk melanjutkan. Pastikan semua persiapan sudah selesai.'
-            commentLabel = 'Kode Ujian'
-            placeholder = 'Masukkan kode ujian di sini...'
-        } else {
-            withComment = false
-        }
+        const examType = examTypeCode as ExamTypeCategory
+        const config = this.examTypeHandler.getStartExamConfig(examType)
 
         this.confirmationService
             .open(
-                withComment,
-                title,
-                message,
-                commentLabel,
+                config.withComment,
+                config.title,
+                config.message,
+                config.commentLabel,
                 undefined, // confirmButtonText (uses default 'Yakin')
                 undefined, // cancelButtonText (uses default 'Batal')
-                placeholder, // Pass the conditional placeholder
+                config.placeholder,
             )
             .subscribe({
                 next: ({ confirmed, comment }) => {
                     if (!confirmed) return
 
-                    const EXAM_ROUTE_MAP: Record<string, string> = {
-                        CAT: 'cat',
-                        MAKALAH: 'seminar-paper',
-                        WAWANCARA: 'interviews',
-                    }
-
-                    const LOADING_MAP: Record<
-                        string,
-                        WritableSignal<boolean>
-                    > = {
-                        CAT: this.startCATLoading,
-                        MAKALAH: this.startMakalahLoading,
-                        WAWANCARA: this.startWawancaraLoading,
-                    }
-                    LOADING_MAP[examTypeCode]?.set(true)
+                    const loadingSignal = this.examTypeHandler.getLoadingSignal(
+                        examType,
+                        {
+                            startCATLoading: this.startCATLoading,
+                            startMakalahLoading: this.startMakalahLoading,
+                            startWawancaraLoading: this.startWawancaraLoading,
+                        },
+                    )
+                    loadingSignal?.set(true)
 
                     this.examService
                         .startExam(
@@ -243,12 +217,13 @@ export class DashboardComponent implements OnInit {
                         )
                         .pipe(
                             finalize(() => {
-                                LOADING_MAP[examTypeCode]?.set(false)
+                                loadingSignal?.set(false)
                             }),
                         )
                         .subscribe({
                             next: () => {
-                                const route = EXAM_ROUTE_MAP[examTypeCode]
+                                const route =
+                                    this.examTypeHandler.getRoute(examType)
 
                                 if (!route) {
                                     this.handlerService.handleAlert(

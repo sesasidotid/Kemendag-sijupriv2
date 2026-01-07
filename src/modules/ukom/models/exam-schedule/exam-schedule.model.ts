@@ -11,6 +11,7 @@ export class ExamSchedule extends Serializable {
     roomUkomId: string = undefined
     duration: number = undefined
     secretKey: string | null = undefined
+    personalSchedule: string | null | undefined = undefined
     participantScheduleList: ParticipantScheduleList[] | undefined | null = []
     examinerScheduleList: ExaminerScheduleList[] | undefined | null = []
 

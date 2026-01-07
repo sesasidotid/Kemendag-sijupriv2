@@ -1,3 +1,4 @@
+<script src="dashboard.component.ts"></script>
 <ng-container *ngIf="roomLoading(); else dashboardContent">
     <div class="d-flex justify-content-center my-5">
         <div class="spinner-border" role="status">
@@ -78,8 +79,14 @@
                     <div class="accordion-body">
                         <p>
                             <strong>Jadwal:</strong>
-                            {{ exam.startTime | formatExamSchedule: exam.endTime
-                            }}
+                            <!--                            {{ exam.startTime | formatExamSchedule: exam.endTime-->
+                            <!--                            }}-->
+                            <!--                            {{ (exam.personalSchedule || exam.startTime) |-->
+                            <!--                            formatExamSchedule : exam.endTime : exam.duration }}-->
+                            {{ exam.examTypeCode === ExamTypeCategory.WAWANCARA
+                            ? (exam.personalSchedule | formatExamSchedule:
+                            undefined : exam.duration ): (exam.startTime |
+                            formatExamSchedule: exam.endTime)}}
                         </p>
 
                         <div
@@ -131,6 +138,30 @@
                                     class="btn btn-success"
                                 >
                                     Makalah berhasil diunggah
+                                </button>
+                            </ng-container>
+
+                            <ng-container
+                                *ngIf="exam.examTypeCode === ExamTypeCategory.WAWANCARA"
+                            >
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="canStartExam(exam.personalSchedule) ||
+                                                scoreMap[exam.id]?.score == null ||
+                                                scoreMap[exam.id]?.score === undefined"
+                                    [className]="'btn btn-primary'"
+                                    [disabled]="!canStartExam(exam.personalSchedule) ||
+                                                (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
+                                    [isLoading]="startMakalahLoading()"
+                                    [label]="'Mulai Wawancara'"
+                                >
+                                </app-loading-button>
+
+                                <button
+                                    *ngIf="scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined"
+                                    class="btn btn-success"
+                                >
+                                    Wawancara Selesai
                                 </button>
                             </ng-container>
                         </div>

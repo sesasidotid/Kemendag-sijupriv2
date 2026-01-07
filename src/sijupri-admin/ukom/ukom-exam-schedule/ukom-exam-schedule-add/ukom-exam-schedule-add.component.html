@@ -1,8 +1,8 @@
 <section>
-    <button class="btn btn-sm btn-outline-secondary mb-3" (click)="goBack()">
+    <button (click)="goBack()" class="btn btn-sm btn-outline-secondary mb-3">
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
-    <form [formGroup]="examScheduleForm" (ngSubmit)="submit()">
+    <form (ngSubmit)="submit()" [formGroup]="examScheduleForm">
         <div>
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label fw-bold"
@@ -10,13 +10,13 @@
                 >
                 <div class="col-sm-10">
                     <input
-                        type="datetime-local"
-                        formControlName="startTime"
                         class="form-control"
+                        formControlName="startTime"
+                        type="datetime-local"
                     />
                     <div
-                        class="text-danger"
                         *ngIf="getError('startTime', 'Waktu Mulai')"
+                        class="text-danger"
                     >
                         {{ getError('startTime', 'Waktu Mulai') }}
                     </div>
@@ -28,13 +28,13 @@
                 >
                 <div class="col-sm-10">
                     <input
-                        type="datetime-local"
-                        formControlName="endTime"
                         class="form-control"
+                        formControlName="endTime"
+                        type="datetime-local"
                     />
                     <div
-                        class="text-danger"
                         *ngIf="getError('endTime', 'Waktu Selesai')"
+                        class="text-danger"
                     >
                         {{ getError('endTime', 'Waktu Selesai') }}
                     </div>
@@ -46,8 +46,8 @@
                     >Jenis UKom <span class="text-danger">*</span></label
                 >
                 <div class="col-sm-10">
-                    <select formControlName="examTypeCode" class="form-select">
-                        <option value="" disabled selected hidden>
+                    <select class="form-select" formControlName="examTypeCode">
+                        <option disabled hidden selected value="">
                             Pilih Jenis UKom
                         </option>
                         <option
@@ -58,32 +58,35 @@
                         </option>
                     </select>
                     <div
-                        class="text-danger"
                         *ngIf="getError('examTypeCode', 'Jenis UKom')"
+                        class="text-danger"
                     >
                         {{ getError('examTypeCode', 'Jenis UKom') }}
                     </div>
                 </div>
             </div>
 
-            <div class="row mb-3">
+            <div
+                *ngIf="examScheduleForm.get('duration')?.hasValidator(requiredValidator)"
+                class="row mb-3"
+            >
                 <label class="col-sm-2 col-form-label fw-bold"
                     >Durasi <span class="text-danger">*</span></label
                 >
                 <div class="col-sm-10">
                     <div class="input-group">
                         <input
-                            type="number"
-                            formControlName="duration"
                             class="form-control"
-                            placeholder="Masukkan durasi"
+                            formControlName="duration"
                             min="1"
+                            placeholder="Masukkan durasi"
+                            type="number"
                         />
                         <span class="input-group-text">menit</span>
                     </div>
                     <div
-                        class="text-danger"
                         *ngIf="getError('duration', 'Durasi')"
+                        class="text-danger"
                     >
                         {{ getError('duration', 'Durasi') }}
                     </div>
@@ -93,30 +96,30 @@
                 </div>
             </div>
 
-            <div class="row mb-3" *ngIf="isCatExamType()">
+            <div *ngIf="isCatExamType()" class="row mb-3">
                 <label class="col-sm-2 col-form-label fw-bold"
                     >Secret Key <span class="text-danger">*</span></label
                 >
                 <div class="col-sm-10">
                     <div class="input-group">
                         <input
-                            type="text"
                             class="form-control"
                             formControlName="secretKey"
                             placeholder="Auto-generated secret key"
+                            type="text"
                         />
                         <button
-                            type="button"
-                            class="btn btn-outline-secondary"
                             (click)="generateSecretKey()"
+                            class="btn btn-outline-secondary"
                             title="Generate secret key"
+                            type="button"
                         >
                             <i class="mdi mdi-shuffle-variant"></i>
                         </button>
                     </div>
                     <div
-                        class="text-danger"
                         *ngIf="getError('secretKey', 'Secret Key')"
+                        class="text-danger"
                     >
                         {{ getError('secretKey', 'Secret Key') }}
                     </div>
@@ -141,22 +144,22 @@
                 </div>
             </div>
 
-            <div class="row mb-3" *ngIf="!isCatExamType()">
+            <div *ngIf="!isCatExamType()" class="row mb-3">
                 <label class="col-sm-2 col-form-label fw-bold"
                     >Penguji <span class="text-danger">*</span>
                 </label>
                 <div class="col-sm-10">
                     <app-multi-select-api
                         [fetchFunction]="fetchExaminers"
+                        [pageSize]="20"
                         [searchParamName]="'like_user|name'"
                         formControlName="examinerIdList"
                         placeholder="Pilih Penguji"
                         searchPlaceholder="Cari penguji..."
-                        [pageSize]="20"
                     ></app-multi-select-api>
                     <div
-                        class="text-danger"
                         *ngIf="getError('examinerIdList', 'Penguji') as error"
+                        class="text-danger"
                     >
                         {{ error}}
                     </div>
@@ -166,10 +169,10 @@
 
         <div class="d-flex justify-content-end mb-3 gap-1">
             <app-loading-button
-                [isLoading]="submitLoading()"
-                [disabled]="examScheduleForm.invalid"
-                [label]="'Simpan'"
                 [className]="'btn btn-primary'"
+                [disabled]="examScheduleForm.invalid"
+                [isLoading]="submitLoading()"
+                [label]="'Simpan'"
                 [type]="'submit'"
             ></app-loading-button>
         </div>
@@ -178,15 +181,15 @@
 
     <ng-container *ngIf="isUpdateModalOpen">
         <app-modal
-            [title]="'Edit Jadwal Ujian'"
             (toggle)="isUpdateModalOpen = !isUpdateModalOpen"
-            [size]="'lg'"
             [enableFooter]="false"
+            [size]="'lg'"
+            [title]="'Edit Jadwal Ujian'"
         >
             <app-ukom-exam-schedule-update
+                (refresh)="refresh = !refresh; isUpdateModalOpen = false"
                 [examScheduleId]="selectedExamSchedule.id"
                 [roomUkomId]="id"
-                (refresh)="refresh = !refresh; isUpdateModalOpen = false"
             ></app-ukom-exam-schedule-update>
         </app-modal>
     </ng-container>
