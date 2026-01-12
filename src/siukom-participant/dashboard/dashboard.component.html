@@ -97,11 +97,9 @@
                             >
                                 <app-loading-button
                                     (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                    *ngIf="canStartExam(exam.startTime, exam.endTime) &&
-                                                (scoreMap[exam.id]?.score === null || scoreMap[exam.id]?.score === undefined)"
+                                    *ngIf="canStartExam(exam.startTime, exam.endTime) || (scoreMap[exam.id]?.score == null)"
                                     [className]="'btn btn-primary'"
-                                    [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
-                                                (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
+                                    [disabled]="!canStartExam(exam.startTime, exam.endTime) || (scoreMap[exam.id]?.score != null)"
                                     [isLoading]="startCATLoading()"
                                     [label]="'Mulai'"
                                 >
@@ -122,11 +120,9 @@
                                 <app-loading-button
                                     (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
                                     *ngIf="canStartExam(exam.startTime, exam.endTime) ||
-                                                scoreMap[exam.id]?.score == null ||
-                                                scoreMap[exam.id]?.score === undefined"
+                                                scoreMap[exam.id]?.score == null"
                                     [className]="'btn btn-primary'"
-                                    [disabled]="!canStartExam(exam.startTime, exam.endTime) ||
-                                                (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
+                                    [disabled]="!canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score != null"
                                     [isLoading]="startMakalahLoading()"
                                     [label]="'Unggah Makalah'"
                                 >
@@ -146,13 +142,11 @@
                             >
                                 <app-loading-button
                                     (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                    *ngIf="canStartExam(exam.personalSchedule) ||
-                                                scoreMap[exam.id]?.score == null ||
-                                                scoreMap[exam.id]?.score === undefined"
+                                    *ngIf="canStartExam(exam.personalSchedule) || scoreMap[exam.id]?.score == null"
                                     [className]="'btn btn-primary'"
                                     [disabled]="!canStartExam(exam.personalSchedule) ||
                                                 (scoreMap[exam.id]?.score !== null && scoreMap[exam.id]?.score !== undefined)"
-                                    [isLoading]="startMakalahLoading()"
+                                    [isLoading]="startWawancaraLoading()"
                                     [label]="'Mulai Wawancara'"
                                 >
                                 </app-loading-button>

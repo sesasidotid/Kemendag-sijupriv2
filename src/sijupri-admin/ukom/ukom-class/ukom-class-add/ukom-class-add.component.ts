@@ -6,19 +6,18 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { BehaviorSubject, of } from 'rxjs'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { Observable } from 'rxjs'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { ApiService } from '@/modules/base/services/api.service'
+import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
+import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
+import { RoomUkom } from '@/modules/ukom/models/room-ukom.model'
+import { HandlerService } from '@/modules/base/services/handler.service'
 import { distinctUntilChanged, finalize, map } from 'rxjs/operators'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
-import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { BidangJabatan } from '@/modules/maintenance/models/bidang-jabatan.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 
 @Component({
@@ -29,10 +28,10 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         FormsModule,
         LucideAngularModule,
         ReactiveFormsModule,
-        LoadingButtonComponent
+        LoadingButtonComponent,
     ],
     templateUrl: './ukom-class-add.component.html',
-    styleUrl: './ukom-class-add.component.scss'
+    styleUrl: './ukom-class-add.component.scss',
 })
 export class UkomClassAddComponent {
     @Output() changeTabActive: EventEmitter<any> = new EventEmitter()
@@ -49,23 +48,22 @@ export class UkomClassAddComponent {
     private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
     bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
 
-    constructor (
+    constructor(
         private confirmationService: ConfirmationService,
         private apiService: ApiService,
         private handlerService: HandlerService,
-        private formValidationService: FormValidationService
+        private formValidationService: FormValidationService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handleFormInit()
         this.getJabatanList()
-        // this.getListJenjang()
         this.handleSubscribe()
         this.handleBidangJabatanValidation()
     }
 
-    handleBidangJabatanValidation () {
-        this.bidangJabatanList$.subscribe(bidangJabatanList => {
+    handleBidangJabatanValidation() {
+        this.bidangJabatanList$.subscribe((bidangJabatanList) => {
             const control = this.kelasForm.get('bidang_jabatan_code')
             if (!control) return
 
@@ -73,7 +71,7 @@ export class UkomClassAddComponent {
                 ? [control.validator]
                 : []
             const isRequiredAlreadySet = currentValidators.some(
-                v => v === Validators.required
+                (v) => v === Validators.required,
             )
 
             if (bidangJabatanList.length > 0 && !isRequiredAlreadySet) {
@@ -86,15 +84,15 @@ export class UkomClassAddComponent {
         })
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.kelasForm.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    handleFormInit () {
+    handleFormInit() {
         this.kelasForm = new FormGroup({
             name: new FormControl('', Validators.required),
             jabatan_code: new FormControl('', Validators.required),
@@ -102,18 +100,18 @@ export class UkomClassAddComponent {
             bidang_jabatan_code: new FormControl(''),
             participant_quota: new FormControl('', [
                 Validators.required,
-                Validators.pattern(/^\d+$/)
+                Validators.pattern(/^\d+$/),
             ]),
             vid_call_link: new FormControl('', Validators.required),
             exam_start_at: new FormControl('', Validators.required),
-            exam_end_at: new FormControl('', Validators.required)
+            exam_end_at: new FormControl('', Validators.required),
         })
     }
 
-    setupInstansiValidation () {
-        this.bidangJabatanList$.subscribe(bidangList => {
+    setupInstansiValidation() {
+        this.bidangJabatanList$.subscribe((bidangList) => {
             const bidangJabatanControl = this.kelasForm.get(
-                'bidang_jabatan_code'
+                'bidang_jabatan_code',
             )
 
             if (bidangList.length > 0) {
@@ -125,14 +123,14 @@ export class UkomClassAddComponent {
         })
     }
 
-    handleSubscribe () {
+    handleSubscribe() {
         const jabatanControl = this.kelasForm.get('jabatan_code')
         const bidangJabatanControl = this.kelasForm.get('bidang_jabatan_code')
         const jenjangControl = this.kelasForm.get('jenjang_code')
 
         jabatanControl?.valueChanges
             .pipe(distinctUntilChanged())
-            .subscribe(jabatanCode => {
+            .subscribe((jabatanCode) => {
                 bidangJabatanControl?.reset()
                 jenjangControl?.reset()
                 jenjangControl?.patchValue('')
@@ -144,16 +142,16 @@ export class UkomClassAddComponent {
             })
     }
 
-    getJabatanList () {
+    getJabatanList() {
         this.jabatanList$ = this.apiService
             .getData(`/api/v1/jabatan`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
                         (jabatan: { [key: string]: any }) =>
-                            new Jabatan(jabatan)
-                    )
-                )
+                            new Jabatan(jabatan),
+                    ),
+                ),
             )
     }
 
@@ -169,37 +167,37 @@ export class UkomClassAddComponent {
     //             )
     //         )
     // }
-    getListJenjang (jabatanCode: string) {
+    getListJenjang(jabatanCode: string) {
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
             .pipe(
-                map(response =>
+                map((response) =>
                     response.map(
                         (jenjang: { [key: string]: any }) =>
-                            new Jenjang(jenjang)
-                    )
-                )
+                            new Jenjang(jenjang),
+                    ),
+                ),
             )
     }
 
-    getBidangJabatanByJabatanCode (jabatanCode: string): void {
+    getBidangJabatanByJabatanCode(jabatanCode: string): void {
         this.apiService
             .getData(`/api/v1/bidang_jabatan/jabatan/${jabatanCode}`)
             .pipe(
                 map((res: any) =>
                     Array.isArray(res)
-                        ? res.map(item => new BidangJabatan(item))
-                        : []
-                )
+                        ? res.map((item) => new BidangJabatan(item))
+                        : [],
+                ),
             )
-            .subscribe(list => {
+            .subscribe((list) => {
                 this.bidangJabatanListSubject.next(list)
             })
     }
 
-    submit () {
+    submit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 this.submitLoading$.next(true)
@@ -227,25 +225,25 @@ export class UkomClassAddComponent {
                     .pipe(
                         finalize(() => {
                             this.submitLoading$.next(false)
-                        })
+                        }),
                     )
                     .subscribe({
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menambahkan data kelas'
+                                'Berhasil menambahkan data kelas',
                             )
                             this.changeTabActive.emit(0)
                         },
-                        error: error => {
+                        error: (error) => {
                             console.log(error)
                             this.handlerService.handleAlert(
                                 'Info',
-                                'Gagal menambahkan data kelas'
+                                'Gagal menambahkan data kelas',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

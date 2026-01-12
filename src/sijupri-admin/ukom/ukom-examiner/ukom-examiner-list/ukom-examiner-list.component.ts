@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
@@ -8,7 +8,7 @@ import {
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, finalize } from 'rxjs'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { Router } from '@angular/router'
 import { UkomExaminerAddComponent } from '../ukom-examiner-add/ukom-examiner-add.component'
@@ -41,7 +41,7 @@ import { FormValidationService } from '@/modules/base/services/form-validation.s
     templateUrl: './ukom-examiner-list.component.html',
     styleUrl: './ukom-examiner-list.component.scss',
 })
-export class UkomExaminerListComponent {
+export class UkomExaminerListComponent implements OnInit {
     formValidationService = inject(FormValidationService)
     pagable: Pagable
     refreshToggle: boolean = false
@@ -129,6 +129,7 @@ export class UkomExaminerListComponent {
                     .withField('Nama', 'text')
                     .build(),
             )
+            .withQueryParams()
             .build()
     }
 
@@ -177,25 +178,25 @@ export class UkomExaminerListComponent {
                 this.isLoading$.next(true)
                 this.apiService
                     .putData('/api/v1/examiner_ukom', payload)
+                    .pipe(
+                        finalize(() => {
+                            this.isLoading$.next(false)
+                        }),
+                    )
                     .subscribe({
                         next: (response) => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menambahkan data',
+                                'Berhasil mengupdate data',
                             )
                             this.handleRefreshToggle()
                             this.toggleModal()
-                            this.isLoading$.next(false)
-                            // setTimeout(() => {
-                            //   window.location.reload()
-                            // }, 1000)
                         },
                         error: (error) => {
-                            console.log('error', error)
-                            this.isLoading$.next(false)
+                            console.log(error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal mengubah data',
+                                'Gagal mengupdate data',
                             )
                         },
                     })
