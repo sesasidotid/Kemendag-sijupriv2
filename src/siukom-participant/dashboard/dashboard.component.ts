@@ -1,10 +1,19 @@
 import { CommonModule } from '@angular/common'
 import { LoginContext } from '@/modules/base/commons/login-context'
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { catchError, concatMap, finalize, forkJoin, map, of, tap } from 'rxjs'
+import {
+    catchError,
+    concatMap,
+    finalize,
+    forkJoin,
+    map,
+    of,
+    tap,
+    timer,
+} from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { CATScore } from '@/modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
@@ -12,7 +21,6 @@ import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty
 import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '@/modules/base/services/file-preview.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
-import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
@@ -22,9 +30,23 @@ import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-
 import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedule.pipe'
 import { ExamDurationPipe } from '@/modules/ukom/pipes/exam-duration.pipe'
-import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { ExamTypeHandlerService } from './exam-type-handler.service'
+
+const MONTHS = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mei',
+    'Jun',
+    'Jul',
+    'Agu',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Des',
+]
 
 @Component({
     selector: 'app-dashboard',
@@ -36,17 +58,17 @@ import { ExamTypeHandlerService } from './exam-type-handler.service'
         LoadingButtonComponent,
         FormatExamSchedulePipe,
         ExamDurationPipe,
-        PrettyNamePipe,
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
-    ukomMiscellaneousService = inject(UkomMiscellaneousService)
     participantService = inject(UkomParticipantService)
     examGradeService = inject(ExamGradeService)
     examService = inject(ExamService)
     examTypeHandler = inject(ExamTypeHandlerService)
+
+    nowGmt7 = signal<string>(this.getNowGmt7String())
 
     isModalOpen = signal(false)
     initialOpenAccordion = signal<string | null>(null)
@@ -59,6 +81,16 @@ export class DashboardComponent implements OnInit {
     startCATLoading = signal(false)
     startMakalahLoading = signal(false)
     startWawancaraLoading = signal(false)
+
+    formattedCurrentDate = computed(() => {
+        const raw = this.nowGmt7()
+        const { year, month, day, hour, minute } = this.parseRawDate(raw)
+
+        return `${day} ${MONTHS[month - 1]} ${year}, ${hour
+            .toString()
+            .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+    })
+
     protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor(
@@ -69,7 +101,16 @@ export class DashboardComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        this.updateNowGmt7()
         this.loadExams()
+
+        const now = new Date()
+        const msUntilNextMinute =
+            (60 - now.getSeconds()) * 1000 - now.getMilliseconds()
+
+        timer(msUntilNextMinute, 60000).subscribe(() => {
+            this.updateNowGmt7()
+        })
     }
 
     loadExams() {
@@ -386,5 +427,50 @@ export class DashboardComponent implements OnInit {
      */
     isInitiallyOpen(examId: string): boolean {
         return this.initialOpenAccordion() === examId
+    }
+
+    getExamDisplayName(examTypeCode: string): string {
+        const displayNames: Record<string, string> = {
+            CAT: 'CAT',
+            PRAKTIK: 'Praktik',
+            WAWANCARA: 'Wawancara',
+            MAKALAH: 'Makalah',
+            SEMINAR: 'Seminar',
+            PORTOFOLIO: 'Portofolio',
+            STUDI_KASUS: 'Studi Kasus',
+        }
+
+        return displayNames[examTypeCode] || examTypeCode
+    }
+
+    private updateNowGmt7(): void {
+        this.nowGmt7.set(this.getNowGmt7String())
+    }
+
+    private getNowGmt7String(): string {
+        const now = new Date() // ✅ system clock only
+
+        // Convert local time → UTC
+        const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000
+
+        // Add GMT+7 offset
+        const gmt7 = new Date(utcMillis + 7 * 60 * 60000)
+
+        const yyyy = gmt7.getFullYear()
+        const mm = (gmt7.getMonth() + 1).toString().padStart(2, '0')
+        const dd = gmt7.getDate().toString().padStart(2, '0')
+        const hh = gmt7.getHours().toString().padStart(2, '0')
+        const mi = gmt7.getMinutes().toString().padStart(2, '0')
+        const ss = gmt7.getSeconds().toString().padStart(2, '0')
+
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
+    }
+
+    private parseRawDate(dateTimeStr: string) {
+        const [datePart, timePart] = dateTimeStr.split(' ')
+        const [year, month, day] = datePart.split('-').map(Number)
+        const [hour, minute, second] = timePart.split(':').map(Number)
+
+        return { year, month, day, hour, minute, second }
     }
 }

@@ -38,6 +38,13 @@
                     {{ examDetail.examTypeCode }}
                 </div>
             </div>
+
+            <div>
+                <label class="form-label text-muted">Durasi</label>
+                <div class="fs-5 fw-semibold">
+                    {{ examDetail.duration | duration }}
+                </div>
+            </div>
         </section>
 
         <ng-container *ngIf="typeUkom === 'CAT'">

@@ -8,9 +8,7 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
-import { EMPTY, finalize, switchMap } from 'rxjs'
-import { ExamService } from '@/modules/ukom/services/exam.service'
-import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
+import { EMPTY, finalize, switchMap, timer } from 'rxjs'
 
 type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
 
@@ -51,6 +49,7 @@ export class DashboardComponent implements OnInit {
     selectedExamForParticipants = signal<GroupedExam | null>(null)
     nowGmt7 = signal<string>(this.getNowGmt7String())
     showCompletedExams = signal(false)
+
     // Computed values
     groupedExams = computed(() => this.groupExamsByStatus())
     ongoingExam = computed(() =>
@@ -62,6 +61,11 @@ export class DashboardComponent implements OnInit {
     completedExams = computed(() =>
         this.groupedExams().filter((e) => e.status === 'completed'),
     )
+    // TODO : Get the current ongoin participant personal schedule,
+    //  the objective is to show current running one, but make it array
+    //  in case more than one personal schedule at same time
+    ongoingParticipantSchedules = computed(() => {})
+
     // Format current date for display
     formattedCurrentDate = computed(() => {
         const raw = this.nowGmt7()
@@ -77,18 +81,20 @@ export class DashboardComponent implements OnInit {
     private handlerService = inject(HandlerService)
     private examScheduleService = inject(UkomExamScheduleService)
     private examinerService = inject(UkomExaminerService)
-    private examService = inject(ExamService)
 
     private schedules = signal<ExamSchedule[]>([])
 
     ngOnInit(): void {
         this.updateNowGmt7()
-
-        setInterval(() => {
-            this.updateNowGmt7()
-        }, 60000)
-
         this.fetchExaminerSchedule()
+
+        const now = new Date()
+        const msUntilNextMinute =
+            (60 - now.getSeconds()) * 1000 - now.getMilliseconds()
+
+        timer(msUntilNextMinute, 60000).subscribe(() => {
+            this.updateNowGmt7()
+        })
     }
 
     fetchExaminerSchedule(): void {
@@ -115,39 +121,6 @@ export class DashboardComponent implements OnInit {
                     )
                 },
             })
-    }
-
-    formatDateRange(startTime: string, endTime: string): string {
-        const start = this.parseRawDate(startTime)
-        const end = this.parseRawDate(endTime)
-
-        const formatDate = (d: typeof start) =>
-            `${d.day} ${MONTHS[d.month - 1]} ${d.year}`
-
-        const formatTime = (d: typeof start) =>
-            `${d.hour.toString().padStart(2, '0')}:${d.minute
-                .toString()
-                .padStart(2, '0')}`
-
-        // Same day
-        if (
-            start.year === end.year &&
-            start.month === end.month &&
-            start.day === end.day
-        ) {
-            return `${formatDate(start)}, ${formatTime(start)} - ${formatTime(
-                end,
-            )} WIB`
-        }
-
-        if (start.year === end.year && start.month === end.month) {
-            return `${start.day}–${end.day} ${MONTHS[start.month - 1]} ${
-                start.year
-            } WIB`
-        }
-
-        // Different month or year (date-only)
-        return `${formatDate(start)} - ${formatDate(end)}`
     }
 
     enterExam(
@@ -213,73 +186,51 @@ export class DashboardComponent implements OnInit {
         return exam.schedule.participantScheduleList || []
     }
 
-    formatPersonalScheduleStart(startTime: string): string {
-        const { year, month, day, hour, minute } = this.parseRawDate(startTime)
-
-        return `${day} ${MONTHS[month - 1]} ${year}, ${hour
-            .toString()
-            .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-    }
-
     getParticipantScheduleTime(pSchedule: any, exam: GroupedExam): string {
         const time = pSchedule.personalSchedule ?? exam.schedule.startTime
 
         return this.formatPersonalScheduleStart(time) + ' (WIB)'
     }
 
-    private updateNowGmt7(): void {
-        this.nowGmt7.set(this.getNowGmt7String())
+    formatDateRange(startTime: string, endTime: string): string {
+        const start = this.parseRawDate(startTime)
+        const end = this.parseRawDate(endTime)
+
+        const formatDate = (d: typeof start) =>
+            `${d.day} ${MONTHS[d.month - 1]} ${d.year}`
+
+        const formatTime = (d: typeof start) =>
+            `${d.hour.toString().padStart(2, '0')}:${d.minute
+                .toString()
+                .padStart(2, '0')}`
+
+        // Same day
+        if (
+            start.year === end.year &&
+            start.month === end.month &&
+            start.day === end.day
+        ) {
+            return `${formatDate(start)}, ${formatTime(start)} - ${formatTime(
+                end,
+            )} WIB`
+        }
+
+        if (start.year === end.year && start.month === end.month) {
+            return `${start.day}–${end.day} ${MONTHS[start.month - 1]} ${
+                start.year
+            } WIB`
+        }
+
+        // Different month or year (date-only)
+        return `${formatDate(start)} - ${formatDate(end)}`
     }
 
-    private startWawancaraExam(
-        participantId: string,
-        roomUkomId: string,
-        examScheduleId: string,
-    ) {
-        this.examService
-            .startExamByExaminer(
-                new ExaminerExamStartRequest({
-                    participantId: participantId,
-                    examTypeCode: ExamTypeCategory.WAWANCARA,
-                    roomUkomId: roomUkomId,
-                    examScheduleId: examScheduleId,
-                }),
-            )
-            .subscribe({
-                next: () => {
-                    this.router.navigate([
-                        '/interviews',
-                        examScheduleId,
-                        participantId,
-                    ])
-                },
-                error: (err) => {
-                    console.error(err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal memulai ujian wawancara. Silahkan coba lagi.',
-                    )
-                },
-            })
-    }
+    formatPersonalScheduleStart(startTime: string): string {
+        const { year, month, day, hour, minute } = this.parseRawDate(startTime)
 
-    private getNowGmt7String(): string {
-        const now = new Date() // ✅ system clock only
-
-        // Convert local time → UTC
-        const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000
-
-        // Add GMT+7 offset
-        const gmt7 = new Date(utcMillis + 7 * 60 * 60000)
-
-        const yyyy = gmt7.getFullYear()
-        const mm = (gmt7.getMonth() + 1).toString().padStart(2, '0')
-        const dd = gmt7.getDate().toString().padStart(2, '0')
-        const hh = gmt7.getHours().toString().padStart(2, '0')
-        const mi = gmt7.getMinutes().toString().padStart(2, '0')
-        const ss = gmt7.getSeconds().toString().padStart(2, '0')
-
-        return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
+        return `${day} ${MONTHS[month - 1]} ${year}, ${hour
+            .toString()
+            .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
     }
 
     private groupExamsByStatus(): GroupedExam[] {
@@ -321,6 +272,29 @@ export class DashboardComponent implements OnInit {
 
             return 0
         })
+    }
+
+    private updateNowGmt7(): void {
+        this.nowGmt7.set(this.getNowGmt7String())
+    }
+
+    private getNowGmt7String(): string {
+        const now = new Date() // ✅ system clock only
+
+        // Convert local time → UTC
+        const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000
+
+        // Add GMT+7 offset
+        const gmt7 = new Date(utcMillis + 7 * 60 * 60000)
+
+        const yyyy = gmt7.getFullYear()
+        const mm = (gmt7.getMonth() + 1).toString().padStart(2, '0')
+        const dd = gmt7.getDate().toString().padStart(2, '0')
+        const hh = gmt7.getHours().toString().padStart(2, '0')
+        const mi = gmt7.getMinutes().toString().padStart(2, '0')
+        const ss = gmt7.getSeconds().toString().padStart(2, '0')
+
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
     }
 
     private parseRawDate(dateTimeStr: string) {
