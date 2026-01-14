@@ -71,7 +71,6 @@ export class DashboardComponent implements OnInit {
     nowGmt7 = signal<string>(this.getNowGmt7String())
 
     isModalOpen = signal(false)
-    initialOpenAccordion = signal<string | null>(null)
     selectedExamId = signal<string | null>(null)
 
     roomUkom = new RoomUkom()
@@ -90,7 +89,6 @@ export class DashboardComponent implements OnInit {
             .toString()
             .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
     })
-
     protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor(
@@ -162,7 +160,7 @@ export class DashboardComponent implements OnInit {
                         map((response) => {
                             const scoreInstance =
                                 this.examTypeHandler.createScore(
-                                    examSchedule.examTypeCode as ExamTypeCategory,
+                                    examSchedule.examTypeCode,
                                     response,
                                 )
 
@@ -180,7 +178,6 @@ export class DashboardComponent implements OnInit {
                             result.scoreInstance
                     }
                 })
-                this.setInitialOpenAccordion()
             }),
         )
     }
@@ -219,10 +216,10 @@ export class DashboardComponent implements OnInit {
 
     startExam(
         roomUkomId: string,
-        examTypeCode: string,
+        examTypeCode: ExamTypeCategory,
         examScheduleId: string,
     ) {
-        const examType = examTypeCode as ExamTypeCategory
+        const examType = examTypeCode
         const config = this.examTypeHandler.getStartExamConfig(examType)
 
         this.confirmationService
@@ -394,39 +391,6 @@ export class DashboardComponent implements OnInit {
                 question.answerDto?.answerChoice ===
                 this.getCorrectAnswer(question),
         ).length
-    }
-
-    /**
-     * Determine which accordion should be initially open
-     * Opens the first exam that hasn't been completed yet
-     */
-    setInitialOpenAccordion() {
-        if (!this.roomUkom?.examScheduleDtoList?.length) {
-            this.initialOpenAccordion.set(null)
-            return
-        }
-
-        // Find first exam that hasn't been completed
-        for (const exam of this.roomUkom.examScheduleDtoList) {
-            const score = this.scoreMap[exam.id]
-            const isCompleted =
-                score?.score !== null && score?.score !== undefined
-
-            if (!isCompleted) {
-                this.initialOpenAccordion.set(exam.id)
-                return
-            }
-        }
-
-        // If all exams are completed, open the first one
-        this.initialOpenAccordion.set(this.roomUkom.examScheduleDtoList[0].id)
-    }
-
-    /**
-     * Check if an accordion should be initially open
-     */
-    isInitiallyOpen(examId: string): boolean {
-        return this.initialOpenAccordion() === examId
     }
 
     getExamDisplayName(examTypeCode: string): string {

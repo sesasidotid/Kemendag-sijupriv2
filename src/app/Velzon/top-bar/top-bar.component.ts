@@ -270,7 +270,10 @@ export class TopBarComponent {
         }
     }
     logOut() {
-        if (LoginContext.getApplicationCode() === 'siukom-participant') {
+        if (
+            LoginContext.getApplicationCode() === 'siukom-participant' ||
+            LoginContext.getApplicationCode() === 'siukom-examiner'
+        ) {
             this.router.navigate(['/login-cat']).then(() => {
                 window.location.reload()
             })
@@ -285,35 +288,6 @@ export class TopBarComponent {
 
     profile() {
         this.router.navigate(['/profile'])
-    }
-
-    private calculateAge(dateCreated: string): string {
-        const now = new Date()
-        const diffInSeconds = Math.floor(
-            (now.getTime() - new Date(dateCreated).getTime()) / 1000,
-        )
-
-        if (diffInSeconds < 60) {
-            return `${diffInSeconds} seconds ago`
-        } else if (diffInSeconds < 3600) {
-            const minutes = Math.floor(diffInSeconds / 60)
-            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
-        } else if (diffInSeconds < 86400) {
-            const hours = Math.floor(diffInSeconds / 3600)
-            return `${hours} hour${hours > 1 ? 's' : ''} ago`
-        } else if (diffInSeconds < 604800) {
-            const days = Math.floor(diffInSeconds / 86400)
-            return `${days} day${days > 1 ? 's' : ''} ago`
-        } else if (diffInSeconds < 2629746) {
-            const weeks = Math.floor(diffInSeconds / 604800)
-            return `${weeks} week${weeks > 1 ? 's' : ''} ago`
-        } else if (diffInSeconds < 31556952) {
-            const months = Math.floor(diffInSeconds / 2629746)
-            return `${months} month${months > 1 ? 's' : ''} ago`
-        } else {
-            const years = Math.floor(diffInSeconds / 31556952)
-            return `${years} year${years > 1 ? 's' : ''} ago`
-        }
     }
 
     checkNotificationsDeleteId(notificationId: string) {
@@ -415,5 +389,34 @@ export class TopBarComponent {
                     })
             },
         })
+    }
+
+    private calculateAge(dateCreated: string): string {
+        const now = new Date()
+        const diffInSeconds = Math.floor(
+            (now.getTime() - new Date(dateCreated).getTime()) / 1000,
+        )
+
+        if (diffInSeconds < 60) {
+            return `${diffInSeconds} seconds ago`
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60)
+            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600)
+            return `${hours} hour${hours > 1 ? 's' : ''} ago`
+        } else if (diffInSeconds < 604800) {
+            const days = Math.floor(diffInSeconds / 86400)
+            return `${days} day${days > 1 ? 's' : ''} ago`
+        } else if (diffInSeconds < 2629746) {
+            const weeks = Math.floor(diffInSeconds / 604800)
+            return `${weeks} week${weeks > 1 ? 's' : ''} ago`
+        } else if (diffInSeconds < 31556952) {
+            const months = Math.floor(diffInSeconds / 2629746)
+            return `${months} month${months > 1 ? 's' : ''} ago`
+        } else {
+            const years = Math.floor(diffInSeconds / 31556952)
+            return `${years} year${years > 1 ? 's' : ''} ago`
+        }
     }
 }
