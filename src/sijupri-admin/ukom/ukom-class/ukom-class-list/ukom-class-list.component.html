@@ -1,4 +1,12 @@
 <ng-container *ngIf="(tab$ | async) === 0">
+    <!-- Timeline Button -->
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-soft-info" (click)="openTimelineModal()">
+            <i class="ri-calendar-schedule-line me-1"></i>
+            Lihat Timeline Jadwal
+        </button>
+    </div>
+
     <app-pagable [pagable]="pagable$ | async" [refresh]="refreshToggle"></app-pagable>
 </ng-container>
 <ng-container *ngIf="(tab$ | async) === 1">
@@ -151,4 +159,12 @@
             </button>
         </ng-template> -->
     </form>
+</app-modal>
+
+<!-- Timeline Modal -->
+<app-modal *ngIf="isTimelineModalOpen$ | async" [title]="'Unified Schedule Timeline'" (toggle)="closeTimelineModal()"
+    [enableFooter]="false" [size]="'xl'">
+    <app-schedule-timeline-modal [schedules]="(timelineSchedules$ | async) || []" [defaultView]="'gantt'"
+        (closeTimeline)="closeTimelineModal()">
+    </app-schedule-timeline-modal>
 </app-modal>

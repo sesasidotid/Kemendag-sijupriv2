@@ -1,32 +1,21 @@
 <div aria-modal="true" class="modal show d-block" role="dialog" tabindex="-1">
-    <div
-        [ngClass]="{
+    <div [ngClass]="{
       'modal-sm-custom': size === 'sm',
       'modal-md-custom': size === 'md',
       'modal-lg-custom': size === 'lg',
+      'modal-xl-custom': size === 'xl',
       '': size === ''
-    }"
-        class="modal-dialog modal-dialog-centered"
-    >
+    }" class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-light pb-3">
                 <h5 class="modal-title">{{ title }}</h5>
-                <button
-                    (click)="toggleModal()"
-                    aria-label="Close"
-                    class="btn-close"
-                    type="button"
-                ></button>
+                <button (click)="toggleModal()" aria-label="Close" class="btn-close" type="button"></button>
             </div>
             <div class="modal-body">
                 <ng-content></ng-content>
             </div>
             <div *ngIf="enableFooter" class="modal-footer">
-                <button
-                    (click)="toggleModal()"
-                    class="btn btn-secondary"
-                    type="button"
-                >
+                <button (click)="toggleModal()" class="btn btn-secondary" type="button">
                     Tutup
                 </button>
                 <button (click)="save()" class="btn btn-primary" type="button">

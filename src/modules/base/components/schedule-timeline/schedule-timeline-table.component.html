@@ -1,0 +1,109 @@
+<div class="table-container">
+    <!-- Summary Cards -->
+    <div class="summary-section" *ngIf="summary$ | async as summary">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body text-center py-3">
+                        <h4 class="card-title mb-1">{{ summary.total }}</h4>
+                        <p class="card-text text-muted mb-0 small">Total Jadwal</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info bg-opacity-10">
+                    <div class="card-body text-center py-3">
+                        <h4 class="card-title text-info mb-1">{{ summary.uniqueDates }}</h4>
+                        <p class="card-text text-muted mb-0 small">Jumlah Hari</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-primary bg-opacity-10">
+                    <div class="card-body text-center py-3">
+                        <h4 class="card-title text-primary mb-1">{{ summary.totalLanes }}</h4>
+                        <p class="card-text text-muted mb-0 small">Total Lane (Paralel)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card" [class.bg-warning]="summary.withConflicts > 0"
+                    [class.bg-opacity-10]="summary.withConflicts > 0" [class.bg-success]="summary.withConflicts === 0"
+                    [class.bg-opacity-10]="summary.withConflicts === 0">
+                    <div class="card-body text-center py-3">
+                        <h4 class="card-title mb-1" [class.text-warning]="summary.withConflicts > 0"
+                            [class.text-success]="summary.withConflicts === 0">
+                            {{ summary.withConflicts }}
+                        </h4>
+                        <p class="card-text text-muted mb-0 small">Jadwal Tumpang Tindih</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Button -->
+    <div class="toolbar-section d-flex justify-content-between align-items-center">
+        <div class="legend">
+            <span class="legend-label me-2">Keterangan Jabatan:</span>
+            <span class="legend-item">
+                <span class="legend-color" style="background-color: #4CAF50"></span>
+                Penyelia
+            </span>
+            <span class="legend-item">
+                <span class="legend-color" style="background-color: #2196F3"></span>
+                Penera
+            </span>
+            <span class="legend-item">
+                <span class="legend-color" style="background-color: #FF9800"></span>
+                Analis
+            </span>
+            <span class="legend-item">
+                <span class="legend-color" style="background-color: #9C27B0"></span>
+                Pengawas
+            </span>
+            <span class="legend-item">
+                <span class="legend-color" style="background-color: #E91E63"></span>
+                Administrator
+            </span>
+            <span class="legend-item">
+                <span class="legend-color" style="background-color: #00BCD4"></span>
+                Koordinator
+            </span>
+        </div>
+        <button class="btn btn-outline-success btn-sm" (click)="exportToCsv()">
+            <i class="ri-file-excel-2-line me-1"></i>
+            Export CSV
+        </button>
+    </div>
+
+    <!-- AG Grid Table -->
+    <div class="grid-section" *ngIf="(processedRows$ | async)?.length; else emptyState">
+        <ag-grid-angular (gridReady)="onGridReady($event)" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef"
+            [paginationPageSize]="25" [paginationPageSizeSelector]="[10, 25, 50, 100]" [pagination]="true"
+            [rowData]="processedRows$ | async" [suppressCellFocus]="true" [animateRows]="true" class="ag-theme-alpine"
+            style="height: 500px; width: 100%">
+        </ag-grid-angular>
+    </div>
+
+    <!-- Empty State -->
+    <ng-template #emptyState>
+        <div class="empty-state text-center py-5">
+            <i class="ri-calendar-line empty-icon"></i>
+            <p class="text-muted mt-3">Tidak ada jadwal untuk ditampilkan</p>
+        </div>
+    </ng-template>
+
+    <!-- Conflict Info -->
+    <div class="alert alert-info mt-3 small" *ngIf="(summary$ | async)?.totalLanes as lanes">
+        <i class="ri-information-line me-2"></i>
+        <strong>Lane</strong> menunjukkan jalur paralel yang dibutuhkan.
+        <span *ngIf="lanes > 1">
+            Terdapat <strong>{{ lanes }}</strong> lane, artinya terdapat hingga {{ lanes }} jadwal yang berjalan
+            bersamaan.
+        </span>
+        <span *ngIf="lanes === 1">
+            Semua jadwal berjalan secara berurutan tanpa tumpang tindih.
+        </span>
+    </div>
+</div>

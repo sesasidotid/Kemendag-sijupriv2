@@ -1,0 +1,163 @@
+.table-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 16px;
+}
+
+// Summary Section
+.summary-section {
+    flex-shrink: 0;
+
+    .card {
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+    }
+}
+
+// Toolbar Section
+.toolbar-section {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .legend {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 12px;
+
+        .legend-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #6c757d;
+
+            .legend-color {
+                width: 12px;
+                height: 12px;
+                border-radius: 3px;
+                flex-shrink: 0;
+            }
+        }
+    }
+}
+
+// Grid Section
+.grid-section {
+    flex: 1;
+    min-height: 400px;
+
+    .ag-theme-alpine {
+        --ag-header-background-color: #f8f9fa;
+        --ag-odd-row-background-color: #fafbfc;
+        --ag-row-hover-color: #e8f4fd;
+        --ag-selected-row-background-color: #cfe2ff;
+        --ag-font-family: inherit;
+        --ag-font-size: 13px;
+        --ag-header-font-weight: 600;
+        --ag-borders: solid 1px;
+        --ag-border-color: #dee2e6;
+        --ag-row-border-color: #e9ecef;
+
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+    }
+}
+
+// Empty State
+.empty-state {
+    .empty-icon {
+        font-size: 48px;
+        color: #adb5bd;
+    }
+}
+
+// Badge styles (AG Grid cell renderer)
+:host ::ng-deep {
+    .badge {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .bg-warning {
+        background-color: #ffc107 !important;
+    }
+
+    .bg-success {
+        background-color: #198754 !important;
+        color: #fff !important;
+    }
+
+    .text-dark {
+        color: #212529 !important;
+    }
+
+    // AG Grid customizations
+    .ag-header-cell-label {
+        font-weight: 600;
+    }
+
+    .ag-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .text-center {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .ag-paging-panel {
+        border-top: 1px solid #dee2e6;
+        padding: 8px 16px;
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .toolbar-section {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .legend {
+            order: 2;
+        }
+
+        button {
+            order: 1;
+            align-self: flex-end;
+        }
+    }
+
+    .summary-section {
+        .row {
+            .col-md-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+    }
+}

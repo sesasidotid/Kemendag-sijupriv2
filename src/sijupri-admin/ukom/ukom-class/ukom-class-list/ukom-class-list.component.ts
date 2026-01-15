@@ -31,6 +31,11 @@ import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jab
 import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
 import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import {
+    ScheduleTimelineModalComponent,
+    ScheduleItem,
+    generateDemoScheduleData,
+} from '../../../../modules/base/components/schedule-timeline'
 @Component({
     selector: 'app-ukom-class-list',
     standalone: true,
@@ -41,7 +46,8 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         ModalComponent,
         FormsModule,
         ReactiveFormsModule,
-        LoadingButtonComponent
+        LoadingButtonComponent,
+        ScheduleTimelineModalComponent,
     ],
     templateUrl: './ukom-class-list.component.html',
     styleUrl: './ukom-class-list.component.scss',
@@ -65,6 +71,10 @@ export class UkomClassListComponent {
     bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
+    // Timeline modal state
+    isTimelineModalOpen$ = new BehaviorSubject<boolean>(false)
+    timelineSchedules$ = new BehaviorSubject<ScheduleItem[]>([])
+
     constructor(
         private tabService: TabService,
         private router: Router,
@@ -72,7 +82,7 @@ export class UkomClassListComponent {
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService,
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.handleTabService()
@@ -435,6 +445,25 @@ export class UkomClassListComponent {
     handleTabChange(tab?: number) {
         this.tab$.next(tab)
         this.tabService.changeTabActive(tab)
+    }
+
+    // Timeline modal methods
+    openTimelineModal(): void {
+        // Generate demo data with hundreds of schedules based on current date
+        const demoSchedules = generateDemoScheduleData(200)
+        this.timelineSchedules$.next(demoSchedules)
+        this.isTimelineModalOpen$.next(true)
+    }
+
+    // Use this method to open timeline with real API data
+    openTimelineWithData(schedules: ScheduleItem[]): void {
+        this.timelineSchedules$.next(schedules)
+        this.isTimelineModalOpen$.next(true)
+    }
+
+    closeTimelineModal(): void {
+        this.isTimelineModalOpen$.next(false)
+        this.timelineSchedules$.next([])
     }
 
     submit() {
