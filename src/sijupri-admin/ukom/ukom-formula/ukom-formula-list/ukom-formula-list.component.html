@@ -4,94 +4,101 @@
     [size]="'md'">
     <form [formGroup]="editFormulaForm">
         <div class="mb-3">
-            <label for="cat_percentage" class="form-label">CAT <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="cat_percentage" required
+            <label for="cat_percentage" class="form-label fw-bold">CAT <span class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="cat_percentage"
                 formControlName="cat_percentage" />
-            <div *ngIf="getErrorMessage('cat_percentage', 'CAT') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('cat_percentage', 'CAT') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="wawancara_percentage" class="form-label">Wawancara <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="wawancara_percentage" required
+            <label for="wawancara_percentage" class="form-label fw-bold">Wawancara <span
+                    class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="wawancara_percentage"
                 formControlName="wawancara_percentage" />
-            <div *ngIf="getErrorMessage('wawancara_percentage', 'Wawancara') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('wawancara_percentage', 'Wawancara') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="seminar_percentage" class="form-label">Seminar <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="seminar_percentage" required
+            <label for="seminar_percentage" class="form-label fw-bold">Seminar <span
+                    class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="seminar_percentage"
                 formControlName="seminar_percentage" />
-            <div *ngIf="getErrorMessage('seminar_percentage', 'Seminar') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('seminar_percentage', 'Seminar') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="praktik_percentage" class="form-label">Praktik <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="praktik_percentage" required
+            <label for="praktik_percentage" class="form-label fw-bold">Praktik <span
+                    class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="praktik_percentage"
                 formControlName="praktik_percentage" />
-            <div *ngIf="getErrorMessage('praktik_percentage', 'Praktik') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('praktik_percentage', 'Praktik') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="portofolio_percentage" class="form-label">Portofolia <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="portofolio_percentage" required
+            <label for="portofolio_percentage" class="form-label fw-bold">Portofolia <span
+                    class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="portofolio_percentage"
                 formControlName="portofolio_percentage" />
-            <div *ngIf="getErrorMessage('portofolio_percentage', 'Portofolia') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('portofolio_percentage', 'Portofolia') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="ukt_percentage" class="form-label">UKT <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="ukt_percentage" required
+            <label for="ukt_percentage" class="form-label fw-bold">UKT <span class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="ukt_percentage"
                 formControlName="ukt_percentage" />
-            <div *ngIf="getErrorMessage('ukt_percentage', 'UKT') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('ukt_percentage', 'UKT') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="ukmsk_percentage" class="form-label">UKSMK <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="ukmsk_percentage" required
+            <label for="ukmsk_percentage" class="form-label fw-bold">UKSMK <span class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="ukmsk_percentage"
                 formControlName="ukmsk_percentage" />
-            <div *ngIf="getErrorMessage('ukmsk_percentage', 'UKSMK') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('ukmsk_percentage', 'UKSMK') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="grade_threshold" class="form-label">Ambang Batas Nilai <span class="text-danger">*</span>
+            <label for="grade_threshold" class="form-label fw-bold">Ambang Batas Nilai <span
+                    class="text-danger">*</span>
             </label>
-            <input type="number" step="1" class="form-control" id="grade_threshold" required
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="grade_threshold"
                 formControlName="grade_threshold" />
             <div *ngIf="
           getErrorMessage('grade_threshold', 'Ambang Batas Nilai') as error
-        " class="text-danger">
+        " class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="ukt_threshold" class="form-label">Ambang Batas UKT <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="ukt_threshold" required
+            <label for="ukt_threshold" class="form-label fw-bold">Ambang Batas UKT <span
+                    class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="ukt_threshold"
                 formControlName="ukt_threshold" />
-            <div *ngIf="getErrorMessage('ukt_threshold', 'Ambang Batas UKT') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('ukt_threshold', 'Ambang Batas UKT') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="jpm_threshold" class="form-label">Ambang Batas JPM <span class="text-danger">*</span></label>
-            <input type="number" step="1" class="form-control" id="jpm_threshold" required
+            <label for="jpm_threshold" class="form-label fw-bold">Ambang Batas JPM <span
+                    class="text-danger">*</span></label>
+            <input appInvalidOnTouch type="number" step="1" class="form-control" id="jpm_threshold"
                 formControlName="jpm_threshold" />
-            <div *ngIf="getErrorMessage('jpm_threshold', 'Ambang Batas JPM') as error" class="text-danger">
+            <div *ngIf="getErrorMessage('jpm_threshold', 'Ambang Batas JPM') as error" class="invalid-feedback">
                 {{ error }}
             </div>
         </div>

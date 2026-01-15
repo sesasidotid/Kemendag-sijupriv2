@@ -16,6 +16,7 @@ import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
     selector: 'app-ukom-examiner-add',
@@ -26,6 +27,7 @@ import { FormValidationService } from '@/modules/base/services/form-validation.s
         LucideAngularModule,
         ReactiveFormsModule,
         LoadingButtonComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-examiner-add.component.html',
     styleUrl: './ukom-examiner-add.component.scss',

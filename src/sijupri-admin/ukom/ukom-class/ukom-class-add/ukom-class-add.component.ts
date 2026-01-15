@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, Output } from '@angular/core'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import { LucideAngularModule } from 'lucide-angular'
 import {
     FormControl,
@@ -19,6 +19,7 @@ import { distinctUntilChanged, finalize, map } from 'rxjs/operators'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { BidangJabatan } from '@/modules/maintenance/models/bidang-jabatan.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
     selector: 'app-ukom-class-add',
@@ -29,11 +30,12 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         LucideAngularModule,
         ReactiveFormsModule,
         LoadingButtonComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-class-add.component.html',
     styleUrl: './ukom-class-add.component.scss',
 })
-export class UkomClassAddComponent {
+export class UkomClassAddComponent implements OnInit {
     @Output() changeTabActive: EventEmitter<any> = new EventEmitter()
 
     tab$ = new BehaviorSubject<number | null>(0)
@@ -44,7 +46,6 @@ export class UkomClassAddComponent {
     kelasData: RoomUkom = new RoomUkom()
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
-
     private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
     bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
 
@@ -155,18 +156,6 @@ export class UkomClassAddComponent {
             )
     }
 
-    // getListJenjang () {
-    //     this.jenjangList$ = this.apiService
-    //         .getData(`/api/v1/jenjang`)
-    //         .pipe(
-    //             map(response =>
-    //                 response.map(
-    //                     (jenjang: { [key: string]: any }) =>
-    //                         new Jenjang(jenjang)
-    //                 )
-    //             )
-    //         )
-    // }
     getListJenjang(jabatanCode: string) {
         this.jenjangList$ = this.apiService
             .getData(`/api/v1/jenjang/jabatan/${jabatanCode}`)
@@ -201,22 +190,6 @@ export class UkomClassAddComponent {
                 if (!result.confirmed) return
 
                 this.submitLoading$.next(true)
-
-                // this.kelasData.name = this.kelasForm.get('name')?.value
-                // this.kelasData.jabatan_code =
-                //     this.kelasForm.get('jabatan')?.value
-                // this.kelasData.jenjang_code =
-                //     this.kelasForm.get('jenjang')?.value
-                // this.kelasData.participant_quota =
-                //     this.kelasForm.get('participant_quota')?.value
-                // this.kelasData.vid_call_link =
-                //     this.kelasForm.get('vid_call_link')?.value
-                // this.kelasData.exam_start_at =
-                //     this.kelasForm.get('exam_start_at')?.value
-                // this.kelasData.exam_end_at =
-                //     this.kelasForm.get('exam_end_at')?.value
-                // this.kelasData.bidang_jabatan_code =
-                //     this.kelasForm.get('bidang_jabatan')?.value
 
                 this.kelasData = new RoomUkom(this.kelasForm.value)
 

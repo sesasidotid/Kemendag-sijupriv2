@@ -1,11 +1,11 @@
 import {
-    Component,
-    Input,
-    Output,
-    EventEmitter,
     ChangeDetectionStrategy,
-    OnInit,
+    Component,
+    EventEmitter,
+    Input,
     OnChanges,
+    OnInit,
+    Output,
     SimpleChanges,
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
@@ -67,7 +67,9 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
     currentZoomIndex$ = new BehaviorSubject<number>(1) // Default 30m
     processedSchedules$ = new BehaviorSubject<ProcessedSchedule[]>([])
     lanes$ = new BehaviorSubject<number[]>([])
-    timeMarkers$ = new BehaviorSubject<{ time: string; position: number; isNewDay: boolean }[]>([])
+    timeMarkers$ = new BehaviorSubject<
+        { time: string; position: number; isNewDay: boolean }[]
+    >([])
     timelineWidth$ = new BehaviorSubject<number>(0)
     hoveredSchedule$ = new BehaviorSubject<ProcessedSchedule | null>(null)
     tooltipPosition$ = new BehaviorSubject<{ x: number; y: number }>({
@@ -80,13 +82,18 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
 
     // Color palette for jabatanName
     private readonly colorPalette: Record<string, string> = {
-        Penyelia: '#4CAF50',
+        'Negosiator Perdagangan': '#4CAF50',
         Penera: '#2196F3',
-        Analis: '#FF9800',
-        Pengawas: '#9C27B0',
-        Administrator: '#E91E63',
-        Koordinator: '#00BCD4',
+        'Analis Perdagangan': '#FF9800',
+        'Pengawas Perdagangan': '#9C27B0',
+        'Penguji Mutu Barang': '#E91E63',
+        'Pengamat Tera': '#00BCD4',
         DEFAULT: '#607D8B',
+    }
+
+    // Get current zoom level
+    get currentZoom(): ZoomLevel {
+        return this.zoomLevels[this.currentZoomIndex$.value]
     }
 
     ngOnInit(): void {
@@ -108,7 +115,10 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         return lane
     }
 
-    trackByMarker(index: number, marker: { time: string; position: number; isNewDay: boolean }): number {
+    trackByMarker(
+        index: number,
+        marker: { time: string; position: number; isNewDay: boolean },
+    ): number {
         return marker.position
     }
 
@@ -118,9 +128,76 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         this.processSchedules()
     }
 
-    // Get current zoom level
-    get currentZoom(): ZoomLevel {
-        return this.zoomLevels[this.currentZoomIndex$.value]
+    // Format time for display with date
+    formatTimeWithDate(date: Date): string {
+        const day = date.getDate().toString().padStart(2, '0')
+        const month = date.toLocaleString('id-ID', { month: 'short' })
+        const hour = date.getHours().toString().padStart(2, '0')
+        const minute = date.getMinutes().toString().padStart(2, '0')
+        return `${day} ${month} ${hour}:${minute}`
+    }
+
+    // Format datetime for tooltip
+    formatDateTime(date: Date): string {
+        return date.toLocaleString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        })
+    }
+
+    // Format duration for tooltip
+    formatDuration(minutes: number): string {
+        if (minutes < 60) {
+            return `${minutes} menit`
+        }
+        const hours = Math.floor(minutes / 60)
+        const remainingMinutes = minutes % 60
+        if (remainingMinutes === 0) {
+            return `${hours} jam`
+        }
+        return `${hours} jam ${remainingMinutes} menit`
+    }
+
+    // Get schedule style
+    getScheduleStyle(schedule: ProcessedSchedule): Record<string, string> {
+        const left = schedule.startMinutes * this.currentZoom.pixelsPerMinute
+        const width =
+            schedule.durationMinutes * this.currentZoom.pixelsPerMinute
+
+        return {
+            left: `${left}px`,
+            width: `${Math.max(width, 20)}px`, // Minimum width for visibility
+            'background-color': schedule.color,
+        }
+    }
+
+    // Tooltip handlers
+    showTooltip(event: MouseEvent, schedule: ProcessedSchedule): void {
+        this.hoveredSchedule$.next(schedule)
+        this.updateTooltipPosition(event)
+    }
+
+    hideTooltip(): void {
+        this.hoveredSchedule$.next(null)
+    }
+
+    moveTooltip(event: MouseEvent): void {
+        if (this.hoveredSchedule$.value) {
+            this.updateTooltipPosition(event)
+        }
+    }
+
+    // Get jabatan display name
+    getJabatanDisplayName(jabatanName: string): string {
+        return jabatanName || 'Tidak Diketahui'
+    }
+
+    // Close modal
+    close(): void {
+        this.closeTimeline.emit()
     }
 
     // Get color for jabatanName
@@ -148,7 +225,9 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         const processed: ProcessedSchedule[] = this.schedules.map((s) => {
             const startTime = this.parseDateTime(s.personalSchedule)
             const durationMinutes = s.duration * 60
-            const endTime = new Date(startTime.getTime() + durationMinutes * 60000)
+            const endTime = new Date(
+                startTime.getTime() + durationMinutes * 60000,
+            )
 
             return {
                 ...s,
@@ -166,10 +245,10 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
 
         // Find timeline bounds
         this.timelineStart = new Date(
-            Math.min(...processed.map((s) => s.startTime.getTime()))
+            Math.min(...processed.map((s) => s.startTime.getTime())),
         )
         this.timelineEnd = new Date(
-            Math.max(...processed.map((s) => s.endTime.getTime()))
+            Math.max(...processed.map((s) => s.endTime.getTime())),
         )
 
         // Add padding to timeline bounds (30 minutes on each side)
@@ -178,7 +257,10 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
 
         // Round to nearest interval
         const interval = this.currentZoom.minutesPerUnit
-        this.timelineStart = this.roundDownToInterval(this.timelineStart, interval)
+        this.timelineStart = this.roundDownToInterval(
+            this.timelineStart,
+            interval,
+        )
         this.timelineEnd = this.roundUpToInterval(this.timelineEnd, interval)
 
         // Compute start minutes relative to timeline start
@@ -219,24 +301,28 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         this.timelineWidth$.next(width)
 
         // Generate time markers
-        const markers: { time: string; position: number; isNewDay: boolean }[] = []
+        const markers: { time: string; position: number; isNewDay: boolean }[] =
+            []
         let currentTime = new Date(this.timelineStart)
         let lastDate = -1
 
         while (currentTime <= this.timelineEnd) {
             const position =
-                ((currentTime.getTime() - this.timelineStart.getTime()) / 60000) *
+                ((currentTime.getTime() - this.timelineStart.getTime()) /
+                    60000) *
                 this.currentZoom.pixelsPerMinute
             const isNewDay = currentTime.getDate() !== lastDate
             lastDate = currentTime.getDate()
 
             markers.push({
-                time: isNewDay ? this.formatTimeWithDate(currentTime) : this.formatTimeOnly(currentTime),
+                time: isNewDay
+                    ? this.formatTimeWithDate(currentTime)
+                    : this.formatTimeOnly(currentTime),
                 position,
                 isNewDay,
             })
             currentTime = new Date(
-                currentTime.getTime() + this.currentZoom.minutesPerUnit * 60000
+                currentTime.getTime() + this.currentZoom.minutesPerUnit * 60000,
             )
         }
 
@@ -248,7 +334,8 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
     // Round down to interval
     private roundDownToInterval(date: Date, intervalMinutes: number): Date {
         const minutes = date.getMinutes()
-        const roundedMinutes = Math.floor(minutes / intervalMinutes) * intervalMinutes
+        const roundedMinutes =
+            Math.floor(minutes / intervalMinutes) * intervalMinutes
         const result = new Date(date)
         result.setMinutes(roundedMinutes, 0, 0)
         return result
@@ -257,19 +344,11 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
     // Round up to interval
     private roundUpToInterval(date: Date, intervalMinutes: number): Date {
         const minutes = date.getMinutes()
-        const roundedMinutes = Math.ceil(minutes / intervalMinutes) * intervalMinutes
+        const roundedMinutes =
+            Math.ceil(minutes / intervalMinutes) * intervalMinutes
         const result = new Date(date)
         result.setMinutes(roundedMinutes, 0, 0)
         return result
-    }
-
-    // Format time for display with date
-    formatTimeWithDate(date: Date): string {
-        const day = date.getDate().toString().padStart(2, '0')
-        const month = date.toLocaleString('id-ID', { month: 'short' })
-        const hour = date.getHours().toString().padStart(2, '0')
-        const minute = date.getMinutes().toString().padStart(2, '0')
-        return `${day} ${month} ${hour}:${minute}`
     }
 
     // Format time only (for non-first markers of the same day)
@@ -280,73 +359,11 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         })
     }
 
-    // Format datetime for tooltip
-    formatDateTime(date: Date): string {
-        return date.toLocaleString('id-ID', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        })
-    }
-
-    // Format duration for tooltip
-    formatDuration(minutes: number): string {
-        if (minutes < 60) {
-            return `${minutes} menit`
-        }
-        const hours = Math.floor(minutes / 60)
-        const remainingMinutes = minutes % 60
-        if (remainingMinutes === 0) {
-            return `${hours} jam`
-        }
-        return `${hours} jam ${remainingMinutes} menit`
-    }
-
-    // Get schedule style
-    getScheduleStyle(schedule: ProcessedSchedule): Record<string, string> {
-        const left = schedule.startMinutes * this.currentZoom.pixelsPerMinute
-        const width = schedule.durationMinutes * this.currentZoom.pixelsPerMinute
-
-        return {
-            left: `${left}px`,
-            width: `${Math.max(width, 20)}px`, // Minimum width for visibility
-            'background-color': schedule.color,
-        }
-    }
-
-    // Tooltip handlers
-    showTooltip(event: MouseEvent, schedule: ProcessedSchedule): void {
-        this.hoveredSchedule$.next(schedule)
-        this.updateTooltipPosition(event)
-    }
-
-    hideTooltip(): void {
-        this.hoveredSchedule$.next(null)
-    }
-
-    moveTooltip(event: MouseEvent): void {
-        if (this.hoveredSchedule$.value) {
-            this.updateTooltipPosition(event)
-        }
-    }
-
     private updateTooltipPosition(event: MouseEvent): void {
         const offset = 15
         this.tooltipPosition$.next({
             x: event.clientX + offset,
             y: event.clientY + offset,
         })
-    }
-
-    // Get jabatan display name
-    getJabatanDisplayName(jabatanName: string): string {
-        return jabatanName || 'Tidak Diketahui'
-    }
-
-    // Close modal
-    close(): void {
-        this.closeTimeline.emit()
     }
 }

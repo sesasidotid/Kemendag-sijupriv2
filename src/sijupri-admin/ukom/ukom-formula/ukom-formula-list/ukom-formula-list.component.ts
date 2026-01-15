@@ -27,6 +27,7 @@ import { Observable, of, Subject } from 'rxjs'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 @Component({
     selector: 'app-ukom-formula-list',
     standalone: true,
@@ -36,7 +37,8 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         ModalComponent,
         FormsModule,
         ReactiveFormsModule,
-        LoadingButtonComponent
+        LoadingButtonComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-formula-list.component.html',
     styleUrl: './ukom-formula-list.component.scss',

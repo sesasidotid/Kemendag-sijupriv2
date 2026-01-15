@@ -8,11 +8,18 @@ import { IndikatorKompetensiUkom } from '@/modules/ukom/models/indikator-kompete
 import { CommonModule } from '@angular/common'
 import { BehaviorSubject } from 'rxjs'
 import { HandlerService } from '@/modules/base/services/handler.service'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 
 @Component({
     selector: 'app-ukom-indikator-kompetensi-add',
     standalone: true,
-    imports: [ReactiveFormsModule, CommonModule],
+    imports: [
+        ReactiveFormsModule,
+        CommonModule,
+        InvalidOnTouchDirective,
+        LoadingButtonComponent,
+    ],
     templateUrl: './ukom-indikator-kompetensi-add.component.html',
     styleUrl: './ukom-indikator-kompetensi-add.component.scss',
 })

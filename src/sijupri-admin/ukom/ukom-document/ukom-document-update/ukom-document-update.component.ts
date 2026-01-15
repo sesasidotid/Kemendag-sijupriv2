@@ -19,6 +19,7 @@ import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.servi
 import { SpecificationService } from '@/modules/complement/services/specification.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 @Component({
     selector: 'app-ukom-document-update',
     standalone: true,
@@ -28,6 +29,7 @@ import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/
         LucideAngularModule,
         ReactiveFormsModule,
         LoadingButtonComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-document-update.component.html',
 })

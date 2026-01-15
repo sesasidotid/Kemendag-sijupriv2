@@ -2,23 +2,28 @@ import { ConfirmationService } from './../../services/confirmation.service'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import {
     FormBuilder,
+    FormControl,
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
     Validators,
-    AbstractControl,
-    ValidationErrors,
-    FormControl,
 } from '@angular/forms'
 import { UserService } from '../../../security/services/user.service'
 import { CommonModule } from '@angular/common'
 import { FormValidationService } from '../../../base/services/form-validation.service'
 import { BehaviorSubject, finalize } from 'rxjs'
 import { HandlerService } from '../../services/handler.service'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+
 @Component({
     selector: 'app-force-password-form',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        InvalidOnTouchDirective,
+    ],
     templateUrl: './force-password-form.component.html',
     styleUrl: './force-password-form.component.scss',
 })

@@ -1,46 +1,79 @@
-<div class="row">
-    <form [formGroup]="exportGradeForm">
-        <div class="row mb-3">
-            <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Tanggal <span
-                    class="text-danger">*</span></label>
-            <div class="col-sm-5">
-                <input type="date" name="dateFrom" class="form-control" id="inputDateFrom" formControlName="dateFrom" />
-                <div *ngIf="getErrorMessage('dateFrom', 'Tanggal awal') as error" class="text-danger">
-                    {{ error }}
-                </div>
-            </div>
-            <div class="col-sm-5">
-                <input type="date" name="dateTo" class="form-control" id="inputDateTo" formControlName="dateTo" />
-                <div *ngIf="getErrorMessage('dateTo', 'Tanggal akhir') as error" class="text-danger">
-                    {{ error }}
-                </div>
+<form [formGroup]="exportGradeForm">
+    <div class="row mb-3">
+        <label class="col-sm-2 form-label fw-bold" for="inputDate"
+            >Tanggal <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-5">
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="dateFrom"
+                id="inputDateFrom"
+                name="dateFrom"
+                type="date"
+            />
+            <div
+                *ngIf="getErrorMessage('dateFrom', 'Tanggal awal') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
             </div>
         </div>
+        <div class="col-sm-5">
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="dateTo"
+                id="inputDateTo"
+                name="dateTo"
+                type="date"
+            />
+            <div
+                *ngIf="getErrorMessage('dateTo', 'Tanggal akhir') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
+            </div>
+        </div>
+    </div>
 
-        <div class="row mb-3">
-            <label for="inputfileType" class="col-sm-2 col-form-label fw-bold">Format File <span
-                    class="text-danger">*</span></label>
-            <div class="col-sm-10">
-                <select id="inputfileType" class="form-select" formControlName="fileType" name="fileType">
-                    <option [value]="''">Pilih</option>
-                    <option [value]="'xlsx'">Excel 2007</option>
-                    <option [value]="'xls'">Excel</option>
-                    <option [value]="'csv'">CSV</option>
-                </select>
-                <div *ngIf="getErrorMessage('fileType', 'Format File') as error" class="text-danger">
-                    {{ error }}
-                </div>
+    <div class="row mb-3">
+        <label class="col-sm-2 form-label fw-bold" for="inputfileType"
+            >Format File <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <select
+                appInvalidOnTouch
+                class="form-select"
+                formControlName="fileType"
+                id="inputfileType"
+                name="fileType"
+            >
+                <option [value]="''">Pilih</option>
+                <option [value]="'xlsx'">Excel 2007</option>
+                <option [value]="'xls'">Excel</option>
+                <option [value]="'csv'">CSV</option>
+            </select>
+            <div
+                *ngIf="getErrorMessage('fileType', 'Format File') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
             </div>
         </div>
+    </div>
 
-        <div class="row text-end">
-            <app-loading-button [isLoading]="isLoading$ | async" [disabled]="exportGradeForm.invalid" [label]="'Export'"
-                [type]="'button'" [className]="'btn btn-primary'" (clicked)="submit()"></app-loading-button>
-        </div>
-    </form>
-</div>
+    <div class="row text-end">
+        <app-loading-button
+            (clicked)="submit()"
+            [className]="'btn btn-primary'"
+            [disabled]="exportGradeForm.invalid"
+            [isLoading]="isLoading$ | async"
+            [label]="'Export'"
+            [type]="'button'"
+        ></app-loading-button>
+    </div>
+</form>
 
 <hr />
-<div class="row">
-    <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
-</div>
+<app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>

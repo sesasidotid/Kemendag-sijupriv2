@@ -24,11 +24,12 @@ import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { BehaviorSubject } from 'rxjs'
 import { FormValidationService } from '../../../modules/base/services/form-validation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
     selector: 'app-ukom-grade-export',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, PagableComponent, LoadingButtonComponent],
+    imports: [CommonModule, ReactiveFormsModule, PagableComponent, LoadingButtonComponent, InvalidOnTouchDirective],
     templateUrl: './ukom-grade-export.component.html',
     styleUrl: './ukom-grade-export.component.scss',
 })

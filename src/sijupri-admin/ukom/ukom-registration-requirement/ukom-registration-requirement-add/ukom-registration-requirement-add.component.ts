@@ -14,10 +14,11 @@ import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.servi
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 @Component({
     selector: 'app-ukom-registration-requirement-add',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, LoadingButtonComponent],
+    imports: [CommonModule, ReactiveFormsModule, LoadingButtonComponent, InvalidOnTouchDirective],
     templateUrl: './ukom-registration-requirement-add.component.html',
     styleUrl: './ukom-registration-requirement-add.component.scss',
 })

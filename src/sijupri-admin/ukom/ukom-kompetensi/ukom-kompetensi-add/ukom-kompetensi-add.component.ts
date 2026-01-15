@@ -8,18 +8,18 @@ import {
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { BehaviorSubject, of } from 'rxjs'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { KompetensiUkom } from '../../../../modules/ukom/models/kompetensi'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { Observable } from 'rxjs'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { ApiService } from '@/modules/base/services/api.service'
+import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
+import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
+import { KompetensiUkom } from '@/modules/ukom/models/kompetensi'
+import { HandlerService } from '@/modules/base/services/handler.service'
 import { distinctUntilChanged, map } from 'rxjs/operators'
-import { Pangkat } from '../../../../modules/maintenance/models/pangkat.model'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
-import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
+import { Pangkat } from '@/modules/maintenance/models/pangkat.model'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { BidangJabatan } from '@/modules/maintenance/models/bidang-jabatan.model'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
     selector: 'app-ukom-kompetensi-add',
@@ -29,6 +29,7 @@ import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jab
         ReactiveFormsModule,
         FormsModule,
         LucideAngularModule,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-kompetensi-add.component.html',
     styleUrl: './ukom-kompetensi-add.component.scss',

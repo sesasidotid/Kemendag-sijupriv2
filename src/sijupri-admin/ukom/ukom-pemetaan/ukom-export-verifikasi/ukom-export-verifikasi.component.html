@@ -1,63 +1,112 @@
-<div class="row">
-    <form [formGroup]="hasilVerifikasiForm" (submit)="onSubmit()">
-        <div class="row mb-3">
-            <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Tanggal</label>
-            <div class="col-sm-5">
-                <input type="date" name="dateFrom" class="form-control" id="inputDateFrom" formControlName="dateFrom" />
-            </div>
-
-            <div class="col-sm-5">
-                <input type="date" name="dateTo" class="form-control" id="inputDateTo" formControlName="dateTo" />
-            </div>
+<form (submit)="onSubmit()" [formGroup]="hasilVerifikasiForm">
+    <div class="row mb-3">
+        <label class="col-sm-2 col-form-label fw-bold" for="inputDate"
+            >Tanggal</label
+        >
+        <div class="col-sm-5">
+            <input
+                class="form-control"
+                formControlName="dateFrom"
+                id="inputDateFrom"
+                name="dateFrom"
+                type="date"
+            />
         </div>
 
-        <div class="row mb-3">
-            <label for="jabatanCode" class="col-sm-2 col-form-label fw-bold">Jabatan</label>
-            <div class="col-sm-10">
-                <select id="jabatanCode" class="form-select" formControlName="jabatanCode" name="jabatanCode">
-                    <option value="" selected>Pilih Jabatan</option>
-                    <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
-                        {{ jabatan.name }}
-                    </option>
-                </select>
+        <div class="col-sm-5">
+            <input
+                class="form-control"
+                formControlName="dateTo"
+                id="inputDateTo"
+                name="dateTo"
+                type="date"
+            />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label class="col-sm-2 col-form-label fw-bold" for="jabatanCode"
+            >Jabatan</label
+        >
+        <div class="col-sm-10">
+            <select
+                appInvalidOnTouch
+                class="form-select"
+                formControlName="jabatanCode"
+                id="jabatanCode"
+                name="jabatanCode"
+            >
+                <option selected value="">Pilih Jabatan</option>
+                <option
+                    *ngFor="let jabatan of jabatanList"
+                    [value]="jabatan.code"
+                >
+                    {{ jabatan.name }}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label class="col-sm-2 col-form-label fw-bold" for="taskStatus"
+            >Status Verifikasi <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <select
+                appInvalidOnTouch
+                class="form-select"
+                formControlName="taskStatus"
+                id="taskStatus"
+                name="taskStatus"
+            >
+                <option selected value="">Pilih Status Verifikasi</option>
+                <option selected value="COMPLETED">Lolos</option>
+                <option selected value="FAILED">Tidak Lolos</option>
+            </select>
+            <div
+                *ngIf="getErrorMessage('taskStatus', 'Status') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
             </div>
         </div>
+    </div>
 
-        <div class="row mb-3">
-            <label for="taskStatus" class="col-sm-2 col-form-label fw-bold">Status Verifikasi <span
-                    class="text-danger">*</span></label>
-            <div class="col-sm-10">
-                <select id="taskStatus" class="form-select" formControlName="taskStatus" name="taskStatus">
-                    <option value="" selected>Pilih Status Verifikasi</option>
-                    <option value="COMPLETED" selected>Lolos</option>
-                    <option value="FAILED" selected>Tidak Lolos</option>
-                </select>
+    <div class="row mb-3">
+        <label class="col-sm-2 col-form-label fw-bold" for="inputfileType"
+            >Format File <span class="text-danger">*</span></label
+        >
+        <div class="col-sm-10">
+            <select
+                appInvalidOnTouch
+                class="form-select"
+                formControlName="fileType"
+                id="inputfileType"
+                name="fileType"
+            >
+                <option [value]="''">Pilih</option>
+                <option [value]="'xlsx'">Excel 2007</option>
+                <option [value]="'xls'">Excel</option>
+                <option [value]="'csv'">CSV</option>
+            </select>
+            <div
+                *ngIf="getErrorMessage('fileType', 'Format File') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
             </div>
         </div>
+    </div>
 
-        <div class="row mb-3">
-            <label for="inputfileType" class="col-sm-2 col-form-label fw-bold">Format File <span
-                    class="text-danger">*</span></label>
-            <div class="col-sm-10">
-                <select id="inputfileType" class="form-select" formControlName="fileType" name="fileType">
-                    <option [value]="''">Pilih</option>
-                    <option [value]="'xlsx'">Excel 2007</option>
-                    <option [value]="'xls'">Excel</option>
-                    <option [value]="'csv'">CSV</option>
-                </select>
-                <div *ngIf="getErrorMessage('fileType', 'Format File') as error" class="text-danger">
-                    {{ error }}
-                </div>
-            </div>
-        </div>
-
-        <div class="row text-end">
-            <app-loading-button [isLoading]="isLoading$ | async" [disabled]="hasilVerifikasiForm.invalid"
-                [type]="'submit'" [label]="'Export'" [className]="'btn btn-primary'"></app-loading-button>
-        </div>
-    </form>
-</div>
+    <div class="row text-end">
+        <app-loading-button
+            [className]="'btn btn-primary'"
+            [disabled]="hasilVerifikasiForm.invalid"
+            [isLoading]="isLoading$ | async"
+            [label]="'Export'"
+            [type]="'submit'"
+        ></app-loading-button>
+    </div>
+</form>
 <hr />
-<div class="row">
-    <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
-</div>
+<app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>

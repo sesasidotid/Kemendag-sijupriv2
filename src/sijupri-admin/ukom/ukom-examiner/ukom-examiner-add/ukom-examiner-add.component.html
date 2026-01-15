@@ -1,114 +1,112 @@
-<form [formGroup]="examinerForm" (ngSubmit)="submit()">
-    <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold"
+<form (ngSubmit)="submit()" [formGroup]="examinerForm">
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="name"
             >Nama <span class="text-danger">*</span></label
         >
-        <div class="col-sm-10">
-            <input
-                type="text"
-                id="name"
-                class="form-control"
-                name="name"
-                formControlName="name"
-                placeholder="Masukan nama penguji"
-            />
-            <div
-                *ngIf="getErrorMessage('name','Nama' ) as error"
-                class="text-danger"
-            >
-                {{ error }}
-            </div>
+        <input
+            appInvalidOnTouch
+            class="form-control"
+            formControlName="name"
+            id="name"
+            name="name"
+            placeholder="Masukan nama penguji"
+            type="text"
+        />
+        <div
+            *ngIf="getErrorMessage('name','Nama' ) as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
         </div>
     </div>
-    <div class="row mb-3">
-        <label for="nip" class="col-sm-2 col-form-label fw-bold"
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="nip"
             >Username <span class="text-danger">*</span></label
         >
-        <div class="col-sm-10">
-            <input
-                type="text"
-                id="nip"
-                class="form-control"
-                name="nip"
-                formControlName="nip"
-                placeholder="Masukan Username"
-            />
-            <div
-                *ngIf="getErrorMessage('nip','Username' ) as error"
-                class="text-danger"
-            >
-                {{ error }}
-            </div>
+        <input
+            appInvalidOnTouch
+            class="form-control"
+            formControlName="nip"
+            id="nip"
+            name="nip"
+            placeholder="Masukan Username"
+            type="text"
+        />
+        <div
+            *ngIf="getErrorMessage('nip','Username' ) as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
         </div>
     </div>
-    <div class="row mb-3">
-        <label for="jenisKelaminCode" class="col-sm-2 col-form-label fw-bold"
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="jenisKelaminCode"
             >Jenis Kelamin <span class="text-danger">*</span></label
         >
-        <div class="col-sm-10">
-            <select
-                id="jenisKelaminCode"
-                class="form-select"
-                name="jenisKelaminCode"
-                formControlName="jenisKelaminCode"
-            >
-                <option [value]="'F'">Wanita</option>
-                <option [value]="'M'">Pria</option>
-            </select>
-            <div
-                *ngIf="getErrorMessage('jenisKelaminCode','Jenis Kelamin' ) as error"
-                class="text-danger"
-            >
-                {{ error }}
-            </div>
+        <select
+            appInvalidOnTouch
+            class="form-select"
+            formControlName="jenisKelaminCode"
+            id="jenisKelaminCode"
+            name="jenisKelaminCode"
+        >
+            <option hidden="" selected value="">
+                Pilih jenis kelamin penguji
+            </option>
+            <option [value]="'F'">Wanita</option>
+            <option [value]="'M'">Pria</option>
+        </select>
+        <div
+            *ngIf="getErrorMessage('jenisKelaminCode','Jenis Kelamin' ) as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
         </div>
     </div>
-    <div class="row mb-3">
-        <label for="name" class="col-sm-2 col-form-label fw-bold"
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="password"
             >Password <span class="text-danger">*</span></label
         >
-        <div class="col-sm-10">
-            <input
-                type="password"
-                id="password"
-                class="form-control"
-                name="password"
-                formControlName="password"
-                placeholder="Masukan password"
-            />
-            <div
-                *ngIf="getErrorMessage('password','Password' ) as error"
-                class="text-danger"
-            >
-                {{ error }}
-            </div>
+        <input
+            appInvalidOnTouch
+            class="form-control"
+            formControlName="password"
+            id="password"
+            name="password"
+            placeholder="Masukan password"
+            type="password"
+        />
+        <div
+            *ngIf="getErrorMessage('password','Password' ) as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
         </div>
     </div>
-    <div class="row mb-3">
-        <label for="confirmPassword" class="col-sm-2 col-form-label fw-bold"
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="confirmPassword"
             >Konfirmasi Password <span class="text-danger">*</span></label
         >
-        <div class="col-sm-10">
-            <input
-                type="password"
-                class="form-control"
-                id="confirmPassword"
-                required
-                formControlName="confirmPassword"
-            />
-            <div
-                *ngIf="getErrorMessage('confirmPassword','Konfirmasi Password' ) as error"
-                class="text-danger"
-            >
-                {{ error }}
-            </div>
+        <input
+            appInvalidOnTouch
+            class="form-control"
+            formControlName="confirmPassword"
+            id="confirmPassword"
+            placeholder="Masukan konfirmasi password"
+            type="password"
+        />
+        <div
+            *ngIf="getErrorMessage('confirmPassword','Konfirmasi Password' ) as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
         </div>
     </div>
-    <div class="row text-end">
+    <div class="text-end">
         <app-loading-button
-            [isLoading]="submitLoading$ | async"
-            [disabled]="examinerForm.invalid"
             [className]="'btn btn-primary'"
+            [disabled]="examinerForm.invalid"
+            [isLoading]="submitLoading$ | async"
             [label]="'Simpan'"
             [type]="'submit'"
         ></app-loading-button>

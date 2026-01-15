@@ -12,6 +12,7 @@ import { finalize, Observable } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ImportQuestionRequest } from '@/modules/ukom/models/ukom-module-refactor/import-question-request.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
     selector: 'app-ukom-question-import',
@@ -21,6 +22,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         FileHandlerComponent,
         LoadingButtonComponent,
         ReactiveFormsModule,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-question-import.component.html',
     styleUrl: './ukom-question-import.component.scss',

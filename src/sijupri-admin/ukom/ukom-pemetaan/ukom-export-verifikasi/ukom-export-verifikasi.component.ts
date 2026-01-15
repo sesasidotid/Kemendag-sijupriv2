@@ -23,6 +23,7 @@ import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 @Component({
     selector: 'app-ukom-export-verifikasi',
     standalone: true,
@@ -31,6 +32,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         ReactiveFormsModule,
         CommonModule,
         LoadingButtonComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-export-verifikasi.component.html',
     styleUrl: './ukom-export-verifikasi.component.scss',

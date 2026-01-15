@@ -1,9 +1,8 @@
 import { CommonModule, Location } from '@angular/common'
 import { Component, inject, OnInit, signal } from '@angular/core'
-import { FilePlus, LucideAngularModule } from 'lucide-angular'
+import { LucideAngularModule } from 'lucide-angular'
 import {
     FormBuilder,
-    FormControl,
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
@@ -43,7 +42,92 @@ import {
 } from '@/modules/base/components/multi-select-api'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
-import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+
+interface DynamicFieldConfig {
+    controlName: string
+    validators?: any[]
+    visible?: boolean
+    required?: boolean
+}
+
+interface ExamTypeFormConfig {
+    primary: DynamicFieldConfig[]
+    secondary?: {
+        fields: DynamicFieldConfig[]
+        label: string
+        examTypeCode: string
+    }
+}
+
+const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
+    CAT: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'duration',
+                validators: [Validators.required, Validators.min(1)],
+            },
+            { controlName: 'secretKey', validators: [Validators.required] },
+            { controlName: 'participantIdList', visible: false },
+        ],
+    },
+    WAWANCARA: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'duration',
+                validators: [Validators.required, Validators.min(1)],
+            },
+            {
+                controlName: 'participantIdList',
+                visible: true,
+                required: false,
+            },
+            {
+                controlName: 'examinerIdList',
+                validators: [Validators.required],
+            },
+        ],
+    },
+    MAKALAH: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'duration',
+                validators: [Validators.required, Validators.min(1)],
+            },
+            { controlName: 'participantIdList', validators: [] },
+            {
+                controlName: 'examinerIdList',
+                validators: [Validators.required],
+            },
+        ],
+        secondary: {
+            label: 'Jadwal Seminar',
+            examTypeCode: 'SEMINAR',
+            fields: [
+                {
+                    controlName: 'startTime2',
+                    validators: [Validators.required],
+                },
+                { controlName: 'endTime2', validators: [Validators.required] },
+                {
+                    controlName: 'duration2',
+                    validators: [Validators.required, Validators.min(1)],
+                },
+                { controlName: 'participantIdList2', validators: [] },
+                {
+                    controlName: 'examinerIdList2',
+                    validators: [Validators.required],
+                },
+            ],
+        },
+    },
+}
 
 @Component({
     selector: 'app-ukom-exam-schedule-add',
@@ -59,12 +143,13 @@ import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
         LoadingButtonComponent,
         MultiSelectComponent,
         MultiSelectApiComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-exam-schedule-add.component.html',
     styleUrl: './ukom-exam-schedule-add.component.scss',
 })
 export class UkomExamScheduleAddComponent implements OnInit {
-    isUpdateModalOpen = false
+    isUpdateModalOpen = signal(false)
     selectedExamSchedule: ExamSchedule
 
     location = inject(Location)
@@ -80,9 +165,8 @@ export class UkomExamScheduleAddComponent implements OnInit {
 
     jenisUkomList$: Observable<JenisUkom[]>
 
-    id: string
+    roomId: string
     pagable: Pagable
-    readonly filePlus = FilePlus
     refresh: boolean = false
 
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
@@ -103,7 +187,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
         this.jenisUkomList$ = this.ukomMiscellaneousService.getExamType()
 
         this.activatedRoute.paramMap.subscribe((params) => {
-            this.id = params.get('id')
+            this.roomId = params.get('id')
             this.initPagable()
             this.getParticipantListOptions()
         })
@@ -111,163 +195,9 @@ export class UkomExamScheduleAddComponent implements OnInit {
         this.initForm()
     }
 
-    getParticipantListOptions() {
-        this.participantService
-            .getParticipantListByRoomUkomId(this.id)
-            .pipe(
-                map((participants) =>
-                    participants.map((p) => ({
-                        id: p.id,
-                        label: `${p.name} (${p.nip})`,
-                    })),
-                ),
-            )
-            .subscribe({
-                next: (options) => {
-                    this.participants = options
-                },
-                error: (err) => {
-                    console.error(err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal memuat daftar peserta',
-                    )
-                },
-            })
-    }
-
-    fetchExaminers = (params: MultiSelectApiParams): Observable<any> => {
-        // Extract search value from dynamic param
-        const searchName = params['like_user|name'] || ''
-
-        return this.examinerService
-            .searchExaminer(params.limit, params.page, searchName)
-            .pipe(
-                map((response) => {
-                    if (response && response.data) {
-                        return {
-                            ...response,
-                            data: response.data.map((examiner) => ({
-                                id: examiner.id,
-                                label: examiner.user?.name || examiner.id,
-                            })),
-                        }
-                    }
-                    return response
-                }),
-            )
-    }
-
-    initTabs() {
-        this.tabService
-            .addTab({
-                label: 'Detail Kelas',
-                icon: 'mdi-list-box',
-                onClick: () => this.handleTabChange(),
-            })
-            .addTab({
-                label: 'Tambah Jadwal UKom',
-                icon: 'mdi-plus-circle',
-                isActive: true,
-                onClick: () => {},
-            })
-    }
-
-    handleTabChange() {
-        this.router.navigate(['../'], {
-            relativeTo: this.activatedRoute,
-            replaceUrl: true,
-        })
-    }
-
-    goBack() {
-        if (window.history.length > 1) {
-            this.location.back()
-        } else {
-            this.router.navigate(['../', { relativeTo: this.activatedRoute }])
-        }
-    }
-
-    catValidator() {
-        return (control: FormControl) => {
-            if (!control.parent) {
-                return null
-            }
-
-            const examTypeValue = control.parent.get('examTypeCode')?.value
-
-            if (
-                examTypeValue === 'CAT' &&
-                (!control.value || control.value.toString().trim() === '')
-            ) {
-                return { required: true }
-            }
-
-            return null
-        }
-    }
-
-    examinerRequiredWhenNotCat() {
-        return (control: FormControl) => {
-            if (!control.parent) {
-                return null
-            }
-
-            const examType = control.parent.get('examTypeCode')?.value
-
-            if (
-                examType !== 'CAT' &&
-                (!control.value || control.value.length === 0)
-            ) {
-                return { required: true }
-            }
-
-            return null
-        }
-    }
-
-    initForm() {
-        this.examScheduleForm = this.fb.group({
-            startTime: ['', Validators.required],
-            endTime: ['', Validators.required],
-            examTypeCode: ['', Validators.required],
-            duration: [''],
-            secretKey: [null, this.catValidator()],
-            participantIdList: [null],
-            examinerIdList: [null, this.examinerRequiredWhenNotCat()],
-        })
-
-        this.examScheduleForm
-            .get('examTypeCode')
-            ?.valueChanges.subscribe((examType) => {
-                const secretKeyControl = this.examScheduleForm.get('secretKey')
-                const examinerControl =
-                    this.examScheduleForm.get('examinerIdList')
-                const durationControl = this.examScheduleForm.get('duration')
-
-                if (examType !== ExamTypeCategory.CAT) {
-                    secretKeyControl?.setValue(null)
-                }
-
-                if (
-                    examType === ExamTypeCategory.CAT ||
-                    examType === ExamTypeCategory.WAWANCARA
-                ) {
-                    durationControl?.setValidators([Validators.required])
-                } else {
-                    durationControl?.clearValidators()
-                    durationControl?.setValue(null)
-                }
-
-                secretKeyControl?.updateValueAndValidity()
-                examinerControl?.updateValueAndValidity()
-                durationControl?.updateValueAndValidity()
-            })
-    }
-
     initPagable() {
         this.pagable = new PagableBuilder(
-            `/api/v1/exam_schedule/room/${this.id}`,
+            `/api/v1/exam_schedule/room/${this.roomId}`,
         )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
@@ -309,7 +239,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     .setAction((item: ExamSchedule) => {
                         this.router.navigate(
                             [
-                                `ukom/ukom-room-list/${this.id}/competence/${item.id}`,
+                                `ukom/ukom-room-list/${this.roomId}/competence/${item.id}`,
                             ],
                             { queryParams: { type_ukom: item.examTypeCode } },
                         )
@@ -321,7 +251,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
                 new ActionColumnBuilder()
                     .setAction((item: ExamSchedule) => {
                         this.selectedExamSchedule = item
-                        this.isUpdateModalOpen = true
+                        this.isUpdateModalOpen.set(true)
                     }, 'primary')
                     .withIcon('update')
                     .build(),
@@ -337,6 +267,176 @@ export class UkomExamScheduleAddComponent implements OnInit {
             .build()
     }
 
+    initTabs() {
+        this.tabService
+            .addTab({
+                label: 'Detail Kelas',
+                icon: 'mdi-list-box',
+                onClick: () => this.handleTabChange(),
+            })
+            .addTab({
+                label: 'Tambah Jadwal UKom',
+                icon: 'mdi-plus-circle',
+                isActive: true,
+                onClick: () => {},
+            })
+    }
+
+    initForm() {
+        this.examScheduleForm = this.fb.group({
+            examTypeCode: ['', Validators.required],
+            startTime: [''],
+            endTime: [''],
+            duration: [''],
+            secretKey: [null],
+            participantIdList: [null],
+            examinerIdList: [null],
+            // Secondary form fields for MAKALAH/SEMINAR
+            startTime2: [''],
+            endTime2: [''],
+            duration2: [''],
+            participantIdList2: [null],
+            examinerIdList2: [null],
+        })
+
+        this.examScheduleForm
+            .get('examTypeCode')
+            ?.valueChanges.subscribe((examType) => {
+                const config = UKOM_FORM_CONFIG[examType]
+                if (!config) return
+
+                const primaryControls = new Set(
+                    config.primary.map((c) => c.controlName),
+                )
+                const secondaryControls = new Set(
+                    config.secondary?.fields.map((c) => c.controlName) || [],
+                )
+                const allConfiguredControls = new Set([
+                    ...primaryControls,
+                    ...secondaryControls,
+                ])
+
+                // Clear validators for all configurable fields
+                const allFields = [
+                    'startTime',
+                    'endTime',
+                    'duration',
+                    'secretKey',
+                    'participantIdList',
+                    'examinerIdList',
+                    'startTime2',
+                    'endTime2',
+                    'duration2',
+                    'participantIdList2',
+                    'examinerIdList2',
+                ]
+                allFields.forEach((fieldName) => {
+                    const control = this.examScheduleForm.get(fieldName)
+                    if (control) {
+                        control.clearValidators()
+                        // Clear value if not in current config
+                        if (!allConfiguredControls.has(fieldName)) {
+                            control.setValue(null)
+                        }
+                    }
+                })
+
+                // Apply validators from primary config
+                config.primary.forEach((fieldConfig) => {
+                    const control = this.examScheduleForm.get(
+                        fieldConfig.controlName,
+                    )
+                    if (control && fieldConfig.validators) {
+                        control.setValidators(fieldConfig.validators)
+                    }
+                })
+
+                // Apply validators from secondary config if exists
+                if (config.secondary) {
+                    config.secondary.fields.forEach((fieldConfig) => {
+                        const control = this.examScheduleForm.get(
+                            fieldConfig.controlName,
+                        )
+                        if (control && fieldConfig.validators) {
+                            control.setValidators(fieldConfig.validators)
+                        }
+                    })
+                }
+
+                // Update validity
+                allFields.forEach((fieldName) => {
+                    this.examScheduleForm
+                        .get(fieldName)
+                        ?.updateValueAndValidity()
+                })
+            })
+    }
+
+    getParticipantListOptions() {
+        this.participantService
+            .getParticipantListByRoomUkomId(this.roomId)
+            .pipe(
+                map((participants) =>
+                    participants.map((p) => ({
+                        id: p.id,
+                        label: `${p.name} (${p.nip})`,
+                    })),
+                ),
+            )
+            .subscribe({
+                next: (options) => {
+                    this.participants = options
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat daftar peserta',
+                    )
+                },
+            })
+    }
+
+    fetchExaminers = (params: MultiSelectApiParams): Observable<any> => {
+        const searchName = params['like_user|name'] || ''
+
+        return this.examinerService
+            .searchExaminerV2({
+                limit: params.limit,
+                page: params.page,
+                searchName: searchName,
+            })
+            .pipe(
+                map((response) => {
+                    if (response && response.data) {
+                        return {
+                            ...response,
+                            data: response.data.map((examiner) => ({
+                                id: examiner.id,
+                                label: examiner.user?.name || examiner.id,
+                            })),
+                        }
+                    }
+                    return response
+                }),
+            )
+    }
+
+    handleTabChange() {
+        this.router.navigate(['../'], {
+            relativeTo: this.activatedRoute,
+            replaceUrl: true,
+        })
+    }
+
+    goBack() {
+        if (window.history.length > 1) {
+            this.location.back()
+        } else {
+            this.router.navigate(['../', { relativeTo: this.activatedRoute }])
+        }
+    }
+
     getError(controlName: string, label: string) {
         const control = this.examScheduleForm.get(controlName)
         return this.formValidationService.getErrorMessage(
@@ -346,9 +446,78 @@ export class UkomExamScheduleAddComponent implements OnInit {
         )
     }
 
-    isCatExamType(): boolean {
-        const examTypeControl = this.examScheduleForm.get('examTypeCode')
-        return examTypeControl?.value === 'CAT'
+    hasSecondaryForm(): boolean {
+        const examType = this.examScheduleForm.get('examTypeCode')?.value
+        return !!UKOM_FORM_CONFIG[examType]?.secondary
+    }
+
+    getSecondaryFormLabel(): string {
+        const examType = this.examScheduleForm.get('examTypeCode')?.value
+        return UKOM_FORM_CONFIG[examType]?.secondary?.label || ''
+    }
+
+    isFieldVisible(controlName: string): boolean {
+        const examType = this.examScheduleForm.get('examTypeCode')?.value
+        const config = UKOM_FORM_CONFIG[examType]
+        if (!config) return false
+
+        // Check primary fields
+        const primaryField = config.primary.find(
+            (f) => f.controlName === controlName,
+        )
+        if (primaryField) {
+            return primaryField.visible !== false
+        }
+
+        // Check secondary fields
+        const secondaryField = config.secondary?.fields.find(
+            (f) => f.controlName === controlName,
+        )
+        if (secondaryField) {
+            return secondaryField.visible !== false
+        }
+
+        return false
+    }
+
+    isFieldRequired(controlName: string): boolean {
+        const examType = this.examScheduleForm.get('examTypeCode')?.value
+        const config = UKOM_FORM_CONFIG[examType]
+        if (!config) return false
+
+        // Check primary fields
+        const primaryField = config.primary.find(
+            (f) => f.controlName === controlName,
+        )
+        if (primaryField) {
+            // If explicit required property exists, use it
+            if (primaryField.required !== undefined) {
+                return primaryField.required
+            }
+            // Otherwise check if Validators.required is in the validators array
+            return (
+                primaryField.validators?.includes(Validators.required) ??
+                false
+            )
+        }
+
+        // Check secondary fields
+        const secondaryField = config.secondary?.fields.find(
+            (f) => f.controlName === controlName,
+        )
+        if (secondaryField) {
+            // If explicit required property exists, use it
+            if (secondaryField.required !== undefined) {
+                return secondaryField.required
+            }
+            // Otherwise check if Validators.required is in the validators array
+            return (
+                secondaryField.validators?.includes(Validators.required) ??
+                false
+            )
+        }
+
+        return false
     }
 
     generateSecretKey(): void {
@@ -403,56 +572,140 @@ export class UkomExamScheduleAddComponent implements OnInit {
 
                 this.submitLoading.set(true)
 
-                if (
-                    this.examScheduleForm.getError('examTypeCode')?.value ===
-                    'CAT'
-                ) {
-                    this.examScheduleForm.get('examinerIdList').setValue([])
-                }
+                const examType =
+                    this.examScheduleForm.get('examTypeCode')?.value
+                const config = UKOM_FORM_CONFIG[examType]
 
-                const request = new CreateExamScheduleRequest(
-                    this.examScheduleForm.value,
-                )
-                request.roomUkomId = this.id
+                // Create primary schedule
+                const primaryRequest = new CreateExamScheduleRequest({
+                    startTime: this.examScheduleForm.get('startTime')?.value,
+                    endTime: this.examScheduleForm.get('endTime')?.value,
+                    examTypeCode: examType,
+                    duration: this.examScheduleForm.get('duration')?.value,
+                    secretKey: this.examScheduleForm.get('secretKey')?.value,
+                    participantIdList:
+                        this.examScheduleForm.get('participantIdList')?.value,
+                    examinerIdList:
+                        this.examScheduleForm.get('examinerIdList')?.value,
+                })
+                primaryRequest.roomUkomId = this.roomId
 
-                if (request.duration) {
-                    request.duration = Number(
-                        (request.duration / 60).toFixed(2),
+                if (primaryRequest.duration) {
+                    primaryRequest.duration = Number(
+                        (primaryRequest.duration / 60).toFixed(2),
                     )
                 }
 
-                this.ukomExamScheduleService
-                    .createExamSchedule(request)
-                    .pipe(
-                        finalize(() => {
-                            this.submitLoading.set(false)
-                        }),
+                const createPrimary$ =
+                    this.ukomExamScheduleService.createExamSchedule(
+                        primaryRequest,
                     )
-                    .subscribe({
-                        next: () => {
-                            this.handlerService.handleAlert(
-                                'Success',
-                                'Jadwal ujian berhasil dibuat',
-                            )
-                            this.examScheduleForm.reset()
-                            this.refresh = !this.refresh
-                        },
-                        error: (err) => {
-                            console.error(err)
-                            if (err.error.code === 'ESS-00001') {
+
+                // Check if we need to create secondary schedule
+                if (config?.secondary) {
+                    const secondaryRequest = new CreateExamScheduleRequest({
+                        startTime:
+                            this.examScheduleForm.get('startTime2')?.value,
+                        endTime: this.examScheduleForm.get('endTime2')?.value,
+                        examTypeCode: config.secondary.examTypeCode,
+                        duration: this.examScheduleForm.get('duration2')?.value,
+                        participantIdList:
+                            this.examScheduleForm.get('participantIdList2')
+                                ?.value,
+                        examinerIdList:
+                            this.examScheduleForm.get('examinerIdList2')?.value,
+                    })
+                    secondaryRequest.roomUkomId = this.roomId
+
+                    if (secondaryRequest.duration) {
+                        secondaryRequest.duration = Number(
+                            (secondaryRequest.duration / 60).toFixed(2),
+                        )
+                    }
+
+                    // Create both schedules sequentially
+                    createPrimary$
+                        .pipe(
+                            finalize(() => {
+                                this.submitLoading.set(false)
+                            }),
+                        )
+                        .subscribe({
+                            next: () => {
+                                // Primary created, now create secondary
+                                this.ukomExamScheduleService
+                                    .createExamSchedule(secondaryRequest)
+                                    .subscribe({
+                                        next: () => {
+                                            this.handlerService.handleAlert(
+                                                'Success',
+                                                'Jadwal ujian Makalah dan Seminar berhasil dibuat',
+                                            )
+                                            this.examScheduleForm.reset()
+                                            this.refresh = !this.refresh
+                                        },
+                                        error: (err) => {
+                                            console.error(err)
+                                            this.handlerService.handleAlert(
+                                                'Error',
+                                                'Gagal membuat jadwal Seminar',
+                                            )
+                                        },
+                                    })
+                            },
+                            error: (err) => {
+                                console.error(err)
+                                if (err.error.code === 'ESS-00001') {
+                                    this.handlerService.handleAlert(
+                                        'Error',
+                                        'Jumlah slot waktu tidak mencukupi untuk semua peserta',
+                                    )
+                                    return
+                                }
                                 this.handlerService.handleAlert(
                                     'Error',
-                                    'Jumlah slot waktu tidak mencukupi untuk semua peserta',
+                                    'Gagal membuat jadwal ujian',
                                 )
-                                return
-                            }
-                            this.handlerService.handleAlert(
-                                'Error',
-                                'Gagal membuat jadwal ujian',
-                            )
-                        },
-                    })
+                            },
+                        })
+                } else {
+                    // Single schedule creation
+                    createPrimary$
+                        .pipe(
+                            finalize(() => {
+                                this.submitLoading.set(false)
+                            }),
+                        )
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Jadwal ujian berhasil dibuat',
+                                )
+                                this.examScheduleForm.reset()
+                                this.refresh = !this.refresh
+                            },
+                            error: (err) => {
+                                console.error(err)
+                                if (err.error.code === 'ESS-00001') {
+                                    this.handlerService.handleAlert(
+                                        'Error',
+                                        'Jumlah slot waktu tidak mencukupi untuk semua peserta',
+                                    )
+                                    return
+                                }
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal membuat jadwal ujian',
+                                )
+                            },
+                        })
+                }
             },
         })
+    }
+
+    toggleUpdateModal() {
+        this.isUpdateModalOpen.set(!this.isUpdateModalOpen())
     }
 }

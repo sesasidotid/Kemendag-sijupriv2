@@ -1,11 +1,11 @@
 import {
-    Component,
-    Input,
-    Output,
-    EventEmitter,
     ChangeDetectionStrategy,
-    OnInit,
+    Component,
+    EventEmitter,
+    Input,
     OnChanges,
+    OnInit,
+    Output,
     SimpleChanges,
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
@@ -69,12 +69,12 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
 
     // Color palette for jabatanName
     private readonly colorPalette: Record<string, string> = {
-        Penyelia: '#4CAF50',
+        'Negosiator Perdagangan': '#4CAF50',
         Penera: '#2196F3',
-        Analis: '#FF9800',
-        Pengawas: '#9C27B0',
-        Administrator: '#E91E63',
-        Koordinator: '#00BCD4',
+        'Analis Perdagangan': '#FF9800',
+        'Pengawas Perdagangan': '#9C27B0',
+        'Penguji Mutu Barang': '#E91E63',
+        'Pengamat Tera': '#00BCD4',
         DEFAULT: '#607D8B',
     }
 
@@ -214,7 +214,12 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
     private processSchedules(): void {
         if (!this.schedules || this.schedules.length === 0) {
             this.processedRows$.next([])
-            this.summary$.next({ total: 0, withConflicts: 0, uniqueDates: 0, totalLanes: 0 })
+            this.summary$.next({
+                total: 0,
+                withConflicts: 0,
+                uniqueDates: 0,
+                totalLanes: 0,
+            })
             return
         }
 
@@ -222,7 +227,9 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
         const rows: ScheduleTableRow[] = this.schedules.map((s, index) => {
             const startTime = this.parseDateTime(s.personalSchedule)
             const durationMinutes = s.duration * 60
-            const endTime = new Date(startTime.getTime() + durationMinutes * 60000)
+            const endTime = new Date(
+                startTime.getTime() + durationMinutes * 60000,
+            )
 
             return {
                 index: index + 1,
@@ -276,7 +283,7 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
             const conflicts = rows.filter(
                 (other) =>
                     other.participantScheduleId !== row.participantScheduleId &&
-                    this.hasOverlap(row, other)
+                    this.hasOverlap(row, other),
             )
             row.hasConflict = conflicts.length > 0
             row.conflictCount = conflicts.length

@@ -36,6 +36,7 @@ import {
     MultiSelectApiComponent,
     MultiSelectApiParams,
 } from '@/modules/base/components/multi-select-api'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
     selector: 'app-ukom-exam-schedule-update',
@@ -46,6 +47,7 @@ import {
         LoadingButtonComponent,
         MultiSelectComponent,
         MultiSelectApiComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-exam-schedule-update.component.html',
     styleUrl: './ukom-exam-schedule-update.component.scss',

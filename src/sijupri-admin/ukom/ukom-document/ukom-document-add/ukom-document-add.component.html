@@ -1,109 +1,166 @@
-<form [formGroup]="documentForm" (ngSubmit)="submit()">
-    <div class=" mb-3">
-        <label for="dokumenPersyaratanName" class="form-label fw-bold">Nama Dokumen <span
-                class="text-danger">*</span></label>
-        <input type="text" id="dokumenPersyaratanName" class="form-control" name="dokumenPersyaratanName"
-            formControlName="dokumenPersyaratanName" placeholder="Nama Dokumen" />
-        <div *ngIf="
+<form (ngSubmit)="submit()" [formGroup]="documentForm">
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="dokumenPersyaratanName"
+            >Nama Dokumen <span class="text-danger">*</span></label
+        >
+        <input
+            appInvalidOnTouch
+            class="form-control"
+            formControlName="dokumenPersyaratanName"
+            id="dokumenPersyaratanName"
+            name="dokumenPersyaratanName"
+            placeholder="Nama Dokumen"
+            type="text"
+        />
+        <div
+            *ngIf="
                         getErrorMessage(
                             'dokumenPersyaratanName',
                             'Nama dokumen'
                         ) as error
-                    " class="text-danger">
+                    "
+            class="invalid-feedback"
+        >
             {{ error }}
         </div>
     </div>
 
-    <div class=" mb-3">
-        <label for="jenisUkom" class="form-label fw-bold">Jenis Ukom <span class="text-danger">*</span></label>
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="jenisUkom"
+            >Jenis Ukom <span class="text-danger">*</span></label
+        >
 
-        <select id="jenisUkom" class="form-select" name="jenisUkom" formControlName="jenisUkom">
+        <select
+            appInvalidOnTouch
+            class="form-select"
+            formControlName="jenisUkom"
+            id="jenisUkom"
+            name="jenisUkom"
+        >
             <option [ngValue]="''" disabled hidden selected>
                 Pilih Jenis UKom
             </option>
-            <ng-container *ngIf="
+            <ng-container
+                *ngIf="
                             jenisUkomService.jenisUkomList.length > 0;
                             else JenisUkomNotFound
-                        ">
-                <option *ngFor="let jenis of jenisUkomService.jenisUkomList" [value]="jenis.value">
+                        "
+            >
+                <option
+                    *ngFor="let jenis of jenisUkomService.jenisUkomList"
+                    [value]="jenis.value"
+                >
                     {{ jenis.label }}
                 </option>
             </ng-container>
             <ng-template #JenisUkomNotFound>
-                <option disabled>
-                    Jenis UKom tidak ditemukan
-                </option>
+                <option disabled>Jenis UKom tidak ditemukan</option>
             </ng-template>
         </select>
-        <div *ngIf="getErrorMessage('jenisUkom', 'Jenis UKom') as error" class="text-danger">
+        <div
+            *ngIf="getErrorMessage('jenisUkom', 'Jenis UKom') as error"
+            class="invalid-feedback"
+        >
             {{ error }}
         </div>
     </div>
 
-    <div class=" mb-3">
-        <label for="jabatanCode" class="form-label fw-bold">Jabatan</label>
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="jabatanCode">Jabatan</label>
 
-        <select id="jabatanCode" class="form-select" name="jabatanCode" formControlName="jabatanCode">
+        <select
+            appInvalidOnTouch
+            class="form-select"
+            formControlName="jabatanCode"
+            id="jabatanCode"
+            name="jabatanCode"
+        >
             <option [ngValue]="''" selected>Untuk Jabatan ...</option>
-            <ng-container *ngIf="(jabatanService.jabatanList$ | async) as jabatanList">
+            <ng-container
+                *ngIf="(jabatanService.jabatanList$ | async) as jabatanList"
+            >
                 <ng-container *ngIf=" jabatanList.length> 0; else jabatanEmpty">
-                    <option *ngFor="let jabatan of jabatanList" [value]="jabatan.code">
+                    <option
+                        *ngFor="let jabatan of jabatanList"
+                        [value]="jabatan.code"
+                    >
                         {{ jabatan.name }}
                     </option>
                 </ng-container>
             </ng-container>
             <ng-template #jabatanEmpty>
-                <option disabled>
-                    Jabatan yang dituju tidak ditemukan
-                </option>
+                <option disabled>Jabatan yang dituju tidak ditemukan</option>
             </ng-template>
         </select>
-        <div *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error" class="text-danger">
+        <div
+            *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error"
+            class="invalid-feedback"
+        >
             {{ error }}
         </div>
     </div>
 
-    <div class=" mb-3">
-        <label for="jenjangCode" class="form-label fw-bold">Jenjang</label>
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="jenjangCode">Jenjang</label>
 
-        <select id="jenjangCode" class="form-select" name="jenjangCode" formControlName="jenjangCode">
+        <select
+            appInvalidOnTouch
+            class="form-select"
+            formControlName="jenjangCode"
+            id="jenjangCode"
+            name="jenjangCode"
+        >
             <option [ngValue]="''" selected>Untuk Jenjang ...</option>
-            <ng-container *ngIf="jenjangService.jenjangList$ | async as jenjangList">
+            <ng-container
+                *ngIf="jenjangService.jenjangList$ | async as jenjangList"
+            >
                 <ng-container *ngIf="jenjangList.length > 0; else jenjangEmpty">
-                    <option *ngFor="let jenjang of jenjangList" [value]="jenjang.code">
+                    <option
+                        *ngFor="let jenjang of jenjangList"
+                        [value]="jenjang.code"
+                    >
                         {{ jenjang.name }}
                     </option>
                 </ng-container>
             </ng-container>
             <ng-template #jenjangEmpty>
-                <option disabled>
-                    Jenjang yang dituju tidak ditemukan
-                </option>
+                <option disabled>Jenjang yang dituju tidak ditemukan</option>
             </ng-template>
         </select>
-        <div *ngIf="getErrorMessage('jenjangCode', 'Jenjang') as error" class="text-danger">
+        <div
+            *ngIf="getErrorMessage('jenjangCode', 'Jenjang') as error"
+            class="invalid-feedback"
+        >
             {{ error }}
         </div>
     </div>
 
-    <div class=" mb-3">
-        <label for="isMengulang" class="form-label fw-bold">
+    <div class="mb-3">
+        <label class="form-label fw-bold" for="isMengulang">
             Dokumen Khusus Mengulang?
         </label>
         <div class="col-sm-10 d-flex align-items-center">
-            <input type="checkbox" class="btn-check" id="isMengulang" autocomplete="off"
-                formControlName="isMengulang" />
-            <label [ngClass]="
+            <input
+                autocomplete="off"
+                class="btn-check"
+                formControlName="isMengulang"
+                id="isMengulang"
+                type="checkbox"
+            />
+            <label
+                [ngClass]="
                         documentForm.get('isMengulang')?.value
                             ? 'btn btn-primary'
                             : 'btn btn-outline-primary'
-                    " for="isMengulang">
-                {{
-                documentForm.get('isMengulang')?.value
-                ? 'Mengulang'
-                : 'Bukan Dokumen Mengulang'
-                }}
-                <span *ngIf="documentForm.get('isMengulang')?.value" class="mdi mdi-check-bold"></span>
+                    "
+                for="isMengulang"
+            >
+                {{ documentForm.get('isMengulang')?.value ? 'Mengulang' : 'Bukan
+                Dokumen Mengulang' }}
+                <span
+                    *ngIf="documentForm.get('isMengulang')?.value"
+                    class="mdi mdi-check-bold"
+                ></span>
             </label>
         </div>
     </div>
@@ -111,39 +168,51 @@
     <div class="mb-3">
         <label class="form-label fw-bold">Diperuntukan</label>
 
-        <div *ngIf="specificationService.specificationList as jenjangList; else jenjangEmpty">
+        <div
+            *ngIf="specificationService.specificationList as jenjangList; else jenjangEmpty"
+        >
             <div *ngFor="let jenjang of jenjangList" class="form-check">
-                <input class="form-check-input" type="radio" [id]="jenjang.value" formControlName="specification"
-                    [value]="jenjang.value" />
-                <label class="form-check-label" [for]="jenjang.value">
+                <input
+                    [id]="jenjang.value"
+                    [value]="jenjang.value"
+                    class="form-check-input"
+                    formControlName="specification"
+                    type="radio"
+                />
+                <label [for]="jenjang.value" class="form-check-label">
                     {{ jenjang.label }}
                 </label>
             </div>
         </div>
 
         <ng-template #jenjangEmpty>
-            <small class="text-muted">Jenjang yang dituju tidak ditemukan</small>
+            <small class="text-muted"
+                >Jenjang yang dituju tidak ditemukan</small
+            >
         </ng-template>
 
-        <div *ngIf="getErrorMessage('specification', 'Diperuntukan') as error" class="text-danger mt-1">
+        <div
+            *ngIf="getErrorMessage('specification', 'Diperuntukan') as error"
+            class="text-danger mt-1"
+        >
             {{ error }}
         </div>
     </div>
 
-    <div class="mb-3">
-        <div class="bg-warning rounded border p-2 max-width-400">
-            <small class="text-white d-block">
-                Isi jabatan dan jenjang jika diperlukan. Jika dokumen
-                untuk jenjang tertentu, cukup isi jenjang. Jika untuk
-                jabatan tertentu dan jenjang tertentu, isi keduanya.
-            </small>
-        </div>
+    <div class="alert alert-warning mb-3" role="alert">
+        Isi jabatan dan jenjang jika diperlukan. Jika dokumen untuk jenjang
+        tertentu, cukup isi jenjang. Jika untuk jabatan tertentu dan jenjang
+        tertentu, isi keduanya.
     </div>
 
-
     <div class="text-end">
-        <app-loading-button [isLoading]="documentService.createDocumentLoading$| async" [label]="'Simpan'"
-            [disabled]="documentForm.invalid" [type]="'submit'" [className]="'btn btn-primary'">
+        <app-loading-button
+            [className]="'btn btn-primary'"
+            [disabled]="documentForm.invalid"
+            [isLoading]="documentService.createDocumentLoading$| async"
+            [label]="'Simpan'"
+            [type]="'submit'"
+        >
         </app-loading-button>
     </div>
 </form>

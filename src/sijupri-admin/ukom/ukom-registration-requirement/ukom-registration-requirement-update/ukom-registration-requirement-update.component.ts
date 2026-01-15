@@ -14,11 +14,12 @@ import { UkomRegistrationRuleService } from '@/modules/ukom/services/ukom-regist
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { UkomRegistrationRequirement } from '@/modules/ukom/models/ukom-registration-refactored/ukom-registration-rule.model'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
     selector: 'app-ukom-registration-requirement-update',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, LoadingButtonComponent],
+    imports: [CommonModule, ReactiveFormsModule, LoadingButtonComponent, InvalidOnTouchDirective],
     templateUrl: './ukom-registration-requirement-update.component.html',
     styleUrl: './ukom-registration-requirement-update.component.scss',
 })

@@ -18,6 +18,7 @@ import {
     Validators,
 } from '@angular/forms'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
     selector: 'app-ukom-question-list',
@@ -27,6 +28,7 @@ import { FormValidationService } from '@/modules/base/services/form-validation.s
         FileHandlerComponent,
         FormsModule,
         ReactiveFormsModule,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-question-list.component.html',
     styleUrl: './ukom-question-list.component.scss',

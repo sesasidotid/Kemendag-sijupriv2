@@ -9,20 +9,17 @@ export function generateDemoScheduleData(count: number = 200): ScheduleItem[] {
     const jenisUkomTypes = [
         'PERPINDAHAN_JABATAN',
         'KENAIKAN_JENJANG',
-        'PENGANGKATAN_PERTAMA',
-        'PENYESUAIAN',
-        'INPASSING',
         'PROMOSI',
     ]
 
     // Define jabatan names
     const jabatanNames = [
-        'Penyelia',
+        'Negosiator Perdagangan',
         'Penera',
-        'Analis',
-        'Pengawas',
-        'Administrator',
-        'Koordinator',
+        'Analis Perdagangan',
+        'Pengawas Perdagangan',
+        'Penguji Mutu Barang',
+        'Pengamat Tera',
     ]
 
     // Define jenjang names
@@ -66,7 +63,8 @@ export function generateDemoScheduleData(count: number = 200): ScheduleItem[] {
         const personalSchedule = formatDateForSchedule(scheduleDate)
 
         // Random duration
-        const duration = durationOptions[Math.floor(Math.random() * durationOptions.length)]
+        const duration =
+            durationOptions[Math.floor(Math.random() * durationOptions.length)]
 
         // Generate UUID
         const participantScheduleId = generateUUID()
@@ -74,10 +72,14 @@ export function generateDemoScheduleData(count: number = 200): ScheduleItem[] {
         const examScheduleId = generateUUID()
 
         // Random selections
-        const jenisUkom = jenisUkomTypes[Math.floor(Math.random() * jenisUkomTypes.length)]
-        const jabatanName = jabatanNames[Math.floor(Math.random() * jabatanNames.length)]
-        const jenjangName = jenjangNames[Math.floor(Math.random() * jenjangNames.length)]
-        const unitKerjaName = unitKerjaNames[Math.floor(Math.random() * unitKerjaNames.length)]
+        const jenisUkom =
+            jenisUkomTypes[Math.floor(Math.random() * jenisUkomTypes.length)]
+        const jabatanName =
+            jabatanNames[Math.floor(Math.random() * jabatanNames.length)]
+        const jenjangName =
+            jenjangNames[Math.floor(Math.random() * jenjangNames.length)]
+        const unitKerjaName =
+            unitKerjaNames[Math.floor(Math.random() * unitKerjaNames.length)]
 
         // Generate NIP (18 digits)
         const nip = generateNIP()
@@ -100,9 +102,10 @@ export function generateDemoScheduleData(count: number = 200): ScheduleItem[] {
     }
 
     // Sort by personal schedule
-    schedules.sort((a, b) =>
-        new Date(a.personalSchedule.replace(' ', 'T')).getTime() -
-        new Date(b.personalSchedule.replace(' ', 'T')).getTime()
+    schedules.sort(
+        (a, b) =>
+            new Date(a.personalSchedule.replace(' ', 'T')).getTime() -
+            new Date(b.personalSchedule.replace(' ', 'T')).getTime(),
     )
 
     return schedules

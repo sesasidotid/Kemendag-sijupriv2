@@ -3,7 +3,7 @@
         <label for="jenjangCode" class="form-label fw-bold">
             Jenjang <span class="text-danger">*</span>
         </label>
-        <select id="jenjangCode" class="form-select" formControlName="jenjangCode">
+        <select appInvalidOnTouch id="jenjangCode" class="form-select" formControlName="jenjangCode">
             <option [ngValue]="''" hidden disabled selected>Pilih Jenjang</option>
             <ng-container *ngIf="(jenjangService.jenjangList$ | async) as jenjangList">
                 <ng-container *ngIf="jenjangList.length > 0; else noJenjang">
@@ -16,7 +16,7 @@
                 <option disabled>Tidak ada data</option>
             </ng-template>
         </select>
-        <div *ngIf="getError('jenjangCode', 'Jenjang') as error" class="text-danger">
+        <div *ngIf="getError('jenjangCode', 'Jenjang') as error" class="invalid-feedback">
             {{ error }}
         </div>
     </div>
@@ -25,9 +25,9 @@
         <label for="angkaKreditThreshold" class="form-label fw-bold">
             Angka Kredit Threshold <span class="text-danger">*</span>
         </label>
-        <input type="number" id="angkaKreditThreshold" class="form-control" formControlName="angkaKreditThreshold"
-            placeholder="Angka Kredit Threshold" />
-        <div *ngIf="getError('angkaKreditThreshold', 'Angka Kredit Threshold') as error" class="text-danger">
+        <input appInvalidOnTouch type="number" id="angkaKreditThreshold" class="form-control"
+            formControlName="angkaKreditThreshold" placeholder="Angka Kredit Threshold" />
+        <div *ngIf="getError('angkaKreditThreshold', 'Angka Kredit Threshold') as error" class="invalid-feedback">
             {{ error }}
         </div>
     </div>
@@ -36,9 +36,9 @@
         <label for="lastNYear" class="form-label fw-bold">
             N Tahun Terakhir <span class="text-danger">*</span>
         </label>
-        <input type="number" id="lastNYear" class="form-control" formControlName="lastNYear"
+        <input appInvalidOnTouch type="number" id="lastNYear" class="form-control" formControlName="lastNYear"
             placeholder="N Tahun Terakhir" />
-        <div *ngIf="getError('lastNYear', 'N Tahun Terakhir') as error" class="text-danger">
+        <div *ngIf="getError('lastNYear', 'N Tahun Terakhir') as error" class="invalid-feedback">
             {{ error }}
         </div>
     </div>
@@ -47,7 +47,7 @@
         <label for="ratingHasilId" class="form-label fw-bold">
             Rating Hasil Kinerja <span class="text-danger">*</span>
         </label>
-        <select id="ratingHasilId" class="form-select" formControlName="ratingHasilId">
+        <select appInvalidOnTouch id="ratingHasilId" class="form-select" formControlName="ratingHasilId">
             <option [ngValue]="''" hidden disabled selected>Pilih Rating Hasil Kinerja</option>
             <ng-container *ngIf="(kinerjaService.ratingKinerjaList$ | async) as ratings">
                 <ng-container *ngIf="ratings.length > 0; else noRatings">
@@ -58,7 +58,7 @@
                 <option disabled>Tidak ada data</option>
             </ng-template>
         </select>
-        <div *ngIf="getError('ratingHasilId', 'Rating Hasil') as error" class="text-danger">
+        <div *ngIf="getError('ratingHasilId', 'Rating Hasil') as error" class="invalid-feedback">
             {{ error }}
         </div>
     </div>
@@ -67,7 +67,7 @@
         <label for="ratingKinerjaId" class="form-label fw-bold">
             Rating Perilaku Kinerja <span class="text-danger">*</span>
         </label>
-        <select id="ratingKinerjaId" class="form-select" formControlName="ratingKinerjaId">
+        <select appInvalidOnTouch id="ratingKinerjaId" class="form-select" formControlName="ratingKinerjaId">
             <option [ngValue]="''" hidden disabled selected>Pilih Rating Perilaku Kinerja</option>
             <ng-container *ngIf="(kinerjaService.ratingKinerjaList$ | async) as ratings; else noRatings">
                 <option *ngFor="let rating of ratings" [value]="rating.id">{{ rating.name }}</option>
@@ -76,7 +76,7 @@
                 <option disabled>Tidak ada data</option>
             </ng-template>
         </select>
-        <div *ngIf="getError('ratingKinerjaId', 'Rating Kinerja') as error" class="text-danger">
+        <div *ngIf="getError('ratingKinerjaId', 'Rating Kinerja') as error" class="invalid-feedback">
             {{ error }}
         </div>
     </div>
@@ -85,7 +85,7 @@
         <label for="predikatKinerjaId" class="form-label fw-bold">
             Predikat Kinerja <span class="text-danger">*</span>
         </label>
-        <select id="predikatKinerjaId" class="form-select" formControlName="predikatKinerjaId">
+        <select appInvalidOnTouch id="predikatKinerjaId" class="form-select" formControlName="predikatKinerjaId">
             <option [ngValue]="''" hidden disabled selected>Pilih Predikat Kinerja</option>
             <ng-container *ngIf="(kinerjaService.predikatKinerjaList$ | async) as ratings">
                 <ng-container *ngIf="ratings.length > 0; else noRatings">
@@ -96,7 +96,7 @@
                 <option disabled>Tidak ada data</option>
             </ng-template>
         </select>
-        <div *ngIf="getError('predikatKinerjaId', 'Predikat Kinerja') as error" class="text-danger">
+        <div *ngIf="getError('predikatKinerjaId', 'Predikat Kinerja') as error" class="invalid-feedback">
             {{ error }}
         </div>
     </div>
@@ -105,7 +105,7 @@
         <label for="jenisUkom" class="form-label fw-bold">
             Jenis UKom <span class="text-danger">*</span>
         </label>
-        <select id="jenisUkom" class="form-select" formControlName="jenisUkom">
+        <select appInvalidOnTouch id="jenisUkom" class="form-select" formControlName="jenisUkom">
             <option [ngValue]="''" hidden disabled selected>Pilih Jenis UKom</option>
             <ng-container *ngIf="(jenisUkomService.jenisUkomList$ | async) as jenisUkomList">
                 <ng-container *ngIf="jenisUkomList.length > 0; else noJenisUkom">
@@ -118,7 +118,7 @@
                 <option disabled>Tidak ada data</option>
             </ng-template>
         </select>
-        <div *ngIf="getError('jenisUkom', 'Jenis UKom') as error" class="text-danger">
+        <div *ngIf="getError('jenisUkom', 'Jenis UKom') as error" class="invalid-feedback">
             {{ error }}
         </div>
     </div>

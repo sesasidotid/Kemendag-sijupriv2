@@ -1,22 +1,24 @@
-import { IndikatorKompetensiUkom } from './../../../../modules/ukom/models/indikator-kompetensi'
+import { IndikatorKompetensiUkom } from '@/modules/ukom/models/indikator-kompetensi'
 import { Component, Input } from '@angular/core'
-import { TabService } from '../../../../modules/base/services/tab.service'
 import { BehaviorSubject } from 'rxjs'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PrimaryColumnBuilder
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { ApiService } from '../../../../modules/base/services/api.service'
+    PrimaryColumnBuilder,
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { ApiService } from '@/modules/base/services/api.service'
 import { CommonModule } from '@angular/common'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { Router } from '@angular/router'
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
-import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+
 @Component({
     selector: 'app-ukom-kompetensi-detail-pagable',
     standalone: true,
@@ -24,10 +26,12 @@ import { HandlerService } from '../../../../modules/base/services/handler.servic
         CommonModule,
         PagableComponent,
         ModalComponent,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        LoadingButtonComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-kompetensi-detail-pagable.component.html',
-    styleUrl: './ukom-kompetensi-detail-pagable.component.scss'
+    styleUrl: './ukom-kompetensi-detail-pagable.component.scss',
 })
 export class UkomKompetensiDetailPagableComponent {
     @Input() kompetensiId: string | null = null
@@ -37,38 +41,41 @@ export class UkomKompetensiDetailPagableComponent {
 
     editIndikatorKompetensiForm = this.fb.group({
         id: ['', [Validators.required]],
-        name: ['', [Validators.required, Validators.minLength(3)]]
+        name: ['', [Validators.required, Validators.minLength(3)]],
     })
-    constructor (
+    constructor(
         private apiService: ApiService,
         private router: Router,
         private fb: FormBuilder,
         private formValidationService: FormValidationService,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
+        private handlerService: HandlerService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.handlePagable()
     }
 
-    handlePagable (): void {
+    handlePagable(): void {
         this.pagable = new PagableBuilder(
-            `/api/v1/kompetensi_indikator/search?like_kompetensiId=${this.kompetensiId}`
+            `/api/v1/kompetensi_indikator/search?like_kompetensiId=${this.kompetensiId}`,
         )
             .addPrimaryColumn(new PrimaryColumnBuilder('Kode', 'code').build())
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Indikator Kompetensi', 'name').build()
+                new PrimaryColumnBuilder(
+                    'Indikator Kompetensi',
+                    'name',
+                ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((data: IndikatorKompetensiUkom) => {
                         this.router.navigate([
-                            `maintenance/kompetensi-list/${data.kompetensiId}/indikator/${data.id}`
+                            `maintenance/kompetensi-list/${data.kompetensiId}/indikator/${data.id}`,
                         ])
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -77,7 +84,7 @@ export class UkomKompetensiDetailPagableComponent {
                         this.setDefaultFormValues(data)
                     }, 'primary')
                     .withIcon('update')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -85,31 +92,31 @@ export class UkomKompetensiDetailPagableComponent {
                         this.deleteIndikatorKompetensi(data.id)
                     }, 'danger')
                     .withIcon('danger')
-                    .build()
+                    .build(),
             )
             .build()
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.editIndikatorKompetensiForm.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    setDefaultFormValues (data: IndikatorKompetensiUkom): void {
+    setDefaultFormValues(data: IndikatorKompetensiUkom): void {
         this.editIndikatorKompetensiForm.patchValue({
             id: data.id,
-            name: data.name
+            name: data.name,
         })
     }
 
-    toggleModal (): void {
+    toggleModal(): void {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    deleteIndikatorKompetensi (id: string): void {
+    deleteIndikatorKompetensi(id: string): void {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
@@ -120,21 +127,21 @@ export class UkomKompetensiDetailPagableComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menghapus data'
+                                'Berhasil menghapus data',
                             )
                             this.handlePagable()
                         },
                         error: () => {
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menghapus data'
+                                'Gagal menghapus data',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
-    onSubmit (): void {
+    onSubmit(): void {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
@@ -142,7 +149,7 @@ export class UkomKompetensiDetailPagableComponent {
                 this.isSubmitLoading$.next(true)
 
                 const payload = new IndikatorKompetensiUkom(
-                    this.editIndikatorKompetensiForm.value
+                    this.editIndikatorKompetensiForm.value,
                 )
 
                 this.apiService
@@ -155,23 +162,23 @@ export class UkomKompetensiDetailPagableComponent {
 
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil memperbarui data'
+                                'Berhasil memperbarui data',
                             )
                         },
-                        error: err => {
+                        error: (err) => {
                             console.error(
                                 'Error updating indikator kompetensi:',
-                                err
+                                err,
                             )
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal memperbarui data'
+                                'Gagal memperbarui data',
                             )
 
                             this.isSubmitLoading$.next(false)
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }

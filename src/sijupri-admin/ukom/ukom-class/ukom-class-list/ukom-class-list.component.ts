@@ -1,24 +1,23 @@
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { Component, inject } from '@angular/core'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { Component, inject, OnInit, signal } from '@angular/core'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
-import { TabService } from '../../../../modules/base/services/tab.service'
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { TabService } from '@/modules/base/services/tab.service'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { BehaviorSubject, distinctUntilChanged, map } from 'rxjs'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs'
 import { UkomClassAddComponent } from '../ukom-class-add/ukom-class-add.component'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { Observable } from 'rxjs'
-import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
+import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
+import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import {
     FormControl,
     FormGroup,
@@ -26,16 +25,18 @@ import {
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
-import { BidangJabatan } from '../../../../modules/maintenance/models/bidang-jabatan.model'
-import { RoomUkom } from '../../../../modules/ukom/models/room-ukom.model'
-import { TanggalWaktuIndoPipe } from '../../../../modules/base/pipes/tangga-waktu.pipe'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { BidangJabatan } from '@/modules/maintenance/models/bidang-jabatan.model'
+import { RoomUkom } from '@/modules/ukom/models/room-ukom.model'
+import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import {
-    ScheduleTimelineModalComponent,
-    ScheduleItem,
     generateDemoScheduleData,
-} from '../../../../modules/base/components/schedule-timeline'
+    ScheduleItem,
+    ScheduleTimelineModalComponent,
+} from '@/modules/base/components/schedule-timeline'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+
 @Component({
     selector: 'app-ukom-class-list',
     standalone: true,
@@ -48,32 +49,34 @@ import {
         ReactiveFormsModule,
         LoadingButtonComponent,
         ScheduleTimelineModalComponent,
+        InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-class-list.component.html',
     styleUrl: './ukom-class-list.component.scss',
 })
-export class UkomClassListComponent {
+export class UkomClassListComponent implements OnInit {
     route = inject(ActivatedRoute)
-    tab$ = new BehaviorSubject<number | null>(0)
+    tab = signal(0)
+
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
     fixedJenjangList$: Observable<Jenjang[]>
+
     jenjangMap: Record<string, string> = {}
     jabatanMap: Record<string, string> = {}
+
     bidangJabatanMap: Record<string, string> = {}
     pagable$ = new BehaviorSubject<Pagable | null>(null)
-    data: any[] = []
     refreshToggle: boolean = false
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     editRoomUkomForm: FormGroup
     submitLoading$ = new BehaviorSubject<boolean>(false)
-    private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
-    bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
-    // Timeline modal state
-    isTimelineModalOpen$ = new BehaviorSubject<boolean>(false)
-    timelineSchedules$ = new BehaviorSubject<ScheduleItem[]>([])
+    isTimelineModalOpen = signal(false)
+    timelineSchedules = signal<ScheduleItem[]>([])
+    private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
+    bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
 
     constructor(
         private tabService: TabService,
@@ -82,7 +85,7 @@ export class UkomClassListComponent {
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService,
-    ) { }
+    ) {}
 
     ngOnInit() {
         this.handleTabService()
@@ -443,27 +446,26 @@ export class UkomClassListComponent {
     }
 
     handleTabChange(tab?: number) {
-        this.tab$.next(tab)
+        this.tab.set(tab)
         this.tabService.changeTabActive(tab)
     }
 
     // Timeline modal methods
     openTimelineModal(): void {
-        // Generate demo data with hundreds of schedules based on current date
-        const demoSchedules = generateDemoScheduleData(200)
-        this.timelineSchedules$.next(demoSchedules)
-        this.isTimelineModalOpen$.next(true)
+        const demoSchedules = generateDemoScheduleData(50)
+        this.timelineSchedules.set(demoSchedules)
+        this.isTimelineModalOpen.set(true)
     }
 
     // Use this method to open timeline with real API data
     openTimelineWithData(schedules: ScheduleItem[]): void {
-        this.timelineSchedules$.next(schedules)
-        this.isTimelineModalOpen$.next(true)
+        this.timelineSchedules.set(schedules)
+        this.isTimelineModalOpen.set(true)
     }
 
     closeTimelineModal(): void {
-        this.isTimelineModalOpen$.next(false)
-        this.timelineSchedules$.next([])
+        this.isTimelineModalOpen.set(false)
+        this.timelineSchedules.set([])
     }
 
     submit() {
