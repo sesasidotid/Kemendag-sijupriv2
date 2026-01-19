@@ -54,7 +54,7 @@
 
             <ng-template #loadCompleted>
                 <!-- Upload button -->
-                <div #container *ngIf="!inputs.viewOnly" class="d-flex gap-3">
+                <div #container *ngIf="!inputs.viewOnly" class="d-flex gap-2">
                     <input
                         (change)="handleFileUpload($event, obj.key)"
                         [id]="'fileInput' + obj.key"

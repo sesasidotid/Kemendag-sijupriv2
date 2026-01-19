@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common'
-import { Component, ElementRef, Input, ViewChild } from '@angular/core'
+import {
+    Component,
+    ElementRef,
+    Input,
+    SimpleChanges,
+    ViewChild,
+} from '@angular/core'
 import { FilePreviewService } from '../../services/file-preview.service'
 import {
     MultiFileHandler,
@@ -20,6 +26,7 @@ export class MultiFileHandlerComponent {
     @ViewChild('container') containerRef!: ElementRef
 
     @Input() inputs!: MultiFileHandler
+    @Input() resetKey?: string
 
     // Store multiple files per key
     uploadedFiles: { [key: string]: UploadedFile[] } = {}
@@ -64,6 +71,25 @@ export class MultiFileHandlerComponent {
 
     ngAfterViewInit() {
         this.observeContainerResize()
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        // When resetKey changes to a new non-null value, clear all files
+        if (
+            changes['resetKey'] &&
+            changes['resetKey'].currentValue &&
+            changes['resetKey'].currentValue !==
+                changes['resetKey'].previousValue
+        ) {
+            this.resetAllFiles()
+        }
+    }
+
+    resetAllFiles() {
+        for (const key in this.uploadedFiles) {
+            this.uploadedFiles[key] = []
+            this.notifyListener(key)
+        }
     }
 
     observeContainerResize() {
@@ -158,12 +184,6 @@ export class MultiFileHandlerComponent {
         this.notifyListener(key)
     }
 
-    private notifyListener(key: string) {
-        if (this.inputs.listen) {
-            this.inputs.listen(key, [...this.uploadedFiles[key]])
-        }
-    }
-
     isImage(source: string): boolean {
         if (!source) return false
         return source.startsWith('data:image/')
@@ -182,5 +202,11 @@ export class MultiFileHandlerComponent {
         b: { key: string; value: any },
     ): number => {
         return a.value.label.localeCompare(b.value.label)
+    }
+
+    private notifyListener(key: string) {
+        if (this.inputs.listen) {
+            this.inputs.listen(key, [...this.uploadedFiles[key]])
+        }
     }
 }
