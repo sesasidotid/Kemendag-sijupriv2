@@ -2,85 +2,96 @@
     <!-- Zoom Controls -->
     <div class="zoom-controls">
         <span class="zoom-label">Zoom:</span>
-        <button *ngFor="let zoom of zoomLevels; let i = index" [class.active]="(currentZoomIndex$ | async) === i"
-            (click)="setZoom(i)" class="zoom-btn" type="button">
+        <button
+            (click)="setZoom(i)"
+            *ngFor="let zoom of zoomLevels; let i = index"
+            [class.active]="(currentZoomIndex$ | async) === i"
+            class="zoom-btn"
+            type="button"
+        >
             {{ zoom.label }}
         </button>
     </div>
 
-    <!-- Legend -->
     <div class="legend">
         <span class="legend-label">Keterangan Jabatan:</span>
-        <div class="legend-items">
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #4CAF50"></span>
-                <span>Penyelia</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #2196F3"></span>
-                <span>Penera</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #FF9800"></span>
-                <span>Analis</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #9C27B0"></span>
-                <span>Pengawas</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #E91E63"></span>
-                <span>Administrator</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #00BCD4"></span>
-                <span>Koordinator</span>
-            </div>
+
+        <div *ngFor="let role of colorPalette | keyvalue" class="legend-item">
+            <ng-container *ngIf="role.key !== 'DEFAULT'">
+                <span
+                    [style.backgroundColor]="role.value"
+                    class="legend-color"
+                ></span>
+                <span>{{ role.key }}</span>
+            </ng-container>
         </div>
     </div>
 
     <!-- Timeline Scroll Container -->
     <div class="timeline-scroll-container">
         <!-- Time Axis -->
-        <div class="time-axis" [style.width.px]="timelineWidth$ | async">
-            <div *ngFor="let marker of timeMarkers$ | async; trackBy: trackByMarker" class="time-marker"
-                [class.new-day]="marker.isNewDay" [style.left.px]="marker.position">
+        <div [style.width.px]="timelineWidth$ | async" class="time-axis">
+            <div
+                *ngFor="let marker of timeMarkers$ | async; trackBy: trackByMarker"
+                [class.new-day]="marker.isNewDay"
+                [style.left.px]="marker.position"
+                class="time-marker"
+            >
                 <span class="time-label">{{ marker.time }}</span>
             </div>
         </div>
 
         <!-- Lanes Container -->
-        <div class="lanes-container" [style.width.px]="timelineWidth$ | async">
+        <div [style.width.px]="timelineWidth$ | async" class="lanes-container">
             <!-- Grid Lines -->
             <div class="grid-lines">
-                <div *ngFor="let marker of timeMarkers$ | async; trackBy: trackByMarker" class="grid-line"
-                    [class.new-day-line]="marker.isNewDay" [style.left.px]="marker.position"></div>
+                <div
+                    *ngFor="let marker of timeMarkers$ | async; trackBy: trackByMarker"
+                    [class.new-day-line]="marker.isNewDay"
+                    [style.left.px]="marker.position"
+                    class="grid-line"
+                ></div>
             </div>
             <!-- Lane Backgrounds -->
-            <div *ngFor="let lane of lanes$ | async; trackBy: trackByLane" class="lane"
-                [class.lane-even]="lane % 2 === 0" [class.lane-odd]="lane % 2 !== 0">
-            </div>
+            <div
+                *ngFor="let lane of lanes$ | async; trackBy: trackByLane"
+                [class.lane-even]="lane % 2 === 0"
+                [class.lane-odd]="lane % 2 !== 0"
+                class="lane"
+            ></div>
 
             <!-- Schedule Blocks -->
-            <div *ngFor="let schedule of processedSchedules$ | async; trackBy: trackByScheduleId" class="schedule-block"
-                [ngStyle]="getScheduleStyle(schedule)" [style.top.px]="schedule.lane * 50 + 5"
-                (mouseenter)="showTooltip($event, schedule)" (mouseleave)="hideTooltip()"
-                (mousemove)="moveTooltip($event)">
+            <div
+                (mouseenter)="showTooltip($event, schedule)"
+                (mouseleave)="hideTooltip()"
+                (mousemove)="moveTooltip($event)"
+                *ngFor="let schedule of processedSchedules$ | async; trackBy: trackByScheduleId"
+                [ngStyle]="getScheduleStyle(schedule)"
+                [style.top.px]="schedule.lane * 50 + 5"
+                class="schedule-block"
+            >
                 <span class="schedule-name">{{ schedule.name }}</span>
             </div>
         </div>
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="(processedSchedules$ | async)?.length === 0" class="empty-state">
+    <div
+        *ngIf="(processedSchedules$ | async)?.length === 0"
+        class="empty-state"
+    >
         <i class="ri-calendar-line empty-icon"></i>
         <p>Tidak ada jadwal untuk ditampilkan</p>
     </div>
 
     <!-- Tooltip -->
-    <div *ngIf="hoveredSchedule$ | async as schedule" class="tooltip-container"
-        [style.left.px]="(tooltipPosition$ | async)?.x" [style.top.px]="(tooltipPosition$ | async)?.y">
-        <div class="tooltip-header" [style.background-color]="schedule.color">
+    <div
+        *ngIf="hoveredSchedule$ | async as schedule"
+        [style.left.px]="(tooltipPosition$ | async)?.x"
+        [style.top.px]="(tooltipPosition$ | async)?.y"
+        class="tooltip-container"
+    >
+        <div [style.background-color]="schedule.color" class="tooltip-header">
             {{ getJabatanDisplayName(schedule.jabatanName) }}
         </div>
         <div class="tooltip-body">
@@ -90,21 +101,27 @@
             </div>
             <div class="tooltip-row">
                 <span class="tooltip-label">Mulai:</span>
-                <span class="tooltip-value">{{ formatDateTime(schedule.startTime) }}</span>
+                <span class="tooltip-value"
+                    >{{ formatDateTime(schedule.startTime) }}</span
+                >
             </div>
             <div class="tooltip-row">
                 <span class="tooltip-label">Selesai:</span>
-                <span class="tooltip-value">{{ formatDateTime(schedule.endTime) }}</span>
+                <span class="tooltip-value"
+                    >{{ formatDateTime(schedule.endTime) }}</span
+                >
             </div>
             <div class="tooltip-row">
                 <span class="tooltip-label">Durasi:</span>
-                <span class="tooltip-value">{{ formatDuration(schedule.durationMinutes) }}</span>
+                <span class="tooltip-value"
+                    >{{ formatDuration(schedule.durationMinutes) }}</span
+                >
             </div>
-            <div class="tooltip-row" *ngIf="schedule.jenjangName">
+            <div *ngIf="schedule.jenjangName" class="tooltip-row">
                 <span class="tooltip-label">Jenjang:</span>
                 <span class="tooltip-value">{{ schedule.jenjangName }}</span>
             </div>
-            <div class="tooltip-row" *ngIf="schedule.jenisUkom">
+            <div *ngIf="schedule.jenisUkom" class="tooltip-row">
                 <span class="tooltip-label">Jenis Ukom:</span>
                 <span class="tooltip-value">{{ schedule.jenisUkom }}</span>
             </div>

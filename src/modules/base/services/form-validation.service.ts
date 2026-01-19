@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { AbstractControl, FormGroup } from '@angular/forms'
+import { AbstractControl } from '@angular/forms'
 
 @Injectable({
     providedIn: 'root',
@@ -42,6 +42,8 @@ export class FormValidationService {
                     return `${label} harus terdiri dari 16 digit angka.`
                 case 'phone':
                     return `${label} harus terdiri dari 10 hingga 15 digit angka.`
+                case 'videoLink':
+                    return `Format ${label} tidak valid. Harus berupa URL yang diawali dengan https://`
                 default:
                     return `Format ${label} tidak valid.`
             }

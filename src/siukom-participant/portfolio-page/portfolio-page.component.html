@@ -1,0 +1,27 @@
+<h3 class="mb-4 text-center">Portfolio Peserta</h3>
+
+<form (ngSubmit)="submitPortfolio()">
+    <div *ngFor="let q of questions(); let i = index" class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <h5 class="mb-3">
+                Pertanyaan {{ i + 1 }}
+                <span class="badge bg-info ms-2" *ngIf="getUploadedFilesCount(q.id) > 0">
+                    {{ getUploadedFilesCount(q.id) }} file diunggah
+                </span>
+            </h5>
+
+            <p class="fw-bold">{{ q.question }}</p>
+
+            <app-multi-file-handler [inputs]="getMultiFileHandlerInputs(q)"></app-multi-file-handler>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <p class="text-muted mb-2" *ngIf="getTotalFilesCount() > 0">
+            Total file yang akan dikirim: {{ getTotalFilesCount() }}
+        </p>
+        <button class="btn btn-success btn-lg px-5" type="submit">
+            Kirim Portfolio
+        </button>
+    </div>
+</form>

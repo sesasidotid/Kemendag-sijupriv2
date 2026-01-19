@@ -1,0 +1,69 @@
+<button
+    (click)="backToDashboard()"
+    class="btn btn-sm btn-outline-secondary mb-4"
+>
+    <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
+
+<ng-container *ngIf="questionLoading(); else content">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
+        </div>
+        <p class="mt-2">Memuat soal ujian...</p>
+    </div>
+</ng-container>
+
+<ng-template #content>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="mb-2">
+                <i class="mdi mdi-file-pdf-box text-danger me-1"></i>
+                Unduh Soal Ujian
+            </h5>
+
+            <p class="mb-3">Klik tombol di bawah untuk mengunduh soal ujian.</p>
+
+            <button (click)="previewQuestionFile()" class="btn btn-primary">
+                <i class="mdi mdi-download me-1"></i>
+                Unduh Soal
+            </button>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <h4 class="alert-heading">
+            <i class="mdi mdi-information-outline"></i>
+            Petunjuk Pengerjaan
+        </h4>
+
+        <ol>
+            <li>Klik tombol <b>Unduh Soal</b>.</li>
+            <li>
+                Masukkan <b>Secret Key</b> yang diberikan oleh panitia, lalu
+                klik <b>Unduh</b>.
+            </li>
+            <li>Soal akan otomatis terunduh ke perangkat Anda.</li>
+            <li>Buka file soal dan kerjakan jawabannya.</li>
+            <li>Setelah selesai, simpan jawaban dalam bentuk <b>PDF</b>.</li>
+            <li>Pilih file jawaban (PDF), lalu klik <b>Kirim</b>.</li>
+        </ol>
+
+        <p>Jika mengalami kesulitan, silakan hubungi panitia ujian.</p>
+    </div>
+
+    <form (ngSubmit)="submitAnswer()">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <app-file-handler [inputs]="inputs"></app-file-handler>
+                <app-loading-button
+                    [className]="'btn btn-primary float-end'"
+                    [disabled]="!answerFile()"
+                    [isLoading]="submitLoading()"
+                    [label]="'Simpan Jawaban Saya'"
+                    [type]="'submit'"
+                ></app-loading-button>
+            </div>
+        </div>
+    </form>
+</ng-template>

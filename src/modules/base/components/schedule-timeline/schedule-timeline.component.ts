@@ -76,12 +76,8 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         x: 0,
         y: 0,
     })
-
-    private timelineStart: Date = new Date()
-    private timelineEnd: Date = new Date()
-
     // Color palette for jabatanName
-    private readonly colorPalette: Record<string, string> = {
+    colorPalette: Record<string, string> = {
         'Negosiator Perdagangan': '#4CAF50',
         Penera: '#2196F3',
         'Analis Perdagangan': '#FF9800',
@@ -90,6 +86,8 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         'Pengamat Tera': '#00BCD4',
         DEFAULT: '#607D8B',
     }
+    private timelineStart: Date = new Date()
+    private timelineEnd: Date = new Date()
 
     // Get current zoom level
     get currentZoom(): ZoomLevel {

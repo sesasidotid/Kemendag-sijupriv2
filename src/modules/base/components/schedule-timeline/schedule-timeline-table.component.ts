@@ -68,7 +68,7 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
     }
 
     // Color palette for jabatanName
-    private readonly colorPalette: Record<string, string> = {
+    colorPalette: Record<string, string> = {
         'Negosiator Perdagangan': '#4CAF50',
         Penera: '#2196F3',
         'Analis Perdagangan': '#FF9800',

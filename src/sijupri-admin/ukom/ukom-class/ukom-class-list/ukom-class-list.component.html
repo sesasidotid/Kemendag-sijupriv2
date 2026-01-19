@@ -1,36 +1,73 @@
 <ng-container *ngIf="tab() === 0">
     <div class="d-flex justify-content-end mb-3">
-        <button (click)="openTimelineModal()" class="btn btn-info" type="button">
+        <button
+            (click)="openTimelineModal()"
+            class="btn btn-primary"
+            type="button"
+        >
             <i class="mdi mdi-calendar-range-outline me-1"></i>
             Lihat Timeline Jadwal
         </button>
     </div>
 
-    <app-pagable [pagable]="pagable$ | async" [refresh]="refreshToggle"></app-pagable>
+    <app-pagable
+        [pagable]="pagable$ | async"
+        [refresh]="refreshToggle"
+    ></app-pagable>
 </ng-container>
 
 <ng-container *ngIf="tab() === 1">
-    <app-ukom-class-add (changeTabActive)="handleTabChange(0)"></app-ukom-class-add>
+    <app-ukom-class-add
+        (changeTabActive)="handleTabChange(0)"
+    ></app-ukom-class-add>
 </ng-container>
 
-<app-modal (toggle)="toggleModal()" *ngIf="isModalOpen$ | async" [enableFooter]="false" [size]="'md'"
-    [title]="'Update Kelas'">
+<app-modal
+    (toggle)="toggleModal()"
+    *ngIf="isModalOpen$ | async"
+    [enableFooter]="false"
+    [size]="'md'"
+    [title]="'Update Kelas'"
+>
     <form [formGroup]="editRoomUkomForm" class="">
         <div class="mb-3">
-            <label class="form-label fw-bold" for="name">Nama <span class="text-danger">*</span></label>
-            <input appInvalidOnTouch class="form-control" formControlName="name" id="name" type="text" />
-            <div *ngIf="getErrorMessage('name', 'Nama') as error" class="invalid-feedback">
+            <label class="form-label fw-bold" for="name"
+                >Nama <span class="text-danger">*</span></label
+            >
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="name"
+                id="name"
+                type="text"
+            />
+            <div
+                *ngIf="getErrorMessage('name', 'Nama') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label fw-bold" for="jabatan_code">Jabatan <span class="text-danger">*</span></label>
-            <select appInvalidOnTouch class="form-select" formControlName="jabatan_code" id="jabatan_code"
-                name="jabatan_code">
+            <label class="form-label fw-bold" for="jabatan_code"
+                >Jabatan <span class="text-danger">*</span></label
+            >
+            <select
+                appInvalidOnTouch
+                class="form-select"
+                formControlName="jabatan_code"
+                id="jabatan_code"
+                name="jabatan_code"
+            >
                 <option hidden selected value="">Pilih Jabatan</option>
-                <ng-container *ngIf="(jabatanList$ | async)?.length; else jabatanNotFound">
-                    <option *ngFor="let jabatan of jabatanList$ | async" [value]="jabatan.code">
+                <ng-container
+                    *ngIf="(jabatanList$ | async)?.length; else jabatanNotFound"
+                >
+                    <option
+                        *ngFor="let jabatan of jabatanList$ | async"
+                        [value]="jabatan.code"
+                    >
                         {{ jabatan.name }}
                     </option>
                 </ng-container>
@@ -38,21 +75,36 @@
                     <option disabled>Jabatan tidak ditemukan</option>
                 </ng-template>
             </select>
-            <div *ngIf="getErrorMessage('jabatan_code', 'Jabatan') as error" class="invalid-feedback">
+            <div
+                *ngIf="getErrorMessage('jabatan_code', 'Jabatan') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label fw-bold" for="jenjang_code">Jenjang <span class="text-danger">*</span></label>
-            <select appInvalidOnTouch class="form-select" formControlName="jenjang_code" id="jenjang_code"
-                name="jenjang_code">
+            <label class="form-label fw-bold" for="jenjang_code"
+                >Jenjang <span class="text-danger">*</span></label
+            >
+            <select
+                appInvalidOnTouch
+                class="form-select"
+                formControlName="jenjang_code"
+                id="jenjang_code"
+                name="jenjang_code"
+            >
                 <option hidden selected value="">Pilih Jenjang</option>
-                <ng-container *ngIf="
+                <ng-container
+                    *ngIf="
                         (fixedJenjangList$ | async)?.length;
                         else jabatanNotSelected
-                    ">
-                    <option *ngFor="let jenjang of fixedJenjangList$ | async" [value]="jenjang.code">
+                    "
+                >
+                    <option
+                        *ngFor="let jenjang of fixedJenjangList$ | async"
+                        [value]="jenjang.code"
+                    >
                         {{ jenjang.name }}
                     </option>
                 </ng-container>
@@ -60,25 +112,39 @@
                     <option disabled>Jenjang tidak ditemukan</option>
                 </ng-template>
             </select>
-            <div *ngIf="getErrorMessage('jenjang_code', 'Jenjang') as error" class="invalid-feedback">
+            <div
+                *ngIf="getErrorMessage('jenjang_code', 'Jenjang') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div *ngIf="(bidangJabatanList$ | async)?.length" class="mb-3">
-            <label class="form-label fw-bold" for="bidang_jabatan_code">Bidang Jabatan <span
-                    class="text-danger">*</span></label>
-            <select appInvalidOnTouch class="form-select" formControlName="bidang_jabatan_code" id="bidang_jabatan_code"
-                name="bidang_jabatan_code">
+            <label class="form-label fw-bold" for="bidang_jabatan_code"
+                >Bidang Jabatan <span class="text-danger">*</span></label
+            >
+            <select
+                appInvalidOnTouch
+                class="form-select"
+                formControlName="bidang_jabatan_code"
+                id="bidang_jabatan_code"
+                name="bidang_jabatan_code"
+            >
                 <option [ngValue]="null" disabled hidden selected>
                     Pilih Bidang Jabatan
                 </option>
 
-                <ng-container *ngIf="
+                <ng-container
+                    *ngIf="
                         (bidangJabatanList$ | async)?.length;
                         else bidangJabatanNotSelected
-                    ">
-                    <option *ngFor="let bidangJabatan of bidangJabatanList$ | async" [value]="bidangJabatan.code">
+                    "
+                >
+                    <option
+                        *ngFor="let bidangJabatan of bidangJabatanList$ | async"
+                        [value]="bidangJabatan.code"
+                    >
                         {{ bidangJabatan.name }}
                     </option>
                 </ng-container>
@@ -87,70 +153,124 @@
                 </ng-template>
             </select>
 
-            <div *ngIf="
+            <div
+                *ngIf="
                     getErrorMessage(
                         'bidang_jabatan_code',
                         'Bidang Jabatan'
                     ) as error
-                " class="invalid-feedback">
+                "
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label fw-bold" for="participant_quota">Kuota Peserta <span
-                    class="text-danger">*</span></label>
-            <input appInvalidOnTouch class="form-control" formControlName="participant_quota" id="participant_quota"
-                type="text" />
-            <div *ngIf="
+            <label class="form-label fw-bold" for="participant_quota"
+                >Kuota Peserta <span class="text-danger">*</span></label
+            >
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="participant_quota"
+                id="participant_quota"
+                type="text"
+            />
+            <div
+                *ngIf="
                     getErrorMessage(
                         'participant_quota',
                         'Kuota peserta'
                     ) as error
-                " class="invalid-feedback">
+                "
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label fw-bold" for="vid_call_link">Link Zoom <span class="text-danger">*</span></label>
-            <input appInvalidOnTouch class="form-control" formControlName="vid_call_link" id="vid_call_link"
-                type="text" />
-            <div *ngIf="getErrorMessage('vid_call_link', 'Link Zoom') as error" class="invalid-feedback">
+            <label class="form-label fw-bold" for="vid_call_link"
+                >Link Zoom <span class="text-danger">*</span></label
+            >
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="vid_call_link"
+                id="vid_call_link"
+                type="text"
+            />
+            <div
+                *ngIf="getErrorMessage('vid_call_link', 'Link Zoom') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label fw-bold" for="exam_start_at">Waktu Mulai <span class="text-danger">*</span></label>
-            <input appInvalidOnTouch class="form-control" formControlName="exam_start_at" id="exam_start_at"
-                type="datetime-local" />
-            <div *ngIf="getErrorMessage('exam_start_at', 'Waktu mulai') as error" class="invalid-feedback">
+            <label class="form-label fw-bold" for="exam_start_at"
+                >Waktu Mulai <span class="text-danger">*</span></label
+            >
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="exam_start_at"
+                id="exam_start_at"
+                type="datetime-local"
+            />
+            <div
+                *ngIf="getErrorMessage('exam_start_at', 'Waktu mulai') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label class="form-label fw-bold" for="exam_end_at">Waktu Selesai <span class="text-danger">*</span>
+            <label class="form-label fw-bold" for="exam_end_at"
+                >Waktu Selesai <span class="text-danger">*</span>
             </label>
-            <input appInvalidOnTouch class="form-control" formControlName="exam_end_at" id="exam_end_at"
-                type="datetime-local" />
-            <div *ngIf="getErrorMessage('exam_end_at', 'Waktu selesai') as error" class="invalid-feedback">
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="exam_end_at"
+                id="exam_end_at"
+                type="datetime-local"
+            />
+            <div
+                *ngIf="getErrorMessage('exam_end_at', 'Waktu selesai') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="text-end">
-            <app-loading-button (clicked)="submit()" [className]="'btn btn-primary'"
-                [disabled]="editRoomUkomForm.invalid" [isLoading]="submitLoading$ | async" [label]="'Simpan'"
-                [type]="'button'"></app-loading-button>
+            <app-loading-button
+                (clicked)="submit()"
+                [className]="'btn btn-primary'"
+                [disabled]="editRoomUkomForm.invalid"
+                [isLoading]="submitLoading$ | async"
+                [label]="'Simpan'"
+                [type]="'button'"
+            ></app-loading-button>
         </div>
     </form>
 </app-modal>
 
-<app-modal (toggle)="closeTimelineModal()" *ngIf="isTimelineModalOpen()" [enableFooter]="false" [size]="'xl'"
-    [title]="'Timeline Jadwal'">
-    <app-schedule-timeline-modal (closeTimeline)="closeTimelineModal()" [defaultView]="'gantt'"
-        [schedules]="timelineSchedules() || []">
+<app-modal
+    (toggle)="closeTimelineModal()"
+    *ngIf="isTimelineModalOpen()"
+    [enableFooter]="false"
+    [size]="'xl'"
+    [title]="'Timeline Jadwal'"
+>
+    <app-schedule-timeline-modal
+        (closeTimeline)="closeTimelineModal()"
+        [defaultView]="'table'"
+        [schedules]="timelineSchedules() || []"
+    >
     </app-schedule-timeline-modal>
 </app-modal>

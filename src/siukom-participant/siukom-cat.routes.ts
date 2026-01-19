@@ -33,6 +33,27 @@ export const routes: Routes = [
                         (m) => m.WawancaraPageComponent,
                     ),
             },
+            {
+                path: 'case-study/:examScheduleId',
+                loadComponent: () =>
+                    import(
+                        './studi-kasus-page/studi-kasus-page.component'
+                    ).then((m) => m.StudiKasusPageComponent),
+            },
+            {
+                path: 'portfolio/:examScheduleId',
+                loadComponent: () =>
+                    import('./portfolio-page/portfolio-page.component').then(
+                        (m) => m.PortfolioPageComponent,
+                    ),
+            },
+            {
+                path: 'practical-work/:examScheduleId',
+                loadComponent: () =>
+                    import(
+                        './practical-work-page/practical-work-page.component'
+                    ).then((m) => m.PracticalWorkPageComponent),
+            },
         ],
     },
     {

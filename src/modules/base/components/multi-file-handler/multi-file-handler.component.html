@@ -1,0 +1,145 @@
+<!-- multi-file-handler.component.html -->
+<div class="file-parent">
+    <div *ngIf="!inputs.viewOnly">
+        <div class="mb-3">
+            <label class="form-label">
+                File: <span class="text-danger">*</span>
+            </label>
+            <small
+                *ngIf="inputs.allowedTypes?.length || inputs.maxSize || inputs.maxFiles"
+                class="text-muted d-block"
+            >
+                <span *ngIf="inputs.allowedTypes?.length">
+                    Jenis file yang diperbolehkan: {{ getAllowedTypes() }}
+                    <br />
+                </span>
+                <span *ngIf="inputs.maxSize">
+                    Ukuran maksimum: {{ inputs.maxSize / (1024 * 1024) }} MB
+                    <br />
+                </span>
+                <span *ngIf="inputs.maxFiles">
+                    Maksimum file: {{ inputs.maxFiles }}
+                </span>
+            </small>
+        </div>
+    </div>
+
+    <ng-container *ngFor="let obj of inputs.files | keyvalue: sortByLabel">
+        <div
+            *ngIf="
+                obj.value.visible == null ||
+                obj.value.visible == undefined ||
+                obj.value.visible()
+            "
+            class="d-flex flex-column mb-3 gap-2"
+        >
+            <label class="form-label">
+                {{ obj.value.label }}
+                <span *ngIf="obj.value.required" class="text-danger">*</span>
+                <span
+                    *ngIf="getFileCount(obj.key) > 0"
+                    class="badge bg-secondary ms-2"
+                >
+                    {{ getFileCount(obj.key) }} file
+                </span>
+            </label>
+
+            <div
+                *ngIf="hadItemsLoading$ | async; else loadCompleted"
+                class="spinner-border"
+                role="status"
+            >
+                <span class="visually-hidden">Loading...</span>
+            </div>
+
+            <ng-template #loadCompleted>
+                <!-- Upload button -->
+                <div #container *ngIf="!inputs.viewOnly" class="d-flex gap-3">
+                    <input
+                        (change)="handleFileUpload($event, obj.key)"
+                        [id]="'fileInput' + obj.key"
+                        class="d-none"
+                        type="file"
+                    />
+                    <label
+                        [for]="'fileInput' + obj.key"
+                        class="btn btn-outline-primary d-inline-flex align-items-center m-0 gap-2"
+                    >
+                        <i class="mdi mdi-upload"></i>
+                        Pilih File
+                    </label>
+
+                    <button
+                        (click)="clearAllFiles(obj.key)"
+                        *ngIf="getFileCount(obj.key) > 1"
+                        class="btn btn-danger"
+                        type="button"
+                    >
+                        Hapus Semua
+                    </button>
+                </div>
+
+                <!-- Uploaded files list -->
+                <div
+                    *ngIf="uploadedFiles[obj.key]?.length"
+                    class="uploaded-files-list mt-2"
+                >
+                    <div
+                        *ngFor="let file of uploadedFiles[obj.key]; let idx = index"
+                        class="uploaded-file-item d-flex align-items-center justify-content-between mb-2 gap-2 rounded border p-2"
+                    >
+                        <div
+                            class="d-flex align-items-center flex-grow-1 gap-2 overflow-hidden"
+                        >
+                            <span class="file-index badge bg-primary"
+                                >{{ idx + 1 }}</span
+                            >
+                            <span
+                                [title]="file.fileName"
+                                class="file-name text-truncate"
+                            >
+                                {{ file.fileName }}
+                            </span>
+                        </div>
+
+                        <div
+                            class="d-flex align-items-center flex-shrink-0 gap-2"
+                        >
+                            <button
+                                (click)="previewFile(file.fileName, file.base64)"
+                                class="btn btn-soft-success btn-sm"
+                                type="button"
+                            >
+                                Preview
+                            </button>
+                            <button
+                                (click)="removeFile(obj.key, file.id)"
+                                *ngIf="!inputs.viewOnly"
+                                class="btn btn-soft-danger btn-sm"
+                                type="button"
+                            >
+                                <i class="ri-delete-bin-line"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div
+                    *ngIf="!uploadedFiles[obj.key]?.length && inputs.viewOnly"
+                    class="text-muted fst-italic"
+                >
+                    Tidak ada file yang diunggah
+                </div>
+
+                <!-- Remark/Revision notes -->
+                <ng-container *ngIf="obj.value.remark">
+                    <div class="alert alert-warning mt-1">
+                        <strong>Catatan Revisi : </strong>
+                        {{ obj.value.remark }}
+                    </div>
+                </ng-container>
+            </ng-template>
+        </div>
+    </ng-container>
+</div>

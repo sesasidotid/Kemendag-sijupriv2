@@ -1,0 +1,85 @@
+/* multi-file-handler.component.scss */
+.file-parent {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.file-name {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-file-upload {
+    flex-shrink: 0;
+}
+
+.hidden-input {
+    display: none;
+}
+
+/* Uploaded files list styles */
+.uploaded-files-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.uploaded-file-item {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #e9ecef;
+    }
+}
+
+.file-index {
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* Button styles */
+.btn-soft-success {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+    border: none;
+
+    &:hover {
+        background-color: rgba(25, 135, 84, 0.2);
+        color: #198754;
+    }
+}
+
+.btn-soft-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: none;
+
+    &:hover {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .uploaded-file-item {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 8px !important;
+
+        .d-flex.align-items-center.gap-2.flex-shrink-0 {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+
+    .file-name {
+        max-width: 100%;
+    }
+}

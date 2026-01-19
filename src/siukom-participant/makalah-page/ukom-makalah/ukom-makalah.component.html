@@ -1,3 +1,10 @@
+<button
+    (click)="backToDashboard()"
+    class="btn btn-sm btn-outline-secondary mb-3"
+>
+    <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
+
 <ng-container *ngIf="questionLoading(); else content">
     <div class="col-12 text-center">
         <div class="spinner-border" role="status">
@@ -7,12 +14,6 @@
 </ng-container>
 
 <ng-template #content>
-    <button
-        (click)="backToDashboard()"
-        class="btn btn-sm btn-outline-secondary mb-3"
-    >
-        <i class="mdi mdi-chevron-left"></i> Kembali
-    </button>
     <form>
         <div class="col-lg-12 mb-3">
             <div class="alert alert-primary" role="alert">

@@ -1,0 +1,63 @@
+<button
+    (click)="backToDashboard()"
+    class="btn btn-sm btn-outline-secondary mb-4"
+>
+    <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
+
+<ng-container *ngIf="loading(); else content">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
+        </div>
+        <p class="mt-2">Memuat halaman...</p>
+    </div>
+</ng-container>
+
+<ng-template #content>
+    <div class="alert alert-info">
+        <h4 class="alert-heading">
+            <i class="mdi mdi-information-outline"></i>
+            Petunjuk
+        </h4>
+        <ol>
+            <li>Rekam video praktik Anda.</li>
+            <li>Unggah video ke YouTube / Google Drive / platform lain.</li>
+            <li>Salin link video tersebut.</li>
+            <li>Tempelkan link ke kolom di bawah.</li>
+            <li>Klik <b>Simpan Link Video</b>.</li>
+        </ol>
+    </div>
+
+    <form (ngSubmit)="submitVideoLink()" [formGroup]="videoForm">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        Link Video Praktik <span class="text-danger">*</span>
+                    </label>
+                    <input
+                        appInvalidOnTouch
+                        class="form-control"
+                        formControlName="videoLink"
+                        placeholder="Contoh: https://youtu.be/xxxxx"
+                        type="url"
+                    />
+                    <div
+                        *ngIf="getErrorMessage('videoLink', 'Link Video Praktik') as error"
+                        class="invalid-feedback"
+                    >
+                        {{error}}
+                    </div>
+                </div>
+                <app-loading-button
+                    [className]="'btn btn-primary float-end'"
+                    [disabled]="videoForm.invalid"
+                    [isLoading]="submitting()"
+                    [label]="'Simpan Link Video'"
+                    [type]="'submit'"
+                ></app-loading-button>
+            </div>
+        </div>
+    </form>
+</ng-template>
