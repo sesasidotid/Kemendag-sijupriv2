@@ -1,20 +1,19 @@
-import { Component } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
-import { BehaviorSubject } from 'rxjs'
-import { ApiService } from '../../../../modules/base/services/api.service'
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { BehaviorSubject, finalize } from 'rxjs'
+import { ApiService } from '@/modules/base/services/api.service'
 import { Router } from '@angular/router'
-import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { Jenjang } from '../../../../modules/maintenance/models/jenjang.modle'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
+import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
+import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import {
     FormControl,
     FormGroup,
@@ -22,12 +21,14 @@ import {
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
-import { map, filter } from 'rxjs/operators'
-import { Observable, of, Subject } from 'rxjs'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+import { PageFilter } from '@/modules/base/commons/pagable/page-filter'
+import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
+import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
+
 @Component({
     selector: 'app-ukom-formula-list',
     standalone: true,
@@ -43,16 +44,18 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
     templateUrl: './ukom-formula-list.component.html',
     styleUrl: './ukom-formula-list.component.scss',
 })
-export class UkomFormulaListComponent {
+export class UkomFormulaListComponent implements OnInit {
     pagable$ = new BehaviorSubject<Pagable | null>(null)
     isModalOpen$ = new BehaviorSubject<boolean>(false)
 
     editFormulaForm: FormGroup
-    jabatanList$: Observable<Jabatan[]>
-    jenjangList$: Observable<Jenjang[]>
+    jabatanList: Jabatan[] = []
     refreshToggle: boolean = false
 
     isLoading$ = new BehaviorSubject<boolean>(false)
+
+    jabatanService = inject(JabatanService)
+    jenjangService = inject(JenjangService)
 
     constructor(
         private apiService: ApiService,
@@ -65,8 +68,8 @@ export class UkomFormulaListComponent {
     ngOnInit() {
         this.handlePagable()
         this.handleFormInit()
-        this.getListJabatan()
-        this.getListJenjang()
+        this.getJabatanList()
+        this.jenjangService.fetchJenjang()
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
@@ -158,21 +161,36 @@ export class UkomFormulaListComponent {
                         .withIcon('detail')
                         .build(),
                 )
-                .addFilter(
-                    new PageFilterBuilder('like')
-                        .setProperty('jabatan|name')
-                        .withField('Jabatan', 'text')
-                        .build(),
-                )
-                .addFilter(
-                    new PageFilterBuilder('like')
-                        .setProperty('Jenjang|name')
-                        .withField('Jenjang', 'text')
-                        .build(),
-                )
                 .withQueryParams()
                 .build(),
         )
+    }
+
+    updateFilterOptions() {
+        const currentPagable = this.pagable$.value
+        let filterList = currentPagable.filterList
+
+        // Ensure jabatan filter
+        filterList = this.ensureFilter(
+            filterList,
+            'eq_jabatanCode',
+            'Jabatan',
+            this.jabatanList,
+        )
+
+        this.jenjangService.jenjangList$.subscribe((jenjangs) => {
+            const finalFilterList = this.ensureFilter(
+                filterList,
+                'eq_jenjangCode',
+                'Jenjang',
+                jenjangs,
+            )
+
+            this.pagable$.next({
+                ...currentPagable,
+                filterList: finalFilterList,
+            })
+        })
     }
 
     handleFormInit() {
@@ -217,37 +235,23 @@ export class UkomFormulaListComponent {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
 
-    getListJabatan() {
-        this.jabatanList$ = this.apiService
-            .getData(`/api/v1/jabatan`)
+    getJabatanList() {
+        this.jabatanService
+            .findAll()
             .pipe(
-                map((response) =>
-                    response.map(
-                        (jabatan: { [key: string]: any }) =>
-                            new Jabatan(jabatan),
-                    ),
-                ),
+                finalize(() => {
+                    this.updateFilterOptions()
+                }),
             )
-
-        this.jabatanList$.forEach((data) => {
-            console.log('jabatan', data)
-        })
-    }
-
-    getListJenjang() {
-        this.jenjangList$ = this.apiService
-            .getData(`/api/v1/jenjang`)
-            .pipe(
-                map((response) =>
-                    response.map(
-                        (jenjang: { [key: string]: any }) =>
-                            new Jenjang(jenjang),
-                    ),
-                ),
-            )
-        this.jenjangList$.forEach((data) => {
-            console.log('jenjang', data)
-        })
+            .subscribe({
+                next: (res) => {
+                    this.jabatanList = res
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.jabatanList = []
+                },
+            })
     }
 
     submit() {
@@ -298,5 +302,40 @@ export class UkomFormulaListComponent {
                     })
             },
         })
+    }
+
+    private ensureFilter(
+        filterList: PageFilter[],
+        key: string,
+        label: string,
+        sourceList: { code: string; name: string }[],
+    ): PageFilter[] {
+        const updated = filterList.map((item) =>
+            item.key === key
+                ? {
+                      ...item,
+                      optionList: sourceList.map((i) => ({
+                          label: i.name,
+                          value: i.code,
+                      })),
+                  }
+                : item,
+        )
+
+        return updated.some((item) => item.key === key)
+            ? updated
+            : [
+                  ...updated,
+                  new PageFilter({
+                      label,
+                      fieldType: 'select',
+                      key,
+                      value: '',
+                      optionList: sourceList.map((i) => ({
+                          label: i.name,
+                          value: i.code,
+                      })),
+                  }),
+              ]
     }
 }

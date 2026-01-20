@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
@@ -20,6 +20,7 @@ import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
 import { UkomTaskService } from '@/modules/ukom/services/ukom-task.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
+
 @Component({
     selector: 'app-ukom-task-list',
     standalone: true,
@@ -27,7 +28,7 @@ import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/p
     templateUrl: './ukom-task-list.component.html',
     styleUrl: './ukom-task-list.component.scss',
 })
-export class UkomTaskListComponent {
+export class UkomTaskListComponent implements OnInit {
     public flowId = UkomFlowId
 
     pagable$ = new BehaviorSubject<Pagable | null>(null)
@@ -59,10 +60,10 @@ export class UkomTaskListComponent {
     syncTabWithUrl() {
         const flowId = this.route.snapshot.queryParams['eq_flowId']
         const flowToTabIndex: { [key: string]: number } = {
-            'ukom_flow_1': 0,
-            'ukom_flow_2': 1,
-            'ukom_flow_3': 2,
-            'ukom_flow_4': 3,
+            ukom_flow_1: 0,
+            ukom_flow_2: 1,
+            ukom_flow_3: 2,
+            ukom_flow_4: 3,
         }
         if (flowId && flowToTabIndex[flowId] !== undefined) {
             this.tabIndex.next(flowToTabIndex[flowId])
@@ -241,41 +242,6 @@ export class UkomTaskListComponent {
         })
     }
 
-    private ensureFilter(
-        filterList: PageFilter[],
-        key: string,
-        label: string,
-        sourceList: { name: string }[],
-    ): PageFilter[] {
-        const updated = filterList.map((item) =>
-            item.key === key
-                ? {
-                      ...item,
-                      optionList: sourceList.map((i) => ({
-                          label: i.name,
-                          value: i.name,
-                      })),
-                  }
-                : item,
-        )
-
-        return updated.some((item) => item.key === key)
-            ? updated
-            : [
-                  ...updated,
-                  new PageFilter({
-                      label,
-                      fieldType: 'select',
-                      key,
-                      value: '',
-                      optionList: sourceList.map((i) => ({
-                          label: i.name,
-                          value: i.name,
-                      })),
-                  }),
-              ]
-    }
-
     getJabatanList() {
         this.apiService.getData('/api/v1/jabatan').subscribe({
             next: (response) => {
@@ -289,7 +255,6 @@ export class UkomTaskListComponent {
                 this.jabatanList = []
             },
             complete: () => {
-                console.log('complete', this.jabatanList)
                 this.updateFilterOptions()
             },
         })
@@ -356,5 +321,40 @@ export class UkomTaskListComponent {
                     })
             },
         })
+    }
+
+    private ensureFilter(
+        filterList: PageFilter[],
+        key: string,
+        label: string,
+        sourceList: { name: string }[],
+    ): PageFilter[] {
+        const updated = filterList.map((item) =>
+            item.key === key
+                ? {
+                      ...item,
+                      optionList: sourceList.map((i) => ({
+                          label: i.name,
+                          value: i.name,
+                      })),
+                  }
+                : item,
+        )
+
+        return updated.some((item) => item.key === key)
+            ? updated
+            : [
+                  ...updated,
+                  new PageFilter({
+                      label,
+                      fieldType: 'select',
+                      key,
+                      value: '',
+                      optionList: sourceList.map((i) => ({
+                          label: i.name,
+                          value: i.name,
+                      })),
+                  }),
+              ]
     }
 }

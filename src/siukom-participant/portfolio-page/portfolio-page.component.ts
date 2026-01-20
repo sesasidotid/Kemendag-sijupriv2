@@ -151,7 +151,6 @@ export class PortfolioPageComponent implements OnInit {
                 files: {
                     [q.id]: {
                         label: 'Unggah Jawaban',
-                        required: true,
                     },
                 },
                 allowedTypes: [{ label: 'pdf', type: 'application/pdf' }],
