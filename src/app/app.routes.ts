@@ -41,7 +41,7 @@ export const routes: Routes = [
     {
         path: 'not-found',
         loadComponent: () =>
-            import('./template[not_used]/not-found/not-found.component').then(
+            import('@/app/template/not-found/not-found.component').then(
                 (m) => m.NotFoundComponent,
             ),
     },

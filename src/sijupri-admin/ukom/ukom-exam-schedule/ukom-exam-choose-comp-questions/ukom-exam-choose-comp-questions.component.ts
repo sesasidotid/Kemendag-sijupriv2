@@ -1,6 +1,6 @@
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
-import { Component, inject } from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { CommonModule } from '@angular/common'
 import {
@@ -19,6 +19,9 @@ import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-sched
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { UkomExamWawancaraComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-wawancara/ukom-exam-wawancara.component'
 import { DurationPipe } from '@/modules/base/pipes/duration.pipe'
+import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-examiner-list.model'
+import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
+import { AgGridAngular } from 'ag-grid-angular'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -30,11 +33,12 @@ import { DurationPipe } from '@/modules/base/pipes/duration.pipe'
         TanggalWaktuIndoPipe,
         UkomExamWawancaraComponent,
         DurationPipe,
+        AgGridAngular,
     ],
     templateUrl: './ukom-exam-choose-comp-questions.component.html',
     styleUrl: './ukom-exam-choose-comp-questions.component.scss',
 })
-export class UkomExamChooseCompQuestionsComponent {
+export class UkomExamChooseCompQuestionsComponent implements OnInit {
     ukomRoomService = inject(UkomRoomService)
     ukomExamScheduleService = inject(UkomExamScheduleService)
     roomUkomDetail = new RoomUkomDetail()
@@ -47,6 +51,17 @@ export class UkomExamChooseCompQuestionsComponent {
         new BehaviorSubject<boolean>(false)
 
     isLoading$: Observable<boolean>
+
+    examinerList = signal<ExaminerScheduleList[]>([])
+
+    columnDefs: ColDef[] = []
+    defaultColDef: ColDef = {
+        sortable: true,
+        filter: true,
+        resizable: true,
+    }
+    // AG Grid
+    private gridApi!: GridApi
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -71,7 +86,23 @@ export class UkomExamChooseCompQuestionsComponent {
             this.typeUkom = typeUkom
             this.getRoomDetail(roomId)
             this.getExamDetail(roomId, examId)
+            this.getExaminerListId(examId)
         })
+
+        this.initializeColumnDefs()
+    }
+
+    getExaminerListId(examScheduleId: string) {
+        this.ukomExamScheduleService
+            .getExaminerListByExamScheduleId(examScheduleId)
+            .subscribe({
+                next: (res) => {
+                    this.examinerList.set(res)
+                },
+                error: (err) => {
+                    console.error(err)
+                },
+            })
     }
 
     back() {
@@ -129,5 +160,29 @@ export class UkomExamChooseCompQuestionsComponent {
                     )
                 },
             })
+    }
+
+    onGridReady(params: GridReadyEvent): void {
+        this.gridApi = params.api
+        this.gridApi.sizeColumnsToFit()
+    }
+
+    private initializeColumnDefs(): void {
+        this.columnDefs = [
+            {
+                headerName: 'No',
+                field: 'index',
+                width: 80,
+                cellClass: 'text-center',
+                valueGetter: (params) => {
+                    return params.node.rowIndex + 1
+                },
+            },
+            {
+                headerName: 'Nama Penguji',
+                field: 'examinerUkom.user.name',
+                flex: 1,
+            },
+        ]
     }
 }

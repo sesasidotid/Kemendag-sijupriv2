@@ -4,16 +4,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import {
-    catchError,
-    concatMap,
-    finalize,
-    forkJoin,
-    map,
-    of,
-    tap,
-    timer,
-} from 'rxjs'
+import { catchError, concatMap, finalize, forkJoin, map, of, tap, timer } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { CATScore } from '@/modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
@@ -80,6 +71,9 @@ export class DashboardComponent implements OnInit {
     startCATLoading = signal(false)
     startMakalahLoading = signal(false)
     startWawancaraLoading = signal(false)
+    startPraktikLoading = signal(false)
+    startStudiKasusLoading = signal(false)
+    startPortofolioLoading = signal(false)
 
     formattedCurrentDate = computed(() => {
         const raw = this.nowGmt7()

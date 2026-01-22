@@ -4,7 +4,7 @@ import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { finalize } from 'rxjs'
+import { finalize, forkJoin } from 'rxjs'
 import { AgGridAngular } from 'ag-grid-angular'
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
 import {
@@ -15,6 +15,8 @@ import {
 } from '@/modules/ukom/models/schedule-slot.model'
 import { ScheduleSlotService } from '@/modules/ukom/services/schedule-slot.service'
 import { RescheduleModalComponent } from './reschedule-modal/reschedule-modal.component'
+import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
+import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-examiner-list.model'
 
 /**
  * Admin Schedule Viewer with Manual Rescheduling
@@ -38,6 +40,7 @@ import { RescheduleModalComponent } from './reschedule-modal/reschedule-modal.co
 export class UkomExamWawancaraComponent implements OnInit {
     roomUkomDetail = input<RoomUkomDetail>()
     examDetail = input<ExamSchedule>()
+    examinerList = input.required<ExaminerScheduleList[]>()
 
     handlerService = inject(HandlerService)
     examScheduleService = inject(UkomExamScheduleService)
@@ -97,13 +100,19 @@ export class UkomExamWawancaraComponent implements OnInit {
      */
     fetchExamScheduleDetail(examId: string): void {
         this.examScheduleDetailLoading.set(true)
-        this.examScheduleService
-            .getExamScheduleDetailById(examId)
+        forkJoin({
+            schedule:
+                this.examScheduleService.getExamScheduleDetailById(examId),
+            participants:
+                this.examScheduleService.getParticipantListByExamScheduleId(
+                    examId,
+                ),
+        })
             .pipe(finalize(() => this.examScheduleDetailLoading.set(false)))
             .subscribe({
-                next: (res) => {
-                    this.examScheduleDetail.set(res)
-                    this.transformToMainSchedule(res)
+                next: ({ schedule, participants }) => {
+                    this.examScheduleDetail.set(schedule)
+                    this.transformToMainSchedule(schedule, participants)
                 },
                 error: (err) => {
                     console.error(err)
@@ -239,6 +248,15 @@ export class UkomExamWawancaraComponent implements OnInit {
                 },
             },
             {
+                headerName: 'Penguji',
+                field: 'participantSchedule.examinerName',
+                flex: 1,
+                valueGetter: (params) => {
+                    const slot = params.data as ScheduleSlot
+                    return slot.participantSchedule?.examinerName || '—'
+                },
+            },
+            {
                 headerName: 'Status',
                 width: 120,
                 cellClass: 'text-center',
@@ -280,9 +298,14 @@ export class UkomExamWawancaraComponent implements OnInit {
      * Transform ExamSchedule to MainSchedule and generate slots
      * All dates are parsed as UTC+7 times (no timezone conversion)
      */
-    private transformToMainSchedule(examSchedule: ExamSchedule): void {
+    private transformToMainSchedule(
+        examSchedule: ExamSchedule,
+        participantScheduleList: ParticipantScheduleList[],
+    ): void {
+        const examinerMap = this.buildExaminerMap(this.examinerList())
+
         const participantSchedules: ParticipantSchedule[] =
-            examSchedule.participantScheduleList?.map((p) => ({
+            participantScheduleList.map((p) => ({
                 id: p.id,
                 participantId: p.participantId,
                 examScheduleId: p.examScheduleId,
@@ -290,7 +313,11 @@ export class UkomExamWawancaraComponent implements OnInit {
                     ? this.slotService.parseAsUTC7(p.personalSchedule)
                     : null,
                 participantName: p.participantUkom?.name || 'Unknown',
-                participantNip: p.participantUkom?.nip,
+                participantNip: p.participantUkom?.nip || 'Unknown',
+                examinerName:
+                    examinerMap.get(
+                        p.examScheduleSupervised[0]?.examinerScheduleId,
+                    ) ?? 'Unknown',
             })) || []
 
         const mainSchedule: MainSchedule = {
@@ -354,5 +381,16 @@ export class UkomExamWawancaraComponent implements OnInit {
                     )
                 },
             })
+    }
+
+    private buildExaminerMap(
+        examiners: ExaminerScheduleList[],
+    ): Map<string, string> {
+        return new Map(
+            examiners.map((e) => [
+                e.id,
+                e.examinerUkom?.user?.name ?? 'Unknown',
+            ]),
+        )
     }
 }

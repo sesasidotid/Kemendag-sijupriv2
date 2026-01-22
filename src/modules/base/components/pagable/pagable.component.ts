@@ -2,9 +2,9 @@ import {
     Component,
     Input,
     OnChanges,
-    SimpleChanges,
-    OnInit,
     OnDestroy,
+    OnInit,
+    SimpleChanges,
 } from '@angular/core'
 import { ApiService } from '../../services/api.service'
 import { CommonModule } from '@angular/common'
@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { Pagable } from '../../commons/pagable/pagable'
 import { HttpClient } from '@angular/common/http'
 import { Subscription } from 'rxjs'
+
 @Component({
     selector: 'app-pagable',
     standalone: true,
@@ -88,26 +89,6 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
         if (changes['refresh'] && !changes['refresh'].isFirstChange()) {
             this.loadData()
         }
-    }
-
-    private filtersChanged(): boolean {
-        if (!this.pagable.filterList) return false
-
-        let changed = false
-
-        this.pagable.filterList.forEach((filter) => {
-            const oldValue = this.lastFilterState[filter.key]
-            const newValue = filter.value
-
-            if (oldValue !== newValue) {
-                changed = true
-            }
-
-            // update last state
-            this.lastFilterState[filter.key] = newValue
-        })
-
-        return changed
     }
 
     isSearchExist() {
@@ -302,8 +283,6 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
                     this.enablePagination = false
                 }
 
-                console.log(this.enablePagination)
-
                 if (this.paginator.data?.roomUkomDto?.examScheduleDtoList) {
                     this.paginator.data =
                         this.paginator.data.roomUkomDto.examScheduleDtoList
@@ -375,5 +354,25 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
 
     getSortIcon(columnProperty: string): string {
         return this.sortOrder[columnProperty]
+    }
+
+    private filtersChanged(): boolean {
+        if (!this.pagable.filterList) return false
+
+        let changed = false
+
+        this.pagable.filterList.forEach((filter) => {
+            const oldValue = this.lastFilterState[filter.key]
+            const newValue = filter.value
+
+            if (oldValue !== newValue) {
+                changed = true
+            }
+
+            // update last state
+            this.lastFilterState[filter.key] = newValue
+        })
+
+        return changed
     }
 }

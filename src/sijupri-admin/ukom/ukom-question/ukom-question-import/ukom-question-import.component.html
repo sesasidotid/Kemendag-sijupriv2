@@ -1,7 +1,7 @@
 <form>
     <div class="mb-3">
-        <label class="form-label" for="examTypeCode"
-            >Jenis Ujian <span class="text-danger">*</span>
+        <label class="form-label">
+            Jenis Ujian <span class="text-danger">*</span>
         </label>
         <select
             [formControl]="examTypeCode"
@@ -25,7 +25,20 @@
         </div>
     </div>
 
-    <app-file-handler [inputs]="inputs"></app-file-handler>
+    <!-- TEMPLATE EXCEL -->
+    <app-file-handler
+        #templateHandler
+        [inputs]="templateInputs"
+    ></app-file-handler>
+
+    <!-- STUDI KASUS PDF -->
+    <app-file-handler
+        #studiKasusHandler
+        *ngIf="examTypeCode.value === ExamTypeCategory.STUDI_KASUS"
+        [inputs]="studiKasusInputs"
+        class="mt-3"
+    ></app-file-handler>
+
     <ng-container *ngIf="examTypeCode.value">
         <a
             (click)="handleDownloadTemplate(); $event.preventDefault()"
@@ -41,7 +54,7 @@
         <app-loading-button
             (clicked)="importQuestion()"
             [className]="'btn btn-primary'"
-            [disabled]="!base64FileQuestion || examTypeCode.invalid"
+            [disabled]="isSubmitDisabled()"
             [isLoading]="isLoading"
             label="Import"
         ></app-loading-button>

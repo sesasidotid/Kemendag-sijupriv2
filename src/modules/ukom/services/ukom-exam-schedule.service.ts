@@ -1,9 +1,12 @@
 import { inject, Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
 import { ApiService } from '@/modules/base/services/api.service'
-import { CreateExamScheduleRequest } from '../models/exam-schedule/create-exam-schedule-request.model'
 import { UpdateExamScheduleRequest } from '../models/exam-schedule/update-exam-schedule-request.model'
 import { ExamSchedule } from '../models/exam-schedule/exam-schedule.model'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { BaseExamScheduleRequest } from '../models/exam-schedule/create-exam-schedule-request.model'
+import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
+import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-examiner-list.model'
 
 @Injectable({
     providedIn: 'root',
@@ -18,12 +21,16 @@ export class UkomExamScheduleService {
         return this.apiService.getData(`${this.API_BASE_URL}/room/${roomId}`)
     }
 
-    createExamSchedule(body: CreateExamScheduleRequest): Observable<void> {
-        return this.apiService.postData(this.API_BASE_URL, body)
+    createExamSchedule(
+        examTypeCode: ExamTypeCategory,
+        body: BaseExamScheduleRequest,
+    ): Observable<void> {
+        const type = examTypeCode.toLowerCase()
+        return this.apiService.postData(`${this.API_BASE_URL}/${type}`, body)
     }
 
     updateExamSchedule(body: UpdateExamScheduleRequest): Observable<void> {
-        return this.apiService.putData(this.API_BASE_URL, body)
+        return this.apiService.putData(`${this.API_BASE_URL}/`, body)
     }
 
     deleteExamScheduleById(examScheduleId: string): Observable<void> {
@@ -49,6 +56,22 @@ export class UkomExamScheduleService {
     getExamByExaminerId(examinerId: string): Observable<ExamSchedule[]> {
         return this.apiService.getData(
             `${this.API_BASE_URL}/examiner/${examinerId}`,
+        )
+    }
+
+    getExaminerListByExamScheduleId(
+        examScheduleId: string,
+    ): Observable<ExaminerScheduleList[]> {
+        return this.apiService.getData(
+            `${this.API_BASE_URL}/examiner_schedule/${examScheduleId}`,
+        )
+    }
+
+    getParticipantListByExamScheduleId(
+        examScheduleId: string,
+    ): Observable<ParticipantScheduleList[]> {
+        return this.apiService.getData(
+            `${this.API_BASE_URL}/participant_schedule/${examScheduleId}`,
         )
     }
 }

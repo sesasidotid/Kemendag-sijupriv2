@@ -144,7 +144,6 @@ export class UkomExamCatComponent implements OnChanges {
     }
 
     getTotalQuestionCount(): number {
-        console.log(this.indicatorQuestionCounts)
         let total = 0
         this.indicatorQuestionCounts.forEach((count) => {
             total += count
@@ -154,58 +153,6 @@ export class UkomExamCatComponent implements OnChanges {
 
     toArray(keys: IterableIterator<string>) {
         return Array.from(keys)
-    }
-
-    private fetchIndikatorKompetensi(
-        detail: RoomUkomDetail,
-    ): Observable<IndikatorKompetensiUkom[]> {
-        const { jabatanCode, jenjangCode, bidangJabatanCode } = detail
-
-        const params = new URLSearchParams()
-        if (jabatanCode) params.append('jabatanCode', jabatanCode)
-        if (jenjangCode) params.append('jenjangCode', jenjangCode)
-        if (bidangJabatanCode)
-            params.append('bidangJabatanCode', bidangJabatanCode)
-
-        const queryString = params.toString()
-        const url = `/api/v1/kompetensi_indikator/droplist${
-            queryString ? '?' + queryString : ''
-        }`
-
-        return this.apiService.getData(url)
-    }
-
-    private fetchExistingExamConfig(): void {
-        const url = `/api/v1/exam_config/exam_schedule/${this.examDetail.id}`
-
-        this.apiService.getData(url).subscribe({
-            next: (config: ExamConfigModel) => {
-                if (
-                    config &&
-                    config.examShuffleConfigurationDtoList &&
-                    config.examShuffleConfigurationDtoList.length > 0
-                ) {
-                    // Config exists, pre-fill the question counts
-                    this.preFillQuestionCounts(config)
-                }
-            },
-            error: (err) => {
-                console.error(err)
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengambil konfigurasi ujian yang ada',
-                )
-            },
-        })
-    }
-
-    private preFillQuestionCounts(config: ExamConfigModel): void {
-        config.examShuffleConfigurationDtoList.forEach((item) => {
-            this.indicatorQuestionCounts.set(
-                item.kompetensiIndikatorId,
-                item.numOfQuestion,
-            )
-        })
     }
 
     clearAllSelection() {
@@ -276,6 +223,58 @@ export class UkomExamCatComponent implements OnChanges {
                         },
                     })
             },
+        })
+    }
+
+    private fetchIndikatorKompetensi(
+        detail: RoomUkomDetail,
+    ): Observable<IndikatorKompetensiUkom[]> {
+        const { jabatanCode, jenjangCode, bidangJabatanCode } = detail
+
+        const params = new URLSearchParams()
+        if (jabatanCode) params.append('jabatanCode', jabatanCode)
+        if (jenjangCode) params.append('jenjangCode', jenjangCode)
+        if (bidangJabatanCode)
+            params.append('bidangJabatanCode', bidangJabatanCode)
+
+        const queryString = params.toString()
+        const url = `/api/v1/kompetensi_indikator/droplist${
+            queryString ? '?' + queryString : ''
+        }`
+
+        return this.apiService.getData(url)
+    }
+
+    private fetchExistingExamConfig(): void {
+        const url = `/api/v1/exam_config/exam_schedule/${this.examDetail.id}`
+
+        this.apiService.getData(url).subscribe({
+            next: (config: ExamConfigModel) => {
+                if (
+                    config &&
+                    config.examShuffleConfigurationDtoList &&
+                    config.examShuffleConfigurationDtoList.length > 0
+                ) {
+                    // Config exists, pre-fill the question counts
+                    this.preFillQuestionCounts(config)
+                }
+            },
+            error: (err) => {
+                console.error(err)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengambil konfigurasi ujian yang ada',
+                )
+            },
+        })
+    }
+
+    private preFillQuestionCounts(config: ExamConfigModel): void {
+        config.examShuffleConfigurationDtoList.forEach((item) => {
+            this.indicatorQuestionCounts.set(
+                item.kompetensiIndikatorId,
+                item.numOfQuestion,
+            )
         })
     }
 }

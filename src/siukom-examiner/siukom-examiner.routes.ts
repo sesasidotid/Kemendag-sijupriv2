@@ -42,7 +42,7 @@ export const routes: Routes = [
                     ),
             },
             {
-                path: 'study-case/:id',
+                path: 'case-study/:id',
                 loadComponent: () =>
                     import('./studi-kasus/studi-kasus.component').then(
                         (m) => m.StudiKasusComponent,

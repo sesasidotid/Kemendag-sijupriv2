@@ -183,6 +183,46 @@
                                             Wawancara Selesai
                                         </button>
                                     </ng-container>
+
+                                    <!-- Praktik -->
+                                    <ng-container
+                                        *ngIf="exam.examTypeCode === ExamTypeCategory.PRAKTIK"
+                                    >
+                                        <app-loading-button
+                                            (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                            [className]="'btn btn-primary btn-lg'"
+                                            [disabled]="!canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score != null"
+                                            [isLoading]="startPraktikLoading()"
+                                            [label]="'Mulai Praktik'"
+                                        ></app-loading-button>
+
+                                        <button
+                                            *ngIf="scoreMap[exam.id]?.score !== null"
+                                            class="btn btn-success btn-lg"
+                                        >
+                                            Praktik Selesai
+                                        </button>
+                                    </ng-container>
+
+                                    <!-- Studi Kasis -->
+                                    <ng-container
+                                        *ngIf="exam.examTypeCode === ExamTypeCategory.STUDI_KASUS"
+                                    >
+                                        <app-loading-button
+                                            (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                            [className]="'btn btn-primary btn-lg'"
+                                            [disabled]="!canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score != null"
+                                            [isLoading]="startStudiKasusLoading()"
+                                            [label]="'Mulai Studi Kasus'"
+                                        ></app-loading-button>
+
+                                        <button
+                                            *ngIf="scoreMap[exam.id]?.score !== null"
+                                            class="btn btn-success btn-lg"
+                                        >
+                                            Studi Kasus Selesai
+                                        </button>
+                                    </ng-container>
                                 </div>
                             </div>
                         </div>

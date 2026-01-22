@@ -1,6 +1,6 @@
 /**
  * Schedule Slot Models for Admin Manual Rescheduling
- * 
+ *
  * Business Rules:
  * - Personal schedules must be within main schedule boundaries
  * - No overlapping participant slots
@@ -23,6 +23,7 @@ export interface ParticipantSchedule {
     personalSchedule: Date | null
     participantName: string // denormalized for display
     participantNip?: string
+    examinerName: string
 }
 
 export interface ScheduleSlot {

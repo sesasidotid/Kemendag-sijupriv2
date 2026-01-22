@@ -7,7 +7,10 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { ExamType } from '@/modules/ukom/models/exam-type.model'
+import {
+    ExamType,
+    ExamTypeCategory,
+} from '@/modules/ukom/models/exam-type.model'
 import { finalize, Observable } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ImportQuestionRequest } from '@/modules/ukom/models/ukom-module-refactor/import-question-request.model'
@@ -29,15 +32,26 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 })
 export class UkomQuestionImportComponent {
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
-    @ViewChild(FileHandlerComponent) fileHandlerComponent!: FileHandlerComponent
-    examTypeCode = new FormControl('', Validators.required)
-    base64FileQuestion = ''
 
+    @ViewChild('templateHandler') templateHandler!: FileHandlerComponent
+    @ViewChild('studiKasusHandler') studiKasusHandler!: FileHandlerComponent
+
+    examTypeCode = new FormControl('', Validators.required)
+
+    examTypeList$: Observable<ExamType[]>
     isLoading = false
 
-    inputs: FIleHandler = {
+    // collected files
+    templateFileBase64 = ''
+    studiKasusFileBase64 = ''
+
+    /** TEMPLATE (EXCEL) */
+    templateInputs: FIleHandler = {
         files: {
-            questionFile: { label: 'File Pertanyaan' },
+            file_question: {
+                label: 'File Pertanyaan',
+                required: true,
+            },
         },
         allowedTypes: [
             { label: 'xls', type: 'application/vnd.ms-excel' },
@@ -46,12 +60,26 @@ export class UkomQuestionImportComponent {
                 type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             },
         ],
-        listen: (key: string, base64Data: string) => {
-            this.base64FileQuestion = base64Data
+        listen: (_key: string, source: string) => {
+            this.templateFileBase64 = source
         },
     }
 
-    examTypeList$: Observable<ExamType[]>
+    /** STUDI KASUS (PDF) */
+    studiKasusInputs: FIleHandler = {
+        files: {
+            upload_soal: {
+                label: 'File Studi Kasus',
+                required: true,
+            },
+        },
+        allowedTypes: [{ label: 'pdf', type: 'application/pdf' }],
+        listen: (_key: string, source: string) => {
+            this.studiKasusFileBase64 = source
+            console.log('update')
+        },
+    }
+    protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor(
         private ukomModulesService: UkomModulesService,
@@ -62,6 +90,13 @@ export class UkomQuestionImportComponent {
 
     ngOnInit() {
         this.examTypeList$ = this.ukomMiscellaneousService.getExamType()
+
+        this.examTypeCode.valueChanges.subscribe((value) => {
+            if (value !== ExamTypeCategory.STUDI_KASUS) {
+                this.studiKasusFileBase64 = ''
+                this.studiKasusHandler?.clearFileName()
+            }
+        })
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
@@ -76,8 +111,7 @@ export class UkomQuestionImportComponent {
         this.ukomModulesService
             .downloadTemplate(this.examTypeCode.value)
             .subscribe({
-                error: (err) => {
-                    console.error(err)
+                error: () => {
                     this.handlerService.handleAlert(
                         'Error',
                         'Gagal mengunduh template pertanyaan',
@@ -93,13 +127,17 @@ export class UkomQuestionImportComponent {
 
                 this.isLoading = true
 
-                const body = new ImportQuestionRequest({
-                    exam_type: this.examTypeCode.value,
-                    file_question: this.base64FileQuestion,
-                })
+                const body: any = {
+                    examType: this.examTypeCode.value,
+                    fileQuestion: this.templateFileBase64,
+                }
+
+                if (this.examTypeCode.value === ExamTypeCategory.STUDI_KASUS) {
+                    body.uploadSoal = this.studiKasusFileBase64
+                }
 
                 this.ukomModulesService
-                    .saveBulk(body)
+                    .saveBulk(new ImportQuestionRequest(body))
                     .pipe(finalize(() => (this.isLoading = false)))
                     .subscribe({
                         next: () => {
@@ -107,11 +145,12 @@ export class UkomQuestionImportComponent {
                                 'Success',
                                 'Berhasil mengimpor pertanyaan',
                             )
-                            this.fileHandlerComponent.clearFileName()
-                            this.base64FileQuestion = ''
+                            this.templateHandler.clearFileName()
+                            this.studiKasusHandler?.clearFileName()
+                            this.templateFileBase64 = ''
+                            this.studiKasusFileBase64 = ''
                         },
-                        error: (err) => {
-                            console.error(err)
+                        error: () => {
                             this.handlerService.handleAlert(
                                 'Error',
                                 'Gagal mengimpor pertanyaan',
@@ -120,5 +159,20 @@ export class UkomQuestionImportComponent {
                     })
             },
         })
+    }
+
+    isSubmitDisabled(): boolean {
+        if (this.examTypeCode.invalid || !this.templateFileBase64) {
+            return true
+        }
+
+        if (
+            this.examTypeCode.value === ExamTypeCategory.STUDI_KASUS &&
+            !this.studiKasusFileBase64
+        ) {
+            return true
+        }
+
+        return false
     }
 }
