@@ -1,15 +1,14 @@
-
-.available-slots {
+.available-examiners {
     ::ng-deep .ag-theme-alpine {
         .ag-row-selected {
             background-color: #d1e7dd !important;
         }
 
-        .ag-row.current-slot {
+        .ag-row.current-examiner {
             background-color: #cfe2ff;
         }
 
-        .ag-row.current-slot.ag-row-selected {
+        .ag-row.current-examiner.ag-row-selected {
             background-color: #d1e7dd !important;
         }
     }

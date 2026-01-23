@@ -167,6 +167,17 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
         this.gridApi.sizeColumnsToFit()
     }
 
+    calculateGridHeight(): string {
+        const rowCount = this.examinerList().length
+        const headerHeight = 48
+        const rowHeight = 42
+
+        // Total = Header + (Rows * Height) + 2px for top/bottom borders
+        const totalHeight = headerHeight + rowCount * rowHeight + 2
+
+        return `${totalHeight + 1}px`
+    }
+
     private initializeColumnDefs(): void {
         this.columnDefs = [
             {
@@ -179,7 +190,11 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
                 },
             },
             {
-                headerName: 'Nama Penguji',
+                headerName: 'Username',
+                field: 'examinerUkom.nip',
+            },
+            {
+                headerName: 'Nama',
                 field: 'examinerUkom.user.name',
                 flex: 1,
             },

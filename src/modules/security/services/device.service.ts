@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core'
-import { v4 as uuidv4 } from 'uuid'
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class DeviceService {
-  constructor () {}
+    getDeviceId(): string {
+        let deviceId = localStorage.getItem('device_id')
 
-  public getDeviceId () {
-    let deviceId = localStorage.getItem('device_id')
-    if (!deviceId) {
-      deviceId = uuidv4()
-      localStorage.setItem('device_id', deviceId)
+        if (!deviceId) {
+            deviceId = crypto.randomUUID()
+            localStorage.setItem('device_id', deviceId)
+        }
+
+        return deviceId
     }
-    return deviceId
-  }
 }

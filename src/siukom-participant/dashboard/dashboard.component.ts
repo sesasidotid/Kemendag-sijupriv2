@@ -4,7 +4,16 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { catchError, concatMap, finalize, forkJoin, map, of, tap, timer } from 'rxjs'
+import {
+    catchError,
+    concatMap,
+    finalize,
+    forkJoin,
+    map,
+    of,
+    tap,
+    timer,
+} from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { CATScore } from '@/modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
@@ -236,6 +245,9 @@ export class DashboardComponent implements OnInit {
                             startCATLoading: this.startCATLoading,
                             startMakalahLoading: this.startMakalahLoading,
                             startWawancaraLoading: this.startWawancaraLoading,
+                            startPraktikLoading: this.startPraktikLoading,
+                            startStudiKasusLoading: this.startStudiKasusLoading,
+                            startPortofolioLoading: this.startPortofolioLoading,
                         },
                     )
                     loadingSignal?.set(true)
@@ -274,6 +286,14 @@ export class DashboardComponent implements OnInit {
                                         'Error',
                                         'Kode ujian yang dimasukkan tidak valid.',
                                     )
+                                    // } else if (
+                                    //     err.error.message ==
+                                    //     "Exam's not yet started"
+                                    // ) {
+                                    //     this.handlerService.handleAlert(
+                                    //         'Error',
+                                    //         'Ujian belum dimulai oleh penguji.',
+                                    //     )
                                 } else {
                                     this.handlerService.handleException(err)
                                 }

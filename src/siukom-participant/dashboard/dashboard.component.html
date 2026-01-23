@@ -123,105 +123,176 @@
                                     <ng-container
                                         *ngIf="exam.examTypeCode === ExamTypeCategory.CAT"
                                     >
-                                        <app-loading-button
-                                            (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                            *ngIf="canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score == null"
-                                            [className]="'btn btn-primary btn-lg'"
-                                            [disabled]="!canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score != null"
-                                            [isLoading]="startCATLoading()"
-                                            [label]="'Mulai Ujian'"
-                                        ></app-loading-button>
-
-                                        <button
-                                            (click)="openScoreModal(exam.id)"
-                                            *ngIf="scoreMap[exam.id]?.score !== null"
-                                            class="btn btn-success btn-lg"
+                                        <ng-container
+                                            *ngIf="scoreMap[exam.id]?.score as score; else catNoScore"
                                         >
-                                            Lihat Nilai
-                                        </button>
+                                            <button
+                                                (click)="openScoreModal(exam.id)"
+                                                class="btn btn-success btn-lg"
+                                            >
+                                                Lihat Nilai
+                                            </button>
+                                        </ng-container>
+
+                                        <ng-template #catNoScore>
+                                            <app-loading-button
+                                                (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                                [className]="'btn btn-primary btn-lg'"
+                                                [disabled]="!canStartExam(exam.startTime, exam.endTime)"
+                                                [isLoading]="startCATLoading()"
+                                                [label]="'Mulai Ujian'"
+                                            ></app-loading-button>
+                                        </ng-template>
                                     </ng-container>
 
                                     <!-- MAKALAH -->
                                     <ng-container
                                         *ngIf="exam.examTypeCode === ExamTypeCategory.MAKALAH"
                                     >
-                                        <app-loading-button
-                                            (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                            *ngIf="canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score == null"
-                                            [className]="'btn btn-primary btn-lg'"
-                                            [disabled]="!canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score != null"
-                                            [isLoading]="startMakalahLoading()"
-                                            [label]="'Unggah Makalah'"
-                                        ></app-loading-button>
-
-                                        <button
-                                            (click)="viewUploadedMakalah(exam.id)"
-                                            *ngIf="scoreMap[exam.id]?.score !== null"
-                                            class="btn btn-success btn-lg"
+                                        <ng-container
+                                            *ngIf="scoreMap[exam.id]?.score as score; else makalahNoScore"
                                         >
-                                            Makalah Terkirim
-                                        </button>
+                                            <button
+                                                (click)="viewUploadedMakalah(exam.id)"
+                                                class="btn btn-success btn-lg"
+                                            >
+                                                Makalah Terkirim
+                                            </button>
+                                        </ng-container>
+
+                                        <ng-template #makalahNoScore>
+                                            <app-loading-button
+                                                (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                                [className]="'btn btn-primary btn-lg'"
+                                                [disabled]="!canStartExam(exam.startTime, exam.endTime)"
+                                                [isLoading]="startMakalahLoading()"
+                                                [label]="'Unggah Makalah'"
+                                            ></app-loading-button>
+                                        </ng-template>
                                     </ng-container>
 
                                     <!-- WAWANCARA -->
                                     <ng-container
                                         *ngIf="exam.examTypeCode === ExamTypeCategory.WAWANCARA"
                                     >
-                                        <app-loading-button
-                                            (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                            *ngIf="canStartExam(exam.personalSchedule) || scoreMap[exam.id]?.score == null"
-                                            [className]="'btn btn-primary btn-lg'"
-                                            [disabled]="!canStartExam(exam.personalSchedule) || scoreMap[exam.id]?.score != null"
-                                            [isLoading]="startWawancaraLoading()"
-                                            [label]="'Mulai Wawancara'"
-                                        ></app-loading-button>
-
-                                        <button
-                                            *ngIf="scoreMap[exam.id]?.score !== null"
-                                            class="btn btn-success btn-lg"
+                                        <ng-container
+                                            *ngIf="scoreMap[exam.id]?.score as score; else wawancaraNoScore"
                                         >
-                                            Wawancara Selesai
-                                        </button>
+                                            <button
+                                                class="btn btn-success btn-lg"
+                                            >
+                                                Wawancara Selesai
+                                            </button>
+                                        </ng-container>
+
+                                        <ng-template #wawancaraNoScore>
+                                            <!--                                            <app-loading-button-->
+                                            <!--                                                (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"-->
+                                            <!--                                                [className]="'btn btn-primary btn-lg'"-->
+                                            <!--                                                [disabled]="!canStartExam(exam.personalSchedule)"-->
+                                            <!--                                                [isLoading]="startWawancaraLoading()"-->
+                                            <!--                                                [label]="'Mulai Wawancara'"-->
+                                            <!--                                            ></app-loading-button>-->
+                                            <div
+                                                class="alert alert-info d-flex align-items-start gap-3"
+                                            >
+                                                <i
+                                                    class="mdi mdi-clock-outline fs-4"
+                                                ></i>
+                                                <div>
+                                                    <div class="fw-semibold">
+                                                        Wawancara Online (Zoom)
+                                                    </div>
+                                                    <div
+                                                        class="small text-muted"
+                                                    >
+                                                        Silakan bergabung ke
+                                                        Zoom melalui tautan
+                                                        diatas
+                                                        <strong
+                                                            >sesuai jadwal
+                                                            wawancara yang telah
+                                                            ditentukan</strong
+                                                        >.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template>
                                     </ng-container>
 
-                                    <!-- Praktik -->
+                                    <!-- PRAKTIK -->
                                     <ng-container
                                         *ngIf="exam.examTypeCode === ExamTypeCategory.PRAKTIK"
                                     >
-                                        <app-loading-button
-                                            (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                            [className]="'btn btn-primary btn-lg'"
-                                            [disabled]="!canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score != null"
-                                            [isLoading]="startPraktikLoading()"
-                                            [label]="'Mulai Praktik'"
-                                        ></app-loading-button>
-
-                                        <button
-                                            *ngIf="scoreMap[exam.id]?.score !== null"
-                                            class="btn btn-success btn-lg"
+                                        <ng-container
+                                            *ngIf="scoreMap[exam.id]?.score as score; else praktikNoScore"
                                         >
-                                            Praktik Selesai
-                                        </button>
+                                            <button
+                                                class="btn btn-success btn-lg"
+                                            >
+                                                Praktik Selesai
+                                            </button>
+                                        </ng-container>
+
+                                        <ng-template #praktikNoScore>
+                                            <app-loading-button
+                                                (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                                [className]="'btn btn-primary btn-lg'"
+                                                [disabled]="!canStartExam(exam.startTime, exam.endTime)"
+                                                [isLoading]="startPraktikLoading()"
+                                                [label]="'Mulai Praktik'"
+                                            ></app-loading-button>
+                                        </ng-template>
                                     </ng-container>
 
-                                    <!-- Studi Kasis -->
+                                    <!-- STUDI KASUS -->
                                     <ng-container
                                         *ngIf="exam.examTypeCode === ExamTypeCategory.STUDI_KASUS"
                                     >
-                                        <app-loading-button
-                                            (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                            [className]="'btn btn-primary btn-lg'"
-                                            [disabled]="!canStartExam(exam.startTime, exam.endTime) || scoreMap[exam.id]?.score != null"
-                                            [isLoading]="startStudiKasusLoading()"
-                                            [label]="'Mulai Studi Kasus'"
-                                        ></app-loading-button>
-
-                                        <button
-                                            *ngIf="scoreMap[exam.id]?.score !== null"
-                                            class="btn btn-success btn-lg"
+                                        <ng-container
+                                            *ngIf="scoreMap[exam.id]?.score as score; else studiKasusNoScore"
                                         >
-                                            Studi Kasus Selesai
-                                        </button>
+                                            <button
+                                                class="btn btn-success btn-lg"
+                                            >
+                                                Studi Kasus Selesai
+                                            </button>
+                                        </ng-container>
+
+                                        <ng-template #studiKasusNoScore>
+                                            <app-loading-button
+                                                (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                                [className]="'btn btn-primary btn-lg'"
+                                                [disabled]="!canStartExam(exam.startTime, exam.endTime)"
+                                                [isLoading]="startStudiKasusLoading()"
+                                                [label]="'Mulai Studi Kasus'"
+                                            ></app-loading-button>
+                                        </ng-template>
+                                    </ng-container>
+
+                                    <!-- PORTFOLIO -->
+                                    <ng-container
+                                        *ngIf="exam.examTypeCode === ExamTypeCategory.PORTOFOLIO"
+                                    >
+                                        <ng-container
+                                            *ngIf="scoreMap[exam.id]?.score as score; else portfolioNoScore"
+                                        >
+                                            <button
+                                                class="btn btn-success btn-lg"
+                                            >
+                                                Portfolio Terkirim
+                                            </button>
+                                        </ng-container>
+
+                                        <ng-template #portfolioNoScore>
+                                            <app-loading-button
+                                                (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                                [className]="'btn btn-primary btn-lg'"
+                                                [disabled]="!canStartExam(exam.startTime, exam.endTime)"
+                                                [isLoading]="startPortofolioLoading()"
+                                                [label]="'Unggah Portfolio'"
+                                            ></app-loading-button>
+                                        </ng-template>
                                     </ng-container>
                                 </div>
                             </div>

@@ -32,6 +32,9 @@ export class ExamTypeHandlerService {
         [ExamTypeCategory.CAT]: 'cat',
         [ExamTypeCategory.MAKALAH]: 'seminar-paper',
         [ExamTypeCategory.WAWANCARA]: 'interviews',
+        [ExamTypeCategory.STUDI_KASUS]: 'case-study',
+        [ExamTypeCategory.PORTOFOLIO]: 'portfolio',
+        [ExamTypeCategory.PRAKTIK]: 'practical-work',
     }
 
     /**
@@ -43,6 +46,7 @@ export class ExamTypeHandlerService {
     getStartExamConfig(examType: ExamTypeCategory): StartExamConfig {
         switch (examType) {
             case ExamTypeCategory.CAT:
+            case ExamTypeCategory.STUDI_KASUS:
                 return {
                     withComment: true,
                     title: 'Konfirmasi Mulai Ujian CAT',
@@ -87,12 +91,20 @@ export class ExamTypeHandlerService {
             startCATLoading: WritableSignal<boolean>
             startMakalahLoading: WritableSignal<boolean>
             startWawancaraLoading: WritableSignal<boolean>
+            startPraktikLoading: WritableSignal<boolean>
+            startStudiKasusLoading: WritableSignal<boolean>
+            startPortofolioLoading: WritableSignal<boolean>
         },
     ): WritableSignal<boolean> | undefined {
         const LOADING_MAP: Record<string, WritableSignal<boolean>> = {
             [ExamTypeCategory.CAT]: loadingSignals.startCATLoading,
             [ExamTypeCategory.MAKALAH]: loadingSignals.startMakalahLoading,
             [ExamTypeCategory.WAWANCARA]: loadingSignals.startWawancaraLoading,
+            [ExamTypeCategory.PRAKTIK]: loadingSignals.startPraktikLoading,
+            [ExamTypeCategory.STUDI_KASUS]:
+                loadingSignals.startStudiKasusLoading,
+            [ExamTypeCategory.PORTOFOLIO]:
+                loadingSignals.startPortofolioLoading,
         }
 
         return LOADING_MAP[examType]

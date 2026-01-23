@@ -7,6 +7,7 @@ import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { BaseExamScheduleRequest } from '../models/exam-schedule/create-exam-schedule-request.model'
 import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
 import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-examiner-list.model'
+import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-schedule/update-examiner-for-participant-request.model'
 
 @Injectable({
     providedIn: 'root',
@@ -72,6 +73,15 @@ export class UkomExamScheduleService {
     ): Observable<ParticipantScheduleList[]> {
         return this.apiService.getData(
             `${this.API_BASE_URL}/participant_schedule/${examScheduleId}`,
+        )
+    }
+
+    updateExaminerForParticipantScheduleByParticipantScheduleId(
+        payload: UpdateExaminerForParticipantRequest,
+    ) {
+        return this.apiService.putData(
+            `${this.API_BASE_URL}/examiner_schedule`,
+            payload,
         )
     }
 }

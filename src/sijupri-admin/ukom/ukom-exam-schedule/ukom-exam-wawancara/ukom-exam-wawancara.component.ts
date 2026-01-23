@@ -15,8 +15,10 @@ import {
 } from '@/modules/ukom/models/schedule-slot.model'
 import { ScheduleSlotService } from '@/modules/ukom/services/schedule-slot.service'
 import { RescheduleModalComponent } from './reschedule-modal/reschedule-modal.component'
+import { UpdateExaminerModalComponent } from './update-examiner-modal/update-examiner-modal.component'
 import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
 import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-examiner-list.model'
+import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-schedule/update-examiner-for-participant-request.model'
 
 /**
  * Admin Schedule Viewer with Manual Rescheduling
@@ -33,7 +35,12 @@ import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-s
 @Component({
     selector: 'app-ukom-exam-wawancara',
     standalone: true,
-    imports: [CommonModule, AgGridAngular, RescheduleModalComponent],
+    imports: [
+        CommonModule,
+        AgGridAngular,
+        RescheduleModalComponent,
+        UpdateExaminerModalComponent,
+    ],
     templateUrl: './ukom-exam-wawancara.component.html',
     styleUrl: './ukom-exam-wawancara.component.scss',
 })
@@ -58,6 +65,12 @@ export class UkomExamWawancaraComponent implements OnInit {
     selectedParticipant = signal<ParticipantSchedule | null>(null)
     availableSlotsForReschedule = signal<ScheduleSlot[]>([])
     currentParticipantSlot = signal<ScheduleSlot | null>(null)
+
+    // Examiner Modal state
+    showExaminerModal = signal<boolean>(false)
+    selectedParticipantForExaminer = signal<ParticipantSchedule | null>(null)
+    currentSlotForExaminer = signal<ScheduleSlot | null>(null)
+
     columnDefs: ColDef[] = []
     defaultColDef: ColDef = {
         sortable: true,
@@ -197,6 +210,44 @@ export class UkomExamWawancaraComponent implements OnInit {
     }
 
     /**
+     * Open examiner update modal for a participant
+     */
+    openExaminerModal(slot: ScheduleSlot): void {
+        if (!slot.participantSchedule) return
+
+        this.selectedParticipantForExaminer.set(slot.participantSchedule)
+        this.currentSlotForExaminer.set(slot)
+        this.showExaminerModal.set(true)
+    }
+
+    /**
+     * Close examiner update modal
+     */
+    closeExaminerModal(): void {
+        this.showExaminerModal.set(false)
+        this.selectedParticipantForExaminer.set(null)
+        this.currentSlotForExaminer.set(null)
+    }
+
+    /**
+     * Confirm examiner update action
+     */
+    confirmExaminerUpdate(event: {
+        participant: ParticipantSchedule
+        examinerId: string
+    }): void {
+        const { participant, examinerId } = event
+
+        // Prepare request
+        const request = new UpdateExaminerForParticipantRequest({
+            participantScheduleId: participant.id,
+            examinerScheduleIdList: [examinerId], // For wawancara, only one examiner
+        })
+
+        this.performExaminerUpdate(request)
+    }
+
+    /**
      * Initialize AG Grid column definitions
      */
     private initializeColumnDefs(): void {
@@ -275,19 +326,29 @@ export class UkomExamWawancaraComponent implements OnInit {
             },
             {
                 headerName: 'Aksi',
-                width: 140,
+                width: 250,
                 cellClass: 'text-center',
                 cellRenderer: (params: any) => {
                     const slot = params.data as ScheduleSlot
                     if (!slot.isOccupied) {
                         return '—'
                     }
-                    return `<button class="btn btn-sm btn-primary">Atur Ulang</button>`
+                    return `
+                        <button class="btn btn-sm btn-primary me-2" data-action="reschedule">Atur Ulang</button>
+                        <button class="btn btn-sm btn-info" data-action="update-examiner">Ubah Penguji</button>
+                    `
                 },
                 onCellClicked: (params) => {
                     const slot = params.data as ScheduleSlot
-                    if (slot.isOccupied) {
+                    if (!slot.isOccupied) return
+
+                    const target = params.event.target as HTMLElement
+                    const action = target.getAttribute('data-action')
+
+                    if (action === 'reschedule') {
                         this.openRescheduleModal(slot)
+                    } else if (action === 'update-examiner') {
+                        this.openExaminerModal(slot)
                     }
                 },
             },
@@ -378,6 +439,64 @@ export class UkomExamWawancaraComponent implements OnInit {
                     this.handlerService.handleAlert(
                         'Error',
                         'Gagal mengubah jadwal. Silakan coba lagi.',
+                    )
+                },
+            })
+    }
+
+    /**
+     * Perform examiner update via API
+     */
+    private performExaminerUpdate(
+        request: UpdateExaminerForParticipantRequest,
+    ): void {
+        const main = this.mainSchedule()
+        if (!main) return
+
+        this.examScheduleService
+            .updateExaminerForParticipantScheduleByParticipantScheduleId(
+                request,
+            )
+            .subscribe({
+                next: () => {
+                    // Update in-memory state AFTER API success
+                    const participantIndex =
+                        main.participantScheduleList.findIndex(
+                            (p) => p.id === request.participantScheduleId,
+                        )
+
+                    if (participantIndex !== -1) {
+                        // Find the new examiner name
+                        const newExaminer = this.examinerList().find(
+                            (e) => e.id === request.examinerScheduleIdList[0],
+                        )
+
+                        if (newExaminer) {
+                            main.participantScheduleList[
+                                participantIndex
+                            ].examinerName =
+                                newExaminer.examinerUkom?.user?.name ??
+                                'Unknown'
+                        }
+
+                        // Regenerate slots to reflect updated examiner
+                        const slots = this.slotService.generateAllSlots(main)
+                        this.allSlots.set(slots)
+                    }
+
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'Penguji berhasil diubah',
+                    )
+
+                    this.closeExaminerModal()
+                },
+                error: (err) => {
+                    console.error('Update examiner failed', err)
+
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengubah penguji. Silakan coba lagi.',
                     )
                 },
             })

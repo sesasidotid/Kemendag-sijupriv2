@@ -1,10 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
-import {
-    FormBuilder,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms'
+import { Component, effect, inject, OnInit, signal } from '@angular/core'
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
 import { CommonModule } from '@angular/common'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
@@ -12,6 +7,8 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ActivatedRoute, Router } from '@angular/router'
+import { finalize } from 'rxjs'
+import { ExamService } from '@/modules/ukom/services/exam.service'
 
 @Component({
     selector: 'app-practical-work-page',
@@ -38,6 +35,20 @@ export class PracticalWorkPageComponent implements OnInit {
     router = inject(Router)
     route = inject(ActivatedRoute)
     fb = inject(FormBuilder)
+    examService = inject(ExamService)
+    questionLoading = signal(false)
+
+    constructor() {
+        effect(
+            () => {
+                const examId = this.examId()
+                if (!examId) return
+
+                this.getQuestion()
+            },
+            { allowSignalWrites: true },
+        )
+    }
 
     ngOnInit() {
         this.route.paramMap.subscribe((params) => {
@@ -47,6 +58,31 @@ export class PracticalWorkPageComponent implements OnInit {
         })
     }
 
+    getQuestion() {
+        this.questionLoading.set(true)
+        this.examService
+            .getExamQuestionByScheduleId(this.examId(), {
+                limit: '1000',
+                page: '1',
+            })
+            .pipe(
+                finalize(() => {
+                    this.questionLoading.set(false)
+                }),
+            )
+            .subscribe({
+                next: (res) => {
+                    console.log('Fetched question:', res)
+                },
+                error: (err) => {
+                    console.error('Error fetching question:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil soal praktik',
+                    )
+                },
+            })
+    }
     getErrorMessage(controlName: string, label: string): string | null {
         const control = this.videoForm.get(controlName)
         return this.formValidationService.getErrorMessage(

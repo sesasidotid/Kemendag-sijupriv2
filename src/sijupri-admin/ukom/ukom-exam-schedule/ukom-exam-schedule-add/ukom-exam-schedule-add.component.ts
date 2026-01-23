@@ -702,6 +702,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     endTime: v.endTime,
                     participantIdList: v.participantIdList ?? [],
                     examinerIdList: v.examinerIdList,
+                    secretKey: v.secretKey,
                 })
         }
     }

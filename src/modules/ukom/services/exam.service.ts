@@ -1,6 +1,9 @@
 import { inject, Injectable } from '@angular/core'
 import { ApiService } from '@/modules/base/services/api.service'
-import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
+import {
+    ExamAnswerDto,
+    SaveExamAnswerRequest,
+} from '@/modules/ukom/models/exam/exam-answer.model'
 import { Observable } from 'rxjs'
 import { HttpParams } from '@angular/common/http'
 import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
@@ -54,6 +57,16 @@ export class ExamService {
             (params.toString() ? `?${params.toString()}` : '')
 
         return this.apiService.getData(path)
+    }
+
+    saveExamAnswerForParticipantByExamScheduleId(
+        examScheduleId: string,
+        payload: ExamAnswerDto,
+    ) {
+        return this.apiService.postData(
+            `${this.BASE_PATH}/answer/${examScheduleId}`,
+            payload,
+        )
     }
 
     saveExamAnswersByExamScheduleId(

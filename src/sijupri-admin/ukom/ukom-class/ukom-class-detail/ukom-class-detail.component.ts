@@ -1,25 +1,29 @@
-import { Component } from '@angular/core'
-import { ApiService } from '@/modules/base/services/api.service'
-import { CommonModule, Location } from '@angular/common'
+import { Component } from "@angular/core"
+import { ApiService } from "@/modules/base/services/api.service"
+import { CommonModule, Location } from "@angular/common"
 import {
-    ActionColumnBuilder,
-    PagableBuilder,
-    PrimaryColumnBuilder,
-} from '@/modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
-import { Pagable } from '@/modules/base/commons/pagable/pagable'
-import { ActivatedRoute } from '@angular/router'
-import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
-import { combineLatest, finalize, Observable } from 'rxjs'
-import { map, take, BehaviorSubject } from 'rxjs'
-import { Router } from '@angular/router'
-import { TabService } from '@/modules/base/services/tab.service'
-import { HandlerService } from '@/modules/base/services/handler.service'
-import { TanggalIndoPipe } from '@/modules/base/pipes/tanggal-indo.pipe'
+  ActionColumnBuilder,
+  PagableBuilder,
+  PrimaryColumnBuilder
+} from "@/modules/base/commons/pagable/pagable-builder"
+import { PagableComponent } from "@/modules/base/components/pagable/pagable.component"
+import { Pagable } from "@/modules/base/commons/pagable/pagable"
+import { ActivatedRoute, Router } from "@angular/router"
+import { RoomUkomDetail } from "@/modules/ukom/models/room-ukom-detail"
+import { BehaviorSubject, combineLatest, finalize, map, Observable, take } from "rxjs"
+import { TabService } from "@/modules/base/services/tab.service"
+import { HandlerService } from "@/modules/base/services/handler.service"
+import { TanggalIndoPipe } from "@/modules/base/pipes/tanggal-indo.pipe"
+
 @Component({
     selector: 'app-ukom-class-detail',
     standalone: true,
-    imports: [PagableComponent, CommonModule, TanggalIndoPipe],
+    imports: [
+        PagableComponent,
+        CommonModule,
+        TanggalIndoPipe,
+
+    ],
     templateUrl: './ukom-class-detail.component.html',
     styleUrl: './ukom-class-detail.component.scss',
 })

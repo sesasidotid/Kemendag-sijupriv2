@@ -45,18 +45,6 @@
                         </div>
                     </div>
                 </div>
-                <!--                <div class="col-md-3">-->
-                <!--                    <div class="card bg-danger bg-opacity-10">-->
-                <!--                        <div class="card-body text-center">-->
-                <!--                            <h5 class="card-title text-danger">-->
-                <!--                                {{ scheduleSummary.unavailable }}-->
-                <!--                            </h5>-->
-                <!--                            <p class="card-text text-muted mb-0">-->
-                <!--                                Tidak Tersedia (20:00-06:00 WIB)-->
-                <!--                            </p>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                </div>-->
             </div>
 
             <!-- Schedule Info -->
@@ -83,9 +71,10 @@
             [paginationPageSize]="20"
             [pagination]="true"
             [rowData]="allSlots()"
+            [style.height.px]="600"
+            [style.width.%]="100"
             [suppressCellFocus]="true"
             class="ag-theme-alpine"
-            style="height: 600px; width: 100%"
         >
         </ag-grid-angular>
 
@@ -106,15 +95,6 @@
                     ></span>
                     <span class="legend-label">Slot Tersedia</span>
                 </div>
-                <!--                <div class="legend-item">-->
-                <!--                    <span-->
-                <!--                        class="legend-box"-->
-                <!--                        style="background-color: #f8d7da"-->
-                <!--                    ></span>-->
-                <!--                    <span class="legend-label"-->
-                <!--                        >Tidak Tersedia (20:00-06:00 WIB)</span-->
-                <!--                    >-->
-                <!--                </div>-->
             </div>
         </div>
     </div>
@@ -152,3 +132,14 @@
     [participant]="selectedParticipant()!"
 >
 </app-reschedule-modal>
+
+<!-- Update Examiner Modal -->
+<app-update-examiner-modal
+    (close)="closeExaminerModal()"
+    (confirm)="confirmExaminerUpdate($event)"
+    *ngIf="showExaminerModal() && selectedParticipantForExaminer()"
+    [currentSlot]="currentSlotForExaminer()"
+    [examinerList]="examinerList()"
+    [participant]="selectedParticipantForExaminer()!"
+>
+</app-update-examiner-modal>

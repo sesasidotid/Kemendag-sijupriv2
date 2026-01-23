@@ -1,74 +1,77 @@
-<button (click)="back()" class="btn btn-sm btn-outline-secondary mb-3">
-    <i class="mdi mdi-chevron-left"></i> Kembali
-</button>
+<div class="d-flex align-items-center mb-3">
+    <button (click)="back()" class="btn btn-sm btn-outline-secondary me-3">
+        <i class="mdi mdi-chevron-left"></i> Kembali
+    </button>
+</div>
 
 <ng-container *ngIf="isLoading$ | async; else ukomExamContent">
     <div class="d-flex justify-content-center my-5">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
+        <div class="spinner-border" role="status"></div>
     </div>
 </ng-container>
 
 <ng-template #ukomExamContent>
     <div class="d-flex flex-column gap-4">
-        <section class="row g-3">
-            <div class="col-12">
-                <label class="form-label text-muted">Nama Kelas</label>
-                <div class="form-control-plaintext fw-semibold fs-5">
-                    {{ roomUkomDetail.name }}
-                </div>
-            </div>
+        <div class="card">
+            <div class="card-header fw-semibold">Informasi Ujian</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label text-muted small"
+                            >Nama Kelas</label
+                        >
+                        <div class="fw-semibold fs-5">
+                            {{ roomUkomDetail.name }}
+                        </div>
+                    </div>
 
-            <div class="col-md-6">
-                <label class="form-label text-muted">Waktu Mulai</label>
-                <div class="form-control-plaintext fw-semibold fs-5">
-                    {{ examDetail.startTime | tanggalWaktuIndo }}
-                </div>
-            </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small"
+                            >Waktu Mulai</label
+                        >
+                        <div>{{ examDetail.startTime | tanggalWaktuIndo }}</div>
+                    </div>
 
-            <div class="col-md-6">
-                <label class="form-label text-muted">Waktu Selesai</label>
-                <div class="form-control-plaintext fw-semibold fs-5">
-                    {{ examDetail.endTime | tanggalWaktuIndo }}
-                </div>
-            </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small"
+                            >Waktu Selesai</label
+                        >
+                        <div>{{ examDetail.endTime | tanggalWaktuIndo }}</div>
+                    </div>
 
-            <div class="col-md-6">
-                <label class="form-label text-muted">Jenis Ujian</label>
-                <div class="form-control-plaintext fw-semibold fs-5">
-                    {{ examDetail.examTypeCode }}
-                </div>
-            </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small"
+                            >Jenis Ujian</label
+                        >
+                        <div>{{ examDetail.examTypeCode }}</div>
+                    </div>
 
-            <div class="col-md-6">
-                <label class="form-label text-muted">Durasi</label>
-                <div class="form-control-plaintext fw-semibold fs-5">
-                    {{ examDetail.duration | duration }}
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small"
+                            >Durasi</label
+                        >
+                        <div>{{ examDetail.duration | duration }}</div>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
 
         <ng-container *ngIf="examinerList().length > 0">
-            <div class="d-flex align-items-center mt-3 gap-2">
-                <h6 class="fw-semibold text-uppercase text-secondary mb-0">
-                    Daftar Penguji
-                </h6>
-                <div class="flex-grow-1 border-top"></div>
+            <div class="card">
+                <div class="card-header fw-semibold">Daftar Penguji</div>
+                <div class="card-body p-0">
+                    <ag-grid-angular
+                        [columnDefs]="columnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [rowData]="examinerList()"
+                        [style.height]="calculateGridHeight()"
+                        [suppressCellFocus]="true"
+                        class="ag-theme-alpine"
+                    ></ag-grid-angular>
+                </div>
             </div>
-
-            <ag-grid-angular
-                [columnDefs]="columnDefs"
-                [defaultColDef]="defaultColDef"
-                [paginationPageSize]="20"
-                [pagination]="true"
-                [rowData]="examinerList()"
-                [suppressCellFocus]="true"
-                class="ag-theme-alpine auto-grid"
-                domLayout="autoHeight"
-            >
-            </ag-grid-angular>
         </ng-container>
+
         <ng-container *ngIf="typeUkom === 'CAT'">
             <app-ukom-exam-cat
                 [examDetail]="examDetail"

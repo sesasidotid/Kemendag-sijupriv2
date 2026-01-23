@@ -1,106 +1,74 @@
+<button (click)="goBack()" class="btn btn-sm btn-outline-secondary mb-3">
+    <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
 <ng-container *ngIf="(tab$ | async) === 0">
     <ng-container *ngIf="isLoading$ | async; else kelasHadItem">
-        <div class="card parent">
-            <div class="d-flex justify-content-center my-5">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
+        <div class="d-flex justify-content-center my-5">
+            <div class="spinner-border" role="status"></div>
         </div>
     </ng-container>
 
     <ng-template #kelasHadItem>
-        <button class="btn btn-sm btn-outline-secondary mb-3" (click)="goBack()">
-            <i class="mdi mdi-chevron-left"></i> Kembali
-        </button>
-        <div>
-            <div class="row mb-3">
-                <label for="" class="col-sm-2 col-form-label fw-bold">Nama Kelas</label>
-                <div class="col-sm-10 pt-2">
-                    <p>: {{ detailKelas.name }}</p>
-                </div>
-            </div>
+        <div class="card">
+            <div class="card-header fw-semibold">Informasi Kelas</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label text-muted small"
+                            >Nama Kelas</label
+                        >
+                        <div class="fw-semibold fs-5">
+                            {{ detailKelas.name }}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted small"
+                            >Tanggal</label
+                        >
+                        <div>
+                            {{ detailKelas.examStartAt | tanggalIndo:
+                            detailKelas.examEndAt }}
+                        </div>
+                    </div>
 
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label fw-bold">
-                    Tanggal
-                </label>
-                <div class="col-sm-10 pt-2">
-                    <p class="text-transform-none">
-                        :
-                        {{ detailKelas.examStartAt | tanggalIndo: detailKelas.examEndAt }}
-                    </p>
-                </div>
-            </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small"
+                            >Jabatan</label
+                        >
+                        <div>{{ detailKelas.jabatanName }}</div>
+                    </div>
 
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label fw-bold">
-                    Jabatan
-                </label>
-                <div class="col-sm-10 pt-2">
-                    <p>
-                        :
-                        {{ detailKelas.jabatanName }}
-                    </p>
-                </div>
-            </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small"
+                            >Jenjang</label
+                        >
+                        <div>{{ detailKelas.jenjangName }}</div>
+                    </div>
 
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label fw-bold">
-                    Jenjang
-                </label>
-                <div class="col-sm-10 pt-2">
-                    <p>
-                        :
-                        {{ detailKelas.jenjangName }}
-                    </p>
-                </div>
-            </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted small"
+                            >Bidang Jabatan</label
+                        >
+                        <div>{{ detailKelas.bidangJabatanName ?? '-' }}</div>
+                    </div>
 
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label fw-bold">
-                    Bidang Jabatan
-                </label>
-                <div class="col-sm-10 pt-2">
-                    <p>
-                        :
-                        {{ detailKelas.bidangJabatanName }}
-                    </p>
-                </div>
-            </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small"
+                            >Kuota Peserta</label
+                        >
+                        <div>{{ detailKelas.participantQuota ?? '-' }}</div>
+                    </div>
 
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label fw-bold">
-                    Kuota Peserta
-                </label>
-                <div class="col-sm-10 pt-2">
-                    <p>
-                        :
-                        {{ detailKelas.participantQuota }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label fw-bold">
-                    Link Zoom
-                </label>
-                <div class="col-sm-10 pt-2">
-                    <p class="text-transform-none">
-                        :
-                        {{ detailKelas.vidCallLink }}
-                    </p>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small"
+                            >Link Zoom</label
+                        >
+                        <div>{{ detailKelas.vidCallLink ?? '-' }}</div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <section class="mt-5">
-            <h5 class="fw-bold">Daftar Peserta</h5>
-            <app-pagable [pagable]="pagable"></app-pagable>
-        </section>
+        <h5 class="fw-bold">Daftar Peserta</h5>
+        <app-pagable [pagable]="pagable"></app-pagable>
     </ng-template>
 </ng-container>
-
-<!-- <ng-container *ngIf="(tab$ | async) === 1">
-    <app-ukom-exam-schedule-add (changeTabActive)="handleTabChange(0)"></app-ukom-exam-schedule-add>
-</ng-container> -->
