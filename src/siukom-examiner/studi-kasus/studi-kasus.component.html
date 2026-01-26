@@ -1,6 +1,6 @@
 <div class="d-flex align-items-center justify-content-between mb-3">
-    <button class="btn-back">
-        <span class="icon">←</span>
+    <button (click)="backToDashboard()" class="btn btn-outline-secondary">
+        <span class="mdi mdi-chevron-left me-1"></span>
         Kembali ke Dashboard
     </button>
     <div class="alert alert-success d-flex align-items-center mb-0 px-2 py-1">
@@ -17,74 +17,137 @@
     </div>
 </ng-container>
 <ng-template #questionForm>
-    <ng-container *ngIf="questions().length > 0">
-        <div class="case-study-container">
+    <ng-container *ngIf="questions().length > 0;else noQuestions">
+        <div class="assessment-container">
             <div class="header-section">
                 <h1>Form Penilaian Studi Kasus</h1>
                 <p>
                     Berikan penilaian dan catatan untuk setiap aspek analisis
                     studi kasus peserta.
                 </p>
+                <div class="d-flex justify-content-center">
+                    <button (click)="openAnswer()" class="btn btn-primary">
+                        <span class="mdi mdi-open-in-new me-2"></span>
+                        Lihat Jawaban Peserta
+                    </button>
+                </div>
             </div>
 
-            <!-- Answer Link Section -->
-            <div class="action-section">
-                <button (click)="openAnswer()" class="btn-answer">
-                    📝 Lihat Jawaban Peserta
-                    <span class="external-icon">↗</span>
-                </button>
-            </div>
-
-            <div class="assessment-list">
-                <div *ngFor="let item of questions(); let i = index" class="assessment-card">
-                    <!-- Aspect Header -->
-                    <div class="card-header">
-                        <span class="item-number">Aspek {{ i + 1 }}</span>
-                        <h2 class="aspect-name">{{ item.question }}</h2>
-                        <div class="aspect-meta">
-                            <span class="weight-badge" *ngIf="item.weight">
-                                <i class="mdi mdi-weight"></i> Bobot: {{ item.weight }}%
-                            </span>
-                            <span class="kompetensi-badge" *ngIf="item.kompetensiIndikatorName">
-                                {{ item.kompetensiIndikatorName }}
+            <form [formGroup]="assessmentForm">
+                <div class="question-list" formArrayName="answerDtoList">
+                    <div
+                        *ngFor="let question of questions(); let i = index"
+                        [formGroupName]="i"
+                        class="question-card"
+                    >
+                        <div class="card-header">
+                            <span class="question-number"
+                                >{{ question.kompetensiIndikatorName }}</span
+                            >
+                            <h2 class="question-text">
+                                {{ question.question }}
+                            </h2>
+                            <span
+                                *ngIf="question.weight"
+                                class="badge bg-primary"
+                            >
+                                Bobot: {{ question.weight }}
                             </span>
                         </div>
-                    </div>
 
-                    <div class="card-body">
-                        <!-- Score Input -->
-                        <div class="score-section">
-                            <label [for]}="'score-' + i" class="input-label">Nilai (0-{{ item.weight || 100 }}):</label>
-                            <div class="score-input-wrapper">
-                                <input (change)="validateScore(item)" [(ngModel)]="item.answerDto.score"
-                                    [id]="'score-' + i" class="form-control score-input" [max]="item.weight || 100"
-                                    min="0" placeholder="0" type="number" />
-                                <span class="score-suffix">/ {{ item.weight || 100 }}</span>
+                        <div class="card-body">
+                            <!-- Score Input -->
+                            <div class="mb-3">
+                                <label [for]="'score-' + i" class="form-label">
+                                    Nilai <span class="text-danger">*</span>
+                                    <small class="text-muted"
+                                        >(0-{{ question.weight || 100 }})</small
+                                    >
+                                </label>
+                                <div class="">
+                                    <input
+                                        (blur)="validateScore(i)"
+                                        (input)="validateScore(i)"
+                                        [class.is-invalid]="isScoreInvalid(i)"
+                                        [id]="'score-' + i"
+                                        [max]="question.weight || 100"
+                                        class="form-control score-input"
+                                        formControlName="score"
+                                        min="0"
+                                        placeholder="Masukkan nilai"
+                                        type="number"
+                                    />
+                                    <div
+                                        *ngIf="getScoreError(i)"
+                                        class="invalid-feedback"
+                                    >
+                                        {{ getScoreError(i) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Note Input -->
+                            <div class="mb-3">
+                                <label [for]="'note-' + i" class="form-label"
+                                    >Catatan Penilaian:</label
+                                >
+                                <textarea
+                                    [id]="'note-' + i"
+                                    class="form-control"
+                                    formControlName="answerText"
+                                    placeholder="Tuliskan alasan penilaian dan masukan..."
+                                    rows="4"
+                                ></textarea>
                             </div>
                         </div>
-
-                        <!-- Note Input -->
-                        <div class="note-section">
-                            <label [for]="'note-' + i" class="input-label">Catatan Penilaian:</label>
-                            <textarea [(ngModel)]="item.answerDto.answerText" [id]="'note-' + i" class="form-control"
-                                placeholder="Tuliskan alasan penilaian dan masukan..." rows="4">
-                            </textarea>
-                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Summary & Submit -->
-            <div class="form-footer">
-                <div class="final-score-box">
-                    <span class="label">Nilai Akhir:</span>
-                    <span class="value">{{ finalScore }}</span>
+                <!-- Summary & Submit -->
+                <!--                    <div class="">-->
+                <!--                        <span class="label">Nilai Akhir:</span>-->
+                <!--                        <span class="value">{{ finalScore }}</span>-->
+                <!--                    </div>-->
+
+                <div class="mt-3 text-end">
+                    <app-loading-button
+                        (clicked)="submitAssessment()"
+                        [className]="'btn btn-primary'"
+                        [disabled]="assessmentForm.invalid"
+                        [isLoading]="submitting()"
+                        [label]="'Simpan Penilaian Studi Kasus'"
+                        [type]="'button'"
+                    >
+                    </app-loading-button>
+
+                    <!--                                    <button-->
+                    <!--                                        (click)="submitAssessment()"-->
+                    <!--                                        [disabled]="submitting() || assessmentForm.invalid"-->
+                    <!--                                        class="btn-submit"-->
+                    <!--                                        type="button"-->
+                    <!--                                    >-->
+                    <!--                                        <span-->
+                    <!--                                            *ngIf="submitting()"-->
+                    <!--                                            class="spinner-border spinner-border-sm me-2"-->
+                    <!--                                            role="status"-->
+                    <!--                                        ></span>-->
+                    <!--                                        {{ submitting() ? 'Menyimpan...' : 'Simpan Penilaian-->
+                    <!--                                        Studi Kasus' }}-->
+                    <!--                                    </button>-->
                 </div>
-
-                <button (click)="submitAssessment()" class="btn-submit">
-                    Simpan Penilaian Studi Kasus
-                </button>
-            </div>
+            </form>
         </div>
     </ng-container>
+    <ng-template #noQuestions>
+        <div class="no-questions-container">
+            <app-empty-state
+                [buttonAction]="backToDashboard.bind(this)"
+                [buttonText]="'Kembali ke Dashboard'"
+                [description]="'Tidak ada pertanyaan yang tersedia untuk penilaian studi kasus saat ini.'"
+                [icon]="'mdi mdi-clipboard-text-outline'"
+                [title]="'Pertanyaan Tidak Ditemukan'"
+            >
+            </app-empty-state>
+        </div>
+    </ng-template>
 </ng-template>

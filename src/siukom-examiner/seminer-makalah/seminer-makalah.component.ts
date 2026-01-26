@@ -171,7 +171,7 @@ export class SeminerMakalahComponent implements OnInit {
                 }
 
                 this.examService
-                    .saveExamAnswersByExamScheduleId(
+                    .saveExamAnswersForExaminerByExamScheduleId(
                         this.examScheduleId,
                         payload,
                     )

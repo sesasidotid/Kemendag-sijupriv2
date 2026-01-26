@@ -69,10 +69,10 @@ export class ExamService {
         )
     }
 
-    saveExamAnswersByExamScheduleId(
+    saveExamAnswersForExaminerByExamScheduleId(
         examScheduleId: string,
         payload: SaveExamAnswerRequest,
-    ): Observable<unknown> {
+    ): Observable<void> {
         return this.apiService.postData(
             `${this.BASE_PATH}/answer/examiner/${examScheduleId}`,
             payload,

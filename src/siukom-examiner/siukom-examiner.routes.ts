@@ -48,6 +48,12 @@ export const routes: Routes = [
                         (m) => m.StudiKasusComponent,
                     ),
             },
+            {
+                path: 'practical-work/:id/:participantId',
+                loadComponent:()=>
+                    import('./practical-work/practical-work.component').then((m)=>m.PracticalWorkComponent
+                    )
+            }
         ],
     },
 ]

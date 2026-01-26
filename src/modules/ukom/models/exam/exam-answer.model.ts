@@ -59,6 +59,10 @@ export interface ExamAnswerDto {
     question?: string | null
     isUncertain?: boolean | null
     fileAnswerUpload?: unknown
+    answerList?: {
+        valid: boolean
+        memadai: boolean
+    } | null
 }
 
 export interface SaveExamAnswerRequest {

@@ -1,117 +1,296 @@
-import { Component, inject, OnInit } from '@angular/core'
+import { Component, effect, inject, OnInit, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
+import {
+    FormArray,
+    FormBuilder,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+} from '@angular/forms'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-
-interface PortfolioItem {
-    id: number
-    competency: string
-    assessmentAspect: string
-    documentUrl: string
-    documentName: string
-    examinerNote: string
-    isValid: boolean
-    isAdequate: boolean
-}
+import { ExamService } from '@/modules/ukom/services/exam.service'
+import { ActivatedRoute, Router } from '@angular/router'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { finalize } from 'rxjs'
+import { PortfolioDraftService } from '@/siukom-examiner/portofolio/portfolio-draft.service'
+import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
+import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 
 @Component({
     selector: 'app-portofolio',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        EmptyStateComponent,
+        LoadingButtonComponent,
+    ],
     templateUrl: './portofolio.component.html',
     styleUrls: ['./portofolio.component.scss'],
 })
 export class PortofolioComponent implements OnInit {
     handlerService = inject(HandlerService)
     confirmationService = inject(ConfirmationService)
+    examService = inject(ExamService)
+    route = inject(ActivatedRoute)
+    router = inject(Router)
+    loadingQuestions = signal(false)
+    questions = signal<ExamQuestion[]>([])
+    formValidationService = inject(FormValidationService)
+    fb = inject(FormBuilder)
+    loadingSubmitForm = signal(false)
+    assessmentForm: FormGroup
 
-    examinerName: string = 'Budi Santoso, S.Kom., M.T.' // Dummy Examiner Name
-    portfolioItems: PortfolioItem[] = []
+    examId = signal('')
+    participantId = signal('')
+    draftService = inject(PortfolioDraftService)
+    private saveTimeout: number | undefined
 
-    constructor() {}
+    constructor() {
+        this.assessmentForm = this.fb.group({
+            answerDtoList: this.fb.array([]),
+        })
+
+        // Subscribe to form value changes for auto-save
+        this.assessmentForm.valueChanges.subscribe(() => {
+            this.scheduleAutoSave()
+        })
+
+        effect(
+            () => {
+                const examId = this.examId()
+                const participantId = this.participantId()
+                if (examId && participantId) {
+                    this.fetchQuestionsToGrade()
+                }
+            },
+            { allowSignalWrites: true },
+        )
+    }
+
+    get answerDtoList(): FormArray {
+        return this.assessmentForm.get('answerDtoList') as FormArray
+    }
 
     ngOnInit(): void {
-        this.portfolioItems = [
-            {
-                id: 1,
-                competency: 'Manajemen Data dan Informasi',
-                assessmentAspect:
-                    'Kemampuan mengelola siklus hidup data organisasi',
-                documentUrl: 'https://example.com/doc1.pdf',
-                documentName: 'Laporan_Pengelolaan_Data_2024.pdf',
-                examinerNote: '',
-                isValid: false,
-                isAdequate: false,
-            },
-            {
-                id: 2,
-                competency: 'Keamanan Informasi',
-                assessmentAspect: 'Penerapan standar keamanan ISO 27001',
-                documentUrl: 'https://example.com/doc2.pdf',
-                documentName: 'Sertifikat_Internal_Security_Audit.pdf',
-                examinerNote: '',
-                isValid: false,
-                isAdequate: false,
-            },
-            {
-                id: 3,
-                competency: 'Manajemen Layanan TI',
-                assessmentAspect: 'Evaluasi kualitas layanan berdasarkan SLA',
-                documentUrl: 'https://example.com/doc3.pdf',
-                documentName: 'Bukti_Dukung_SLA_Q1.pdf',
-                examinerNote: '',
-                isValid: false,
-                isAdequate: false,
-            },
-            {
-                id: 4,
-                competency: 'Manajemen Risiko TI',
-                assessmentAspect:
-                    'Identifikasi dan mitigasi risiko operasional',
-                documentUrl: 'https://example.com/doc4.pdf',
-                documentName: 'Risk_Assessment_Report.pdf',
-                examinerNote: '',
-                isValid: false,
-                isAdequate: false,
-            },
-            {
-                id: 5,
-                competency: 'Perencanaan Strategis TI',
-                assessmentAspect: 'Penyusunan Roadmap TI 5 Tahunan',
-                documentUrl: 'https://example.com/doc5.pdf',
-                documentName: 'IT_Master_Plan_2025-2030.pdf',
-                examinerNote: '',
-                isValid: false,
-                isAdequate: false,
-            },
-        ]
+        this.route.params.subscribe((params) => {
+            this.examId.set(params['id'])
+            this.participantId.set(params['participantId'])
+        })
+    }
+
+    fetchQuestionsToGrade() {
+        this.loadingQuestions.set(true)
+        this.examService
+            .getExamQuestionsByScheduleAndParticipant(
+                this.examId(),
+                this.participantId(),
+                { page: '1', limit: '1000' },
+            )
+            .pipe(finalize(() => this.loadingQuestions.set(false)))
+            .subscribe({
+                next: async (result) => {
+                    const data = result.data
+                    const draft = await this.draftService.load(
+                        this.examId(),
+                        this.participantId(),
+                    )
+
+                    data.forEach((q) => {
+                        const draftAnswer = draft?.answers?.[q.id]
+
+                        // Check if backend has meaningful data
+                        const hasBackendAnswer =
+                            q.answerDto &&
+                            ((q.answerDto.answerText !== null &&
+                                q.answerDto.answerText !== undefined) ||
+                                q.answerDto.answerList?.valid === true ||
+                                q.answerDto.answerList?.memadai === true)
+
+                        if (!q.answerDto) {
+                            // No backend answer object - use draft if available
+                            q.answerDto = {
+                                participantId: this.participantId(),
+                                questionId: q.id,
+                                answerText: draftAnswer?.answerText ?? null,
+                                answerList: draftAnswer?.answerList ?? {
+                                    valid: false,
+                                    memadai: false,
+                                },
+                            }
+                        } else if (!hasBackendAnswer && draftAnswer) {
+                            // Backend answer exists but is empty - use draft
+                            q.answerDto.answerText =
+                                draftAnswer.answerText ?? null
+                            q.answerDto.answerList = draftAnswer.answerList ?? {
+                                valid: false,
+                                memadai: false,
+                            }
+                        } else if (!q.answerDto.answerList) {
+                            // Backend has data but no answerList - ensure structure exists
+                            q.answerDto.answerList = {
+                                valid: false,
+                                memadai: false,
+                            }
+                        }
+                        // If hasBackendAnswer is true, keep backend data (prioritize backend)
+                    })
+
+                    this.questions.set(data)
+                    this.buildFormArray(data)
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data pertanyaan untuk dinilai.',
+                    )
+                },
+            })
+    }
+
+    buildFormArray(questions: ExamQuestion[]): void {
+        this.answerDtoList.clear()
+
+        // Add form group for each question
+        questions.forEach((q) => {
+            // Get answerList from answerDto (from draft or backend)
+            const answerList = q.answerDto?.answerList || {
+                memadai: false,
+                valid: false,
+            }
+
+            const formGroup = this.fb.group({
+                id: [q.answerDto?.id || null],
+                participantId: [
+                    q.answerDto?.participantId || this.participantId(),
+                ],
+                questionId: [q.id],
+                answerText: [q.answerDto?.answerText || null],
+                answerList: this.fb.group({
+                    memadai: [answerList.memadai || false],
+                    valid: [answerList.valid || false],
+                }),
+            })
+            this.answerDtoList.push(formGroup)
+        })
     }
 
     openDocument(url: string): void {
         window.open(url, '_blank')
     }
 
-    isItemCompetent(item: PortfolioItem): boolean {
-        return item.isValid && item.isAdequate
+    isItemCompetent(index: number): boolean {
+        const formGroup = this.answerDtoList.at(index) as FormGroup
+        const answerListGroup = formGroup.get('answerList') as FormGroup
+        const valid = answerListGroup.get('valid')?.value
+        const memadai = answerListGroup.get('memadai')?.value
+        return valid && memadai
     }
 
-    // Optional: Overall form validation logic if needed
-    canSubmit(): boolean {
-        // Maybe require all items to be checked? Or just allow partial?
-        // For now, allow submit anytime
-        return true
+    isCheckboxAnswered(index: number, controlName: string): boolean {
+        const formGroup = this.answerDtoList.at(index) as FormGroup
+        const answerListGroup = formGroup.get('answerList') as FormGroup
+        const value = answerListGroup.get(controlName)?.value
+        return value !== null && value !== undefined
+    }
+
+    getCheckboxState(
+        index: number,
+        controlName: string,
+    ): 'checked' | 'unchecked' | 'unanswered' {
+        const formGroup = this.answerDtoList.at(index) as FormGroup
+        const answerListGroup = formGroup.get('answerList') as FormGroup
+        const value = answerListGroup.get(controlName)?.value
+
+        if (value === null || value === undefined) {
+            return 'unanswered'
+        }
+        return value === true ? 'checked' : 'unchecked'
+    }
+
+    scheduleAutoSave(): void {
+        clearTimeout(this.saveTimeout)
+        this.saveTimeout = window.setTimeout(() => {
+            const answers: Record<string, any> = {}
+            const formValues = this.answerDtoList.value
+
+            // Convert form array to record keyed by questionId
+            formValues.forEach((item: any) => {
+                answers[item.questionId] = {
+                    id: item.id,
+                    participantId: item.participantId,
+                    questionId: item.questionId,
+                    answerText: item.answerText,
+                    answerList: item.answerList,
+                }
+            })
+
+            this.draftService
+                .save(this.examId(), this.participantId(), answers)
+                .catch((err) => console.warn('Failed to save draft:', err))
+        }, 500)
+    }
+
+    backToDashboard() {
+        this.router.navigate(['/'])
+    }
+
+    allQuestionsAnswered() {
+        const allHaveAnswerList = this.questions().every(
+            (item) => item.answerDto?.answerList != null,
+        )
+        return allHaveAnswerList
     }
 
     submitAssessment(): void {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
+                this.loadingSubmitForm.set(true)
+                const formValues = this.answerDtoList.value
 
-                this.handlerService.handleAlert(
-                    'Success',
-                    'Penilaian Portofolio disimpan (Simulasi)',
-                )
+                const payload: SaveExamAnswerRequest = {
+                    answerDtoList: formValues.map((item: any) => ({
+                        ...(item.id && { id: item.id }),
+                        participantId: item.participantId,
+                        questionId: item.questionId,
+                        answerList: item.answerList,
+                        answerText: item.answerText,
+                    })),
+                }
+
+                this.examService
+                    .saveExamAnswersForExaminerByExamScheduleId(
+                        this.examId(),
+                        payload,
+                    )
+                    .pipe(finalize(() => this.loadingSubmitForm.set(false)))
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Penilaian Portofolio berhasil disimpan.',
+                            )
+                            this.draftService
+                                .remove(this.examId(), this.participantId())
+                                .catch((err) =>
+                                    console.warn('Failed to clear draft:', err),
+                                )
+                            this.fetchQuestionsToGrade()
+                        },
+                        error: (err) => {
+                            console.error('Error submitting assessment', err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menyimpan penilaian Portofolio.',
+                            )
+                        },
+                    })
             },
         })
     }

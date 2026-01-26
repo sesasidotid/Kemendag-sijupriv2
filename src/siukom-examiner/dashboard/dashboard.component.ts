@@ -144,6 +144,9 @@ export class DashboardComponent implements OnInit {
             case ExamTypeCategory.STUDI_KASUS:
                 this.router.navigate(['/case-study', examId, participantId])
                 break
+            case ExamTypeCategory.PRAKTIK:
+                this.router.navigate(['/practical-work', examId, participantId])
+                break
             default:
                 this.handlerService.handleAlert(
                     'Warning',

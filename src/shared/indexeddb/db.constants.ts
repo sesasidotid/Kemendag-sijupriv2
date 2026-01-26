@@ -17,8 +17,11 @@ export const DB_NAME = 'ukom_exam_db' as const
  * Migration history:
  * - v1: Legacy (decentralized - deprecated)
  * - v2: Centralized schema with wawancara + seminar_makalah
+ * - v3: Added studi_kasus_answers
+ * - v4: Added portfolio_answer
+ * - v5: Added practical_work_answer
  */
-export const DB_VERSION = 2
+export const DB_VERSION = 5
 
 /**
  * Object Store Names
@@ -27,6 +30,9 @@ export const DB_VERSION = 2
 export const OBJECT_STORES = {
     WAWANCARA_ANSWERS: 'wawancara_answers',
     SEMINAR_MAKALAH_ANSWERS: 'seminar_makalah_answers',
+    STUDI_KASUS_ANSWERS: 'studi_kasus_answers',
+    PORTFOLIO_ANSWER: 'portfolio_answer',
+    PRAKTIK: 'practical_work_answer',
     // Add future stores here and bump DB_VERSION
 } as const
 
@@ -56,6 +62,15 @@ export const STORE_CONFIGS: Record<
         keyPath: 'key',
     },
     [OBJECT_STORES.SEMINAR_MAKALAH_ANSWERS]: {
+        keyPath: 'key',
+    },
+    [OBJECT_STORES.STUDI_KASUS_ANSWERS]: {
+        keyPath: 'key',
+    },
+    [OBJECT_STORES.PORTFOLIO_ANSWER]: {
+        keyPath: 'key',
+    },
+    [OBJECT_STORES.PRAKTIK]: {
         keyPath: 'key',
     },
 }

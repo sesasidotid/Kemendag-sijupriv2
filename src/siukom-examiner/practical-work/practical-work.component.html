@@ -1,0 +1,110 @@
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <button (click)="backToDashboard()" class="btn btn-outline-secondary">
+        <span class="mdi mdi-chevron-left me-1"></span>
+        Kembali ke Dashboard
+    </button>
+    <div
+        *ngIf="!loadingQuestions() && allQuestionsAnswered()"
+        class="alert alert-success d-flex align-items-center mb-0 px-2 py-1"
+    >
+        <i class="mdi mdi-check-circle me-1"></i>
+        <small>Jawaban telah disimpan</small>
+    </div>
+</div>
+<ng-container *ngIf="loadingQuestions(); else questionForm">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
+        </div>
+        <p class="mt-2">Memuat form penilaian...</p>
+    </div>
+</ng-container>
+<ng-template #questionForm>
+    <ng-container *ngIf="questions().length > 0; else noQuestions">
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Praktik</h1>
+                <p>
+                    Silakan periksa link Video dan berikan penilaian untuk
+                    setiap pertanyaan.
+                </p>
+            </div>
+
+            <div *ngIf="participantAnswer()" class="card shadow-sm">
+                <div class="card-header bg-primary">
+                    <h5 class="mb-0 text-white">
+                        <span class="mdi mdi-video-outline me-2"></span> Video
+                        Praktik Peserta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <app-video-preview
+                        [height]="'450px'"
+                        [showTitle]="false"
+                        [videoUrl]="participantAnswer().answerDto.answerText"
+                    ></app-video-preview>
+                    <div class="alert alert-info mb-0 mt-3">
+                        {{participantAnswer().answerDto.answerText}}
+                    </div>
+                </div>
+            </div>
+
+            <form [formGroup]="assessmentForm">
+                <div class="question-list" formArrayName="answerDtoList">
+                    <div
+                        *ngFor="let question of questions(); let i = index"
+                        [formGroupName]="i"
+                        class="question-card"
+                    >
+                        <!-- Competency Header -->
+                        <div class="card-header">
+                            <span class="question-number"
+                                >{{ question.kompetensiIndikatorName }}</span
+                            >
+                            <h2 class="question-text">
+                                {{ question.question }}
+                            </h2>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label [for]="'note-' + i" class="form-label"
+                                    >Catatan Penilaian:</label
+                                >
+                                <textarea
+                                    [id]="'note-' + i"
+                                    class="form-control"
+                                    formControlName="answerText"
+                                    placeholder="Tuliskan penilaian dan masukan..."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 text-end">
+                    <app-loading-button
+                        (clicked)="submitAssessment()"
+                        [className]="'btn btn-primary'"
+                        [disabled]="assessmentForm.invalid"
+                        [isLoading]="loadingSubmitForm()"
+                        [label]="'Simpan Penilaian Praktik'"
+                        [type]="'button'"
+                    ></app-loading-button>
+                </div>
+            </form>
+        </div>
+    </ng-container>
+    <ng-template #noQuestions>
+        <div class="no-questions-container">
+            <app-empty-state
+                [buttonAction]="backToDashboard.bind(this)"
+                [buttonText]="'Kembali ke Dashboard'"
+                [description]="'Tidak ada pertanyaan yang tersedia untuk penilaian praktik saat ini.'"
+                [icon]="'mdi mdi-clipboard-text-outline'"
+                [title]="'Pertanyaan Tidak Ditemukan'"
+            >
+            </app-empty-state>
+        </div>
+    </ng-template>
+</ng-template>

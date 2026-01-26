@@ -1,52 +1,56 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core'
-import { CommonModule } from '@angular/common'
+import { Component, effect, inject, signal } from '@angular/core'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { ExamService } from '@/modules/ukom/services/exam.service'
+import { ActivatedRoute, Router } from '@angular/router'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import {
     FormArray,
     FormBuilder,
     FormGroup,
+    FormsModule,
     ReactiveFormsModule,
-    Validators,
 } from '@angular/forms'
-import { HandlerService } from '@/modules/base/services/handler.service'
-import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { PracticalWorkDraftService } from '@/siukom-examiner/practical-work/practical-work-draft.service'
 import { finalize } from 'rxjs'
-import { ExamService } from '@/modules/ukom/services/exam.service'
-import { ActivatedRoute, Router } from '@angular/router'
-import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
-import { StudiKasusDraftService } from './studi-kasus-draft.service'
+import { CommonModule } from '@angular/common'
+import { VideoPreviewComponent } from '@/modules/base/components/video-preview/video-preview.component'
 
 @Component({
-    selector: 'app-studi-kasus',
+    selector: 'app-practical-work',
     standalone: true,
     imports: [
         CommonModule,
-        ReactiveFormsModule,
         EmptyStateComponent,
+        FormsModule,
         LoadingButtonComponent,
+        ReactiveFormsModule,
+        VideoPreviewComponent,
     ],
-    templateUrl: './studi-kasus.component.html',
-    styleUrls: ['./studi-kasus.component.scss'],
+    templateUrl: './practical-work.component.html',
+    styleUrl: './practical-work.component.scss',
 })
-export class StudiKasusComponent implements OnInit {
+export class PracticalWorkComponent {
     handlerService = inject(HandlerService)
     confirmationService = inject(ConfirmationService)
-    formValidationService = inject(FormValidationService)
+    examService = inject(ExamService)
     route = inject(ActivatedRoute)
-    fb = inject(FormBuilder)
-    draftService = inject(StudiKasusDraftService)
     router = inject(Router)
     loadingQuestions = signal(false)
-    submitting = signal(false)
-    examService = inject(ExamService)
+    questions = signal<ExamQuestion[]>([])
+    formValidationService = inject(FormValidationService)
+    fb = inject(FormBuilder)
+    loadingSubmitForm = signal(false)
+    assessmentForm: FormGroup
+
     examId = signal('')
     participantId = signal('')
-    questions = signal<ExamQuestion[]>([])
-    assessmentForm: FormGroup
-    participantAnswer = signal<ExamQuestion | null>(null)
+    draftService = inject(PracticalWorkDraftService)
+    participantAnswer = signal<ExamQuestion>(null)
     private saveTimeout: number | undefined
 
     constructor() {
@@ -70,44 +74,15 @@ export class StudiKasusComponent implements OnInit {
             { allowSignalWrites: true },
         )
     }
-
     get answerDtoList(): FormArray {
         return this.assessmentForm.get('answerDtoList') as FormArray
     }
-
-    get finalScore(): number {
-        const items = this.questions()
-        const formValues = this.answerDtoList.value
-        if (formValues.length === 0) return 0
-
-        const scoredItems = formValues.filter(
-            (item: any, index: number) =>
-                item.score !== null &&
-                item.score !== undefined &&
-                item.score !== '',
-        )
-        if (scoredItems.length === 0) return 0
-
-        let totalMaxScore = 0
-        let totalScore = 0
-
-        scoredItems.forEach((formItem: any) => {
-            const question = items.find((q) => q.id === formItem.questionId)
-            const maxScore = question?.weight || 100
-            totalMaxScore += maxScore
-            totalScore += Number(formItem.score) || 0
-        })
-
-        return Math.round((totalScore / totalMaxScore) * 100)
-    }
-
     ngOnInit(): void {
         this.route.params.subscribe((params) => {
             this.examId.set(params['id'])
             this.participantId.set(params['participantId'])
         })
     }
-
     fetchQuestionsToGrade() {
         this.loadingQuestions.set(true)
         this.examService
@@ -121,43 +96,37 @@ export class StudiKasusComponent implements OnInit {
                 next: async (result) => {
                     const data = result.data
                     const baseQuestion = data.find(
-                        (item) => item.id === 'base_studi_kasus_question',
+                        (item) => item.id === 'base_praktik_question',
                     )
                     const otherQuestions = data.filter(
-                        (item) => item.id !== 'base_studi_kasus_question',
+                        (item) => item.id !== 'base_praktik_question',
                     )
-                    this.participantAnswer.set(baseQuestion || null)
-
-                    // Load draft first
+                    this.participantAnswer.set(baseQuestion)
                     const draft = await this.draftService.load(
                         this.examId(),
                         this.participantId(),
                     )
 
-                    // Initialize answers - prioritize backend data over draft
                     otherQuestions.forEach((q) => {
                         const draftAnswer = draft?.answers?.[q.id]
+
+                        // Check if backend has meaningful data
                         const hasBackendAnswer =
-                            q.answerDto &&
-                            (q.answerDto.score !== null ||
-                                q.answerDto.answerText !== null)
+                            q.answerDto && q.answerDto.answerText != null
 
                         if (!q.answerDto) {
-                            // No backend answer - use draft if available
+                            // No backend answer object - use draft if available
                             q.answerDto = {
                                 participantId: this.participantId(),
                                 questionId: q.id,
-                                score: draftAnswer?.score ?? null,
                                 answerText: draftAnswer?.answerText ?? null,
                             }
                         } else if (!hasBackendAnswer && draftAnswer) {
-                            // Backend answer exists but empty - prefer draft
-                            q.answerDto.score =
-                                draftAnswer.score ?? q.answerDto.score
+                            // Backend answer exists but is empty - use draft
                             q.answerDto.answerText =
-                                draftAnswer.answerText ?? q.answerDto.answerText
+                                draftAnswer.answerText ?? null
                         }
-                        // Else: Backend has answer - keep it (prioritize backend)
+                        // If hasBackendAnswer is true, keep backend data (prioritize backend)
                     })
 
                     this.questions.set(otherQuestions)
@@ -173,98 +142,20 @@ export class StudiKasusComponent implements OnInit {
             })
     }
 
-    openAnswer(): void {
-        window.open(
-            this.participantAnswer()?.answerDto?.answerUploadUrl,
-            '_blank',
-        )
-    }
-
     buildFormArray(questions: ExamQuestion[]): void {
-        // Clear existing form array
         this.answerDtoList.clear()
 
         // Add form group for each question
         questions.forEach((q) => {
-            const maxScore = q.weight || 100
             const formGroup = this.fb.group({
                 id: [q.answerDto?.id || null],
                 participantId: [
                     q.answerDto?.participantId || this.participantId(),
                 ],
                 questionId: [q.id],
-                score: [
-                    q.answerDto?.score ?? null,
-                    [
-                        Validators.required,
-                        Validators.min(0),
-                        Validators.max(maxScore),
-                    ],
-                ],
                 answerText: [q.answerDto?.answerText || null],
             })
             this.answerDtoList.push(formGroup)
-        })
-    }
-
-    validateScore(index: number): void {
-        const formGroup = this.answerDtoList.at(index) as FormGroup
-        const scoreControl = formGroup.get('score')
-        const question = this.questions()[index]
-        const maxScore = question?.weight || 100
-
-        if (
-            scoreControl &&
-            scoreControl.value !== null &&
-            scoreControl.value !== ''
-        ) {
-            let score = Number(scoreControl.value)
-            if (score < 0) score = 0
-            if (score > maxScore) score = maxScore
-            scoreControl.setValue(score)
-        }
-        scoreControl?.markAsTouched()
-    }
-
-    getScoreError(index: number): string | null {
-        const formGroup = this.answerDtoList.at(index) as FormGroup
-        const scoreControl = formGroup.get('score')
-        const question = this.questions()[index]
-        const maxScore = question?.weight || 100
-
-        if (!scoreControl || !scoreControl.errors || !scoreControl.touched) {
-            return null
-        }
-
-        if (scoreControl.errors['required']) {
-            return 'Nilai tidak boleh kosong.'
-        }
-        if (scoreControl.errors['min']) {
-            return 'Nilai tidak boleh kurang dari 0.'
-        }
-        if (scoreControl.errors['max']) {
-            return `Nilai tidak boleh melebihi bobot maksimal (${maxScore}).`
-        }
-
-        return this.formValidationService.getErrorMessage(
-            scoreControl,
-            'score',
-            'Nilai',
-        )
-    }
-
-    isScoreInvalid(index: number): boolean {
-        const formGroup = this.answerDtoList.at(index) as FormGroup
-        const scoreControl = formGroup.get('score')
-        return !!(scoreControl && scoreControl.invalid && scoreControl.touched)
-    }
-
-    markAllAsTouched(): void {
-        this.answerDtoList.controls.forEach((control) => {
-            const formGroup = control as FormGroup
-            Object.keys(formGroup.controls).forEach((key) => {
-                formGroup.get(key)?.markAsTouched()
-            })
         })
     }
 
@@ -280,7 +171,6 @@ export class StudiKasusComponent implements OnInit {
                     id: item.id,
                     participantId: item.participantId,
                     questionId: item.questionId,
-                    score: item.score,
                     answerText: item.answerText,
                 }
             })
@@ -291,63 +181,61 @@ export class StudiKasusComponent implements OnInit {
         }, 500)
     }
 
+    backToDashboard() {
+        this.router.navigate(['/'])
+    }
+
+    allQuestionsAnswered() {
+        const allHaveAnswerList = this.questions().every(
+            (item) => item.answerDto?.answerText != null,
+        )
+        return allHaveAnswerList
+    }
+
     submitAssessment(): void {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
-
-                // Mark all fields as touched to show validation errors
-                this.markAllAsTouched()
-
+                this.loadingSubmitForm.set(true)
                 const formValues = this.answerDtoList.value
 
-                // Build payload in SaveExamAnswerRequest format
                 const payload: SaveExamAnswerRequest = {
                     answerDtoList: formValues.map((item: any) => ({
                         ...(item.id && { id: item.id }),
                         participantId: item.participantId,
                         questionId: item.questionId,
-                        score: item.score,
                         answerText: item.answerText,
                     })),
                 }
-
-                this.submitting.set(true)
 
                 this.examService
                     .saveExamAnswersForExaminerByExamScheduleId(
                         this.examId(),
                         payload,
                     )
-                    .pipe(finalize(() => this.submitting.set(false)))
+                    .pipe(finalize(() => this.loadingSubmitForm.set(false)))
                     .subscribe({
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Penilaian berhasil disimpan.',
+                                'Penilaian Praktik berhasil disimpan.',
                             )
-                            // Clear draft after successful save
                             this.draftService
                                 .remove(this.examId(), this.participantId())
                                 .catch((err) =>
                                     console.warn('Failed to clear draft:', err),
                                 )
-                            // Refetch questions to get updated answerDto
                             this.fetchQuestionsToGrade()
                         },
                         error: (err) => {
-                            console.error('Error save the answer:', err)
+                            console.error('Error submitting assessment', err)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menyimpan penilaian.',
+                                'Gagal menyimpan penilaian Praktik.',
                             )
                         },
                     })
             },
         })
-    }
-
-    backToDashboard() {
-        this.router.navigate(['/'])
     }
 }

@@ -121,6 +121,12 @@
         class="card mb-3 shadow-sm"
     >
         <div class="card-body">
+            <img
+                *ngIf="q.attachmentUrl"
+                [src]="q.attachmentUrl"
+                alt="Question Image"
+                class="img-fluid img-custom-300 mb-1 rounded object-cover"
+            />
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <p class="fw-bold mb-0">{{ q.question }}</p>
                 <span

@@ -202,7 +202,10 @@ export class WawancaraComponent implements OnInit {
                 }
 
                 this.examService
-                    .saveExamAnswersByExamScheduleId(this.examId, payload)
+                    .saveExamAnswersForExaminerByExamScheduleId(
+                        this.examId,
+                        payload,
+                    )
                     .pipe(finalize(() => this.submitQuestionLoading.set(false)))
                     .subscribe({
                         next: () => {
