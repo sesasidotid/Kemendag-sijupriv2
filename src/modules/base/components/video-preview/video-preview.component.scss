@@ -1,0 +1,10 @@
+.video-preview-container {
+    .embed-container {
+        position: relative;
+        width: 100%;
+        
+        iframe {
+            display: block;
+        }
+    }
+}

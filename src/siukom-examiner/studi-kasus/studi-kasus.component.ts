@@ -1,16 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core'
+import { Component, effect, inject, OnInit, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-
-interface CaseStudyItem {
-    id: number
-    aspect: string
-    description: string
-    score: number | null
-    note: string
-}
+import { finalize } from 'rxjs'
+import { ExamService } from '@/modules/ukom/services/exam.service'
+import { ActivatedRoute } from '@angular/router'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 
 @Component({
     selector: 'app-studi-kasus',
@@ -22,68 +18,123 @@ interface CaseStudyItem {
 export class StudiKasusComponent implements OnInit {
     handlerService = inject(HandlerService)
     confirmationService = inject(ConfirmationService)
-    caseStudyAnswerUrl: string = 'https://example.com/jawaban-studi-kasus.pdf' // Dummy URL
-    assessmentItems: CaseStudyItem[] = []
+    route = inject(ActivatedRoute)
+    loadingQuestions = signal(false)
+    examService = inject(ExamService)
+    examId = signal('')
+    participantId = signal('')
 
-    constructor() {}
+    questions = signal<ExamQuestion[]>([])
+
+    participantAnswer = signal<ExamQuestion | null>(null)
+
+    constructor() {
+        effect(
+            () => {
+                const examId = this.examId()
+                const participantId = this.participantId()
+                if (examId && participantId) {
+                    this.fetchQuestionsToGrade()
+                }
+            },
+            { allowSignalWrites: true },
+        )
+    }
 
     get finalScore(): number {
-        const scoredItems = this.assessmentItems.filter(
-            (item) => item.score !== null,
+        const items = this.questions()
+        const scoredItems = items.filter(
+            (item) =>
+                item.answerDto?.score !== null &&
+                item.answerDto?.score !== undefined,
         )
         if (scoredItems.length === 0) return 0
 
-        const total = scoredItems.reduce(
-            (sum, item) => sum + (item.score || 0),
+        const totalMaxScore = scoredItems.reduce(
+            (sum, item) => sum + (item.weight || 100),
             0,
         )
-        return Math.round(total / scoredItems.length)
+        const totalScore = scoredItems.reduce(
+            (sum, item) => sum + (item.answerDto?.score || 0),
+            0,
+        )
+        return Math.round((totalScore / totalMaxScore) * 100)
     }
 
     ngOnInit(): void {
-        // Initialize with the 3 required aspects
-        this.assessmentItems = [
-            {
-                id: 1,
-                aspect: 'Landasan Teori/Regulasi',
-                description:
-                    'Ketepatan penggunaan teori dan regulasi yang relevan dengan kasus.',
-                score: null,
-                note: '',
-            },
-            {
-                id: 2,
-                aspect: 'Analisis Masalah',
-                description:
-                    'Kemampuan mengidentifikasi akar masalah dan dampaknya secara komprehensif.',
-                score: null,
-                note: '',
-            },
-            {
-                id: 3,
-                aspect: 'Solusi dan Rekomendasi',
-                description:
-                    'Efektivitas, kebaruan, dan kelayakan solusi yang ditawarkan.',
-                score: null,
-                note: '',
-            },
-        ]
+        this.route.params.subscribe((params) => {
+            this.examId.set(params['id'])
+            this.participantId.set(params['participantId'])
+        })
+    }
+
+    fetchQuestionsToGrade() {
+        this.loadingQuestions.set(true)
+        this.examService
+            .getExamQuestionsByScheduleAndParticipant(
+                this.examId(),
+                this.participantId(),
+                { page: '1', limit: '1000' },
+            )
+            .pipe(finalize(() => this.loadingQuestions.set(false)))
+            .subscribe({
+                next: async (result) => {
+                    const data = result.data
+                    const baseQuestion = data.find(
+                        (item) => item.id === 'base_studi_kasus_question',
+                    )
+                    const otherQuestions = data.filter(
+                        (item) => item.id !== 'base_studi_kasus_question',
+                    )
+                    this.participantAnswer.set(baseQuestion || null)
+                    // Ensure each question has answerDto initialized
+                    otherQuestions.forEach((q) => {
+                        if (!q.answerDto) {
+                            q.answerDto = {
+                                participantId: this.participantId(),
+                                questionId: q.id,
+                                score: null,
+                                answerText: null,
+                            }
+                        }
+                    })
+                    this.questions.set(otherQuestions)
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data pertanyaan untuk dinilai.',
+                    )
+                },
+            })
     }
 
     openAnswer(): void {
-        window.open(this.caseStudyAnswerUrl, '_blank')
+        window.open(
+            this.participantAnswer().answerDto?.answerUploadUrl,
+            '_blank',
+        )
     }
 
-    validateScore(item: CaseStudyItem): void {
-        if (item.score !== null) {
-            if (item.score < 0) item.score = 0
-            if (item.score > 100) item.score = 100
+    validateScore(item: ExamQuestion): void {
+        if (
+            item.answerDto &&
+            item.answerDto.score !== null &&
+            item.answerDto.score !== undefined
+        ) {
+            const maxScore = item.weight || 100
+            if (item.answerDto.score < 0) item.answerDto.score = 0
+            if (item.answerDto.score > maxScore) item.answerDto.score = maxScore
         }
     }
 
     submitAssessment(): void {
-        const hasEmptyScores = this.assessmentItems.some(
-            (item) => item.score === null,
+        const items = this.questions()
+        const hasEmptyScores = items.some(
+            (item) =>
+                item.answerDto?.score === null ||
+                item.answerDto?.score === undefined,
         )
 
         if (hasEmptyScores) {
@@ -97,7 +148,12 @@ export class StudiKasusComponent implements OnInit {
         }
 
         const payload = {
-            items: this.assessmentItems,
+            items: items.map((item) => ({
+                questionId: item.id,
+                score: item.answerDto?.score,
+                answerText: item.answerDto?.answerText,
+                weight: item.weight,
+            })),
             finalScore: this.finalScore,
         }
 

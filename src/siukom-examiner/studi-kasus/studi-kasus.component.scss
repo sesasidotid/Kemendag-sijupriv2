@@ -18,14 +18,14 @@ $score-color: #4f46e5;
 .header-section {
   text-align: center;
   margin-bottom: 2rem;
-  
+
   h1 {
     font-size: 2rem;
     font-weight: 700;
     color: $primary-color;
     margin-bottom: 0.5rem;
   }
-  
+
   p {
     font-size: 1.1rem;
     color: #6b7280;
@@ -95,7 +95,41 @@ $score-color: #4f46e5;
     font-size: 1.4rem;
     font-weight: 700;
     color: $primary-color;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .aspect-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .weight-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: rgba($score-color, 0.1);
+    color: $score-color;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+
+  .kompetensi-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: rgba(#10b981, 0.1);
+    color: #059669;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
   }
 
   .aspect-desc {
@@ -158,7 +192,7 @@ $score-color: #4f46e5;
   line-height: 1.5;
   transition: border-color 0.2s;
   background-color: #fff;
-  
+
   &:focus {
     outline: none;
     border-color: $link-color;
@@ -225,7 +259,7 @@ $score-color: #4f46e5;
   .card-body {
     flex-direction: column;
     gap: 1.5rem;
-    
+
     .score-section {
       flex: 1;
       width: 100%;
@@ -241,3 +275,5 @@ $score-color: #4f46e5;
     width: 100%;
   }
 }
+
+@import '../shared-examiner-styles';

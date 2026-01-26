@@ -334,6 +334,7 @@ export class PortfolioPageComponent implements OnInit {
                         this.touchedQuestions.delete(question.id)
                         // Silently refetch questions to get updated answers
                         // The effect will automatically reinitialize file handlers with new data
+                        // resetKey is set at end of initMultiFileHandlerInputs() to ensure proper timing
                         this.getQuestion(true)
                     },
                     error: (err) => {
@@ -398,5 +399,11 @@ export class PortfolioPageComponent implements OnInit {
                 },
             })
         }
+
+        // Force MultiFileHandler to reset and re-render with updated server data
+        // Use setTimeout to ensure Angular has processed the inputs change first
+        setTimeout(() => {
+            this.resetKey.set(`reset_${Date.now()}`)
+        }, 0)
     }
 }

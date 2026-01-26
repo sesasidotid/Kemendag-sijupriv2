@@ -1,14 +1,22 @@
 import { Component, effect, inject, OnInit, signal } from '@angular/core'
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import {
+    FormBuilder,
+    FormGroup,
+    ReactiveFormsModule,
+    Validators,
+} from '@angular/forms'
 import { CommonModule } from '@angular/common'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { VideoPreviewComponent } from '@/modules/base/components/video-preview/video-preview.component'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { finalize } from 'rxjs'
 import { ExamService } from '@/modules/ukom/services/exam.service'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 @Component({
     selector: 'app-practical-work-page',
@@ -18,6 +26,7 @@ import { ExamService } from '@/modules/ukom/services/exam.service'
         CommonModule,
         InvalidOnTouchDirective,
         LoadingButtonComponent,
+        VideoPreviewComponent,
     ],
     templateUrl: './practical-work-page.component.html',
     styleUrl: './practical-work-page.component.scss',
@@ -38,7 +47,23 @@ export class PracticalWorkPageComponent implements OnInit {
     examService = inject(ExamService)
     questionLoading = signal(false)
 
+    question = signal<ExamQuestion>(null)
+    criticalError = signal<boolean>(false)
+    errorMessage = signal<string>('')
+    hasExistingAnswer = signal<boolean>(false)
+
+    readonly userId: string
     constructor() {
+        const raw = LoginContext.getUserId()
+        if (!raw) {
+            this.criticalError.set(true)
+            this.errorMessage.set(
+                'UserId tidak ditemukan. Silakan login ulang.',
+            )
+        }
+
+        this.userId = raw.replace(/^PU-/, '')
+
         effect(
             () => {
                 const examId = this.examId()
@@ -48,6 +73,11 @@ export class PracticalWorkPageComponent implements OnInit {
             },
             { allowSignalWrites: true },
         )
+
+        effect(() => {
+            this.question()
+            this.getUploadedVideoLink()
+        })
     }
 
     ngOnInit() {
@@ -56,6 +86,10 @@ export class PracticalWorkPageComponent implements OnInit {
             this.initForm()
             this.getUploadedVideoLink()
         })
+    }
+
+    reloadPage() {
+        window.location.reload()
     }
 
     getQuestion() {
@@ -72,17 +106,29 @@ export class PracticalWorkPageComponent implements OnInit {
             )
             .subscribe({
                 next: (res) => {
-                    console.log('Fetched question:', res)
+                    const question = res.data.find(
+                        (q) => q.id === 'base_praktik_question',
+                    )
+                    if (!question) {
+                        this.criticalError.set(true)
+                        this.errorMessage.set(
+                            'Soal praktik tidak ditemukan untuk jadwal ujian ini. Silahkan hubungi panitia ujian',
+                        )
+                        return
+                    }
+                    this.question.set(question)
+                    this.hasExistingAnswer.set(!!question.answerDto?.answerText)
                 },
                 error: (err) => {
                     console.error('Error fetching question:', err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengambil soal praktik',
+                    this.criticalError.set(true)
+                    this.errorMessage.set(
+                        'Gagal memuat soal praktik. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
                     )
                 },
             })
     }
+
     getErrorMessage(controlName: string, label: string): string | null {
         const control = this.videoForm.get(controlName)
         return this.formValidationService.getErrorMessage(
@@ -102,10 +148,11 @@ export class PracticalWorkPageComponent implements OnInit {
     }
 
     getUploadedVideoLink() {
-        this.loading.set(true)
-        setTimeout(() => {
-            this.loading.set(false)
-        }, 2000)
+        if (this.question()?.answerDto?.answerText) {
+            this.videoForm
+                .get('videoLink')
+                ?.setValue(this.question()?.answerDto?.answerText)
+        }
     }
 
     backToDashboard() {
@@ -118,14 +165,38 @@ export class PracticalWorkPageComponent implements OnInit {
                 if (!confirmed) return
 
                 this.submitting.set(true)
-                setTimeout(() => {
-                    this.submitting.set(false)
-                    this.handlerService.handleAlert(
-                        'Success',
-                        'Berhasil mengirim tautan video praktik kerja industri.',
+                const payload = {
+                    participantId: this.userId,
+                    questionId: this.question().id,
+                    answerText: this.videoForm.get('videoLink')?.value,
+                }
+                this.examService
+                    .saveExamAnswerForParticipantByExamScheduleId(
+                        this.examId(),
+                        payload,
                     )
-                    this.videoForm.reset()
-                }, 2000)
+                    .pipe(
+                        finalize(() => {
+                            this.submitting.set(false)
+                        }),
+                    )
+                    .subscribe({
+                        next: (res) => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Link video berhasil disimpan',
+                            )
+                            // Refetch question to update preview with new answer
+                            this.getQuestion()
+                        },
+                        error: (err) => {
+                            console.error(err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menyimpan link video. Silakan coba lagi.',
+                            )
+                        },
+                    })
             },
         })
     }

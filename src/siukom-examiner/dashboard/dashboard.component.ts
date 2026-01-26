@@ -139,10 +139,10 @@ export class DashboardComponent implements OnInit {
                 this.router.navigate(['/seminar-paper', examId, participantId])
                 break
             case ExamTypeCategory.PORTOFOLIO:
-                this.router.navigate(['/portfolio', examId])
+                this.router.navigate(['/portfolio', examId, participantId])
                 break
             case ExamTypeCategory.STUDI_KASUS:
-                this.router.navigate(['/study-case', examId])
+                this.router.navigate(['/case-study', examId, participantId])
                 break
             default:
                 this.handlerService.handleAlert(

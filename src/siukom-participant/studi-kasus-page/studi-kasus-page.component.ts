@@ -145,16 +145,18 @@ export class StudiKasusPageComponent implements OnInit {
                     console.error('Error fetching question:', err)
                     if (!silent) {
                         this.criticalError.set(true)
-                        if (err.error?.cause === 'attendance not found') {
-                            this.errorMessage.set(
-                                'Anda belum memulai jadwal ujian ini. Silahkan mulai ujian di dashboard anda.',
-                            )
-                        } else {
-                            this.errorMessage.set(
-                                'Gagal memuat soal ujian. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
-                            )
-                        }
-
+                        // if (err.error?.cause === 'attendance not found') {
+                        //     this.errorMessage.set(
+                        //         'Anda belum memulai jadwal ujian ini. Silahkan mulai ujian di dashboard anda.',
+                        //     )
+                        // } else {
+                        //     this.errorMessage.set(
+                        //         'Gagal memuat soal ujian. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
+                        //     )
+                        // }
+                        this.errorMessage.set(
+                            'Gagal memuat soal ujian. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
+                        )
                         this.questionLoading.set(false)
                     }
                 },

@@ -1,57 +1,90 @@
-<div class="case-study-container">
-    <div class="header-section">
-        <h1>Form Penilaian Studi Kasus</h1>
-        <p>Berikan penilaian (0-100) dan catatan untuk setiap aspek analisis studi kasus peserta.</p>
-    </div>
-
-    <!-- Answer Link Section -->
-    <div class="action-section">
-        <button class="btn-answer" (click)="openAnswer()">
-            📝 Lihat Jawaban Peserta <span class="external-icon">↗</span>
-        </button>
-    </div>
-
-    <div class="assessment-list">
-        <div class="assessment-card" *ngFor="let item of assessmentItems; let i = index">
-
-            <!-- Aspect Header -->
-            <div class="card-header">
-                <span class="item-number">Aspek {{ item.id }}</span>
-                <h2 class="aspect-name">{{ item.aspect }}</h2>
-                <p class="aspect-desc">{{ item.description }}</p>
-            </div>
-
-            <div class="card-body">
-                <!-- Score Input -->
-                <div class="score-section">
-                    <label [for]="'score-' + i" class="input-label">Nilai (0-100):</label>
-                    <div class="score-input-wrapper">
-                        <input type="number" [id]="'score-' + i" class="form-control score-input"
-                            [(ngModel)]="item.score" (change)="validateScore(item)" min="0" max="100" placeholder="0">
-                        <span class="score-suffix">/ 100</span>
-                    </div>
-                </div>
-
-                <!-- Note Input -->
-                <div class="note-section">
-                    <label [for]="'note-' + i" class="input-label">Catatan Penilaian:</label>
-                    <textarea [id]="'note-' + i" rows="4" class="form-control" [(ngModel)]="item.note"
-                        placeholder="Tuliskan alasan penilaian dan masukan...">
-          </textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Summary & Submit -->
-    <div class="form-footer">
-        <div class="final-score-box">
-            <span class="label">Nilai Akhir:</span>
-            <span class="value">{{ finalScore }}</span>
-        </div>
-
-        <button class="btn-submit" (click)="submitAssessment()">
-            Simpan Penilaian Studi Kasus
-        </button>
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <button class="btn-back">
+        <span class="icon">←</span>
+        Kembali ke Dashboard
+    </button>
+    <div class="alert alert-success d-flex align-items-center mb-0 px-2 py-1">
+        <i class="mdi mdi-check-circle me-1"></i>
+        <small>Jawaban telah disimpan</small>
     </div>
 </div>
+<ng-container *ngIf="loadingQuestions(); else questionForm">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
+        </div>
+        <p class="mt-2">Memuat form penilaian...</p>
+    </div>
+</ng-container>
+<ng-template #questionForm>
+    <ng-container *ngIf="questions().length > 0">
+        <div class="case-study-container">
+            <div class="header-section">
+                <h1>Form Penilaian Studi Kasus</h1>
+                <p>
+                    Berikan penilaian dan catatan untuk setiap aspek analisis
+                    studi kasus peserta.
+                </p>
+            </div>
+
+            <!-- Answer Link Section -->
+            <div class="action-section">
+                <button (click)="openAnswer()" class="btn-answer">
+                    📝 Lihat Jawaban Peserta
+                    <span class="external-icon">↗</span>
+                </button>
+            </div>
+
+            <div class="assessment-list">
+                <div *ngFor="let item of questions(); let i = index" class="assessment-card">
+                    <!-- Aspect Header -->
+                    <div class="card-header">
+                        <span class="item-number">Aspek {{ i + 1 }}</span>
+                        <h2 class="aspect-name">{{ item.question }}</h2>
+                        <div class="aspect-meta">
+                            <span class="weight-badge" *ngIf="item.weight">
+                                <i class="mdi mdi-weight"></i> Bobot: {{ item.weight }}%
+                            </span>
+                            <span class="kompetensi-badge" *ngIf="item.kompetensiIndikatorName">
+                                {{ item.kompetensiIndikatorName }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Score Input -->
+                        <div class="score-section">
+                            <label [for]}="'score-' + i" class="input-label">Nilai (0-{{ item.weight || 100 }}):</label>
+                            <div class="score-input-wrapper">
+                                <input (change)="validateScore(item)" [(ngModel)]="item.answerDto.score"
+                                    [id]="'score-' + i" class="form-control score-input" [max]="item.weight || 100"
+                                    min="0" placeholder="0" type="number" />
+                                <span class="score-suffix">/ {{ item.weight || 100 }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Note Input -->
+                        <div class="note-section">
+                            <label [for]="'note-' + i" class="input-label">Catatan Penilaian:</label>
+                            <textarea [(ngModel)]="item.answerDto.answerText" [id]="'note-' + i" class="form-control"
+                                placeholder="Tuliskan alasan penilaian dan masukan..." rows="4">
+                            </textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary & Submit -->
+            <div class="form-footer">
+                <div class="final-score-box">
+                    <span class="label">Nilai Akhir:</span>
+                    <span class="value">{{ finalScore }}</span>
+                </div>
+
+                <button (click)="submitAssessment()" class="btn-submit">
+                    Simpan Penilaian Studi Kasus
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>

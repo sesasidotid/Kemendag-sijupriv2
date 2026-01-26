@@ -74,7 +74,12 @@ export class MultiFileHandlerComponent {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        // When resetKey changes to a new non-null value, clear all files
+        // When inputs change, reinitialize with new initial files
+        if (changes['inputs'] && !changes['inputs'].firstChange) {
+            this.reinitializeFromInputs()
+        }
+
+        // When resetKey changes to a new non-null value, reset and reload from inputs
         if (
             changes['resetKey'] &&
             changes['resetKey'].currentValue &&
@@ -85,9 +90,35 @@ export class MultiFileHandlerComponent {
         }
     }
 
+    reinitializeFromInputs() {
+        // Re-initialize uploadedFiles for each key with new initial files
+        for (const key in this.inputs.files) {
+            if (!this.uploadedFiles[key]) {
+                this.uploadedFiles[key] = []
+            }
+
+            // Only reinitialize if there are initial files from server
+            if (this.inputs.files[key].initialFiles?.length) {
+                this.uploadedFiles[key] = [
+                    ...this.inputs.files[key].initialFiles!,
+                ]
+                this.notifyListener(key)
+            }
+        }
+    }
+
     resetAllFiles() {
         for (const key in this.uploadedFiles) {
+            // Clear existing files
             this.uploadedFiles[key] = []
+
+            // Reload initial files from inputs if provided
+            if (this.inputs.files[key]?.initialFiles?.length) {
+                this.uploadedFiles[key] = [
+                    ...this.inputs.files[key].initialFiles!,
+                ]
+            }
+
             this.notifyListener(key)
         }
     }

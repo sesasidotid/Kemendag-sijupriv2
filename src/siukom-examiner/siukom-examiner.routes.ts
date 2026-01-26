@@ -35,14 +35,14 @@ export const routes: Routes = [
                     ),
             },
             {
-                path: 'portfolio/:id',
+                path: 'portfolio/:id/:participantId',
                 loadComponent: () =>
                     import('./portofolio/portofolio.component').then(
                         (m) => m.PortofolioComponent,
                     ),
             },
             {
-                path: 'case-study/:id',
+                path: 'case-study/:id/:participantId',
                 loadComponent: () =>
                     import('./studi-kasus/studi-kasus.component').then(
                         (m) => m.StudiKasusComponent,
