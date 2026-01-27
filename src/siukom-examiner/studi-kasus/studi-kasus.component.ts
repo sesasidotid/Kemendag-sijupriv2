@@ -18,6 +18,7 @@ import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.mo
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { StudiKasusDraftService } from './studi-kasus-draft.service'
+import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
 
 @Component({
     selector: 'app-studi-kasus',
@@ -27,6 +28,7 @@ import { StudiKasusDraftService } from './studi-kasus-draft.service'
         ReactiveFormsModule,
         EmptyStateComponent,
         LoadingButtonComponent,
+        ExamAssessmentLayoutComponent,
     ],
     templateUrl: './studi-kasus.component.html',
     styleUrls: ['./studi-kasus.component.scss'],
@@ -39,9 +41,9 @@ export class StudiKasusComponent implements OnInit {
     fb = inject(FormBuilder)
     draftService = inject(StudiKasusDraftService)
     router = inject(Router)
+    examService = inject(ExamService)
     loadingQuestions = signal(false)
     submitting = signal(false)
-    examService = inject(ExamService)
     examId = signal('')
     participantId = signal('')
     questions = signal<ExamQuestion[]>([])

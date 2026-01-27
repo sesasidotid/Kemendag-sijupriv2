@@ -4,7 +4,13 @@ import { ExamService } from '@/modules/ukom/services/exam.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { finalize } from 'rxjs'
 import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
+import {
+    FormArray,
+    FormBuilder,
+    FormGroup,
+    ReactiveFormsModule,
+    Validators,
+} from '@angular/forms'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import {
@@ -17,11 +23,22 @@ import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.
 import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { UkomRoomService } from '@/modules/ukom/services/ukom-room.service'
+import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
+import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
+import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
 
 @Component({
     selector: 'app-wawancara',
     standalone: true,
-    imports: [CommonModule, FormsModule, LoadingButtonComponent],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        LoadingButtonComponent,
+        EmptyStateComponent,
+        ExamAssessmentLayoutComponent,
+    ],
     templateUrl: './wawancara.component.html',
     styleUrl: './wawancara.component.scss',
 })
@@ -31,11 +48,11 @@ export class WawancaraComponent implements OnInit {
 
     loadingQuestions = signal(false)
     questions = signal<ExamQuestion[]>([])
-    answers = signal<Record<string, WawancaraExamAnswer>>({})
     submitQuestionLoading = signal(false)
-    examScheduleDetail = signal<ExamSchedule | null>(null)
     startExamLoading = signal(false)
     examStarted = signal(false)
+
+    assessmentForm: FormGroup
     private router = inject(Router)
     private route = inject(ActivatedRoute)
     private handlerService = inject(HandlerService)
@@ -43,13 +60,31 @@ export class WawancaraComponent implements OnInit {
     private examService = inject(ExamService)
     private draftService = inject(WawancaraDraftService)
     private examScheduleService = inject(UkomExamScheduleService)
+    private fb = inject(FormBuilder)
+    private formValidationService = inject(FormValidationService)
     private saveTimeout: number | undefined
 
+    // Keep examScheduleDetail for getting roomUkomId needed for startExamByExaminer
+    examScheduleDetail = signal<ExamSchedule | null>(null)
+
     constructor() {
+        this.assessmentForm = this.fb.group({
+            answerDtoList: this.fb.array([]),
+        })
+
+        // Subscribe to form value changes for auto-save
+        this.assessmentForm.valueChanges.subscribe(() => {
+            this.scheduleAutoSave()
+        })
+
         effect(
             () => {
                 const examId = this.examId()
                 const participantId = this.participantId()
+
+                if (examId) {
+                    this.getExamScheduleDetail()
+                }
 
                 if (examId && participantId) {
                     this.fetchQuestionsToGrade()
@@ -57,17 +92,10 @@ export class WawancaraComponent implements OnInit {
             },
             { allowSignalWrites: true },
         )
+    }
 
-        effect(
-            () => {
-                const examId = this.examId()
-
-                if (examId) {
-                    this.getExamScheduleDetail()
-                }
-            },
-            { allowSignalWrites: true },
-        )
+    get answerDtoList(): FormArray {
+        return this.assessmentForm.get('answerDtoList') as FormArray
     }
 
     ngOnInit() {
@@ -83,6 +111,13 @@ export class WawancaraComponent implements OnInit {
             .subscribe({
                 next: (res) => {
                     this.examScheduleDetail.set(res)
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data jadwal.',
+                    )
                 },
             })
     }
@@ -148,52 +183,42 @@ export class WawancaraComponent implements OnInit {
                         this.examStarted.set(true)
                     }
 
-                    const initialAnswers: Record<string, WawancaraExamAnswer> =
-                        {}
-
-                    // Initialize answers
-                    this.questions().forEach((q) => {
-                        initialAnswers[q.id] = new WawancaraExamAnswer({
-                            questionId: q.id,
-                        })
-                    })
-
                     // Load draft first
                     const draft = await this.draftService.load(
                         this.examId(),
                         this.participantId(),
                     )
 
-                    if (draft) {
-                        this.answers.set(draft.answers)
-                    } else {
-                        this.answers.set(initialAnswers)
-                    }
+                    // Initialize answers - prioritize backend data over draft
+                    const questionsWithAnswers = result.data.map((q) => {
+                        const draftAnswer = draft?.answers?.[q.id]
+                        const hasBackendAnswer =
+                            q.answerDto &&
+                            (q.answerDto.answerChoice !== null ||
+                                q.answerDto.answerText !== null)
 
-                    // Prioritize server answers over draft
-                    const finalAnswers = { ...this.answers() }
-                    this.questions().forEach((q) => {
-                        if (q.answerDto) {
-                            const hasAnswerText =
-                                q.answerDto.answerText !== null &&
-                                q.answerDto.answerText !== undefined &&
-                                q.answerDto.answerText.trim() !== ''
-                            const hasAnswerChoice =
-                                q.answerDto.answerChoice !== null &&
-                                q.answerDto.answerChoice !== undefined &&
-                                q.answerDto.answerChoice.trim() !== ''
-
-                            if (hasAnswerText || hasAnswerChoice) {
-                                finalAnswers[q.id] = new WawancaraExamAnswer({
-                                    questionId: q.id,
-                                    answerText: q.answerDto.answerText || '',
-                                    answerChoice:
-                                        q.answerDto.answerChoice || '',
-                                })
+                        if (!q.answerDto) {
+                            // No backend answer - use draft if available
+                            q.answerDto = {
+                                participantId: this.participantId(),
+                                questionId: q.id,
+                                answerChoice: draftAnswer?.answerChoice ?? null,
+                                answerText: draftAnswer?.answerText ?? null,
                             }
+                        } else if (!hasBackendAnswer && draftAnswer) {
+                            // Backend answer exists but empty - prefer draft
+                            q.answerDto.answerChoice =
+                                draftAnswer.answerChoice ??
+                                q.answerDto.answerChoice
+                            q.answerDto.answerText =
+                                draftAnswer.answerText ?? q.answerDto.answerText
                         }
+                        // Else: Backend has answer - keep it (prioritize backend)
+                        return q
                     })
-                    this.answers.set(finalAnswers)
+
+                    this.questions.set(questionsWithAnswers)
+                    this.buildFormArray(questionsWithAnswers)
                 },
                 error: (err) => {
                     console.error(err)
@@ -205,10 +230,60 @@ export class WawancaraComponent implements OnInit {
             })
     }
 
-    isFormValid(): boolean {
-        return this.questions().every(
-            (q) => this.answers()[q.id]?.answerChoice !== undefined,
+    buildFormArray(questions: ExamQuestion[]): void {
+        // Clear existing form array
+        this.answerDtoList.clear()
+
+        // Add form group for each question
+        questions.forEach((q) => {
+            const formGroup = this.fb.group({
+                id: [q.answerDto?.id || null],
+                participantId: [
+                    q.answerDto?.participantId || this.participantId(),
+                ],
+                questionId: [q.id],
+                answerChoice: [
+                    q.answerDto?.answerChoice || null,
+                    [Validators.required],
+                ],
+                answerText: [q.answerDto?.answerText || null],
+            })
+            this.answerDtoList.push(formGroup)
+        })
+    }
+
+    getAnswerChoiceError(index: number): string | null {
+        const formGroup = this.answerDtoList.at(index) as FormGroup
+        const control = formGroup.get('answerChoice')
+
+        if (!control || !control.errors || !control.touched) {
+            return null
+        }
+
+        if (control.errors['required']) {
+            return 'Penilaian harus dipilih.'
+        }
+
+        return this.formValidationService.getErrorMessage(
+            control,
+            'answerChoice',
+            'Penilaian',
         )
+    }
+
+    isAnswerChoiceInvalid(index: number): boolean {
+        const formGroup = this.answerDtoList.at(index) as FormGroup
+        const control = formGroup.get('answerChoice')
+        return !!(control && control.invalid && control.touched)
+    }
+
+    markAllAsTouched(): void {
+        this.answerDtoList.controls.forEach((control) => {
+            const formGroup = control as FormGroup
+            Object.keys(formGroup.controls).forEach((key) => {
+                formGroup.get(key)?.markAsTouched()
+            })
+        })
     }
 
     submitAssessment(): void {
@@ -216,16 +291,23 @@ export class WawancaraComponent implements OnInit {
             next: ({ confirmed }) => {
                 if (!confirmed) return
 
-                this.submitQuestionLoading.set(true)
+                // Mark all fields as touched to show validation errors
+                this.markAllAsTouched()
 
+                const formValues = this.answerDtoList.value
+
+                // Build payload in SaveExamAnswerRequest format
                 const payload: SaveExamAnswerRequest = {
-                    answerDtoList: Object.values(this.answers()).map(
-                        (answer) => ({
-                            ...answer,
-                            participantId: this.participantId(),
-                        }),
-                    ),
+                    answerDtoList: formValues.map((item: any) => ({
+                        ...(item.id && { id: item.id }),
+                        participantId: item.participantId,
+                        questionId: item.questionId,
+                        answerChoice: item.answerChoice,
+                        answerText: item.answerText,
+                    })),
                 }
+
+                this.submitQuestionLoading.set(true)
 
                 this.examService
                     .saveExamAnswersForExaminerByExamScheduleId(
@@ -239,14 +321,16 @@ export class WawancaraComponent implements OnInit {
                                 'Success',
                                 'Penilaian wawancara berhasil disimpan.',
                             )
+                            // Clear draft after successful save
                             this.draftService
                                 .remove(this.examId(), this.participantId())
-                                .then(() => {
-                                    this.backToDashboard()
-                                })
+                                .catch((err) =>
+                                    console.warn('Failed to clear draft:', err),
+                                )
+                            this.fetchQuestionsToGrade()
                         },
                         error: (err) => {
-                            console.error(err)
+                            console.error('Error save the answer:', err)
                             this.handlerService.handleAlert(
                                 'Error',
                                 'Gagal menyimpan penilaian wawancara.',
@@ -257,14 +341,28 @@ export class WawancaraComponent implements OnInit {
         })
     }
 
-    scheduleAutoSave() {
+    scheduleAutoSave(): void {
         clearTimeout(this.saveTimeout)
         this.saveTimeout = window.setTimeout(() => {
-            this.draftService.save(
-                this.examId(),
-                this.participantId(),
-                this.answers(),
-            )
+            const answers: Record<string, WawancaraExamAnswer> = {}
+            const formValues = this.answerDtoList.value
+
+            // Convert form array to record keyed by questionId
+            formValues.forEach((item: any) => {
+                answers[item.questionId] = new WawancaraExamAnswer({
+                    questionId: item.questionId,
+                    answerChoice: item.answerChoice,
+                    answerText: item.answerText,
+                })
+            })
+
+            this.draftService
+                .save(this.examId(), this.participantId(), answers)
+                .catch((err) => console.warn('Failed to save draft:', err))
         }, 500)
+    }
+
+    isAllQuestionsAnswered(): boolean {
+        return !this.questions().some((q) => q.answerDto.answerChoice == null)
     }
 }

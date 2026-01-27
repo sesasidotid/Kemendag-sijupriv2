@@ -18,6 +18,7 @@ import { PortfolioDraftService } from '@/siukom-examiner/portofolio/portfolio-dr
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
 
 @Component({
     selector: 'app-portofolio',
@@ -28,6 +29,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         ReactiveFormsModule,
         EmptyStateComponent,
         LoadingButtonComponent,
+        ExamAssessmentLayoutComponent,
     ],
     templateUrl: './portofolio.component.html',
     styleUrls: ['./portofolio.component.scss'],

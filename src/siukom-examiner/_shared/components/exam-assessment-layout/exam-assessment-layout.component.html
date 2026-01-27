@@ -1,0 +1,79 @@
+<!-- Header Actions Bar -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <button
+        (click)="onBackClick()"
+        *ngIf="showBackButton()"
+        class="btn btn-outline-secondary"
+    >
+        <span class="mdi mdi-chevron-left me-1"></span>
+        Kembali ke Dashboard
+    </button>
+    <div
+        *ngIf="showSavedIndicator()"
+        class="alert alert-success d-flex align-items-center"
+    >
+        <i class="mdi mdi-check-circle me-1"></i>
+        <small>{{ savedMessage() }}</small>
+    </div>
+</div>
+
+<div
+    *ngIf="zoomLink()"
+    class="alert alert-info d-flex align-items-center justify-content-between mb-3"
+>
+    <div class="d-flex align-items-center">
+        <i class="mdi mdi-video fs-5 me-2"></i>
+        <div>
+            <strong>Informasi Zoom Meeting</strong>
+            <div class="small text-muted">
+                Klik untuk bergabung ke ruang zoom
+            </div>
+        </div>
+    </div>
+
+    <a
+        [href]="getZoomUrl(zoomLink())"
+        class="btn btn-sm btn-primary"
+        rel="noopener noreferrer"
+        target="_blank"
+    >
+        <i class="mdi mdi-video-outline me-1"></i>
+        Join Zoom
+    </a>
+</div>
+<div *ngIf="participantDetail()" class="card mb-3 border-0 shadow-sm">
+    <div class="card-body py-3">
+        <div class="d-flex align-items-center mb-2">
+            <i class="mdi mdi-account-circle fs-4 text-primary me-2"></i>
+            <h6 class="fw-semibold mb-0">Informasi Peserta</h6>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="text-muted">Nama Peserta</div>
+                <div class="fw-medium">{{ participantName() }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="text-muted">NIP</div>
+                <div class="fw-medium font-monospace">
+                    {{ participantNip() }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-container *ngIf="loading(); else content">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
+        </div>
+        <p class="mt-2">{{ loadingMessage() }}</p>
+    </div>
+</ng-container>
+
+<!-- Main Content -->
+<ng-template #content>
+    <ng-content></ng-content>
+</ng-template>

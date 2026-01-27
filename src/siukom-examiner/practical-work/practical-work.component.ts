@@ -20,6 +20,7 @@ import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { CommonModule } from '@angular/common'
 import { VideoPreviewComponent } from '@/modules/base/components/video-preview/video-preview.component'
+import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
 
 @Component({
     selector: 'app-practical-work',
@@ -31,6 +32,7 @@ import { VideoPreviewComponent } from '@/modules/base/components/video-preview/v
         LoadingButtonComponent,
         ReactiveFormsModule,
         VideoPreviewComponent,
+        ExamAssessmentLayoutComponent,
     ],
     templateUrl: './practical-work.component.html',
     styleUrl: './practical-work.component.scss',

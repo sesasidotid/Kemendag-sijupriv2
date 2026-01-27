@@ -421,6 +421,31 @@ export class DashboardComponent implements OnInit {
         return displayNames[examTypeCode] || examTypeCode
     }
 
+    isExamExpired(endTime?: string): boolean {
+        if (!endTime) return false
+
+        const now = new Date()
+        const end = this.parseToGmt7(endTime)
+
+        return now > end
+    }
+    isExamNotStartedYet(startTime: string): boolean {
+        const now = new Date()
+        const start = this.parseToGmt7(startTime)
+
+        return now < start
+    }
+    private parseToGmt7(dateStr: string): Date {
+        const [datePart, timePart] = dateStr.split(' ')
+        const [year, month, day] = datePart.split('-').map(Number)
+        const [hour, minute, second] = timePart.split(':').map(Number)
+
+        // dateStr is GMT+7 → convert to UTC internally
+        return new Date(
+            Date.UTC(year, month - 1, day, hour - 7, minute, second),
+        )
+    }
+
     private updateNowGmt7(): void {
         this.nowGmt7.set(this.getNowGmt7String())
     }

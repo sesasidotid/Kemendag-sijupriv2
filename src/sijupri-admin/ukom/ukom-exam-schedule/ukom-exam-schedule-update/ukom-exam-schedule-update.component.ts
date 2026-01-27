@@ -10,7 +10,6 @@ import {
 import { CommonModule } from '@angular/common'
 import {
     FormBuilder,
-    FormControl,
     FormGroup,
     ReactiveFormsModule,
     Validators,
@@ -37,6 +36,144 @@ import {
     MultiSelectApiParams,
 } from '@/modules/base/components/multi-select-api'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+
+interface DynamicFieldConfig {
+    controlName: string
+    validators?: any[]
+    visible?: boolean
+    required?: boolean
+}
+
+interface ExamTypeFormConfig {
+    primary: DynamicFieldConfig[]
+}
+
+const UKOM_UPDATE_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
+    CAT: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'duration',
+                validators: [Validators.required, Validators.min(1)],
+            },
+            { controlName: 'secretKey', validators: [Validators.required] },
+            {
+                controlName: 'participantIdList',
+                visible: true,
+                required: false,
+            },
+        ],
+    },
+    WAWANCARA: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'duration',
+                validators: [Validators.required, Validators.min(1)],
+            },
+            {
+                controlName: 'participantIdList',
+                visible: true,
+                required: false,
+            },
+            {
+                controlName: 'examinerIdList',
+                validators: [Validators.required],
+            },
+        ],
+    },
+    MAKALAH: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'participantIdList',
+                visible: true,
+                required: false,
+            },
+            {
+                controlName: 'examinerIdList',
+                validators: [Validators.required],
+            },
+        ],
+    },
+    SEMINAR: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'duration',
+                validators: [Validators.required, Validators.min(1)],
+            },
+            {
+                controlName: 'participantIdList',
+                visible: true,
+                required: false,
+            },
+            {
+                controlName: 'examinerIdList',
+                validators: [Validators.required],
+            },
+        ],
+    },
+    PRAKTIK: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'participantIdList',
+                visible: true,
+                required: false,
+            },
+            {
+                controlName: 'examinerIdList',
+                validators: [Validators.required],
+            },
+        ],
+    },
+    PORTOFOLIO: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'participantIdList',
+                visible: true,
+                required: false,
+            },
+            {
+                controlName: 'examinerIdList',
+                validators: [Validators.required],
+            },
+        ],
+    },
+    STUDI_KASUS: {
+        primary: [
+            { controlName: 'startTime', validators: [Validators.required] },
+            { controlName: 'endTime', validators: [Validators.required] },
+            { controlName: 'secretKey', validators: [Validators.required] },
+            {
+                controlName: 'participantIdList',
+                visible: true,
+                required: false,
+            },
+            {
+                controlName: 'examinerIdList',
+                validators: [Validators.required],
+            },
+        ],
+    },
+}
+
+const ALL_FORM_FIELDS = [
+    'startTime',
+    'endTime',
+    'duration',
+    'secretKey',
+    'participantIdList',
+    'examinerIdList',
+]
 
 @Component({
     selector: 'app-ukom-exam-schedule-update',
@@ -108,12 +245,46 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
 
     initForm() {
         this.examScheduleForm = this.fb.group({
-            startTime: ['', Validators.required],
-            endTime: ['', Validators.required],
-            duration: ['', Validators.required],
-            secretKey: [null, this.catValidator()],
+            startTime: [''],
+            endTime: [''],
+            duration: [''],
+            secretKey: [null],
             participantIdList: [null],
-            examinerIdList: [null, this.examinerRequiredWhenNotCat()],
+            examinerIdList: [null],
+        })
+    }
+
+    applyValidatorsForExamType(examType: string) {
+        const config = UKOM_UPDATE_FORM_CONFIG[examType]
+        if (!config) return
+
+        const primaryControls = new Set(
+            config.primary.map((c) => c.controlName),
+        )
+
+        // Clear validators for all configurable fields
+        ALL_FORM_FIELDS.forEach((fieldName) => {
+            const control = this.examScheduleForm.get(fieldName)
+            if (control) {
+                control.clearValidators()
+                // Clear value if not in current config
+                if (!primaryControls.has(fieldName)) {
+                    control.setValue(null)
+                }
+            }
+        })
+
+        // Apply validators from primary config
+        config.primary.forEach((fieldConfig) => {
+            const control = this.examScheduleForm.get(fieldConfig.controlName)
+            if (control && fieldConfig.validators) {
+                control.setValidators(fieldConfig.validators)
+            }
+        })
+
+        // Update validity
+        ALL_FORM_FIELDS.forEach((fieldName) => {
+            this.examScheduleForm.get(fieldName)?.updateValueAndValidity()
         })
     }
 
@@ -175,8 +346,8 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             .subscribe({
                 next: (examSchedule) => {
                     this.examSchedule = examSchedule
+                    this.applyValidatorsForExamType(examSchedule.examTypeCode)
                     this.patchForm(examSchedule)
-                    this.updateValidatorsBasedOnExamType()
                 },
                 error: (error) => {
                     console.error(error)
@@ -188,52 +359,37 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             })
     }
 
-    private updateValidatorsBasedOnExamType() {
-        const secretKeyControl = this.examScheduleForm.get('secretKey')
-        const examinerControl = this.examScheduleForm.get('examinerIdList')
+    isFieldVisible(controlName: string): boolean {
+        const config = UKOM_UPDATE_FORM_CONFIG[this.examTypeCode]
+        if (!config) return false
 
-        if (this.examTypeCode !== 'CAT') {
-            secretKeyControl?.setValue(null)
+        const primaryField = config.primary.find(
+            (f) => f.controlName === controlName,
+        )
+        if (primaryField) {
+            return primaryField.visible !== false
         }
 
-        secretKeyControl?.updateValueAndValidity()
-        examinerControl?.updateValueAndValidity()
+        return false
     }
 
-    catValidator() {
-        return (control: FormControl) => {
-            if (!this.examSchedule) return null
+    isFieldRequired(controlName: string): boolean {
+        const config = UKOM_UPDATE_FORM_CONFIG[this.examTypeCode]
+        if (!config) return false
 
-            const examTypeValue = this.examTypeCode
-
-            if (
-                examTypeValue === 'CAT' &&
-                (!control.value || control.value.toString().trim() === '')
-            ) {
-                return { required: true }
+        const primaryField = config.primary.find(
+            (f) => f.controlName === controlName,
+        )
+        if (primaryField) {
+            if (primaryField.required !== undefined) {
+                return primaryField.required
             }
-
-            return null
+            return (
+                primaryField.validators?.includes(Validators.required) ?? false
+            )
         }
-    }
 
-    examinerRequiredWhenNotCat() {
-        return (control: FormControl) => {
-            if (!control.parent) {
-                return null
-            }
-
-            const examType = this.examTypeCode
-
-            if (
-                examType !== 'CAT' &&
-                (!control.value || control.value.length === 0)
-            ) {
-                return { required: true }
-            }
-
-            return null
-        }
+        return false
     }
 
     patchForm(data: ExamSchedule) {
@@ -321,12 +477,10 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
     }
 
     generateSecretKey(): void {
-        const examType = this.examSchedule?.examTypeCode
-
-        if (examType !== 'CAT') {
+        if (!this.isFieldVisible('secretKey')) {
             this.handlerService.handleAlert(
                 'Warning',
-                'Hanya ujian dengan jenis CAT yang memerlukan secret key.',
+                'Jenis ujian ini tidak memerlukan secret key.',
             )
             return
         }

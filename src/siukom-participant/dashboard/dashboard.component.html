@@ -140,7 +140,7 @@
                                                 [className]="'btn btn-primary btn-lg'"
                                                 [disabled]="!canStartExam(exam.startTime, exam.endTime)"
                                                 [isLoading]="startCATLoading()"
-                                                [label]="'Mulai Ujian'"
+                                                [label]="isExamExpired(exam.endTime) ? 'Waktu ujian telah selesai' : 'Mulai Ujian'"
                                             ></app-loading-button>
                                         </ng-template>
                                     </ng-container>
@@ -166,7 +166,7 @@
                                                 [className]="'btn btn-primary btn-lg'"
                                                 [disabled]="!canStartExam(exam.startTime, exam.endTime)"
                                                 [isLoading]="startMakalahLoading()"
-                                                [label]="'Unggah Makalah'"
+                                                [label]="isExamExpired(exam.endTime) ? 'Waktu ujian telah selesai' : 'Mulai Ujian'"
                                             ></app-loading-button>
                                         </ng-template>
                                     </ng-container>
@@ -186,13 +186,6 @@
                                         </ng-container>
 
                                         <ng-template #wawancaraNoScore>
-                                            <!--                                            <app-loading-button-->
-                                            <!--                                                (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"-->
-                                            <!--                                                [className]="'btn btn-primary btn-lg'"-->
-                                            <!--                                                [disabled]="!canStartExam(exam.personalSchedule)"-->
-                                            <!--                                                [isLoading]="startWawancaraLoading()"-->
-                                            <!--                                                [label]="'Mulai Wawancara'"-->
-                                            <!--                                            ></app-loading-button>-->
                                             <div
                                                 class="alert alert-info d-flex align-items-start gap-3"
                                             >
@@ -240,7 +233,7 @@
                                                 [className]="'btn btn-primary btn-lg'"
                                                 [disabled]="!canStartExam(exam.startTime, exam.endTime)"
                                                 [isLoading]="startPraktikLoading()"
-                                                [label]="'Mulai Praktik'"
+                                                [label]="isExamExpired(exam.endTime) ? 'Waktu ujian telah selesai' : 'Mulai Ujian'"
                                             ></app-loading-button>
                                         </ng-template>
                                     </ng-container>
@@ -265,7 +258,7 @@
                                                 [className]="'btn btn-primary btn-lg'"
                                                 [disabled]="!canStartExam(exam.startTime, exam.endTime)"
                                                 [isLoading]="startStudiKasusLoading()"
-                                                [label]="'Mulai Studi Kasus'"
+                                                [label]="isExamExpired(exam.endTime) ? 'Waktu ujian telah selesai' : 'Mulai Ujian'"
                                             ></app-loading-button>
                                         </ng-template>
                                     </ng-container>
@@ -290,7 +283,7 @@
                                                 [className]="'btn btn-primary btn-lg'"
                                                 [disabled]="!canStartExam(exam.startTime, exam.endTime)"
                                                 [isLoading]="startPortofolioLoading()"
-                                                [label]="'Unggah Portfolio'"
+                                                [label]="isExamExpired(exam.endTime) ? 'Waktu ujian telah selesai' : 'Mulai Ujian'"
                                             ></app-loading-button>
                                         </ng-template>
                                     </ng-container>

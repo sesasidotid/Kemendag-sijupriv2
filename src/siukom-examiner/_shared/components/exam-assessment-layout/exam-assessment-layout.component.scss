@@ -1,0 +1,54 @@
+.assessment-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+}
+
+.card {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+
+    .card-header {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 1rem 1.25rem;
+
+        h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+    }
+
+    .card-body {
+        padding: 1.25rem;
+
+        strong {
+            font-weight: 600;
+            color: #495057;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+    }
+}

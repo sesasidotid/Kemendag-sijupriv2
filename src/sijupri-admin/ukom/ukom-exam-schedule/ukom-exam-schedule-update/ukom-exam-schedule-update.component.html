@@ -1,149 +1,184 @@
-<form [formGroup]="examScheduleForm">
-    <div class="mb-3">
-        <label class="form-label fw-bold" for="startTime"
-            >Waktu Mulai <span class="text-danger">*</span></label
-        >
-
-        <input
-            appInvalidOnTouch
-            class="form-control"
-            formControlName="startTime"
-            id="startTime"
-            type="datetime-local"
-        />
-        <div
-            *ngIf="getError('startTime', 'Waktu Mulai') as error"
-            class="invalid-feedback"
-        >
-            {{ error }}
+<ng-container *ngIf="dataLoading(); else content">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
         </div>
+        <p class="mt-2">Memuat halaman...</p>
     </div>
+</ng-container>
 
-    <div class="mb-3">
-        <label class="form-label fw-bold" for="endTime"
-            >Waktu Selesai <span class="text-danger">*</span></label
-        >
-
-        <input
-            appInvalidOnTouch
-            class="form-control"
-            formControlName="endTime"
-            id="endTime"
-            type="datetime-local"
-        />
-        <div
-            *ngIf="getError('endTime', 'Waktu Selesai') as error"
-            class="invalid-feedback"
-        >
-            {{ error }}
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label fw-bold" for="duration"
-            >Durasi <span class="text-danger">*</span></label
-        >
-
-        <div class="input-group">
-            <input
-                appInvalidOnTouch
-                class="form-control"
-                formControlName="duration"
-                id="duration"
-                min="1"
-                placeholder="Masukkan durasi"
-                type="number"
-            />
-            <span class="input-group-text">menit</span>
-        </div>
-        <div
-            *ngIf="getError('duration', 'Durasi') as error"
-            class="invalid-feedback"
-        >
-            {{ error }}
-        </div>
-        <small class="form-text text-muted"> Durasi ujian dalam menit </small>
-    </div>
-
-    <div *ngIf="isCatExamType" class="mb-3">
-        <label class="form-label fw-bold" for="secretKey"
-            >Secret Key <span class="text-danger">*</span></label
-        >
-
-        <div class="input-group">
-            <input
-                appInvalidOnTouch
-                class="form-control"
-                formControlName="secretKey"
-                id="secretKey"
-                placeholder="Auto-generated secret key"
-                type="text"
-            />
-            <button
-                (click)="generateSecretKey()"
-                class="btn btn-outline-secondary"
-                title="Generate secret key"
-                type="button"
+<ng-template #content>
+    <form [formGroup]="examScheduleForm">
+        <div *ngIf="isFieldVisible('startTime')" class="mb-3">
+            <label class="form-label fw-bold" for="startTime"
+                >Waktu Mulai
+                <span *ngIf="isFieldRequired('startTime')" class="text-danger"
+                    >*</span
+                ></label
             >
-                <i class="mdi mdi-shuffle-variant"></i>
-            </button>
+
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="startTime"
+                id="startTime"
+                type="datetime-local"
+            />
+            <div
+                *ngIf="getError('startTime', 'Waktu Mulai') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
+            </div>
         </div>
-        <div
-            *ngIf="getError('secretKey', 'Secret Key') as error"
-            class="invalid-feedback"
-        >
-            {{ error }}
+
+        <div *ngIf="isFieldVisible('endTime')" class="mb-3">
+            <label class="form-label fw-bold" for="endTime"
+                >Waktu Selesai
+                <span *ngIf="isFieldRequired('endTime')" class="text-danger"
+                    >*</span
+                ></label
+            >
+
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="endTime"
+                id="endTime"
+                type="datetime-local"
+            />
+            <div
+                *ngIf="getError('endTime', 'Waktu Selesai') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
+            </div>
         </div>
-        <small class="form-text text-muted"
-            >Klik ikon untuk menghasilkan kunci acak yang aman.</small
-        >
-    </div>
 
-    <div class="mb-3">
-        <label class="form-label fw-bold" for="participantIdList"
-            >Peserta</label
-        >
+        <div *ngIf="isFieldVisible('duration')" class="mb-3">
+            <label class="form-label fw-bold" for="duration"
+                >Durasi
+                <span *ngIf="isFieldRequired('duration')" class="text-danger"
+                    >*</span
+                ></label
+            >
 
-        <app-multi-select
-            [options]="participants"
-            formControlName="participantIdList"
-            placeholder="Pilih Peserta"
-        ></app-multi-select>
-        <small class="form-text text-muted"
-            >Kosongkan jika ingin seluruh perseta ikut ujian.
-        </small>
-    </div>
-
-    <div *ngIf="!isCatExamType" class="mb-3">
-        <label class="form-label fw-bold" for="examinerIdList"
-            >Penguji <span class="text-danger">*</span>
-        </label>
-
-        <app-multi-select-api
-            [fetchFunction]="fetchExaminers"
-            [initialSelectedOptions]="selectedExaminers"
-            [pageSize]="20"
-            [searchParamName]="'like_user|name'"
-            formControlName="examinerIdList"
-            id="examinerIdList"
-            placeholder="Pilih Penguji"
-            searchPlaceholder="Cari penguji..."
-        ></app-multi-select-api>
-        <div
-            *ngIf="getError('examinerIdList', 'Penguji') as error"
-            class="invalid-feedback"
-        >
-            {{ error }}
+            <div class="input-group">
+                <input
+                    appInvalidOnTouch
+                    class="form-control"
+                    formControlName="duration"
+                    id="duration"
+                    min="1"
+                    placeholder="Masukkan durasi"
+                    type="number"
+                />
+                <span class="input-group-text">menit</span>
+            </div>
+            <div
+                *ngIf="getError('duration', 'Durasi') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
+            </div>
+            <small class="form-text text-muted">
+                Durasi ujian dalam menit
+            </small>
         </div>
+
+        <div *ngIf="isFieldVisible('secretKey')" class="mb-3">
+            <label class="form-label fw-bold" for="secretKey"
+                >Secret Key
+                <span *ngIf="isFieldRequired('secretKey')" class="text-danger"
+                    >*</span
+                ></label
+            >
+
+            <div class="input-group">
+                <input
+                    appInvalidOnTouch
+                    class="form-control"
+                    formControlName="secretKey"
+                    id="secretKey"
+                    placeholder="Auto-generated secret key"
+                    type="text"
+                />
+                <button
+                    (click)="generateSecretKey()"
+                    class="btn btn-outline-secondary"
+                    title="Generate secret key"
+                    type="button"
+                >
+                    <i class="mdi mdi-shuffle-variant"></i>
+                </button>
+            </div>
+            <div
+                *ngIf="getError('secretKey', 'Secret Key') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
+            </div>
+            <small class="form-text text-muted"
+                >Klik ikon untuk menghasilkan kunci acak yang aman.</small
+            >
+        </div>
+
+        <div *ngIf="isFieldVisible('participantIdList')" class="mb-3">
+            <label class="form-label fw-bold" for="participantIdList"
+                >Peserta
+                <span
+                    *ngIf="isFieldRequired('participantIdList')"
+                    class="text-danger"
+                    >*</span
+                ></label
+            >
+
+            <app-multi-select
+                [options]="participants"
+                formControlName="participantIdList"
+                placeholder="Pilih Peserta"
+            ></app-multi-select>
+            <small class="form-text text-muted"
+                >Kosongkan jika ingin seluruh perseta ikut ujian.
+            </small>
+        </div>
+
+        <div *ngIf="isFieldVisible('examinerIdList')" class="mb-3">
+            <label class="form-label fw-bold" for="examinerIdList"
+                >Penguji
+                <span
+                    *ngIf="isFieldRequired('examinerIdList')"
+                    class="text-danger"
+                    >*</span
+                >
+            </label>
+
+            <app-multi-select-api
+                [fetchFunction]="fetchExaminers"
+                [initialSelectedOptions]="selectedExaminers"
+                [pageSize]="20"
+                [searchParamName]="'like_user|name'"
+                formControlName="examinerIdList"
+                id="examinerIdList"
+                placeholder="Pilih Penguji"
+                searchPlaceholder="Cari penguji..."
+            ></app-multi-select-api>
+            <div
+                *ngIf="getError('examinerIdList', 'Penguji') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
+            </div>
+        </div>
+    </form>
+    <div class="d-flex justify-content-end gap-1">
+        <app-loading-button
+            (clicked)="submit()"
+            [className]="'btn btn-primary'"
+            [disabled]="examScheduleForm.invalid"
+            [isLoading]="submitLoading()"
+            [label]="'Simpan'"
+            [type]="'button'"
+        ></app-loading-button>
     </div>
-</form>
-<div class="d-flex justify-content-end gap-1">
-    <app-loading-button
-        (clicked)="submit()"
-        [className]="'btn btn-primary'"
-        [disabled]="examScheduleForm.invalid"
-        [isLoading]="submitLoading()"
-        [label]="'Simpan'"
-        [type]="'button'"
-    ></app-loading-button>
-</div>
+</ng-template>

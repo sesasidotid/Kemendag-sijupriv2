@@ -1,42 +1,26 @@
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <button (click)="backToDashboard()" class="btn btn-outline-secondary">
-        <span class="mdi mdi-chevron-left me-1"></span>
-        Kembali ke Dashboard
-    </button>
-    <div
-        *ngIf="!loadingQuestions() && isAllQuestionsAnswered()"
-        class="alert alert-success d-flex align-items-center mb-0 px-2 py-1"
-    >
-        <i class="mdi mdi-check-circle me-1"></i>
-        <small>Jawaban telah disimpan</small>
-    </div>
-</div>
-<ng-container *ngIf="loadingQuestions(); else questionForm">
-    <div class="py-5 text-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Memuat...</span>
-        </div>
-        <p class="mt-2">Memuat form penilaian...</p>
-    </div>
-</ng-container>
-<ng-template #questionForm>
-    <ng-container *ngIf="questions().length > 0;else noQuestions">
-        <div class="assessment-container">
-            <div class="header-section">
-                <h1>Form Penilaian Studi Kasus</h1>
-                <p>
-                    Berikan penilaian dan catatan untuk setiap aspek analisis
-                    studi kasus peserta.
-                </p>
-                <div class="d-flex justify-content-center">
-                    <button (click)="openAnswer()" class="btn btn-primary">
-                        <span class="mdi mdi-open-in-new me-2"></span>
-                        Lihat Jawaban Peserta
-                    </button>
+<app-exam-assessment-layout
+    (backClicked)="backToDashboard()"
+    [examScheduleId]="examId()"
+    [loading]="loadingQuestions()"
+    [participantId]="participantId()"
+    [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnswered() && questions().length > 0"
+>
+    <ng-container *ngIf="questions().length > 0; else noQuestions">
+        <form [formGroup]="assessmentForm">
+            <div class="assessment-container">
+                <div class="header-section">
+                    <h1>Form Penilaian Studi Kasus</h1>
+                    <p>
+                        Silakan isi penilaian untuk setiap pertanyaan di bawah
+                        ini.
+                    </p>
+                    <div class="d-flex justify-content-center" header>
+                        <button (click)="openAnswer()" class="btn btn-primary">
+                            <span class="mdi mdi-open-in-new me-2"></span>
+                            Lihat Jawaban Peserta
+                        </button>
+                    </div>
                 </div>
-            </div>
-
-            <form [formGroup]="assessmentForm">
                 <div class="question-list" formArrayName="answerDtoList">
                     <div
                         *ngFor="let question of questions(); let i = index"
@@ -106,51 +90,28 @@
                     </div>
                 </div>
 
-                <!-- Summary & Submit -->
-                <!--                    <div class="">-->
-                <!--                        <span class="label">Nilai Akhir:</span>-->
-                <!--                        <span class="value">{{ finalScore }}</span>-->
-                <!--                    </div>-->
-
-                <div class="mt-3 text-end">
+                <div class="mt-3 text-end" footer>
                     <app-loading-button
                         (clicked)="submitAssessment()"
-                        [className]="'btn btn-primary'"
+                        [className]="'btn btn-primary btn-lg'"
                         [disabled]="assessmentForm.invalid"
                         [isLoading]="submitting()"
-                        [label]="'Simpan Penilaian Studi Kasus'"
+                        [label]="'Simpan Penilaian'"
                         [type]="'button'"
                     >
                     </app-loading-button>
-
-                    <!--                                    <button-->
-                    <!--                                        (click)="submitAssessment()"-->
-                    <!--                                        [disabled]="submitting() || assessmentForm.invalid"-->
-                    <!--                                        class="btn-submit"-->
-                    <!--                                        type="button"-->
-                    <!--                                    >-->
-                    <!--                                        <span-->
-                    <!--                                            *ngIf="submitting()"-->
-                    <!--                                            class="spinner-border spinner-border-sm me-2"-->
-                    <!--                                            role="status"-->
-                    <!--                                        ></span>-->
-                    <!--                                        {{ submitting() ? 'Menyimpan...' : 'Simpan Penilaian-->
-                    <!--                                        Studi Kasus' }}-->
-                    <!--                                    </button>-->
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </ng-container>
     <ng-template #noQuestions>
-        <div class="no-questions-container">
-            <app-empty-state
-                [buttonAction]="backToDashboard.bind(this)"
-                [buttonText]="'Kembali ke Dashboard'"
-                [description]="'Tidak ada pertanyaan yang tersedia untuk penilaian studi kasus saat ini.'"
-                [icon]="'mdi mdi-clipboard-text-outline'"
-                [title]="'Pertanyaan Tidak Ditemukan'"
-            >
-            </app-empty-state>
-        </div>
+        <app-empty-state
+            [buttonAction]="backToDashboard.bind(this)"
+            [buttonText]="'Kembali ke Dashboard'"
+            [description]="'Tidak ada pertanyaan yang tersedia untuk penilaian saat ini.'"
+            [icon]="'mdi mdi-clipboard-text-outline'"
+            [title]="'Pertanyaan Tidak Ditemukan'"
+        >
+        </app-empty-state>
     </ng-template>
-</ng-template>
+</app-exam-assessment-layout>
