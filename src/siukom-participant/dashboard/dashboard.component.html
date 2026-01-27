@@ -1,5 +1,5 @@
 <div class="welcome-section mb-4">
-    <h1 class="welcome-title">👋 Selamat Datang, Bapak/Ibu</h1>
+    <h1 class="welcome-title">Selamat Datang, Bapak/Ibu</h1>
     <p class="current-date">Hari ini: {{ formattedCurrentDate() }} (WIB)</p>
 </div>
 
@@ -53,10 +53,11 @@
                 <ng-container *ngIf="roomUkom.vidCallLink; else noLink">
                     <a
                         [href]="getAbsoluteUrl(roomUkom.vidCallLink)"
-                        class="btn btn-primary btn-lg fw-bold py-3"
+                        class="btn btn-primary btn-lg fw-bold d-inline-flex align-items-center justify-content-center py-3"
                         target="_blank"
                     >
-                        Bergabung ke Zoom
+                        <i class="mdi mdi-video-outline fs-3 me-2"></i>
+                        <span>Bergabung ke Zoom</span>
                     </a>
                 </ng-container>
 

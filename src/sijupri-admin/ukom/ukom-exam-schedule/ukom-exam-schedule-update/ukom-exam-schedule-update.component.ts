@@ -58,11 +58,6 @@ const UKOM_UPDATE_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
                 validators: [Validators.required, Validators.min(1)],
             },
             { controlName: 'secretKey', validators: [Validators.required] },
-            {
-                controlName: 'participantIdList',
-                visible: true,
-                required: false,
-            },
         ],
     },
     WAWANCARA: {
@@ -73,30 +68,12 @@ const UKOM_UPDATE_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
                 controlName: 'duration',
                 validators: [Validators.required, Validators.min(1)],
             },
-            {
-                controlName: 'participantIdList',
-                visible: true,
-                required: false,
-            },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
-            },
         ],
     },
     MAKALAH: {
         primary: [
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
-            {
-                controlName: 'participantIdList',
-                visible: true,
-                required: false,
-            },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
-            },
         ],
     },
     SEMINAR: {
@@ -107,45 +84,18 @@ const UKOM_UPDATE_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
                 controlName: 'duration',
                 validators: [Validators.required, Validators.min(1)],
             },
-            {
-                controlName: 'participantIdList',
-                visible: true,
-                required: false,
-            },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
-            },
         ],
     },
     PRAKTIK: {
         primary: [
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
-            {
-                controlName: 'participantIdList',
-                visible: true,
-                required: false,
-            },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
-            },
         ],
     },
     PORTOFOLIO: {
         primary: [
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
-            {
-                controlName: 'participantIdList',
-                visible: true,
-                required: false,
-            },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
-            },
         ],
     },
     STUDI_KASUS: {
@@ -153,15 +103,6 @@ const UKOM_UPDATE_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
             { controlName: 'secretKey', validators: [Validators.required] },
-            {
-                controlName: 'participantIdList',
-                visible: true,
-                required: false,
-            },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
-            },
         ],
     },
 }
@@ -212,14 +153,6 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
 
     examSchedule: ExamSchedule
 
-    get examTypeCode() {
-        return this.examSchedule?.examTypeCode
-    }
-
-    get isCatExamType(): boolean {
-        return this.examTypeCode === 'CAT'
-    }
-
     constructor() {
         effect(() => {
             const id = this.roomUkomId()
@@ -236,6 +169,14 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             },
             { allowSignalWrites: true },
         )
+    }
+
+    get examTypeCode() {
+        return this.examSchedule?.examTypeCode
+    }
+
+    get isCatExamType(): boolean {
+        return this.examTypeCode === 'CAT'
     }
 
     ngOnInit() {
