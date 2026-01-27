@@ -15,6 +15,7 @@ import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { ParticpantStudyCaseExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
+import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 
 @Component({
     selector: 'app-studi-kasus-page',
@@ -24,6 +25,7 @@ import { Participant } from '@/modules/ukom/models/cat/participant.model'
         FileHandlerComponent,
         LoadingButtonComponent,
         FormsModule,
+        EmptyStateComponent,
     ],
     templateUrl: './studi-kasus-page.component.html',
     styleUrl: './studi-kasus-page.component.scss',

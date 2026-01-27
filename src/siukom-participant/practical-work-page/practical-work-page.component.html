@@ -7,11 +7,11 @@
     </button>
 
     <div
-        *ngIf="hasExistingAnswer() && question()?.answerDto?.answerText"
+        *ngIf="hasExistingAnswer() && !questionLoading()"
         class="alert alert-success d-flex align-items-center mb-0 px-2 py-1"
     >
         <i class="mdi mdi-check-circle me-1"></i>
-        <small>Jawaban telah dikirim</small>
+        <small>Jawaban telah disimpan</small>
     </div>
 </div>
 
@@ -74,92 +74,104 @@
 </ng-container>
 
 <ng-template #content>
-    <div class="alert alert-info">
-        <h4 class="alert-heading">
-            <i class="mdi mdi-information-outline"></i>
-            Petunjuk
-        </h4>
-        <ol>
-            <li>Rekam video praktik Anda.</li>
-            <li>Unggah video ke YouTube / Google Drive / platform lain.</li>
-            <li>Salin link video tersebut.</li>
-            <li>Tempelkan link ke kolom di bawah.</li>
-            <li>Klik <b>Simpan Link Video</b>.</li>
-        </ol>
-    </div>
+    <ng-container *ngIf="question();else noQuestion">
+        <div class="alert alert-info">
+            <h4 class="alert-heading">
+                <i class="mdi mdi-information-outline"></i>
+                Petunjuk
+            </h4>
+            <ol>
+                <li>Rekam video praktik Anda.</li>
+                <li>Unggah video ke YouTube / Google Drive / platform lain.</li>
+                <li>Salin link video tersebut.</li>
+                <li>Tempelkan link ke kolom di bawah.</li>
+                <li>Klik <b>Simpan Link Video</b>.</li>
+            </ol>
+        </div>
 
-    <form (ngSubmit)="submitVideoLink()" [formGroup]="videoForm">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="mdi mdi-upload me-2"></i>
-                    {{ hasExistingAnswer() ? 'Update' : 'Upload' }} Link Video
-                    Praktik
+        <form (ngSubmit)="submitVideoLink()" [formGroup]="videoForm">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="mdi mdi-upload me-2"></i>
+                        {{ hasExistingAnswer() ? 'Update' : 'Upload' }} Link
+                        Video Praktik
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="question(); else noQuestion" class="mb-3">
+                        <label class="form-label fw-bold">
+                            {{question().question}}
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input
+                            appInvalidOnTouch
+                            class="form-control"
+                            formControlName="videoLink"
+                            placeholder="Contoh: https://youtu.be/xxxxx"
+                            type="url"
+                        />
+                        <div
+                            *ngIf="getErrorMessage('videoLink', 'Link Video Praktik') as error"
+                            class="invalid-feedback"
+                        >
+                            {{error}}
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            <i class="mdi mdi-lightbulb-outline me-1"></i>
+                            Mendukung: YouTube, Google Drive, Vimeo, atau link
+                            video lainnya
+                        </small>
+                    </div>
+                    <ng-template #noQuestion>
+                        <div class="alert alert-warning">
+                            <i class="mdi mdi-alert-outline me-2"></i>
+                            Soal praktik tidak ditemukan.
+                        </div>
+                    </ng-template>
+                    <app-loading-button
+                        [className]="'btn btn-primary float-end'"
+                        [disabled]="videoForm.invalid"
+                        [isLoading]="submitting()"
+                        [label]="hasExistingAnswer() ? 'Update Link Video' : 'Simpan Link Video'"
+                        [type]="'submit'"
+                    ></app-loading-button>
+                </div>
+            </div>
+        </form>
+        <!-- Video Preview Section -->
+        <div
+            *ngIf="hasExistingAnswer() && question()?.answerDto?.answerText"
+            class="card shadow-sm"
+        >
+            <div class="card-header bg-success">
+                <h5 class="mb-0 text-white">
+                    <i class="mdi mdi-check-circle me-2"></i>
+                    Video Praktik Anda
                 </h5>
             </div>
             <div class="card-body">
-                <div *ngIf="question(); else noQuestion" class="mb-3">
-                    <label class="form-label fw-bold">
-                        {{question().question}}
-                        <span class="text-danger">*</span>
-                    </label>
-                    <input
-                        appInvalidOnTouch
-                        class="form-control"
-                        formControlName="videoLink"
-                        placeholder="Contoh: https://youtu.be/xxxxx"
-                        type="url"
-                    />
-                    <div
-                        *ngIf="getErrorMessage('videoLink', 'Link Video Praktik') as error"
-                        class="invalid-feedback"
-                    >
-                        {{error}}
-                    </div>
-                    <small class="text-muted d-block mt-2">
-                        <i class="mdi mdi-lightbulb-outline me-1"></i>
-                        Mendukung: YouTube, Google Drive, Vimeo, atau link video
-                        lainnya
-                    </small>
+                <app-video-preview
+                    [height]="'450px'"
+                    [showTitle]="false"
+                    [videoUrl]="question()?.answerDto?.answerText"
+                ></app-video-preview>
+                <div class="alert alert-info mb-0 mt-3">
+                    <i class="mdi mdi-information-outline me-2"></i>
+                    Anda dapat mengubah link video dengan mengisi form dan klik
+                    <strong>Simpan Link Video</strong> kembali.
                 </div>
-                <ng-template #noQuestion>
-                    <div class="alert alert-warning">
-                        <i class="mdi mdi-alert-outline me-2"></i>
-                        Soal praktik tidak ditemukan.
-                    </div>
-                </ng-template>
-                <app-loading-button
-                    [className]="'btn btn-primary float-end'"
-                    [disabled]="videoForm.invalid"
-                    [isLoading]="submitting()"
-                    [label]="hasExistingAnswer() ? 'Update Link Video' : 'Simpan Link Video'"
-                    [type]="'submit'"
-                ></app-loading-button>
             </div>
         </div>
-    </form>
-    <!-- Video Preview Section -->
-    <div
-        *ngIf="hasExistingAnswer() && question()?.answerDto?.answerText"
-        class="card shadow-sm"
-    >
-        <div class="card-header bg-success">
-            <h5 class="mb-0 text-white">
-                <i class="mdi mdi-check-circle me-2"></i>
-                Video Praktik Anda
-            </h5>
-        </div>
-        <div class="card-body">
-            <app-video-preview
-                [height]="'450px'"
-                [showTitle]="false"
-                [videoUrl]="question()?.answerDto?.answerText"
-            ></app-video-preview>
-            <div class="alert alert-info mb-0 mt-3">
-                <i class="mdi mdi-information-outline me-2"></i>
-                Anda dapat mengubah link video dengan mengisi form dan klik
-                <strong>Simpan Link Video</strong> kembali.
-            </div>
-        </div>
-    </div>
+    </ng-container>
+    <ng-template #noQuestion>
+        <app-empty-state
+            [buttonAction]="backToDashboard.bind(this)"
+            [buttonText]="'Kembali ke Dashboard'"
+            [description]="'Tidak ada pertanyaan yang tersedia saat ini.'"
+            [icon]="'mdi mdi-clipboard-text-outline'"
+            [title]="'Pertanyaan Tidak Ditemukan'"
+        >
+        </app-empty-state>
+    </ng-template>
 </ng-template>

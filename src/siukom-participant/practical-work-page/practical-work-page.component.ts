@@ -17,6 +17,7 @@ import { finalize } from 'rxjs'
 import { ExamService } from '@/modules/ukom/services/exam.service'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { LoginContext } from '@/modules/base/commons/login-context'
+import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 
 @Component({
     selector: 'app-practical-work-page',
@@ -27,13 +28,13 @@ import { LoginContext } from '@/modules/base/commons/login-context'
         InvalidOnTouchDirective,
         LoadingButtonComponent,
         VideoPreviewComponent,
+        EmptyStateComponent,
     ],
     templateUrl: './practical-work-page.component.html',
     styleUrl: './practical-work-page.component.scss',
 })
 export class PracticalWorkPageComponent implements OnInit {
     examId = signal('')
-    loading = signal(false)
     submitting = signal(false)
 
     videoForm!: FormGroup
@@ -83,9 +84,8 @@ export class PracticalWorkPageComponent implements OnInit {
     ngOnInit() {
         this.route.paramMap.subscribe((params) => {
             this.examId.set(params.get('examScheduleId'))
-            this.initForm()
-            this.getUploadedVideoLink()
         })
+        this.initForm()
     }
 
     reloadPage() {

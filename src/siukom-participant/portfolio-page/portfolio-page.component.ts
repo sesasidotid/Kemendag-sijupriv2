@@ -6,7 +6,6 @@ import {
     MultiFileHandler,
     UploadedFile,
 } from '@/modules/base/commons/file-handler/multi-file-handler'
-import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
@@ -18,6 +17,7 @@ import { UkomParticipantService } from '@/modules/ukom/services/participant.serv
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
 import { ParticipantPortfolioExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
+import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 
 @Component({
     selector: 'app-portfolio-page',
@@ -26,7 +26,7 @@ import { ParticipantPortfolioExamAnswer } from '@/modules/ukom/models/exam/exam-
         CommonModule,
         FormsModule,
         MultiFileHandlerComponent,
-        LoadingButtonComponent,
+        EmptyStateComponent,
     ],
     templateUrl: './portfolio-page.component.html',
     styleUrl: './portfolio-page.component.scss',
@@ -135,7 +135,6 @@ export class PortfolioPageComponent implements OnInit {
             )
             .subscribe({
                 next: (res) => {
-                    console.log('Fetched question:', res)
                     const sortedQuestions = res.data.sort((a, b) =>
                         a.id.localeCompare(b.id),
                     )
