@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, effect, inject, OnInit, signal } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ExamService } from '@/modules/ukom/services/exam.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
@@ -16,17 +16,18 @@ import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-sched
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 
 @Component({
     selector: 'app-wawancara',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, LoadingButtonComponent],
     templateUrl: './wawancara.component.html',
     styleUrl: './wawancara.component.scss',
 })
 export class WawancaraComponent implements OnInit {
-    examId: string
-    participantId: string
+    examId = signal('')
+    participantId = signal('')
 
     loadingQuestions = signal(false)
     questions = signal<ExamQuestion[]>([])
@@ -44,16 +45,41 @@ export class WawancaraComponent implements OnInit {
     private examScheduleService = inject(UkomExamScheduleService)
     private saveTimeout: number | undefined
 
+    constructor() {
+        effect(
+            () => {
+                const examId = this.examId()
+                const participantId = this.participantId()
+
+                if (examId && participantId) {
+                    this.fetchQuestionsToGrade()
+                }
+            },
+            { allowSignalWrites: true },
+        )
+
+        effect(
+            () => {
+                const examId = this.examId()
+
+                if (examId) {
+                    this.getExamScheduleDetail()
+                }
+            },
+            { allowSignalWrites: true },
+        )
+    }
+
     ngOnInit() {
-        this.examId = this.route.snapshot.paramMap.get('id')
-        this.participantId = this.route.snapshot.paramMap.get('participantId')
-        this.getExamScheduleDetail()
-        this.fetchQuestionsToGrade()
+        this.route.params.subscribe((params) => {
+            this.examId.set(params['id'])
+            this.participantId.set(params['participantId'])
+        })
     }
 
     getExamScheduleDetail() {
         this.examScheduleService
-            .getExamScheduleDetailById(this.examId)
+            .getExamScheduleDetailById(this.examId())
             .subscribe({
                 next: (res) => {
                     this.examScheduleDetail.set(res)
@@ -71,10 +97,10 @@ export class WawancaraComponent implements OnInit {
                 this.examService
                     .startExamByExaminer(
                         new ExaminerExamStartRequest({
-                            participantId: this.participantId,
+                            participantId: this.participantId(),
                             examTypeCode: ExamTypeCategory.WAWANCARA,
                             roomUkomId: this.examScheduleDetail().roomUkomId,
-                            examScheduleId: this.examId,
+                            examScheduleId: this.examId(),
                         }),
                     )
                     .pipe(finalize(() => this.startExamLoading.set(false)))
@@ -108,8 +134,8 @@ export class WawancaraComponent implements OnInit {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
-                this.examId,
-                this.participantId,
+                this.examId(),
+                this.participantId(),
                 { page: '1', limit: '1000' },
             )
             .pipe(finalize(() => this.loadingQuestions.set(false)))
@@ -134,8 +160,8 @@ export class WawancaraComponent implements OnInit {
 
                     // Load draft first
                     const draft = await this.draftService.load(
-                        this.examId,
-                        this.participantId,
+                        this.examId(),
+                        this.participantId(),
                     )
 
                     if (draft) {
@@ -196,14 +222,14 @@ export class WawancaraComponent implements OnInit {
                     answerDtoList: Object.values(this.answers()).map(
                         (answer) => ({
                             ...answer,
-                            participantId: this.participantId,
+                            participantId: this.participantId(),
                         }),
                     ),
                 }
 
                 this.examService
                     .saveExamAnswersForExaminerByExamScheduleId(
-                        this.examId,
+                        this.examId(),
                         payload,
                     )
                     .pipe(finalize(() => this.submitQuestionLoading.set(false)))
@@ -214,7 +240,7 @@ export class WawancaraComponent implements OnInit {
                                 'Penilaian wawancara berhasil disimpan.',
                             )
                             this.draftService
-                                .remove(this.examId, this.participantId)
+                                .remove(this.examId(), this.participantId())
                                 .then(() => {
                                     this.backToDashboard()
                                 })
@@ -235,8 +261,8 @@ export class WawancaraComponent implements OnInit {
         clearTimeout(this.saveTimeout)
         this.saveTimeout = window.setTimeout(() => {
             this.draftService.save(
-                this.examId,
-                this.participantId,
+                this.examId(),
+                this.participantId(),
                 this.answers(),
             )
         }, 500)

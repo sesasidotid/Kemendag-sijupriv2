@@ -1,12 +1,13 @@
-import { Injectable, signal } from '@angular/core'
+import { inject, Injectable, signal } from '@angular/core'
 import { ApiService } from '@/modules/base/services/api.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { BehaviorSubject, Observable, throwError } from 'rxjs'
+import { BehaviorSubject, map, Observable, throwError } from 'rxjs'
 import { finalize, tap } from 'rxjs/operators'
 import { PaginationWrapper } from '@/modules/base/models/pagination.model'
-import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 import { CATAnswerState } from '@/modules/ukom/models/cat/cat-answer-state.model'
+import { CatFlaggedQuestionsService } from './cat-flagged-questions.service'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 
 /**
  * Service responsible for managing exam answers, question navigation, and submission
@@ -20,37 +21,84 @@ export class CatAnswerService {
     readonly selectedAnswer = signal<{ [questionId: string]: string }>({})
     readonly savedAnswer = signal<{ [questionId: string]: string }>({})
     readonly flaggedQuestions = signal<Set<string>>(new Set())
-
     readonly isSavingAnswer$ = new BehaviorSubject<boolean>(false)
     readonly isSubmittingAnswer$ = new BehaviorSubject<boolean>(false)
-
-    private readonly FLAGGED_KEY = 'cat_flagged_questions'
+    private flaggedQuestionsService = inject(CatFlaggedQuestionsService)
+    /** Current exam schedule ID for flagged questions storage */
+    private currentExamScheduleId: string | null = null
 
     constructor(
         private api: ApiService,
         private handler: HandlerService,
         private confirmationService: ConfirmationService,
-    ) {
-        this.loadFlaggedQuestions()
+    ) {}
+
+    /**
+     * Set the current exam schedule ID and load flagged questions from IndexedDB
+     */
+    async initializeForExam(examScheduleId: string): Promise<void> {
+        this.currentExamScheduleId = examScheduleId
+        await this.loadFlaggedQuestions()
     }
 
     /**
      * Load questions and initialize answer tracking
      */
+    // loadQuestions(
+    //     examScheduleId: string,
+    // ): Observable<PaginationWrapper<ExamQuestion>> {
+    //     return this.api
+    //         .getData(`/api/v1/exam/page/${examScheduleId}?limit=1000&page=1`)
+    //         .pipe(
+    //             tap((response: PaginationWrapper<ExamQuestion>) => {
+    //                 const sortedQuestions = [...response.data].sort((a, b) =>
+    //                     String(a.id).localeCompare(String(b.id), undefined, {
+    //                         numeric: true,
+    //                     }),
+    //                 )
+    //
+    //                 const questions = sortedQuestions || []
+    //                 this.totalQuestions.set(sortedQuestions.length)
+    //
+    //                 const saved: { [key: string]: string } = {}
+    //                 const selected: { [key: string]: string } = {}
+    //
+    //                 questions.forEach((question: any) => {
+    //                     if (question.answerDto?.id) {
+    //                         saved[question.id] = question.answerDto.answerChoice
+    //                         selected[question.id] =
+    //                             question.answerDto.answerChoice
+    //                     }
+    //                 })
+    //
+    //                 this.savedAnswer.set(saved)
+    //                 this.selectedAnswer.set(selected)
+    //             }),
+    //         )
+    // }
     loadQuestions(
         examScheduleId: string,
-    ): Observable<PaginationWrapper<CATQuestions>> {
+    ): Observable<PaginationWrapper<ExamQuestion>> {
         return this.api
             .getData(`/api/v1/exam/page/${examScheduleId}?limit=1000&page=1`)
             .pipe(
+                map((response: PaginationWrapper<ExamQuestion>) => {
+                    response.data = [...response.data].sort((a, b) =>
+                        String(a.id).localeCompare(String(b.id), undefined, {
+                            numeric: true,
+                        }),
+                    )
+
+                    return response
+                }),
+
                 tap((response) => {
-                    const questions = response.data || []
-                    this.totalQuestions.set(questions.length)
+                    this.totalQuestions.set(response.data.length)
 
-                    const saved: { [key: string]: string } = {}
-                    const selected: { [key: string]: string } = {}
+                    const saved: Record<string, string> = {}
+                    const selected: Record<string, string> = {}
 
-                    questions.forEach((question: any) => {
+                    response.data.forEach((question) => {
                         if (question.answerDto?.id) {
                             saved[question.id] = question.answerDto.answerChoice
                             selected[question.id] =
@@ -95,33 +143,22 @@ export class CatAnswerService {
     }
 
     /**
-     * Load flagged questions from localStorage
+     * Public method to save flagged questions to IndexedDB
      */
-    private loadFlaggedQuestions() {
-        const stored = localStorage.getItem(this.FLAGGED_KEY)
-        if (stored) {
-            try {
-                const flaggedArray = JSON.parse(stored)
-                this.flaggedQuestions.set(new Set(flaggedArray))
-            } catch (e) {
-                console.error('Failed to load flagged questions:', e)
-            }
-        }
-    }
-
-    /**
-     * Save flagged questions to localStorage
-     */
-    private saveFlaggedQuestions() {
-        const flaggedArray = Array.from(this.flaggedQuestions())
-        localStorage.setItem(this.FLAGGED_KEY, JSON.stringify(flaggedArray))
-    }
-
-    /**
-     * Public method to save flagged questions to localStorage
-     */
-    saveFlaggedToLocalStorage() {
+    saveFlaggedToStorage(): void {
         this.saveFlaggedQuestions()
+    }
+
+    /**
+     * Remove flagged questions for the current exam (call on exam finish)
+     */
+    async clearFlaggedQuestions(): Promise<void> {
+        if (!this.currentExamScheduleId) {
+            return
+        }
+
+        await this.flaggedQuestionsService.remove(this.currentExamScheduleId)
+        this.flaggedQuestions.set(new Set())
     }
 
     /**
@@ -306,7 +343,16 @@ Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
         this.flaggedQuestions.set(new Set())
         this.isSavingAnswer$.next(false)
         this.isSubmittingAnswer$.next(false)
-        localStorage.removeItem(this.FLAGGED_KEY)
+        this.currentExamScheduleId = null
+    }
+
+    /**
+     * Reset answer service state and clear flagged questions from IndexedDB
+     * Call this when the exam is finished
+     */
+    async resetWithCleanup(): Promise<void> {
+        await this.clearFlaggedQuestions()
+        this.reset()
     }
 
     /**
@@ -319,5 +365,44 @@ Aksi yang sudah dilakukan tidak dapat dikembalikan lagi.
         return this.api.getData(
             `/api/v1/exam/state/${examTypeCode}/${roomUkomId}`,
         )
+    }
+
+    /**
+     * Load flagged questions from IndexedDB for the current exam
+     */
+    private async loadFlaggedQuestions(): Promise<void> {
+        if (!this.currentExamScheduleId) {
+            console.warn(
+                '[CatAnswerService] No exam schedule ID set, cannot load flagged questions',
+            )
+            return
+        }
+
+        const flagged = await this.flaggedQuestionsService.load(
+            this.currentExamScheduleId,
+        )
+        this.flaggedQuestions.set(flagged)
+    }
+
+    /**
+     * Save flagged questions to IndexedDB for the current exam
+     */
+    private saveFlaggedQuestions(): void {
+        if (!this.currentExamScheduleId) {
+            console.warn(
+                '[CatAnswerService] No exam schedule ID set, cannot save flagged questions',
+            )
+            return
+        }
+
+        // Fire-and-forget save to IndexedDB
+        this.flaggedQuestionsService
+            .save(this.currentExamScheduleId, this.flaggedQuestions())
+            .catch((err) =>
+                console.error(
+                    '[CatAnswerService] Failed to save flagged questions:',
+                    err,
+                ),
+            )
     }
 }

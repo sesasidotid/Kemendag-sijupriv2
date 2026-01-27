@@ -240,11 +240,15 @@ export class PortofolioComponent implements OnInit {
         this.router.navigate(['/'])
     }
 
-    allQuestionsAnswered() {
-        const allHaveAnswerList = this.questions().every(
-            (item) => item.answerDto?.answerList != null,
-        )
-        return allHaveAnswerList
+    allQuestionsAnswered(): boolean {
+        return this.questions().every((q) => {
+            const answer = q.answerDto?.answerList
+            return (
+                answer != null &&
+                typeof answer.valid === 'boolean' &&
+                typeof answer.memadai === 'boolean'
+            )
+        })
     }
 
     submitAssessment(): void {

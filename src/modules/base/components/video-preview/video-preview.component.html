@@ -1,32 +1,59 @@
 <div *ngIf="videoInfo" class="video-preview-container">
-    <div *ngIf="showTitle" class="d-flex justify-content-between align-items-center mb-2">
+    <div
+        *ngIf="showTitle"
+        class="d-flex justify-content-between align-items-center mb-2"
+    >
         <span class="badge bg-primary">
             <i class="mdi mdi-video-outline me-1"></i>
             {{ videoInfo.platform }}
         </span>
-        <button type="button" class="btn btn-sm btn-outline-primary" (click)="openInNewTab()" title="Buka di tab baru">
+        <button
+            (click)="openInNewTab()"
+            class="btn btn-sm btn-outline-primary"
+            title="Buka di tab baru"
+            type="button"
+        >
             <i class="mdi mdi-open-in-new"></i>
             Buka Link
         </button>
     </div>
 
-    <div *ngIf="videoInfo.isEmbeddable; else notEmbeddable" class="embed-container">
-        <iframe [src]="videoInfo.embedUrl" [style.height]="height" class="w-100 rounded border" frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen></iframe>
+    <div
+        *ngIf="videoInfo.isEmbeddable; else notEmbeddable"
+        class="embed-container"
+    >
+        <iframe
+            [src]="videoInfo.embedUrl"
+            [style.height]="height"
+            allow="
+                accelerometer;
+                autoplay;
+                clipboard-write;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture;
+            "
+            allowfullscreen
+            class="w-100 rounded border"
+            frameborder="0"
+        ></iframe>
     </div>
 
     <ng-template #notEmbeddable>
         <div class="alert alert-warning">
             <i class="mdi mdi-alert-outline me-2"></i>
             Video tidak dapat ditampilkan secara langsung.
-            <a [href]="videoInfo.originalUrl" target="_blank" class="alert-link">
+            <a
+                [href]="videoInfo.originalUrl"
+                class="alert-link"
+                target="_blank"
+            >
                 Klik di sini untuk membuka link
             </a>
         </div>
-        <div class="p-3 bg-light rounded">
-            <small class="text-muted d-block mb-1">Link Video:</small>
-            <code class="d-block text-break">{{ videoInfo.originalUrl }}</code>
-        </div>
     </ng-template>
+    <div class="bg-light rounded p-3">
+        <small class="text-muted d-block mb-1">Link Video:</small>
+        <code class="d-block text-break">{{ videoInfo.originalUrl }}</code>
+    </div>
 </div>

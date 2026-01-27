@@ -11,6 +11,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
+    Validators,
 } from '@angular/forms'
 import { PracticalWorkDraftService } from '@/siukom-examiner/practical-work/practical-work-draft.service'
 import { finalize } from 'rxjs'
@@ -101,6 +102,7 @@ export class PracticalWorkComponent {
                     const otherQuestions = data.filter(
                         (item) => item.id !== 'base_praktik_question',
                     )
+
                     this.participantAnswer.set(baseQuestion)
                     const draft = await this.draftService.load(
                         this.examId(),
@@ -153,10 +155,36 @@ export class PracticalWorkComponent {
                     q.answerDto?.participantId || this.participantId(),
                 ],
                 questionId: [q.id],
-                answerText: [q.answerDto?.answerText || null],
+                answerText: [
+                    q.answerDto?.answerText || null,
+                    [Validators.required],
+                ],
             })
             this.answerDtoList.push(formGroup)
         })
+    }
+
+    getAnswerTextError(index: number): string | null {
+        const formGroup = this.answerDtoList.at(index) as FormGroup
+        const answerTextControl = formGroup.get('answerText')
+
+        if (
+            !answerTextControl ||
+            !answerTextControl.touched ||
+            !answerTextControl.errors
+        ) {
+            return null
+        }
+
+        if (answerTextControl.errors['required']) {
+            return 'Catatan penilaian tidak boleh kosong.'
+        }
+
+        return this.formValidationService.getErrorMessage(
+            answerTextControl,
+            'answerText',
+            'Catatan Penilaian',
+        )
     }
 
     scheduleAutoSave(): void {
@@ -186,10 +214,9 @@ export class PracticalWorkComponent {
     }
 
     allQuestionsAnswered() {
-        const allHaveAnswerList = this.questions().every(
+        return this.questions().every(
             (item) => item.answerDto?.answerText != null,
         )
-        return allHaveAnswerList
     }
 
     submitAssessment(): void {

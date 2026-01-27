@@ -350,4 +350,8 @@ export class StudiKasusComponent implements OnInit {
     backToDashboard() {
         this.router.navigate(['/'])
     }
+
+    isAllQuestionsAnswered(): boolean {
+        return !this.questions().some((item) => item.answerDto?.score == null)
+    }
 }

@@ -50,10 +50,11 @@ export const routes: Routes = [
             },
             {
                 path: 'practical-work/:id/:participantId',
-                loadComponent:()=>
-                    import('./practical-work/practical-work.component').then((m)=>m.PracticalWorkComponent
-                    )
-            }
+                loadComponent: () =>
+                    import('./practical-work/practical-work.component').then(
+                        (m) => m.PracticalWorkComponent,
+                    ),
+            },
         ],
     },
 ]

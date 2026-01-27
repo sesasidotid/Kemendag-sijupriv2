@@ -57,7 +57,7 @@ export class StudiKasusPageComponent implements OnInit {
     route = inject(ActivatedRoute)
     examId = signal('')
     examService = inject(ExamService)
-    questions = signal<ExamQuestion[]>([])
+    question = signal<ExamQuestion>(null)
     participant: Participant
     participantService = inject(UkomParticipantService)
 
@@ -84,9 +84,7 @@ export class StudiKasusPageComponent implements OnInit {
 
         effect(
             () => {
-                const questions = this.questions()
-                if (!questions.length) return
-
+                this.question()
                 this.initFileHandlerInputs()
             },
             { allowSignalWrites: true },
@@ -133,10 +131,11 @@ export class StudiKasusPageComponent implements OnInit {
             )
             .subscribe({
                 next: (res) => {
-                    const sortedQuestions = res.data.sort((a, b) =>
-                        a.id.localeCompare(b.id),
+                    const selectedQuestion = res.data.find(
+                        (q) => q.id === 'base_studi_kasus_question',
                     )
-                    this.questions.set(sortedQuestions)
+
+                    this.question.set(selectedQuestion)
                     if (!silent) {
                         this.questionLoading.set(false)
                     }
@@ -145,15 +144,6 @@ export class StudiKasusPageComponent implements OnInit {
                     console.error('Error fetching question:', err)
                     if (!silent) {
                         this.criticalError.set(true)
-                        // if (err.error?.cause === 'attendance not found') {
-                        //     this.errorMessage.set(
-                        //         'Anda belum memulai jadwal ujian ini. Silahkan mulai ujian di dashboard anda.',
-                        //     )
-                        // } else {
-                        //     this.errorMessage.set(
-                        //         'Gagal memuat soal ujian. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
-                        //     )
-                        // }
                         this.errorMessage.set(
                             'Gagal memuat soal ujian. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
                         )
@@ -168,11 +158,7 @@ export class StudiKasusPageComponent implements OnInit {
     }
 
     previewQuestionFile() {
-        const selectedQuestion = this.questions().find(
-            (q) => q.id === 'base_studi_kasus_question',
-        )
-        console.log('selectedQuestion', selectedQuestion)
-        if (!selectedQuestion) {
+        if (!this.question().attachmentUrl) {
             this.handlerService.handleAlert(
                 'Error',
                 'Soal studi kasus tidak ditemukan.',
@@ -180,8 +166,8 @@ export class StudiKasusPageComponent implements OnInit {
             return
         }
         this.filePreviewService.open(
-            selectedQuestion.attachment,
-            selectedQuestion.attachmentUrl,
+            this.question().attachment,
+            this.question().attachmentUrl,
         )
     }
 
@@ -190,10 +176,7 @@ export class StudiKasusPageComponent implements OnInit {
     }
 
     hasExistingAnswer(): boolean {
-        const selectedQuestion = this.questions().find(
-            (q) => q.id === 'base_studi_kasus_question',
-        )
-        return !!selectedQuestion?.answerDto?.answerUpload
+        return !!this.question()?.answerDto?.answerUploadUrl
     }
 
     submitAnswer() {
@@ -204,7 +187,7 @@ export class StudiKasusPageComponent implements OnInit {
 
                 const payload = new ParticpantStudyCaseExamAnswer({
                     participantId: this.participant.id,
-                    questionId: 'base_studi_kasus_question',
+                    questionId: this.question().id,
                     fileAnswerUpload: this.answerFile(),
                 })
 
@@ -240,9 +223,7 @@ export class StudiKasusPageComponent implements OnInit {
     }
 
     private initFileHandlerInputs() {
-        const selectedQuestion = this.questions().find(
-            (q) => q.id === 'base_studi_kasus_question',
-        )
+        const selectedQuestion = this.question()
 
         if (!selectedQuestion) return
 

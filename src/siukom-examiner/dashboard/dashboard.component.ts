@@ -185,7 +185,6 @@ export class DashboardComponent implements OnInit {
     }
 
     getParticipants(exam: GroupedExam) {
-        console.log('exam participants', exam)
         return exam.schedule.participantScheduleList || []
     }
 

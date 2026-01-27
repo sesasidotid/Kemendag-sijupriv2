@@ -1,7 +1,16 @@
-<button (click)="backToDashboard()" class="btn-back">
-    <span class="icon">←</span>
-    Kembali ke Dashboard
-</button>
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <button (click)="backToDashboard()" class="btn btn-outline-secondary">
+        <span class="mdi mdi-chevron-left me-1"></span>
+        Kembali ke Dashboard
+    </button>
+    <div
+        *ngif="!loadingQuestions()"
+        class="alert alert-success d-flex align-items-center mb-0 px-2 py-1"
+    >
+        <i class="mdi mdi-check-circle me-1"></i>
+        <small>Jawaban telah disimpan</small>
+    </div>
+</div>
 <ng-container *ngIf="loadingQuestions(); else questionForm">
     <div class="py-5 text-center">
         <div class="spinner-border text-primary" role="status">
@@ -26,21 +35,14 @@
 
             <!-- Start Exam Button Section -->
             <div class="form-actions">
-                <button
-                    (click)="startTheExam()"
-                    [disabled]="startExamLoading()"
-                    class="btn-submit"
-                >
-                    <ng-container *ngIf="startExamLoading(); else startText">
-                        <div
-                            class="spinner-border spinner-sm-custom"
-                            role="status"
-                        >
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </ng-container>
-                    <ng-template #startText> Mulai Ujian </ng-template>
-                </button>
+                <app-loading-button
+                    (clicked)="startTheExam()"
+                    [className]="'btn btn-primary btn-lg'"
+                    [icon]="'mdi-clipboard-play-outline'"
+                    [isLoading]="startExamLoading()"
+                    [label]="'Mulai Ujian'"
+                    [type]="'button'"
+                ></app-loading-button>
             </div>
         </div>
     </ng-container>

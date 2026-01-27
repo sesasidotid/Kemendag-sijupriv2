@@ -3,7 +3,10 @@
         <span class="mdi mdi-chevron-left me-1"></span>
         Kembali ke Dashboard
     </button>
-    <div class="alert alert-success d-flex align-items-center mb-0 px-2 py-1">
+    <div
+        *ngIf="!loadingQuestions() && isAllQuestionsAnswered()"
+        class="alert alert-success d-flex align-items-center mb-0 px-2 py-1"
+    >
         <i class="mdi mdi-check-circle me-1"></i>
         <small>Jawaban telah disimpan</small>
     </div>

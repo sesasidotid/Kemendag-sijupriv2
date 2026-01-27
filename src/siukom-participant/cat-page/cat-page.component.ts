@@ -1,9 +1,8 @@
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
-import { Component, effect, inject } from '@angular/core'
+import { Component, effect, HostListener, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
-import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
@@ -20,7 +19,6 @@ import {
     take,
 } from 'rxjs'
 import { ReactiveFormsModule } from '@angular/forms'
-import { HostListener } from '@angular/core'
 import { ExamAttendance } from '@/modules/ukom/models/cat/exam-attendance'
 import { CatService } from '@/modules/ukom/services/cat.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
@@ -29,6 +27,7 @@ import { CatExamTimerService } from './cat-exam-timer.service'
 import { CatAnswerService } from './cat-answer.service'
 import { DisableRightClickDirective } from './disable-right-click.directive'
 import { DisableKeyboardShortcutsDirective } from './disable-keyboard-shortcuts.directive'
+import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 
 @Component({
     selector: 'app-cat-page',
@@ -46,34 +45,36 @@ import { DisableKeyboardShortcutsDirective } from './disable-keyboard-shortcuts.
 export class CatPageComponent {
     // Services
     catService = inject(CatService)
+    // Feature services
+    securityService = inject(CatExamSecurityService)
+    // Constants
+    readonly EXAM_TYPE = 'CAT'
+    readonly userID = LoginContext.getUserId()
+    // Params
+    examScheduleId: string
+    // Data models
+    data: ExamQuestion[] = []
+    roomUkom = new RoomUkom()
+    pesertaUkom = new Participant()
+    examAttendance = new ExamAttendance()
+    // Exam state
+    examEndTime: Date | null = null
+    isLoadingRoomUkom$ = new BehaviorSubject<boolean>(false)
+    showWarning = this.securityService.showWarning
+    violationCount = this.securityService.violationCount
+    isFullscreen = this.securityService.isFullscreen
+    isSubmitted = this.securityService.isSubmitted
+    violationPanelOpen = false
+    isLoading$: Observable<boolean>
     private participantService = inject(UkomParticipantService)
     private handler = inject(HandlerService)
     private confirmationService = inject(ConfirmationService)
     private router = inject(Router)
     private activateRoute = inject(ActivatedRoute)
-
-    // Feature services
-    securityService = inject(CatExamSecurityService)
     private timerService = inject(CatExamTimerService)
+    remainingTime = this.timerService.remainingTime
+    remainingSeconds = this.timerService.remainingSeconds
     private answerService = inject(CatAnswerService)
-
-    // Constants
-    readonly EXAM_TYPE = 'CAT'
-    readonly userID = LoginContext.getUserId()
-
-    // Params
-    examScheduleId: string
-
-    // Data models
-    data: CATQuestions[] = []
-    roomUkom = new RoomUkom()
-    pesertaUkom = new Participant()
-    examAttendance = new ExamAttendance()
-
-    // Exam state
-    examEndTime: Date | null = null
-    isLoadingRoomUkom$ = new BehaviorSubject<boolean>(false)
-
     // Computed & reactive properties from services
     currentPage = this.answerService.currentPage
     totalQuestions = this.answerService.totalQuestions
@@ -82,20 +83,8 @@ export class CatPageComponent {
     flaggedQuestions = this.answerService.flaggedQuestions
     isSavingAnswer$ = this.answerService.isSavingAnswer$
     isSubmittingAnswer$ = this.answerService.isSubmittingAnswer$
-
-    remainingTime = this.timerService.remainingTime
-    remainingSeconds = this.timerService.remainingSeconds
-
-    showWarning = this.securityService.showWarning
-    violationCount = this.securityService.violationCount
-    isFullscreen = this.securityService.isFullscreen
-    isSubmitted = this.securityService.isSubmitted
-    violationPanelOpen = false
     private violationPanelPinned = false
     private violationAutoCloseTimer?: ReturnType<typeof setTimeout>
-
-    isLoading$: Observable<boolean>
-
     private destroy$ = new Subject<void>()
 
     constructor() {
@@ -189,7 +178,7 @@ export class CatPageComponent {
         if (!selectedChoiceId) {
             this.handler.handleAlert(
                 'Warning',
-                'Silakan pilih jawaban terlebih dahulu sebelum menandai ragu-ragu'
+                'Silakan pilih jawaban terlebih dahulu sebelum menandai ragu-ragu',
             )
             return
         }
@@ -242,10 +231,12 @@ export class CatPageComponent {
             })
     }
 
-    handleFinishExam() {
+    async handleFinishExam() {
         this.securityService.clearViolations()
         this.securityService.markSubmitted()
         this.securityService.exitFullScreen()
+        // Clean up flagged questions from IndexedDB on exam finish
+        await this.answerService.clearFlaggedQuestions()
         this.router.navigate(['/'])
     }
 
@@ -259,10 +250,12 @@ export class CatPageComponent {
                 this.securityService.examScheduleId,
             )
             .subscribe({
-                next: () => {
+                next: async () => {
                     this.securityService.clearViolations()
                     this.securityService.markSubmitted()
                     this.securityService.exitFullScreen()
+                    // Clean up flagged questions from IndexedDB on exam submit
+                    await this.answerService.clearFlaggedQuestions()
                     this.router.navigate(['/'])
                 },
                 error: (err) => {
@@ -281,10 +274,12 @@ export class CatPageComponent {
                 openDialog,
             )
             .subscribe({
-                next: () => {
+                next: async () => {
                     this.securityService.clearViolations()
                     this.securityService.markSubmitted()
                     this.securityService.exitFullScreen()
+                    // Clean up flagged questions from IndexedDB on exam submit
+                    await this.answerService.clearFlaggedQuestions()
                     this.router.navigate(['/'])
                 },
                 error: (err) => {
@@ -374,7 +369,12 @@ export class CatPageComponent {
             })
     }
 
-    getQuestion() {
+    async getQuestion() {
+        // Initialize answer service with exam schedule ID for IndexedDB storage
+        await this.answerService.initializeForExam(
+            this.securityService.examScheduleId,
+        )
+
         this.answerService
             .loadQuestions(this.securityService.examScheduleId)
             .pipe(
@@ -401,8 +401,8 @@ export class CatPageComponent {
                     }
 
                     this.answerService.flaggedQuestions.set(localFlags)
-                    // Save merged flags to localStorage
-                    this.answerService.saveFlaggedToLocalStorage()
+                    // Save merged flags to IndexedDB
+                    this.answerService.saveFlaggedToStorage()
                 },
                 error: (err) => {
                     if (err.error.message === `Exam's already ended`) {
@@ -458,6 +458,13 @@ export class CatPageComponent {
         this.violationPanelPinned = false
     }
 
+    remainingViolations() {
+        return Math.max(
+            0,
+            this.securityService.MAX_VIOLATIONS - this.violationCount(),
+        )
+    }
+
     private openViolationPanel(auto = false) {
         this.violationPanelOpen = true
         this.clearViolationAutoClose()
@@ -477,12 +484,5 @@ export class CatPageComponent {
             clearTimeout(this.violationAutoCloseTimer)
             this.violationAutoCloseTimer = undefined
         }
-    }
-
-    remainingViolations() {
-        return Math.max(
-            0,
-            this.securityService.MAX_VIOLATIONS - this.violationCount(),
-        )
     }
 }

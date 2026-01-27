@@ -2,7 +2,14 @@
  * Barrel export for centralized IndexedDB utilities
  */
 
-export { DB_NAME, DB_VERSION, OBJECT_STORES, TTL_MS, STORE_CONFIGS } from './db.constants'
+export {
+    DB_NAME,
+    DB_VERSION,
+    OBJECT_STORES,
+    TTL_MS,
+    TTL_3_DAYS_MS,
+    STORE_CONFIGS,
+} from './db.constants'
 export type { ObjectStoreName } from './db.constants'
 
 export {
@@ -16,4 +23,3 @@ export {
 
 export { GenericDraftService } from './generic-draft.service'
 export type { DraftRecord } from './generic-draft.service'
-

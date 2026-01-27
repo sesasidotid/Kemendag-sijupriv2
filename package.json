@@ -6,7 +6,9 @@
         "start": "ng serve",
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
-        "test": "ng test"
+        "test": "ng test",
+        "stale-run": "npx http-server dist/fe-template-angular/browser -p 4300 -c-1",
+        "admin": "ng build --configuration development && npm run stale-run"
     },
     "private": true,
     "dependencies": {

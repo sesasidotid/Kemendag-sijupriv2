@@ -20,8 +20,9 @@ export const DB_NAME = 'ukom_exam_db' as const
  * - v3: Added studi_kasus_answers
  * - v4: Added portfolio_answer
  * - v5: Added practical_work_answer
+ * - v6: Added cat_flagged_questions
  */
-export const DB_VERSION = 5
+export const DB_VERSION = 6
 
 /**
  * Object Store Names
@@ -33,6 +34,7 @@ export const OBJECT_STORES = {
     STUDI_KASUS_ANSWERS: 'studi_kasus_answers',
     PORTFOLIO_ANSWER: 'portfolio_answer',
     PRAKTIK: 'practical_work_answer',
+    CAT_FLAGGED_QUESTIONS: 'cat_flagged_questions',
     // Add future stores here and bump DB_VERSION
 } as const
 
@@ -42,6 +44,7 @@ export type ObjectStoreName = (typeof OBJECT_STORES)[keyof typeof OBJECT_STORES]
  * TTL Configuration
  */
 export const TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
+export const TTL_3_DAYS_MS = 3 * 24 * 60 * 60 * 1000 // 3 days
 
 /**
  * Object Store Configurations
@@ -72,5 +75,15 @@ export const STORE_CONFIGS: Record<
     },
     [OBJECT_STORES.PRAKTIK]: {
         keyPath: 'key',
+    },
+    [OBJECT_STORES.CAT_FLAGGED_QUESTIONS]: {
+        keyPath: 'key',
+        indexes: [
+            {
+                name: 'expiresAt',
+                keyPath: 'expiresAt',
+                options: { unique: false },
+            },
+        ],
     },
 }
