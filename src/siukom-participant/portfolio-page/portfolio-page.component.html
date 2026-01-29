@@ -1,14 +1,11 @@
 <div class="d-flex align-items-center justify-content-between mb-3">
-    <button
-        (click)="backToDashboard()"
-        class="btn btn-sm btn-outline-secondary"
-    >
+    <button (click)="backToDashboard()" class="btnbtn-outline-secondary">
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
 
     <div
         *ngIf="!questionLoading() && checkAllQuestionsAnswered()"
-        class="alert alert-success d-flex align-items-center mb-0 px-2 py-1"
+        class="alert alert-success d-flex align-items-center"
     >
         <i class="mdi mdi-check-circle me-1"></i>
         <small>Semua tugas telah disimpan</small>

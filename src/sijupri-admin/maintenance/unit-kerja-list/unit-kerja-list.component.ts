@@ -6,22 +6,21 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { Router } from '@angular/router'
-import { LoginContext } from '../../../modules/base/commons/login-context'
 
 @Component({
     selector: 'app-unit-kerja-list',
     standalone: true,
     imports: [PagableComponent],
     templateUrl: './unit-kerja-list.component.html',
-    styleUrl: './unit-kerja-list.component.scss'
+    styleUrl: './unit-kerja-list.component.scss',
 })
 export class UnitKerjaListComponent {
     pagable: Pagable
 
-    constructor(private router: Router) { }
+    constructor(private router: Router) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -31,24 +30,26 @@ export class UnitKerjaListComponent {
         this.pagable = new PagableBuilder('/api/v1/unit_kerja/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Instansi', 'instansi|name').build()
+                new PrimaryColumnBuilder('Instansi', 'instansi|name').build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((unitKerja: any) => {
-                        this.router.navigate([`/maintenance/unit-kerja/${unitKerja.id}`])
+                        this.router.navigate([
+                            `/maintenance/unit-kerja/${unitKerja.id}`,
+                        ])
                     }, 'info')
                     .withIcon('detail')
                     //   .addInactiveCondition((unitKerja: Instansi) => {
                     //     return true
                     //   })
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('name')
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             //   .addFilter(
             //     new PageFilterBuilder('like')
@@ -56,6 +57,7 @@ export class UnitKerjaListComponent {
             //       .withField('Instansi', 'text')
             //       .build()
             //   )
+            .withQueryParams()
             .build()
     }
 }

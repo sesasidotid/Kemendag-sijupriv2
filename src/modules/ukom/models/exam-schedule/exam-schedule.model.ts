@@ -14,6 +14,8 @@ export class ExamSchedule extends Serializable {
     personalSchedule: string | null | undefined = undefined
     participantScheduleList: ParticipantScheduleList[] | undefined | null = []
     examinerScheduleList: ExaminerScheduleList[] | undefined | null = []
+    examScheduleParentId: string | null = undefined
+    examScheduleChild?: ExamSchedule | null | undefined = undefined
 
     constructor(object?: Partial<ExamSchedule>) {
         super()

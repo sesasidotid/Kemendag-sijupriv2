@@ -48,6 +48,7 @@ export class InstansiListComponent {
                     .withField('Nama', 'text')
                     .build()
             )
+            .withQueryParams()
             .build()
     }
 }

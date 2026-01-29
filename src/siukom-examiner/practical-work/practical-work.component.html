@@ -13,7 +13,7 @@
                 <div class="card-header bg-primary">
                     <h5 class="mb-0 text-white">
                         <span class="mdi mdi-video-outline me-2"></span>
-                        Video Praktik Peserta
+                        Video Persiapan Praktik Peserta
                     </h5>
                 </div>
                 <div class="card-body">
@@ -31,12 +31,12 @@
                 <div class="card-header bg-warning bg-opacity-25">
                     <h5 class="text-warning mb-0">
                         <span class="mdi mdi-alert-circle-outline me-2"></span>
-                        Video Praktik Belum Tersedia
+                        Video Persiapan Praktik Belum Tersedia
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-warning mb-0">
-                        Peserta belum mengunggah video praktik.
+                        Peserta belum mengunggah video persiapan praktik.
                     </div>
                 </div>
             </div>
@@ -59,23 +59,44 @@
 
                     <div class="card-body">
                         <div class="mb-3">
+                            <label [for]="'score-' + i" class="form-label">
+                                Nilai <span class="text-danger">*</span>
+                                <small class="text-muted"
+                                    >(0-{{ question.weight || 100 }})</small
+                                >
+                            </label>
+                            <div class="">
+                                <input
+                                    (blur)="validateScore(i)"
+                                    (input)="validateScore(i)"
+                                    [class.is-invalid]="isScoreInvalid(i)"
+                                    [id]="'score-' + i"
+                                    [max]="question.weight || 100"
+                                    class="form-control score-input"
+                                    formControlName="score"
+                                    min="0"
+                                    placeholder="Masukkan nilai"
+                                    type="number"
+                                />
+                                <div
+                                    *ngIf="getScoreError(i)"
+                                    class="invalid-feedback"
+                                >
+                                    {{ getScoreError(i) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <label [for]="'note-' + i" class="form-label"
                                 >Catatan Penilaian:</label
                             >
                             <textarea
-                                [class.is-invalid]="getAnswerTextError(i)"
                                 [id]="'note-' + i"
                                 class="form-control"
                                 formControlName="answerText"
                                 placeholder="Tuliskan penilaian dan masukan..."
                                 rows="4"
                             ></textarea>
-                            <div
-                                *ngIf="getAnswerTextError(i)"
-                                class="invalid-feedback"
-                            >
-                                {{ getAnswerTextError(i) }}
-                            </div>
                         </div>
                     </div>
                 </div>

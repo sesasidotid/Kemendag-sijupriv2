@@ -1,4 +1,11 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core'
+import {
+    Component,
+    computed,
+    effect,
+    inject,
+    OnInit,
+    signal,
+} from '@angular/core'
 import {
     FormBuilder,
     FormGroup,
@@ -51,7 +58,19 @@ export class PracticalWorkPageComponent implements OnInit {
     question = signal<ExamQuestion>(null)
     criticalError = signal<boolean>(false)
     errorMessage = signal<string>('')
-    hasExistingAnswer = signal<boolean>(false)
+    hasExistingAnswer = computed(() => {
+        if (!this.question()) return false
+        return !!this.question()?.answerDto?.answerText
+    })
+
+    mapQuestionText = computed(() => {
+        const q = this.question()
+        if (!q || !q.question) return ''
+        if (q.question === 'Silahkan masukkan link drive anda') {
+            return 'Silahkan masukkan link video persiapan anda'
+        }
+        return q.question
+    })
 
     readonly userId: string
     constructor() {
@@ -117,7 +136,6 @@ export class PracticalWorkPageComponent implements OnInit {
                         return
                     }
                     this.question.set(question)
-                    this.hasExistingAnswer.set(!!question.answerDto?.answerText)
                 },
                 error: (err) => {
                     console.error('Error fetching question:', err)

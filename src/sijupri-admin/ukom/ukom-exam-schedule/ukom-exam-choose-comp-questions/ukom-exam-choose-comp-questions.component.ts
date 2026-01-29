@@ -1,6 +1,13 @@
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
-import { Component, inject, OnInit, signal } from '@angular/core'
+import {
+    Component,
+    computed,
+    effect,
+    inject,
+    OnInit,
+    signal,
+} from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { CommonModule } from '@angular/common'
 import {
@@ -22,6 +29,8 @@ import { DurationPipe } from '@/modules/base/pipes/duration.pipe'
 import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-examiner-list.model'
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
 import { AgGridAngular } from 'ag-grid-angular'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { UkomExamMakalahComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-makalah/ukom-exam-makalah.component'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -34,6 +43,7 @@ import { AgGridAngular } from 'ag-grid-angular'
         UkomExamWawancaraComponent,
         DurationPipe,
         AgGridAngular,
+        UkomExamMakalahComponent,
     ],
     templateUrl: './ukom-exam-choose-comp-questions.component.html',
     styleUrl: './ukom-exam-choose-comp-questions.component.scss',
@@ -42,9 +52,8 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     ukomRoomService = inject(UkomRoomService)
     ukomExamScheduleService = inject(UkomExamScheduleService)
     roomUkomDetail = new RoomUkomDetail()
-    examDetail = new ExamSchedule()
+    examDetail = signal<ExamSchedule>(null)
 
-    typeUkom: string
     isLoadingRoomDetail$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
     isLoadingExamDetail$: BehaviorSubject<boolean> =
@@ -60,6 +69,16 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
         filter: true,
         resizable: true,
     }
+    roomId = signal('')
+    examId = signal('')
+    childExamId = computed(() => {
+        return this.examDetail()?.examScheduleChild?.id ?? null
+    })
+    typeUkom = computed(() => {
+        return this.examDetail()?.examTypeCode
+    })
+    examScheduleService = inject(UkomExamScheduleService)
+    protected readonly ExamTypeCategory = ExamTypeCategory
     // AG Grid
     private gridApi!: GridApi
 
@@ -72,6 +91,23 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
             this.isLoadingRoomDetail$,
             this.isLoadingExamDetail$,
         ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
+
+        effect(() => {
+            const roomId = this.roomId()
+            if (!roomId) return
+            this.getRoomDetail()
+        })
+        effect(() => {
+            const examId = this.examId()
+
+            if (!examId) return
+            this.getExamDetail()
+        })
+        effect(() => {
+            const examScheduleId = this.childExamId() ?? this.examId()
+            if (!examScheduleId) return
+            this.getExaminerListId()
+        })
     }
 
     ngOnInit() {
@@ -79,20 +115,15 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
             this.activatedRoute.paramMap.pipe(take(1)),
             this.activatedRoute.queryParamMap.pipe(take(1)),
         ]).subscribe(([paramMap, queryParamMap]) => {
-            const roomId = paramMap.get('roomid')
-            const examId = paramMap.get('id')
-            const typeUkom = queryParamMap.get('type_ukom')
-
-            this.typeUkom = typeUkom
-            this.getRoomDetail(roomId)
-            this.getExamDetail(roomId, examId)
-            this.getExaminerListId(examId)
+            this.roomId.set(paramMap.get('roomid'))
+            this.examId.set(paramMap.get('id'))
         })
 
         this.initializeColumnDefs()
     }
 
-    getExaminerListId(examScheduleId: string) {
+    getExaminerListId() {
+        const examScheduleId = this.childExamId() ?? this.examId()
         this.ukomExamScheduleService
             .getExaminerListByExamScheduleId(examScheduleId)
             .subscribe({
@@ -101,6 +132,10 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mendapatkan daftar penguji',
+                    )
                 },
             })
     }
@@ -116,10 +151,10 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
         )
     }
 
-    getRoomDetail(roomId: string) {
+    getRoomDetail() {
         this.isLoadingRoomDetail$.next(true)
         this.ukomRoomService
-            .getRoomDetailByRoomId(roomId)
+            .getRoomDetailByRoomId(this.roomId())
             .pipe(
                 finalize(() => {
                     this.isLoadingRoomDetail$.next(false)
@@ -139,10 +174,33 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
             })
     }
 
-    getExamDetail(roomId: string, examId: string) {
+    getExamDetail() {
+        // this.isLoadingExamDetail$.next(true)
+        // this.ukomExamScheduleService
+        //     .getExamSchedulesRoomID(this.roomId())
+        //     .pipe(
+        //         finalize(() => {
+        //             this.isLoadingExamDetail$.next(false)
+        //         }),
+        //     )
+        //     .subscribe({
+        //         next: (res) => {
+        //             this.examDetail.set(
+        //                 res.find((exam) => exam.id === this.examId()),
+        //             )
+        //             console.log(res.find((exam) => exam.id === this.examId()))
+        //         },
+        //         error: (err) => {
+        //             console.error(err)
+        //             this.handlerService.handleAlert(
+        //                 'Error',
+        //                 'Gagal mendapatkan detail ujian',
+        //             )
+        //         },
+        //     })
         this.isLoadingExamDetail$.next(true)
-        this.ukomExamScheduleService
-            .getExamSchedulesRoomID(roomId)
+        this.examScheduleService
+            .getExamScheduleDetailById(this.examId())
             .pipe(
                 finalize(() => {
                     this.isLoadingExamDetail$.next(false)
@@ -150,7 +208,9 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
             )
             .subscribe({
                 next: (res) => {
-                    this.examDetail = res.find((exam) => exam.id === examId)
+                    this.examDetail.set(
+                        res
+                    )
                 },
                 error: (err) => {
                     console.error(err)

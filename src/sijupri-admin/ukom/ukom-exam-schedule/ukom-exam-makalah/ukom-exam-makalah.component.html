@@ -1,41 +1,148 @@
-<section class="mt-4">
-    <div class="card p-3 bg-light">
-        <div class="d-flex flex-column flex-md-row align-items-stretch gap-2">
-            <div class="flex-fill">
-                <label for="makalah_question" class="form-label">Silahkan masukan petunjuk/pertanyaan makalah:</label>
-                <textarea id="makalah_question" class="form-control" rows="4" [(ngModel)]="question_text"
-                    [ngModelOptions]="{ standalone: true }" placeholder="Masukkan pertanyaan makalah..."></textarea>
+<div class="card">
+    <div class="card-header fw-semibold">Informasi Seminar</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label text-muted small">Waktu Mulai</label>
+                <div>
+                    {{ seminarScheduleDetail()?.startTime | tanggalWaktuIndo }}
+                </div>
             </div>
-        </div>
 
-        <div class="col-lg-12 mt-2">
-            <div class="hstack gap-2 justify-content-end align-items-center">
-                <button [disabled]="question_text.trim() === ''" class="btn btn-success" (click)="onSubmit()"
-                    *ngIf="!(submitLoading$ | async)">
-                    Simpan
-                </button>
-                <button class="btn btn-success" disabled *ngIf="submitLoading$ | async">
-                    <div class="spinner-border spinner-sm-custom" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </button>
+            <div class="col-md-6">
+                <label class="form-label text-muted small">Waktu Selesai</label>
+                <div>
+                    {{ seminarScheduleDetail()?.endTime | tanggalWaktuIndo }}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label text-muted small">Jenis Ujian</label>
+                <div>{{ seminarScheduleDetail()?.examTypeCode }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label text-muted small">Durasi</label>
+                <div>{{ seminarScheduleDetail()?.duration | duration }}</div>
             </div>
         </div>
     </div>
-    <section *ngIf="listSavedQuestion.length > 0" class="mt-5">
-        <div class="card border-0">
-            <div class="row question-container mb-3 pb-2">
-                <label for="" class="p-0 fw-bold">Petunjuk/Pertanyaan</label>
-                <div class="col-sm-12 mt-2">
-                    <ng-container *ngFor="let pertanyaan of listSavedQuestion; index as i">
-                        <div class="row card">
-                            <div class="col">
-                                <p>{{ pertanyaan.question }}</p>
-                            </div>
+</div>
+
+<div class="schedule-viewer-container">
+    <!-- Header -->
+    <div class="header-section mb-4">
+        <!-- Loading State -->
+        <div *ngIf="isLoading()" class="py-5 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Memuat...</span>
+            </div>
+            <p class="mt-2">Memuat data jadwal...</p>
+        </div>
+
+        <!-- Schedule Summary -->
+        <div *ngIf="!isLoading() && mainSchedule()" class="schedule-summary">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                {{ scheduleSummary.total }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Total Slot</p>
                         </div>
-                    </ng-container>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-success">
+                                {{ scheduleSummary.occupied }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Terisi</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-info">
+                                {{ scheduleSummary.available }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Tersedia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Info -->
+            <div class="alert alert-info mb-0 mt-3">
+                <i class="mdi mdi-information-slab-circle-outline me-2"></i>
+                <strong>Durasi per slot:</strong>
+                {{ mainSchedule()!.duration * 60 }} menit
+                <span class="badge bg-primary ms-1">
+                    Zona Waktu: WIB (UTC+7)
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AG Grid Table -->
+    <div *ngIf="!isLoading() && allSlots().length > 0" class="grid-section">
+        <ag-grid-angular
+            (gridReady)="onGridReady($event)"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [paginationPageSize]="20"
+            [pagination]="true"
+            [rowData]="allSlots()"
+            [style.height.px]="600"
+            [style.width.%]="100"
+            [suppressCellFocus]="true"
+            class="ag-theme-alpine"
+        >
+        </ag-grid-angular>
+
+        <!-- Legend -->
+        <div class="legend mt-3">
+            <div class="d-flex flex-wrap gap-3">
+                <div class="legend-item">
+                    <span
+                        class="legend-box"
+                        style="background-color: #d1e7dd"
+                    ></span>
+                    <span class="legend-label">Slot Terisi</span>
+                </div>
+                <div class="legend-item">
+                    <span
+                        class="legend-box"
+                        style="background-color: #f8f9fa"
+                    ></span>
+                    <span class="legend-label">Slot Tersedia</span>
                 </div>
             </div>
         </div>
-    </section>
-</section>
+    </div>
+
+    <!-- Empty State -->
+    <div
+        *ngIf="!isLoading() && allSlots().length === 0 && mainSchedule()"
+        class="alert alert-warning text-center"
+    >
+        <i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i>
+        <h5>Tidak Ada Slot</h5>
+        <p class="mb-0">
+            Tidak ada slot waktu tersedia untuk konfigurasi jadwal ini.
+        </p>
+    </div>
+
+    <!-- No Data State -->
+    <div
+        *ngIf="!isLoading() && !mainSchedule()"
+        class="alert alert-info text-center"
+    >
+        <i class="bi bi-info-circle fs-1 d-block mb-2"></i>
+        <h5>Tidak Ada Data Jadwal</h5>
+        <p class="mb-0">Silakan pilih jadwal ujian untuk melihat timetable.</p>
+    </div>
+</div>

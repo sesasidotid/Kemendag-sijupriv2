@@ -167,6 +167,7 @@ export class UkomKompetensiListComponent {
                     .withIcon('danger')
                     .build(),
             )
+            .withQueryParams()
             .build()
     }
 

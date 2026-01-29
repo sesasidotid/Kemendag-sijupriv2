@@ -67,6 +67,7 @@ export class ProvinsiListComponent {
                     .withField('Nama', 'text')
                     .build()
             )
+            .withQueryParams()
             .build()
     }
 

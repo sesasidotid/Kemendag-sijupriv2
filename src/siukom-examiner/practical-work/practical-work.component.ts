@@ -116,7 +116,9 @@ export class PracticalWorkComponent {
 
                         // Check if backend has meaningful data
                         const hasBackendAnswer =
-                            q.answerDto && q.answerDto.answerText != null
+                            q.answerDto &&
+                            (q.answerDto.score != null ||
+                                q.answerDto.answerText != null)
 
                         if (!q.answerDto) {
                             // No backend answer object - use draft if available
@@ -124,9 +126,11 @@ export class PracticalWorkComponent {
                                 participantId: this.participantId(),
                                 questionId: q.id,
                                 answerText: draftAnswer?.answerText ?? null,
+                                score: draftAnswer?.score ?? null,
                             }
                         } else if (!hasBackendAnswer && draftAnswer) {
                             // Backend answer exists but is empty - use draft
+                            q.answerDto.score = draftAnswer.score ?? null
                             q.answerDto.answerText =
                                 draftAnswer.answerText ?? null
                         }
@@ -151,42 +155,76 @@ export class PracticalWorkComponent {
 
         // Add form group for each question
         questions.forEach((q) => {
+            const maxScore = q.weight || 100
             const formGroup = this.fb.group({
                 id: [q.answerDto?.id || null],
                 participantId: [
                     q.answerDto?.participantId || this.participantId(),
                 ],
                 questionId: [q.id],
-                answerText: [
-                    q.answerDto?.answerText || null,
-                    [Validators.required],
+                score: [
+                    q.answerDto?.score ?? null,
+                    [
+                        Validators.required,
+                        Validators.min(0),
+                        Validators.max(maxScore),
+                    ],
                 ],
+                answerText: [q.answerDto?.answerText || null],
             })
             this.answerDtoList.push(formGroup)
         })
     }
 
-    getAnswerTextError(index: number): string | null {
+    validateScore(index: number): void {
         const formGroup = this.answerDtoList.at(index) as FormGroup
-        const answerTextControl = formGroup.get('answerText')
+        const scoreControl = formGroup.get('score')
+        const question = this.questions()[index]
+        const maxScore = question?.weight || 100
 
         if (
-            !answerTextControl ||
-            !answerTextControl.touched ||
-            !answerTextControl.errors
+            scoreControl &&
+            scoreControl.value !== null &&
+            scoreControl.value !== ''
         ) {
+            let score = Number(scoreControl.value)
+            if (score < 0) score = 0
+            if (score > maxScore) score = maxScore
+            scoreControl.setValue(score)
+        }
+        scoreControl?.markAsTouched()
+    }
+
+    getScoreError(index: number): string | null {
+        const formGroup = this.answerDtoList.at(index) as FormGroup
+        const scoreControl = formGroup.get('score')
+        const question = this.questions()[index]
+        const maxScore = question?.weight || 100
+
+        if (!scoreControl || !scoreControl.errors || !scoreControl.touched) {
             return null
         }
 
-        if (answerTextControl.errors['required']) {
-            return 'Catatan penilaian tidak boleh kosong.'
+        if (scoreControl.errors['required']) {
+            return 'Nilai tidak boleh kosong.'
+        }
+        if (scoreControl.errors['min']) {
+            return 'Nilai tidak boleh kurang dari 0.'
+        }
+        if (scoreControl.errors['max']) {
+            return `Nilai tidak boleh melebihi bobot maksimal (${maxScore}).`
         }
 
         return this.formValidationService.getErrorMessage(
-            answerTextControl,
-            'answerText',
-            'Catatan Penilaian',
+            scoreControl,
+            'score',
+            'Nilai',
         )
+    }
+    isScoreInvalid(index: number): boolean {
+        const formGroup = this.answerDtoList.at(index) as FormGroup
+        const scoreControl = formGroup.get('score')
+        return !!(scoreControl && scoreControl.invalid && scoreControl.touched)
     }
 
     scheduleAutoSave(): void {
@@ -220,11 +258,19 @@ export class PracticalWorkComponent {
             (item) => item.answerDto?.answerText != null,
         )
     }
-
+    markAllAsTouched(): void {
+        this.answerDtoList.controls.forEach((control) => {
+            const formGroup = control as FormGroup
+            Object.keys(formGroup.controls).forEach((key) => {
+                formGroup.get(key)?.markAsTouched()
+            })
+        })
+    }
     submitAssessment(): void {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
                 if (!confirmed) return
+                this.markAllAsTouched()
                 this.loadingSubmitForm.set(true)
                 const formValues = this.answerDtoList.value
 
@@ -234,6 +280,7 @@ export class PracticalWorkComponent {
                         participantId: item.participantId,
                         questionId: item.questionId,
                         answerText: item.answerText,
+                        score: item.score,
                     })),
                 }
 

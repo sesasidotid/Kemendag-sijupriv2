@@ -1,14 +1,11 @@
 <div class="d-flex align-items-center justify-content-between mb-3">
-    <button
-        (click)="backToDashboard()"
-        class="btn btn-sm btn-outline-secondary"
-    >
+    <button (click)="backToDashboard()" class="btn btn-outline-secondary">
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
 
     <div
         *ngIf="hasExistingAnswer() && !questionLoading()"
-        class="alert alert-success d-flex align-items-center mb-0 px-2 py-1"
+        class="alert alert-success d-flex align-items-center"
     >
         <i class="mdi mdi-check-circle me-1"></i>
         <small>Jawaban telah disimpan</small>
@@ -81,7 +78,7 @@
                 Petunjuk
             </h4>
             <ol>
-                <li>Rekam video praktik Anda.</li>
+                <li>Rekam video persiapan praktik Anda.</li>
                 <li>Unggah video ke YouTube / Google Drive / platform lain.</li>
                 <li>Salin link video tersebut.</li>
                 <li>Tempelkan link ke kolom di bawah.</li>
@@ -98,13 +95,14 @@
                     <h5 class="mb-0">
                         <i class="mdi mdi-upload me-2"></i>
                         {{ hasExistingAnswer() ? 'Update' : 'Upload' }} Link
-                        Video Praktik
+                        Video Persiapan Praktik
                     </h5>
                 </div>
                 <div class="card-body">
                     <div *ngIf="question(); else noQuestion" class="mb-3">
                         <label class="form-label fw-bold">
-                            {{question().question}}
+                            <!--                            {{question().question}}-->
+                            {{mapQuestionText()}}
                             <span class="text-danger">*</span>
                         </label>
                         <input
@@ -150,7 +148,7 @@
             <div class="card-header bg-success">
                 <h5 class="mb-0 text-white">
                     <i class="mdi mdi-check-circle me-2"></i>
-                    Video Praktik Anda
+                    Video Persiapan Praktik Anda
                 </h5>
             </div>
             <div class="card-body">
@@ -159,11 +157,6 @@
                     [showTitle]="false"
                     [videoUrl]="question()?.answerDto?.answerText"
                 ></app-video-preview>
-                <!--                <div class="alert alert-info mb-0 mt-3">-->
-                <!--                    <i class="mdi mdi-information-outline me-2"></i>-->
-                <!--                    Anda dapat mengubah link video dengan mengisi form dan klik-->
-                <!--                    <strong>Simpan Link Video</strong> kembali.-->
-                <!--                </div>-->
             </div>
         </div>
     </ng-container>

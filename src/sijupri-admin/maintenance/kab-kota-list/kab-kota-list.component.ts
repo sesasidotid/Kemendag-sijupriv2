@@ -104,6 +104,7 @@ export class KabKotaListComponent {
                     .withField('Provinsi', 'text')
                     .build()
             )
+            .withQueryParams()
             .build()
     }
 

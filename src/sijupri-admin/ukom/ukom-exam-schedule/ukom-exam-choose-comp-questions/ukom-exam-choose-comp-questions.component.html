@@ -1,3 +1,4 @@
+<script src="../ukom-exam-makalah/ukom-exam-makalah.component.ts"></script>
 <div class="d-flex align-items-center mb-3">
     <button (click)="back()" class="btn btn-sm btn-outline-secondary me-3">
         <i class="mdi mdi-chevron-left"></i> Kembali
@@ -29,28 +30,32 @@
                         <label class="form-label text-muted small"
                             >Waktu Mulai</label
                         >
-                        <div>{{ examDetail.startTime | tanggalWaktuIndo }}</div>
+                        <div>
+                            {{ examDetail()?.startTime | tanggalWaktuIndo }}
+                        </div>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label text-muted small"
                             >Waktu Selesai</label
                         >
-                        <div>{{ examDetail.endTime | tanggalWaktuIndo }}</div>
+                        <div>
+                            {{ examDetail()?.endTime | tanggalWaktuIndo }}
+                        </div>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label text-muted small"
                             >Jenis Ujian</label
                         >
-                        <div>{{ examDetail.examTypeCode }}</div>
+                        <div>{{ examDetail()?.examTypeCode }}</div>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label text-muted small"
                             >Durasi</label
                         >
-                        <div>{{ examDetail.duration | duration }}</div>
+                        <div>{{ examDetail()?.duration | duration }}</div>
                     </div>
                 </div>
             </div>
@@ -72,19 +77,25 @@
             </div>
         </ng-container>
 
-        <ng-container *ngIf="typeUkom === 'CAT'">
+        <ng-container *ngIf="typeUkom() === ExamTypeCategory.CAT">
             <app-ukom-exam-cat
-                [examDetail]="examDetail"
+                [examDetail]="examDetail()"
                 [roomUkomDetail]="roomUkomDetail"
             ></app-ukom-exam-cat>
         </ng-container>
 
-        <ng-container *ngIf="typeUkom === 'WAWANCARA'">
+        <ng-container *ngIf="typeUkom() === ExamTypeCategory.WAWANCARA">
             <app-ukom-exam-wawancara
-                [examDetail]="examDetail"
+                [examDetail]="examDetail()"
                 [examinerList]="examinerList()"
                 [roomUkomDetail]="roomUkomDetail"
             ></app-ukom-exam-wawancara>
+        </ng-container>
+
+        <ng-container *ngIf="typeUkom() === ExamTypeCategory.MAKALAH">
+            <app-ukom-exam-makalah
+                [examinerList]="examinerList()"
+            ></app-ukom-exam-makalah>
         </ng-container>
     </div>
 </ng-template>

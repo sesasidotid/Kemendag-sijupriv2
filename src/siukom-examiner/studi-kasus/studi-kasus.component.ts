@@ -141,8 +141,8 @@ export class StudiKasusComponent implements OnInit {
                         const draftAnswer = draft?.answers?.[q.id]
                         const hasBackendAnswer =
                             q.answerDto &&
-                            (q.answerDto.score !== null ||
-                                q.answerDto.answerText !== null)
+                            (q.answerDto.score != null ||
+                                q.answerDto.answerText != null)
 
                         if (!q.answerDto) {
                             // No backend answer - use draft if available
