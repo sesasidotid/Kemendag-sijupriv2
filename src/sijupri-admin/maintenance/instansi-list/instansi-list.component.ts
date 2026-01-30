@@ -6,27 +6,28 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { BehaviorSubject } from 'rxjs'
-import { InstasiAddComponent } from '../instasi-add/instasi-add.component'
 import { CommonModule } from '@angular/common'
 
 @Component({
     selector: 'app-instansi-list',
     standalone: true,
-    imports: [PagableComponent, InstasiAddComponent, CommonModule],
+    imports: [PagableComponent, CommonModule],
     templateUrl: './instansi-list.component.html',
-    styleUrl: './instansi-list.component.scss'
+    styleUrl: './instansi-list.component.scss',
 })
 export class InstansiListComponent {
     pagable: Pagable
     tab$ = new BehaviorSubject<number | null>(0)
     refreshToggle: boolean = false
 
-    constructor(private router: Router, private tabService: TabService) {
-    }
+    constructor(
+        private router: Router,
+        private tabService: TabService,
+    ) {}
 
     ngOnInit(): void {
         this.handlePagable()
@@ -37,16 +38,16 @@ export class InstansiListComponent {
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((item: any) => { }, 'danger')
+                    .setAction((item: any) => {}, 'danger')
                     .withIcon('danger')
                     .addInactiveCondition((item: any) => true)
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('name')
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             .withQueryParams()
             .build()

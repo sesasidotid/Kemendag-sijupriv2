@@ -46,6 +46,11 @@ interface DynamicFieldConfig {
 
 interface ExamTypeFormConfig {
     primary: DynamicFieldConfig[]
+    secondary?: {
+        fields: DynamicFieldConfig[]
+        label: string
+        examTypeCode: string
+    }
 }
 
 const UKOM_UPDATE_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
@@ -75,6 +80,21 @@ const UKOM_UPDATE_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
         ],
+        secondary: {
+            label: 'Jadwal Seminar',
+            examTypeCode: 'SEMINAR',
+            fields: [
+                {
+                    controlName: 'startTime2',
+                    validators: [Validators.required],
+                },
+                { controlName: 'endTime2', validators: [Validators.required] },
+                {
+                    controlName: 'duration2',
+                    validators: [Validators.required, Validators.min(1)],
+                },
+            ],
+        },
     },
     SEMINAR: {
         primary: [
@@ -114,6 +134,9 @@ const ALL_FORM_FIELDS = [
     'secretKey',
     'participantIdList',
     'examinerIdList',
+    'startTime2',
+    'endTime2',
+    'duration2',
 ]
 
 @Component({
@@ -192,6 +215,10 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             secretKey: [null],
             participantIdList: [null],
             examinerIdList: [null],
+            // Secondary form fields for MAKALAH/SEMINAR
+            startTime2: [''],
+            endTime2: [''],
+            duration2: [''],
         })
     }
 
@@ -202,6 +229,9 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
         const primaryControls = new Set(
             config.primary.map((c) => c.controlName),
         )
+        const secondaryControls = new Set(
+            config.secondary?.fields.map((c) => c.controlName) || [],
+        )
 
         // Clear validators for all configurable fields
         ALL_FORM_FIELDS.forEach((fieldName) => {
@@ -209,7 +239,10 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             if (control) {
                 control.clearValidators()
                 // Clear value if not in current config
-                if (!primaryControls.has(fieldName)) {
+                if (
+                    !primaryControls.has(fieldName) &&
+                    !secondaryControls.has(fieldName)
+                ) {
                     control.setValue(null)
                 }
             }
@@ -222,6 +255,18 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
                 control.setValidators(fieldConfig.validators)
             }
         })
+
+        // Apply validators from secondary config if exists
+        if (config.secondary) {
+            config.secondary.fields.forEach((fieldConfig) => {
+                const control = this.examScheduleForm.get(
+                    fieldConfig.controlName,
+                )
+                if (control && fieldConfig.validators) {
+                    control.setValidators(fieldConfig.validators)
+                }
+            })
+        }
 
         // Update validity
         ALL_FORM_FIELDS.forEach((fieldName) => {
@@ -311,6 +356,14 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             return primaryField.visible !== false
         }
 
+        // Check secondary fields
+        const secondaryField = config.secondary?.fields.find(
+            (f) => f.controlName === controlName,
+        )
+        if (secondaryField) {
+            return secondaryField.visible !== false
+        }
+
         return false
     }
 
@@ -327,6 +380,20 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             }
             return (
                 primaryField.validators?.includes(Validators.required) ?? false
+            )
+        }
+
+        // Check secondary fields
+        const secondaryField = config.secondary?.fields.find(
+            (f) => f.controlName === controlName,
+        )
+        if (secondaryField) {
+            if (secondaryField.required !== undefined) {
+                return secondaryField.required
+            }
+            return (
+                secondaryField.validators?.includes(Validators.required) ??
+                false
             )
         }
 
@@ -361,6 +428,17 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             examinerIdList: examinerIds,
         })
 
+        // Patch secondary form if exam has child schedule (MAKALAH -> SEMINAR)
+        if (data.examScheduleChild) {
+            this.examScheduleForm.patchValue({
+                startTime2: data.examScheduleChild.startTime,
+                endTime2: data.examScheduleChild.endTime,
+                duration2: data.examScheduleChild.duration
+                    ? Math.round(data.examScheduleChild.duration * 60)
+                    : 0,
+            })
+        }
+
         this.examScheduleForm.get('secretKey')?.updateValueAndValidity()
     }
 
@@ -381,29 +459,95 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
                     )
                 }
 
-                this.ukomExamScheduleService
-                    .updateExamSchedule(request)
-                    .pipe(
-                        finalize(() => {
-                            this.submitLoading.set(false)
-                        }),
-                    )
-                    .subscribe({
-                        next: () => {
-                            this.handlerService.handleAlert(
-                                'Success',
-                                'Jadwal ujian berhasil diperbarui',
-                            )
-                            this.refresh.emit()
-                        },
-                        error: (err) => {
-                            console.error(err)
-                            this.handlerService.handleAlert(
-                                'Error',
-                                'Gagal memperbarui jadwal ujian',
-                            )
-                        },
-                    })
+                // Handle MAKALAH with SEMINAR child
+                const hasSecondary = this.hasSecondaryForm()
+                if (hasSecondary) {
+                    // Update MAKALAH first
+                    this.ukomExamScheduleService
+                        .updateExamSchedule(request)
+                        .subscribe({
+                            next: () => {
+                                // Then update SEMINAR (child)
+                                const childRequest =
+                                    new UpdateExamScheduleRequest({
+                                        startTime:
+                                            this.examScheduleForm.value
+                                                .startTime2,
+                                        endTime:
+                                            this.examScheduleForm.value
+                                                .endTime2,
+                                        duration:
+                                            this.examScheduleForm.value
+                                                .duration2,
+                                    })
+                                childRequest.id =
+                                    this.examSchedule.examScheduleChild?.id
+
+                                if (childRequest.duration) {
+                                    childRequest.duration = Number(
+                                        (childRequest.duration / 60).toFixed(2),
+                                    )
+                                }
+
+                                this.ukomExamScheduleService
+                                    .updateExamSchedule(childRequest)
+                                    .pipe(
+                                        finalize(() => {
+                                            this.submitLoading.set(false)
+                                        }),
+                                    )
+                                    .subscribe({
+                                        next: () => {
+                                            this.handlerService.handleAlert(
+                                                'Success',
+                                                'Jadwal ujian berhasil diperbarui',
+                                            )
+                                            this.refresh.emit()
+                                        },
+                                        error: (err) => {
+                                            console.error(err)
+                                            this.handlerService.handleAlert(
+                                                'Error',
+                                                'Gagal memperbarui jadwal seminar',
+                                            )
+                                        },
+                                    })
+                            },
+                            error: (err) => {
+                                this.submitLoading.set(false)
+                                console.error(err)
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal memperbarui jadwal makalah',
+                                )
+                            },
+                        })
+                } else {
+                    // Single schedule update
+                    this.ukomExamScheduleService
+                        .updateExamSchedule(request)
+                        .pipe(
+                            finalize(() => {
+                                this.submitLoading.set(false)
+                            }),
+                        )
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Jadwal ujian berhasil diperbarui',
+                                )
+                                this.refresh.emit()
+                            },
+                            error: (err) => {
+                                console.error(err)
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal memperbarui jadwal ujian',
+                                )
+                            },
+                        })
+                }
             },
         })
     }
@@ -414,6 +558,16 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             control,
             controlName,
             label,
+        )
+    }
+
+    hasSecondaryForm(): boolean {
+        return !!UKOM_UPDATE_FORM_CONFIG[this.examTypeCode]?.secondary
+    }
+
+    getSecondaryFormLabel(): string {
+        return (
+            UKOM_UPDATE_FORM_CONFIG[this.examTypeCode]?.secondary?.label || ''
         )
     }
 

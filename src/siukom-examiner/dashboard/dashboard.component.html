@@ -14,21 +14,54 @@
 </ng-container>
 
 <ng-template #examListContent>
+    <!-- Quick Action: Participants Ready for Examination -->
+    <div *ngIf="ongoingParticipantSchedules().length > 0" class="mb-4 quick-action-section">
+        <h3 class="section-title section-title-urgent">
+            <span class="status-dot status-dot-pulse"></span>
+            PESERTA SIAP DINILAI
+        </h3>
+
+        <div class="quick-action-cards">
+            <div *ngFor="let participant of ongoingParticipantSchedules()" class="quick-action-card">
+                <div class="quick-action-header">
+                    <span class="exam-type-badge">{{
+                        participant.examDisplayName
+                        }}</span>
+                    <span class="schedule-badge">{{
+                        participant.formattedSchedule
+                        }}</span>
+                </div>
+
+                <div class="quick-action-body">
+                    <div class="participant-name-large">
+                        <i class="ri-user-3-fill me-2"></i>
+                        {{ participant.participantName }}
+                    </div>
+                    <div class="participant-nip">
+                        NIP: {{ participant.participantNip }}
+                    </div>
+                    <div class="participant-jenis-ukom">
+                        {{ getJenisUkomDisplay(participant.jenisUkom) }}
+                    </div>
+                </div>
+
+                <button (click)="enterExamFromOngoing(participant)" class="btn-primary-action btn-lg w-100">
+                    <i class="ri-play-circle-line me-2"></i>
+                    MULAI PENILAIAN
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Ongoing Exam Section (Most Important) -->
     <ng-container *ngIf="ongoingExam().length > 0; else noOnGoingExam">
         <div class="d-grid mb-4 gap-3">
-            <div
-                *ngFor="let exam of ongoingExam()"
-                class="exam-card exam-card-ongoing"
-                role="alert"
-            >
+            <div *ngFor="let exam of ongoingExam()" class="exam-card exam-card-ongoing" role="alert">
                 <div class="exam-content">
                     <h2 class="exam-title">{{ exam.displayName }}</h2>
 
                     <div class="exam-schedule">
-                        <span
-                            class="mdi mdi-calendar-blank-outline me-1"
-                        ></span>
+                        <span class="mdi mdi-calendar-blank-outline me-1"></span>
                         {{ formatDateRange( exam.schedule.startTime,
                         exam.schedule.endTime )}}
                     </div>
@@ -39,33 +72,25 @@
                     </div>
                 </div>
 
-                <button
-                    (click)="toggleParticipantList(exam.schedule.id, exam)"
-                    class="btn-secondary-small"
-                >
+                <button (click)="toggleParticipantList(exam.schedule.id, exam)" class="btn-secondary-small">
                     <i class="mdi mdi-account-multiple-outline me-1"></i>
                     <!--                <i class="ri-user-line me-2"></i>-->
                     {{ isParticipantListVisible(exam.schedule.id) ?
                     'SEMBUNYIKAN' : 'LIHAT' }} DAFTAR PESERTA
                 </button>
 
-                <div
-                    *ngIf="isParticipantListVisible(exam.schedule.id)"
-                    class="participant-list-container animate-slide-down"
-                >
+                <div *ngIf="isParticipantListVisible(exam.schedule.id)"
+                    class="participant-list-container animate-slide-down">
                     <h3 class="participant-list-title">
                         <!--                    <i class="ri-file-list-3-line me-2"></i>-->
                         Daftar Peserta Ujian
                     </h3>
 
                     <div class="participant-cards">
-                        <div
-                            *ngFor="
+                        <div *ngFor="
                         let pSchedule of getParticipants(exam);
                         let j = index
-                    "
-                            class="participant-card"
-                        >
+                    " class="participant-card">
                             <!--                        <div class="participant-number">{{ j + 1 }}</div>-->
 
                             <div class="participant-info">
@@ -75,9 +100,7 @@
                                 </div>
 
                                 <div class="participant-detail">
-                                    <span class="detail-label"
-                                        >Waktu Pelaksanaan</span
-                                    >
+                                    <span class="detail-label">Waktu Pelaksanaan</span>
                                     <span class="detail-value">
                                         : {{
                                         getParticipantScheduleTime(pSchedule,
@@ -96,15 +119,12 @@
                                     pSchedule.participantUkom.jenisUkom ) }}
                                 </div>
 
-                                <button
-                                    (click)="enterExam(
+                                <button (click)="enterExam(
                                             pSchedule.participantId,
                                             exam.schedule.id,
                                             exam.schedule.examTypeCode,
                                             exam.schedule.roomUkomId
-                                        )"
-                                    class="btn-primary-action btn-sm mt-3"
-                                >
+                                        )" class="btn-primary-action btn-sm mt-3">
                                     MASUK UJIAN
                                 </button>
                             </div>
@@ -114,16 +134,16 @@
             </div>
         </div>
     </ng-container>
-    <ng-template #noOnGoingExam
-        ><div class="exam-card exam-card-empty mb-4">
+    <ng-template #noOnGoingExam>
+        <div class="exam-card exam-card-empty mb-4">
             <div class="empty-state">
                 <i class="ri-checkbox-circle-line empty-icon"></i>
                 <p class="empty-text">
                     Tidak ada ujian yang sedang berlangsung
                 </p>
             </div>
-        </div></ng-template
-    >
+        </div>
+    </ng-template>
 
     <!-- Upcoming Exams Section -->
     <div *ngIf="upcomingExams().length > 0" class="mb-4">
@@ -133,17 +153,12 @@
         </h3>
 
         <div class="exam-list">
-            <div
-                *ngFor="let exam of upcomingExams().slice(0, 2)"
-                class="exam-card exam-card-upcoming"
-            >
+            <div *ngFor="let exam of upcomingExams().slice(0, 2)" class="exam-card exam-card-upcoming">
                 <div class="exam-content">
                     <h4 class="exam-title-secondary">{{ exam.displayName }}</h4>
                     <div class="exam-schedule">
                         <!--                        <i class="ri-calendar-line me-2"></i>-->
-                        <span
-                            class="mdi mdi-calendar-blank-outline me-1"
-                        ></span>
+                        <span class="mdi mdi-calendar-blank-outline me-1"></span>
                         {{ formatDateRange( exam.schedule.startTime,
                         exam.schedule.endTime ) }}
                     </div>
@@ -153,29 +168,21 @@
                     </div>
                 </div>
 
-                <button
-                    (click)="toggleParticipantList(exam.schedule.id, exam)"
-                    class="btn-secondary-small mb-3"
-                >
+                <button (click)="toggleParticipantList(exam.schedule.id, exam)" class="btn-secondary-small mb-3">
                     <i class="mdi mdi-account-multiple-outline me-1"></i>
                     {{ isParticipantListVisible(exam.schedule.id) ?
                     'SEMBUNYIKAN' : 'LIHAT' }} DAFTAR PESERTA
                 </button>
 
                 <!-- Participant List for Upcoming Exam -->
-                <div
-                    *ngIf="isParticipantListVisible(exam.schedule.id)"
-                    class="participant-list-container animate-slide-down mb-3"
-                >
+                <div *ngIf="isParticipantListVisible(exam.schedule.id)"
+                    class="participant-list-container animate-slide-down mb-3">
                     <h3 class="participant-list-title">
                         <i class="ri-file-list-3-line me-2"></i>
                         Daftar Peserta Ujian
                     </h3>
                     <div class="participant-cards">
-                        <div
-                            *ngFor="let pSchedule of getParticipants(exam); let i = index"
-                            class="participant-card"
-                        >
+                        <div *ngFor="let pSchedule of getParticipants(exam); let i = index" class="participant-card">
                             <div class="participant-number">{{ i + 1 }}</div>
                             <div class="participant-info">
                                 <div class="participant-name">
@@ -183,11 +190,17 @@
                                     {{ pSchedule.participantUkom.name }}
                                 </div>
                                 <div class="participant-detail">
-                                    <span class="detail-label">NIP:</span>
-                                    <span class="detail-value"
-                                        >{{ pSchedule.participantUkom.nip
-                                        }}</span
-                                    >
+                                    <span class="detail-label">Waktu Pelaksanaan</span>
+                                    <span class="detail-value">
+                                        : {{
+                                        getParticipantScheduleTime(pSchedule,
+                                        exam) }}
+                                    </span>
+                                </div>
+                                <div class="participant-detail">
+                                    <span class="detail-label">NIP</span>
+                                    <span class="detail-value">: {{ pSchedule.participantUkom.nip
+                                        }}</span>
                                 </div>
                                 <div class="participant-badge">
                                     {{
@@ -216,18 +229,12 @@
                 <span class="status-dot status-dot-completed"></span>
                 UJIAN SELESAI ({{ completedExams().length }})
             </h3>
-            <i
-                [class.ri-arrow-down-s-line]="!showCompletedExams()"
-                [class.ri-arrow-up-s-line]="showCompletedExams()"
-                class="toggle-icon"
-            ></i>
+            <i [class.ri-arrow-down-s-line]="!showCompletedExams()" [class.ri-arrow-up-s-line]="showCompletedExams()"
+                class="toggle-icon"></i>
         </div>
 
         <div *ngIf="showCompletedExams()" class="exam-list animate-slide-down">
-            <div
-                *ngFor="let exam of completedExams()"
-                class="exam-card exam-card-completed"
-            >
+            <div *ngFor="let exam of completedExams()" class="exam-card exam-card-completed">
                 <div class="exam-content">
                     <h4 class="exam-title-secondary">{{ exam.displayName }}</h4>
                     <div class="exam-schedule">
@@ -245,29 +252,21 @@
                     </div>
                 </div>
 
-                <button
-                    (click)="toggleParticipantList(exam.schedule.id, exam)"
-                    class="btn-secondary-small"
-                >
+                <button (click)="toggleParticipantList(exam.schedule.id, exam)" class="btn-secondary-small">
                     <i class="mdi mdi-account-multiple-outline me-1"></i>
                     {{ isParticipantListVisible(exam.schedule.id) ?
                     'SEMBUNYIKAN' : 'LIHAT' }} DAFTAR PESERTA
                 </button>
 
                 <!-- Participant List for Completed Exam -->
-                <div
-                    *ngIf="isParticipantListVisible(exam.schedule.id)"
-                    class="participant-list-container animate-slide-down mt-3"
-                >
+                <div *ngIf="isParticipantListVisible(exam.schedule.id)"
+                    class="participant-list-container animate-slide-down mt-3">
                     <h3 class="participant-list-title">
                         <i class="ri-file-list-3-line me-2"></i>
                         Daftar Peserta Ujian
                     </h3>
                     <div class="participant-cards">
-                        <div
-                            *ngFor="let pSchedule of getParticipants(exam); let i = index"
-                            class="participant-card"
-                        >
+                        <div *ngFor="let pSchedule of getParticipants(exam); let i = index" class="participant-card">
                             <div class="participant-number">{{ i + 1 }}</div>
                             <div class="participant-info">
                                 <div class="participant-name">
@@ -276,10 +275,8 @@
                                 </div>
                                 <div class="participant-detail">
                                     <span class="detail-label">NIP:</span>
-                                    <span class="detail-value"
-                                        >{{ pSchedule.participantUkom.nip
-                                        }}</span
-                                    >
+                                    <span class="detail-value">{{ pSchedule.participantUkom.nip
+                                        }}</span>
                                 </div>
                                 <div class="participant-badge">
                                     {{
@@ -295,14 +292,11 @@
     </div>
 
     <!-- Empty State for No Schedules -->
-    <div
-        *ngIf="
+    <div *ngIf="
                 !ongoingExam() &&
                 upcomingExams().length === 0 &&
                 completedExams().length === 0
-            "
-        class="exam-card exam-card-empty"
-    >
+            " class="exam-card exam-card-empty">
         <div class="empty-state">
             <i class="ri-inbox-line empty-icon"></i>
             <h3 class="empty-title">Belum ada jadwal ujian</h3>

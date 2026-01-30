@@ -5,6 +5,7 @@ import {
     inject,
     input,
     OnInit,
+    output,
     signal,
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
@@ -18,6 +19,7 @@ import { ScheduleSlotService } from '@/modules/ukom/services/schedule-slot.servi
 import {
     MainSchedule,
     ParticipantSchedule,
+    RescheduleRequest,
     ScheduleSlot,
 } from '@/modules/ukom/models/schedule-slot.model'
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
@@ -26,6 +28,9 @@ import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-s
 import { AgGridAngular } from 'ag-grid-angular'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { DurationPipe } from '@/modules/base/pipes/duration.pipe'
+import { RescheduleModalComponent } from './reschedule-modal/reschedule-modal.component'
+import { UpdateExaminerModalComponent } from './update-examiner-modal/update-examiner-modal.component'
+import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-schedule/update-examiner-for-participant-request.model'
 
 @Component({
     selector: 'app-ukom-exam-makalah',
@@ -36,6 +41,8 @@ import { DurationPipe } from '@/modules/base/pipes/duration.pipe'
         AgGridAngular,
         TanggalWaktuIndoPipe,
         DurationPipe,
+        RescheduleModalComponent,
+        UpdateExaminerModalComponent,
     ],
     templateUrl: './ukom-exam-makalah.component.html',
     styleUrl: './ukom-exam-makalah.component.scss',
@@ -48,22 +55,35 @@ export class UkomExamMakalahComponent implements OnInit {
     })
 
     examinerList = input<ExaminerScheduleList[]>([])
+    participantList = input<ParticipantScheduleList[]>([])
+
+    participantListRefresh = output()
 
     route = inject(ActivatedRoute)
     examScheduleService = inject(UkomExamScheduleService)
     examScheduleDetailLoading = signal(false)
-    participantListLoading = signal(false)
     handlerService = inject(HandlerService)
     slotService = inject(ScheduleSlotService)
 
     // Combined loading state for template
     isLoading = computed(() => {
-        return this.examScheduleDetailLoading() || this.participantListLoading()
+        return this.examScheduleDetailLoading()
     })
 
     mainSchedule = signal<MainSchedule | null>(null)
     allSlots = signal<ScheduleSlot[]>([])
-    participantList = signal<ParticipantScheduleList[]>([])
+
+    // Modal state for reschedule
+    showRescheduleModal = signal<boolean>(false)
+    selectedParticipant = signal<ParticipantSchedule | null>(null)
+    availableSlotsForReschedule = signal<ScheduleSlot[]>([])
+    currentParticipantSlot = signal<ScheduleSlot | null>(null)
+
+    // Modal state for update examiner
+    showExaminerModal = signal<boolean>(false)
+    selectedParticipantForExaminer = signal<ParticipantSchedule | null>(null)
+    currentSlotForExaminer = signal<ScheduleSlot | null>(null)
+
     columnDefs: ColDef[] = []
     defaultColDef: ColDef = {
         sortable: true,
@@ -85,28 +105,20 @@ export class UkomExamMakalahComponent implements OnInit {
             { allowSignalWrites: true },
         )
 
-        // Effect 2: Fetch participant list when seminar schedule becomes available
+        // Effect 2: Transform to main schedule when seminar schedule and participants are available
         effect(
             () => {
                 const seminarScheduleDetail = this.seminarScheduleDetail()
-                if (seminarScheduleDetail?.id) {
-                    this.fetchParticipantList(seminarScheduleDetail.id)
+                const participantList = this.participantList()
+                if (seminarScheduleDetail && participantList.length >= 0) {
+                    this.transformToMainSchedule(
+                        seminarScheduleDetail,
+                        participantList,
+                    )
                 }
             },
             { allowSignalWrites: true },
         )
-
-        // Effect 3: Transform to main schedule when both data are available
-        effect(() => {
-            const seminarScheduleDetail = this.seminarScheduleDetail()
-            const participantList = this.participantList()
-            if (seminarScheduleDetail && participantList.length >= 0) {
-                this.transformToMainSchedule(
-                    seminarScheduleDetail,
-                    participantList,
-                )
-            }
-        },{allowSignalWrites:true})
     }
 
     get scheduleSummary() {
@@ -154,24 +166,106 @@ export class UkomExamMakalahComponent implements OnInit {
             })
     }
 
-    fetchParticipantList(seminarScheduleId: string) {
-        this.participantListLoading.set(true)
+    /**
+     * Open reschedule modal for a participant
+     */
+    openRescheduleModal(slot: ScheduleSlot): void {
+        if (!slot.participantSchedule) return
 
-        this.examScheduleService
-            .getParticipantListByExamScheduleId(seminarScheduleId)
-            .pipe(finalize(() => this.participantListLoading.set(false)))
-            .subscribe({
-                next: (participantList) => {
-                    this.participantList.set(participantList)
-                },
-                error: (error) => {
-                    console.error(error)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengambil daftar peserta.',
-                    )
-                },
-            })
+        this.selectedParticipant.set(slot.participantSchedule)
+        this.currentParticipantSlot.set(slot)
+
+        // Get available slots (excluding current participant's slot)
+        const available = this.slotService.getAvailableSlots(this.allSlots())
+        this.availableSlotsForReschedule.set(available)
+
+        this.showRescheduleModal.set(true)
+    }
+
+    /**
+     * Close reschedule modal
+     */
+    closeRescheduleModal(): void {
+        this.showRescheduleModal.set(false)
+        this.selectedParticipant.set(null)
+        this.currentParticipantSlot.set(null)
+        this.availableSlotsForReschedule.set([])
+    }
+
+    /**
+     * Confirm reschedule action
+     */
+    confirmReschedule(event: {
+        participant: ParticipantSchedule
+        newSlot: ScheduleSlot
+    }): void {
+        const { participant, newSlot } = event
+        const main = this.mainSchedule()
+
+        if (!main) return
+
+        // Validate reschedule
+        const validation = this.slotService.validateReschedule(
+            newSlot.startTime,
+            main,
+            participant.participantId,
+        )
+
+        if (!validation.valid) {
+            this.handlerService.handleAlert(
+                'Error',
+                validation.reason || 'Invalid reschedule',
+            )
+            return
+        }
+
+        // Prepare reschedule request
+        const request: RescheduleRequest = {
+            participantScheduleId: participant.id,
+            participantId: participant.participantId,
+            newPersonalSchedule: newSlot.startTime,
+            examScheduleId: participant.examScheduleId,
+        }
+
+        this.performReschedule(request)
+    }
+
+    /**
+     * Open examiner update modal for a participant
+     */
+    openExaminerModal(slot: ScheduleSlot): void {
+        if (!slot.participantSchedule) return
+
+        this.selectedParticipantForExaminer.set(slot.participantSchedule)
+        this.currentSlotForExaminer.set(slot)
+        this.showExaminerModal.set(true)
+    }
+
+    /**
+     * Close examiner update modal
+     */
+    closeExaminerModal(): void {
+        this.showExaminerModal.set(false)
+        this.selectedParticipantForExaminer.set(null)
+        this.currentSlotForExaminer.set(null)
+    }
+
+    /**
+     * Confirm examiner update action
+     */
+    confirmExaminerUpdate(event: {
+        participant: ParticipantSchedule
+        examinerId: string
+    }): void {
+        const { participant, examinerId } = event
+
+        // Prepare request
+        const request = new UpdateExaminerForParticipantRequest({
+            participantScheduleId: participant.id,
+            examinerScheduleIdList: [examinerId],
+        })
+
+        this.performExaminerUpdate(request)
     }
 
     private initializeColumnDefs(): void {
@@ -262,22 +356,23 @@ export class UkomExamMakalahComponent implements OnInit {
                         <button class="btn btn-sm btn-info" data-action="update-examiner">Ubah Penguji</button>
                     `
                 },
-                // onCellClicked: (params) => {
-                //     const slot = params.data as ScheduleSlot
-                //     if (!slot.isOccupied) return
-                //
-                //     const target = params.event.target as HTMLElement
-                //     const action = target.getAttribute('data-action')
-                //
-                //     if (action === 'reschedule') {
-                //         this.openRescheduleModal(slot)
-                //     } else if (action === 'update-examiner') {
-                //         this.openExaminerModal(slot)
-                //     }
-                // },
+                onCellClicked: (params) => {
+                    const slot = params.data as ScheduleSlot
+                    if (!slot.isOccupied) return
+
+                    const target = params.event.target as HTMLElement
+                    const action = target.getAttribute('data-action')
+
+                    if (action === 'reschedule') {
+                        this.openRescheduleModal(slot)
+                    } else if (action === 'update-examiner') {
+                        this.openExaminerModal(slot)
+                    }
+                },
             },
         ]
     }
+
     private transformToMainSchedule(
         examSchedule: ExamSchedule,
         participantScheduleList: ParticipantScheduleList[],
@@ -317,6 +412,73 @@ export class UkomExamMakalahComponent implements OnInit {
         const slots = this.slotService.generateAllSlots(mainSchedule)
         this.allSlots.set(slots)
     }
+
+    /**
+     * Perform reschedule via API
+     */
+    private performReschedule(request: RescheduleRequest): void {
+        const main = this.mainSchedule()
+        if (!main) return
+
+        this.examScheduleService
+            .updateParticipantScheduleById(
+                request.participantScheduleId,
+                request.newPersonalSchedule,
+            )
+            .subscribe({
+                next: () => {
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'Jadwal peserta berhasil diubah.',
+                    )
+
+                    // Notify parent to refresh participants
+                    this.participantListRefresh.emit()
+
+                    this.closeRescheduleModal()
+                },
+                error: (err) => {
+                    console.error('Reschedule error:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengubah jadwal peserta.',
+                    )
+                },
+            })
+    }
+
+    /**
+     * Perform examiner update via API
+     */
+    private performExaminerUpdate(
+        request: UpdateExaminerForParticipantRequest,
+    ): void {
+        this.examScheduleService
+            .updateExaminerForParticipantScheduleByParticipantScheduleId(
+                request,
+            )
+            .subscribe({
+                next: () => {
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'Penguji berhasil diubah.',
+                    )
+
+                    // Notify parent to refresh participants
+                    this.participantListRefresh.emit()
+
+                    this.closeExaminerModal()
+                },
+                error: (err) => {
+                    console.error('Update examiner error:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengubah penguji.',
+                    )
+                },
+            })
+    }
+
     private buildExaminerMap(
         examiners: ExaminerScheduleList[],
     ): Map<string, string> {

@@ -19,6 +19,20 @@ interface GroupedExam {
     participantCount: number
 }
 
+interface OngoingParticipant {
+    participantScheduleId: string
+    participantId: string
+    participantName: string
+    participantNip: string
+    jenisUkom: string
+    examId: string
+    examTypeCode: ExamTypeCategory
+    examDisplayName: string
+    roomUkomId: string
+    personalSchedule: string
+    formattedSchedule: string
+}
+
 const MONTHS = [
     'Jan',
     'Feb',
@@ -61,10 +75,58 @@ export class DashboardComponent implements OnInit {
     completedExams = computed(() =>
         this.groupedExams().filter((e) => e.status === 'completed'),
     )
-    // TODO : Get the current ongoin participant personal schedule,
-    //  the objective is to show current running one, but make it array
-    //  in case more than one personal schedule at same time
-    ongoingParticipantSchedules = computed(() => {})
+    // Participants currently ready for examination
+    // For WAWANCARA/SEMINAR: within personal schedule + duration window
+    // For others: exam started and not yet graded
+    ongoingParticipantSchedules = computed<OngoingParticipant[]>(() => {
+        const now = this.nowGmt7()
+        const ongoingExams = this.ongoingExam()
+        const result: OngoingParticipant[] = []
+
+        ongoingExams.forEach((exam) => {
+            const schedule = exam.schedule
+            const examType = schedule.examTypeCode
+            const duration = schedule.duration || 0 // duration in hours
+            const durationMinutes = duration * 60
+
+            const participants = schedule.participantScheduleList || []
+
+            participants.forEach((pSchedule) => {
+                const isReady = this.isParticipantReadyForExam(
+                    pSchedule,
+                    examType,
+                    durationMinutes,
+                    now,
+                    schedule.startTime,
+                )
+
+                if (isReady) {
+                    const personalTime =
+                        pSchedule.personalSchedule || schedule.startTime
+                    result.push({
+                        participantScheduleId: pSchedule.id,
+                        participantId: pSchedule.participantId,
+                        participantName:
+                            pSchedule.participantUkom?.name || 'Unknown',
+                        participantNip: pSchedule.participantUkom?.nip || '-',
+                        jenisUkom: pSchedule.participantUkom?.jenisUkom || '-',
+                        examId: schedule.id,
+                        examTypeCode: examType,
+                        examDisplayName: exam.displayName,
+                        roomUkomId: schedule.roomUkomId,
+                        personalSchedule: personalTime,
+                        formattedSchedule:
+                            this.formatPersonalScheduleStart(personalTime),
+                    })
+                }
+            })
+        })
+
+        // Sort by personal schedule time (earliest first)
+        return result.sort((a, b) =>
+            a.personalSchedule.localeCompare(b.personalSchedule),
+        )
+    })
 
     // Format current date for display
     formattedCurrentDate = computed(() => {
@@ -188,6 +250,78 @@ export class DashboardComponent implements OnInit {
         return exam.schedule.participantScheduleList || []
     }
 
+    /**
+     * Check if participant is ready for examination based on exam type
+     * - WAWANCARA/SEMINAR: current time is within personal schedule + duration
+     * - Others: exam has started and participant not yet graded
+     */
+    private isParticipantReadyForExam(
+        pSchedule: any,
+        examType: ExamTypeCategory,
+        durationMinutes: number,
+        now: string,
+        examStartTime: string,
+    ): boolean {
+        const personalSchedule = pSchedule.personalSchedule
+        const examAttendance = pSchedule.examAttendance
+
+        // For WAWANCARA and SEMINAR: check if within personal schedule window
+        if (
+            examType === ExamTypeCategory.WAWANCARA ||
+            examType === ExamTypeCategory.SEMINAR
+        ) {
+            if (!personalSchedule) {
+                // No personal schedule assigned yet
+                return false
+            }
+
+            const scheduleEnd = this.addMinutesToDateTime(
+                personalSchedule,
+                durationMinutes,
+            )
+
+            // Current time should be >= personal schedule start and <= end
+            return now >= personalSchedule && now <= scheduleEnd
+        }
+
+        // For PORTOFOLIO, STUDI_KASUS, PRAKTIK, MAKALAH:
+        // Show if exam has started and not yet graded
+        const isExamStarted = now >= examStartTime
+        const isGraded = examAttendance?.isGraded === true
+
+        return isExamStarted && !isGraded
+    }
+
+    /**
+     * Add minutes to a datetime string and return new datetime string
+     */
+    private addMinutesToDateTime(dateTimeStr: string, minutes: number): string {
+        const { year, month, day, hour, minute, second } =
+            this.parseRawDate(dateTimeStr)
+
+        // Create date in local context
+        const date = new Date(year, month - 1, day, hour, minute, second)
+        date.setMinutes(date.getMinutes() + minutes)
+
+        const yyyy = date.getFullYear()
+        const mm = (date.getMonth() + 1).toString().padStart(2, '0')
+        const dd = date.getDate().toString().padStart(2, '0')
+        const hh = date.getHours().toString().padStart(2, '0')
+        const mi = date.getMinutes().toString().padStart(2, '0')
+        const ss = date.getSeconds().toString().padStart(2, '0')
+
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
+    }
+
+    enterExamFromOngoing(participant: OngoingParticipant): void {
+        this.enterExam(
+            participant.participantId,
+            participant.examId,
+            participant.examTypeCode,
+            participant.roomUkomId,
+        )
+    }
+
     getParticipantScheduleTime(pSchedule: any, exam: GroupedExam): string {
         const time = pSchedule.personalSchedule ?? exam.schedule.startTime
 
@@ -206,7 +340,10 @@ export class DashboardComponent implements OnInit {
                 .toString()
                 .padStart(2, '0')}`
 
-        // Same day
+        const formatDateTime = (d: typeof start) =>
+            `${formatDate(d)}, ${formatTime(d)}`
+
+        // Same day - show date once with time range
         if (
             start.year === end.year &&
             start.month === end.month &&
@@ -217,14 +354,8 @@ export class DashboardComponent implements OnInit {
             )} WIB`
         }
 
-        if (start.year === end.year && start.month === end.month) {
-            return `${start.day}–${end.day} ${MONTHS[start.month - 1]} ${
-                start.year
-            } WIB`
-        }
-
-        // Different month or year (date-only)
-        return `${formatDate(start)} - ${formatDate(end)}`
+        // Different days - show full date-time for both start and end
+        return `${formatDateTime(start)} - ${formatDateTime(end)} WIB`
     }
 
     formatPersonalScheduleStart(startTime: string): string {

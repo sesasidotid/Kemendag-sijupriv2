@@ -1,0 +1,16 @@
+
+.available-slots {
+    ::ng-deep .ag-theme-alpine {
+        .ag-row-selected {
+            background-color: #d1e7dd !important;
+        }
+
+        .ag-row.current-slot {
+            background-color: #cfe2ff;
+        }
+
+        .ag-row.current-slot.ag-row-selected {
+            background-color: #d1e7dd !important;
+        }
+    }
+}

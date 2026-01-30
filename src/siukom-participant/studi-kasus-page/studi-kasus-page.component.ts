@@ -32,8 +32,6 @@ import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty
 })
 export class StudiKasusPageComponent implements OnInit {
     questionLoading = signal(false)
-    questionFileUrl: string =
-        'https://morth.nic.in/sites/default/files/dd12-13_0.pdf'
 
     filePreviewService = inject(FilePreviewService)
     confirmationService = inject(ConfirmationService)

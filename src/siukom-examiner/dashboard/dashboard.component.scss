@@ -26,6 +26,148 @@
 }
 
 // ============================================
+// SECTION 1.5: QUICK ACTION - PARTICIPANTS READY
+// ============================================
+.quick-action-section {
+  margin-bottom: 2rem;
+}
+
+.section-title-urgent {
+  color: #0891b2;
+  font-size: clamp(18px, 3.5vw, 24px);
+}
+
+.status-dot-pulse {
+  background: #0891b2;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+.quick-action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quick-action-card {
+  background: linear-gradient(135deg, #ecfeff 0%, #ffffff 100%);
+  border: 3px solid #0891b2;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 16px rgba(8, 145, 178, 0.15);
+  animation: subtle-glow 2s ease-in-out infinite;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0891b2 0%, #06b6d4 100%);
+    border-radius: 12px 12px 0 0;
+  }
+
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes subtle-glow {
+  0%, 100% {
+    box-shadow: 0 4px 16px rgba(8, 145, 178, 0.15);
+  }
+  50% {
+    box-shadow: 0 6px 24px rgba(8, 145, 178, 0.25);
+  }
+}
+
+.quick-action-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.exam-type-badge {
+  background: #0891b2;
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: clamp(12px, 2.5vw, 14px);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.schedule-badge {
+  background: #2d3748;
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: clamp(12px, 2.5vw, 14px);
+  font-weight: 500;
+}
+
+.quick-action-body {
+  margin-bottom: 1.25rem;
+}
+
+.participant-name-large {
+  font-size: clamp(18px, 3.5vw, 22px);
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+
+  i {
+    color: #0891b2;
+    font-size: 24px;
+  }
+}
+
+.participant-nip {
+  font-size: clamp(14px, 2.5vw, 16px);
+  color: #4a5568;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.participant-jenis-ukom {
+  font-size: clamp(13px, 2.5vw, 15px);
+  color: #718096;
+  font-style: italic;
+}
+
+.btn-primary-action.btn-lg {
+  padding: 1rem 1.5rem;
+  font-size: clamp(16px, 3vw, 18px);
+  min-height: 56px;
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(8, 145, 178, 0.5);
+    background: linear-gradient(135deg, #0e7490 0%, #155e75 100%);
+  }
+}
+
+// ============================================
 // SECTION 2: EXAM CARDS (UNIVERSAL STYLES)
 // ============================================
 .exam-card {

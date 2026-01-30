@@ -139,7 +139,7 @@ export class UpdateExaminerModalComponent implements OnInit {
         const headerHeight = 48
         const rowHeight = 42
 
-        // Total = Header + (Rows * Height) + 2px for top/bottom borders`
+        // Total = Header + (Rows * Height) + 2px for top/bottom borders
         const totalHeight = headerHeight + rowCount * rowHeight + 2
 
         return `${totalHeight + 1}px`

@@ -6,17 +6,18 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
 import { Wilayah } from '../../../modules/maintenance/models/wilayah.model'
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
 import { ProvinsiAddComponent } from '../provinsi-add/provinsi-add.component'
 import { ProvinsiUpdateComponent } from '../provinsi-update/provinsi-update.component'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
+
 @Component({
     selector: 'app-provinsi-list',
     standalone: true,
@@ -27,10 +28,10 @@ import { ModalComponent } from '../../../modules/base/components/modal/modal.com
         ReactiveFormsModule,
         ProvinsiAddComponent,
         ProvinsiUpdateComponent,
-        ModalComponent
+        ModalComponent,
     ],
     templateUrl: './provinsi-list.component.html',
-    styleUrl: './provinsi-list.component.scss'
+    styleUrl: './provinsi-list.component.scss',
 })
 export class ProvinsiListComponent {
     pagable: Pagable
@@ -42,7 +43,10 @@ export class ProvinsiListComponent {
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     refresh: boolean = false
 
-    constructor(private router: Router, private tabService: TabService) { }
+    constructor(
+        private router: Router,
+        private tabService: TabService,
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -59,13 +63,13 @@ export class ProvinsiListComponent {
                         this.updateProvinsiData = provinsi
                     }, 'primary')
                     .withIcon('update')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('name')
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             .withQueryParams()
             .build()
@@ -81,12 +85,12 @@ export class ProvinsiListComponent {
                 label: 'Provinsi',
                 icon: 'mdi-list-box',
                 isActive: true,
-                onClick: () => this.handleTabChange(0)
+                onClick: () => this.handleTabChange(0),
             })
             .addTab({
                 label: 'Tambah Provinsi',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1)
+                onClick: () => this.handleTabChange(1),
             })
     }
 
@@ -100,8 +104,6 @@ export class ProvinsiListComponent {
         this.toggleModal()
         this.refresh = !this.refresh
     }
-
-
 
     handleTabChange(tab?: number) {
         this.tab$.next(tab)

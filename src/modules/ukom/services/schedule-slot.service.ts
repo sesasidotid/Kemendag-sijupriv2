@@ -26,8 +26,7 @@ export class ScheduleSlotService {
     private readonly MIDDAY_UNAVAILABLE_END_HOUR = 13 // 13:00
 
     /** Feature toggle */
-    // TODO : make it false after debug complete
-    private disableUnavailableHours = false
+    private disableUnavailableHours = true
 
     /**
      * Parse date string as UTC+7 time (no timezone conversion)

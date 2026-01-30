@@ -1,11 +1,10 @@
-<script src="../ukom-exam-makalah/ukom-exam-makalah.component.ts"></script>
 <div class="d-flex align-items-center mb-3">
     <button (click)="back()" class="btn btn-sm btn-outline-secondary me-3">
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
 </div>
 
-<ng-container *ngIf="isLoading$ | async; else ukomExamContent">
+<ng-container *ngIf="isLoading(); else ukomExamContent">
     <div class="d-flex justify-content-center my-5">
         <div class="spinner-border" role="status"></div>
     </div>
@@ -18,84 +17,77 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label text-muted small"
-                            >Nama Kelas</label
-                        >
+                        <label class="form-label text-muted small">Nama Kelas</label>
                         <div class="fw-semibold fs-5">
                             {{ roomUkomDetail.name }}
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label text-muted small"
-                            >Waktu Mulai</label
-                        >
+                        <label class="form-label text-muted small">Waktu Mulai</label>
                         <div>
                             {{ examDetail()?.startTime | tanggalWaktuIndo }}
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label text-muted small"
-                            >Waktu Selesai</label
-                        >
+                        <label class="form-label text-muted small">Waktu Selesai</label>
                         <div>
                             {{ examDetail()?.endTime | tanggalWaktuIndo }}
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label text-muted small"
-                            >Jenis Ujian</label
-                        >
+                        <label class="form-label text-muted small">Jenis Ujian</label>
                         <div>{{ examDetail()?.examTypeCode }}</div>
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label text-muted small"
-                            >Durasi</label
-                        >
+                        <label class="form-label text-muted small">Durasi</label>
                         <div>{{ examDetail()?.duration | duration }}</div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="d-flex gap-2">
+                            <button (click)="openExaminerListModal()" class="btn btn-info" type="button">
+                                <i class="mdi mdi-account-tie me-2"></i>
+                                Lihat Daftar Penguji ({{ examinerList().length
+                                }})
+                            </button>
+                            <button (click)="openParticipantListModal()" class="btn btn-primary" type="button">
+                                <i class="mdi mdi-account-multiple me-2"></i>
+                                Lihat Daftar Peserta ({{
+                                participantList().length }})
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <ng-container *ngIf="examinerList().length > 0">
-            <div class="card">
-                <div class="card-header fw-semibold">Daftar Penguji</div>
-                <div class="card-body p-0">
-                    <ag-grid-angular
-                        [columnDefs]="columnDefs"
-                        [defaultColDef]="defaultColDef"
-                        [rowData]="examinerList()"
-                        [style.height]="calculateGridHeight()"
-                        [suppressCellFocus]="true"
-                        class="ag-theme-alpine"
-                    ></ag-grid-angular>
-                </div>
-            </div>
-        </ng-container>
-
         <ng-container *ngIf="typeUkom() === ExamTypeCategory.CAT">
-            <app-ukom-exam-cat
-                [examDetail]="examDetail()"
-                [roomUkomDetail]="roomUkomDetail"
-            ></app-ukom-exam-cat>
+            <app-ukom-exam-cat [examDetail]="examDetail()" [roomUkomDetail]="roomUkomDetail"></app-ukom-exam-cat>
         </ng-container>
 
         <ng-container *ngIf="typeUkom() === ExamTypeCategory.WAWANCARA">
-            <app-ukom-exam-wawancara
-                [examDetail]="examDetail()"
-                [examinerList]="examinerList()"
-                [roomUkomDetail]="roomUkomDetail"
-            ></app-ukom-exam-wawancara>
+            <app-ukom-exam-wawancara (participantListRefresh)="refreshParticipantList()" [examDetail]="examDetail()"
+                [examinerList]="examinerList()" [participantList]="participantList()"
+                [roomUkomDetail]="roomUkomDetail"></app-ukom-exam-wawancara>
         </ng-container>
 
         <ng-container *ngIf="typeUkom() === ExamTypeCategory.MAKALAH">
-            <app-ukom-exam-makalah
-                [examinerList]="examinerList()"
-            ></app-ukom-exam-makalah>
+            <app-ukom-exam-makalah (participantListRefresh)="refreshParticipantList()" [examinerList]="examinerList()"
+                [participantList]="participantList()"></app-ukom-exam-makalah>
         </ng-container>
     </div>
 </ng-template>
+
+<!-- Examiner List Modal -->
+<app-examiner-list-modal (close)="closeExaminerListModal()" *ngIf="showExaminerListModal()" [examTypeCode]="typeUkom()"
+    [examinerList]="examinerList()">
+</app-examiner-list-modal>
+
+<!-- Participant List Modal -->
+<app-participant-list-modal (close)="closeParticipantListModal()" *ngIf="showParticipantListModal()"
+    [examTypeCode]="typeUkom()" [participantList]="participantList()">
+</app-participant-list-modal>

@@ -109,8 +109,7 @@
                                 <div class="fs-5 mb-3">
                                     <strong>Jadwal:</strong>
                                     <div class="mt-1">
-                                        {{ exam.examTypeCode ===
-                                        ExamTypeCategory.WAWANCARA ?
+                                        {{ isPersonalScheduleExam(exam) ?
                                         (exam.personalSchedule |
                                         formatExamSchedule: undefined :
                                         exam.duration) : (exam.startTime |
@@ -286,6 +285,48 @@
                                                 [isLoading]="startPortofolioLoading()"
                                                 [label]="isExamExpired(exam.endTime) ? 'Waktu ujian telah selesai' : 'Mulai Ujian'"
                                             ></app-loading-button>
+                                        </ng-template>
+                                    </ng-container>
+
+                                    <!-- SEMINAR -->
+                                    <ng-container
+                                        *ngIf="exam.examTypeCode === ExamTypeCategory.SEMINAR"
+                                    >
+                                        <ng-container
+                                            *ngIf="scoreMap[exam.id]?.score as score; else seminarNoScore"
+                                        >
+                                            <button
+                                                class="btn btn-success btn-lg"
+                                            >
+                                                Seminar Selesai
+                                            </button>
+                                        </ng-container>
+
+                                        <ng-template #seminarNoScore>
+                                            <div
+                                                class="alert alert-info d-flex align-items-start gap-3"
+                                            >
+                                                <i
+                                                    class="mdi mdi-clock-outline fs-4"
+                                                ></i>
+                                                <div>
+                                                    <div class="fw-semibold">
+                                                        Seminar Online (Zoom)
+                                                    </div>
+                                                    <div
+                                                        class="small text-muted"
+                                                    >
+                                                        Silakan bergabung ke
+                                                        Zoom melalui tautan
+                                                        diatas
+                                                        <strong
+                                                            >sesuai jadwal
+                                                            seminar yang telah
+                                                            ditentukan</strong
+                                                        >.
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </ng-template>
                                     </ng-container>
                                 </div>

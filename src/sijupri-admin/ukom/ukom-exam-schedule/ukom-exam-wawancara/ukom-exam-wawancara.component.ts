@@ -1,10 +1,17 @@
-import { Component, effect, inject, input, OnInit, signal } from '@angular/core'
+import {
+    Component,
+    effect,
+    inject,
+    input,
+    OnInit,
+    output,
+    signal,
+} from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { finalize, forkJoin } from 'rxjs'
 import { AgGridAngular } from 'ag-grid-angular'
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
 import {
@@ -45,9 +52,12 @@ import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-
     styleUrl: './ukom-exam-wawancara.component.scss',
 })
 export class UkomExamWawancaraComponent implements OnInit {
+    participantListRefresh = output()
+
     roomUkomDetail = input<RoomUkomDetail>()
     examDetail = input<ExamSchedule>()
     examinerList = input.required<ExaminerScheduleList[]>()
+    participantList = input<ParticipantScheduleList[]>([])
 
     handlerService = inject(HandlerService)
     examScheduleService = inject(UkomExamScheduleService)
@@ -84,9 +94,11 @@ export class UkomExamWawancaraComponent implements OnInit {
         effect(
             () => {
                 const exam = this.examDetail()
+                const participants = this.participantList()
                 if (!exam?.id) return
 
-                this.fetchExamScheduleDetail(exam.id)
+                this.examScheduleDetail.set(exam)
+                this.transformToMainSchedule(exam, participants)
             },
             { allowSignalWrites: true },
         )
@@ -106,35 +118,6 @@ export class UkomExamWawancaraComponent implements OnInit {
 
     ngOnInit(): void {
         this.initializeColumnDefs()
-    }
-
-    /**
-     * Fetch exam schedule detail and transform to MainSchedule
-     */
-    fetchExamScheduleDetail(examId: string): void {
-        this.examScheduleDetailLoading.set(true)
-        forkJoin({
-            schedule:
-                this.examScheduleService.getExamScheduleDetailById(examId),
-            participants:
-                this.examScheduleService.getParticipantListByExamScheduleId(
-                    examId,
-                ),
-        })
-            .pipe(finalize(() => this.examScheduleDetailLoading.set(false)))
-            .subscribe({
-                next: ({ schedule, participants }) => {
-                    this.examScheduleDetail.set(schedule)
-                    this.transformToMainSchedule(schedule, participants)
-                },
-                error: (err) => {
-                    console.error(err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengambil detail jadwal ujian.',
-                    )
-                },
-            })
     }
 
     /**
@@ -410,21 +393,8 @@ export class UkomExamWawancaraComponent implements OnInit {
             )
             .subscribe({
                 next: () => {
-                    // Update in-memory state AFTER API success
-                    const participantIndex =
-                        main.participantScheduleList.findIndex(
-                            (p) => p.id === request.participantScheduleId,
-                        )
-
-                    if (participantIndex !== -1) {
-                        main.participantScheduleList[
-                            participantIndex
-                        ].personalSchedule = request.newPersonalSchedule
-
-                        // Regenerate slots
-                        const slots = this.slotService.generateAllSlots(main)
-                        this.allSlots.set(slots)
-                    }
+                    // Notify parent to refresh participants
+                    this.participantListRefresh.emit()
 
                     this.handlerService.handleAlert(
                         'Success',
@@ -459,30 +429,8 @@ export class UkomExamWawancaraComponent implements OnInit {
             )
             .subscribe({
                 next: () => {
-                    // Update in-memory state AFTER API success
-                    const participantIndex =
-                        main.participantScheduleList.findIndex(
-                            (p) => p.id === request.participantScheduleId,
-                        )
-
-                    if (participantIndex !== -1) {
-                        // Find the new examiner name
-                        const newExaminer = this.examinerList().find(
-                            (e) => e.id === request.examinerScheduleIdList[0],
-                        )
-
-                        if (newExaminer) {
-                            main.participantScheduleList[
-                                participantIndex
-                            ].examinerName =
-                                newExaminer.examinerUkom?.user?.name ??
-                                'Unknown'
-                        }
-
-                        // Regenerate slots to reflect updated examiner
-                        const slots = this.slotService.generateAllSlots(main)
-                        this.allSlots.set(slots)
-                    }
+                    // Notify parent to refresh participants
+                    this.participantListRefresh.emit()
 
                     this.handlerService.handleAlert(
                         'Success',

@@ -6,17 +6,17 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../modules/base/commons/pagable/pagable-builder'
 import { Provinsi } from '../../../modules/maintenance/models/provinsi.model'
 import { BehaviorSubject } from 'rxjs'
 import { CommonModule } from '@angular/common'
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TabService } from '../../../modules/base/services/tab.service'
 import { KabKotaAddComponent } from '../kab-kota-add/kab-kota-add.component'
 import { KabKotaUpdateComponent } from '../kab-kota-update/kab-kota-update.component'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
+
 @Component({
     selector: 'app-kab-kota-list',
     standalone: true,
@@ -25,10 +25,10 @@ import { KabKota } from '../../../modules/maintenance/models/kab-kota.model'
         KabKotaAddComponent,
         CommonModule,
         KabKotaUpdateComponent,
-        ModalComponent
+        ModalComponent,
     ],
     templateUrl: './kab-kota-list.component.html',
-    styleUrl: './kab-kota-list.component.scss'
+    styleUrl: './kab-kota-list.component.scss',
 })
 export class KabKotaListComponent {
     pagable: Pagable
@@ -39,7 +39,10 @@ export class KabKotaListComponent {
 
     refresh: boolean = false
 
-    constructor(private router: Router, private tabService: TabService) { }
+    constructor(
+        private router: Router,
+        private tabService: TabService,
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -56,12 +59,12 @@ export class KabKotaListComponent {
                 label: 'Kabupaten Kota',
                 icon: 'mdi-list-box',
                 isActive: true,
-                onClick: () => this.handleTabChange(0)
+                onClick: () => this.handleTabChange(0),
             })
             .addTab({
                 label: 'Tambah Kabupaten Kota',
                 icon: 'mdi-plus-circle',
-                onClick: () => this.handleTabChange(1)
+                onClick: () => this.handleTabChange(1),
             })
     }
 
@@ -70,7 +73,7 @@ export class KabKotaListComponent {
             .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').build())
             .addPrimaryColumn(new PrimaryColumnBuilder('Tipe', 'type').build())
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Provinsi', 'provinsi|name').build()
+                new PrimaryColumnBuilder('Provinsi', 'provinsi|name').build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -80,13 +83,13 @@ export class KabKotaListComponent {
                         this.updateKabKotaData = kabKota
                     }, 'primary')
                     .withIcon('update')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('name')
                     .withField('Nama Kab/Kota', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
@@ -94,15 +97,15 @@ export class KabKotaListComponent {
                     .withField('Tipe', 'select')
                     .setOptionList([
                         { label: 'KABUPATEN', value: 'KABUPATEN' },
-                        { label: 'KOTA', value: 'KOTA' }
+                        { label: 'KOTA', value: 'KOTA' },
                     ])
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('provinsi|name')
                     .withField('Provinsi', 'text')
-                    .build()
+                    .build(),
             )
             .withQueryParams()
             .build()

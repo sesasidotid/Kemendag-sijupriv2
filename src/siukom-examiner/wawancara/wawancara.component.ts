@@ -24,8 +24,6 @@ import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
-import { UkomRoomService } from '@/modules/ukom/services/ukom-room.service'
-import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
 
@@ -53,6 +51,8 @@ export class WawancaraComponent implements OnInit {
     examStarted = signal(false)
 
     assessmentForm: FormGroup
+    // Keep examScheduleDetail for getting roomUkomId needed for startExamByExaminer
+    examScheduleDetail = signal<ExamSchedule | null>(null)
     private router = inject(Router)
     private route = inject(ActivatedRoute)
     private handlerService = inject(HandlerService)
@@ -63,9 +63,6 @@ export class WawancaraComponent implements OnInit {
     private fb = inject(FormBuilder)
     private formValidationService = inject(FormValidationService)
     private saveTimeout: number | undefined
-
-    // Keep examScheduleDetail for getting roomUkomId needed for startExamByExaminer
-    examScheduleDetail = signal<ExamSchedule | null>(null)
 
     constructor() {
         this.assessmentForm = this.fb.group({

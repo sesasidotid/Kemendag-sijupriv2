@@ -32,6 +32,7 @@ import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedul
 import { ExamDurationPipe } from '@/modules/ukom/pipes/exam-duration.pipe'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { ExamTypeHandlerService } from './exam-type-handler.service'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 
 const MONTHS = [
     'Jan',
@@ -435,6 +436,14 @@ export class DashboardComponent implements OnInit {
 
         return now < start
     }
+
+    isPersonalScheduleExam(exam: ExamSchedule): boolean {
+        return (
+            exam.examTypeCode === ExamTypeCategory.WAWANCARA ||
+            exam.examTypeCode === ExamTypeCategory.SEMINAR
+        )
+    }
+
     private parseToGmt7(dateStr: string): Date {
         const [datePart, timePart] = dateStr.split(' ')
         const [year, month, day] = datePart.split('-').map(Number)

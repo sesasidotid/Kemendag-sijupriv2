@@ -13,6 +13,8 @@ export class ExamAttendance extends Serializable {
     violationCount: number = undefined
     status: string = undefined
     mouseAwayCount: number = undefined
+    // TODO: Change to real field when backend is ready
+    isGraded: boolean = undefined // Flag to indicate if examiner has graded this participant
 
     constructor(object?: { [key: string]: any }) {
         super()

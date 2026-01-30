@@ -89,35 +89,20 @@
 
     <!-- AG Grid Table -->
     <div *ngIf="!isLoading() && allSlots().length > 0" class="grid-section">
-        <ag-grid-angular
-            (gridReady)="onGridReady($event)"
-            [columnDefs]="columnDefs"
-            [defaultColDef]="defaultColDef"
-            [paginationPageSize]="20"
-            [pagination]="true"
-            [rowData]="allSlots()"
-            [style.height.px]="600"
-            [style.width.%]="100"
-            [suppressCellFocus]="true"
-            class="ag-theme-alpine"
-        >
+        <ag-grid-angular (gridReady)="onGridReady($event)" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef"
+            [paginationPageSize]="20" [pagination]="true" [rowData]="allSlots()" [style.height.px]="600"
+            [style.width.%]="100" [suppressCellFocus]="true" class="ag-theme-alpine">
         </ag-grid-angular>
 
         <!-- Legend -->
         <div class="legend mt-3">
             <div class="d-flex flex-wrap gap-3">
                 <div class="legend-item">
-                    <span
-                        class="legend-box"
-                        style="background-color: #d1e7dd"
-                    ></span>
+                    <span class="legend-box" style="background-color: #d1e7dd"></span>
                     <span class="legend-label">Slot Terisi</span>
                 </div>
                 <div class="legend-item">
-                    <span
-                        class="legend-box"
-                        style="background-color: #f8f9fa"
-                    ></span>
+                    <span class="legend-box" style="background-color: #f8f9fa"></span>
                     <span class="legend-label">Slot Tersedia</span>
                 </div>
             </div>
@@ -125,10 +110,7 @@
     </div>
 
     <!-- Empty State -->
-    <div
-        *ngIf="!isLoading() && allSlots().length === 0 && mainSchedule()"
-        class="alert alert-warning text-center"
-    >
+    <div *ngIf="!isLoading() && allSlots().length === 0 && mainSchedule()" class="alert alert-warning text-center">
         <i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i>
         <h5>Tidak Ada Slot</h5>
         <p class="mb-0">
@@ -137,12 +119,21 @@
     </div>
 
     <!-- No Data State -->
-    <div
-        *ngIf="!isLoading() && !mainSchedule()"
-        class="alert alert-info text-center"
-    >
+    <div *ngIf="!isLoading() && !mainSchedule()" class="alert alert-info text-center">
         <i class="bi bi-info-circle fs-1 d-block mb-2"></i>
         <h5>Tidak Ada Data Jadwal</h5>
         <p class="mb-0">Silakan pilih jadwal ujian untuk melihat timetable.</p>
     </div>
 </div>
+
+<!-- Reschedule Modal -->
+<app-reschedule-modal (close)="closeRescheduleModal()" (confirm)="confirmReschedule($event)"
+    *ngIf="showRescheduleModal() && selectedParticipant()" [availableSlots]="availableSlotsForReschedule()"
+    [currentSlot]="currentParticipantSlot()" [participant]="selectedParticipant()!">
+</app-reschedule-modal>
+
+<!-- Update Examiner Modal -->
+<app-update-examiner-modal (close)="closeExaminerModal()" (confirm)="confirmExaminerUpdate($event)"
+    *ngIf="showExaminerModal() && selectedParticipantForExaminer()" [currentSlot]="currentSlotForExaminer()"
+    [examinerList]="examinerList()" [participant]="selectedParticipantForExaminer()!">
+</app-update-examiner-modal>

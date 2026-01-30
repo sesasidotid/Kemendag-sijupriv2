@@ -8,9 +8,9 @@ import {
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { UkomDocumentService } from '@/modules/ukom/services/document.service'
 import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
 import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
@@ -19,6 +19,7 @@ import { SpecificationService } from '@/modules/complement/services/specificatio
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+
 @Component({
     selector: 'app-ukom-document-add',
     standalone: true,
