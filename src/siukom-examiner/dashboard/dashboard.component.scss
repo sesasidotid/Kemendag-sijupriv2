@@ -1,792 +1,710 @@
-// ============================================
-// SECTION 1: WELCOME SECTION
-// ============================================
-.welcome-section {
+/* ============================================
+   EXAMINER DASHBOARD - Elderly-Friendly Design
+
+   COLOR STRATEGY - HIGH CONTRAST:
+   - Primary blue → Action buttons (filled)
+   - Status colors → Badges with colored backgrounds
+   - Secondary buttons → Visible gray background
+   - Cards → White with clear borders
+   - Every element visually distinct from background
+   ============================================ */
+
+/* ============================================
+   DESIGN TOKENS
+   ============================================ */
+
+// Primary action
+$primary-color: #0d6efd;
+$primary-hover: #0b5ed7;
+$primary-light: #e7f1ff;
+
+// Text hierarchy
+$text-dark: #1f2937;
+$text-body: #374151;
+$text-muted: #6b7280;
+$text-light: #9ca3af;
+
+// Backgrounds & Borders
+$bg-page: #f8fafc;
+$bg-card: #ffffff;
+$bg-secondary: #e5e7eb;  // Visible secondary button background
+$border-color: #d1d5db;  // Darker border for visibility
+$border-light: #e5e7eb;
+
+// Status colors - used for badges
+$status-active-bg: #dbeafe;
+$status-active-text: #1e40af;
+$status-upcoming-bg: #fef3c7;
+$status-upcoming-text: #92400e;
+$status-completed-bg: #d1fae5;
+$status-completed-text: #065f46;
+
+// Spacing
+$spacing-xs: 0.5rem;
+$spacing-sm: 0.75rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+
+// Border radius
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+
+// Font sizes
+$font-size-sm: 14px;
+$font-size-base: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 28px;
+
+/* ============================================
+   DASHBOARD HEADER
+   ============================================ */
+.dashboard-header {
   text-align: center;
-  padding: 1.5rem 0;
-  background: linear-gradient(45deg, #2967be, #49ab49);
+  padding: $spacing-lg $spacing-md;
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
   color: white;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(41, 103, 190, 0.2);
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-xl;
+
+  h1 {
+    color: white;
+  }
 }
 
-.welcome-title {
-  font-size: clamp(24px, 5vw, 32px);
+.dashboard-title {
+  font-size: clamp($font-size-2xl, 5vw, $font-size-3xl);
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin: 0 0 $spacing-xs;
   line-height: 1.3;
-  color: white;
 }
 
-.current-date {
-  font-size: clamp(16px, 3vw, 20px);
+.dashboard-date {
+  font-size: clamp($font-size-base, 3vw, $font-size-lg);
   margin: 0;
   opacity: 0.95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
 }
 
-// ============================================
-// SECTION 1.5: QUICK ACTION - PARTICIPANTS READY
-// ============================================
-.quick-action-section {
-  margin-bottom: 2rem;
+/* ============================================
+   LOADING STATE
+   ============================================ */
+.loading-container {
+  text-align: center;
+  padding: $spacing-xl * 2;
 }
 
-.section-title-urgent {
-  color: #0891b2;
-  font-size: clamp(18px, 3.5vw, 24px);
+.loading-text {
+  margin-top: $spacing-md;
+  color: $text-muted;
+  font-size: $font-size-lg;
 }
 
-.status-dot-pulse {
-  background: #0891b2;
-  animation: pulse-dot 1.5s ease-in-out infinite;
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section-primary,
+.section-secondary,
+.section-tertiary {
+  margin-bottom: $spacing-xl;
 }
 
-@keyframes pulse-dot {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.2);
-  }
+.section-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
 }
 
-.quick-action-cards {
+.section-title {
+  font-size: clamp($font-size-lg, 3.5vw, $font-size-xl);
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.section-description {
+  color: $text-muted;
+  font-size: $font-size-base;
+  margin: 0 0 $spacing-lg;
+  line-height: 1.6;
+}
+
+// Count badge - dark background for visibility
+.badge-count {
+  background: $primary-color;
+  color: white;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: 20px;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  min-width: 28px;
+  text-align: center;
+}
+
+/* ============================================
+   STATUS INDICATORS
+   ============================================ */
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.status-active,
+.status-ongoing {
+  background: $primary-color;
+}
+
+.status-upcoming {
+  background: #f59e0b;
+}
+
+.status-completed {
+  background: #10b981;
+}
+
+/* ============================================
+   ACTION CARDS (Participants Ready to Grade)
+   - Clear card with visible border
+   - Prominent action button
+   ============================================ */
+.action-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $spacing-md;
 
-  @media (max-width: 576px) {
+  @media (max-width: 400px) {
     grid-template-columns: 1fr;
   }
 }
 
-.quick-action-card {
-  background: linear-gradient(135deg, #ecfeff 0%, #ffffff 100%);
-  border: 3px solid #0891b2;
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 4px 16px rgba(8, 145, 178, 0.15);
-  animation: subtle-glow 2s ease-in-out infinite;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #0891b2 0%, #06b6d4 100%);
-    border-radius: 12px 12px 0 0;
-  }
-
-  position: relative;
-  overflow: hidden;
+.action-card {
+  background: $primary-light;
+  border: 1px solid #b6d4fe;
+  border-left: 5px solid $primary-color;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
 }
 
-@keyframes subtle-glow {
-  0%, 100% {
-    box-shadow: 0 4px 16px rgba(8, 145, 178, 0.15);
-  }
-  50% {
-    box-shadow: 0 6px 24px rgba(8, 145, 178, 0.25);
-  }
-}
-
-.quick-action-header {
+.action-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+  align-items: flex-start;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: $spacing-sm;
 }
 
-.exam-type-badge {
-  background: #0891b2;
-  color: white;
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
-  font-size: clamp(12px, 2.5vw, 14px);
-  font-weight: 600;
+// Exam type label - colored background for visibility
+.exam-type-label {
+  background: $primary-color;
+  color: #ffffff;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
-.schedule-badge {
-  background: #2d3748;
-  color: white;
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
-  font-size: clamp(12px, 2.5vw, 14px);
+.schedule-label {
+  color: $text-dark;
+  font-size: $font-size-sm;
   font-weight: 500;
-}
-
-.quick-action-body {
-  margin-bottom: 1.25rem;
-}
-
-.participant-name-large {
-  font-size: clamp(18px, 3.5vw, 22px);
-  font-weight: 700;
-  color: #1a202c;
-  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
+  gap: 4px;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+}
 
-  i {
-    color: #0891b2;
+.action-card-body {
+  flex: 1;
+}
+
+.action-card-body .participant-name {
+  font-size: clamp($font-size-lg, 3.5vw, $font-size-xl);
+  font-weight: 700;
+  color: $text-dark;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+
+  .mdi {
+    color: $text-muted;
     font-size: 24px;
   }
 }
 
-.participant-nip {
-  font-size: clamp(14px, 2.5vw, 16px);
-  color: #4a5568;
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-}
-
-.participant-jenis-ukom {
-  font-size: clamp(13px, 2.5vw, 15px);
-  color: #718096;
-  font-style: italic;
-}
-
-.btn-primary-action.btn-lg {
-  padding: 1rem 1.5rem;
-  font-size: clamp(16px, 3vw, 18px);
-  min-height: 56px;
-  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
-  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4);
-
-  &:hover:not(:disabled) {
-    box-shadow: 0 6px 20px rgba(8, 145, 178, 0.5);
-    background: linear-gradient(135deg, #0e7490 0%, #155e75 100%);
-  }
-}
-
-// ============================================
-// SECTION 2: EXAM CARDS (UNIVERSAL STYLES)
-// ============================================
-.exam-card {
-  background: white;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  @media (max-width: 576px) {
-    padding: 0.75rem;
-  }
-}
-
-.exam-content {
-  margin-bottom: 1.5rem;
-}
-
-.exam-title {
-  font-size: clamp(22px, 4vw, 28px);
-  font-weight: 700;
-  margin-bottom: 1rem;
-  line-height: 1.4;
-  color: #1a202c;
-}
-
-.exam-title-secondary {
-  font-size: clamp(18px, 3.5vw, 22px);
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  line-height: 1.4;
-  color: #2d3748;
-}
-
-.exam-schedule {
-  font-size: clamp(16px, 3vw, 18px);
-  color: #4a5568;
+.action-card-body .participant-detail {
   display: flex;
-  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-base;
   line-height: 1.75;
+  color: $text-muted;
 
-  i {
-    font-size: 20px;
-    color: #0d6efd;
+  .detail-label {
+    font-weight: 600;
+    color: $text-body;
   }
 }
 
-// ============================================
-// SECTION 3: ONGOING EXAM (BLUE / PRIMARY)
-// ============================================
-.exam-card-ongoing {
-  border: 3px solid #0d6efd;
-  background: linear-gradient(135deg, #e7f1ff 0%, #ffffff 100%);
-  //animation: pulse-border 2s ease-in-out infinite;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #0d6efd 0%, #6ea8fe 100%);
-  }
-}
-
-@keyframes pulse-border {
-  0%,
-  100% {
-    box-shadow: 0 4px 16px rgba(13, 110, 253, 0.3);
-  }
-  50% {
-    box-shadow: 0 8px 24px rgba(13, 110, 253, 0.5);
-  }
-}
-
-.exam-status-badge {
-  display: inline-flex;
-  align-items: center;
-  background: #0d6efd;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 50px;
-  font-weight: 700;
-  font-size: clamp(14px, 2.5vw, 16px);
-  margin-bottom: 1.5rem;
-}
-
-.status-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-right: 0.75rem;
-}
-
-.status-dot-ongoing {
-  background: white;
-  animation: blink 1.5s ease-in-out infinite;
-}
-
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-
-// ============================================
-// SECTION 4: PRIMARY ACTION BUTTON (BLUE)
-// ============================================
-.btn-primary-action {
+/* Primary Action Button - Blue filled, high contrast */
+.btn-action-primary {
   width: 100%;
-  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+  background: $primary-color;
   color: white;
   border: none;
-  border-radius: 12px;
-  padding: 1.25rem 2rem;
-  font-size: clamp(18px, 3.5vw, 22px);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
-  min-height: 64px;
-
-  &:hover:not(:disabled) {
-    //transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.5);
-    background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%);
-  }
-
-  //&:active:not(:disabled) {
-  //  transform: translateY(0);
-  //}
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-
-// ============================================
-// SECTION 5: UPCOMING EXAMS (YELLOW/WARNING)
-// ============================================
-.exam-card-upcoming {
-  border: 3px solid #d69e2e;
-  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #d69e2e 0%, #d6a440 100%);
-  }
-}
-
-.section-title {
-  font-size: clamp(18px, 3vw, 22px);
-  font-weight: 700;
-  color: #2d3748;
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-
-  .status-dot {
-    margin-right: 0.75rem;
-  }
-}
-
-.status-dot-upcoming {
-  background: #d69e2e;
-}
-
-.exam-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.btn-secondary-action {
-  width: 100%;
-  background: white;
-  color: #d69e2e;
-  border: 2px solid #d69e2e;
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  font-size: clamp(16px, 3vw, 18px);
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-lg;
+  font-size: clamp($font-size-base, 3vw, $font-size-lg);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.3s ease;
   min-height: 56px;
-
-  &:hover {
-    background: #d69e2e;
-    color: white;
-    //transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(214, 158, 46, 0.3);
-  }
-}
-
-// ============================================
-// SECTION 6: COMPLETED EXAMS (GREEN)
-// ============================================
-.exam-card-completed {
-  border: 3px solid #38a169;
-  background: linear-gradient(135deg, #f0fff4 0%, #ffffff 100%);
-
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #38a169 0%, #47a171 100%);
-  }
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  padding: 1rem;
-  background: white;
-  border-radius: 12px;
-  margin-bottom: 1rem;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: #f7fafc;
-  }
-}
-
-.toggle-icon {
-  font-size: 28px;
-  color: #4a5568;
-  transition: transform 0.3s ease;
-}
-
-.status-dot-completed {
-  background: #38a169;
-}
-
-.exam-completed-badge {
-  display: inline-flex;
-  align-items: center;
-  background: #38a169;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  font-size: clamp(14px, 2.5vw, 16px);
-  font-weight: 600;
-  margin-top: 0.75rem;
-
-  i {
-    font-size: 18px;
-  }
-}
-
-.animate-slide-down {
-  animation: slideDown 0.6s ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    //transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    //transform: translateY(0);
-  }
-}
-
-// ============================================
-// SECTION 7: EMPTY STATES
-// ============================================
-.exam-card-empty {
-  border: 2px dashed #cbd5e0;
-  background: #f7fafc;
-  text-align: center;
-  padding: 3rem 2rem;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.empty-icon {
-  font-size: clamp(48px, 10vw, 64px);
-  color: #38a169;
-  margin-bottom: 1rem;
-}
-
-.empty-text {
-  font-size: clamp(18px, 3.5vw, 22px);
-  color: #4a5568;
-  font-weight: 600;
-  margin: 0;
-}
-
-.empty-title {
-  font-size: clamp(20px, 4vw, 24px);
-  color: #2d3748;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.empty-description {
-  font-size: clamp(16px, 3vw, 18px);
-  color: #718096;
-  margin: 0;
-}
-
-// ============================================
-// SECTION 8: RESPONSIVE & ACCESSIBILITY
-// ============================================
-@media (max-width: 768px) {
-  .welcome-section {
-    padding: 1.25rem 1rem;
-  }
-
-  .exam-card {
-    padding: 1.5rem;
-  }
-
-  .btn-primary-action,
-  .btn-secondary-action {
-    padding: 1rem 1.25rem;
-  }
-}
-
-// Touch target accessibility
-button,
-.section-header {
-  min-height: 48px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-// Focus states for keyboard navigation
-button:focus-visible,
-.section-header:focus-visible {
-  outline: 3px solid #0d6efd;
-  outline-offset: 2px;
-}
-
-// High contrast for better readability
-@media (prefers-contrast: high) {
-  .exam-card {
-    border: 2px solid #2d3748;
-  }
-
-  .exam-card-ongoing {
-    border-width: 4px;
-  }
-}
-
-// Reduced motion for accessibility
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-// ============================================
-// SECTION 9: PARTICIPANT LIST STYLES
-// ============================================
-
-// Participant count badge
-.participant-count-badge {
-  display: inline-flex;
-  align-items: center;
-  background: #0d6efd;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  font-size: clamp(14px, 2.5vw, 16px);
-  font-weight: 600;
-  margin-top: 0.75rem;
-
-  i {
-    font-size: 18px;
-  }
-}
-
-// Small secondary button for toggling participant list
-.btn-secondary-small {
-  width: 100%;
-  background: white;
-  color: #0d6efd;
-  border: 2px solid #0d6efd;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  font-size: clamp(14px, 2.5vw, 16px);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-
-  i {
-    font-size: 18px;
-  }
+  gap: $spacing-sm;
+  transition: background-color 0.15s ease;
 
   &:hover {
-    background: #0d6efd;
-    color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    background: $primary-hover;
   }
 
   &:focus-visible {
-    outline: 3px solid #0d6efd;
+    outline: 3px solid rgba($primary-color, 0.5);
+    outline-offset: 2px;
+  }
+
+  .mdi {
+    font-size: 22px;
+  }
+}
+
+/* ============================================
+   SCHEDULE CARDS
+   - White cards with visible borders
+   - Status shown via COLORED badges
+   ============================================ */
+.schedule-cards {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.schedule-card {
+  background: $bg-card;
+  border: 1px solid #cbd5e1;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.schedule-card-ongoing,
+.schedule-card-upcoming,
+.schedule-card-completed {
+  border-left: 5px solid transparent;
+}
+
+.schedule-card-ongoing {
+  border-left-color: $status-active-text;
+  background: #f0f6ff;
+}
+
+.schedule-card-upcoming {
+  border-left-color: $status-upcoming-text;
+  background: #fff8e6;
+}
+
+.schedule-card-completed {
+  border-left-color: $status-completed-text;
+  background: #f0fff7;
+}
+
+/* Status Labels - COLORED backgrounds for high visibility */
+.schedule-status-label {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  font-weight: 700;
+  margin-bottom: $spacing-sm;
+  border: 1px solid transparent;
+}
+
+.status-ongoing-label {
+  background: $status-active-bg;
+  color: $status-active-text;
+  border-color: #bfdbfe;
+}
+
+.status-upcoming-label {
+  background: $status-upcoming-bg;
+  color: $status-upcoming-text;
+  border-color: #fde68a;
+}
+
+.status-completed-label {
+  background: $status-completed-bg;
+  color: $status-completed-text;
+  border-color: #a7f3d0;
+}
+
+.schedule-title {
+  font-size: clamp($font-size-lg, 3.5vw, $font-size-xl);
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0 0 $spacing-sm;
+}
+
+.schedule-meta {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-base;
+  color: $text-body;
+
+  .mdi {
+    color: $text-muted;
+    font-size: 20px;
+  }
+}
+
+/* ============================================
+   EXPAND BUTTON - Visible gray background
+   ============================================ */
+.btn-expand {
+  width: 100%;
+  background: #eef2f7;
+  color: $text-dark;
+  border: 2px solid #94a3b8;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  font-size: $font-size-base;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    border-color: #64748b;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($primary-color, 0.4);
+    outline-offset: 2px;
+  }
+
+  .mdi {
+    font-size: 20px;
+    color: #475569;
+  }
+}
+
+/* ============================================
+   PARTICIPANT LIST (Expanded)
+   ============================================ */
+.participant-list {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 2px solid #cbd5e1;
+}
+
+.participant-list-heading {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0 0 $spacing-md;
+}
+
+.participant-items {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.participant-item {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #94a3b8;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
+}
+
+.participant-number {
+  width: 36px;
+  height: 36px;
+  background: $primary-color;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-sm;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.participant-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.participant-name-row {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $text-dark;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+
+  .mdi {
+    color: $text-muted;
+    font-size: 22px;
+  }
+}
+
+.participant-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: $spacing-sm;
+}
+
+.detail-row {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  display: flex;
+  gap: $spacing-xs;
+
+  .detail-label {
+    font-weight: 600;
+    color: $text-body;
+  }
+}
+
+// Jenis UKom badge - GREEN background for visibility
+.jenis-ukom-badge {
+  display: inline-block;
+  background: $primary-light;
+  color: $primary-color;
+  border: 1px solid #b6d4fe;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  font-weight: 600;
+}
+
+/* Enter Exam Button - Primary blue */
+.btn-enter-exam {
+  background: $primary-color;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: $primary-hover;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($primary-color, 0.5);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 576px) {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   SECTION TOGGLE (Completed Exams)
+   ============================================ */
+.section-toggle {
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid #94a3b8;
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  min-height: 56px;
+  margin-bottom: $spacing-md;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #f1f5f9;
+    border-color: #64748b;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($primary-color, 0.4);
     outline-offset: 2px;
   }
 }
 
-// Participant list container
-.participant-list-container {
-  background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
-  border: 2px solid #0d6efd;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-top: 1rem;
-
-  @media (max-width: 576px) {
-    padding: 1rem;
-  }
+.section-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
 }
 
-.participant-list-title {
-  font-size: clamp(18px, 3.5vw, 20px);
+.section-toggle-title {
+  font-size: $font-size-lg;
   font-weight: 700;
-  color: #2d3748;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e2e8f0;
-
-  i {
-    font-size: 22px;
-    color: #0d6efd;
-  }
+  color: $text-dark;
 }
 
-// Participant cards grid
-.participant-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.section-toggle-icon {
+  font-size: 24px;
+  color: $text-body;
 }
 
-// Individual participant card - Elder friendly design
-.participant-card {
-  background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1.25rem;
-  display: flex;
-  gap: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-
-  @media (max-width: 576px) {
-    padding: 1rem;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-}
-
-// Participant number badge
-.participant-number {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  //background: linear-gradient(135deg, #0d6efd 0%, #764ba2 100%);
-  background: #0d6efd;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(18px, 3.5vw, 22px);
-  font-weight: 700;
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-
-  @media (max-width: 576px) {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-}
-
-// Participant information
-.participant-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.participant-name {
-  font-size: clamp(18px, 3.5vw, 20px);
-  font-weight: 700;
-  color: #1a202c;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.25rem;
-
-  i {
-    color: #0d6efd;
-    font-size: 22px;
-  }
-}
-
-// Participant detail row - Large font for elder users
-.participant-detail {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: clamp(15px, 3vw, 17px);
-  line-height: 1.6;
-  padding: 0.25rem 0;
-
-  @media (max-width: 576px) {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-}
-
-.detail-label {
-  font-weight: 600;
-  color: #4a5568;
-  min-width: 180px;
-
-  @media (max-width: 576px) {
-    min-width: auto;
-  }
-}
-
-.detail-value {
-  color: #2d3748;
-  font-weight: 500;
-  flex: 1;
-}
-
-// Participant badge for jenis ukom
-.participant-badge {
-  display: inline-flex;
-  align-items: center;
-  //background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  background: #48bb78;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  font-size: clamp(13px, 2.5vw, 15px);
-  font-weight: 600;
-  margin-top: 0.5rem;
-  align-self: flex-start;
-  box-shadow: 0 2px 6px rgba(72, 187, 120, 0.3);
-}
-
-// Empty state for no participants
-.no-participants {
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+.empty-state {
   text-align: center;
-  padding: 2rem;
-  color: #718096;
-  font-size: clamp(16px, 3vw, 18px);
+  padding: $spacing-xl;
+  background: #f0fdf4;
+  border: 2px dashed #86efac;
+  border-radius: $radius-md;
 
-  i {
+  .mdi {
     font-size: 48px;
-    color: #cbd5e0;
-    margin-bottom: 1rem;
+    color: #10b981;
+    display: block;
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    color: $text-body;
+    font-size: $font-size-base;
+    margin: 0;
   }
 }
 
-// Responsive adjustments for participant list
-@media (max-width: 768px) {
-  .participant-list-container {
-    padding: 1rem;
+.empty-state-full {
+  text-align: center;
+  padding: $spacing-xl * 2;
+  background: $bg-card;
+  border: 2px dashed $border-color;
+  border-radius: $radius-lg;
+
+  .mdi {
+    font-size: 64px;
+    color: $text-light;
+    display: block;
+    margin-bottom: $spacing-md;
   }
 
-  .participant-card {
-    padding: 1rem;
+  h3 {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 $spacing-sm;
   }
 
-  .participant-number {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
+  p {
+    color: $text-muted;
+    font-size: $font-size-base;
+    margin: 0;
+    max-width: 400px;
+    margin-inline: auto;
+    line-height: 1.6;
   }
 }
 
+/* ============================================
+   ACCESSIBILITY & RESPONSIVENESS
+   ============================================ */
+
+button {
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-contrast: high) {
+  .schedule-card,
+  .action-card {
+    border-width: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-header {
+    padding: $spacing-md;
+  }
+
+  .action-card,
+  .schedule-card {
+    padding: $spacing-md;
+  }
+
+  .section-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.font-monospace {
+  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  letter-spacing: 0.5px;
+}
