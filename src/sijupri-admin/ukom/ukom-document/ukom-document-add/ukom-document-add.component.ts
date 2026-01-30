@@ -1,7 +1,13 @@
 import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Output } from '@angular/core'
 import { LucideAngularModule } from 'lucide-angular'
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
+import {
+    FormControl,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators,
+} from '@angular/forms'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'

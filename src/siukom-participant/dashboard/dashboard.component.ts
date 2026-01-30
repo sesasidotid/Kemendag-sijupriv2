@@ -430,6 +430,7 @@ export class DashboardComponent implements OnInit {
 
         return now > end
     }
+
     isExamNotStartedYet(startTime: string): boolean {
         const now = new Date()
         const start = this.parseToGmt7(startTime)
@@ -441,6 +442,47 @@ export class DashboardComponent implements OnInit {
         return (
             exam.examTypeCode === ExamTypeCategory.WAWANCARA ||
             exam.examTypeCode === ExamTypeCategory.SEMINAR
+        )
+    }
+
+    isExamScheduleHaveScore(examScheduleId: string) {
+        const score = this.scoreMap[examScheduleId]
+        return score !== null && score !== undefined
+    }
+
+    // Helper method for template - checks if exam has score
+    hasScore(examScheduleId: string): boolean {
+        return this.isExamScheduleHaveScore(examScheduleId)
+    }
+
+    isExamCompleted(exam: ExamSchedule): boolean {
+        return (
+            this.isExamExpired(exam.endTime) ||
+            this.isExamScheduleHaveScore(exam.id)
+        )
+    }
+
+    // New: Exam time is over but no score (missed/not answered)
+    isExamMissed(exam: ExamSchedule): boolean {
+        return (
+            this.isExamExpired(exam.endTime) &&
+            !this.isExamScheduleHaveScore(exam.id)
+        )
+    }
+
+    isExamOngoing(exam: ExamSchedule): boolean {
+        return (
+            !this.hasScore(exam.id) &&
+            !this.isExamExpired(exam.endTime) &&
+            this.canStartExam(exam.startTime, exam.endTime)
+        )
+    }
+
+    isExamUpcoming(exam: ExamSchedule): boolean {
+        return (
+            !this.hasScore(exam.id) &&
+            !this.isExamExpired(exam.endTime) &&
+            this.isExamNotStartedYet(exam.startTime)
         )
     }
 
