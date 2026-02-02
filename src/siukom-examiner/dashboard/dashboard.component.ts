@@ -8,7 +8,14 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
-import { EMPTY, finalize, switchMap, timer } from 'rxjs'
+import { EMPTY, finalize, forkJoin, switchMap, timer } from 'rxjs'
+import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
+import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
+import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
+import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jabatan.service'
+import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
+import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
+import { BidangJabatan } from '@/modules/maintenance/models/bidang-jabatan.model'
 
 type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
 
@@ -31,6 +38,7 @@ interface OngoingParticipant {
     roomUkomId: string
     personalSchedule: string
     formattedSchedule: string
+    roomUkom: RoomUkomDetail
 }
 
 const MONTHS = [
@@ -63,7 +71,6 @@ export class DashboardComponent implements OnInit {
     selectedExamForParticipants = signal<GroupedExam | null>(null)
     nowGmt7 = signal<string>(this.getNowGmt7String())
     showCompletedExams = signal(false)
-
     // Computed values
     groupedExams = computed(() => this.groupExamsByStatus())
     ongoingExam = computed(() =>
@@ -75,8 +82,6 @@ export class DashboardComponent implements OnInit {
     completedExams = computed(() =>
         this.groupedExams().filter((e) => e.status === 'completed'),
     )
-    // Participants currently ready for examination
-    // For WAWANCARA/SEMINAR: within personal schedule + duration window
     // For others: exam started and not yet graded
     ongoingParticipantSchedules = computed<OngoingParticipant[]>(() => {
         const now = this.nowGmt7()
@@ -103,6 +108,12 @@ export class DashboardComponent implements OnInit {
                 if (isReady) {
                     const personalTime =
                         pSchedule.personalSchedule || schedule.startTime
+
+                    // Map codes to names for roomUkom
+                    const mappedRoomUkom = this.mapRoomUkomCodesToNames(
+                        schedule.roomUkom,
+                    )
+
                     result.push({
                         participantScheduleId: pSchedule.id,
                         participantId: pSchedule.participantId,
@@ -117,6 +128,7 @@ export class DashboardComponent implements OnInit {
                         personalSchedule: personalTime,
                         formattedSchedule:
                             this.formatPersonalScheduleStart(personalTime),
+                        roomUkom: mappedRoomUkom,
                     })
                 }
             })
@@ -127,7 +139,6 @@ export class DashboardComponent implements OnInit {
             a.personalSchedule.localeCompare(b.personalSchedule),
         )
     })
-
     // Format current date for display
     formattedCurrentDate = computed(() => {
         const raw = this.nowGmt7()
@@ -137,17 +148,26 @@ export class DashboardComponent implements OnInit {
             .toString()
             .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
     })
-
+    // Reference data for mapping codes to names
+    private jabatanList = signal<Jabatan[]>([])
+    // Participants currently ready for examination
+    // For WAWANCARA/SEMINAR: within personal schedule + duration window
+    private jenjangList = signal<Jenjang[]>([])
+    private bidangJabatanList = signal<BidangJabatan[]>([])
     private router = inject(Router)
     private jenisUkomService = inject(JenisUkomService)
     private handlerService = inject(HandlerService)
     private examScheduleService = inject(UkomExamScheduleService)
     private examinerService = inject(UkomExaminerService)
+    private jabatanService = inject(JabatanService)
+    private jenjangService = inject(JenjangService)
+    private bidangJabatanService = inject(BidangJabatanService)
 
     private schedules = signal<ExamSchedule[]>([])
 
     ngOnInit(): void {
         this.updateNowGmt7()
+        this.fetchReferenceData()
         this.fetchExaminerSchedule()
 
         const now = new Date()
@@ -156,6 +176,26 @@ export class DashboardComponent implements OnInit {
 
         timer(msUntilNextMinute, 60000).subscribe(() => {
             this.updateNowGmt7()
+        })
+    }
+
+    /**
+     * Fetch reference data for mapping codes to names
+     */
+    fetchReferenceData(): void {
+        forkJoin({
+            jabatan: this.jabatanService.findAll(),
+            jenjang: this.jenjangService.findAll(),
+            bidangJabatan: this.bidangJabatanService.findAll(),
+        }).subscribe({
+            next: (result) => {
+                this.jabatanList.set(result.jabatan)
+                this.jenjangList.set(result.jenjang)
+                this.bidangJabatanList.set(result.bidangJabatan)
+            },
+            error: (err) => {
+                console.error('Error fetching reference data:', err)
+            },
         })
     }
 
@@ -246,8 +286,79 @@ export class DashboardComponent implements OnInit {
         return this.jenisUkomService.getLabelByValue(jenisUkom) || jenisUkom
     }
 
+    /**
+     * Check if an exam has been graded
+     * In examiner context, graded status is on the exam schedule itself
+     */
+    isExamGraded(exam: GroupedExam): boolean {
+        return exam.schedule.graded === true
+    }
+
     getParticipants(exam: GroupedExam) {
-        return exam.schedule.participantScheduleList || []
+        const participants = exam.schedule.participantScheduleList || []
+        // Map roomUkom codes to names for each participant
+        const mappedRoomUkom = this.mapRoomUkomCodesToNames(
+            exam.schedule.roomUkom,
+        )
+
+        // Add the mapped roomUkom to each participant for display
+        return participants.map((p) => ({
+            ...p,
+            roomUkom: mappedRoomUkom,
+        }))
+    }
+
+    enterExamFromOngoing(participant: OngoingParticipant): void {
+        this.enterExam(
+            participant.participantId,
+            participant.examId,
+            participant.examTypeCode,
+            participant.roomUkomId,
+        )
+    }
+
+    getParticipantScheduleTime(pSchedule: any, exam: GroupedExam): string {
+        const time = pSchedule.personalSchedule ?? exam.schedule.startTime
+
+        return this.formatPersonalScheduleStart(time) + ' (WIB)'
+    }
+
+    formatDateRange(startTime: string, endTime: string): string {
+        const start = this.parseRawDate(startTime)
+        const end = this.parseRawDate(endTime)
+
+        const formatDate = (d: typeof start) =>
+            `${d.day} ${MONTHS[d.month - 1]} ${d.year}`
+
+        const formatTime = (d: typeof start) =>
+            `${d.hour.toString().padStart(2, '0')}:${d.minute
+                .toString()
+                .padStart(2, '0')}`
+
+        const formatDateTime = (d: typeof start) =>
+            `${formatDate(d)}, ${formatTime(d)}`
+
+        // Same day - show date once with time range
+        if (
+            start.year === end.year &&
+            start.month === end.month &&
+            start.day === end.day
+        ) {
+            return `${formatDate(start)}, ${formatTime(start)} - ${formatTime(
+                end,
+            )} WIB`
+        }
+
+        // Different days - show full date-time for both start and end
+        return `${formatDateTime(start)} - ${formatDateTime(end)} WIB`
+    }
+
+    formatPersonalScheduleStart(startTime: string): string {
+        const { year, month, day, hour, minute } = this.parseRawDate(startTime)
+
+        return `${day} ${MONTHS[month - 1]} ${year}, ${hour
+            .toString()
+            .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
     }
 
     /**
@@ -311,59 +422,6 @@ export class DashboardComponent implements OnInit {
         const ss = date.getSeconds().toString().padStart(2, '0')
 
         return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
-    }
-
-    enterExamFromOngoing(participant: OngoingParticipant): void {
-        this.enterExam(
-            participant.participantId,
-            participant.examId,
-            participant.examTypeCode,
-            participant.roomUkomId,
-        )
-    }
-
-    getParticipantScheduleTime(pSchedule: any, exam: GroupedExam): string {
-        const time = pSchedule.personalSchedule ?? exam.schedule.startTime
-
-        return this.formatPersonalScheduleStart(time) + ' (WIB)'
-    }
-
-    formatDateRange(startTime: string, endTime: string): string {
-        const start = this.parseRawDate(startTime)
-        const end = this.parseRawDate(endTime)
-
-        const formatDate = (d: typeof start) =>
-            `${d.day} ${MONTHS[d.month - 1]} ${d.year}`
-
-        const formatTime = (d: typeof start) =>
-            `${d.hour.toString().padStart(2, '0')}:${d.minute
-                .toString()
-                .padStart(2, '0')}`
-
-        const formatDateTime = (d: typeof start) =>
-            `${formatDate(d)}, ${formatTime(d)}`
-
-        // Same day - show date once with time range
-        if (
-            start.year === end.year &&
-            start.month === end.month &&
-            start.day === end.day
-        ) {
-            return `${formatDate(start)}, ${formatTime(start)} - ${formatTime(
-                end,
-            )} WIB`
-        }
-
-        // Different days - show full date-time for both start and end
-        return `${formatDateTime(start)} - ${formatDateTime(end)} WIB`
-    }
-
-    formatPersonalScheduleStart(startTime: string): string {
-        const { year, month, day, hour, minute } = this.parseRawDate(startTime)
-
-        return `${day} ${MONTHS[month - 1]} ${year}, ${hour
-            .toString()
-            .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
     }
 
     private groupExamsByStatus(): GroupedExam[] {
@@ -450,5 +508,50 @@ export class DashboardComponent implements OnInit {
         }
 
         return displayNames[examTypeCode] || examTypeCode
+    }
+
+    /**
+     * Map jabatan, jenjang, and bidang jabatan codes to their names
+     */
+    private mapRoomUkomCodesToNames(
+        roomUkom: RoomUkomDetail | null | undefined,
+    ): RoomUkomDetail {
+        if (!roomUkom) {
+            return new RoomUkomDetail()
+        }
+
+        const mappedRoomUkom = new RoomUkomDetail(roomUkom)
+
+        // Map jabatan code to name
+        if (roomUkom.jabatanCode) {
+            const jabatan = this.jabatanList().find(
+                (j) => j.code === roomUkom.jabatanCode,
+            )
+            if (jabatan) {
+                mappedRoomUkom.jabatanName = jabatan.name
+            }
+        }
+
+        // Map jenjang code to name
+        if (roomUkom.jenjangCode) {
+            const jenjang = this.jenjangList().find(
+                (j) => j.code === roomUkom.jenjangCode,
+            )
+            if (jenjang) {
+                mappedRoomUkom.jenjangName = jenjang.name
+            }
+        }
+
+        // Map bidang jabatan code to name
+        if (roomUkom.bidangJabatanCode) {
+            const bidangJabatan = this.bidangJabatanList().find(
+                (bj) => bj.code === roomUkom.bidangJabatanCode,
+            )
+            if (bidangJabatan) {
+                mappedRoomUkom.bidangJabatanName = bidangJabatan.name
+            }
+        }
+
+        return mappedRoomUkom
     }
 }

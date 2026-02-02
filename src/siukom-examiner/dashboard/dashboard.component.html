@@ -75,6 +75,27 @@
                             }}</span
                         >
                     </div>
+                    <div class="participant-detail">
+                        <span class="detail-label">Jabatan yang Dituju:</span>
+                        <span class="detail-value"
+                            >{{ participant.roomUkom.jabatanName }}</span
+                        >
+                    </div>
+                    <div class="participant-detail">
+                        <span class="detail-label">Jenjang yang Dituju:</span>
+                        <span class="detail-value"
+                            >{{participant.roomUkom.jenjangName }}</span
+                        >
+                    </div>
+                    <div
+                        *ngIf="participant?.roomUkom?.bidangJabatanName"
+                        class="participant-detail"
+                    >
+                        <span class="detail-label">Bidang Jabatan:</span>
+                        <span class="detail-value"
+                            >{{participant.roomUkom.bidangJabatanName }}</span
+                        >
+                    </div>
                 </div>
 
                 <!-- Primary Action Button -->
@@ -93,7 +114,7 @@
     <!-- ============================================
          SECTION 2: Ongoing Exams (Reference)
     ============================================ -->
-    <section class="section-secondary">
+    <section *ngIf="ongoingExam().length > 0" class="section-secondary">
         <div class="section-header-bar">
             <h2 class="section-title">
                 <span class="status-indicator status-ongoing"></span>
@@ -104,112 +125,177 @@
             >
         </div>
 
-        <ng-container *ngIf="ongoingExam().length > 0; else noOngoingExams">
-            <div class="schedule-cards">
-                <article
-                    *ngFor="let exam of ongoingExam()"
-                    class="schedule-card schedule-card-ongoing"
-                >
-                    <!-- Status Label (Text + Color) -->
-                    <div class="schedule-status-label status-ongoing-label">
-                        <span class="mdi mdi-circle-medium me-1"></span>
-                        Sedang Berlangsung
+        <div class="schedule-cards">
+            <article
+                *ngFor="let exam of ongoingExam()"
+                class="schedule-card schedule-card-ongoing"
+            >
+                <!-- Status Label (Text + Color) -->
+                <div class="schedule-status-label status-ongoing-label">
+                    <span class="mdi mdi-circle-medium me-1"></span>
+                    Sedang Berlangsung
+                </div>
+
+                <!-- Schedule Info -->
+                <h3 class="schedule-title">{{ exam.displayName }}</h3>
+
+                <div class="schedule-meta">
+                    <div class="meta-item">
+                        <span class="mdi mdi-calendar-clock me-1"></span>
+                        {{ formatDateRange( exam.schedule.startTime,
+                        exam.schedule.endTime ) }}
                     </div>
-
-                    <!-- Schedule Info -->
-                    <h3 class="schedule-title">{{ exam.displayName }}</h3>
-
-                    <div class="schedule-meta">
-                        <div class="meta-item">
-                            <span class="mdi mdi-calendar-clock me-1"></span>
-                            {{ formatDateRange( exam.schedule.startTime,
-                            exam.schedule.endTime ) }}
-                        </div>
-                        <div class="meta-item">
-                            <span class="mdi mdi-account-group me-1"></span>
-                            {{ exam.participantCount }} Peserta
-                        </div>
+                    <div class="meta-item">
+                        <span class="mdi mdi-account-group me-1"></span>
+                        {{ exam.participantCount }} Peserta
                     </div>
+                </div>
 
-                    <!-- Expand Button -->
-                    <button
-                        (click)="toggleParticipantList(exam.schedule.id, exam)"
-                        [attr.aria-expanded]="
+                <!-- Expand Button -->
+                <button
+                    (click)="toggleParticipantList(exam.schedule.id, exam)"
+                    [attr.aria-expanded]="
                             isParticipantListVisible(exam.schedule.id)
                         "
-                        class="btn-expand"
-                        type="button"
-                    >
-                        <span
-                            *ngIf="!isParticipantListVisible(exam.schedule.id)"
-                        >
-                            <span class="mdi mdi-chevron-down me-1"></span>
-                            Lihat Daftar Peserta
-                        </span>
-                        <span
-                            *ngIf="isParticipantListVisible(exam.schedule.id)"
-                        >
-                            <span class="mdi mdi-chevron-up me-1"></span>
-                            Sembunyikan Daftar Peserta
-                        </span>
-                    </button>
+                    class="btn-expand"
+                    type="button"
+                >
+                    <span *ngIf="!isParticipantListVisible(exam.schedule.id)">
+                        <span class="mdi mdi-chevron-down me-1"></span>
+                        Lihat Daftar Peserta
+                    </span>
+                    <span *ngIf="isParticipantListVisible(exam.schedule.id)">
+                        <span class="mdi mdi-chevron-up me-1"></span>
+                        Sembunyikan Daftar Peserta
+                    </span>
+                </button>
 
-                    <!-- Participant List (Expanded) -->
-                    <div
-                        *ngIf="isParticipantListVisible(exam.schedule.id)"
-                        class="participant-list"
-                    >
-                        <h4 class="participant-list-heading">
-                            Daftar Peserta Ujian
-                        </h4>
+                <!-- Participant List (Expanded) -->
+                <div
+                    *ngIf="isParticipantListVisible(exam.schedule.id)"
+                    class="participant-list"
+                >
+                    <h4 class="participant-list-heading">
+                        Daftar Peserta Ujian
+                    </h4>
 
-                        <div class="participant-items">
-                            <div
-                                *ngFor="
+                    <div class="participant-items">
+                        <div
+                            *ngFor="
                                     let pSchedule of getParticipants(exam);
                                     let i = index
                                 "
-                                class="participant-item"
-                            >
-                                <div class="participant-number">
-                                    {{ i + 1 }}
+                            class="participant-item"
+                        >
+                            <div class="participant-number">{{ i + 1 }}</div>
+                            <div class="participant-info">
+                                <div class="participant-name-row">
+                                    <span class="mdi mdi-account me-1"></span>
+                                    {{ pSchedule.participantUkom.name }}
                                 </div>
-                                <div class="participant-info">
-                                    <div class="participant-name-row">
+                                <div class="participant-details">
+                                    <span class="detail-row">
+                                        <span class="detail-label">NIP:</span>
                                         <span
-                                            class="mdi mdi-account me-1"
-                                        ></span>
-                                        {{ pSchedule.participantUkom.name }}
-                                    </div>
-                                    <div class="participant-details">
-                                        <span class="detail-row">
-                                            <span class="detail-label"
-                                                >NIP:</span
-                                            >
-                                            <span
-                                                class="detail-value font-monospace"
-                                                >{{ pSchedule.participantUkom
-                                                .nip }}</span
-                                            >
-                                        </span>
-                                        <span class="detail-row">
-                                            <span class="detail-label"
-                                                >Jadwal:</span
-                                            >
-                                            <span class="detail-value"
-                                                >{{ getParticipantScheduleTime(
-                                                pSchedule, exam ) }}</span
-                                            >
-                                        </span>
-                                    </div>
+                                            class="detail-value font-monospace"
+                                            >{{ pSchedule.participantUkom .nip
+                                            }}</span
+                                        >
+                                    </span>
+                                    <span class="detail-row">
+                                        <span class="detail-label"
+                                            >Jadwal:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{ getParticipantScheduleTime(
+                                            pSchedule, exam ) }}</span
+                                        >
+                                    </span>
+                                    <span class="detail-row">
+                                        <span class="detail-label"
+                                            >Jabatan:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{ pSchedule.roomUkom?.jabatanName
+                                            || '-' }}</span
+                                        >
+                                    </span>
+                                    <span class="detail-row">
+                                        <span class="detail-label"
+                                            >Jenjang:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{ pSchedule.roomUkom?.jenjangName
+                                            || '-' }}</span
+                                        >
+                                    </span>
+                                    <span
+                                        *ngIf="pSchedule.roomUkom?.bidangJabatanName"
+                                        class="detail-row"
+                                    >
+                                        <span class="detail-label"
+                                            >Bidang Jabatan:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{
+                                            pSchedule.roomUkom?.bidangJabatanName
+                                            }}</span
+                                        >
+                                    </span>
+                                </div>
+                                <div
+                                    style="
+                                        display: flex;
+                                        gap: 0.5rem;
+                                        flex-wrap: wrap;
+                                        margin-top: 0.5rem;
+                                    "
+                                >
                                     <span class="jenis-ukom-badge">
                                         {{ getJenisUkomDisplay(
                                         pSchedule.participantUkom .jenisUkom )
                                         }}
                                     </span>
+                                    <span
+                                        *ngIf="isExamGraded(exam)"
+                                        class="status-badge status-graded"
+                                        style="
+                                            background-color: #d4edda;
+                                            color: #155724;
+                                            padding: 0.25rem 0.75rem;
+                                            border-radius: 0.25rem;
+                                            font-size: 0.875rem;
+                                            display: inline-flex;
+                                            align-items: center;
+                                        "
+                                    >
+                                        <span
+                                            class="mdi mdi-check-circle me-1"
+                                        ></span>
+                                        Sudah Dinilai
+                                    </span>
+                                    <span
+                                        *ngIf="!isExamGraded(exam)"
+                                        class="status-badge status-ungraded"
+                                        style="
+                                            background-color: #fff3cd;
+                                            color: #856404;
+                                            padding: 0.25rem 0.75rem;
+                                            border-radius: 0.25rem;
+                                            font-size: 0.875rem;
+                                            display: inline-flex;
+                                            align-items: center;
+                                        "
+                                    >
+                                        <span
+                                            class="mdi mdi-clock-outline me-1"
+                                        ></span>
+                                        Belum Dinilai
+                                    </span>
                                 </div>
-                                <button
-                                    (click)="
+                            </div>
+                            <button
+                                (click)="
                                         enterExam(
                                             pSchedule.participantId,
                                             exam.schedule.id,
@@ -217,24 +303,16 @@
                                             exam.schedule.roomUkomId
                                         )
                                     "
-                                    class="btn-enter-exam"
-                                    type="button"
-                                >
-                                    Masuk Ujian
-                                </button>
-                            </div>
+                                class="btn-enter-exam"
+                                type="button"
+                            >
+                                Masuk Ujian
+                            </button>
                         </div>
                     </div>
-                </article>
-            </div>
-        </ng-container>
-
-        <ng-template #noOngoingExams>
-            <div class="empty-state">
-                <span class="mdi mdi-checkbox-marked-circle-outline"></span>
-                <p>Tidak ada ujian yang sedang berlangsung saat ini.</p>
-            </div>
-        </ng-template>
+                </div>
+            </article>
+        </div>
     </section>
 
     <!-- ============================================
@@ -332,6 +410,37 @@
                                         <span class="detail-value"
                                             >{{ getParticipantScheduleTime(
                                             pSchedule, exam ) }}</span
+                                        >
+                                    </span>
+                                    <span class="detail-row">
+                                        <span class="detail-label"
+                                            >Jabatan:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{ pSchedule.roomUkom?.jabatanName
+                                            || '-' }}</span
+                                        >
+                                    </span>
+                                    <span class="detail-row">
+                                        <span class="detail-label"
+                                            >Jenjang:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{ pSchedule.roomUkom?.jenjangName
+                                            || '-' }}</span
+                                        >
+                                    </span>
+                                    <span
+                                        *ngIf="pSchedule.roomUkom?.bidangJabatanName"
+                                        class="detail-row"
+                                    >
+                                        <span class="detail-label"
+                                            >Bidang Jabatan:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{
+                                            pSchedule.roomUkom?.bidangJabatanName
+                                            }}</span
                                         >
                                     </span>
                                 </div>
@@ -446,11 +555,87 @@
                                             }}</span
                                         >
                                     </span>
+                                    <span class="detail-row">
+                                        <span class="detail-label"
+                                            >Jabatan:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{ pSchedule.roomUkom?.jabatanName
+                                            || '-' }}</span
+                                        >
+                                    </span>
+                                    <span class="detail-row">
+                                        <span class="detail-label"
+                                            >Jenjang:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{ pSchedule.roomUkom?.jenjangName
+                                            || '-' }}</span
+                                        >
+                                    </span>
+                                    <span
+                                        *ngIf="pSchedule.roomUkom?.bidangJabatanName"
+                                        class="detail-row"
+                                    >
+                                        <span class="detail-label"
+                                            >Bidang Jabatan:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{
+                                            pSchedule.roomUkom?.bidangJabatanName
+                                            }}</span
+                                        >
+                                    </span>
                                 </div>
-                                <span class="jenis-ukom-badge">
-                                    {{ getJenisUkomDisplay(
-                                    pSchedule.participantUkom.jenisUkom ) }}
-                                </span>
+                                <div
+                                    style="
+                                        display: flex;
+                                        gap: 0.5rem;
+                                        flex-wrap: wrap;
+                                        margin-top: 0.5rem;
+                                    "
+                                >
+                                    <span class="jenis-ukom-badge">
+                                        {{ getJenisUkomDisplay(
+                                        pSchedule.participantUkom.jenisUkom ) }}
+                                    </span>
+                                    <span
+                                        *ngIf="isExamGraded(exam)"
+                                        class="status-badge status-graded"
+                                        style="
+                                            background-color: #d4edda;
+                                            color: #155724;
+                                            padding: 0.25rem 0.75rem;
+                                            border-radius: 0.25rem;
+                                            font-size: 0.875rem;
+                                            display: inline-flex;
+                                            align-items: center;
+                                        "
+                                    >
+                                        <span
+                                            class="mdi mdi-check-circle me-1"
+                                        ></span>
+                                        Sudah Dinilai
+                                    </span>
+                                    <span
+                                        *ngIf="!isExamGraded(exam)"
+                                        class="status-badge status-ungraded"
+                                        style="
+                                            background-color: #fff3cd;
+                                            color: #856404;
+                                            padding: 0.25rem 0.75rem;
+                                            border-radius: 0.25rem;
+                                            font-size: 0.875rem;
+                                            display: inline-flex;
+                                            align-items: center;
+                                        "
+                                    >
+                                        <span
+                                            class="mdi mdi-clock-outline me-1"
+                                        ></span>
+                                        Belum Dinilai
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>

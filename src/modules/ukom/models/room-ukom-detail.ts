@@ -13,8 +13,8 @@ export class RoomUkomDetail extends Serializable {
     examStartAt: string = undefined
     examEndAt: string = undefined
     vidCallLink: string = undefined
-    participantDtoList: unknown = undefined
-    examScheduleDtoList: unknown = undefined
+    participantDtoList?: unknown = undefined
+    examScheduleDtoList?: unknown = undefined
 
     constructor(object?: { [key: string]: any }) {
         super()

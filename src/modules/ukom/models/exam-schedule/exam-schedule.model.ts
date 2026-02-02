@@ -3,6 +3,7 @@ import { Participant } from '@/modules/ukom/models/cat/participant.model'
 import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { ExamAttendance } from '../cat/exam-attendance'
+import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 
 export class ExamSchedule extends Serializable {
     id: string = undefined
@@ -17,7 +18,9 @@ export class ExamSchedule extends Serializable {
     examinerScheduleList: ExaminerScheduleList[] | undefined | null = []
     examScheduleParentId: string | null = undefined
     examScheduleChild?: ExamSchedule | null | undefined = undefined
-    examAttendance?: ExamAttendance| null | undefined = undefined
+    examAttendance?: ExamAttendance | null | undefined = undefined
+    roomUkom?: RoomUkomDetail | null | undefined = undefined
+    graded?: boolean | null | undefined = undefined
 
     constructor(object?: Partial<ExamSchedule>) {
         super()
