@@ -42,7 +42,7 @@ export class PendingFormasiService {
             .postData(`${this.BASE_PATH}`, formasiRequest)
             .pipe(
                 catchError((error) => {
-                    console.error('Error save formasi', error)
+                    console.error('Error save deprecated_formasi', error)
                     this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),

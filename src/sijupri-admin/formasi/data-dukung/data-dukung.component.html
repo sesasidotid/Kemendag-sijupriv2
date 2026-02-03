@@ -1,0 +1,38 @@
+<ng-container *ngIf="activeTab() === 0">
+    <app-pagable
+        [pagable]="pagable()"
+        [refresh]="refreshSignal()"
+    ></app-pagable>
+</ng-container>
+
+<ng-container *ngIf="activeTab() === 1">
+    <form (ngSubmit)="submitCreateDataDukung()" [formGroup]="dataDukungForm">
+        <div class="mb-3">
+            <label class="form-label" for="name">Nama</label>
+            <input
+                [class.is-invalid]="isFieldInvalid('name')"
+                class="form-control"
+                formControlName="name"
+                id="name"
+                placeholder="Nama Dokumen Data Dukung"
+                type="text"
+            />
+            <div
+                *ngIf="getErrorMessage('name', 'Nama') as error"
+                class="invalid-feedback d-block"
+            >
+                {{ error }}
+            </div>
+        </div>
+        <div class="text-end">
+            <app-loading-button
+                [className]="'btn btn-primary'"
+                [disabled]="dataDukungForm.invalid"
+                [isLoading]="submitLoading()"
+                [label]="'Simpan'"
+                type="submit"
+            >
+            </app-loading-button>
+        </div>
+    </form>
+</ng-container>

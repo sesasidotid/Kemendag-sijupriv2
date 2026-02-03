@@ -9,18 +9,21 @@ import { ApiService } from '../../modules/base/services/api.service'
 import { Router } from '@angular/router'
 
 @Component({
-    selector: 'app-jf-formasi',
+    selector: 'app-jf-deprecated_formasi',
     standalone: true,
     imports: [CommonModule],
     templateUrl: './jf-formasi.component.html',
-    styleUrl: './jf-formasi.component.scss'
+    styleUrl: './jf-formasi.component.scss',
 })
 export class JfFormasiComponent {
     availableFormation: AvailableFormasiInMap[] = []
     unitKerjaDetail: UnitKerja = new UnitKerja()
     hoveredJabatanIndex: number | null = null
 
-    constructor(private apiService: ApiService, private router: Router) { }
+    constructor(
+        private apiService: ApiService,
+        private router: Router,
+    ) {}
 
     ngOnInit() {
         this.getUnitKerjaAvailableFormation(LoginContext.getUnitKerjaId())
@@ -39,7 +42,7 @@ export class JfFormasiComponent {
             .subscribe({
                 next: (res: any) => {
                     this.availableFormation = res
-                }
+                },
             })
     }
 
@@ -50,14 +53,14 @@ export class JfFormasiComponent {
             .subscribe({
                 next: (res: any) => {
                     this.unitKerjaDetail = res.data[0]
-                }
+                },
             })
     }
 
     getTotalRekapitulasi(): number {
         let total = 0
-        this.availableFormation.forEach(item => {
-            item.jenjangSumList.forEach(formasi => {
+        this.availableFormation.forEach((item) => {
+            item.jenjangSumList.forEach((formasi) => {
                 total += Number(formasi.resultSum) || 0
             })
         })

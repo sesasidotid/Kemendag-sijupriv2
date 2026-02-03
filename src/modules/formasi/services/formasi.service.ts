@@ -12,7 +12,7 @@ import { ObjectTask } from '../../workflow/models/object-task.model'
     providedIn: 'root',
 })
 export class FormasiService {
-    readonly BASE_PATH = '/api/v1/formasi'
+    readonly BASE_PATH = '/api/v1/deprecated_formasi'
 
     constructor(
         private apiService: ApiService,
@@ -37,7 +37,7 @@ export class FormasiService {
             .postData(`${this.BASE_PATH}/task`, formasiRequest)
             .pipe(
                 catchError((error) => {
-                    console.error('Error save formasi', error)
+                    console.error('Error save deprecated_formasi', error)
                     this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
@@ -49,7 +49,7 @@ export class FormasiService {
             .postData(`${this.BASE_PATH}/task/append`, formasiRequest)
             .pipe(
                 catchError((error) => {
-                    console.error('Error save formasi', error)
+                    console.error('Error save deprecated_formasi', error)
                     this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
@@ -79,7 +79,7 @@ export class FormasiService {
             .postData(`${this.BASE_PATH}/task/submit`, task)
             .pipe(
                 catchError((error) => {
-                    console.error('Error submit formasi', error)
+                    console.error('Error submit deprecated_formasi', error)
                     this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),

@@ -8,19 +8,18 @@ import { Observable, map } from 'rxjs'
 import { ApiService } from '../../../modules/base/services/api.service'
 
 @Component({
-    selector: 'app-formasi-list',
+    selector: 'app-deprecated_formasi-list',
     standalone: true,
     imports: [CommonModule],
     templateUrl: './formasi-list.component.html',
-    styleUrl: './formasi-list.component.scss'
+    styleUrl: './formasi-list.component.scss',
 })
 export class FormasiListComponent {
     unitKerjaId: string = ''
     availableFormation: AvailableFormasiInMap[] = []
     unitKerjaDetail: UnitKerja = new UnitKerja()
 
-    constructor(private apiService: ApiService) {
-    }
+    constructor(private apiService: ApiService) {}
 
     ngOnInit() {
         this.getUnitKerjaAvailableFormation(LoginContext.getUnitKerjaId())
@@ -33,7 +32,7 @@ export class FormasiListComponent {
             .subscribe({
                 next: (res: any) => {
                     this.availableFormation = res
-                }
+                },
             })
     }
 
@@ -43,7 +42,7 @@ export class FormasiListComponent {
             .subscribe({
                 next: (res: any) => {
                     this.unitKerjaDetail = res.data[0]
-                }
+                },
             })
     }
 }

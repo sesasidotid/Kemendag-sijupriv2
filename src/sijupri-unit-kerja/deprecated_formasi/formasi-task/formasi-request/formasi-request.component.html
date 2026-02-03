@@ -1,0 +1,48 @@
+<div class="row">
+    <div *ngFor="let jabatan of jabatanList" class="col-xl-4">
+        <a
+            [routerLink]="'/deprecated_formasi/deprecated_formasi-task/' + jabatan.code"
+            class="card card-animate"
+        >
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm flex-shrink-0">
+                        <span
+                            class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2"
+                        >
+                            <lucide-angular
+                                [img]="Icon"
+                                class="my-icon"
+                            ></lucide-angular>
+                        </span>
+                    </div>
+                    <div class="flex-grow-1 ms-3 overflow-hidden">
+                        <div class="d-flex align-items-center mb-3">
+                            <h4 class="flex-grow-1 mb-0">
+                                <span class="counter-value"
+                                    >{{ jabatan.name }}</span
+                                >
+                            </h4>
+                            <span
+                                [ngClass]="
+                  isSubmitted(jabatan.code)
+                    ? 'badge bg-success-subtle text-success fs-12'
+                    : 'badge bg-warning-subtle text-warning fs-12'
+                "
+                            >
+                                <i
+                                    [ngClass]="
+                    isSubmitted(jabatan.code)
+                      ? 'ri-check-line text-success'
+                      : 'ri-arrow-right-s-line'
+                  "
+                                    class="fs-13 me-1 align-middle"
+                                ></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>

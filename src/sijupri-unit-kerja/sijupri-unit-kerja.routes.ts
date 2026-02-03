@@ -33,14 +33,14 @@ export const routes: Routes = [
           'Pendaftaran Formasi': {
             components: () =>
               import(
-                '../sijupri-unit-kerja/formasi/formasi-task/formasi-task.component'
+                '@/sijupri-unit-kerja/deprecated_formasi/formasi-task/formasi-task.component'
               ).then(m => m.FormasiTaskComponent),
             routes: [
               {
                 path: ':id',
                 loadComponent: () =>
                   import(
-                    '../sijupri-unit-kerja/formasi/formasi-task/formasi-jabatan/formasi-jabatan.component'
+                    '@/sijupri-unit-kerja/deprecated_formasi/formasi-task/formasi-jabatan/formasi-jabatan.component'
                   ).then(m => m.FormasiJabatanComponent)
               }
             ]
@@ -48,14 +48,14 @@ export const routes: Routes = [
           'Rekomendasi Formasi': {
             components: () =>
               import(
-                '../sijupri-unit-kerja/formasi/formasi-rekomendasi/formasi-rekomendasi.component'
+                '@/sijupri-unit-kerja/deprecated_formasi/formasi-rekomendasi/formasi-rekomendasi.component'
               ).then(m => m.FormasiRekomendasiComponent),
             routes: [
               {
                 path: ':formasiId',
                 loadComponent: () =>
                   import(
-                    './formasi/formasi-rekomendasi/formasi-detail/formasi-detail.component'
+                    '@/sijupri-unit-kerja/deprecated_formasi/formasi-rekomendasi/formasi-detail/formasi-detail.component'
                   ).then(m => m.FormasiDetailComponent)
               }
             ]
