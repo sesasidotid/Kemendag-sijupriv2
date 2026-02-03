@@ -7,16 +7,13 @@ import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { FormasiUnsur } from '../../../../modules/formasi/models/formasi-unsur.model'
-import { FormasiService } from '../../../../modules/formasi/services/formasi.service'
 import { FormasiResult } from '../../../../modules/formasi/models/formasi-result.model'
 import { LoginContext } from '../../../../modules/base/commons/login-context'
 import { FormasiRequest } from '../../../../modules/formasi/models/formasi-request.model'
-import { AlertService } from '../../../../modules/base/services/alert.service'
-import { PendingFormasiService } from '../../../../modules/formasi/services/pending-formasi.service'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { PengaturanFormasiJabatan } from '../../../../modules/formasi/models/formasi-pengaturan-jabatan.model'
 import { BehaviorSubject } from 'rxjs'
-import { first } from 'rxjs/operators'
+
 @Component({
     selector: 'app-formasi-jabatan',
     standalone: true,

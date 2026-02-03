@@ -17,6 +17,7 @@ import { HandlerService } from '../../../modules/base/services/handler.service'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { ConverterService } from './../../../modules/base/services/converter.service'
 import { Router } from '@angular/router'
+
 @Component({
     selector: 'app-formasi-rekomendasi',
     standalone: true,

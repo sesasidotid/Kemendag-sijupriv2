@@ -1,0 +1,143 @@
+<div class="accordion accordion-flush">
+    <div *ngFor="let jabatan of jabatanList" class="accordion-item">
+        <!-- Header -->
+        <h2 class="accordion-header">
+            <button
+                (click)="toggleJabatan(jabatan.code)"
+                [class.collapsed]="!isExpanded(jabatan.code)"
+                class="accordion-button px-4 py-3"
+                type="button"
+            >
+                <span class="fw-semibold fs-6"> {{ jabatan.name }} </span>
+            </button>
+        </h2>
+
+        <!-- Body -->
+        <div
+            [class.show]="isExpanded(jabatan.code)"
+            class="accordion-collapse collapse"
+        >
+            <div class="accordion-body bg-light px-4 py-3">
+                <div *ngIf="matrices.has(jabatan.code)">
+                    <!-- Selection Buttons -->
+                    <div class="d-flex mb-3 gap-2">
+                        <button
+                            (click)="setStatus(jabatan.code, 'diusulkan')"
+                            [class.btn-outline-primary]="getStatus(jabatan.code) !== 'diusulkan'"
+                            [class.btn-primary]="getStatus(jabatan.code) === 'diusulkan'"
+                            class="btn"
+                            type="button"
+                        >
+                            <i class="mdi mdi-check-circle me-1"></i>
+                            Diusulkan
+                        </button>
+                        <button
+                            (click)="setStatus(jabatan.code, 'tidak_diusulkan')"
+                            [class.btn-danger]="getStatus(jabatan.code) === 'tidak_diusulkan'"
+                            [class.btn-outline-danger]="getStatus(jabatan.code) !== 'tidak_diusulkan'"
+                            class="btn"
+                            type="button"
+                        >
+                            <i class="mdi mdi-close-circle me-1"></i>
+                            Tidak Diusulkan
+                        </button>
+                    </div>
+
+                    <!-- Diusulkan: Show Volume Form -->
+                    <div *ngIf="getStatus(jabatan.code) === 'diusulkan'">
+                        <form [formGroup]="matrices.get(jabatan.code)?.form">
+                            <table
+                                class="table-bordered table-sm mb-0 table align-middle"
+                            >
+                                <thead>
+                                    <tr class="text-center">
+                                        <th rowspan="2">No</th>
+                                        <th rowspan="2">Ruang Lingkup</th>
+                                        <th rowspan="2">
+                                            Definisi Operasional
+                                        </th>
+                                        <th
+                                            [attr.colspan]="
+                                                jabatan.jenjang.length
+                                            "
+                                        >
+                                            Volume
+                                        </th>
+                                    </tr>
+                                    <tr class="text-center">
+                                        <th *ngFor="let j of jabatan.jenjang">
+                                            {{ j | titlecase }}
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody formArrayName="rows">
+                                    <tr
+                                        *ngFor="
+                                            let row of
+                                                rowsOf(jabatan.code).controls;
+                                            let i = index
+                                        "
+                                        [formGroupName]="i"
+                                    >
+                                        <td class="text-center">{{ i + 1 }}</td>
+
+                                        <td>
+                                            {{
+                                            matrices.get(jabatan.code)?.config
+                                            .ruangLingkup[i].name }}
+                                        </td>
+
+                                        <td class="text-muted small">
+                                            {{
+                                            matrices.get(jabatan.code)?.config
+                                            .ruangLingkup[i].definisi }}
+                                        </td>
+
+                                        <td
+                                            *ngFor="
+                                                let j of jabatan.jenjang;
+                                                let jIdx = index
+                                            "
+                                            class="p-1"
+                                        >
+                                            <input
+                                                (keydown)="onVolumeKeydown($event, jabatan.code, i, jIdx)"
+                                                [attr.data-jenjang]="jIdx"
+                                                [attr.data-row]="i"
+                                                [formControl]="
+                                                    volumeControl(
+                                                        jabatan.code,
+                                                        i,
+                                                        j
+                                                    )
+                                                "
+                                                class="form-control form-control-sm text-end"
+                                                min="0"
+                                                type="number"
+                                            />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+
+                    <!-- Tidak Diusulkan: Show File Upload -->
+                    <div *ngIf="getStatus(jabatan.code) === 'tidak_diusulkan'">
+                        <div class="alert alert-info mb-3">
+                            <i class="mdi mdi-information me-2"></i>
+                            Jabatan ini tidak diusulkan. Harap unggah dokumen
+                            pendukung yang menjelaskan alasan.
+                        </div>
+
+                        <app-file-handler
+                            *ngIf="getFileHandler(jabatan.code)"
+                            [inputs]="getFileHandler(jabatan.code)!"
+                        ></app-file-handler>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

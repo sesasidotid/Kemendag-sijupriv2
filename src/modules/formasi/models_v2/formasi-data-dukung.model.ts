@@ -22,7 +22,7 @@ export class FormasiDataDukungModel extends Serializable {
 export class FormasiDataDukungCreateModel extends Serializable {
     id: string = undefined
     name: string = undefined
-    association: string = 'for_formasi'
+    association: 'for_formasi' = undefined
 
     constructor(body: Partial<FormasiDataDukungCreateModel>) {
         super()

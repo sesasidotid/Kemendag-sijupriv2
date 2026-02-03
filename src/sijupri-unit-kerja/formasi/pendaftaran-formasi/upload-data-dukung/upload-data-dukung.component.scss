@@ -1,0 +1,32 @@
+$text-color: #1f2937;
+$muted-text: #6b7280;
+$border-color: #d1d5db;
+$bg-color: #f9fafb;
+.no-form-container {
+  color: $text-color;
+  background-color: $bg-color;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 300px);
+  padding: 2rem;
+  text-align: center;
+  .no-form-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+  }
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $text-color;
+    margin-bottom: 1rem;
+  }
+  p {
+    font-size: 1.1rem;
+    color: $muted-text;
+    margin-bottom: 2rem;
+    max-width: 500px;
+  }
+}

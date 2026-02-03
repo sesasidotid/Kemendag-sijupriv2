@@ -7,6 +7,7 @@ import {
     FormasiDataDukungModel,
 } from '@/modules/formasi/models_v2/formasi-data-dukung.model'
 import { catchError } from 'rxjs/operators'
+import { FormasiDokumenRequirement } from '@/modules/formasi/models/formasi-dokumen-requirement.model'
 
 @Injectable({
     providedIn: 'root',
@@ -43,6 +44,15 @@ export class FormasiDataDukungService {
 
     deleteDataDukung(id: string): Observable<void> {
         return this.apiService.deleteData(`${this.BASE_PATH}/${id}`).pipe(
+            catchError((err) => {
+                this.handlerService.handleException(err)
+                throw err
+            }),
+        )
+    }
+
+    fetchPersyaratanDataDukung(): Observable<FormasiDokumenRequirement[]> {
+        return this.apiService.getData('/api/v1/formasi_dokumen/all').pipe(
             catchError((err) => {
                 this.handlerService.handleException(err)
                 throw err

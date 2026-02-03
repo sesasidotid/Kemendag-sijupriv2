@@ -22,9 +22,7 @@ import { UndanganVerifikasiFormasi } from '@/modules/formasi/models/undangan.mod
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { FormasiRequestComponent } from '@/sijupri-unit-kerja/deprecated_formasi/formasi-task/formasi-request/formasi-request.component'
-import {
-    FormasiDokumenComponent
-} from '@/sijupri-unit-kerja/deprecated_formasi/formasi-task/formasi-dokumen/formasi-dokumen.component'
+import { FormasiDokumenComponent } from '@/sijupri-unit-kerja/deprecated_formasi/formasi-task/formasi-dokumen/formasi-dokumen.component'
 
 @Component({
     selector: 'app-formasi-task',
@@ -38,7 +36,7 @@ import {
         EmptyStateComponent,
         LoadingButtonComponent,
         FormasiRequestComponent,
-        FormasiDokumenComponent
+        FormasiDokumenComponent,
     ],
     templateUrl: './formasi-task.component.html',
     styleUrl: './formasi-task.component.scss',
@@ -223,15 +221,6 @@ export class FormasiTaskComponent {
                             this.groupedFormasiPendingTaskHistory,
                         )
                     }
-
-                    //   if (this.flowId == 'for_flow_4') {
-                    //     this.formasiRequest = new FormasiRequest(this.objectTask.object)
-                    //     this.formasiDokumenList = []
-                    //     for (const formasiDokumen of this.formasiRequest
-                    //       .formasiDokumenList) {
-                    //       this.formasiDokumenList.push(formasiDokumen)
-                    //     }
-                    //   }
                 },
                 error: () => {
                     console.log('error this.flowId', this.flowId)

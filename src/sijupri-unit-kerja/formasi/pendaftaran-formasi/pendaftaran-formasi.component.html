@@ -1,0 +1,299 @@
+<!--<header class="mb-4">-->
+<!--    <h2 class="mb-2">Pendaftaran Usulan Formasi</h2>-->
+<!--</header>-->
+
+<div class="container-fluid py-2">
+    <section *ngIf="currentStep() === 1" class="mb-4">
+        <app-upload-data-dukung></app-upload-data-dukung>
+    </section>
+
+    <!-- Stepper and remaining steps (Only shown after Step 1) -->
+    <div *ngIf="currentStep() > 1" class="card">
+        <div class="card-header">
+            <h3>Status Pendaftaran Formasi</h3>
+        </div>
+        <div class="stepper-wrapper text-center">
+            <!-- Step 2: Jabatan Selection -->
+            <div
+                (click)="handleStepClick(2)"
+                [ngClass]="{
+                    active: currentStep() === 2,
+                    completed: currentStep() > 2
+                }"
+                class="stepper-item"
+            >
+                <div class="step-counter">
+                    <i class="mdi mdi-briefcase-check-outline"></i>
+                </div>
+                <div class="step-name">Pilih Jabatan</div>
+            </div>
+
+            <!-- Step 3: Document Upload -->
+            <div
+                (click)="handleStepClick(3)"
+                [ngClass]="{
+                    active: currentStep() === 3,
+                    completed: currentStep() > 3
+                }"
+                class="stepper-item"
+            >
+                <div class="step-counter">
+                    <i class="mdi mdi-file-document-outline"></i>
+                </div>
+                <div class="step-name">Perbaikan Data</div>
+            </div>
+
+            <!-- Step 4: Verification Schedule -->
+            <div
+                (click)="handleStepClick(4)"
+                [ngClass]="{
+                    active: currentStep() === 4,
+                    completed: currentStep() > 4
+                }"
+                class="stepper-item"
+            >
+                <div class="step-counter">
+                    <i class="mdi mdi-calendar-check-outline"></i>
+                </div>
+                <div class="step-name">Jadwal Verifikasi</div>
+            </div>
+
+            <!-- Step 5: BA Process -->
+            <div
+                (click)="handleStepClick(5)"
+                [ngClass]="{
+                    active: currentStep() === 5,
+                    completed: currentStep() > 5
+                }"
+                class="stepper-item"
+            >
+                <div class="step-counter">
+                    <i class="mdi mdi-file-sign"></i>
+                </div>
+                <div class="step-name">Proses BA</div>
+            </div>
+
+            <!-- Step 6: Final Documents -->
+            <div
+                (click)="handleStepClick(6)"
+                [ngClass]="{
+                    active: currentStep() === 6,
+                    completed: currentStep() > 6
+                }"
+                class="stepper-item"
+            >
+                <div class="step-counter">
+                    <i class="mdi mdi-certificate-outline"></i>
+                </div>
+                <div class="step-name">Dokumen Formasi</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task History for Current Step (Only shown after Step 1) -->
+    <ng-container *ngIf="currentStep() > 1">
+        <ng-container
+            *ngFor="let task of groupedTaskHistory | keyvalue; let i = index"
+        >
+            <div *ngIf="currentStep() === i + 1" class="mb-3">
+                <div *ngIf="task.key" class="d-flex flex-column mt-2 gap-3">
+                    <ng-container *ngFor="let history of task.value">
+                        <a
+                            (click)="
+                            history.taskStatus === 'PENDING' &&
+                            history.needsRevision
+                                ? handleTaskClick(history)
+                                : null
+                        "
+                            [ngClass]="{
+                            'link-with-pointer':
+                                history.taskStatus === 'PENDING' &&
+                                history.needsRevision,
+                            'disabled-link': !(
+                                history.taskStatus === 'PENDING' &&
+                                history.needsRevision
+                            )
+                        }"
+                        >
+                            <div
+                                class="card d-flex align-items-center justify-content-between m-0 flex-row p-4"
+                            >
+                                <div
+                                    class="d-flex flex-column flex-md-row align-items-center gap-3"
+                                >
+                                    <div
+                                        class="rounded-circle d-flex flex-column justify-content-center h-58px border p-3"
+                                    >
+                                        <i
+                                            [class]="getTaskIcon(history.flowId)"
+                                            class="mdi-24px text-muted"
+                                        ></i>
+                                    </div>
+                                    <div class="">
+                                        <ng-container
+                                            *ngIf="
+                                            history.taskStatus === 'COMPLETED'
+                                        "
+                                        >
+                                            <h5 class="">
+                                                {{ history.flowName }}
+                                                <span
+                                                    class="badge rounded-pill text-bg-success"
+                                                >
+                                                    Sudah Diverifikasi
+                                                </span>
+                                            </h5>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="history.taskStatus === 'PENDING'"
+                                        >
+                                            <h5 class="">
+                                                {{ history.flowName }}
+                                                <span
+                                                    [class.text-bg-info]="
+                                                    !history.needsRevision
+                                                "
+                                                    [class.text-bg-warning]="
+                                                    history.needsRevision
+                                                "
+                                                    class="badge rounded-pill"
+                                                >
+                                                    {{ history.needsRevision ?
+                                                    'Perlu Diperbaiki' : 'Belum
+                                                    Diverifikasi' }}
+                                                </span>
+                                            </h5>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="history.taskStatus === 'REJECTED'"
+                                        >
+                                            <h5 class="">
+                                                {{ history.flowName }}
+                                                <span
+                                                    class="badge rounded-pill text-bg-danger"
+                                                >
+                                                    Ditolak
+                                                </span>
+                                            </h5>
+                                        </ng-container>
+
+                                        <ng-container
+                                            *ngIf="
+                                            history.taskStatus === 'COMPLETED'
+                                        "
+                                        >
+                                            <p class="text-muted mb-0">
+                                                Diverifikasi Pada : {{
+                                                history.lastUpdated | date: 'dd
+                                                MMM yyyy HH:mm' }}
+                                            </p>
+                                        </ng-container>
+
+                                        <ng-container
+                                            *ngIf="
+                                            history.taskStatus !== 'COMPLETED'
+                                        "
+                                        >
+                                            <p class="text-muted mb-0">
+                                                Diverifikasi Pada : -
+                                            </p>
+                                        </ng-container>
+
+                                        <ng-container *ngIf="history.remark">
+                                            <div
+                                                class="alert alert-warning mt-2"
+                                            >
+                                                <strong
+                                                    >Catatan Revisi :
+                                                </strong>
+                                                {{ history.remark }}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- Step Content (Only shown after Step 1) -->
+        <div *ngIf="currentStep() > 1" class="card">
+            <div class="card-body">
+                <!-- Step 2: Jabatan Selection & Proposal -->
+                <div *ngIf="currentStep() === 2">
+                    <h5 class="mb-3">Pilih Jabatan untuk Diusulkan</h5>
+                    <app-jabatan-selection></app-jabatan-selection>
+                </div>
+
+                <!-- Step 3: Document Upload (Non-Proposed) -->
+                <div *ngIf="currentStep() === 3">
+                    <h5 class="mb-3">Perbaikan Data</h5>
+                    <p class="text-muted">
+                        TODO: Implement document upload for non-proposed
+                        positions
+                    </p>
+                </div>
+
+                <!-- Step 4: Verification Schedule & Invitation -->
+                <div *ngIf="currentStep() === 4">
+                    <h5 class="mb-3">Jadwal Verifikasi & Surat Undangan</h5>
+                    <p class="text-muted">
+                        TODO: Display verification schedule and invitation
+                        letter
+                    </p>
+                </div>
+
+                <!-- Step 5: BA Process (Combined Steps 6-8) -->
+                <div *ngIf="currentStep() === 5">
+                    <h5 class="mb-3">Proses Berita Acara</h5>
+                    <div class="mb-4">
+                        <h6>1. Unduh BA (Belum Bertanda Tangan)</h6>
+                        <p class="text-muted">
+                            TODO: Implement BA download (unsigned)
+                        </p>
+                    </div>
+                    <div class="mb-4">
+                        <h6>2. Unggah BA yang Telah Ditandatangani</h6>
+                        <p class="text-muted">
+                            TODO: Implement signed BA upload from OPD admin
+                        </p>
+                    </div>
+                    <div>
+                        <h6>3. Unduh BA (Lengkap dengan Tanda Tangan)</h6>
+                        <p class="text-muted">
+                            TODO: Download BA signed by both parties
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 6: Final Formation Documents -->
+                <div *ngIf="currentStep() === 6">
+                    <h5 class="mb-3">Dokumen Formasi</h5>
+                    <div class="mb-4">
+                        <h6>Unduh Surat Rekomendasi Formasi</h6>
+                        <p class="text-muted">
+                            TODO: Download approved formation recommendation
+                            letter
+                        </p>
+                    </div>
+                    <div class="mb-4">
+                        <h6>Unggah Surat Persetujuan Menpan RB</h6>
+                        <p class="text-muted">
+                            TODO: Upload Menpan RB approval letter (verified/not
+                            verified)
+                        </p>
+                    </div>
+                    <div>
+                        <h6>Tabel Pemetaan Formasi Seluruh Daerah</h6>
+                        <p class="text-muted">
+                            TODO: Display formation mapping table for all
+                            regions
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>

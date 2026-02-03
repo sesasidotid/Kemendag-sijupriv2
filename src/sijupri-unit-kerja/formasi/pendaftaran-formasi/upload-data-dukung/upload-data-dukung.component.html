@@ -1,0 +1,38 @@
+<ng-container *ngIf="pageLoading(); else content">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
+        </div>
+        <p class="mt-2">Memuat halaman...</p>
+    </div>
+</ng-container>
+<ng-template #content>
+    <ng-container *ngIf="isFormOpen();else closeForm">
+        <form [formGroup]="formGroup">
+            <div class="mb-3">
+                <app-file-handler [inputs]="inputs"></app-file-handler>
+            </div>
+            <div class="float-end">
+                <app-loading-button
+                    (clicked)="submit()"
+                    [className]="'btn btn-primary'"
+                    [disabled]="formGroup.invalid"
+                    [isLoading]="submitLoading()"
+                    [label]="'Upload Dokumen'"
+                    [type]="'button'"
+                ></app-loading-button>
+            </div>
+        </form>
+    </ng-container>
+    <ng-template #closeForm>
+        <div class="no-form-container">
+            <app-empty-state
+                [buttonAction]="openFormPendaftaran.bind(this)"
+                [buttonIcon]="'mdi-upload-outline'"
+                [buttonText]="'Unggah Dokumen'"
+                [description]="'Anda dapat mengajukan formasi dengan mengunggah dokumen yang diperlukan.'"
+                [title]="'Pendaftaran Formasi'"
+            ></app-empty-state>
+        </div>
+    </ng-template>
+</ng-template>

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { ApiService } from '../../base/services/api.service'
 import { AlertService } from '../../base/services/alert.service'
-import { Formasi } from '../models/formasi.model'
 import { catchError, map, Observable } from 'rxjs'
 import { FormasiRequest } from '../models/formasi-request.model'
 import { FormasiResult } from '../models/formasi-result.model'
@@ -12,7 +11,7 @@ import { ObjectTask } from '../../workflow/models/object-task.model'
     providedIn: 'root',
 })
 export class FormasiService {
-    readonly BASE_PATH = '/api/v1/deprecated_formasi'
+    readonly BASE_PATH = '/api/v1/formasi'
 
     constructor(
         private apiService: ApiService,

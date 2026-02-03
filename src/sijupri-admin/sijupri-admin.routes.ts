@@ -39,20 +39,20 @@ export const routes: Routes = [
                 //     'Data Dukung Formasi': {
                 //         components: () =>
                 //             import(
-                //                 '@/sijupri-admin/deprecated_formasi/formasi-document-list/formasi-document-list.component'
+                //                 '@/sijupri-admin/deprecated_formasi/deprecated_formasi-document-list/deprecated_formasi-document-list.component'
                 //             ).then((m) => m.FormasiDocumentListComponent),
                 //     },
                 //     'Pengajuan Formasi': {
                 //         components: () =>
                 //             import(
-                //                 '@/sijupri-admin/deprecated_formasi/formasi-task-list/formasi-task-list.component'
+                //                 '@/sijupri-admin/deprecated_formasi/deprecated_formasi-task-list/deprecated_formasi-task-list.component'
                 //             ).then((m) => m.FormasiTaskListComponent),
                 //         routes: [
                 //             {
                 //                 path: 'jabatan/:formasi_id/:jabatanCode',
                 //                 loadComponent: () =>
                 //                     import(
-                //                         '@/sijupri-admin/deprecated_formasi/formasi-task-jabatan/formasi-task-jabatan.component'
+                //                         '@/sijupri-admin/deprecated_formasi/deprecated_formasi-task-jabatan/deprecated_formasi-task-jabatan.component'
                 //                     ).then(
                 //                         (m) => m.FormasiTaskJabatanComponent,
                 //                     ),
@@ -61,7 +61,7 @@ export const routes: Routes = [
                 //                 path: ':id',
                 //                 loadComponent: () =>
                 //                     import(
-                //                         '@/sijupri-admin/deprecated_formasi/formasi-task-detail/formasi-task-detail.component'
+                //                         '@/sijupri-admin/deprecated_formasi/deprecated_formasi-task-detail/deprecated_formasi-task-detail.component'
                 //                     ).then((m) => m.FormasiTaskDetailComponent),
                 //             },
                 //         ],
@@ -69,20 +69,20 @@ export const routes: Routes = [
                 //     'Pemetaan Formasi Seluruh Indonesia': {
                 //         components: () =>
                 //             import(
-                //                 '@/sijupri-admin/deprecated_formasi/formasi-pemetaan/formasi-pemetaan.component'
+                //                 '@/sijupri-admin/deprecated_formasi/deprecated_formasi-pemetaan/deprecated_formasi-pemetaan.component'
                 //             ).then((m) => m.FormasiPemetaanComponent),
                 //     },
                 //     'Data Rekomendasi Formasi': {
                 //         components: () =>
                 //             import(
-                //                 '@/sijupri-admin/deprecated_formasi/formasi-data-rekomendasi/formasi-data-rekomendasi.component'
+                //                 '@/sijupri-admin/deprecated_formasi/deprecated_formasi-data-rekomendasi/deprecated_formasi-data-rekomendasi.component'
                 //             ).then((m) => m.FormasiDataRekomendasiComponent),
                 //         routes: [
                 //             {
                 //                 path: ':id',
                 //                 loadComponent: () =>
                 //                     import(
-                //                         '@/sijupri-admin/deprecated_formasi/formasi-data-rekomendasi-detail/formasi-data-rekomendasi-detail.component'
+                //                         '@/sijupri-admin/deprecated_formasi/deprecated_formasi-data-rekomendasi-detail/deprecated_formasi-data-rekomendasi-detail.component'
                 //                     ).then(
                 //                         (m) =>
                 //                             m.FormasiDataRekomendasiDetailComponent,
