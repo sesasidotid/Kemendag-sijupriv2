@@ -1,15 +1,28 @@
-.available-examiners {
-    ::ng-deep .ag-theme-alpine {
-        .ag-row-selected {
-            background-color: #d1e7dd !important;
-        }
-
-        .ag-row.current-examiner {
-            background-color: #cfe2ff;
-        }
-
-        .ag-row.current-examiner.ag-row-selected {
-            background-color: #d1e7dd !important;
-        }
+::ng-deep .ag-theme-alpine {
+    .ag-row-selected {
+        background-color: #d1e7dd !important;
     }
+
+    .ag-row.current-examiner {
+        background-color: #cfe2ff;
+        font-weight: 500;
+    }
+
+    .ag-row.current-examiner.ag-row-selected {
+        background-color: #d1e7dd !important;
+    }
+}
+
+.card {
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+    }
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
 }

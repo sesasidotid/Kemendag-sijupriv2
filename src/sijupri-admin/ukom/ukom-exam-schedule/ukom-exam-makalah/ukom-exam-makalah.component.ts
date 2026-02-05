@@ -255,14 +255,14 @@ export class UkomExamMakalahComponent implements OnInit {
      */
     confirmExaminerUpdate(event: {
         participant: ParticipantSchedule
-        examinerId: string
+        examinerIds: string[]
     }): void {
-        const { participant, examinerId } = event
+        const { participant, examinerIds } = event
 
         // Prepare request
         const request = new UpdateExaminerForParticipantRequest({
             participantScheduleId: participant.id,
-            examinerScheduleIdList: [examinerId],
+            examinerScheduleIdList: examinerIds,
         })
 
         this.performExaminerUpdate(request)
@@ -320,10 +320,25 @@ export class UkomExamMakalahComponent implements OnInit {
                 headerName: 'Penguji',
                 field: 'participantSchedule.examinerName',
                 flex: 1,
-                valueGetter: (params) => {
+                cellRenderer: (params: any) => {
                     const slot = params.data as ScheduleSlot
-                    return slot.participantSchedule?.examinerName || '—'
+                    if (!slot.participantSchedule) return '—'
+
+                    const kompA = slot.participantSchedule.examinerKomponenA || '—'
+                    const kompBC = slot.participantSchedule.examinerKomponenBC || '—'
+
+                    return `
+                        <div style="line-height: 1.4;">
+                            <div style="font-size: 0.85em; color: #6c757d;">
+                                <strong>Komponen A:</strong> ${kompA}
+                            </div>
+                            <div style="font-size: 0.85em; color: #6c757d; margin-top: 2px;">
+                                <strong>Komponen B & C:</strong> ${kompBC}
+                            </div>
+                        </div>
+                    `
                 },
+                autoHeight: true,
             },
             {
                 headerName: 'Status',
@@ -380,20 +395,36 @@ export class UkomExamMakalahComponent implements OnInit {
         const examinerMap = this.buildExaminerMap(this.examinerList())
 
         const participantSchedules: ParticipantSchedule[] =
-            participantScheduleList.map((p) => ({
-                id: p.id,
-                participantId: p.participantId,
-                examScheduleId: p.examScheduleId,
-                personalSchedule: p.personalSchedule
-                    ? this.slotService.parseAsUTC7(p.personalSchedule)
-                    : null,
-                participantName: p.participantUkom?.name || 'Unknown',
-                participantNip: p.participantUkom?.nip || 'Unknown',
-                examinerName:
-                    examinerMap.get(
-                        p.examScheduleSupervised[0]?.examinerScheduleId,
-                    ) ?? 'Unknown',
-            })) || []
+            participantScheduleList.map((p) => {
+                // Get examiners by index
+                const examinerKomponenA =
+                    p.examScheduleSupervised && p.examScheduleSupervised[0]
+                        ? examinerMap.get(
+                              p.examScheduleSupervised[0].examinerScheduleId,
+                          ) ?? 'Unknown'
+                        : 'Unknown'
+
+                const examinerKomponenBC =
+                    p.examScheduleSupervised && p.examScheduleSupervised[1]
+                        ? examinerMap.get(
+                              p.examScheduleSupervised[1].examinerScheduleId,
+                          ) ?? 'Unknown'
+                        : undefined
+
+                return {
+                    id: p.id,
+                    participantId: p.participantId,
+                    examScheduleId: p.examScheduleId,
+                    personalSchedule: p.personalSchedule
+                        ? this.slotService.parseAsUTC7(p.personalSchedule)
+                        : null,
+                    participantName: p.participantUkom?.name || 'Unknown',
+                    participantNip: p.participantUkom?.nip || 'Unknown',
+                    examinerName: examinerKomponenA, // For backward compatibility
+                    examinerKomponenA: examinerKomponenA,
+                    examinerKomponenBC: examinerKomponenBC,
+                }
+            }) || []
 
         const mainSchedule: MainSchedule = {
             id: examSchedule.id,

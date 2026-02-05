@@ -24,7 +24,8 @@
 export const environment = {
     production: false,
     appBaseHref: '',
-    apiBaseUrl: 'http://sijupri.sesasi.xyz:8000',
+    apiBaseUrl: 'http://103.217.144.101:8000',
+    // apiBaseUrl: 'http://sijupri.sesasi.xyz:8000',
     firebaseConfig: {
         apiKey: 'AIzaSyBHvB-ce9lpJdWbDJCBP2XLVJHYzV62oLw',
         authDomain: 'sijupri.firebaseapp.com',

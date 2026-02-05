@@ -23,7 +23,9 @@ export interface ParticipantSchedule {
     personalSchedule: Date | null
     participantName: string // denormalized for display
     participantNip?: string
-    examinerName: string
+    examinerName: string // Deprecated: for backward compatibility
+    examinerKomponenA?: string // Examiner for Komponen A (index 0)
+    examinerKomponenBC?: string // Examiner for Komponen B & C (index 1)
 }
 
 export interface ScheduleSlot {

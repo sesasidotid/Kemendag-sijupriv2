@@ -90,16 +90,18 @@
                 class="form-control"
                 formControlName="duration"
                 id="duration"
-                min="1"
                 placeholder="Masukkan durasi"
                 type="number"
             />
             <span class="input-group-text">menit</span>
+            <div
+                *ngIf="getError('duration', 'Durasi')"
+                class="invalid-feedback"
+            >
+                {{ getError('duration', 'Durasi') }}
+            </div>
         </div>
         <small class="form-text text-muted"> Durasi ujian dalam menit </small>
-        <div *ngIf="getError('duration', 'Durasi')" class="invalid-feedback">
-            {{ getError('duration', 'Durasi') }}
-        </div>
     </div>
 
     <div *ngIf="isFieldVisible('secretKey')" class="mb-3">
@@ -126,16 +128,16 @@
             >
                 <i class="mdi mdi-shuffle-variant"></i>
             </button>
+            <div
+                *ngIf="getError('secretKey', 'Secret Key')"
+                class="invalid-feedback"
+            >
+                {{ getError('secretKey', 'Secret Key') }}
+            </div>
         </div>
         <small class="form-text text-muted"
             >Klik ikon untuk menghasilkan kunci acak yang aman.</small
         >
-        <div
-            *ngIf="getError('secretKey', 'Secret Key')"
-            class="invalid-feedback"
-        >
-            {{ getError('secretKey', 'Secret Key') }}
-        </div>
     </div>
 
     <div *ngIf="isFieldVisible('participantIdList')" class="mb-3">

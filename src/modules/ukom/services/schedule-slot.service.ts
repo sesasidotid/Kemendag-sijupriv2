@@ -20,13 +20,13 @@ import {
     providedIn: 'root',
 })
 export class ScheduleSlotService {
-    private readonly UNAVAILABLE_START_HOUR = 20 // 20:00 UTC+7
-    private readonly UNAVAILABLE_END_HOUR = 6 // 06:00 UTC+7
+    private readonly UNAVAILABLE_START_HOUR = 17 // 17:00 UTC+7
+    private readonly UNAVAILABLE_END_HOUR = 8 // 08:00 UTC+7
     private readonly MIDDAY_UNAVAILABLE_START_HOUR = 12 // 12:00
     private readonly MIDDAY_UNAVAILABLE_END_HOUR = 13 // 13:00
 
     /** Feature toggle */
-    private disableUnavailableHours = true
+    private disableUnavailableHours = false
 
     /**
      * Parse date string as UTC+7 time (no timezone conversion)
@@ -44,7 +44,7 @@ export class ScheduleSlotService {
 
     /**
      * Generate all possible time slots within main schedule
-     * Skips unavailable periods (12:00-13:00 lunch, 20:00-06:00 night) and resumes slots after breaks
+     * Skips unavailable periods (12:00-13:00 lunch, 17:00-08:00 night, weekends) and resumes slots after breaks
      * Example: If exam starts 09:33 with 2h duration:
      *   - Slot 0: 09:33-11:33 ✅
      *   - 11:33-13:33 would overlap lunch, skip to 13:00
@@ -66,6 +66,14 @@ export class ScheduleSlotService {
             // Stop if slot end exceeds main schedule end
             if (currentSlotEnd > mainSchedule.endTime) {
                 break
+            }
+
+            // Check if slot falls on weekend
+            if (this.isWeekend(currentSlotStart)) {
+                // Skip to next Monday 08:00
+                const nextAvailableTime = this.getNextWeekday(currentSlotStart)
+                currentSlotStart = nextAvailableTime
+                continue
             }
 
             const isUnavailable = this.isSlotInUnavailableHours(
@@ -139,6 +147,14 @@ export class ScheduleSlotService {
             }
         }
 
+        // Check if on weekend
+        if (this.isWeekend(newSlotTime)) {
+            return {
+                valid: false,
+                reason: 'Akhir pekan (Sabtu & Minggu) tidak tersedia',
+            }
+        }
+
         // Check unavailable hours
         const slotEndTime = new Date(
             newSlotTime.getTime() + mainSchedule.duration * 60 * 60 * 1000,
@@ -146,7 +162,7 @@ export class ScheduleSlotService {
         if (this.isSlotInUnavailableHours(newSlotTime, slotEndTime)) {
             return {
                 valid: false,
-                reason: 'Slot berada di jam tidak tersedia (20:00-06:00 atau 12:00-13:00)',
+                reason: 'Slot berada di jam tidak tersedia (17:00-08:00 atau 12:00-13:00)',
             }
         }
 
@@ -214,9 +230,39 @@ export class ScheduleSlotService {
     }
 
     /**
+     * Check if date falls on weekend (Saturday or Sunday)
+     */
+    private isWeekend(date: Date): boolean {
+        const dayOfWeek = date.getUTCDay() // 0 = Sunday, 6 = Saturday
+        return dayOfWeek === 0 || dayOfWeek === 6
+    }
+
+    /**
+     * Get next weekday (Monday) at 08:00
+     * If on Saturday, skip to Monday 08:00
+     * If on Sunday, skip to Monday 08:00
+     */
+    private getNextWeekday(date: Date): Date {
+        const dayOfWeek = date.getUTCDay() // 0 = Sunday, 6 = Saturday
+        const nextDate = new Date(date)
+
+        if (dayOfWeek === 6) {
+            // Saturday -> add 2 days to get Monday
+            nextDate.setUTCDate(nextDate.getUTCDate() + 2)
+        } else if (dayOfWeek === 0) {
+            // Sunday -> add 1 day to get Monday
+            nextDate.setUTCDate(nextDate.getUTCDate() + 1)
+        }
+
+        // Set to 08:00
+        nextDate.setUTCHours(this.UNAVAILABLE_END_HOUR, 0, 0, 0)
+        return nextDate
+    }
+
+    /**
      * Calculate the next available time after an unavailable period
      * If a slot overlaps with lunch (12:00-13:00), jump to 13:00
-     * If a slot overlaps with night (20:00-06:00), jump to 06:00 next day
+     * If a slot overlaps with night (17:00-08:00), jump to 08:00 next day
      */
     private getNextAvailableTimeAfterBreak(currentTime: Date): Date {
         const hour = this.getHour(currentTime)
@@ -225,23 +271,35 @@ export class ScheduleSlotService {
         if (hour < this.MIDDAY_UNAVAILABLE_END_HOUR) {
             const nextTime = new Date(currentTime)
             nextTime.setUTCHours(this.MIDDAY_UNAVAILABLE_END_HOUR, 0, 0, 0)
+
+            // Check if 13:00 falls on weekend, if so skip to Monday 08:00
+            if (this.isWeekend(nextTime)) {
+                return this.getNextWeekday(nextTime)
+            }
+
             return nextTime
         }
 
-        // If in or before night time, jump to 06:00 next day
+        // If in or before night time, jump to 08:00 next day
         if (
             hour >= this.UNAVAILABLE_START_HOUR ||
             hour < this.UNAVAILABLE_END_HOUR
         ) {
             const nextTime = new Date(currentTime)
-            // If currently before 06:00, stay same day
+            // If currently before 08:00, stay same day
             if (hour < this.UNAVAILABLE_END_HOUR) {
                 nextTime.setUTCHours(this.UNAVAILABLE_END_HOUR, 0, 0, 0)
             } else {
-                // If currently after 20:00, jump to next day 06:00
+                // If currently after 17:00, jump to next day 08:00
                 nextTime.setUTCDate(nextTime.getUTCDate() + 1)
                 nextTime.setUTCHours(this.UNAVAILABLE_END_HOUR, 0, 0, 0)
             }
+
+            // Check if next time falls on weekend, if so skip to Monday 08:00
+            if (this.isWeekend(nextTime)) {
+                return this.getNextWeekday(nextTime)
+            }
+
             return nextTime
         }
 
@@ -250,7 +308,7 @@ export class ScheduleSlotService {
     }
 
     /**
-     * Check if a time slot falls within unavailable hours (20:00-06:00 UTC+7)
+     * Check if a time slot falls within unavailable hours (17:00-08:00 UTC+7)
      * Handles cross-day unavailability
      * Times are treated as UTC+7 without conversion
      */
