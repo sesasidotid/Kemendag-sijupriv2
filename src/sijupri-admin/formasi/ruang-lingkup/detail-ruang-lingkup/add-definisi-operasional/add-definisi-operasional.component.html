@@ -1,0 +1,131 @@
+<form (ngSubmit)="submitForm()" [formGroup]="definisiOperasionalForm">
+    <div class="mb-3">
+        <label class="form-label" for="name">
+            Nama <span class="text-danger">*</span>
+        </label>
+        <input
+            [class.is-invalid]="isFieldInvalid('name')"
+            class="form-control"
+            formControlName="name"
+            id="name"
+            placeholder="Nama Definisi Operasional"
+            type="text"
+        />
+        <div
+            *ngIf="getErrorMessage('name', 'Nama') as error"
+            class="invalid-feedback d-block"
+        >
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="skr">
+            SKR <span class="text-danger">*</span>
+        </label>
+        <input
+            [class.is-invalid]="isFieldInvalid('skr')"
+            class="form-control"
+            formControlName="skr"
+            id="skr"
+            step="any"
+            type="number"
+        />
+        <div
+            *ngIf="getErrorMessage('skr', 'SKR') as error"
+            class="invalid-feedback d-block"
+        >
+            {{ error }}
+        </div>
+    </div>
+
+    <!-- Jenjang selection -->
+    <ng-container
+        *ngIf="jenjangService.isJenjangListLoading$ | async; else jenjangCheckBox"
+    >
+        <div class="mb-3">
+            <label class="form-label d-block">Pilih Jenjang</label>
+
+            <div class="d-flex align-items-center gap-2">
+                <div
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                ></div>
+                <span class="text-muted">Memuat jenjang...</span>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #jenjangCheckBox>
+        <div class="mb-3">
+            <label class="form-label d-block">Pilih Jenjang</label>
+
+            <div class="d-flex flex-wrap gap-2">
+                <ng-container
+                    *ngFor="let jenjang of jenjangService.jenjangList$ | async"
+                >
+                    <input
+                        #cb
+                        (change)="toggleJenjang(jenjang.code, cb.checked)"
+                        [checked]="isJenjangSelected(jenjang.code)"
+                        [id]="jenjang.code"
+                        autocomplete="off"
+                        class="btn-check"
+                        type="checkbox"
+                    />
+
+                    <label
+                        [for]="jenjang.code"
+                        [ngClass]="{
+          'btn-primary': isJenjangSelected(jenjang.code),
+          'btn-outline-primary': !isJenjangSelected(jenjang.code)
+        }"
+                        class="btn"
+                    >
+                        {{ jenjang.name }}
+                    </label>
+                </ng-container>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- Dynamic jenjang forms -->
+    <div *ngIf="jenjangList.length > 0" formArrayName="jenjangList">
+        <div
+            *ngFor="let group of jenjangList.controls; let i = index"
+            [formGroupName]="i"
+            class="mb-3"
+        >
+            <label class="form-label">
+                Kontribusi (%) – {{
+                getJenjangName(group.get('jenjangCode')?.value) }}
+                <span class="text-danger">*</span>
+            </label>
+
+            <input
+                [class.is-invalid]="isJenjangFieldInvalid(i, 'kontribusi')"
+                class="form-control"
+                formControlName="kontribusi"
+                step="any"
+                type="number"
+            />
+
+            <div
+                *ngIf="getJenjangErrorMessage(i, 'kontribusi', 'Kontribusi') as error"
+                class="invalid-feedback d-block"
+            >
+                {{ error }}
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <app-loading-button
+            [className]="'btn btn-primary'"
+            [disabled]="definisiOperasionalForm.invalid"
+            [isLoading]="submitFormLoading()"
+            [label]="'Simpan'"
+            [type]="'submit'"
+        ></app-loading-button>
+    </div>
+</form>

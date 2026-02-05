@@ -34,6 +34,12 @@ export class FormValidationService {
         if (errors['maxlength']) {
             return `${label} maksimal ${errors['maxlength'].requiredLength} karakter.`
         }
+        if (errors['min']) {
+            return `${label} minimal ${errors['min'].min}.`
+        }
+        if (errors['max']) {
+            return `${label} maksimal ${errors['max'].max}.`
+        }
         if (errors['pattern']) {
             switch (controlName) {
                 case 'nip':

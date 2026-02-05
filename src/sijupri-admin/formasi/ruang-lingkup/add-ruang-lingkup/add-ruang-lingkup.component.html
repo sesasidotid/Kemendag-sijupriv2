@@ -1,0 +1,58 @@
+<form (ngSubmit)="submitForm()" [formGroup]="ruangLingkupForm">
+    <div class="mb-3">
+        <label class="form-label" for="name"
+            >Nama <span class="text-danger">*</span></label
+        >
+        <input
+            [class.is-invalid]="isFieldInvalid('name')"
+            class="form-control"
+            formControlName="name"
+            id="name"
+            placeholder="Nama Ruang Lingkup"
+            type="text"
+        />
+        <div
+            *ngIf="getErrorMessage('name', 'Nama') as error"
+            class="invalid-feedback d-block"
+        >
+            {{ error }}
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="jabatanCode"
+            >Jabatan <span class="text-danger">*</span></label
+        >
+        <select
+            [class.is-invalid]="isFieldInvalid('jabatanCode')"
+            class="form-select"
+            formControlName="jabatanCode"
+            id="jabatanCode"
+        >
+            <option disabled hidden value="null">Pilih Untuk Jabatan..</option>
+
+            <option
+                *ngFor="let jabatan of jabatanService.jabatanList$ | async"
+                [value]="jabatan.code"
+            >
+                {{ jabatan.name }}
+            </option>
+        </select>
+        <div
+            *ngIf="getErrorMessage('jabatanCode', 'Jabatan') as error"
+            class="invalid-feedback d-block"
+        >
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="text-end">
+        <app-loading-button
+            [className]="'btn btn-primary'"
+            [disabled]="ruangLingkupForm.invalid"
+            [isLoading]="submitFormLoading()"
+            [label]="'Simpan'"
+            type="submit"
+        >
+        </app-loading-button>
+    </div>
+</form>

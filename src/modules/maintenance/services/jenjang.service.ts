@@ -21,6 +21,9 @@ export class JenjangService {
     private jenjangListSubject = new BehaviorSubject<Jenjang[]>([])
     jenjangList$ = this.jenjangListSubject.asObservable()
 
+    get jenjangListSnapshot(): Jenjang[] {
+        return this.jenjangListSubject.value
+    }
     private jenjangListLoadingSubject = new BehaviorSubject<boolean>(false)
     isJenjangListLoading$ = this.jenjangListLoadingSubject.asObservable()
     constructor(

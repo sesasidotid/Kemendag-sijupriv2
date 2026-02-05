@@ -1,0 +1,50 @@
+<button (click)="back()" class="btn btn-sm btn-outline-secondary mb-3">
+    <i class="mdi mdi-chevron-left"></i> Kembali
+</button>
+
+<ng-container *ngIf="pageLoading();else content">
+    <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #content>
+    <ng-container *ngIf="activeTab() === 0">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="m-0">
+                    <i class="mdi mdi-certificate me-2"></i> Informasi Ruang
+                    Lingkup
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Nama </label>
+                        <p>{{ ruangLingkup().name }}</p>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Jabatan</label>
+                        <p>{{ ruangLingkup().jabatanName }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="m-0">
+                    <i class="mdi mdi-list-box me-2"></i> Daftar Definisi
+                    Operasional
+                </h5>
+            </div>
+            <div class="card-body"></div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab() === 1">
+        <app-add-definisi-operasional></app-add-definisi-operasional>
+    </ng-container>
+</ng-template>

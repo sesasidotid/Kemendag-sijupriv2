@@ -620,6 +620,26 @@ export const routes: Routes = [
                     },
                 },
             }) ?? []),
+            {
+                path: 'formasi-ruang-lingkup',
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./formasi/ruang-lingkup/ruang-lingkup.component').then(
+                                (m) => m.RuangLingkupComponent,
+                            ),
+                        data: { title: 'Ruang Lingkup Formasi' },
+                    },
+                    {
+                        path: ':id',
+                        loadComponent: () =>
+                            import('./formasi/ruang-lingkup/detail-ruang-lingkup/detail-ruang-lingkup.component').then(
+                                (m) => m.DetailRuangLingkupComponent,
+                            ),
+                    },
+                ],
+            },
         ],
     },
 ]
