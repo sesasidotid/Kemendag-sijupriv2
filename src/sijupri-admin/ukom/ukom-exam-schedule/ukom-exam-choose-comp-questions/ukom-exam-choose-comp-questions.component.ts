@@ -25,6 +25,7 @@ import { UkomExamMakalahComponent } from '@/sijupri-admin/ukom/ukom-exam-schedul
 import { ParticipantListModalComponent } from './participant-list-modal/participant-list-modal.component'
 import { ExaminerListModalComponent } from './examiner-list-modal/examiner-list-modal.component'
 import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -44,6 +45,7 @@ import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exa
     styleUrl: './ukom-exam-choose-comp-questions.component.scss',
 })
 export class UkomExamChooseCompQuestionsComponent implements OnInit {
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
     ukomRoomService = inject(UkomRoomService)
     ukomExamScheduleService = inject(UkomExamScheduleService)
     roomUkomDetail = new RoomUkomDetail()

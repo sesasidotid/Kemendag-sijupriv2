@@ -324,8 +324,10 @@ export class UkomExamMakalahComponent implements OnInit {
                     const slot = params.data as ScheduleSlot
                     if (!slot.participantSchedule) return '—'
 
-                    const kompA = slot.participantSchedule.examinerKomponenA || '—'
-                    const kompBC = slot.participantSchedule.examinerKomponenBC || '—'
+                    const kompA =
+                        slot.participantSchedule.examinerKomponenA || '—'
+                    const kompBC =
+                        slot.participantSchedule.examinerKomponenBC || '—'
 
                     return `
                         <div style="line-height: 1.4;">
@@ -340,23 +342,23 @@ export class UkomExamMakalahComponent implements OnInit {
                 },
                 autoHeight: true,
             },
-            {
-                headerName: 'Status',
-                width: 120,
-                cellClass: 'text-center',
-                valueGetter: (params) => {
-                    const slot = params.data as ScheduleSlot
-                    if (slot.isOccupied) return 'Terisi'
-                    return 'Tersedia'
-                },
-                cellStyle: (params) => {
-                    const slot = params.data as ScheduleSlot
-                    if (slot.isOccupied) {
-                        return { color: '#198754', fontWeight: '500' }
-                    }
-                    return { color: '#6c757d' }
-                },
-            },
+            // {
+            //     headerName: 'Status',
+            //     width: 120,
+            //     cellClass: 'text-center',
+            //     valueGetter: (params) => {
+            //         const slot = params.data as ScheduleSlot
+            //         if (slot.isOccupied) return 'Terisi'
+            //         return 'Tersedia'
+            //     },
+            //     cellStyle: (params) => {
+            //         const slot = params.data as ScheduleSlot
+            //         if (slot.isOccupied) {
+            //             return { color: '#198754', fontWeight: '500' }
+            //         }
+            //         return { color: '#6c757d' }
+            //     },
+            // },
             {
                 headerName: 'Aksi',
                 width: 250,
@@ -399,16 +401,16 @@ export class UkomExamMakalahComponent implements OnInit {
                 // Get examiners by index
                 const examinerKomponenA =
                     p.examScheduleSupervised && p.examScheduleSupervised[0]
-                        ? examinerMap.get(
+                        ? (examinerMap.get(
                               p.examScheduleSupervised[0].examinerScheduleId,
-                          ) ?? 'Unknown'
+                          ) ?? 'Unknown')
                         : 'Unknown'
 
                 const examinerKomponenBC =
                     p.examScheduleSupervised && p.examScheduleSupervised[1]
-                        ? examinerMap.get(
+                        ? (examinerMap.get(
                               p.examScheduleSupervised[1].examinerScheduleId,
-                          ) ?? 'Unknown'
+                          ) ?? 'Unknown')
                         : undefined
 
                 return {

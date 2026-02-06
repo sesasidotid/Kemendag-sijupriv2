@@ -3,6 +3,7 @@ import {
     Component,
     EventEmitter,
     Input,
+    OnInit,
     Output,
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
@@ -12,6 +13,7 @@ import {
     ScheduleTimelineComponent,
 } from './schedule-timeline.component'
 import { ScheduleTimelineTableComponent } from './schedule-timeline-table.component'
+import * as XLSX from 'xlsx'
 
 type ViewMode = 'gantt' | 'table'
 
@@ -53,6 +55,17 @@ type ViewMode = 'gantt' | 'table'
                         Gantt Chart
                     </button>
                 </div>
+
+                <!-- Export Button -->
+                <button
+                    type="button"
+                    class="btn btn-success ms-3"
+                    (click)="exportToExcel()"
+                    [disabled]="!schedules || schedules.length === 0"
+                >
+                    <i class="ri-file-excel-2-line me-1"></i>
+                    Export Excel
+                </button>
             </div>
 
             <!-- Gantt View -->
@@ -83,7 +96,8 @@ type ViewMode = 'gantt' | 'table'
 
             .view-toggle-section {
                 display: flex;
-                justify-content: center;
+                justify-content: space-between;
+                align-items: center;
                 padding: 12px 16px;
                 background-color: #fff;
                 //border-bottom: 1px solid #dee2e6;
@@ -107,7 +121,7 @@ type ViewMode = 'gantt' | 'table'
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduleTimelineModalComponent {
+export class ScheduleTimelineModalComponent implements OnInit {
     @Input() schedules: ScheduleItem[] = []
     @Input() defaultView: ViewMode = 'table'
     @Output() closeTimeline = new EventEmitter<void>()
@@ -122,7 +136,106 @@ export class ScheduleTimelineModalComponent {
         this.viewMode$.next(mode)
     }
 
+    exportToExcel(): void {
+        if (!this.schedules || this.schedules.length === 0) {
+            return
+        }
+
+        // Prepare data for export
+        const exportData = this.schedules.map((schedule, index) => {
+            // Handle format "2026-02-06 13:53:00" (space between date and time)
+            const startTime = new Date(
+                schedule.personalSchedule.replace(' ', 'T'),
+            )
+            const endTime = new Date(
+                startTime.getTime() + schedule.duration * 60 * 60 * 1000,
+            )
+
+            return {
+                No: index + 1,
+                'Nama Peserta': schedule.name,
+                NIP: schedule.nip || '-',
+                Tanggal: this.formatDate(startTime),
+                'Waktu Mulai': this.formatTime(startTime),
+                'Waktu Selesai': this.formatTime(endTime),
+                Durasi: this.formatDuration(schedule.duration * 60),
+                Jabatan: schedule.jabatanName || '-',
+                Jenjang: schedule.jenjangName || '-',
+                'Jenis Ukom': this.formatJenisUkom(schedule.jenisUkom),
+                'Unit Kerja': schedule.unitKerjaName || '-',
+                Email: schedule.email || '-',
+                'No. Telepon': schedule.phone || '-',
+            }
+        })
+
+        // Create worksheet
+        const worksheet = XLSX.utils.json_to_sheet(exportData)
+
+        // Set column widths
+        worksheet['!cols'] = [
+            { wch: 5 }, // No
+            { wch: 25 }, // Nama Peserta
+            { wch: 20 }, // NIP
+            { wch: 15 }, // Tanggal
+            { wch: 12 }, // Waktu Mulai
+            { wch: 12 }, // Waktu Selesai
+            { wch: 12 }, // Durasi
+            { wch: 20 }, // Jabatan
+            { wch: 15 }, // Jenjang
+            { wch: 20 }, // Jenis Ukom
+            { wch: 25 }, // Unit Kerja
+            { wch: 25 }, // Email
+            { wch: 15 }, // No. Telepon
+        ]
+
+        // Create workbook and add the worksheet
+        const workbook = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Jadwal Ujian')
+
+        // Generate filename with current date
+        const fileName = `Jadwal-Ujian-${new Date().toISOString().split('T')[0]}.xlsx`
+
+        // Save file
+        XLSX.writeFile(workbook, fileName)
+    }
+
     close(): void {
         this.closeTimeline.emit()
+    }
+
+    private formatDate(date: Date): string {
+        const day = date.getDate().toString().padStart(2, '0')
+        const month = (date.getMonth() + 1).toString().padStart(2, '0')
+        const year = date.getFullYear()
+        return `${day}/${month}/${year}`
+    }
+
+    private formatTime(date: Date): string {
+        const hours = date.getHours().toString().padStart(2, '0')
+        const minutes = date.getMinutes().toString().padStart(2, '0')
+        return `${hours}:${minutes}`
+    }
+
+    private formatDuration(minutes: number): string {
+        if (minutes < 60) {
+            return `${minutes} menit`
+        }
+        const hours = Math.floor(minutes / 60)
+        const remainingMinutes = minutes % 60
+        if (remainingMinutes === 0) {
+            return `${hours} jam`
+        }
+        return `${hours} jam ${remainingMinutes} menit`
+    }
+
+    private formatJenisUkom(jenisUkom: string): string {
+        const jenisUkomMap: Record<string, string> = {
+            CAT: 'CAT (Computer Assisted Test)',
+            CBT: 'CBT (Computer Based Test)',
+            WAWANCARA: 'Wawancara',
+            PRAKTEK: 'Praktik',
+            SEMINAR: 'Seminar',
+        }
+        return jenisUkomMap[jenisUkom?.toUpperCase()] || jenisUkom || 'CAT'
     }
 }

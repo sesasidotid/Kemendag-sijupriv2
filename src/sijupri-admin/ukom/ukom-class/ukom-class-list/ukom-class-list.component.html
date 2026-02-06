@@ -265,12 +265,96 @@
     *ngIf="isTimelineModalOpen()"
     [enableFooter]="false"
     [size]="'xl'"
-    [title]="'Timeline Jadwal'"
+    [title]="'Timeline Jadwal Ujian'"
 >
-    <app-schedule-timeline-modal
-        (closeTimeline)="closeTimelineModal()"
-        [defaultView]="'table'"
-        [schedules]="timelineSchedules() || []"
-    >
-    </app-schedule-timeline-modal>
+    <div class="timeline-modal-wrapper">
+        <!-- Date Range Form -->
+        <div class="date-range-section mb-3">
+            <form [formGroup]="dateRangeForm" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label" for="startDate"
+                        >Tanggal Mulai</label
+                    >
+                    <input
+                        class="form-control"
+                        formControlName="startDate"
+                        id="startDate"
+                        type="date"
+                    />
+                    <div
+                        *ngIf="dateRangeForm.get('startDate')?.invalid && dateRangeForm.get('startDate')?.touched"
+                        class="text-danger small mt-1"
+                    >
+                        Tanggal mulai wajib diisi
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="endDate"
+                        >Tanggal Akhir</label
+                    >
+                    <input
+                        class="form-control"
+                        formControlName="endDate"
+                        id="endDate"
+                        type="date"
+                    />
+                    <div
+                        *ngIf="dateRangeForm.get('endDate')?.invalid && dateRangeForm.get('endDate')?.touched"
+                        class="text-danger small mt-1"
+                    >
+                        Tanggal akhir wajib diisi
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button
+                        (click)="loadSchedules()"
+                        [disabled]="isLoadingSchedules() || dateRangeForm.invalid"
+                        class="btn btn-primary"
+                        type="button"
+                    >
+                        <span
+                            *ngIf="isLoadingSchedules()"
+                            aria-hidden="true"
+                            class="spinner-border spinner-border-sm me-1"
+                            role="status"
+                        ></span>
+                        <i
+                            *ngIf="!isLoadingSchedules()"
+                            class="ri-search-line me-1"
+                        ></i>
+                        {{ isLoadingSchedules() ? 'Memuat...' : 'Tampilkan Data'
+                        }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Schedule Display Area -->
+        <div *ngIf="!hasLoadedSchedules()" class="text-muted py-5 text-center">
+            <i class="ri-calendar-line" style="font-size: 48px"></i>
+            <p class="mt-3">
+                Silakan pilih rentang tanggal dan klik "Tampilkan Data" untuk
+                melihat jadwal ujian
+            </p>
+        </div>
+
+        <div
+            *ngIf="hasLoadedSchedules() && timelineSchedules().length === 0"
+            class="text-muted py-5 text-center"
+        >
+            <i class="ri-calendar-close-line" style="font-size: 48px"></i>
+            <p class="mt-3">
+                Tidak ada jadwal ujian pada rentang tanggal yang dipilih
+            </p>
+        </div>
+
+        <div *ngIf="hasLoadedSchedules() && timelineSchedules().length > 0">
+            <app-schedule-timeline-modal
+                (closeTimeline)="closeTimelineModal()"
+                [defaultView]="'table'"
+                [schedules]="timelineSchedules()"
+            >
+            </app-schedule-timeline-modal>
+        </div>
+    </div>
 </app-modal>

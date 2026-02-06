@@ -22,7 +22,8 @@
                 *ngFor="let jenisUkom of jenisUkomList$ | async"
                 [value]="jenisUkom.code"
             >
-                {{ jenisUkom.name }}
+                {{ ukomMiscellaneousService.getModuleDisplayName(jenisUkom.name)
+                }}
             </option>
         </select>
         <div

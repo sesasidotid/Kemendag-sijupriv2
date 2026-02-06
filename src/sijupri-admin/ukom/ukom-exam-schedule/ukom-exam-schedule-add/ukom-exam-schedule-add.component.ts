@@ -14,7 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { finalize, map } from 'rxjs/operators'
+import { finalize, map, take } from 'rxjs/operators'
 import { JenisUkom } from '@/modules/ukom/models/jenis-ukom'
 import {
     ActionColumnBuilder,
@@ -274,7 +274,13 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     .build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenis Ukom', 'examTypeCode').build(),
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Jenis Ukom', (data: ExamSchedule) => {
+                        return this.ukomMiscellaneousService.getModuleDisplayName(
+                            data.examTypeCode,
+                        )
+                    })
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
@@ -649,18 +655,73 @@ export class UkomExamScheduleAddComponent implements OnInit {
         this.isUpdateModalOpen.set(!this.isUpdateModalOpen())
     }
 
-    private handleCreateError(err: any) {
+    private handleCreateError(err: any): void {
         console.error(err)
 
-        if (err.error?.code === 'ESS-00001') {
-            this.handlerService.handleAlert(
-                'Error',
-                'Jumlah slot waktu tidak mencukupi untuk semua peserta',
-            )
-            return
-        }
+        const errorCode = err?.error?.code
 
-        this.handlerService.handleAlert('Error', 'Gagal membuat jadwal ujian')
+        switch (errorCode) {
+            case 'ESS-00001':
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Jumlah slot waktu tidak mencukupi untuk semua peserta',
+                )
+                break
+
+            case 'RCD-00002': {
+                const examinerId = this.mapExaminerIdFromErrorMessage(
+                    err?.error?.message,
+                )
+
+                if (!examinerId) {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Terdeteksi konflik jadwal ujian penguji',
+                    )
+                    break
+                }
+
+                this.examinerService
+                    .searchExaminerV2({ id: examinerId })
+                    .pipe(take(1))
+                    .subscribe({
+                        next: (examiner) => {
+                            const examinerName =
+                                examiner?.data?.[0]?.user?.name ?? examinerId
+
+                            this.handlerService.handleAlert(
+                                'Error',
+                                `Penguji ${examinerName} memiliki jadwal ujian yang bentrok`,
+                            )
+                        },
+                        error: () => {
+                            this.handlerService.handleAlert(
+                                'Error',
+                                `Terdeteksi konflik jadwal ujian untuk penguji dengan ID ${examinerId}`,
+                            )
+                        },
+                    })
+                break
+            }
+
+            default:
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal membuat jadwal ujian',
+                )
+        }
+    }
+
+    private mapExaminerIdFromErrorMessage(errorMessage: string): string | null {
+        if (!errorMessage) return null
+
+        // UUID v4 pattern (covers your example)
+        const uuidRegex =
+            /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+
+        const match = errorMessage.match(uuidRegex)
+
+        return match ? match[0] : null
     }
 
     private buildPrimaryRequest(examType: string): BaseExamScheduleRequest {

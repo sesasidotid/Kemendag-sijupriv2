@@ -8,6 +8,10 @@ import { BaseExamScheduleRequest } from '../models/exam-schedule/create-exam-sch
 import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
 import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-examiner-list.model'
 import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-schedule/update-examiner-for-participant-request.model'
+import {
+    ExamScheduleCalendar,
+    ExamScheduleCalendarPayload,
+} from '@/modules/ukom/models/exam-schedule/exam-schedule-calendar.model'
 
 @Injectable({
     providedIn: 'root',
@@ -83,5 +87,16 @@ export class UkomExamScheduleService {
             `${this.API_BASE_URL}/examiner_schedule`,
             payload,
         )
+    }
+
+    getAllExamScheduleCalendar(
+        payload: ExamScheduleCalendarPayload,
+    ): Observable<ExamScheduleCalendar[]> {
+        const query = new URLSearchParams({
+            startDate: payload.startDate,
+            endDate: payload.endDate,
+        }).toString()
+
+        return this.apiService.getData(`${this.API_BASE_URL}/calendar?${query}`)
     }
 }

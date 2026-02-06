@@ -1,221 +1,3 @@
-// import { Component, computed, inject, OnInit, signal } from '@angular/core'
-// import { CommonModule } from '@angular/common'
-// import { FormsModule } from '@angular/forms'
-// import { HandlerService } from '@/modules/base/services/handler.service'
-// import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-// import { ActivatedRoute, Router } from '@angular/router'
-// import { ExamService } from '@/modules/ukom/services/exam.service'
-// import { finalize } from 'rxjs'
-// import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
-// import {
-//     MakalahExamAnswer,
-//     SaveExamAnswerRequest,
-// } from '@/modules/ukom/models/exam/exam-answer.model'
-// import { SeminarMakalahDraftService } from '@/siukom-examiner/seminer-makalah/seminer-makalah-draft.service'
-//
-// @Component({
-//     selector: 'app-seminer-makalah',
-//     standalone: true,
-//     imports: [CommonModule, FormsModule],
-//     templateUrl: './seminer-makalah.component.html',
-//     styleUrls: ['./seminer-makalah.component.scss'],
-// })
-// export class SeminerMakalahComponent implements OnInit {
-//     handlerService = inject(HandlerService)
-//     confirmationService = inject(ConfirmationService)
-//
-//     examScheduleId: string
-//     participantId: string
-//     loadingQuestions = signal(false)
-//     participantAnswer = signal<ExamQuestion | null>(null)
-//     questions = signal<ExamQuestion[]>([])
-//     answers = signal<Record<string, MakalahExamAnswer>>({})
-//     submitQuestionLoading = signal(false)
-//
-//     paperUrl = computed(() => {
-//         const answer = this.participantAnswer()
-//         return answer?.answerDto?.answerUploadUrl ?? null
-//     })
-//     examStarted = computed(() => !!this.paperUrl())
-//
-//     private route = inject(ActivatedRoute)
-//     private router = inject(Router)
-//     private examService = inject(ExamService)
-//     private handlerServive = inject(HandlerService)
-//     private draftService = inject(SeminarMakalahDraftService)
-//     private saveTimeout: number | undefined
-//
-//     constructor() {}
-//
-//     ngOnInit(): void {
-//         this.examScheduleId = this.route.snapshot.paramMap.get('id')
-//         this.participantId = this.route.snapshot.paramMap.get('participantId')
-//         this.fetchQuestionsToGrade()
-//     }
-//
-//     fetchQuestionsToGrade() {
-//         this.loadingQuestions.set(true)
-//
-//         this.examService
-//             .getExamQuestionsByScheduleAndParticipant(
-//                 this.examScheduleId,
-//                 this.participantId,
-//                 { page: '1', limit: '1000' },
-//             )
-//             .pipe(finalize(() => this.loadingQuestions.set(false)))
-//             .subscribe({
-//                 next: async (result) => {
-//                     const allQuestions = result.data
-//
-//                     const baseQuestion =
-//                         allQuestions.find(
-//                             (q) => q.parentQuestionId === null && q.answerDto,
-//                         ) ?? null
-//
-//                     const examinerQuestions = baseQuestion
-//                         ? allQuestions.filter(
-//                               (q) => q.parentQuestionId === baseQuestion.id,
-//                           )
-//                         : []
-//
-//                     this.participantAnswer.set(baseQuestion)
-//                     this.questions.set(examinerQuestions)
-//
-//                     const initialAnswers: Record<string, MakalahExamAnswer> = {}
-//
-//                     // Initialize answers
-//                     examinerQuestions.forEach((q) => {
-//                         initialAnswers[q.id] = new MakalahExamAnswer({
-//                             questionId: q.id,
-//                         })
-//                     })
-//
-//                     // Load draft first
-//                     const draft = await this.draftService.load(
-//                         this.examScheduleId,
-//                         this.participantId,
-//                     )
-//
-//                     if (draft) {
-//                         this.answers.set(draft.answers)
-//                     } else {
-//                         this.answers.set(initialAnswers)
-//                     }
-//
-//                     // Prioritize server answers over draft
-//                     const finalAnswers = { ...this.answers() }
-//                     examinerQuestions.forEach((q) => {
-//                         if (q.answerDto) {
-//                             const hasScore =
-//                                 q.answerDto.score !== null &&
-//                                 q.answerDto.score !== undefined
-//                             const hasAnswerText =
-//                                 q.answerDto.answerText !== null &&
-//                                 q.answerDto.answerText !== undefined &&
-//                                 q.answerDto.answerText.trim() !== ''
-//
-//                             if (hasScore || hasAnswerText) {
-//                                 finalAnswers[q.id] = new MakalahExamAnswer({
-//                                     questionId: q.id,
-//                                     answerText: q.answerDto.answerText || '',
-//                                     score: q.answerDto.score,
-//                                 })
-//                             }
-//                         }
-//                     })
-//                     this.answers.set(finalAnswers)
-//                 },
-//                 error: (err) => {
-//                     console.error(err)
-//                     this.handlerServive.handleAlert(
-//                         'Error',
-//                         'Gagal mengambil data makalah peserta.',
-//                     )
-//                 },
-//             })
-//     }
-//
-//     openPaper(): void {
-//         if (this.paperUrl()) {
-//             window.open(this.paperUrl(), '_blank')
-//         } else {
-//             this.handlerService.handleAlert(
-//                 'Info',
-//                 'Tidak ada file makalah untuk dibuka.',
-//             )
-//         }
-//     }
-//
-//     isFormValid(): boolean {
-//         return this.questions().every(
-//             (q) =>
-//                 this.answers()[q.id]?.score !== undefined &&
-//                 this.answers()[q.id]?.score !== null,
-//         )
-//     }
-//
-//     submitAssessment(): void {
-//         this.confirmationService.open(false).subscribe({
-//             next: ({ confirmed }) => {
-//                 if (!confirmed) return
-//
-//                 this.submitQuestionLoading.set(true)
-//
-//                 const payload: SaveExamAnswerRequest = {
-//                     answerDtoList: Object.values(this.answers()).map(
-//                         (answer) => ({
-//                             ...answer,
-//                             participantId: this.participantId,
-//                         }),
-//                     ),
-//                 }
-//
-//                 this.examService
-//                     .saveExamAnswersForExaminerByExamScheduleId(
-//                         this.examScheduleId,
-//                         payload,
-//                     )
-//                     .pipe(finalize(() => this.submitQuestionLoading.set(false)))
-//                     .subscribe({
-//                         next: () => {
-//                             this.handlerService.handleAlert(
-//                                 'Success',
-//                                 'Penilaian makalah berhasil disimpan.',
-//                             )
-//                             this.draftService
-//                                 .remove(this.examScheduleId, this.participantId)
-//                                 .then(() => {
-//                                     this.backToDashboard()
-//                                 })
-//                         },
-//                         error: (err) => {
-//                             console.error(err)
-//                             this.handlerService.handleAlert(
-//                                 'Error',
-//                                 'Gagal menyimpan penilaian makalah.',
-//                             )
-//                         },
-//                     })
-//             },
-//         })
-//     }
-//
-//     backToDashboard() {
-//         this.router.navigate(['/'])
-//     }
-//
-//     scheduleAutoSave() {
-//         clearTimeout(this.saveTimeout)
-//         this.saveTimeout = window.setTimeout(() => {
-//             this.draftService.save(
-//                 this.examScheduleId,
-//                 this.participantId,
-//                 this.answers(),
-//             )
-//         }, 500)
-//     }
-// }
-
 import { Component, effect, inject, OnInit, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import {
@@ -238,6 +20,10 @@ import { SeminarMakalahDraftService } from '@/siukom-examiner/seminer-makalah/se
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 
 @Component({
     selector: 'app-seminer-makalah',
@@ -263,6 +49,7 @@ export class SeminerMakalahComponent implements OnInit {
     router = inject(Router)
     examService = inject(ExamService)
 
+    startExamLoading = signal(false)
     loadingQuestions = signal(false)
     submitting = signal(false)
     examId = signal('')
@@ -270,7 +57,11 @@ export class SeminerMakalahComponent implements OnInit {
     questions = signal<ExamQuestion[]>([])
     participantAnswer = signal<ExamQuestion | null>(null)
 
+    examStarted = signal(false)
+
     assessmentForm: FormGroup
+    examScheduleService = inject(UkomExamScheduleService)
+    examScheduleDetail = signal<ExamSchedule | null>(null)
     private saveTimeout: number | undefined
 
     constructor() {
@@ -293,6 +84,16 @@ export class SeminerMakalahComponent implements OnInit {
             },
             { allowSignalWrites: true },
         )
+
+        effect(
+            () => {
+                const examId = this.examId()
+                if (examId) {
+                    this.getExamScheduleDetail()
+                }
+            },
+            { allowSignalWrites: true },
+        )
     }
 
     get answerDtoList(): FormArray {
@@ -306,7 +107,62 @@ export class SeminerMakalahComponent implements OnInit {
         })
     }
 
-    fetchQuestionsToGrade() {
+    startTheExam() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.startExamLoading.set(true)
+
+                this.examService
+                    .startExamByExaminer(
+                        new ExaminerExamStartRequest({
+                            participantId: this.participantId(),
+                            examTypeCode: ExamTypeCategory.WAWANCARA,
+                            roomUkomId: this.examScheduleDetail().roomUkomId,
+                            examScheduleId: this.examId(),
+                        }),
+                    )
+                    .pipe(finalize(() => this.startExamLoading.set(false)))
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil memulai ujian.',
+                            )
+                            this.examStarted.set(true)
+                            // Reload questions after starting exam
+                            this.fetchQuestionsToGrade(true)
+                        },
+                        error: (err) => {
+                            console.error(err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal memulai ujian, silahkan coba lagi.',
+                            )
+                        },
+                    })
+            },
+        })
+    }
+
+    getExamScheduleDetail() {
+        this.examScheduleService
+            .getExamScheduleDetailById(this.examId())
+            .subscribe({
+                next: (res) => {
+                    this.examScheduleDetail.set(res)
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data jadwal.',
+                    )
+                },
+            })
+    }
+    fetchQuestionsToGrade(afterStart: boolean = false) {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
@@ -318,6 +174,11 @@ export class SeminerMakalahComponent implements OnInit {
             .subscribe({
                 next: async (result) => {
                     const data = result.data
+
+                    if (!afterStart && result.data.length > 0) {
+                        this.examStarted.set(true)
+                    }
+
                     const baseQuestion = data.find(
                         (item) => item.id === 'base_makalah_question',
                     )

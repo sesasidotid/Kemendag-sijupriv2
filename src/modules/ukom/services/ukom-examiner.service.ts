@@ -9,6 +9,7 @@ export interface SearchExaminerParams {
     page?: number
     searchName?: string
     userId?: string
+    id?: string
 }
 
 @Injectable({
@@ -53,6 +54,7 @@ export class UkomExaminerService {
         if (params.page !== undefined) queryParams['page'] = params.page
         if (params.searchName) queryParams['like_user|name'] = params.searchName
         if (params.userId) queryParams['eq_userId'] = params.userId
+        if (params.id) queryParams['eq_id'] = params.id
 
         const queryString = new URLSearchParams(queryParams).toString()
 

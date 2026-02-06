@@ -267,8 +267,11 @@ export class ScheduleSlotService {
     private getNextAvailableTimeAfterBreak(currentTime: Date): Date {
         const hour = this.getHour(currentTime)
 
-        // If in or before lunch break, jump to 13:00 same day
-        if (hour < this.MIDDAY_UNAVAILABLE_END_HOUR) {
+        // If in lunch break (12:00-13:00), jump to 13:00 same day
+        if (
+            hour >= this.MIDDAY_UNAVAILABLE_START_HOUR &&
+            hour < this.MIDDAY_UNAVAILABLE_END_HOUR
+        ) {
             const nextTime = new Date(currentTime)
             nextTime.setUTCHours(this.MIDDAY_UNAVAILABLE_END_HOUR, 0, 0, 0)
 
@@ -280,7 +283,7 @@ export class ScheduleSlotService {
             return nextTime
         }
 
-        // If in or before night time, jump to 08:00 next day
+        // If in night time (17:00-08:00), jump to 08:00 same or next day
         if (
             hour >= this.UNAVAILABLE_START_HOUR ||
             hour < this.UNAVAILABLE_END_HOUR

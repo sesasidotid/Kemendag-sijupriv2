@@ -306,7 +306,11 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
         return a.startTime < b.endTime && a.endTime > b.startTime
     }
 
-    private parseDateTime(dateStr: string): Date {
+    private parseDateTime(dateStr: string | null): Date {
+        if (!dateStr) {
+            return new Date() // Return current date as fallback
+        }
+        // Handle format "2026-02-06 13:53:00" (space between date and time)
         const normalized = dateStr.replace(' ', 'T')
         return new Date(normalized)
     }

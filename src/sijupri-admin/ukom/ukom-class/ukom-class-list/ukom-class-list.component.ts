@@ -31,11 +31,11 @@ import { RoomUkom } from '@/modules/ukom/models/room-ukom.model'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import {
-    generateDemoScheduleData,
     ScheduleItem,
     ScheduleTimelineModalComponent,
 } from '@/modules/base/components/schedule-timeline'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 
 @Component({
     selector: 'app-ukom-class-list',
@@ -75,6 +75,9 @@ export class UkomClassListComponent implements OnInit {
 
     isTimelineModalOpen = signal(false)
     timelineSchedules = signal<ScheduleItem[]>([])
+    dateRangeForm: FormGroup
+    isLoadingSchedules = signal(false)
+    hasLoadedSchedules = signal(false)
     private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
     bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
 
@@ -85,7 +88,22 @@ export class UkomClassListComponent implements OnInit {
         private apiService: ApiService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService,
-    ) {}
+        private examScheduleService: UkomExamScheduleService,
+    ) {
+        // Initialize date range form
+        const today = new Date()
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+
+        this.dateRangeForm = new FormGroup({
+            startDate: new FormControl(this.formatDate(firstDay), [
+                Validators.required,
+            ]),
+            endDate: new FormControl(this.formatDate(lastDay), [
+                Validators.required,
+            ]),
+        })
+    }
 
     ngOnInit() {
         this.handleTabService()
@@ -144,22 +162,18 @@ export class UkomClassListComponent implements OnInit {
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
                         .withDynamicValue('Mulai', (data: RoomUkom) => {
-                            const formattedDate =
-                                this.tanggalWaktuPipe.transform(
-                                    data.examStartAt,
-                                )
-
-                            return formattedDate
+                            return this.tanggalWaktuPipe.transform(
+                                data.examStartAt,
+                            )
                         })
                         .build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
                         .withDynamicValue('Selesai', (data: RoomUkom) => {
-                            const formattedDate =
-                                this.tanggalWaktuPipe.transform(data.examEndAt)
-
-                            return formattedDate
+                            return this.tanggalWaktuPipe.transform(
+                                data.examEndAt,
+                            )
                         })
                         .build(),
                 )
@@ -452,20 +466,64 @@ export class UkomClassListComponent implements OnInit {
 
     // Timeline modal methods
     openTimelineModal(): void {
-        const demoSchedules = generateDemoScheduleData(50)
-        this.timelineSchedules.set(demoSchedules)
+        // Reset state
+        this.hasLoadedSchedules.set(false)
+        this.timelineSchedules.set([])
         this.isTimelineModalOpen.set(true)
+
+        // Reset date range to current month
+        const today = new Date()
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+
+        this.dateRangeForm.patchValue({
+            startDate: this.formatDate(firstDay),
+            endDate: this.formatDate(lastDay),
+        })
     }
 
-    // Use this method to open timeline with real API data
-    openTimelineWithData(schedules: ScheduleItem[]): void {
-        this.timelineSchedules.set(schedules)
-        this.isTimelineModalOpen.set(true)
+    // Load schedules from API
+    loadSchedules(): void {
+        if (this.dateRangeForm.invalid) {
+            this.handlerService.handleAlert(
+                'Warning',
+                'Mohon lengkapi tanggal mulai dan tanggal akhir',
+            )
+            return
+        }
+
+        this.isLoadingSchedules.set(true)
+        const { startDate, endDate } = this.dateRangeForm.value
+
+        this.examScheduleService
+            .getAllExamScheduleCalendar({ startDate, endDate })
+            .pipe(
+                map((response) =>
+                    response.filter((item) => !!item.personalSchedule),
+                ),
+            )
+            .subscribe({
+                next: (response) => {
+                    const schedules = this.transformToScheduleItems(response)
+                    this.timelineSchedules.set(schedules)
+                    this.hasLoadedSchedules.set(true)
+                    this.isLoadingSchedules.set(false)
+                },
+                error: (error) => {
+                    console.error('Error loading schedules:', error)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data jadwal',
+                    )
+                    this.isLoadingSchedules.set(false)
+                },
+            })
     }
 
     closeTimelineModal(): void {
         this.isTimelineModalOpen.set(false)
         this.timelineSchedules.set([])
+        this.hasLoadedSchedules.set(false)
     }
 
     submit() {
@@ -490,7 +548,7 @@ export class UkomClassListComponent implements OnInit {
                 this.apiService
                     .putData('/api/v1/room_ukom', payload)
                     .subscribe({
-                        next: (response) => {
+                        next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Berhasil mengubah data',
@@ -510,5 +568,51 @@ export class UkomClassListComponent implements OnInit {
                     })
             },
         })
+    }
+
+    // Transform API response to ScheduleItem format
+    private transformToScheduleItems(data: any[]): ScheduleItem[] {
+        return data.map((item) => {
+            const duration =
+                item.personalScheduleEnd && item.personalSchedule
+                    ? this.calculateDuration(
+                          item.personalSchedule,
+                          item.personalScheduleEnd,
+                      )
+                    : 1 // default 1 hour
+
+            return {
+                participantScheduleId: item.id,
+                examScheduleId: item.examScheduleId,
+                personalSchedule: item.personalSchedule,
+                duration: duration,
+                participantId: item.participantId,
+                name: item.participantUkom?.name || 'Tidak Diketahui',
+                email: item.participantUkom?.email,
+                phone: item.participantUkom?.phone,
+                nip: item.participantUkom?.nip,
+                jabatanName: item.examSchedule?.roomUkom?.jabatanName,
+                jenjangName: item.examSchedule?.roomUkom?.jenjangName,
+                unitKerjaName: item.participantUkom?.unitKerjaName,
+                jenisUkom: item.examSchedule?.examTypeCode || 'CAT',
+            } as ScheduleItem
+        })
+    }
+
+    // Calculate duration in hours between two datetime strings
+    private calculateDuration(start: string, end: string): number {
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+        const diffMs = endDate.getTime() - startDate.getTime()
+        const diffHours = diffMs / (1000 * 60 * 60)
+        return Math.max(diffHours, 0.25) // minimum 15 minutes (0.25 hours)
+    }
+
+    // Format date to YYYY-MM-DD
+    private formatDate(date: Date): string {
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
     }
 }

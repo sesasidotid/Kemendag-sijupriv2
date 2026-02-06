@@ -204,8 +204,11 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
     }
 
     // Parse datetime string to Date
-    private parseDateTime(dateStr: string): Date {
-        // Handle format "YYYY-MM-DD HH:mm:ss"
+    private parseDateTime(dateStr: string | null): Date {
+        if (!dateStr) {
+            return new Date() // Return current date as fallback
+        }
+        // Handle format "2026-02-06 13:53:00" (space between date and time)
         const normalized = dateStr.replace(' ', 'T')
         return new Date(normalized)
     }
