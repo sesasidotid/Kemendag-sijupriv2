@@ -92,7 +92,7 @@
         class="tooltip-container"
     >
         <div [style.background-color]="schedule.color" class="tooltip-header">
-            {{ getJabatanDisplayName(schedule.jabatanName) }}
+            {{ schedule.nextJabatanName }}
         </div>
         <div class="tooltip-body">
             <div class="tooltip-row">
@@ -117,9 +117,15 @@
                     >{{ formatDuration(schedule.durationMinutes) }}</span
                 >
             </div>
-            <div *ngIf="schedule.jenjangName" class="tooltip-row">
-                <span class="tooltip-label">Jenjang:</span>
-                <span class="tooltip-value">{{ schedule.jenjangName }}</span>
+            <div *ngIf="schedule.nextJenjangName" class="tooltip-row">
+                <span class="tooltip-label">Jenjang yang Dituju:</span>
+                <span class="tooltip-value"
+                    >{{ schedule.nextJenjangName }}</span
+                >
+            </div>
+            <div *ngIf="schedule.jenisUjian" class="tooltip-row">
+                <span class="tooltip-label">Jenis Ujian:</span>
+                <span class="tooltip-value">{{ schedule.jenisUjian }}</span>
             </div>
             <div *ngIf="schedule.jenisUkom" class="tooltip-row">
                 <span class="tooltip-label">Jenis Ukom:</span>

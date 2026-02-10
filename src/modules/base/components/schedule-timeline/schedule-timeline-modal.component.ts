@@ -2,6 +2,7 @@ import {
     ChangeDetectionStrategy,
     Component,
     EventEmitter,
+    inject,
     Input,
     OnInit,
     Output,
@@ -14,6 +15,7 @@ import {
 } from './schedule-timeline.component'
 import { ScheduleTimelineTableComponent } from './schedule-timeline-table.component'
 import * as XLSX from 'xlsx'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 
 type ViewMode = 'gantt' | 'table'
 
@@ -98,7 +100,7 @@ type ViewMode = 'gantt' | 'table'
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 12px 16px;
+                padding: 12px 0px;
                 background-color: #fff;
                 //border-bottom: 1px solid #dee2e6;
                 flex-shrink: 0;
@@ -127,6 +129,8 @@ export class ScheduleTimelineModalComponent implements OnInit {
     @Output() closeTimeline = new EventEmitter<void>()
 
     viewMode$ = new BehaviorSubject<ViewMode>('table')
+
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
 
     ngOnInit(): void {
         this.viewMode$.next(this.defaultView)
@@ -159,9 +163,10 @@ export class ScheduleTimelineModalComponent implements OnInit {
                 'Waktu Mulai': this.formatTime(startTime),
                 'Waktu Selesai': this.formatTime(endTime),
                 Durasi: this.formatDuration(schedule.duration * 60),
-                Jabatan: schedule.jabatanName || '-',
-                Jenjang: schedule.jenjangName || '-',
-                'Jenis Ukom': this.formatJenisUkom(schedule.jenisUkom),
+                'Jabatan yang Dituju': schedule.nextJabatanName || '-',
+                'Jenjang yang Dituju': schedule.nextJenjangName || '-',
+                'Jenis Ujian': schedule.jenisUjian,
+                'Jenis Ukom': schedule.jenisUkom,
                 'Unit Kerja': schedule.unitKerjaName || '-',
                 Email: schedule.email || '-',
                 'No. Telepon': schedule.phone || '-',
@@ -180,8 +185,8 @@ export class ScheduleTimelineModalComponent implements OnInit {
             { wch: 12 }, // Waktu Mulai
             { wch: 12 }, // Waktu Selesai
             { wch: 12 }, // Durasi
-            { wch: 20 }, // Jabatan
-            { wch: 15 }, // Jenjang
+            { wch: 20 }, // NextJabatan
+            { wch: 15 }, // NextJenjang
             { wch: 20 }, // Jenis Ukom
             { wch: 25 }, // Unit Kerja
             { wch: 25 }, // Email
@@ -226,16 +231,5 @@ export class ScheduleTimelineModalComponent implements OnInit {
             return `${hours} jam`
         }
         return `${hours} jam ${remainingMinutes} menit`
-    }
-
-    private formatJenisUkom(jenisUkom: string): string {
-        const jenisUkomMap: Record<string, string> = {
-            CAT: 'CAT (Computer Assisted Test)',
-            CBT: 'CBT (Computer Based Test)',
-            WAWANCARA: 'Wawancara',
-            PRAKTEK: 'Praktik',
-            SEMINAR: 'Seminar',
-        }
-        return jenisUkomMap[jenisUkom?.toUpperCase()] || jenisUkom || 'CAT'
     }
 }

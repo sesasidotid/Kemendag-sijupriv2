@@ -41,7 +41,11 @@
 
             <div class="info-action">
                 <ng-container *ngIf="roomUkom.vidCallLink; else noLink">
-                    <a [href]="getAbsoluteUrl(roomUkom.vidCallLink)" class="btn-action-primary" target="_blank">
+                    <a
+                        [href]="getAbsoluteUrl(roomUkom.vidCallLink)"
+                        class="btn-action-primary"
+                        target="_blank"
+                    >
                         <i class="mdi mdi-video-outline me-2"></i>
                         Bergabung ke Zoom
                     </a>
@@ -57,14 +61,18 @@
         </div>
     </div>
 
-    <ng-container *ngIf="roomUkom?.examScheduleDtoList.length > 0; else emptyState">
+    <ng-container
+        *ngIf="roomUkom?.examScheduleDtoList.length > 0; else emptyState"
+    >
         <section class="section-primary">
             <div class="section-header-bar">
                 <h2 class="section-title">
                     <span class="status-indicator status-active"></span>
                     Jadwal Ujian Anda
                 </h2>
-                <span class="badge-count">{{ roomUkom.examScheduleDtoList.length }}</span>
+                <span class="badge-count"
+                    >{{ roomUkom.examScheduleDtoList.length }}</span
+                >
             </div>
 
             <!--            <p class="section-description">-->
@@ -73,17 +81,25 @@
             <!--            </p>-->
 
             <div class="schedule-cards">
-                <article *ngFor="let exam of roomUkom.examScheduleDtoList"
+                <article
+                    *ngFor="let exam of roomUkom.examScheduleDtoList"
                     [class.schedule-card-completed]="hasScore(exam.id)"
                     [class.schedule-card-missed]="isExamMissed(exam)"
                     [class.schedule-card-ongoing]="isExamOngoing(exam)"
-                    [class.schedule-card-upcoming]="isExamUpcoming(exam)" class="schedule-card">
-                    <div [class.status-completed-label]="hasScore(exam.id)"
+                    [class.schedule-card-upcoming]="isExamUpcoming(exam)"
+                    class="schedule-card"
+                >
+                    <div
+                        [class.status-completed-label]="hasScore(exam.id)"
                         [class.status-missed-label]="isExamMissed(exam)"
                         [class.status-ongoing-label]="isExamOngoing(exam)"
-                        [class.status-upcoming-label]="isExamUpcoming(exam)" class="schedule-status-label">
+                        [class.status-upcoming-label]="isExamUpcoming(exam)"
+                        class="schedule-status-label"
+                    >
                         <span class="mdi mdi-circle-medium me-1"></span>
-                        <span *ngIf="isExamOngoing(exam)">Sedang Berlangsung</span>
+                        <span *ngIf="isExamOngoing(exam)"
+                            >Sedang Berlangsung</span
+                        >
                         <span *ngIf="isExamUpcoming(exam)">Belum Dimulai</span>
                         <span *ngIf="hasScore(exam.id)">Selesai</span>
                         <span *ngIf="isExamMissed(exam)">Waktu Berakhir</span>
@@ -102,61 +118,93 @@
                         <!-- For exams with personal schedule (Wawancara/Seminar) -->
                         <ng-container *ngIf="isPersonalScheduleExam(exam)">
                             <div class="meta-item">
-                                <span class="mdi mdi-calendar-range me-1"></span>
+                                <span
+                                    class="mdi mdi-calendar-range me-1"
+                                ></span>
                                 <span class="meta-label">Periode Ujian:</span>
                                 <span class="meta-value">
-                                    {{ exam.startTime | formatExamSchedule: exam.endTime }}
+                                    {{ exam.startTime | formatExamSchedule:
+                                    exam.endTime }}
                                 </span>
                             </div>
                             <div class="meta-item">
                                 <span class="mdi mdi-clock-outline me-1"></span>
                                 <span class="meta-label">Jadwal Anda:</span>
                                 <span class="meta-value">
-                                    {{ exam.personalSchedule | formatExamSchedule: undefined : exam.duration }}
+                                    {{ exam.personalSchedule |
+                                    formatExamSchedule: undefined :
+                                    exam.duration }}
                                 </span>
                             </div>
                         </ng-container>
 
                         <!-- For regular exams -->
-                        <div *ngIf="!isPersonalScheduleExam(exam)" class="meta-item">
+                        <div
+                            *ngIf="!isPersonalScheduleExam(exam)"
+                            class="meta-item"
+                        >
                             <span class="mdi mdi-calendar-clock me-1"></span>
                             <span class="meta-label">Jadwal:</span>
                             <span class="meta-value">
-                                {{ exam.startTime | formatExamSchedule: exam.endTime }}
+                                {{ exam.startTime | formatExamSchedule:
+                                exam.endTime }}
                             </span>
                         </div>
                     </div>
 
                     <div class="schedule-actions">
                         <!-- CAT -->
-                        <ng-container *ngIf="exam.examTypeCode === ExamTypeCategory.CAT">
+                        <ng-container
+                            *ngIf="exam.examTypeCode === ExamTypeCategory.CAT"
+                        >
                             <!-- 1. Has score → Show result -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null">
-                                <button (click)="openScoreModal(exam.id)" class="btn-action-success" type="button">
-                                    <span class="mdi mdi-check-circle me-2"></span>
+                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null"
+                            >
+                                <button
+                                    (click)="openScoreModal(exam.id)"
+                                    class="btn-action-success"
+                                    type="button"
+                                >
+                                    <span
+                                        class="mdi mdi-check-circle me-2"
+                                    ></span>
                                     Lihat Nilai
                                 </button>
                             </ng-container>
 
                             <!-- 2. No score yet -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null">
+                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null"
+                            >
                                 <!-- 2a. Upcoming - not started yet -->
-                                <div *ngIf="isExamUpcoming(exam)" class="status-info status-info-upcoming">
-                                    <span class="mdi mdi-clock-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamUpcoming(exam)"
+                                    class="status-info status-info-upcoming"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-outline me-2"
+                                    ></span>
                                     Ujian belum dimulai
                                 </div>
 
                                 <!-- 2b. Ongoing - can start exam -->
-                                <app-loading-button (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                    *ngIf="isExamOngoing(exam)" [className]="'btn-action-primary'"
-                                    [isLoading]="startCATLoading()" [label]="'Mulai Ujian'"></app-loading-button>
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="isExamOngoing(exam)"
+                                    [className]="'btn-action-primary'"
+                                    [isLoading]="startCATLoading()"
+                                    [label]="'Mulai Ujian'"
+                                ></app-loading-button>
 
                                 <!-- 2c. Expired - time over, no score -->
-                                <div *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
-                                    class="status-info status-info-neutral">
-                                    <span class="mdi mdi-clock-check-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
+                                    class="status-info status-info-neutral"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-check-outline me-2"
+                                    ></span>
                                     Ujian telah selesai. Saat ini sedang
                                     menunggu penilaian dari penguji.
                                 </div>
@@ -164,34 +212,69 @@
                         </ng-container>
 
                         <!-- MAKALAH -->
-                        <ng-container *ngIf="exam.examTypeCode === ExamTypeCategory.MAKALAH">
+                        <ng-container
+                            *ngIf="exam.examTypeCode === ExamTypeCategory.MAKALAH"
+                        >
                             <!-- 1. Has score → Show uploaded -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null">
-                                <button (click)="viewUploadedMakalah(exam.id)" class="btn-action-success" type="button">
-                                    <span class="mdi mdi-check-circle me-2"></span>
-                                    Makalah Terkirim
-                                </button>
+                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null"
+                            >
+                                <div class="d-flex gap-2">
+                                    <button
+                                        (click)="openScoreModal(exam.id)"
+                                        class="btn-action-success flex-fill"
+                                        type="button"
+                                    >
+                                        <span
+                                            class="mdi mdi-check-circle me-2"
+                                        ></span>
+                                        Lihat Nilai
+                                    </button>
+                                    <button
+                                        (click)="viewUploadedMakalah(exam.id)"
+                                        class="btn btn-outline-primary"
+                                        type="button"
+                                    >
+                                        <span
+                                            class="mdi mdi-file-document me-2"
+                                        ></span>
+                                        Lihat File
+                                    </button>
+                                </div>
                             </ng-container>
 
                             <!-- 2. No score yet -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null">
+                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null"
+                            >
                                 <!-- 2a. Upcoming -->
-                                <div *ngIf="isExamUpcoming(exam)" class="status-info status-info-upcoming">
-                                    <span class="mdi mdi-clock-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamUpcoming(exam)"
+                                    class="status-info status-info-upcoming"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-outline me-2"
+                                    ></span>
                                     Ujian belum dimulai
                                 </div>
 
                                 <!-- 2b. Ongoing -->
-                                <app-loading-button (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                    *ngIf="isExamOngoing(exam)" [className]="'btn-action-primary'"
-                                    [isLoading]="startMakalahLoading()" [label]="'Unggah Makalah'"></app-loading-button>
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="isExamOngoing(exam)"
+                                    [className]="'btn-action-primary'"
+                                    [isLoading]="startMakalahLoading()"
+                                    [label]="'Unggah Makalah'"
+                                ></app-loading-button>
 
                                 <!-- 2c. Expired -->
-                                <div *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
-                                    class="status-info status-info-neutral">
-                                    <span class="mdi mdi-clock-check-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
+                                    class="status-info status-info-neutral"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-check-outline me-2"
+                                    ></span>
                                     Ujian telah selesai. Saat ini sedang
                                     menunggu penilaian dari penguji.
                                 </div>
@@ -199,22 +282,37 @@
                         </ng-container>
 
                         <!-- WAWANCARA -->
-                        <ng-container *ngIf="exam.examTypeCode === ExamTypeCategory.WAWANCARA">
+                        <ng-container
+                            *ngIf="exam.examTypeCode === ExamTypeCategory.WAWANCARA"
+                        >
                             <!-- 1. Has score -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null">
-                                <button class="btn-action-success" type="button">
-                                    <span class="mdi mdi-check-circle me-2"></span>
-                                    Wawancara Selesai
+                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null"
+                            >
+                                <button
+                                    (click)="openScoreModal(exam.id)"
+                                    class="btn-action-success"
+                                    type="button"
+                                >
+                                    <span
+                                        class="mdi mdi-check-circle me-2"
+                                    ></span>
+                                    Lihat Nilai
                                 </button>
                             </ng-container>
 
                             <!-- 2. No score yet -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null">
+                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null"
+                            >
                                 <!-- 2a. Upcoming -->
-                                <div *ngIf="isExamUpcoming(exam)" class="info-note info-note-upcoming">
-                                    <span class="mdi mdi-clock-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamUpcoming(exam)"
+                                    class="info-note info-note-upcoming"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-outline me-2"
+                                    ></span>
                                     <div>
                                         <div class="note-title">
                                             Wawancara Belum Dimulai
@@ -227,8 +325,13 @@
                                 </div>
 
                                 <!-- 2b. Ongoing -->
-                                <div *ngIf="isExamOngoing(exam)" class="info-note info-note-ongoing">
-                                    <span class="mdi mdi-video-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamOngoing(exam)"
+                                    class="info-note info-note-ongoing"
+                                >
+                                    <span
+                                        class="mdi mdi-video-outline me-2"
+                                    ></span>
                                     <div>
                                         <div class="note-title">
                                             Wawancara Sedang Berlangsung
@@ -241,9 +344,13 @@
                                 </div>
 
                                 <!-- 2c. Expired -->
-                                <div *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam) && !isExamOngoing(exam)"
-                                    class="info-note info-note-neutral">
-                                    <span class="mdi mdi-clock-check-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam) && !isExamOngoing(exam)"
+                                    class="info-note info-note-neutral"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-check-outline me-2"
+                                    ></span>
                                     <div>
                                         <div class="note-title">
                                             Jadwal Wawancara Telah Berakhir
@@ -257,34 +364,57 @@
                         </ng-container>
 
                         <!-- PRAKTIK -->
-                        <ng-container *ngIf="exam.examTypeCode === ExamTypeCategory.PRAKTIK">
+                        <ng-container
+                            *ngIf="exam.examTypeCode === ExamTypeCategory.PRAKTIK"
+                        >
                             <!-- 1. Has score -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null">
-                                <button class="btn-action-success" type="button">
-                                    <span class="mdi mdi-check-circle me-2"></span>
-                                    Praktik Selesai
+                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null"
+                            >
+                                <button
+                                    (click)="openScoreModal(exam.id)"
+                                    class="btn-action-success"
+                                    type="button"
+                                >
+                                    <span
+                                        class="mdi mdi-check-circle me-2"
+                                    ></span>
+                                    Lihat Nilai
                                 </button>
                             </ng-container>
 
                             <!-- 2. No score yet -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null">
+                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null"
+                            >
                                 <!-- 2a. Upcoming -->
-                                <div *ngIf="isExamUpcoming(exam)" class="status-info status-info-upcoming">
-                                    <span class="mdi mdi-clock-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamUpcoming(exam)"
+                                    class="status-info status-info-upcoming"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-outline me-2"
+                                    ></span>
                                     Ujian belum dimulai
                                 </div>
 
                                 <!-- 2b. Ongoing -->
-                                <app-loading-button (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                    *ngIf="isExamOngoing(exam)" [className]="'btn-action-primary'"
-                                    [isLoading]="startPraktikLoading()" [label]="'Mulai Praktik'"></app-loading-button>
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="isExamOngoing(exam)"
+                                    [className]="'btn-action-primary'"
+                                    [isLoading]="startPraktikLoading()"
+                                    [label]="'Mulai Praktik'"
+                                ></app-loading-button>
 
                                 <!-- 2c. Expired - neutral style for PRAKTIK -->
-                                <div *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
-                                    class="status-info status-info-neutral">
-                                    <span class="mdi mdi-clock-check-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
+                                    class="status-info status-info-neutral"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-check-outline me-2"
+                                    ></span>
                                     Ujian telah selesai. Saat ini sedang
                                     menunggu penilaian dari penguji.
                                 </div>
@@ -292,35 +422,57 @@
                         </ng-container>
 
                         <!-- STUDI KASUS -->
-                        <ng-container *ngIf="exam.examTypeCode === ExamTypeCategory.STUDI_KASUS">
+                        <ng-container
+                            *ngIf="exam.examTypeCode === ExamTypeCategory.STUDI_KASUS"
+                        >
                             <!-- 1. Has score -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null">
-                                <button class="btn-action-success" type="button">
-                                    <span class="mdi mdi-check-circle me-2"></span>
-                                    Studi Kasus Selesai
+                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null"
+                            >
+                                <button
+                                    (click)="openScoreModal(exam.id)"
+                                    class="btn-action-success"
+                                    type="button"
+                                >
+                                    <span
+                                        class="mdi mdi-check-circle me-2"
+                                    ></span>
+                                    Lihat Nilai
                                 </button>
                             </ng-container>
 
                             <!-- 2. No score yet -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null">
+                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null"
+                            >
                                 <!-- 2a. Upcoming -->
-                                <div *ngIf="isExamUpcoming(exam)" class="status-info status-info-upcoming">
-                                    <span class="mdi mdi-clock-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamUpcoming(exam)"
+                                    class="status-info status-info-upcoming"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-outline me-2"
+                                    ></span>
                                     Ujian belum dimulai
                                 </div>
 
                                 <!-- 2b. Ongoing -->
-                                <app-loading-button (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                    *ngIf="isExamOngoing(exam)" [className]="'btn-action-primary'"
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="isExamOngoing(exam)"
+                                    [className]="'btn-action-primary'"
                                     [isLoading]="startStudiKasusLoading()"
-                                    [label]="'Mulai Studi Kasus'"></app-loading-button>
+                                    [label]="'Mulai Studi Kasus'"
+                                ></app-loading-button>
 
                                 <!-- 2c. Expired -->
-                                <div *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
-                                    class="status-info status-info-neutral">
-                                    <span class="mdi mdi-clock-check-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
+                                    class="status-info status-info-neutral"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-check-outline me-2"
+                                    ></span>
                                     Ujian telah selesai. Saat ini sedang
                                     menunggu penilaian dari penguji.
                                 </div>
@@ -328,35 +480,57 @@
                         </ng-container>
 
                         <!-- PORTFOLIO -->
-                        <ng-container *ngIf="exam.examTypeCode === ExamTypeCategory.PORTOFOLIO">
+                        <ng-container
+                            *ngIf="exam.examTypeCode === ExamTypeCategory.PORTOFOLIO"
+                        >
                             <!-- 1. Has score -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null">
-                                <button class="btn-action-success" type="button">
-                                    <span class="mdi mdi-check-circle me-2"></span>
-                                    Portofolio Terkirim
+                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null"
+                            >
+                                <button
+                                    (click)="openScoreModal(exam.id)"
+                                    class="btn-action-success"
+                                    type="button"
+                                >
+                                    <span
+                                        class="mdi mdi-check-circle me-2"
+                                    ></span>
+                                    Lihat Nilai
                                 </button>
                             </ng-container>
 
                             <!-- 2. No score yet -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null">
+                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null"
+                            >
                                 <!-- 2a. Upcoming -->
-                                <div *ngIf="isExamUpcoming(exam)" class="status-info status-info-upcoming">
-                                    <span class="mdi mdi-clock-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamUpcoming(exam)"
+                                    class="status-info status-info-upcoming"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-outline me-2"
+                                    ></span>
                                     Ujian belum dimulai
                                 </div>
 
                                 <!-- 2b. Ongoing -->
-                                <app-loading-button (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
-                                    *ngIf="isExamOngoing(exam)" [className]="'btn-action-primary'"
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="isExamOngoing(exam)"
+                                    [className]="'btn-action-primary'"
                                     [isLoading]="startPortofolioLoading()"
-                                    [label]="'Unggah Portofolio'"></app-loading-button>
+                                    [label]="'Unggah Portofolio'"
+                                ></app-loading-button>
 
                                 <!-- 2c. Expired -->
-                                <div *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
-                                    class="status-info status-info-neutral">
-                                    <span class="mdi mdi-clock-check-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
+                                    class="status-info status-info-neutral"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-check-outline me-2"
+                                    ></span>
                                     Ujian telah selesai. Saat ini sedang
                                     menunggu penilaian dari penguji.
                                 </div>
@@ -364,22 +538,37 @@
                         </ng-container>
 
                         <!-- SEMINAR -->
-                        <ng-container *ngIf="exam.examTypeCode === ExamTypeCategory.SEMINAR">
+                        <ng-container
+                            *ngIf="exam.examTypeCode === ExamTypeCategory.SEMINAR"
+                        >
                             <!-- 1. Has score -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null">
-                                <button class="btn-action-success" type="button">
-                                    <span class="mdi mdi-check-circle me-2"></span>
-                                    Seminar Selesai
+                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null"
+                            >
+                                <button
+                                    (click)="openScoreModal(exam.id)"
+                                    class="btn-action-success"
+                                    type="button"
+                                >
+                                    <span
+                                        class="mdi mdi-check-circle me-2"
+                                    ></span>
+                                    Lihat Nilai
                                 </button>
                             </ng-container>
 
                             <!-- 2. No score yet -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null">
+                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null"
+                            >
                                 <!-- 2a. Upcoming -->
-                                <div *ngIf="isExamUpcoming(exam)" class="info-note info-note-upcoming">
-                                    <span class="mdi mdi-clock-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamUpcoming(exam)"
+                                    class="info-note info-note-upcoming"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-outline me-2"
+                                    ></span>
                                     <div>
                                         <div class="note-title">
                                             Seminar Belum Dimulai
@@ -392,8 +581,13 @@
                                 </div>
 
                                 <!-- 2b. Ongoing -->
-                                <div *ngIf="isExamOngoing(exam)" class="info-note info-note-ongoing">
-                                    <span class="mdi mdi-presentation me-2"></span>
+                                <div
+                                    *ngIf="isExamOngoing(exam)"
+                                    class="info-note info-note-ongoing"
+                                >
+                                    <span
+                                        class="mdi mdi-presentation me-2"
+                                    ></span>
                                     <div>
                                         <div class="note-title">
                                             Seminar Sedang Berlangsung
@@ -406,9 +600,13 @@
                                 </div>
 
                                 <!-- 2c. Expired -->
-                                <div *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam) && !isExamOngoing(exam)"
-                                    class="info-note info-note-neutral">
-                                    <span class="mdi mdi-clock-check-outline me-2"></span>
+                                <div
+                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam) && !isExamOngoing(exam)"
+                                    class="info-note info-note-neutral"
+                                >
+                                    <span
+                                        class="mdi mdi-clock-check-outline me-2"
+                                    ></span>
                                     <div>
                                         <div class="note-title">
                                             Jadwal Seminar Telah Berakhir
@@ -430,35 +628,73 @@
         <section class="my-5">
             <app-empty-state
                 [description]="'Panitia belum menetapkan jadwal ujian untuk Anda. Silahkan tunggu informasi selanjutnya.'"
-                [title]="'Anda belum ada jadwal UKom'">
+                [title]="'Anda belum ada jadwal UKom'"
+            >
             </app-empty-state>
         </section>
     </ng-template>
 </ng-template>
 
-<app-modal (toggle)="toggleModal()" *ngIf="isModalOpen()" [enableFooter]="false" [size]="'lg'" [title]="'Hasil Ujian'">
-    <ng-container>
-        <div class="total-score-container">
-            <div class="total-score-value">
-                {{ scoreMap[selectedExamId()]?.score | number: '1.2-2' }}
-            </div>
-        </div>
+<app-modal
+    (toggle)="toggleModal()"
+    *ngIf="isModalOpen()"
+    [enableFooter]="false"
+    [size]="'lg'"
+    [title]="'Hasil Ujian'"
+>
+    <ng-container [ngSwitch]="getSelectedExamTypeCode()">
+        <!-- CAT: Display score with competency breakdown -->
+        <app-cat-score
+            *ngSwitchCase="ExamTypeCategory.CAT"
+            [score]="$any(getSelectedScore())"
+        ></app-cat-score>
 
-        <div *ngFor="let competencyGroup of getGroupedCompetencies()" class="mb-3">
-            <div class="card mb-3 border-0">
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 text-white">
-                            {{ competencyGroup.name }}
-                        </h4>
-                        <span class="badge badge-light badge-lg">
-                            {{ competencyGroup.percentage }}% ({{
-                            competencyGroup.correct }}/{{ competencyGroup.total
-                            }})
-                        </span>
-                    </div>
-                </div>
-            </div>
+        <!-- Wawancara: Display score only -->
+        <app-generic-score
+            *ngSwitchCase="ExamTypeCategory.WAWANCARA"
+            [examTypeName]="'Wawancara'"
+            [score]="$any(getSelectedScore())"
+        ></app-generic-score>
+
+        <!-- Seminar: Display score only -->
+        <app-generic-score
+            *ngSwitchCase="ExamTypeCategory.SEMINAR"
+            [examTypeName]="'Seminar'"
+            [score]="$any(getSelectedScore())"
+        ></app-generic-score>
+
+        <!-- Makalah: Display score only -->
+        <app-generic-score
+            *ngSwitchCase="ExamTypeCategory.MAKALAH"
+            [examTypeName]="'Makalah'"
+            [score]="$any(getSelectedScore())"
+        ></app-generic-score>
+
+        <!-- Portfolio: Display score only -->
+        <app-generic-score
+            *ngSwitchCase="ExamTypeCategory.PORTOFOLIO"
+            [examTypeName]="'Portofolio'"
+            [score]="$any(getSelectedScore())"
+        ></app-generic-score>
+
+        <!-- Praktik: Display score only -->
+        <app-generic-score
+            *ngSwitchCase="ExamTypeCategory.PRAKTIK"
+            [examTypeName]="'Praktik'"
+            [score]="$any(getSelectedScore())"
+        ></app-generic-score>
+
+        <!-- Studi Kasus: Display score only -->
+        <app-generic-score
+            *ngSwitchCase="ExamTypeCategory.STUDI_KASUS"
+            [examTypeName]="'Studi Kasus'"
+            [score]="$any(getSelectedScore())"
+        ></app-generic-score>
+
+        <!-- Default/Unknown -->
+        <div *ngSwitchDefault class="alert alert-warning">
+            <i class="mdi mdi-alert me-2"></i>
+            Tipe ujian tidak dikenali
         </div>
     </ng-container>
 </app-modal>

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core'
+import { Component, inject, signal, ViewChild } from '@angular/core'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
 import { Router } from '@angular/router'
@@ -6,19 +6,21 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
-} from '../../../modules/base/commons/pagable/pagable-builder'
-import { TabService } from '../../../modules/base/services/tab.service'
-import { BehaviorSubject } from 'rxjs'
-import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
-import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
-import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
-import { HandlerService } from '../../../modules/base/services/handler.service'
-import { ApiService } from '../../../modules/base/services/api.service'
-import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
+    PrimaryColumnBuilder,
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { TabService } from '@/modules/base/services/tab.service'
+import { BehaviorSubject, finalize } from 'rxjs'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
+import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { CommonModule } from '@angular/common'
-import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
+import { UkomGrade } from '@/modules/ukom/models/ukom-grade'
 import { UkomGradeUploadBatchComponent } from './ukom-grade-upload-batch/ukom-grade-upload-batch.component'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
 
 @Component({
     selector: 'app-ukom-grade-list',
@@ -28,13 +30,16 @@ import { UkomGradeUploadBatchComponent } from './ukom-grade-upload-batch/ukom-gr
         ModalComponent,
         FileHandlerComponent,
         CommonModule,
-        UkomGradeUploadBatchComponent
+        UkomGradeUploadBatchComponent,
+        LoadingButtonComponent,
     ],
     templateUrl: './ukom-grade-list.component.html',
-    styleUrl: './ukom-grade-list.component.scss'
+    styleUrl: './ukom-grade-list.component.scss',
 })
 export class UkomGradeListComponent {
     @ViewChild(FileHandlerComponent) fileHandler: FileHandlerComponent
+
+    examGradeService = inject(ExamGradeService)
 
     pagable!: Pagable
     isModalOpen$ = new BehaviorSubject<boolean>(false)
@@ -42,14 +47,14 @@ export class UkomGradeListComponent {
     isDeleteLoading$ = new BehaviorSubject<boolean>(false)
     payload: { id: string; file_rekomendasi: string } = {
         id: '',
-        file_rekomendasi: ''
+        file_rekomendasi: '',
     }
 
-    refresh: boolean
-
+    refresh = signal(false)
+    isFinishExaminerAssessmentLoading = signal(false)
     inputs: FIleHandler = {
         files: {
-            file_rekom: { label: 'File Rekomendasi' }
+            file_rekom: { label: 'File Rekomendasi' },
         },
         maxSize: 2 * 1024 * 1024,
         allowedTypes: [{ type: 'application/pdf' }],
@@ -59,7 +64,7 @@ export class UkomGradeListComponent {
                     this.payload.file_rekomendasi = base64Data
                     break
             }
-        }
+        },
     }
 
     isModalUploadBatchOpen$ = new BehaviorSubject<boolean>(false)
@@ -70,7 +75,7 @@ export class UkomGradeListComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
-    ) { }
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -87,10 +92,10 @@ export class UkomGradeListComponent {
         this.pagable = new PagableBuilder('/api/v1/ukom_grade/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Nama', 'participantName').build()
+                new PrimaryColumnBuilder('Nama', 'participantName').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Kelas', 'roomUkomName').build()
+                new PrimaryColumnBuilder('Kelas', 'roomUkomName').build(),
             )
 
             .addPrimaryColumn(
@@ -98,7 +103,7 @@ export class UkomGradeListComponent {
                     .withDynamicValue('Skor CAT', (item: UkomGrade) => {
                         return this.rounding(item.catGradeScore)
                     })
-                    .build()
+                    .build(),
             )
 
             .addPrimaryColumn(
@@ -106,63 +111,63 @@ export class UkomGradeListComponent {
                     .withDynamicValue('Skor Wawancara', (item: UkomGrade) => {
                         return this.rounding(item.wawancaraGradeScore)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Seminar', (item: UkomGrade) => {
                         return this.rounding(item.seminarGradeScore)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Praktik', (item: UkomGrade) => {
                         return this.rounding(item.praktikGradeScore)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Portofolio', (item: UkomGrade) => {
                         return this.rounding(item.portofolioGradeScore)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('UKT', (item: UkomGrade) => {
                         return this.rounding(item.ukt)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB CAT', (item: UkomGrade) => {
                         return this.rounding(item.nbCat)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Wawancara', (item: UkomGrade) => {
                         return this.rounding(item.nbWawancara)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Seminar', (item: UkomGrade) => {
                         return this.rounding(item.nbSeminar)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Praktik', (item: UkomGrade) => {
                         return this.rounding(item.nbPraktik)
                     })
-                    .build()
+                    .build(),
             )
 
             .addPrimaryColumn(
@@ -170,80 +175,80 @@ export class UkomGradeListComponent {
                     .withDynamicValue('NB Portofolio', (item: UkomGrade) => {
                         return this.rounding(item.nbPortofolio)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB UKT', (item: UkomGrade) => {
                         return this.rounding(item.nbUkt)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('RUKMSK', (item: UkomGrade) => {
                         return this.rounding(item.score)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('UKMSK', (item: UkomGrade) => {
                         return this.rounding(item.jpm)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB UKMSK', (item: UkomGrade) => {
                         return this.rounding(item.ukmsk)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Nilai Akhir', (item: UkomGrade) => {
                         return this.rounding(item.grade)
                     })
-                    .build()
+                    .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Status', 'status')
                     .withCellClass((row: UkomGrade) => {
                         if (!row.rekomendasi) {
-                            return '';
+                            return ''
                         }
                         return row.passed
                             ? 'bg-success text-white fw-bold'
-                            : 'bg-danger text-white';
+                            : 'bg-danger text-white'
                     })
-                    .build()
+                    .build(),
             )
 
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('participantUkom|nip')
                     .withField('NIP', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('participantUkom|name')
                     .withField('Nama', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('roomUkom|name')
                     .withField('Kelas', 'text')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((participantUkom: UkomGrade) => {
                         this.payload = {
                             id: participantUkom.participantId,
-                            file_rekomendasi: ''
+                            file_rekomendasi: '',
                         }
 
                         this.inputs.files['file_rekom'].fileName =
@@ -254,7 +259,7 @@ export class UkomGradeListComponent {
                         this.toggleModal()
                     }, 'primary')
                     .withIcon('upload')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -262,7 +267,7 @@ export class UkomGradeListComponent {
                         this.onDelete(item.id)
                     }, 'danger')
                     .withIcon('danger')
-                    .build()
+                    .build(),
             )
             .build()
     }
@@ -277,21 +282,21 @@ export class UkomGradeListComponent {
                 label: 'List Nilai Ukom',
                 isActive: true,
                 icon: 'mdi-list-box',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`])
+                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`]),
             })
             .addTab({
                 label: 'Import Nilai',
                 isActive: false,
                 icon: 'mdi-plus-circle',
                 onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/import`])
+                    this.router.navigate([`/ukom/ukom-grade-list/import`]),
             })
             .addTab({
                 label: 'Export Nilai',
                 isActive: false,
                 icon: 'mdi-export',
                 onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/export`])
+                    this.router.navigate([`/ukom/ukom-grade-list/export`]),
             })
     }
 
@@ -304,23 +309,23 @@ export class UkomGradeListComponent {
             this.inputs.files['file_rekom'].source = undefined
             this.payload = {
                 id: '',
-                file_rekomendasi: ''
+                file_rekomendasi: '',
             }
         }
     }
 
     rounding(value: string | number | null | undefined): string {
         if (value === null || value === undefined) {
-            return "-";
+            return '-'
         }
 
-        const num = parseFloat(value.toString());
+        const num = parseFloat(value.toString())
 
         if (isNaN(num)) {
-            return "-"; // handle cases like "", "abc"
+            return '-' // handle cases like "", "abc"
         }
 
-        return num.toFixed(2);
+        return num.toFixed(2)
     }
 
     onDelete(id: string) {
@@ -336,19 +341,19 @@ export class UkomGradeListComponent {
                             this.isDeleteLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menghapus nilai'
+                                'Berhasil menghapus nilai',
                             )
-                            this.refresh = !this.refresh
+                            this.refreshPagable()
                         },
-                        error: err => {
+                        error: (err) => {
                             this.isDeleteLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menghapus nilai'
+                                'Gagal menghapus nilai',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
@@ -361,28 +366,28 @@ export class UkomGradeListComponent {
                 this.apiService
                     .postData(
                         '/api/v1/participant_ukom/upload_rekomendasi',
-                        this.payload
+                        this.payload,
                     )
                     .subscribe({
                         next: () => {
                             this.isSubmitLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil mengunggah rekomendasi'
+                                'Berhasil mengunggah rekomendasi',
                             )
                             this.toggleModal()
-                            this.refresh = !this.refresh
+                            this.refreshPagable()
                         },
-                        error: err => {
+                        error: (err) => {
                             console.error('Error uploading rekomendasi:', err)
                             this.isSubmitLoading$.next(false)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal mengunggah rekomendasi'
+                                'Gagal mengunggah rekomendasi',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
@@ -395,6 +400,40 @@ export class UkomGradeListComponent {
     }
 
     refreshPagable() {
-        this.refresh = !this.refresh
+        this.refresh.set(!this.refresh())
+    }
+
+    finishExaminerAssessment() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.isFinishExaminerAssessmentLoading.set(true)
+
+                this.examGradeService
+                    .finishExaminerGradeByAdmin()
+                    .pipe(
+                        finalize(() => {
+                            this.isFinishExaminerAssessmentLoading.set(false)
+                        }),
+                    )
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil menyelesaikan penilaian penguji',
+                            )
+                            this.refreshPagable()
+                        },
+                        error: (err) => {
+                            console.error('Error uploading rekomendasi:', err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menyelesaikan penilaian penguji',
+                            )
+                        },
+                    })
+            },
+        })
     }
 }

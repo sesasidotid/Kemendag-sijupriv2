@@ -1,32 +1,33 @@
 import { Component, inject } from '@angular/core'
-import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
-import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
-import { Pangkat } from '@/modules/maintenance/models/pangkat.model'
 import { CommonModule, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
     BehaviorSubject,
     catchError,
+    combineLatest,
+    EMPTY,
+    finalize,
     forkJoin,
     map,
     Observable,
     of,
     switchMap,
     tap,
-    combineLatest,
-    finalize,
-    filter,
-    EMPTY,
 } from 'rxjs'
 import { ApiService } from '@/modules/base/services/api.service'
-import { CATScore } from '@/modules/ukom/models/cat/cat-score'
+// import { CATScore } from '@/modules/ukom/models/cat/cat-score'
+import {
+    CATScore,
+    MakalahScore,
+} from '@/modules/ukom/models/exam/exam-score.model'
+
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { DataDokumenUkom } from '@/modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import { ExamType } from '@/modules/ukom/models/exam-type.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
+// import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '@/modules/base/services/file-preview.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'

@@ -2,6 +2,7 @@ import {
     ChangeDetectionStrategy,
     Component,
     EventEmitter,
+    inject,
     Input,
     OnChanges,
     OnInit,
@@ -13,14 +14,15 @@ import { BehaviorSubject } from 'rxjs'
 import { AgGridAngular } from 'ag-grid-angular'
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
 import { ScheduleItem } from './schedule-timeline.component'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 
 // Processed schedule row for table
 interface ScheduleTableRow {
     index: number
     participantScheduleId: string
     name: string
-    jabatanName: string
-    jenjangName: string
+    nextJabatanName: string
+    nextJenjangName: string
     jenisUkom: string
     unitKerjaName: string
     nip: string
@@ -66,6 +68,8 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
         filter: true,
         resizable: true,
     }
+
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
 
     // Color palette for jabatanName
     colorPalette: Record<string, string> = {
@@ -155,8 +159,8 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
                 cellClass: 'text-center',
             },
             {
-                headerName: 'Jabatan',
-                field: 'jabatanName',
+                headerName: 'Jabatan yang Dituju',
+                field: 'nextJabatanName',
                 width: 140,
                 cellStyle: (params) => {
                     const row = params.data as ScheduleTableRow
@@ -168,15 +172,19 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
                 },
             },
             {
-                headerName: 'Jenjang',
-                field: 'jenjangName',
+                headerName: 'Jenjang yang Dituju',
+                field: 'nextJenjangName',
+                width: 120,
+            },
+            {
+                headerName: 'Jenis Ujian',
+                field: 'jenisUjian',
                 width: 120,
             },
             {
                 headerName: 'Jenis Ukom',
                 field: 'jenisUkom',
                 width: 180,
-                valueFormatter: (params) => this.formatJenisUkom(params.value),
             },
             {
                 headerName: 'Unit Kerja',
@@ -195,19 +203,19 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
                 cellClass: 'text-center',
                 valueFormatter: (params) => `#${params.value + 1}`,
             },
-            {
-                headerName: 'Konflik',
-                field: 'hasConflict',
-                width: 100,
-                cellClass: 'text-center',
-                cellRenderer: (params: any) => {
-                    const row = params.data as ScheduleTableRow
-                    if (row.hasConflict) {
-                        return `<span class="badge bg-warning text-dark">${row.conflictCount} tumpang</span>`
-                    }
-                    return '<span class="badge bg-success">Tidak</span>'
-                },
-            },
+            // {
+            //     headerName: 'Konflik',
+            //     field: 'hasConflict',
+            //     width: 100,
+            //     cellClass: 'text-center',
+            //     cellRenderer: (params: any) => {
+            //         const row = params.data as ScheduleTableRow
+            //         if (row.hasConflict) {
+            //             return `<span class="badge bg-warning text-dark">${row.conflictCount} tumpang</span>`
+            //         }
+            //         return '<span class="badge bg-success">Tidak</span>'
+            //     },
+            // },
         ]
     }
 
@@ -235,8 +243,9 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
                 index: index + 1,
                 participantScheduleId: s.participantScheduleId,
                 name: s.name,
-                jabatanName: s.jabatanName || '',
-                jenjangName: s.jenjangName || '',
+                nextJabatanName: s.nextJabatanName || '',
+                nextJenjangName: s.nextJenjangName || '',
+                jenisUjian: s.jenisUjian,
                 jenisUkom: s.jenisUkom,
                 unitKerjaName: s.unitKerjaName || '',
                 nip: s.nip || '',
@@ -250,7 +259,7 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
                 formattedEndTime: this.formatTime(endTime),
                 formattedDate: this.formatDate(startTime),
                 formattedDuration: this.formatDuration(durationMinutes),
-                color: this.getColor(s.jabatanName || ''),
+                color: this.getColor(s.nextJabatanName),
                 lane: 0,
                 hasConflict: false,
                 conflictCount: 0,
@@ -315,8 +324,10 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
         return new Date(normalized)
     }
 
-    private getColor(jabatanName: string): string {
-        return this.colorPalette[jabatanName] || this.colorPalette['DEFAULT']
+    private getColor(nextjabatanName: string): string {
+        return (
+            this.colorPalette[nextjabatanName] || this.colorPalette['DEFAULT']
+        )
     }
 
     private formatTime(date: Date): string {
@@ -345,17 +356,5 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
             return `${hours} jam`
         }
         return `${hours}j ${remainingMinutes}m`
-    }
-
-    private formatJenisUkom(jenisUkom: string): string {
-        const displayNames: Record<string, string> = {
-            PERPINDAHAN_JABATAN: 'Perpindahan Jabatan',
-            KENAIKAN_JENJANG: 'Kenaikan Jenjang',
-            PENGANGKATAN_PERTAMA: 'Pengangkatan Pertama',
-            PENYESUAIAN: 'Penyesuaian',
-            INPASSING: 'Inpassing',
-            PROMOSI: 'Promosi',
-        }
-        return displayNames[jenisUkom] || jenisUkom
     }
 }

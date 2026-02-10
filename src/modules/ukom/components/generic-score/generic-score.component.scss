@@ -1,0 +1,38 @@
+//.score-display-container {
+//    padding: 1rem;
+//}
+//
+//.score-header {
+//    h4 {
+//        font-weight: 600;
+//        color: #2c3e50;
+//    }
+//}
+
+
+/* Empty - inherits parent styles */
+
+.total-score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 25px;
+  border-radius: 50px;
+  max-width: 320px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+
+.total-score-value {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #212529; /* Bootstrap Dark Gray */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.total-score-value:hover {
+  transform: scale(1.1);
+}

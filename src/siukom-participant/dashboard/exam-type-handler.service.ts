@@ -1,8 +1,15 @@
 import { Injectable, WritableSignal } from '@angular/core'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
-import { CATScore } from '@/modules/ukom/models/cat/cat-score'
-import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
+// import { CATScore } from '@/modules/ukom/models/cat/cat-score'
+// import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
+import {
+    CATScore,
+    MakalahScore,
+    PortofolioScore,
+    PraktikScore,
+    StudiKasusScore,
+} from '@/modules/ukom/models/exam/exam-score.model'
 
 /**
  * Configuration for starting an exam, including confirmation dialog settings
@@ -127,8 +134,15 @@ export class ExamTypeHandlerService {
                 return new CATScore(response)
 
             case ExamTypeCategory.MAKALAH:
+                return new MakalahScore(response)
             case ExamTypeCategory.WAWANCARA:
                 return new MakalahScore(response)
+            case ExamTypeCategory.PRAKTIK:
+                return new PraktikScore(response)
+            case ExamTypeCategory.STUDI_KASUS:
+                return new StudiKasusScore(response)
+            case ExamTypeCategory.PORTOFOLIO:
+                return new PortofolioScore()
 
             default:
                 // For unknown exam types, return raw response as fallback

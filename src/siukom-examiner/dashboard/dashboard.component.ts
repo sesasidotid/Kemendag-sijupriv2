@@ -117,10 +117,9 @@ export class DashboardComponent implements OnInit {
                     result.push({
                         participantScheduleId: pSchedule.id,
                         participantId: pSchedule.participantId,
-                        participantName:
-                            pSchedule.participantUkom?.name || 'Unknown',
-                        participantNip: pSchedule.participantUkom?.nip || '-',
-                        jenisUkom: pSchedule.participantUkom?.jenisUkom || '-',
+                        participantName: pSchedule.participantUkom?.name,
+                        participantNip: pSchedule.participantUkom?.nip,
+                        jenisUkom: pSchedule.participantUkom?.jenisUkom,
                         examId: schedule.id,
                         examTypeCode: examType,
                         examDisplayName: exam.displayName,

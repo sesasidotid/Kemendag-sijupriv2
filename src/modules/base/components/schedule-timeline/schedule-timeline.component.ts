@@ -22,10 +22,11 @@ export interface ScheduleItem {
     email?: string
     phone?: string
     nip?: string
-    jabatanName?: string
-    jenjangName?: string
+    nextJabatanName: string
+    nextJenjangName: string
     unitKerjaName?: string
     jenisUkom: string // subclass identifier
+    jenisUjian: string
 }
 
 // Processed schedule with computed values
@@ -78,12 +79,12 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
     })
     // Color palette for jabatanName
     colorPalette: Record<string, string> = {
-        'Negosiator Perdagangan': '#4CAF50',
-        Penera: '#2196F3',
         'Analis Perdagangan': '#FF9800',
         'Pengawas Perdagangan': '#9C27B0',
         'Penguji Mutu Barang': '#E91E63',
         'Pengamat Tera': '#00BCD4',
+        Penera: '#2196F3',
+        'Negosiator Perdagangan': '#4CAF50',
         DEFAULT: '#607D8B',
     }
     private timelineStart: Date = new Date()
@@ -188,19 +189,15 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         }
     }
 
-    // Get jabatan display name
-    getJabatanDisplayName(jabatanName: string): string {
-        return jabatanName || 'Tidak Diketahui'
-    }
-
     // Close modal
     close(): void {
         this.closeTimeline.emit()
     }
 
-    // Get color for jabatanName
-    private getColor(jabatanName: string): string {
-        return this.colorPalette[jabatanName] || this.colorPalette['DEFAULT']
+    private getColor(nextJabatanName: string): string {
+        return (
+            this.colorPalette[nextJabatanName] || this.colorPalette['DEFAULT']
+        )
     }
 
     // Parse datetime string to Date
@@ -237,7 +234,7 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
                 startMinutes: 0, // Will be computed after finding timeline bounds
                 durationMinutes,
                 lane: 0,
-                color: this.getColor(s.jabatanName || ''),
+                color: this.getColor(s.nextJabatanName || ''),
             }
         })
 

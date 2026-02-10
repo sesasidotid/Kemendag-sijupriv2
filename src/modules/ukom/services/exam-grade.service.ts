@@ -28,4 +28,8 @@ export class ExamGradeService {
             `${this.BASE_PATH}/${examScheduleId}/${participantId}`,
         )
     }
+
+    finishExaminerGradeByAdmin() {
+        return this.apiService.postData(`${this.BASE_PATH}/trigger`, {})
+    }
 }

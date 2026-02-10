@@ -31,11 +31,15 @@ import { RoomUkom } from '@/modules/ukom/models/room-ukom.model'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import {
+    generateDemoScheduleData,
     ScheduleItem,
     ScheduleTimelineModalComponent,
 } from '@/modules/base/components/schedule-timeline'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
+import { ExamScheduleCalendar } from '@/modules/ukom/models/exam-schedule/exam-schedule-calendar.model'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 
 @Component({
     selector: 'app-ukom-class-list',
@@ -75,9 +79,12 @@ export class UkomClassListComponent implements OnInit {
 
     isTimelineModalOpen = signal(false)
     timelineSchedules = signal<ScheduleItem[]>([])
+    demoTimelineSchedules = signal<ScheduleItem[]>(generateDemoScheduleData())
     dateRangeForm: FormGroup
     isLoadingSchedules = signal(false)
     hasLoadedSchedules = signal(false)
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
+    jenisUkomService = inject(JenisUkomService)
     private bidangJabatanListSubject = new BehaviorSubject<BidangJabatan[]>([])
     bidangJabatanList$ = this.bidangJabatanListSubject.asObservable()
 
@@ -571,7 +578,9 @@ export class UkomClassListComponent implements OnInit {
     }
 
     // Transform API response to ScheduleItem format
-    private transformToScheduleItems(data: any[]): ScheduleItem[] {
+    private transformToScheduleItems(
+        data: ExamScheduleCalendar[],
+    ): ScheduleItem[] {
         return data.map((item) => {
             const duration =
                 item.personalScheduleEnd && item.personalSchedule
@@ -587,14 +596,23 @@ export class UkomClassListComponent implements OnInit {
                 personalSchedule: item.personalSchedule,
                 duration: duration,
                 participantId: item.participantId,
-                name: item.participantUkom?.name || 'Tidak Diketahui',
+                name: item.participantUkom?.name,
                 email: item.participantUkom?.email,
                 phone: item.participantUkom?.phone,
                 nip: item.participantUkom?.nip,
-                jabatanName: item.examSchedule?.roomUkom?.jabatanName,
-                jenjangName: item.examSchedule?.roomUkom?.jenjangName,
+                jabatanName: item.participantUkom.jabatanName,
+                nextJabatanName:
+                    this.jabatanMap[item.examSchedule.roomUkom.jabatanCode],
+                jenjangName: item.participantUkom.jenjangName,
+                nextJenjangName:
+                    this.jenjangMap[item.examSchedule.roomUkom.jenjangCode],
                 unitKerjaName: item.participantUkom?.unitKerjaName,
-                jenisUkom: item.examSchedule?.examTypeCode || 'CAT',
+                jenisUkom: this.jenisUkomService.getLabelByValue(
+                    item.participantUkom.jenisUkom,
+                ),
+                jenisUjian: this.ukomMiscellaneousService.getModuleDisplayName(
+                    item.examSchedule?.examTypeCode,
+                ),
             } as ScheduleItem
         })
     }

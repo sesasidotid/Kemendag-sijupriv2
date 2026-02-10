@@ -15,7 +15,6 @@ import {
     timer,
 } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { CATScore } from '@/modules/ukom/models/cat/cat-score'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
@@ -26,13 +25,13 @@ import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
 import { ExamService } from '@/modules/ukom/services/exam.service'
 import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
-import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-competency.model'
-import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
 import { FormatExamSchedulePipe } from '@/modules/ukom/pipes/format-exam-schedule.pipe'
 import { ExamDurationPipe } from '@/modules/ukom/pipes/exam-duration.pipe'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { ExamTypeHandlerService } from './exam-type-handler.service'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+import { CatScoreComponent } from '@/modules/ukom/components/cat-score/cat-score.component'
+import { GenericScoreComponent } from '@/modules/ukom/components/generic-score/generic-score.component'
 
 const MONTHS = [
     'Jan',
@@ -59,6 +58,8 @@ const MONTHS = [
         LoadingButtonComponent,
         FormatExamSchedulePipe,
         ExamDurationPipe,
+        CatScoreComponent,
+        GenericScoreComponent,
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
@@ -316,6 +317,21 @@ export class DashboardComponent implements OnInit {
         this.toggleModal()
     }
 
+    getSelectedExamTypeCode(): string | null {
+        const examId = this.selectedExamId()
+        if (!examId) return null
+
+        const exam = this.roomUkom.examScheduleDtoList.find(e => e.id === examId)
+        return exam?.examTypeCode || null
+    }
+
+    getSelectedScore(): ScoreValue | null {
+        const examId = this.selectedExamId()
+        if (!examId) return null
+
+        return this.scoreMap[examId] || null
+    }
+
     viewUploadedMakalah(examId: string) {
         const rawScore = this.scoreMap[examId]
 
@@ -343,70 +359,6 @@ export class DashboardComponent implements OnInit {
         )
     }
 
-    getGroupedCompetencies() {
-        const examId = this.selectedExamId()
-        if (!examId) return []
-
-        const rawScore = this.scoreMap[examId]
-
-        if (!rawScore) return []
-
-        if (!(rawScore instanceof CATScore)) {
-            return []
-        }
-
-        type GroupResult = {
-            name: string
-            items: typeof rawScore.kompetensiIndikatorDtoList
-            total: number
-            correct: number
-        }
-
-        const grouped = rawScore.kompetensiIndikatorDtoList.reduce(
-            (acc, kompetensi) => {
-                const key = kompetensi.kompetensiId
-                acc[key] ??= {
-                    name: kompetensi.kompetensiName ?? '-',
-                    items: [],
-                    total: 0,
-                    correct: 0,
-                }
-                acc[key].items.push(kompetensi)
-                acc[key].total += kompetensi.questionDtoList?.length ?? 0
-                acc[key].correct += this.getCorrectAnswersCount(kompetensi)
-
-                return acc
-            },
-            {} as Record<string, GroupResult>,
-        )
-
-        return Object.values(grouped).map((group) => ({
-            ...group,
-            percentage:
-                group.total > 0
-                    ? Math.round((group.correct / group.total) * 100)
-                    : 0,
-        }))
-    }
-
-    getCorrectAnswer(question: CATQuestions): string {
-        const correctChoice = question.multipleChoiceDtoList.find(
-            (choice) => choice.correct,
-        )
-        return correctChoice ? correctChoice.choiceId : ''
-    }
-
-    getCorrectAnswersCount(kompetensi: CATIndicatorCompetency): number {
-        if (!kompetensi.questionDtoList) {
-            return 0
-        }
-
-        return kompetensi.questionDtoList.filter(
-            (question) =>
-                question.answerDto?.answerChoice ===
-                this.getCorrectAnswer(question),
-        ).length
-    }
 
     getExamDisplayName(examTypeCode: string): string {
         const displayNames: Record<string, string> = {
@@ -455,12 +407,6 @@ export class DashboardComponent implements OnInit {
         return this.isExamScheduleHaveScore(examScheduleId)
     }
 
-    isExamCompleted(exam: ExamSchedule): boolean {
-        return (
-            this.isExamExpired(exam.endTime) ||
-            this.isExamScheduleHaveScore(exam.id)
-        )
-    }
 
     // New: Exam time is over but no score (missed/not answered)
     isExamMissed(exam: ExamSchedule): boolean {
@@ -527,4 +473,6 @@ export class DashboardComponent implements OnInit {
 
         return { year, month, day, hour, minute, second }
     }
+
+
 }

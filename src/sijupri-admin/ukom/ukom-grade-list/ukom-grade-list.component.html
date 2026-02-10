@@ -1,14 +1,28 @@
-<div class="d-flex justify-content-end mb-3">
-    <button class="btn btn-primary" (click)="handleOpenBatchUploadModal()">
-        <i class="mdi mdi-upload"></i>
-        <span class="ms-1">Upload Batch Surat Rekomendasi</span>
-    </button>
+<div class="d-grid d-md-flex justify-content-md-end mb-3 gap-2">
+    <app-loading-button
+        (clicked)="finishExaminerAssessment()"
+        [className]="'btn btn-primary'"
+        [icon]="'mdi mdi-check-decagram'"
+        [isLoading]="isFinishExaminerAssessmentLoading()"
+        [label]="'Finalisasi Penilaian Penguji'"
+    ></app-loading-button>
+
+    <app-loading-button
+        (clicked)="handleOpenBatchUploadModal()"
+        [className]="'btn btn-primary'"
+        [icon]="'mdi mdi-upload'"
+        [label]="'pload Batch Surat Rekomendasi'"
+    ></app-loading-button>
 </div>
 
-<app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+<app-pagable [pagable]="pagable" [refresh]="refresh()"></app-pagable>
 
-<app-modal *ngIf="isModalOpen$ | async" [title]="'Upload Rekomendasi Hasil UKom'" (toggle)="toggleModal()"
-    [enableFooter]="false">
+<app-modal
+    (toggle)="toggleModal()"
+    *ngIf="isModalOpen$ | async"
+    [enableFooter]="false"
+    [title]="'Upload Rekomendasi Hasil UKom'"
+>
     <app-file-handler [inputs]="inputs"></app-file-handler>
     <ng-container *ngIf="isSubmitLoading$ | async; else noLoading">
         <button class="btn btn-success float-end" disabled>
@@ -18,15 +32,24 @@
         </button>
     </ng-container>
     <ng-template #noLoading>
-        <button type="button" class="btn btn-success float-end"
-            [disabled]="!payload.file_rekomendasi || (isSubmitLoading$ | async)" (click)="onSubmit()">
+        <button
+            (click)="onSubmit()"
+            [disabled]="!payload.file_rekomendasi || (isSubmitLoading$ | async)"
+            class="btn btn-success float-end"
+            type="button"
+        >
             Simpan
         </button>
     </ng-template>
 </app-modal>
 
-
-<app-modal *ngIf="isModalUploadBatchOpen$ | async" [title]="'Upload Batch Rekomendasi Hasil UKom'"
-    (toggle)="handleCloseBatchUploadModal()" [enableFooter]="false">
+<app-modal
+    (toggle)="handleCloseBatchUploadModal()"
+    *ngIf="isModalUploadBatchOpen$ | async"
+    [enableFooter]="false"
+    [title]="'Upload Batch Rekomendasi Hasil UKom'"
+>
     <app-ukom-grade-upload-batch
-        (uploadSuccess)="handleCloseBatchUploadModal(); refreshPagable()"></app-ukom-grade-upload-batch></app-modal>
+        (uploadSuccess)="handleCloseBatchUploadModal(); refreshPagable()"
+    ></app-ukom-grade-upload-batch
+></app-modal>

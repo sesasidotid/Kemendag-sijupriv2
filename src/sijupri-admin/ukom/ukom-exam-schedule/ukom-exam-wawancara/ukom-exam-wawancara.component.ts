@@ -290,23 +290,23 @@ export class UkomExamWawancaraComponent implements OnInit {
                     return slot.participantSchedule?.examinerName || '—'
                 },
             },
-            {
-                headerName: 'Status',
-                width: 120,
-                cellClass: 'text-center',
-                valueGetter: (params) => {
-                    const slot = params.data as ScheduleSlot
-                    if (slot.isOccupied) return 'Terisi'
-                    return 'Tersedia'
-                },
-                cellStyle: (params) => {
-                    const slot = params.data as ScheduleSlot
-                    if (slot.isOccupied) {
-                        return { color: '#198754', fontWeight: '500' }
-                    }
-                    return { color: '#6c757d' }
-                },
-            },
+            // {
+            //     headerName: 'Status',
+            //     width: 120,
+            //     cellClass: 'text-center',
+            //     valueGetter: (params) => {
+            //         const slot = params.data as ScheduleSlot
+            //         if (slot.isOccupied) return 'Terisi'
+            //         return 'Tersedia'
+            //     },
+            //     cellStyle: (params) => {
+            //         const slot = params.data as ScheduleSlot
+            //         if (slot.isOccupied) {
+            //             return { color: '#198754', fontWeight: '500' }
+            //         }
+            //         return { color: '#6c757d' }
+            //     },
+            // },
             {
                 headerName: 'Aksi',
                 width: 250,
