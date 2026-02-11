@@ -3,8 +3,34 @@
     [examScheduleId]="examId()"
     [loading]="loadingQuestions()"
     [participantId]="participantId()"
-    [showSavedIndicator]="!loadingQuestions() && allQuestionsAnswered() && questions().length > 0"
+    [showSavedIndicator]="!loadingQuestions() && allQuestionsAnsweredAndSaved() && questions().length > 0"
 >
+    <ng-container
+        *ngIf="!examStarted() && questions().length === 0; else examContent"
+    >
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Praktik</h1>
+                <p>
+                    Klik tombol di bawah ini untuk memulai sesi penilaian
+                    praktik peserta.
+                </p>
+            </div>
+
+            <!-- Start Exam Button Section -->
+            <div class="form-actions">
+                <app-loading-button
+                    (clicked)="startTheExam()"
+                    [className]="'btn btn-primary btn-lg'"
+                    [icon]="'mdi-clipboard-play-outline'"
+                    [isLoading]="startExamLoading()"
+                    [label]="'Mulai Ujian'"
+                    [type]="'button'"
+                ></app-loading-button>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #examContent>
     <ng-container *ngIf="questions().length > 0; else noQuestions">
         <ng-container
             *ngIf="participantAnswer().answerDto; else participantDontHaveAnswer"
@@ -117,10 +143,11 @@
         <app-empty-state
             [buttonAction]="backToDashboard.bind(this)"
             [buttonText]="'Kembali ke Dashboard'"
-            [description]="'Tidak ada pertanyaan yang tersedia untuk penilaian praktik saat ini.'"
+            [description]="'Belum ada form penilaian yang tersedia untuk saat ini.'"
             [icon]="'mdi mdi-clipboard-text-outline'"
-            [title]="'Pertanyaan Tidak Ditemukan'"
+            [title]="'Form Penilaian Belum Tersedia'"
         >
         </app-empty-state>
+    </ng-template>
     </ng-template>
 </app-exam-assessment-layout>

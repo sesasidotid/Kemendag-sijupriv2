@@ -6,6 +6,8 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
+    AbstractControl,
+    ValidationErrors,
 } from '@angular/forms'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
@@ -19,6 +21,10 @@ import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty
 import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
+import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-portofolio',
@@ -51,6 +57,26 @@ export class PortofolioComponent implements OnInit {
     participantId = signal('')
     draftService = inject(PortfolioDraftService)
     private saveTimeout: number | undefined
+    startExamLoading = signal(false)
+    examStarted = signal(false)
+    examScheduleService = inject(UkomExamScheduleService)
+    examScheduleDetail = signal<ExamSchedule | null>(null)
+
+    /**
+     * Custom validator to ensure checkbox value is boolean (not null)
+     */
+    private booleanRequiredValidator(
+        control: AbstractControl,
+    ): ValidationErrors | null {
+        const value = control.value
+        if (value === null || value === undefined) {
+            return { required: true }
+        }
+        if (typeof value !== 'boolean') {
+            return { required: true }
+        }
+        return null
+    }
 
     constructor() {
         this.assessmentForm = this.fb.group({
@@ -72,6 +98,16 @@ export class PortofolioComponent implements OnInit {
             },
             { allowSignalWrites: true },
         )
+
+        effect(
+            () => {
+                const examId = this.examId()
+                if (examId) {
+                    this.getExamScheduleDetail()
+                }
+            },
+            { allowSignalWrites: true },
+        )
     }
 
     get answerDtoList(): FormArray {
@@ -85,7 +121,62 @@ export class PortofolioComponent implements OnInit {
         })
     }
 
-    fetchQuestionsToGrade() {
+    startTheExam() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.startExamLoading.set(true)
+
+                this.examService
+                    .startExamByExaminer(
+                        new ExaminerExamStartRequest({
+                            participantId: this.participantId(),
+                            examTypeCode: ExamTypeCategory.PORTOFOLIO,
+                            roomUkomId: this.examScheduleDetail().roomUkomId,
+                            examScheduleId: this.examId(),
+                        }),
+                    )
+                    .pipe(finalize(() => this.startExamLoading.set(false)))
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil memulai ujian.',
+                            )
+                            this.examStarted.set(true)
+                            this.fetchQuestionsToGrade(true)
+                        },
+                        error: (err) => {
+                            console.error(err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal memulai ujian, silahkan coba lagi.',
+                            )
+                        },
+                    })
+            },
+        })
+    }
+
+    getExamScheduleDetail() {
+        this.examScheduleService
+            .getExamScheduleDetailById(this.examId())
+            .subscribe({
+                next: (res) => {
+                    this.examScheduleDetail.set(res)
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data jadwal.',
+                    )
+                },
+            })
+    }
+
+    fetchQuestionsToGrade(afterStart: boolean = false) {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
@@ -101,6 +192,11 @@ export class PortofolioComponent implements OnInit {
                         this.examId(),
                         this.participantId(),
                     )
+
+                    // If we have questions on initial load, exam has already started
+                    if (!afterStart && data.length > 0) {
+                        this.examStarted.set(true)
+                    }
 
                     data.forEach((q) => {
                         const draftAnswer = draft?.answers?.[q.id]
@@ -120,8 +216,8 @@ export class PortofolioComponent implements OnInit {
                                 questionId: q.id,
                                 answerText: draftAnswer?.answerText ?? null,
                                 answerList: draftAnswer?.answerList ?? {
-                                    valid: false,
-                                    memadai: false,
+                                    valid: null,
+                                    memadai: null,
                                 },
                             }
                         } else if (!hasBackendAnswer && draftAnswer) {
@@ -129,14 +225,14 @@ export class PortofolioComponent implements OnInit {
                             q.answerDto.answerText =
                                 draftAnswer.answerText ?? null
                             q.answerDto.answerList = draftAnswer.answerList ?? {
-                                valid: false,
-                                memadai: false,
+                                valid: null,
+                                memadai: null,
                             }
                         } else if (!q.answerDto.answerList) {
                             // Backend has data but no answerList - ensure structure exists
                             q.answerDto.answerList = {
-                                valid: false,
-                                memadai: false,
+                                valid: null,
+                                memadai: null,
                             }
                         }
                         // If hasBackendAnswer is true, keep backend data (prioritize backend)
@@ -162,8 +258,8 @@ export class PortofolioComponent implements OnInit {
         questions.forEach((q) => {
             // Get answerList from answerDto (from draft or backend)
             const answerList = q.answerDto?.answerList || {
-                memadai: false,
-                valid: false,
+                memadai: null,
+                valid: null,
             }
 
             const formGroup = this.fb.group({
@@ -174,8 +270,14 @@ export class PortofolioComponent implements OnInit {
                 questionId: [q.id],
                 answerText: [q.answerDto?.answerText || null],
                 answerList: this.fb.group({
-                    memadai: [answerList.memadai || false],
-                    valid: [answerList.valid || false],
+                    memadai: [
+                        answerList.memadai ?? null,
+                        [this.booleanRequiredValidator.bind(this)],
+                    ],
+                    valid: [
+                        answerList.valid ?? null,
+                        [this.booleanRequiredValidator.bind(this)],
+                    ],
                 }),
             })
             this.answerDtoList.push(formGroup)
@@ -249,6 +351,19 @@ export class PortofolioComponent implements OnInit {
                 answer != null &&
                 typeof answer.valid === 'boolean' &&
                 typeof answer.memadai === 'boolean'
+            )
+        })
+    }
+
+    allQuestionsAnsweredAndSaved(): boolean {
+        return this.questions().every((q) => {
+            // Check if answer exists in backend (has id from backend response)
+            // and has boolean values (not null) for valid and memadai
+            return (
+                q.answerDto &&
+                q.answerDto.id && // Backend-saved answers have an id
+                typeof q.answerDto.answerList?.valid === 'boolean' &&
+                typeof q.answerDto.answerList?.memadai === 'boolean'
             )
         })
     }

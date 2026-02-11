@@ -362,4 +362,15 @@ export class WawancaraComponent implements OnInit {
     isAllQuestionsAnswered(): boolean {
         return !this.questions().some((q) => q.answerDto.answerChoice == null)
     }
+
+    isAllQuestionsAnsweredAndSaved(): boolean {
+        return this.questions().every((q) => {
+            // Check if answer is saved to backend (has id) and has meaningful data
+            return (
+                q.answerDto &&
+                q.answerDto.id && // Backend-saved answers have an id
+                q.answerDto.answerChoice != null
+            )
+        })
+    }
 }

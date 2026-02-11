@@ -257,7 +257,7 @@
                                         }}
                                     </span>
                                     <span
-                                        *ngIf="isExamGraded(exam)"
+                                        *ngIf="isParticipantExamined(exam, pSchedule)"
                                         class="status-badge status-graded"
                                         style="
                                             background-color: #d4edda;
@@ -275,7 +275,7 @@
                                         Sudah Dinilai
                                     </span>
                                     <span
-                                        *ngIf="!isExamGraded(exam)"
+                                        *ngIf="!isParticipantExamined(exam, pSchedule)"
                                         class="status-badge status-ungraded"
                                         style="
                                             background-color: #fff3cd;
@@ -538,7 +538,7 @@
                                 let pSchedule of getParticipants(exam);
                                 let i = index
                             "
-                            class="participant-item participant-item-readonly"
+                            class="participant-item"
                         >
                             <div class="participant-number">{{ i + 1 }}</div>
                             <div class="participant-info">
@@ -553,6 +553,15 @@
                                             class="detail-value font-monospace"
                                             >{{ pSchedule.participantUkom.nip
                                             }}</span
+                                        >
+                                    </span>
+                                    <span class="detail-row">
+                                        <span class="detail-label"
+                                            >Jadwal:</span
+                                        >
+                                        <span class="detail-value"
+                                            >{{ getParticipantScheduleTime(
+                                            pSchedule, exam ) }}</span
                                         >
                                     </span>
                                     <span class="detail-row">
@@ -600,7 +609,7 @@
                                         pSchedule.participantUkom.jenisUkom ) }}
                                     </span>
                                     <span
-                                        *ngIf="isExamGraded(exam)"
+                                        *ngIf="isParticipantExamined(exam, pSchedule)"
                                         class="status-badge status-graded"
                                         style="
                                             background-color: #d4edda;
@@ -618,7 +627,7 @@
                                         Sudah Dinilai
                                     </span>
                                     <span
-                                        *ngIf="!isExamGraded(exam)"
+                                        *ngIf="!isParticipantExamined(exam, pSchedule)"
                                         class="status-badge status-ungraded"
                                         style="
                                             background-color: #fff3cd;
@@ -637,6 +646,20 @@
                                     </span>
                                 </div>
                             </div>
+                            <button
+                                (click)="
+                                        enterExam(
+                                            pSchedule.participantId,
+                                            exam.schedule.id,
+                                            exam.schedule.examTypeCode,
+                                            exam.schedule.roomUkomId
+                                        )
+                                    "
+                                class="btn-enter-exam"
+                                type="button"
+                            >
+                                Masuk Ujian
+                            </button>
                         </div>
                     </div>
                 </div>

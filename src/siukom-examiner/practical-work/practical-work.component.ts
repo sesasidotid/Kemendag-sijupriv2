@@ -21,6 +21,10 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
 import { CommonModule } from '@angular/common'
 import { VideoPreviewComponent } from '@/modules/base/components/video-preview/video-preview.component'
 import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
+import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-practical-work',
@@ -55,6 +59,10 @@ export class PracticalWorkComponent {
     draftService = inject(PracticalWorkDraftService)
     participantAnswer = signal<ExamQuestion>(null)
     private saveTimeout: number | undefined
+    startExamLoading = signal(false)
+    examStarted = signal(false)
+    examScheduleService = inject(UkomExamScheduleService)
+    examScheduleDetail = signal<ExamSchedule | null>(null)
 
     constructor() {
         this.assessmentForm = this.fb.group({
@@ -76,6 +84,16 @@ export class PracticalWorkComponent {
             },
             { allowSignalWrites: true },
         )
+
+        effect(
+            () => {
+                const examId = this.examId()
+                if (examId) {
+                    this.getExamScheduleDetail()
+                }
+            },
+            { allowSignalWrites: true },
+        )
     }
     get answerDtoList(): FormArray {
         return this.assessmentForm.get('answerDtoList') as FormArray
@@ -86,7 +104,63 @@ export class PracticalWorkComponent {
             this.participantId.set(params['participantId'])
         })
     }
-    fetchQuestionsToGrade() {
+
+    startTheExam() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.startExamLoading.set(true)
+
+                this.examService
+                    .startExamByExaminer(
+                        new ExaminerExamStartRequest({
+                            participantId: this.participantId(),
+                            examTypeCode: ExamTypeCategory.PRAKTIK,
+                            roomUkomId: this.examScheduleDetail().roomUkomId,
+                            examScheduleId: this.examId(),
+                        }),
+                    )
+                    .pipe(finalize(() => this.startExamLoading.set(false)))
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil memulai ujian.',
+                            )
+                            this.examStarted.set(true)
+                            this.fetchQuestionsToGrade(true)
+                        },
+                        error: (err) => {
+                            console.error(err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal memulai ujian, silahkan coba lagi.',
+                            )
+                        },
+                    })
+            },
+        })
+    }
+
+    getExamScheduleDetail() {
+        this.examScheduleService
+            .getExamScheduleDetailById(this.examId())
+            .subscribe({
+                next: (res) => {
+                    this.examScheduleDetail.set(res)
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data jadwal.',
+                    )
+                },
+            })
+    }
+
+    fetchQuestionsToGrade(afterStart: boolean = false) {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
@@ -106,6 +180,12 @@ export class PracticalWorkComponent {
                     )
 
                     this.participantAnswer.set(baseQuestion)
+
+                    // If we have questions on initial load, exam has already started
+                    if (!afterStart && otherQuestions.length > 0) {
+                        this.examStarted.set(true)
+                    }
+
                     const draft = await this.draftService.load(
                         this.examId(),
                         this.participantId(),
@@ -258,6 +338,18 @@ export class PracticalWorkComponent {
             (item) => item.answerDto?.answerText != null,
         )
     }
+
+    allQuestionsAnsweredAndSaved(): boolean {
+        return this.questions().every((item) => {
+            // Check if answer is saved to backend (has id) and has meaningful data
+            return (
+                item.answerDto &&
+                item.answerDto.id && // Backend-saved answers have an id
+                item.answerDto.score != null
+            )
+        })
+    }
+
     markAllAsTouched(): void {
         this.answerDtoList.controls.forEach((control) => {
             const formGroup = control as FormGroup

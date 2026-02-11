@@ -19,6 +19,10 @@ import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { StudiKasusDraftService } from './studi-kasus-draft.service'
 import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
+import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-studi-kasus',
@@ -50,6 +54,10 @@ export class StudiKasusComponent implements OnInit {
     assessmentForm: FormGroup
     participantAnswer = signal<ExamQuestion | null>(null)
     private saveTimeout: number | undefined
+    startExamLoading = signal(false)
+    examStarted = signal(false)
+    examScheduleService = inject(UkomExamScheduleService)
+    examScheduleDetail = signal<ExamSchedule | null>(null)
 
     constructor() {
         this.assessmentForm = this.fb.group({
@@ -67,6 +75,16 @@ export class StudiKasusComponent implements OnInit {
                 const participantId = this.participantId()
                 if (examId && participantId) {
                     this.fetchQuestionsToGrade()
+                }
+            },
+            { allowSignalWrites: true },
+        )
+
+        effect(
+            () => {
+                const examId = this.examId()
+                if (examId) {
+                    this.getExamScheduleDetail()
                 }
             },
             { allowSignalWrites: true },
@@ -110,7 +128,62 @@ export class StudiKasusComponent implements OnInit {
         })
     }
 
-    fetchQuestionsToGrade() {
+    startTheExam() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.startExamLoading.set(true)
+
+                this.examService
+                    .startExamByExaminer(
+                        new ExaminerExamStartRequest({
+                            participantId: this.participantId(),
+                            examTypeCode: ExamTypeCategory.STUDI_KASUS,
+                            roomUkomId: this.examScheduleDetail().roomUkomId,
+                            examScheduleId: this.examId(),
+                        }),
+                    )
+                    .pipe(finalize(() => this.startExamLoading.set(false)))
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil memulai ujian.',
+                            )
+                            this.examStarted.set(true)
+                            this.fetchQuestionsToGrade(true)
+                        },
+                        error: (err) => {
+                            console.error(err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal memulai ujian, silahkan coba lagi.',
+                            )
+                        },
+                    })
+            },
+        })
+    }
+
+    getExamScheduleDetail() {
+        this.examScheduleService
+            .getExamScheduleDetailById(this.examId())
+            .subscribe({
+                next: (res) => {
+                    this.examScheduleDetail.set(res)
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengambil data jadwal.',
+                    )
+                },
+            })
+    }
+
+    fetchQuestionsToGrade(afterStart: boolean = false) {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
@@ -129,6 +202,11 @@ export class StudiKasusComponent implements OnInit {
                         (item) => item.id !== 'base_studi_kasus_question',
                     )
                     this.participantAnswer.set(baseQuestion || null)
+
+                    // If we have questions on initial load, exam has already started
+                    if (!afterStart && otherQuestions.length > 0) {
+                        this.examStarted.set(true)
+                    }
 
                     // Load draft first
                     const draft = await this.draftService.load(
@@ -355,5 +433,16 @@ export class StudiKasusComponent implements OnInit {
 
     isAllQuestionsAnswered(): boolean {
         return !this.questions().some((item) => item.answerDto?.score == null)
+    }
+
+    isAllQuestionsAnsweredAndSaved(): boolean {
+        return this.questions().every((item) => {
+            // Check if answer is saved to backend (has id) and has meaningful data
+            return (
+                item.answerDto &&
+                item.answerDto.id && // Backend-saved answers have an id
+                item.answerDto.score != null
+            )
+        })
     }
 }

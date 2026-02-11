@@ -413,4 +413,15 @@ export class SeminerMakalahComponent implements OnInit {
     isAllQuestionsAnswered(): boolean {
         return !this.questions().some((item) => item.answerDto?.score == null)
     }
+
+    isAllQuestionsAnsweredAndSaved(): boolean {
+        return this.questions().every((item) => {
+            // Check if answer is saved to backend (has id) and has meaningful data
+            return (
+                item.answerDto &&
+                item.answerDto.id && // Backend-saved answers have an id
+                item.answerDto.score != null
+            )
+        })
+    }
 }

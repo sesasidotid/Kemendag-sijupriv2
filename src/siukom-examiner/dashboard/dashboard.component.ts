@@ -286,11 +286,15 @@ export class DashboardComponent implements OnInit {
     }
 
     /**
-     * Check if an exam has been graded
-     * In examiner context, graded status is on the exam schedule itself
+     * Check if a participant has been examined
+     * Now checks the examined field on each participant in participantScheduleList
      */
-    isExamGraded(exam: GroupedExam): boolean {
-        return exam.schedule.graded === true
+    isParticipantExamined(
+        exam: GroupedExam,
+        participantSchedule: any,
+    ): boolean {
+        // Check the examined field on the participant schedule object
+        return participantSchedule?.examined === true
     }
 
     getParticipants(exam: GroupedExam) {
@@ -363,7 +367,7 @@ export class DashboardComponent implements OnInit {
     /**
      * Check if participant is ready for examination based on exam type
      * - WAWANCARA/SEMINAR: current time is within personal schedule + duration
-     * - Others: exam has started and participant not yet graded
+     * - Others: exam has started and participant not yet examined
      */
     private isParticipantReadyForExam(
         pSchedule: any,
@@ -373,7 +377,6 @@ export class DashboardComponent implements OnInit {
         examStartTime: string,
     ): boolean {
         const personalSchedule = pSchedule.personalSchedule
-        const examAttendance = pSchedule.examAttendance
 
         // For WAWANCARA and SEMINAR: check if within personal schedule window
         if (
@@ -395,11 +398,11 @@ export class DashboardComponent implements OnInit {
         }
 
         // For PORTOFOLIO, STUDI_KASUS, PRAKTIK, MAKALAH:
-        // Show if exam has started and not yet graded
+        // Show if exam has started and not yet examined
         const isExamStarted = now >= examStartTime
-        const isGraded = examAttendance?.isGraded === true
+        const isExamined = pSchedule.examined === true
 
-        return isExamStarted && !isGraded
+        return isExamStarted && !isExamined
     }
 
     /**

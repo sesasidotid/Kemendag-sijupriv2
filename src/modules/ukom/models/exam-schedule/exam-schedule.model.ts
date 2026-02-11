@@ -34,6 +34,7 @@ interface ParticipantScheduleList {
     examScheduleId: string
     personalSchedule: string | null | undefined
     participantUkom: Participant
+    examined?: boolean | null
 }
 
 interface ExaminerScheduleList {

@@ -8,6 +8,7 @@ export class ParticipantScheduleList extends Serializable {
     personalSchedule: string = undefined
     examScheduleSupervised: ExamScheduleSupervised[] = []
     participantUkom: Participant = undefined
+    examined: boolean | null = undefined
 
     constructor(object?: Partial<ParticipantScheduleList>) {
         super()

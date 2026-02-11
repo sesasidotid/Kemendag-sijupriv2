@@ -3,7 +3,7 @@
     [examScheduleId]="examId()"
     [loading]="loadingQuestions()"
     [participantId]="participantId()"
-    [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnswered() && questions().length > 0"
+    [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnsweredAndSaved() && questions().length > 0"
 >
     <ng-container
         *ngIf="!examStarted() && questions().length === 0; else examContent"
@@ -163,9 +163,9 @@
             <app-empty-state
                 [buttonAction]="backToDashboard.bind(this)"
                 [buttonText]="'Kembali ke Dashboard'"
-                [description]="'Tidak ada pertanyaan yang tersedia untuk penilaian saat ini.'"
+                [description]="'Belum ada form penilaian yang tersedia untuk saat ini.'"
                 [icon]="'mdi mdi-clipboard-text-outline'"
-                [title]="'Pertanyaan Tidak Ditemukan'"
+                [title]="'Form Penilaian Belum Tersedia'"
             >
             </app-empty-state>
         </ng-template>

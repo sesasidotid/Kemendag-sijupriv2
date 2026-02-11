@@ -2,9 +2,35 @@
     [loading]="loadingQuestions()"
     [examScheduleId]="examId()"
     [participantId]="participantId()"
-    [showSavedIndicator]="!loadingQuestions() && allQuestionsAnswered() && questions().length > 0"
+    [showSavedIndicator]="!loadingQuestions() && allQuestionsAnsweredAndSaved() && questions().length > 0"
     (backClicked)="backToDashboard()"
 >
+    <ng-container
+        *ngIf="!examStarted() && questions().length === 0; else examContent"
+    >
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Portofolio</h1>
+                <p>
+                    Klik tombol di bawah ini untuk memulai sesi penilaian
+                    portofolio peserta.
+                </p>
+            </div>
+
+            <!-- Start Exam Button Section -->
+            <div class="form-actions">
+                <app-loading-button
+                    (clicked)="startTheExam()"
+                    [className]="'btn btn-primary btn-lg'"
+                    [icon]="'mdi-clipboard-play-outline'"
+                    [isLoading]="startExamLoading()"
+                    [label]="'Mulai Ujian'"
+                    [type]="'button'"
+                ></app-loading-button>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #examContent>
     <ng-container *ngIf="questions().length > 0; else noQuestions">
         <form [formGroup]="assessmentForm">
             <div class="question-list" formArrayName="answerDtoList">
@@ -20,13 +46,23 @@
                         >
                         <h2 class="question-text">{{ question.question }}</h2>
 
+                        <!-- HAS DOCUMENT -->
                         <button
                             (click)="openDocument(question?.answerDto?.answerUploadUrl)"
+                            *ngIf="question?.answerDto?.answerUploadUrl; else noDocument"
                             class="btn btn-primary mt-2"
                         >
                             <span class="mdi mdi-open-in-new me-2"></span>
                             Lihat Dokumen Peserta
                         </button>
+
+                        <!-- NO DOCUMENT -->
+                        <ng-template #noDocument>
+                            <div class="alert alert-warning mt-2 mb-0">
+                                <span class="mdi mdi-file-alert-outline me-2"></span>
+                                Peserta belum mengunggah dokumen untuk item ini
+                            </div>
+                        </ng-template>
                     </div>
 
                     <div class="card-body">
@@ -81,8 +117,7 @@
                                 [class.not-competent]="!isItemCompetent(i)"
                                 class="status-badge"
                             >
-                                Status: {{ isItemCompetent(i) ? 'DITERIMA (Nilai
-                                Masuk)' : 'BELUM DITERIMA' }}
+                                Status: {{ isItemCompetent(i) ? 'DITERIMA (Nilai Masuk)' : 'BELUM DITERIMA' }}
                             </div>
                             <p *ngIf="!isItemCompetent(i)" class="small-hint">
                                 *Harus Valid DAN Memadai untuk mendapatkan
@@ -124,11 +159,12 @@
             <app-empty-state
                 [buttonAction]="backToDashboard.bind(this)"
                 [buttonText]="'Kembali ke Dashboard'"
-                [description]="'Tidak ada pertanyaan yang tersedia untuk penilaian saat ini.'"
+                [description]="'Belum ada form penilaian yang tersedia untuk saat ini.'"
                 [icon]="'mdi mdi-clipboard-text-outline'"
-                [title]="'Pertanyaan Tidak Ditemukan'"
+                [title]="'Form Penilaian Belum Tersedia'"
             >
             </app-empty-state>
         </div>
+    </ng-template>
     </ng-template>
 </app-exam-assessment-layout>
