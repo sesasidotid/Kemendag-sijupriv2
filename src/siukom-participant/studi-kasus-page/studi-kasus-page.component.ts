@@ -1,5 +1,6 @@
 import { Component, effect, inject, OnInit, signal } from '@angular/core'
 import { FilePreviewService } from '@/modules/base/services/file-preview.service'
+import { SecureFilePreviewService } from '@/modules/base/services/secure-file-preview.service'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
@@ -12,10 +13,12 @@ import { LoginContext } from '@/modules/base/commons/login-context'
 import { finalize } from 'rxjs'
 import { ExamService } from '@/modules/ukom/services/exam.service'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
-import { ParticpantStudyCaseExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
+import { ParticipantStudyCaseExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
+import { ParticipantExamLayoutComponent } from '@/siukom-participant/_shared/components/participant-exam-layout/participant-exam-layout.component'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-studi-kasus-page',
@@ -26,14 +29,15 @@ import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty
         LoadingButtonComponent,
         FormsModule,
         EmptyStateComponent,
+        ParticipantExamLayoutComponent,
     ],
     templateUrl: './studi-kasus-page.component.html',
     styleUrl: './studi-kasus-page.component.scss',
 })
 export class StudiKasusPageComponent implements OnInit {
     questionLoading = signal(false)
-
     filePreviewService = inject(FilePreviewService)
+    secureFilePreviewService = inject(SecureFilePreviewService)
     confirmationService = inject(ConfirmationService)
     handlerService = inject(HandlerService)
     router = inject(Router)
@@ -50,7 +54,6 @@ export class StudiKasusPageComponent implements OnInit {
     })
     submitLoading = signal(false)
     readonly userId: string
-
     // Error states
     criticalError = signal<boolean>(false)
     errorMessage = signal<string>('')
@@ -60,6 +63,7 @@ export class StudiKasusPageComponent implements OnInit {
     question = signal<ExamQuestion>(null)
     participant: Participant
     participantService = inject(UkomParticipantService)
+    protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor() {
         const raw = LoginContext.getUserId()
@@ -165,7 +169,7 @@ export class StudiKasusPageComponent implements OnInit {
             )
             return
         }
-        this.filePreviewService.open(
+        this.secureFilePreviewService.open(
             this.question().attachment,
             this.question().attachmentUrl,
         )
@@ -185,7 +189,7 @@ export class StudiKasusPageComponent implements OnInit {
                 if (!confirmed) return
                 this.submitLoading.set(true)
 
-                const payload = new ParticpantStudyCaseExamAnswer({
+                const payload = new ParticipantStudyCaseExamAnswer({
                     participantId: this.participant.id,
                     questionId: this.question().id,
                     fileAnswerUpload: this.answerFile(),

@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
-import { finalize } from 'rxjs'
+import { finalize, forkJoin } from 'rxjs'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ScheduleSlotService } from '@/modules/ukom/services/schedule-slot.service'
 import {
@@ -56,6 +56,10 @@ export class UkomExamMakalahComponent implements OnInit {
 
     examinerList = input<ExaminerScheduleList[]>([])
     participantList = input<ParticipantScheduleList[]>([])
+
+    // Makalah participant list (fetched internally using makalah exam schedule ID)
+    // Used to resolve Komponen A examiners from examScheduleSupervised
+    makalahParticipantList = signal<ParticipantScheduleList[]>([])
 
     participantListRefresh = output()
 
@@ -105,15 +109,28 @@ export class UkomExamMakalahComponent implements OnInit {
             { allowSignalWrites: true },
         )
 
-        // Effect 2: Transform to main schedule when seminar schedule and participants are available
+        // Effect 2: Fetch makalah participant list (for Komponen A examiners) when examId changes
+        effect(
+            () => {
+                const examId = this.examId()
+                if (examId) {
+                    this.fetchMakalahParticipantList()
+                }
+            },
+            { allowSignalWrites: true },
+        )
+
+        // Effect 3: Transform to main schedule when seminar schedule, both participant lists, and examiners are available
         effect(
             () => {
                 const seminarScheduleDetail = this.seminarScheduleDetail()
                 const participantList = this.participantList()
+                const makalahParticipantList = this.makalahParticipantList()
                 if (seminarScheduleDetail && participantList.length >= 0) {
                     this.transformToMainSchedule(
                         seminarScheduleDetail,
                         participantList,
+                        makalahParticipantList,
                     )
                 }
             },
@@ -252,20 +269,35 @@ export class UkomExamMakalahComponent implements OnInit {
 
     /**
      * Confirm examiner update action
+     * Sends separate API calls for Komponen A (makalah) and Komponen B&C (seminar)
      */
     confirmExaminerUpdate(event: {
         participant: ParticipantSchedule
-        examinerIds: string[]
+        examinerIdKomponenA: string
+        examinerIdKomponenBC: string
+        makalahParticipantScheduleId: string
+        seminarParticipantScheduleId: string
     }): void {
-        const { participant, examinerIds } = event
+        const {
+            examinerIdKomponenA,
+            examinerIdKomponenBC,
+            makalahParticipantScheduleId,
+            seminarParticipantScheduleId,
+        } = event
 
-        // Prepare request
-        const request = new UpdateExaminerForParticipantRequest({
-            participantScheduleId: participant.id,
-            examinerScheduleIdList: examinerIds,
+        // Update Komponen A (makalah schedule)
+        const requestKomponenA = new UpdateExaminerForParticipantRequest({
+            participantScheduleId: makalahParticipantScheduleId,
+            examinerScheduleIdList: [examinerIdKomponenA],
         })
 
-        this.performExaminerUpdate(request)
+        // Update Komponen B&C (seminar schedule)
+        const requestKomponenBC = new UpdateExaminerForParticipantRequest({
+            participantScheduleId: seminarParticipantScheduleId,
+            examinerScheduleIdList: [examinerIdKomponenBC],
+        })
+
+        this.performExaminerUpdate(requestKomponenA, requestKomponenBC)
     }
 
     private initializeColumnDefs(): void {
@@ -392,39 +424,63 @@ export class UkomExamMakalahComponent implements OnInit {
 
     private transformToMainSchedule(
         examSchedule: ExamSchedule,
-        participantScheduleList: ParticipantScheduleList[],
+        seminarParticipantList: ParticipantScheduleList[],
+        makalahParticipantList: ParticipantScheduleList[],
     ): void {
+        // Both Komponen A and B&C use the same examiner pool
         const examinerMap = this.buildExaminerMap(this.examinerList())
 
-        const participantSchedules: ParticipantSchedule[] =
-            participantScheduleList.map((p) => {
-                // Get examiners by index
-                const examinerKomponenA =
-                    p.examScheduleSupervised && p.examScheduleSupervised[0]
-                        ? (examinerMap.get(
-                              p.examScheduleSupervised[0].examinerScheduleId,
-                          ) ?? 'Unknown')
-                        : 'Unknown'
+        // Build lookup: participantId -> makalah participant schedule data
+        const makalahByParticipantId = new Map<
+            string,
+            ParticipantScheduleList
+        >()
+        makalahParticipantList.forEach((p) => {
+            makalahByParticipantId.set(p.participantId, p)
+        })
 
-                const examinerKomponenBC =
-                    p.examScheduleSupervised && p.examScheduleSupervised[1]
-                        ? (examinerMap.get(
-                              p.examScheduleSupervised[1].examinerScheduleId,
-                          ) ?? 'Unknown')
-                        : undefined
+        // Use seminar participant list as the base (since it has personalSchedule for slots)
+        const participantSchedules: ParticipantSchedule[] =
+            seminarParticipantList.map((seminarP) => {
+                // Komponen A: from makalah participant's examScheduleSupervised
+                const makalahP = makalahByParticipantId.get(
+                    seminarP.participantId,
+                )
+                const makalahSupervised = makalahP?.examScheduleSupervised?.[0]
+                const examinerIdKomponenA =
+                    makalahSupervised?.examinerScheduleId ?? null
+                const examinerKomponenA = examinerIdKomponenA
+                    ? (examinerMap.get(examinerIdKomponenA) ?? 'Unknown')
+                    : 'Belum ada'
+
+                // Komponen B&C: from seminar participant's examScheduleSupervised
+                const seminarSupervised = seminarP.examScheduleSupervised?.[0]
+                const examinerIdKomponenBC =
+                    seminarSupervised?.examinerScheduleId ?? null
+                const examinerKomponenBC = examinerIdKomponenBC
+                    ? (examinerMap.get(examinerIdKomponenBC) ?? 'Unknown')
+                    : 'Belum ada'
 
                 return {
-                    id: p.id,
-                    participantId: p.participantId,
-                    examScheduleId: p.examScheduleId,
-                    personalSchedule: p.personalSchedule
-                        ? this.slotService.parseAsUTC7(p.personalSchedule)
+                    id: seminarP.id,
+                    participantId: seminarP.participantId,
+                    examScheduleId: seminarP.examScheduleId,
+                    personalSchedule: seminarP.personalSchedule
+                        ? this.slotService.parseAsUTC7(
+                              seminarP.personalSchedule,
+                          )
                         : null,
-                    participantName: p.participantUkom?.name || 'Unknown',
-                    participantNip: p.participantUkom?.nip || 'Unknown',
+                    participantName:
+                        seminarP.participantUkom?.name || 'Unknown',
+                    participantNip: seminarP.participantUkom?.nip || 'Unknown',
                     examinerName: examinerKomponenA, // For backward compatibility
                     examinerKomponenA: examinerKomponenA,
                     examinerKomponenBC: examinerKomponenBC,
+                    // IDs for separate update
+                    makalahParticipantScheduleId: makalahP?.id ?? null,
+                    seminarParticipantScheduleId: seminarP.id,
+                    examinerIdKomponenA: examinerIdKomponenA,
+                    examinerIdKomponenBC: examinerIdKomponenBC,
                 }
             }) || []
 
@@ -436,14 +492,27 @@ export class UkomExamMakalahComponent implements OnInit {
             participantScheduleList: participantSchedules,
         }
 
-        console.log('mainschedule', mainSchedule)
-
         this.mainSchedule.set(mainSchedule)
-        console.log('qq', this.mainSchedule())
 
         // Generate all slots
         const slots = this.slotService.generateAllSlots(mainSchedule)
         this.allSlots.set(slots)
+    }
+
+    /**
+     * Fetch makalah participant list to get examScheduleSupervised for Komponen A
+     */
+    fetchMakalahParticipantList(): void {
+        this.examScheduleService
+            .getParticipantListByExamScheduleId(this.examId())
+            .subscribe({
+                next: (res) => {
+                    this.makalahParticipantList.set(res)
+                },
+                error: (err) => {
+                    console.error('Error fetching makalah participants:', err)
+                },
+            })
     }
 
     /**
@@ -481,35 +550,42 @@ export class UkomExamMakalahComponent implements OnInit {
     }
 
     /**
-     * Perform examiner update via API
+     * Perform examiner update via API - sends two separate calls for Komponen A and B&C
      */
     private performExaminerUpdate(
-        request: UpdateExaminerForParticipantRequest,
+        requestKomponenA: UpdateExaminerForParticipantRequest,
+        requestKomponenBC: UpdateExaminerForParticipantRequest,
     ): void {
-        this.examScheduleService
-            .updateExaminerForParticipantScheduleByParticipantScheduleId(
-                request,
-            )
-            .subscribe({
-                next: () => {
-                    this.handlerService.handleAlert(
-                        'Success',
-                        'Penguji berhasil diubah.',
-                    )
+        forkJoin([
+            this.examScheduleService.updateExaminerForParticipantScheduleByParticipantScheduleId(
+                requestKomponenA,
+            ),
+            this.examScheduleService.updateExaminerForParticipantScheduleByParticipantScheduleId(
+                requestKomponenBC,
+            ),
+        ]).subscribe({
+            next: () => {
+                this.handlerService.handleAlert(
+                    'Success',
+                    'Penguji berhasil diubah.',
+                )
 
-                    // Notify parent to refresh participants
-                    this.participantListRefresh.emit()
+                // Refresh makalah participant list (for Komponen A examiners)
+                this.fetchMakalahParticipantList()
 
-                    this.closeExaminerModal()
-                },
-                error: (err) => {
-                    console.error('Update examiner error:', err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengubah penguji.',
-                    )
-                },
-            })
+                // Notify parent to refresh participants (including seminar data)
+                this.participantListRefresh.emit()
+
+                this.closeExaminerModal()
+            },
+            error: (err) => {
+                console.error('Update examiner error:', err)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mengubah penguji.',
+                )
+            },
+        })
     }
 
     private buildExaminerMap(

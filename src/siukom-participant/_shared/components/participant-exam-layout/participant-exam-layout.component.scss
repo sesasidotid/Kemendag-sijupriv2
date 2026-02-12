@@ -1,0 +1,23 @@
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.error-header {
+  background-color: #dc3545; // Bootstrap danger
+  color: #fff;
+  border-bottom: none;
+  padding: 1rem 1.25rem;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+
+  .modal-title {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  i {
+    font-size: 1.1rem;
+  }
+}

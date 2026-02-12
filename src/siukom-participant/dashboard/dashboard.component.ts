@@ -321,7 +321,9 @@ export class DashboardComponent implements OnInit {
         const examId = this.selectedExamId()
         if (!examId) return null
 
-        const exam = this.roomUkom.examScheduleDtoList.find(e => e.id === examId)
+        const exam = this.roomUkom.examScheduleDtoList.find(
+            (e) => e.id === examId,
+        )
         return exam?.examTypeCode || null
     }
 
@@ -358,7 +360,6 @@ export class DashboardComponent implements OnInit {
             answerDto.answerUploadUrl,
         )
     }
-
 
     getExamDisplayName(examTypeCode: string): string {
         const displayNames: Record<string, string> = {
@@ -406,7 +407,6 @@ export class DashboardComponent implements OnInit {
     hasScore(examScheduleId: string): boolean {
         return this.isExamScheduleHaveScore(examScheduleId)
     }
-
 
     // New: Exam time is over but no score (missed/not answered)
     isExamMissed(exam: ExamSchedule): boolean {
@@ -473,6 +473,4 @@ export class DashboardComponent implements OnInit {
 
         return { year, month, day, hour, minute, second }
     }
-
-
 }

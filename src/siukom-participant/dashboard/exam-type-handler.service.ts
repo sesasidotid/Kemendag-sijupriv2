@@ -1,8 +1,6 @@
-import { Injectable, WritableSignal } from '@angular/core'
+import { inject, Injectable, WritableSignal } from '@angular/core'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
-// import { CATScore } from '@/modules/ukom/models/cat/cat-score'
-// import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
 import {
     CATScore,
     MakalahScore,
@@ -10,6 +8,7 @@ import {
     PraktikScore,
     StudiKasusScore,
 } from '@/modules/ukom/models/exam/exam-score.model'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 
 /**
  * Configuration for starting an exam, including confirmation dialog settings
@@ -32,6 +31,7 @@ export interface StartExamConfig {
     providedIn: 'root',
 })
 export class ExamTypeHandlerService {
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
     /**
      * Map of exam types to their corresponding route paths
      */
@@ -51,27 +51,28 @@ export class ExamTypeHandlerService {
      * @returns Configuration object for the start exam confirmation dialog
      */
     getStartExamConfig(examType: ExamTypeCategory): StartExamConfig {
+        const moduleName =
+            this.ukomMiscellaneousService.getModuleDisplayName(examType)
+
+        const baseConfig: StartExamConfig = {
+            withComment: false,
+            title: `Konfirmasi Mulai ${moduleName}`,
+            message: `Anda akan memulai ujian ${moduleName}. Pastikan semua persiapan sudah selesai.`,
+        }
+
         switch (examType) {
             case ExamTypeCategory.CAT:
             case ExamTypeCategory.STUDI_KASUS:
                 return {
+                    ...baseConfig,
                     withComment: true,
-                    title: 'Konfirmasi Mulai Ujian CAT',
-                    message:
-                        'Anda akan memulai ujian CAT ini. Silakan masukkan kode ujian untuk melanjutkan. Pastikan semua persiapan sudah selesai.',
+                    message: `Anda akan memulai ujian ${moduleName}. Silakan masukkan kode ujian untuk melanjutkan. Pastikan semua persiapan sudah selesai.`,
                     commentLabel: 'Kode Ujian',
                     placeholder: 'Masukkan kode ujian di sini...',
                 }
 
-            case ExamTypeCategory.MAKALAH:
-            case ExamTypeCategory.WAWANCARA:
             default:
-                return {
-                    withComment: false,
-                    title: 'Konfirmasi Mulai Ujian',
-                    message:
-                        'Anda akan memulai ujian ini. Pastikan semua persiapan sudah selesai.',
-                }
+                return baseConfig
         }
     }
 
@@ -132,7 +133,6 @@ export class ExamTypeHandlerService {
         switch (examType) {
             case ExamTypeCategory.CAT:
                 return new CATScore(response)
-
             case ExamTypeCategory.MAKALAH:
                 return new MakalahScore(response)
             case ExamTypeCategory.WAWANCARA:
@@ -142,10 +142,9 @@ export class ExamTypeHandlerService {
             case ExamTypeCategory.STUDI_KASUS:
                 return new StudiKasusScore(response)
             case ExamTypeCategory.PORTOFOLIO:
-                return new PortofolioScore()
+                return new PortofolioScore(response)
 
             default:
-                // For unknown exam types, return raw response as fallback
                 return response
         }
     }

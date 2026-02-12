@@ -1,81 +1,8 @@
-<!--<app-ukom-makalah-->
-<!--    [participant_id]="participant_id"-->
-<!--    [room_id]="roomUkom.id"-->
-<!--    (afterSubmit)="backToDashboard()"-->
-<!--&gt;-->
-<!--</app-ukom-makalah>-->
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <button (click)="backToDashboard()" class="btn btn-outline-secondary">
-        <i class="mdi mdi-chevron-left"></i> Kembali
-    </button>
-    <div
-        *ngIf="!pageLoading() && hasExistingAnswer()"
-        class="alert alert-success d-flex align-items-center"
-    >
-        <i class="mdi mdi-check-circle me-1"></i>
-        <small>Jawaban telah disimpan</small>
-    </div>
-</div>
-
-<div
-    *ngIf="criticalError()"
-    class="modal d-block"
-    style="background-color: rgba(0, 0, 0, 0.5)"
-    tabindex="-1"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="mdi mdi-alert-circle me-2"></i>
-                    Terjadi Kesalahan
-                </h5>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-danger mb-3">
-                    <i class="mdi mdi-alert me-2"></i>
-                    <strong>{{ errorMessage() }}</strong>
-                </div>
-                <p class="mb-2"><strong>Apa yang harus dilakukan?</strong></p>
-                <ul>
-                    <li>
-                        Klik tombol <strong>"Reload Halaman"</strong> untuk
-                        memuat ulang halaman
-                    </li>
-                    <li>Jika masalah tetap berlanjut, hubungi panitia ujian</li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button
-                    (click)="reloadPage()"
-                    class="btn btn-primary"
-                    type="button"
-                >
-                    <i class="mdi mdi-refresh me-1"></i>
-                    Reload Halaman
-                </button>
-                <button
-                    (click)="backToDashboard()"
-                    class="btn btn-secondary"
-                    type="button"
-                >
-                    Kembali ke Dashboard
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<ng-container *ngIf="pageLoading(); else content">
-    <div class="py-5 text-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Memuat...</span>
-        </div>
-        <p class="mt-2">Memuat soal ujian...</p>
-    </div>
-</ng-container>
-
-<ng-template #content>
+<app-participant-exam-layout (backClicked)="backToDashboard()" (reloadClicked)="reloadPage()"
+    [backButtonLabel]="'Kembali'" [criticalError]="criticalError()" [errorMessage]="errorMessage()"
+    [examTypeCode]="ExamTypeCategory.MAKALAH" [loadingMessage]="'Memuat soal ujian...'" [loading]="pageLoading()"
+    [savedMessage]="'Jawaban telah disimpan'" [showBackButton]="true"
+    [showSavedIndicator]="!pageLoading() && hasExistingAnswer()">
     <ng-container *ngIf="question();else noQuestion">
         <div class="alert alert-info">
             <h4 class="alert-heading">
@@ -96,9 +23,7 @@
 
         <form (ngSubmit)="submitAnswer()">
             <div class="card shadow-sm">
-                <div
-                    class="card-header d-flex align-items-center justify-content-between"
-                >
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="mb-0">
                         <i class="mdi mdi-upload me-2"></i>
                         {{ hasExistingAnswer() ? 'Update' : 'Upload' }} Jawaban
@@ -112,17 +37,10 @@
                 <div class="card-body">
                     <app-file-handler [inputs]="inputs()"></app-file-handler>
                     <div class="mt-3">
-                        <app-loading-button
-                            [className]="'btn btn-primary'"
-                            [disabled]="!answerFile()"
-                            [isLoading]="submitLoading()"
-                            [label]="'Simpan Jawaban Saya'"
-                            [type]="'submit'"
-                        ></app-loading-button>
-                        <small
-                            *ngIf="hasExistingAnswer()"
-                            class="text-muted ms-2"
-                        >
+                        <app-loading-button [className]="'btn btn-primary'" [disabled]="!answerFile()"
+                            [isLoading]="submitLoading()" [label]="'Simpan Jawaban Saya'"
+                            [type]="'submit'"></app-loading-button>
+                        <small *ngIf="hasExistingAnswer()" class="text-muted ms-2">
                             Jawaban telah tersimpan. Unggah file baru untuk
                             memperbarui.
                         </small>
@@ -132,13 +50,9 @@
         </form>
     </ng-container>
     <ng-template #noQuestion>
-        <app-empty-state
-            [buttonAction]="backToDashboard.bind(this)"
-            [buttonText]="'Kembali ke Dashboard'"
-            [description]="'Tidak ada pertanyaan yang tersedia saat ini.'"
-            [icon]="'mdi mdi-clipboard-text-outline'"
-            [title]="'Pertanyaan Tidak Ditemukan'"
-        >
+        <app-empty-state [buttonAction]="backToDashboard.bind(this)" [buttonText]="'Kembali ke Dashboard'"
+            [description]="'Tidak ada pertanyaan yang tersedia saat ini.'" [icon]="'mdi mdi-clipboard-text-outline'"
+            [title]="'Pertanyaan Tidak Ditemukan'">
         </app-empty-state>
     </ng-template>
-</ng-template>
+</app-participant-exam-layout>

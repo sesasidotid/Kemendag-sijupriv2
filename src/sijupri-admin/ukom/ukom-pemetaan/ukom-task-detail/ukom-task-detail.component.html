@@ -1,6 +1,20 @@
-<button class="btn btn-sm btn-outline-secondary mb-3" (click)="goBack()">
-    <i class="mdi mdi-chevron-left"></i> Kembali
-</button>
+<div
+    class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2"
+>
+    <button (click)="goBack()" class="btn-sm btn btn-outline-secondary">
+        <i class="mdi mdi-chevron-left"></i> Kembali
+    </button>
+
+    <ng-container *ngIf="!(isLoading$ | async)">
+        <button
+            (click)="toggleUpdatePasswordModal()"
+            class="btn btn-primary mb-3"
+        >
+            <i class="mdi mdi-lock-reset me-1"></i>
+            Lupa password akun UKom? <strong>Reset di sini</strong>
+        </button>
+    </ng-container>
+</div>
 
 <ng-container *ngIf="isLoading$ | async; else ukomHadItem">
     <div class="d-flex justify-content-center my-5">
@@ -11,465 +25,378 @@
 </ng-container>
 
 <ng-template #ukomHadItem>
-    <div class="row">
-        <div class="text-end">
-            <button class="btn btn-primary mb-3 " (click)="toggleUpdatePasswordModal()">
-                <i class="mdi mdi-lock-reset me-1"></i>
-                Lupa password akun UKom? <strong>Reset di sini</strong>
-            </button>
+    <div class="card">
+        <div class="card-header align-items-center d-flex">
+            <h5 class="m-0">
+                <i class="mdi mdi-account me-2"></i>Detail Peserta UKom
+            </h5>
         </div>
 
-        <div class="">
-            <div class="card">
-                <div class="card-header align-items-center d-flex">
-                    <h4 class="m-0">
-                        <i class="mdi mdi-account me-2"></i>Detail Peserta UKom
-                    </h4>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h5 class="fw-bold">Identitas Peserta</h5>
+                    <hr />
                 </div>
 
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <h5 class="fw-bold">Identitas Peserta</h5>
-                            <hr />
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Status Pendaftar</label>
+                        <p class="border-bottom">
+                            {{ participant.participantStatus == 'jf' ? 'JF
+                            Perdagangan' : 'Non-JF Perdagangan' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Status Pendaftar</label>
-                                <p class="border-bottom">
-                                    {{
-                                    participant.participantStatus == 'jf'
-                                    ? 'JF Perdagangan'
-                                    : 'Non-JF Perdagangan'
-                                    }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <p class="border-bottom">
+                            {{ participant.name ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Nama Lengkap</label>
-                                <p class="border-bottom">
-                                    {{ participant.name ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">NIP</label>
+                        <p class="border-bottom">
+                            {{ participant.nip ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">NIP</label>
-                                <p class="border-bottom">
-                                    {{ participant.nip ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nomor Whatsapp</label>
+                        <p class="border-bottom">
+                            {{ participant.phone ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Nomor Whatsapp</label>
-                                <p class="border-bottom">
-                                    {{ participant.phone ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-lg-6 mb-2">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <p class="border-bottom">
+                            {{ participant.email ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6 mb-2">
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <p class="border-bottom">
-                                    {{ participant.email ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Lahir</label>
+                        <p class="border-bottom">
+                            {{ participant.tanggalLahir | tanggalIndo }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Tanggal Lahir</label>
-                                <p class="border-bottom">
-                                    {{ participant.tanggalLahir | tanggalIndo }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label"
+                            >Usia Menurut Surat Usulan</label
+                        >
+                        <p class="border-bottom">
+                            {{ calculateAge( participant.tanggalLahir,
+                            participant.tglSuratUsulan ) }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Usia Menurut Surat Usulan</label>
-                                <p class="border-bottom">
-                                    {{
-                                    calculateAge(
-                                    participant.tanggalLahir,
-                                    participant.tglSuratUsulan
-                                    )
-                                    }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-lg-12">
+                    <h5 class="fw-bold mt-3">Pendidikan & Pekerjaan</h5>
+                    <hr />
+                </div>
 
-                        <div class="col-lg-12">
-                            <h5 class="fw-bold mt-3">Pendidikan & Pekerjaan</h5>
-                            <hr />
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Jenjang Pendidikan</label>
+                        <p class="border-bottom">{{ pendidikanName ?? '-' }}</p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Jenjang Pendidikan</label>
-                                <p class="border-bottom">
-                                    {{ pendidikanName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Program Studi/Jurusan</label>
+                        <p class="border-bottom">
+                            {{ participant.jurusan ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Program Studi/Jurusan</label>
-                                <p class="border-bottom">
-                                    {{ participant.jurusan ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Instansi</label>
+                        <p class="border-bottom">
+                            {{ transformInstansiName( participant.jenisInstansi
+                            ) ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Instansi</label>
-                                <p class="border-bottom">
-                                    {{
-                                    transformInstansiName(
-                                    participant.jenisInstansi
-                                    ) ?? '-'
-                                    }}
-                                </p>
-                            </div>
-                        </div>
+                <div *ngIf="provinsiName" class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Provinsi</label>
+                        <p class="border-bottom">{{ provinsiName ?? '-' }}</p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6" *ngIf="provinsiName">
-                            <div class="mb-3">
-                                <label class="form-label">Provinsi</label>
-                                <p class="border-bottom">
-                                    {{ provinsiName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
+                <div *ngIf="kabupatenName" class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Kabupaten/Kota</label>
+                        <p class="border-bottom">
+                            {{ kabupatenName ? typeKabKota + ' ' + kabupatenName
+                            : '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="col-lg-6" *ngIf="kabupatenName">
-                            <div class="mb-3">
-                                <label class="form-label">Kabupaten/Kota</label>
-                                <p class="border-bottom">
-                                    {{
-                                    kabupatenName
-                                    ? typeKabKota + ' ' + kabupatenName
-                                    : '-'
-                                    }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div [ngClass]="{
+                <div
+                    [ngClass]="{
                                 'col-lg-6':
                                     participant.jenisInstansi !=
                                     'PEMERINTAH_PROVINSI',
                                 'col-lg-12':
                                     participant.jenisInstansi ==
                                     'PEMERINTAH_PROVINSI'
-                            }">
-                            <div class="mb-3">
-                                <label class="form-label">Unit Kerja</label>
-                                <p class="border-bottom">
-                                    {{ participant.unitKerjaName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Jabatan</label>
-                                <p class="border-bottom">
-                                    {{ participant.jabatanName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Jabatan Yang Dituju</label>
-                                <p class="border-bottom">
-                                    {{ participant.nextJabatanName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Jenjang</label>
-                                <p class="border-bottom">
-                                    {{ participant.jenjangName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Jenjang Yang Dituju</label>
-                                <p class="border-bottom">
-                                    {{ participant.nextJenjangName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Pangkat</label>
-                                <p class="border-bottom">
-                                    {{ participant.pangkatName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Bidang Jabatan Yang Dituju</label>
-                                <p class="border-bottom">
-                                    {{ bidangJabatanName ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-12">
-                            <h5 class="fw-bold mt-3">Informasi Pengajuan</h5>
-                            <hr />
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Jenis UKom</label>
-                                <p class="border-bottom">
-                                    {{
-                                    jenisUkomService.getLabelByValue(participant.jenisUkom)
-                                    }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Status Pendaftaran</label>
-                                <p class="border-bottom">
-                                    {{
-                                    participant.isMengulang
-                                    ? 'Mengulang'
-                                    : 'Baru'
-                                    }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Nomor Surat Usulan</label>
-                                <p class="border-bottom">
-                                    {{ participant.noSuratUsulan ?? '-' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Tanggal Surat Usulan</label>
-                                <p class="border-bottom">
-                                    {{
-                                    participant.tglSuratUsulan | tanggalIndo
-                                    }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Predikat Kinerja Pegawai Satu Tahun
-                                    Terakhir</label>
-                                <p class="border-bottom">
-                                    {{ predikat1Name }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label class="form-label">Predikat Kinerja Pegawai Dua Tahun
-                                    Terakhir</label>
-                                <p class="border-bottom">
-                                    {{ predikat2Name }}
-                                </p>
-                            </div>
-                        </div>
+                            }"
+                >
+                    <div class="mb-3">
+                        <label class="form-label">Unit Kerja</label>
+                        <p class="border-bottom">
+                            {{ participant.unitKerjaName ?? '-' }}
+                        </p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Dokumen Pendaftaran -->
-            <div class="card" *ngIf="dataDokumenUkom.length > 0">
-                <div class="card-header">
-                    <h5 class="m-0">
-                        <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen Pendaftaran UKom
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
-                </div>
-            </div>
-
-            <div class="card" *ngIf="(scoreMap | keyvalue)?.length > 0 && hasNonNullScores()">
-                <div class="card-header">
-                    <h5 class="m-0">
-                        <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
-                        Detail UKom
-                    </h5>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Jabatan</label>
+                        <p class="border-bottom">
+                            {{ participant.jabatanName ?? '-' }}
+                        </p>
+                    </div>
                 </div>
 
-                <div class="list-group">
-                    <ng-container *ngFor="let exam of participant.roomUkomDto?.examScheduleDtoList">
-                        <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
-                            *ngIf="scoreMap[exam.id] !== null && scoreMap[exam.id] !== undefined && exam.examTypeCode === 'CAT'">
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Jabatan Yang Dituju</label>
+                        <p class="border-bottom">
+                            {{ participant.nextJabatanName ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                            <div>
-                                <h5 class="m-0">CAT</h5>
-                            </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Jenjang</label>
+                        <p class="border-bottom">
+                            {{ participant.jenjangName ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                <button class="btn btn-success" (click)="toggleModal(exam.id)">
-                                    Lihat Nilai
-                                </button>
-                                <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async" [type]="'button'"
-                                    label="Hapus Nilai" [className]="'btn btn-danger'"
-                                    (clicked)="deleteExamScore(scoreMap[exam.id]?.id)">
-                                </app-loading-button>
-                            </div>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Jenjang Yang Dituju</label>
+                        <p class="border-bottom">
+                            {{ participant.nextJenjangName ?? '-' }}
+                        </p>
+                    </div>
+                </div>
 
-                        <div class="list-group-item d-flex justify-content-between align-items-center"
-                            *ngIf="scoreMap[exam.id] !== null && scoreMap[exam.id] !== undefined && exam.examTypeCode === 'MAKALAH'">
-                            <div>
-                                <h5 class="m-0">Makalah</h5>
-                            </div>
-                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                <button class="btn btn-success" (click)="viewFile(exam.id)">
-                                    Lihat Makalah
-                                </button>
-                                <app-loading-button [isLoading]="isDeleteExamScoreLoading$ | async" [type]="'button'"
-                                    label="Hapus Makalah" [className]="'btn btn-danger'"
-                                    (clicked)="deleteExamScore(scoreMap[exam.id]?.id)">
-                                </app-loading-button>
-                            </div>
-                        </div>
-                    </ng-container>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Pangkat</label>
+                        <p class="border-bottom">
+                            {{ participant.pangkatName ?? '-' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label"
+                            >Bidang Jabatan Yang Dituju</label
+                        >
+                        <p class="border-bottom">
+                            {{ bidangJabatanName ?? '-' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <h5 class="fw-bold mt-3">Informasi Pengajuan</h5>
+                    <hr />
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Jenis UKom</label>
+                        <p class="border-bottom">
+                            {{
+                            jenisUkomService.getLabelByValue(participant.jenisUkom)
+                            }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Status Pendaftaran</label>
+                        <p class="border-bottom">
+                            {{ participant.isMengulang ? 'Mengulang' : 'Baru' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nomor Surat Usulan</label>
+                        <p class="border-bottom">
+                            {{ participant.noSuratUsulan ?? '-' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Surat Usulan</label>
+                        <p class="border-bottom">
+                            {{ participant.tglSuratUsulan | tanggalIndo }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label"
+                            >Predikat Kinerja Pegawai Satu Tahun Terakhir</label
+                        >
+                        <p class="border-bottom">{{ predikat1Name }}</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label"
+                            >Predikat Kinerja Pegawai Dua Tahun Terakhir</label
+                        >
+                        <p class="border-bottom">{{ predikat2Name }}</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Dokumen Pendaftaran -->
+    <div *ngIf="dataDokumenUkom.length > 0" class="card">
+        <div class="card-header">
+            <h5 class="m-0">
+                <i class="mdi mdi-file-document-check-outline me-2"></i>Dokumen
+                Pendaftaran UKom
+            </h5>
+        </div>
+        <div class="card-body">
+            <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
+        </div>
+    </div>
+
+    <div
+        *ngIf="(scoreMap | keyvalue)?.length > 0 && hasNonNullScores()"
+        class="card"
+    >
+        <div class="card-header">
+            <h5 class="m-0">
+                <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
+                Detail UKom
+            </h5>
+        </div>
+
+        <div class="list-group">
+            <ng-container
+                *ngFor="let exam of participant.roomUkomDto?.examScheduleDtoList"
+            >
+                <div
+                    *ngIf="scoreMap[exam.id] != null && exam.examTypeCode === ExamTypeCategory.CAT"
+                    class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
+                >
+                    <h5 class="m-0">
+                        {{ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)}}
+                    </h5>
+
+                    <div
+                        class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
+                    >
+                        <button
+                            (click)="toggleModal(exam.id)"
+                            class="btn btn-success"
+                        >
+                            Lihat Nilai
+                        </button>
+                        <app-loading-button
+                            (clicked)="deleteExamScore(scoreMap[exam.id]?.id)"
+                            [className]="'btn btn-danger'"
+                            [isLoading]="isDeleteExamScoreLoading$ | async"
+                            [type]="'button'"
+                            label="Hapus Nilai"
+                        >
+                        </app-loading-button>
+                    </div>
+                </div>
+
+                <div
+                    *ngIf="scoreMap[exam.id] != null  && exam.examTypeCode === ExamTypeCategory.MAKALAH"
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                >
+                    <h5 class="m-0">
+                        {{ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)}}
+                    </h5>
+                    <div
+                        class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
+                    >
+                        <button
+                            (click)="viewFile(exam.id)"
+                            class="btn btn-success"
+                        >
+                            Lihat Makalah
+                        </button>
+                        <app-loading-button
+                            (clicked)="deleteExamScore(scoreMap[exam.id]?.id)"
+                            [className]="'btn btn-danger'"
+                            [isLoading]="isDeleteExamScoreLoading$ | async"
+                            [type]="'button'"
+                            label="Hapus Makalah"
+                        >
+                        </app-loading-button>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
 </ng-template>
 
-<app-modal *ngIf="isModalOpen$ | async" [title]="'Hasil Ujian'" (toggle)="toggleModal()" [enableFooter]="false"
-    [size]="'lg'">
-    <ng-container>
-        <div class="total-score-container">
-            <div class="total-score-value">
-                {{ selectedExamId ? (getScoreByExamId(selectedExamId)?.score | number: '1.2-2') : '-' }}
-            </div>
-        </div>
-
-        <div *ngFor="let competencyGroup of getGroupedCompetencies()" class="mb-5">
-            <div class="card border-0 mb-3">
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 text-white">
-                            {{ competencyGroup.name }}
-                        </h4>
-                        <span class="badge badge-light badge-lg">
-                            {{ competencyGroup.percentage }}% ({{
-                            competencyGroup.correct
-                            }}/{{ competencyGroup.total }})
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub-competencies -->
-            <div class="row">
-                <div *ngFor="let kompetensi of competencyGroup.items" class="col-md-6 mb-3">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">{{ kompetensi.name }}</h5>
-                            <span class="badge" [ngClass]="{
-                                    'bg-success':
-                                        getCompetencyPercentage(kompetensi) >=
-                                        70,
-                                    'bg-warning':
-                                        getCompetencyPercentage(kompetensi) >=
-                                            50 &&
-                                        getCompetencyPercentage(kompetensi) <
-                                            70,
-                                    'bg-danger':
-                                        getCompetencyPercentage(kompetensi) < 50
-                                }">
-                                {{ getCompetencyPercentage(kompetensi) }}%
-                            </span>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Pertanyaan</th>
-                                            <th>Jawaban</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="
-                                                let question of kompetensi.questionDtoList
-                                            " [ngClass]="{
-                                                'table-success':
-                                                    question.answerDto
-                                                        ?.answerChoice ===
-                                                    getCorrectAnswer(question),
-                                                'table-danger':
-                                                    question.answerDto
-                                                        ?.answerChoice !==
-                                                    getCorrectAnswer(question)
-                                            }">
-                                            <td>{{ question.question }}</td>
-                                            <td>
-                                                {{
-                                                question.answerDto
-                                                ?.answerChoice
-                                                }}
-                                            </td>
-                                            <td>
-                                                <span>
-                                                    {{
-                                                    question.answerDto
-                                                    ?.answerChoice ===
-                                                    getCorrectAnswer(
-                                                    question
-                                                    )
-                                                    ? 'Benar'
-                                                    : 'Salah'
-                                                    }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ng-container>
+<app-modal
+    (toggle)="toggleModal()"
+    *ngIf="isModalOpen$ | async"
+    [enableFooter]="false"
+    [size]="'lg'"
+    [title]="'Hasil Ujian'"
+>
+    <app-cat-score-admin [score]="getSelectedScore()"></app-cat-score-admin>
 </app-modal>
 
-<app-modal *ngIf="isToggleUpdatePasswordModal$ | async" [title]="'Update Password '"
-    (toggle)="toggleUpdatePasswordModal()" [enableFooter]="false">
-    <app-force-password-form [userId]="participant.userId" (passwordUpdated)="toggleUpdatePasswordModal()" />
+<app-modal
+    (toggle)="toggleUpdatePasswordModal()"
+    *ngIf="isToggleUpdatePasswordModal$ | async"
+    [enableFooter]="false"
+    [title]="'Update Password '"
+>
+    <app-force-password-form
+        (passwordUpdated)="toggleUpdatePasswordModal()"
+        [userId]="participant.userId"
+    />
 </app-modal>

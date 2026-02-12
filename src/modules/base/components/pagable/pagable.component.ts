@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Pagable } from '../../commons/pagable/pagable'
 import { HttpClient } from '@angular/common/http'
-import { Subscription } from 'rxjs'
+import { finalize, Subscription } from 'rxjs'
 
 @Component({
     selector: 'app-pagable',
@@ -265,11 +265,10 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
             ? this.http.get(fetchUrl)
             : this.apiService.getData(fetchUrl)
 
-        fetchObservable.subscribe({
+        fetchObservable.pipe(finalize(() => (this.onLoad = false))).subscribe({
             next: (response: any) => {
                 // Wrap response in data only if it isn't already wrapped
                 this.paginator = response?.data ? response : { data: response }
-                this.onLoad = false
 
                 const hasPagination =
                     response &&
@@ -290,6 +289,8 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
             },
             error: (e) => {
                 console.error('Error fetching data', e)
+                this.enablePagination = false
+                this.paginator = { data: [] }
             },
         })
     }

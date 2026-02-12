@@ -3,11 +3,12 @@ import { RouterOutlet } from '@angular/router'
 import { FcmService } from '../modules/notification-firebase/services/fcm.service'
 import { FilePreviewComponent } from '@/modules/base/components/file-preview/file-preview.component'
 import { ConfirmationDialogComponent } from '@/modules/base/components/confirmation-dialog/confirmation-dialog.component'
+import { SecureFilePreviewComponent } from '@/modules/base/components/secure-file-preview/secure-file-preview.component'
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [RouterOutlet, FilePreviewComponent, ConfirmationDialogComponent],
+    imports: [RouterOutlet, FilePreviewComponent, ConfirmationDialogComponent,SecureFilePreviewComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
 })

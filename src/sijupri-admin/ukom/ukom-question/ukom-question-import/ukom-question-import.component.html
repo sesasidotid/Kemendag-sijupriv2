@@ -18,7 +18,9 @@
                     *ngFor="let examType of examTypeList$ | async"
                     [value]="examType.code"
                 >
-                    {{ examType.code }}
+                    {{
+                    ukomMiscellaneousService.getModuleDisplayName(examType.code)
+                    }}
                 </option>
             </select>
 

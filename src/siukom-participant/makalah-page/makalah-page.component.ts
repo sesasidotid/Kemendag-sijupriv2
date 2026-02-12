@@ -66,13 +66,15 @@ import { UkomParticipantService } from '@/modules/ukom/services/participant.serv
 import { finalize } from 'rxjs'
 import { ExamService } from '@/modules/ukom/services/exam.service'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
-import { ParticpantStudyCaseExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
+import { ParticipantStudyCaseExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { FormsModule } from '@angular/forms'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { ParticipantExamLayoutComponent } from '@/siukom-participant/_shared/components/participant-exam-layout/participant-exam-layout.component'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-makalah-page',
@@ -83,22 +85,20 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         FileHandlerComponent,
         FormsModule,
         LoadingButtonComponent,
+        ParticipantExamLayoutComponent,
     ],
     templateUrl: './makalah-page.component.html',
     styleUrl: './makalah-page.component.scss',
 })
 export class MakalahPageComponent {
     userId: string
-
     questionLoading = signal(false)
     participantLoading = signal(false)
     pageLoading = computed(() => {
         return this.questionLoading() || this.participantLoading()
     })
-
     answerFile = signal('')
     submitLoading = signal(false)
-
     examId = signal('')
     participant = signal<Participant>(null)
     question = signal<ExamQuestion>(null)
@@ -108,7 +108,6 @@ export class MakalahPageComponent {
     examService = inject(ExamService)
     confirmationService = inject(ConfirmationService)
     handlerService = inject(HandlerService)
-
     inputs = signal<FIleHandler>({
         files: {
             answerFile: { label: 'Jawaban Anda' },
@@ -119,10 +118,10 @@ export class MakalahPageComponent {
             this.answerFile.set(base64Data)
         },
     })
-
     // Error states
     criticalError = signal<boolean>(false)
     errorMessage = signal<string>('')
+    protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor() {
         const raw = LoginContext.getUserId()
@@ -242,7 +241,7 @@ export class MakalahPageComponent {
                 if (!confirmed) return
                 this.submitLoading.set(true)
 
-                const payload = new ParticpantStudyCaseExamAnswer({
+                const payload = new ParticipantStudyCaseExamAnswer({
                     participantId: this.participant().id,
                     questionId: this.question().id,
                     fileAnswerUpload: this.answerFile(),
@@ -262,7 +261,7 @@ export class MakalahPageComponent {
                         next: (res) => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Jawaban studi kasus berhasil diunggah.',
+                                'Makalah berhasil diunggah.',
                             )
                             // Silently refetch to get updated answer
                             this.getQuestion(true)
@@ -271,7 +270,7 @@ export class MakalahPageComponent {
                             console.error('Error submitting answer:', err)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal mengunggah jawaban studi kasus. Silakan coba lagi atau hubungi panitia ujian jika masalah berlanjut.',
+                                'Gagal mengunggah Makalah. Silakan coba lagi atau hubungi panitia ujian jika masalah berlanjut.',
                             )
                         },
                     })

@@ -25,6 +25,11 @@ import { ExamService } from '@/modules/ukom/services/exam.service'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
+import { ParticipantExamLayoutComponent } from '@/siukom-participant/_shared/components/participant-exam-layout/participant-exam-layout.component'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { ParticipantPracticalExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
 
 @Component({
     selector: 'app-practical-work-page',
@@ -36,16 +41,17 @@ import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty
         LoadingButtonComponent,
         VideoPreviewComponent,
         EmptyStateComponent,
+        ParticipantExamLayoutComponent,
+        FileHandlerComponent,
     ],
     templateUrl: './practical-work-page.component.html',
     styleUrl: './practical-work-page.component.scss',
 })
 export class PracticalWorkPageComponent implements OnInit {
     examId = signal('')
-    submitting = signal(false)
-
+    submittingVideo = signal(false)
+    submittingDocument = signal(false)
     videoForm!: FormGroup
-
     formValidationService = inject(FormValidationService)
     handlerService = inject(HandlerService)
     confirmationService = inject(ConfirmationService)
@@ -54,15 +60,19 @@ export class PracticalWorkPageComponent implements OnInit {
     fb = inject(FormBuilder)
     examService = inject(ExamService)
     questionLoading = signal(false)
-
     question = signal<ExamQuestion>(null)
     criticalError = signal<boolean>(false)
     errorMessage = signal<string>('')
-    hasExistingAnswer = computed(() => {
+
+    hasExistingVideoLink = computed(() => {
         if (!this.question()) return false
         return !!this.question()?.answerDto?.answerText
     })
 
+    hasExistingDocument = computed(() => {
+        if (!this.question()) return false
+        return !!this.question()?.answerDto?.answerUploadUrl
+    })
     mapQuestionText = computed(() => {
         const q = this.question()
         if (!q || !q.question) return ''
@@ -71,8 +81,20 @@ export class PracticalWorkPageComponent implements OnInit {
         }
         return q.question
     })
-
+    answerFile = signal('')
+    inputs = signal<FIleHandler>({
+        files: {
+            answerFile: { label: 'Dokumen Hasil Kerja', required: false },
+        },
+        allowedTypes: [{ label: 'pdf', type: 'application/pdf' }],
+        maxSize: 2 * 1024 * 1024,
+        listen: (key: string, base64Data: string) => {
+            this.answerFile.set(base64Data)
+        },
+    })
     readonly userId: string
+    protected readonly ExamTypeCategory = ExamTypeCategory
+
     constructor() {
         const raw = LoginContext.getUserId()
         if (!raw) {
@@ -95,8 +117,13 @@ export class PracticalWorkPageComponent implements OnInit {
         )
 
         effect(() => {
-            this.question()
-            this.getUploadedVideoLink()
+            const question = this.question()
+            if (question?.answerDto?.answerText) {
+                this.videoForm
+                    .get('videoLink')
+                    ?.setValue(this.question()?.answerDto?.answerText)
+            }
+            this.initFileHandlerInputs(question)
         })
     }
 
@@ -111,8 +138,10 @@ export class PracticalWorkPageComponent implements OnInit {
         window.location.reload()
     }
 
-    getQuestion() {
-        this.questionLoading.set(true)
+    getQuestion(silent: boolean = false) {
+        if (!silent) {
+            this.questionLoading.set(true)
+        }
         this.examService
             .getExamQuestionByScheduleId(this.examId(), {
                 limit: '1000',
@@ -120,7 +149,9 @@ export class PracticalWorkPageComponent implements OnInit {
             })
             .pipe(
                 finalize(() => {
-                    this.questionLoading.set(false)
+                    if (!silent) {
+                        this.questionLoading.set(false)
+                    }
                 }),
             )
             .subscribe({
@@ -165,14 +196,6 @@ export class PracticalWorkPageComponent implements OnInit {
         })
     }
 
-    getUploadedVideoLink() {
-        if (this.question()?.answerDto?.answerText) {
-            this.videoForm
-                .get('videoLink')
-                ?.setValue(this.question()?.answerDto?.answerText)
-        }
-    }
-
     backToDashboard() {
         this.router.navigate(['/'])
     }
@@ -182,12 +205,14 @@ export class PracticalWorkPageComponent implements OnInit {
             next: ({ confirmed }) => {
                 if (!confirmed) return
 
-                this.submitting.set(true)
-                const payload = {
+                this.submittingVideo.set(true)
+
+                const payload = new ParticipantPracticalExamAnswer({
                     participantId: this.userId,
                     questionId: this.question().id,
                     answerText: this.videoForm.get('videoLink')?.value,
-                }
+                })
+
                 this.examService
                     .saveExamAnswerForParticipantByExamScheduleId(
                         this.examId(),
@@ -195,7 +220,7 @@ export class PracticalWorkPageComponent implements OnInit {
                     )
                     .pipe(
                         finalize(() => {
-                            this.submitting.set(false)
+                            this.submittingVideo.set(false)
                         }),
                     )
                     .subscribe({
@@ -215,6 +240,83 @@ export class PracticalWorkPageComponent implements OnInit {
                             )
                         },
                     })
+            },
+        })
+    }
+
+    submitDocument() {
+        if (!this.answerFile()) {
+            this.handlerService.handleAlert(
+                'Error',
+                'Pilih file dokumen terlebih dahulu.',
+            )
+            return
+        }
+
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.submittingDocument.set(true)
+                const payload = new ParticipantPracticalExamAnswer({
+                    participantId: this.userId,
+                    questionId: this.question().id,
+                    fileAnswerUpload: this.answerFile(),
+                })
+
+                this.examService
+                    .saveExamAnswerForParticipantByExamScheduleId(
+                        this.examId(),
+                        payload,
+                    )
+                    .pipe(
+                        finalize(() => {
+                            this.submittingDocument.set(false)
+                        }),
+                    )
+                    .subscribe({
+                        next: (res) => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Dokumen pendukung berhasil diunggah',
+                            )
+                            // Refetch question to update preview with new answer
+                            this.getQuestion()
+                        },
+                        error: (err) => {
+                            console.error(err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengunggah dokumen. Silakan coba lagi.',
+                            )
+                        },
+                    })
+            },
+        })
+    }
+
+    private initFileHandlerInputs(question: ExamQuestion | null) {
+        if (!question) return
+
+        const hasAnswer =
+            question.answerDto?.answerUpload &&
+            question.answerDto?.answerUploadUrl
+
+        this.inputs.set({
+            files: {
+                answerFile: {
+                    label: 'Dokumen Hasil Kerja',
+                    required: false,
+                    ...(hasAnswer && {
+                        fileName: question.answerDto.answerUpload,
+                        source: question.answerDto.answerUploadUrl,
+                    }),
+                },
+            },
+            allowedTypes: [{ label: 'pdf', type: 'application/pdf' }],
+            maxSize: 2 * 1024 * 1024,
+            listen: (key: string, base64Data: string) => {
+                this.answerFile.set(base64Data)
             },
         })
     }

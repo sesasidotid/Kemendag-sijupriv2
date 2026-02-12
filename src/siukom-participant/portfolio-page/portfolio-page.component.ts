@@ -18,6 +18,8 @@ import { LoginContext } from '@/modules/base/commons/login-context'
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
 import { ParticipantPortfolioExamAnswer } from '@/modules/ukom/models/exam/exam-answer.model'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
+import { ParticipantExamLayoutComponent } from '@/siukom-participant/_shared/components/participant-exam-layout/participant-exam-layout.component'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-portfolio-page',
@@ -27,11 +29,14 @@ import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty
         FormsModule,
         MultiFileHandlerComponent,
         EmptyStateComponent,
+        ParticipantExamLayoutComponent,
     ],
     templateUrl: './portfolio-page.component.html',
     styleUrl: './portfolio-page.component.scss',
 })
 export class PortfolioPageComponent implements OnInit {
+    protected readonly ExamTypeCategory = ExamTypeCategory
+
     resetKey = signal<string | null>(null)
 
     examId = signal('')

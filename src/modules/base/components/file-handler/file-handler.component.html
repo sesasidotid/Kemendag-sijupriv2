@@ -2,9 +2,14 @@
 <div class="file-parent">
     <div *ngIf="!inputs.viewOnly">
         <div class="mb-3">
-            <label for="emailInput" class="form-label">
-                File: <span class="text-danger">*</span></label>
-            <small *ngIf="inputs.allowedTypes?.length || inputs.maxSize" class="text-muted d-block">
+            <label class="form-label" for="emailInput">
+                File:
+                <!--                <span class="text-danger">*</span>-->
+            </label>
+            <small
+                *ngIf="inputs.allowedTypes?.length || inputs.maxSize"
+                class="text-muted d-block"
+            >
                 <span *ngIf="inputs.allowedTypes?.length">
                     Jenis file yang diperbolehkan: {{ getAllowedTypes() }}
                     <br />
@@ -18,42 +23,65 @@
     </div>
     <!-- <ng-container *ngFor="let obj of inputs.files | keyvalue"> -->
     <ng-container *ngFor="let obj of inputs.files | keyvalue: sortByLabel">
-        <div class="mb-3 d-flex flex-column gap-2" *ngIf="
+        <div
+            *ngIf="
                 obj.value.visible == null ||
                 obj.value.visible == undefined ||
                 obj.value.visible()
-            ">
+            "
+            class="d-flex flex-column mb-3 gap-2"
+        >
             <label class="form-label">
                 {{ obj.value.label }}
                 <span *ngIf="obj.value.required" class="text-danger">*</span>
             </label>
-            <div class="spinner-border" role="status" *ngIf="hadItemsLoading$ | async; else loadCompleted">
+            <div
+                *ngIf="hadItemsLoading$ | async; else loadCompleted"
+                class="spinner-border"
+                role="status"
+            >
                 <span class="visually-hidden">Loading...</span>
             </div>
             <ng-template #loadCompleted>
-                <div #container class="d-flex align-items-center gap-3 w-100"
-                    [class.justify-content-between]="isSmallScreen">
+                <div
+                    #container
+                    [class.justify-content-between]="isSmallScreen"
+                    class="d-flex align-items-center w-100 gap-3"
+                >
                     <div class="d-flex align-items-center overflow-hidden">
                         <div *ngIf="!inputs.viewOnly">
                             <div class="custom-file-upload">
-                                <input type="file" [id]="'fileInput' + obj.key"
-                                    (change)="handleFileUpload($event, obj.key)" class="hidden-input" />
-                                <label [for]="'fileInput' + obj.key" class="custom-file-label">
+                                <input
+                                    (change)="handleFileUpload($event, obj.key)"
+                                    [id]="'fileInput' + obj.key"
+                                    class="hidden-input"
+                                    type="file"
+                                />
+                                <label
+                                    [for]="'fileInput' + obj.key"
+                                    class="custom-file-label"
+                                >
                                     <span class="file-icon"></span>
                                     <span class="file-text">Pilih File</span>
                                 </label>
                             </div>
                         </div>
-                        <div *ngIf="fileNames[obj.key]" class="file-name text-truncate" [title]="fileNames[obj.key]">
+                        <div
+                            *ngIf="fileNames[obj.key]"
+                            [title]="fileNames[obj.key]"
+                            class="file-name text-truncate"
+                        >
                             {{ fileNames[obj.key] }}
                         </div>
                     </div>
 
                     <ng-container *ngIf="obj.value.source">
-                        <a class="btn btn-soft-success d-flex align-items-center justify-content-center text-center flex-shrink-0"
+                        <a
                             (click)="
                                 previewFile(obj.value.label, obj.value.source)
-                            ">
+                            "
+                            class="btn btn-soft-success d-flex align-items-center justify-content-center flex-shrink-0 text-center"
+                        >
                             Preview
                         </a>
                     </ng-container>

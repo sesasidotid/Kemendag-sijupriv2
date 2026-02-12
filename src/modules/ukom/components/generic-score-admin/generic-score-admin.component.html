@@ -1,0 +1,171 @@
+<div class="admin-generic-score-detail">
+    <!-- Total Score Display -->
+    <div class="total-score-container mb-4">
+        <div class="total-score-label">{{ examType || 'Exam' }} Score</div>
+        <div class="total-score-value">{{ score?.score | number: '1.2-2' }}</div>
+        <div *ngIf="getMaxScore() > 0" class="total-score-breakdown">
+            <span class="badge" [ngClass]="getBadgeClass(getPercentage())">
+                {{ getPercentage() }}% ({{ getTotalScore() }}/{{ getMaxScore() }})
+            </span>
+        </div>
+    </div>
+
+    <!-- Questions Detail -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0 text-white">
+                <i class="mdi mdi-file-document-outline me-2"></i>
+                Question Details
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <div *ngIf="questionList.length === 0" class="text-center py-4">
+                <i class="mdi mdi-alert-circle-outline text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">No questions available</p>
+            </div>
+
+            <div *ngIf="questionList.length > 0" class="questions-list">
+                <div *ngFor="let question of questionList; let i = index" class="question-item mb-4 p-3 border rounded">
+                    <!-- Question Header -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="question-number">
+                            <span class="badge bg-primary">Question {{ i + 1 }}</span>
+                        </div>
+                        <div class="question-meta d-flex gap-2">
+                            <span *ngIf="question.weight" class="badge bg-secondary">
+                                <i class="mdi mdi-weight"></i> Weight: {{ question.weight }}
+                            </span>
+                            <span *ngIf="question.answerDto?.score !== null && question.answerDto?.score !== undefined"
+                                class="badge"
+                                [ngClass]="getBadgeClass((question.answerDto.score / question.weight) * 100)">
+                                <i class="mdi mdi-star"></i> Score: {{ question.answerDto.score }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="question-text mb-3">
+                        <h6 class="fw-bold mb-2">Question:</h6>
+                        <p class="mb-0">{{ question.question }}</p>
+                        <small *ngIf="question.type" class="text-muted">Type: {{ question.type }}</small>
+                    </div>
+
+                    <!-- Answer Section -->
+                    <div class="answer-section">
+                        <h6 class="fw-bold mb-2">Answer:</h6>
+
+                        <!-- Text Answer -->
+                        <div *ngIf="question.answerDto?.answerText" class="answer-text mb-2">
+                            <p class="bg-light p-3 rounded">{{ question.answerDto.answerText }}</p>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div *ngIf="hasUpload(question)" class="answer-upload mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="mdi mdi-file-document text-primary fs-4"></i>
+                                <div>
+                                    <div class="fw-bold">Uploaded File</div>
+                                    <small class="text-muted">{{ question.answerDto.answerUpload || 'File available'
+                                        }}</small>
+                                </div>
+                                <a *ngIf="question.answerDto?.answerUploadUrl"
+                                    [href]="question.answerDto.answerUploadUrl" target="_blank"
+                                    class="btn btn-sm btn-outline-primary ms-auto">
+                                    <i class="mdi mdi-open-in-new"></i> View File
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Portfolio Validation (if applicable) -->
+                        <div *ngIf="getValidationStatus(question) as validation" class="validation-status mt-2">
+                            <div class="d-flex gap-3">
+                                <div class="validation-item">
+                                    <span class="badge" [ngClass]="validation.memadai ? 'bg-success' : 'bg-danger'">
+                                        <i
+                                            [class]="validation.memadai ? 'mdi mdi-check-circle' : 'mdi mdi-close-circle'"></i>
+                                        {{ validation.memadai ? 'Memadai' : 'Tidak Memadai' }}
+                                    </span>
+                                </div>
+                                <div class="validation-item">
+                                    <span class="badge" [ngClass]="validation.valid ? 'bg-success' : 'bg-danger'">
+                                        <i
+                                            [class]="validation.valid ? 'mdi mdi-check-circle' : 'mdi mdi-close-circle'"></i>
+                                        {{ validation.valid ? 'Valid' : 'Tidak Valid' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- No Answer -->
+                        <div *ngIf="!question.answerDto || (!question.answerDto.answerText && !hasUpload(question))"
+                            class="no-answer">
+                            <p class="text-muted fst-italic">
+                                <i class="mdi mdi-alert-outline"></i> No answer provided
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Child Questions (for hierarchical questions like Praktik) -->
+                    <div *ngIf="question.parentQuestionId === null" class="child-questions mt-3">
+                        <div *ngFor="let childQuestion of questionList.filter(q => q.parentQuestionId === question.id)"
+                            class="child-question ms-4 mt-2 p-2 border-start border-3 border-primary">
+                            <small class="text-muted">Sub-question:</small>
+                            <p class="mb-1">{{ childQuestion.question }}</p>
+                            <div *ngIf="childQuestion.answerDto" class="mt-1">
+                                <small class="text-muted">Answer: {{ childQuestion.answerDto.answerText || 'File
+                                    uploaded' }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div *ngIf="questionList.length > 0" class="card mt-4">
+        <div class="card-header">
+            <h6 class="mb-0">
+                <i class="mdi mdi-chart-bar me-2"></i>Summary
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <i class="mdi mdi-format-list-numbered text-primary fs-3 me-2"></i>
+                        <div>
+                            <div class="text-muted small">Total Questions</div>
+                            <div class="fw-bold">{{ questionList.length }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <i class="mdi mdi-star text-warning fs-3 me-2"></i>
+                        <div>
+                            <div class="text-muted small">Total Score</div>
+                            <div class="fw-bold">{{ getTotalScore() }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" *ngIf="getMaxScore() > 0">
+                    <div class="d-flex align-items-center">
+                        <i class="mdi mdi-chart-arc text-success fs-3 me-2"></i>
+                        <div>
+                            <div class="text-muted small">Percentage</div>
+                            <div class="fw-bold">{{ getPercentage() }}%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!score" class="text-center py-5">
+        <i class="mdi mdi-alert-circle-outline text-muted" style="font-size: 4rem;"></i>
+        <p class="text-muted mt-3">No exam score data available</p>
+    </div>
+</div>

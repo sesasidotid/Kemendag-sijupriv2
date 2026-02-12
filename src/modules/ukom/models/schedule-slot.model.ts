@@ -24,8 +24,13 @@ export interface ParticipantSchedule {
     participantName: string // denormalized for display
     participantNip?: string
     examinerName: string // Deprecated: for backward compatibility
-    examinerKomponenA?: string // Examiner for Komponen A (index 0)
-    examinerKomponenBC?: string // Examiner for Komponen B & C (index 1)
+    examinerKomponenA?: string // Examiner name for Komponen A (from makalah schedule)
+    examinerKomponenBC?: string // Examiner name for Komponen B & C (from seminar schedule)
+    // IDs for separate examiner updates
+    makalahParticipantScheduleId?: string // participant_schedule ID on the makalah exam schedule
+    seminarParticipantScheduleId?: string // participant_schedule ID on the seminar exam schedule
+    examinerIdKomponenA?: string // examiner_schedule ID for Komponen A
+    examinerIdKomponenBC?: string // examiner_schedule ID for Komponen B & C
 }
 
 export interface ScheduleSlot {

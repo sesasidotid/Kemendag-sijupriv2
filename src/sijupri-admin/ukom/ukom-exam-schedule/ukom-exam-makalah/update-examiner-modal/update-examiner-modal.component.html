@@ -1,9 +1,4 @@
-<app-modal
-    (saveEvent)="onConfirm()"
-    (toggle)="onClose()"
-    [size]="'xl'"
-    [title]="'Ubah Penguji'"
->
+<app-modal (saveEvent)="onConfirm()" (toggle)="onClose()" [size]="'xl'" [title]="'Ubah Penguji'">
     <div class="row g-3">
         <div class="card mb-3">
             <div class="card-header fw-semibold">Informasi Peserta</div>
@@ -35,32 +30,25 @@
                 <div class="ms-3">
                     <div class="mb-1">
                         <span class="badge bg-primary me-2">Komponen A</span>
-                        <span
-                            >{{ participant.examinerKomponenA || 'Belum ada
-                            penguji' }}</span
-                        >
+                        <span>{{ participant.examinerKomponenA || 'Belum ada
+                            penguji' }}</span>
                     </div>
                     <div>
-                        <span class="badge bg-success me-2"
-                            >Komponen B & C</span
-                        >
-                        <span
-                            >{{ participant.examinerKomponenBC || 'Belum ada
-                            penguji' }}</span
-                        >
+                        <span class="badge bg-success me-2">Komponen B & C</span>
+                        <span>{{ participant.examinerKomponenBC || 'Belum ada
+                            penguji' }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="alert alert-warning border">
-            <i
-                class="mdi mdi-information-slab-circle-outline text-warning me-2"
-            ></i>
+            <i class="mdi mdi-information-slab-circle-outline text-warning me-2"></i>
             <small>
-                <strong>Catatan:</strong> Pastikan penguji yang dipilih tersedia
-                pada waktu yang dijadwalkan. Urutan pemilihan penting: Index 0
-                untuk Komponen A, Index 1 untuk Komponen B & C.
+                <strong>Catatan:</strong> Penguji Komponen A diambil dari jadwal
+                Makalah, sedangkan penguji Komponen B & C diambil dari jadwal
+                Seminar. Pastikan penguji yang dipilih tersedia pada waktu yang
+                dijadwalkan.
             </small>
         </div>
 
@@ -70,27 +58,19 @@
                 <div class="card-header bg-primary fw-semibold text-white">
                     <i class="mdi mdi-account-check me-2"></i>
                     Pilih Penguji untuk Komponen A
+                    <small class="ms-2 fw-normal">(dari jadwal Makalah)</small>
                 </div>
                 <div class="card-body">
-                    <div
-                        *ngIf="examinerList.length === 0"
-                        class="alert alert-warning"
-                    >
+                    <div *ngIf="examinerListKomponenA.length === 0" class="alert alert-warning">
                         Tidak ada penguji tersedia.
                     </div>
 
-                    <ag-grid-angular
-                        (gridReady)="onGridReadyKomponenA($event)"
+                    <ag-grid-angular (gridReady)="onGridReadyKomponenA($event)"
                         (selectionChanged)="onSelectionChangedKomponenA($event)"
-                        *ngIf="examinerList.length > 0"
-                        [columnDefs]="columnDefsKomponenA"
-                        [defaultColDef]="defaultColDef"
-                        [getRowClass]="getRowClassKomponenA.bind(this)"
-                        [rowData]="examinerList"
-                        [rowSelection]="'single'"
-                        [style.height]="calculateGridHeight()"
-                        class="ag-theme-alpine"
-                    >
+                        *ngIf="examinerListKomponenA.length > 0" [columnDefs]="columnDefsKomponenA"
+                        [defaultColDef]="defaultColDef" [getRowClass]="getRowClassKomponenA.bind(this)"
+                        [rowData]="examinerListKomponenA" [rowSelection]="'single'"
+                        [style.height]="calculateGridHeightKomponenA()" class="ag-theme-alpine">
                     </ag-grid-angular>
                 </div>
             </div>
@@ -102,27 +82,18 @@
                 <div class="card-header bg-success fw-semibold text-white">
                     <i class="mdi mdi-account-check me-2"></i>
                     Pilih Penguji untuk Komponen B & C
+                    <small class="ms-2 fw-normal">(dari jadwal Seminar)</small>
                 </div>
                 <div class="card-body">
-                    <div
-                        *ngIf="examinerList.length === 0"
-                        class="alert alert-warning"
-                    >
+                    <div *ngIf="examinerList.length === 0" class="alert alert-warning">
                         Tidak ada penguji tersedia.
                     </div>
 
-                    <ag-grid-angular
-                        (gridReady)="onGridReadyKomponenBC($event)"
-                        (selectionChanged)="onSelectionChangedKomponenBC($event)"
-                        *ngIf="examinerList.length > 0"
-                        [columnDefs]="columnDefsKomponenBC"
-                        [defaultColDef]="defaultColDef"
-                        [getRowClass]="getRowClassKomponenBC.bind(this)"
-                        [rowData]="examinerList"
-                        [rowSelection]="'single'"
-                        [style.height]="calculateGridHeight()"
-                        class="ag-theme-alpine"
-                    >
+                    <ag-grid-angular (gridReady)="onGridReadyKomponenBC($event)"
+                        (selectionChanged)="onSelectionChangedKomponenBC($event)" *ngIf="examinerList.length > 0"
+                        [columnDefs]="columnDefsKomponenBC" [defaultColDef]="defaultColDef"
+                        [getRowClass]="getRowClassKomponenBC.bind(this)" [rowData]="examinerList"
+                        [rowSelection]="'single'" [style.height]="calculateGridHeight()" class="ag-theme-alpine">
                     </ag-grid-angular>
                 </div>
             </div>

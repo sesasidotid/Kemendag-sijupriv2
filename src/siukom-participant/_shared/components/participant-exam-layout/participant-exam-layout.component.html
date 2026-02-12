@@ -1,0 +1,92 @@
+<!-- Header Actions Bar -->
+<div
+    class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2"
+>
+    <button
+        (click)="onBackClick()"
+        *ngIf="showBackButton()"
+        class="btn btn-outline-secondary btn-sm"
+    >
+        <i class="mdi mdi-chevron-left me-1"></i>
+        {{ backButtonLabel() }}
+    </button>
+
+    <div class="d-flex align-items-center gap-2">
+        <div
+            *ngIf="showExamTypeIndicator()"
+            class="bg-light text-dark small rounded-1 border px-3 py-2"
+        >
+            <i class="mdi mdi-clipboard-text-outline me-1"></i>
+            <strong>Tipe Ujian:</strong> {{ examTypeDisplayName() }}
+        </div>
+
+        <div
+            *ngIf="showSavedIndicator()"
+            class="border-success bg-success-subtle text-success small rounded-1 px-3 py-2"
+        >
+            <i class="mdi mdi-check-circle me-1"></i>
+            {{ savedMessage() }}
+        </div>
+    </div>
+</div>
+
+<!-- Critical Error Modal -->
+<div *ngIf="criticalError()" class="modal d-block modal-overlay" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="mdi mdi-alert-circle me-2"></i>
+                    Terjadi Kesalahan
+                </h5>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-danger mb-3">
+                    <i class="mdi mdi-alert me-2"></i>
+                    <strong>{{ errorMessage() }}</strong>
+                </div>
+                <p class="mb-2"><strong>Apa yang harus dilakukan?</strong></p>
+                <ul>
+                    <li>
+                        Klik tombol <strong>"Reload Halaman"</strong> untuk
+                        memuat ulang halaman
+                    </li>
+                    <li>Jika masalah tetap berlanjut, hubungi panitia ujian</li>
+                </ul>
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    (click)="onReloadClick()"
+                    class="btn btn-primary"
+                    type="button"
+                >
+                    <i class="mdi mdi-refresh me-1"></i>
+                    Reload Halaman
+                </button>
+                <button
+                    (click)="onBackClick()"
+                    class="btn btn-secondary"
+                    type="button"
+                >
+                    Kembali ke Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading State -->
+<ng-container *ngIf="loading(); else content">
+    <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Memuat...</span>
+        </div>
+        <p class="mt-2">{{ loadingMessage() }}</p>
+    </div>
+</ng-container>
+<!-- Main Content -->
+<ng-template #content>
+    <ng-content></ng-content>
+</ng-template>

@@ -15,7 +15,6 @@ import {
     tap,
 } from 'rxjs'
 import { ApiService } from '@/modules/base/services/api.service'
-// import { CATScore } from '@/modules/ukom/models/cat/cat-score'
 import {
     CATScore,
     MakalahScore,
@@ -25,14 +24,17 @@ import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { DataDokumenUkom } from '@/modules/ukom/models/data-dukung'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
-import { ExamType } from '@/modules/ukom/models/exam-type.model'
+import {
+    ExamType,
+    ExamTypeCategory,
+} from '@/modules/ukom/models/exam-type.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
-// import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
 import { FilePreviewService } from '@/modules/base/services/file-preview.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { TanggalIndoPipe } from '@/modules/base/pipes/tanggal-indo.pipe'
 import { ForcePasswordFormComponent } from '@/modules/base/components/force-password-form/force-password-form.component'
+import { CatScoreAdminComponent } from '@/modules/ukom/components/cat-score-admin/cat-score-admin.component'
 import { PredikatKinerjaService } from '@/modules/maintenance/services/predikat-kinerja.service'
 import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
@@ -55,6 +57,7 @@ import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
         LoadingButtonComponent,
         TanggalIndoPipe,
         ForcePasswordFormComponent,
+        CatScoreAdminComponent,
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss',
@@ -101,6 +104,8 @@ export class UkomTaskDetailComponent {
     isDeleteExamScoreLoading$ = new BehaviorSubject<boolean>(false)
 
     isToggleUpdatePasswordModal$ = new BehaviorSubject<boolean>(false)
+    protected readonly ExamTypeCategory = ExamTypeCategory
+
     constructor(
         private activatedRoute: ActivatedRoute,
         private apiService: ApiService,
@@ -427,90 +432,11 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    getGroupedCompetencies(): any[] {
+    getSelectedScore(): CATScore | null {
         if (!this.selectedExamId) {
-            return []
+            return null
         }
-
-        const catScore = this.scoreMap[this.selectedExamId] as CATScore
-        if (!catScore?.kompetensiIndikatorDtoList) {
-            return []
-        }
-
-        // Group by kompetensiId
-        const grouped = catScore.kompetensiIndikatorDtoList.reduce(
-            (acc: any, kompetensi: any) => {
-                const key = kompetensi.kompetensiId || 'default'
-
-                if (!acc[key]) {
-                    acc[key] = {
-                        name: kompetensi.kompetensiName || '-',
-                        items: [],
-                        total: 0,
-                        correct: 0,
-                    }
-                }
-
-                acc[key].items.push(kompetensi)
-                acc[key].total += kompetensi.questionDtoList?.length || 0
-                acc[key].correct += this.getCorrectAnswersCount(kompetensi)
-
-                return acc
-            },
-            {},
-        )
-
-        return Object.values(grouped).map((group: any) => ({
-            ...group,
-            percentage:
-                group.total > 0
-                    ? Math.round((group.correct / group.total) * 100)
-                    : 0,
-        }))
-    }
-
-    getCorrectAnswer(question: any): string {
-        const correctChoice = question.multipleChoiceDtoList.find(
-            (choice: any) => choice.correct,
-        )
-        return correctChoice ? correctChoice.choiceId : ''
-    }
-
-    getCompetencyPercentage(kompetensi: any): number {
-        if (
-            !kompetensi.questionDtoList ||
-            kompetensi.questionDtoList.length === 0
-        ) {
-            return 0
-        }
-
-        const correctAnswers = this.getCorrectAnswersCount(kompetensi)
-        const totalQuestions = kompetensi.questionDtoList.length
-
-        return Math.round((correctAnswers / totalQuestions) * 100)
-    }
-
-    getCorrectAnswersCount(kompetensi: any): number {
-        if (!kompetensi.questionDtoList) {
-            return 0
-        }
-
-        return kompetensi.questionDtoList.filter(
-            (question: any) =>
-                question.answerDto?.answerChoice ===
-                this.getCorrectAnswer(question),
-        ).length
-    }
-
-    getWrongAnswersCount(kompetensi: any): number {
-        if (!kompetensi.questionDtoList) {
-            return 0
-        }
-
-        return (
-            kompetensi.questionDtoList.length -
-            this.getCorrectAnswersCount(kompetensi)
-        )
+        return this.scoreMap[this.selectedExamId] as CATScore
     }
 
     deleteExamScore(exam_grade_id: string): void {

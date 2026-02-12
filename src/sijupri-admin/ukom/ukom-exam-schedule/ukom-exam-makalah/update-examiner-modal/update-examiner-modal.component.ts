@@ -25,13 +25,17 @@ import {
 })
 export class UpdateExaminerModalComponent implements OnInit {
     @Input() participant!: ParticipantSchedule
-    @Input() examinerList: ExaminerScheduleList[] = []
+    @Input() examinerList: ExaminerScheduleList[] = [] // Seminar examiners (Komponen B&C)
+    @Input() examinerListKomponenA: ExaminerScheduleList[] = [] // Makalah examiners (Komponen A)
     @Input() currentSlot: ScheduleSlot | null = null
 
     @Output() close = new EventEmitter<void>()
     @Output() confirm = new EventEmitter<{
         participant: ParticipantSchedule
-        examinerIds: string[] // Array of examiner IDs [KomponenA, KomponenBC]
+        examinerIdKomponenA: string // Examiner schedule ID for Komponen A (makalah)
+        examinerIdKomponenBC: string // Examiner schedule ID for Komponen B&C (seminar)
+        makalahParticipantScheduleId: string // Participant schedule ID on makalah
+        seminarParticipantScheduleId: string // Participant schedule ID on seminar
     }>()
 
     // Selected examiner IDs for each component
@@ -60,30 +64,14 @@ export class UpdateExaminerModalComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Find current examiner IDs based on participant's examiner names
-        if (this.participant.examinerKomponenA) {
-            const currentExaminer = this.examinerList.find(
-                (e) =>
-                    e.examinerUkom?.user?.name ===
-                    this.participant.examinerKomponenA,
-            )
-            if (currentExaminer) {
-                this.currentExaminerIdKomponenA = currentExaminer.id
-                this.selectedExaminerKomponenA = currentExaminer.id
-            }
-        }
+        // Use stored examiner IDs directly from the participant
+        this.currentExaminerIdKomponenA =
+            this.participant.examinerIdKomponenA ?? null
+        this.selectedExaminerKomponenA = this.currentExaminerIdKomponenA
 
-        if (this.participant.examinerKomponenBC) {
-            const currentExaminer = this.examinerList.find(
-                (e) =>
-                    e.examinerUkom?.user?.name ===
-                    this.participant.examinerKomponenBC,
-            )
-            if (currentExaminer) {
-                this.currentExaminerIdKomponenBC = currentExaminer.id
-                this.selectedExaminerKomponenBC = currentExaminer.id
-            }
-        }
+        this.currentExaminerIdKomponenBC =
+            this.participant.examinerIdKomponenBC ?? null
+        this.selectedExaminerKomponenBC = this.currentExaminerIdKomponenBC
 
         this.initializeColumnDefs()
     }
@@ -92,10 +80,12 @@ export class UpdateExaminerModalComponent implements OnInit {
         if (this.selectedExaminerKomponenA && this.selectedExaminerKomponenBC) {
             this.confirm.emit({
                 participant: this.participant,
-                examinerIds: [
-                    this.selectedExaminerKomponenA,
-                    this.selectedExaminerKomponenBC,
-                ],
+                examinerIdKomponenA: this.selectedExaminerKomponenA,
+                examinerIdKomponenBC: this.selectedExaminerKomponenBC,
+                makalahParticipantScheduleId:
+                    this.participant.makalahParticipantScheduleId,
+                seminarParticipantScheduleId:
+                    this.participant.seminarParticipantScheduleId,
             })
         }
     }
@@ -164,10 +154,15 @@ export class UpdateExaminerModalComponent implements OnInit {
         const rowCount = this.examinerList.length
         const headerHeight = 48
         const rowHeight = 42
-
-        // Total = Header + (Rows * Height) + 2px for top/bottom borders
         const totalHeight = headerHeight + rowCount * rowHeight + 2
+        return `${totalHeight + 1}px`
+    }
 
+    calculateGridHeightKomponenA(): string {
+        const rowCount = this.examinerListKomponenA.length
+        const headerHeight = 48
+        const rowHeight = 42
+        const totalHeight = headerHeight + rowCount * rowHeight + 2
         return `${totalHeight + 1}px`
     }
 

@@ -37,10 +37,20 @@ export class ParticipantPortfolioExamAnswer extends BaseExamAnswer {
     }
 }
 
-export class ParticpantStudyCaseExamAnswer extends BaseExamAnswer {
+export class ParticipantStudyCaseExamAnswer extends BaseExamAnswer {
     fileAnswerUpload: string | undefined = undefined
 
-    constructor(object?: Partial<ParticpantStudyCaseExamAnswer>) {
+    constructor(object?: Partial<ParticipantStudyCaseExamAnswer>) {
+        super()
+        if (object) this.fromObject(object)
+    }
+}
+
+export class ParticipantPracticalExamAnswer extends BaseExamAnswer {
+    fileAnswerUpload: string | undefined = undefined
+    answerText: string | undefined = undefined
+
+    constructor(object?: Partial<ParticipantPracticalExamAnswer>) {
         super()
         if (object) this.fromObject(object)
     }

@@ -1,110 +1,59 @@
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <button (click)="backToDashboard()" class="btn btn-outline-secondary">
-        <i class="mdi mdi-chevron-left"></i> Kembali
-    </button>
-
-    <div
-        *ngIf="hasExistingAnswer() && !questionLoading()"
-        class="alert alert-success d-flex align-items-center"
-    >
-        <i class="mdi mdi-check-circle me-1"></i>
-        <small>Jawaban telah disimpan</small>
-    </div>
-</div>
-
-<div
-    *ngIf="criticalError()"
-    class="modal d-block"
-    style="background-color: rgba(0, 0, 0, 0.5)"
-    tabindex="-1"
+<app-participant-exam-layout
+    (backClicked)="backToDashboard()"
+    (reloadClicked)="reloadPage()"
+    [backButtonLabel]="'Kembali'"
+    [criticalError]="criticalError()"
+    [errorMessage]="errorMessage()"
+    [examTypeCode]="ExamTypeCategory.PRAKTIK"
+    [loadingMessage]="'Memuat halaman...'"
+    [loading]="questionLoading()"
+    [savedMessage]="'Jawaban telah disimpan'"
+    [showBackButton]="true"
+    [showSavedIndicator]="(hasExistingVideoLink() || hasExistingDocument()) && !questionLoading()"
 >
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="mdi mdi-alert-circle me-2"></i>
-                    Terjadi Kesalahan
-                </h5>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-danger mb-3">
-                    <i class="mdi mdi-alert me-2"></i>
-                    <strong>{{ errorMessage() }}</strong>
-                </div>
-                <p class="mb-2"><strong>Apa yang harus dilakukan?</strong></p>
-                <ul>
-                    <li>
-                        Klik tombol <strong>"Reload Halaman"</strong> untuk
-                        memuat ulang halaman
-                    </li>
-                    <li>Jika masalah tetap berlanjut, hubungi panitia ujian</li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button
-                    (click)="reloadPage()"
-                    class="btn btn-primary"
-                    type="button"
-                >
-                    <i class="mdi mdi-refresh me-1"></i>
-                    Reload Halaman
-                </button>
-                <button
-                    (click)="backToDashboard()"
-                    class="btn btn-secondary"
-                    type="button"
-                >
-                    Kembali ke Dashboard
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<ng-container *ngIf="questionLoading(); else content">
-    <div class="py-5 text-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Memuat...</span>
-        </div>
-        <p class="mt-2">Memuat halaman...</p>
-    </div>
-</ng-container>
-
-<ng-template #content>
-    <ng-container *ngIf="question();else noQuestion">
+    <ng-container *ngIf="question(); else noQuestion">
+        <!-- Instruction -->
         <div class="alert alert-info">
             <h4 class="alert-heading">
                 <i class="mdi mdi-information-outline"></i>
                 Petunjuk
             </h4>
             <ol>
-                <li>Rekam video persiapan praktik Anda.</li>
-                <li>Unggah video ke YouTube / Google Drive / platform lain.</li>
-                <li>Salin link video tersebut.</li>
-                <li>Tempelkan link ke kolom di bawah.</li>
-                <li>Klik <b>Simpan Link Video</b>.</li>
                 <li>
-                    Anda dapat mengupdate link video dengan mengisi form kembali
+                    <b>Untuk Video Persiapan:</b> Rekam video persiapan praktik
+                    Anda, unggah ke YouTube/Google Drive, salin link, lalu
+                    tempelkan di kolom Link Video dan klik
+                    <b>Simpan Link Video</b>.
                 </li>
+                <li>
+                    <b>Untuk Dokumen Pendukung:</b> Siapkan dokumen hasil kerja
+                    dalam format PDF, pilih file, lalu klik
+                    <b>Simpan Dokumen</b>.
+                </li>
+                <!--                <li>-->
+                <!--                    Anda dapat mengirim video dan dokumen secara terpisah atau-->
+                <!--                    bersamaan.-->
+                <!--                </li>-->
+                <li>Anda dapat mengupdate keduanya kapan saja.</li>
             </ol>
         </div>
 
+        <!-- Video Link Card -->
         <form (ngSubmit)="submitVideoLink()" [formGroup]="videoForm">
-            <div class="card shadow-sm">
+            <div class="card mb-3 shadow-sm">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="mdi mdi-upload me-2"></i>
-                        {{ hasExistingAnswer() ? 'Update' : 'Upload' }} Link
-                        Video Persiapan Praktik
+                        <i class="mdi mdi-link-variant me-2"></i>
+                        Link Video Persiapan
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div *ngIf="question(); else noQuestion" class="mb-3">
+                    <div class="mb-3">
                         <label class="form-label fw-bold">
-                            <!--                            {{question().question}}-->
-                            {{mapQuestionText()}}
-                            <span class="text-danger">*</span>
+                            {{ mapQuestionText() }}
+                            <!--                            <span class="text-danger">*</span>-->
                         </label>
+
                         <input
                             appInvalidOnTouch
                             class="form-control"
@@ -112,38 +61,78 @@
                             placeholder="Contoh: https://youtu.be/xxxxx"
                             type="url"
                         />
+
                         <div
                             *ngIf="getErrorMessage('videoLink', 'Link Video Praktik') as error"
                             class="invalid-feedback"
                         >
-                            {{error}}
+                            {{ error }}
                         </div>
+
                         <small class="text-muted d-block mt-2">
                             <i class="mdi mdi-lightbulb-outline me-1"></i>
                             Mendukung: YouTube, Google Drive, Vimeo, atau link
                             video lainnya
                         </small>
                     </div>
-                    <ng-template #noQuestion>
-                        <div class="alert alert-warning">
-                            <i class="mdi mdi-alert-outline me-2"></i>
-                            Soal praktik tidak ditemukan.
-                        </div>
-                    </ng-template>
-                    <app-loading-button
-                        [className]="'btn btn-primary float-end'"
-                        [disabled]="videoForm.invalid"
-                        [isLoading]="submitting()"
-                        [label]="hasExistingAnswer() ? 'Update Link Video' : 'Simpan Link Video'"
-                        [type]="'submit'"
-                    ></app-loading-button>
+
+                    <div class="d-flex justify-content-end">
+                        <app-loading-button
+                            [className]="'btn btn-primary'"
+                            [disabled]="videoForm.invalid"
+                            [isLoading]="submittingVideo()"
+                            [label]="'Simpan Link Video'"
+                            [type]="'submit'"
+                        ></app-loading-button>
+                    </div>
                 </div>
             </div>
         </form>
-        <!-- Video Preview Section -->
+
+        <!-- File Handler Card -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="mdi mdi-file-upload-outline me-2"></i>
+                    Dokumen Pendukung
+                </h5>
+            </div>
+            <div class="card-body">
+                <app-file-handler [inputs]="inputs()"></app-file-handler>
+
+                <div class="d-flex justify-content-end mt-3">
+                    <app-loading-button
+                        (clicked)="submitDocument()"
+                        [className]="'btn btn-primary'"
+                        [disabled]="!answerFile()"
+                        [isLoading]="submittingDocument()"
+                        [label]="' Simpan Dokumen'"
+                        [type]="'button'"
+                    ></app-loading-button>
+                    <!--                    <button-->
+                    <!--                        (click)="submitDocument()"-->
+                    <!--                        [disabled]="submittingDocument()"-->
+                    <!--                        class="btn btn-primary"-->
+                    <!--                        type="button"-->
+                    <!--                    >-->
+                    <!--                        <span-->
+                    <!--                            *ngIf="submittingDocument()"-->
+                    <!--                            class="spinner-border spinner-border-sm me-1"-->
+                    <!--                        ></span>-->
+                    <!--                        <i-->
+                    <!--                            *ngIf="!submittingDocument()"-->
+                    <!--                            class="mdi mdi-content-save me-1"-->
+                    <!--                        ></i>-->
+                    <!--                        Simpan Dokumen-->
+                    <!--                    </button>-->
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing Answer Preview -->
         <div
-            *ngIf="hasExistingAnswer() && question()?.answerDto?.answerText"
-            class="card shadow-sm"
+            *ngIf="hasExistingVideoLink() && question()?.answerDto?.answerText"
+            class="card mt-4 shadow-sm"
         >
             <div class="card-header bg-success">
                 <h5 class="mb-0 text-white">
@@ -160,6 +149,8 @@
             </div>
         </div>
     </ng-container>
+
+    <!-- No Question State -->
     <ng-template #noQuestion>
         <app-empty-state
             [buttonAction]="backToDashboard.bind(this)"
@@ -170,4 +161,4 @@
         >
         </app-empty-state>
     </ng-template>
-</ng-template>
+</app-participant-exam-layout>

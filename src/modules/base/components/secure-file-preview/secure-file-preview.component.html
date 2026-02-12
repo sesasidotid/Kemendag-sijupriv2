@@ -1,0 +1,82 @@
+<div
+    (contextmenu)="$event.preventDefault()"
+    [ngClass]="{ 'show d-block': showModal }"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ fileName }}</h5>
+                <button
+                    (click)="closeModal()"
+                    aria-label="Close"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    type="button"
+                ></button>
+            </div>
+            <div
+                class="modal-body position-relative p-0"
+                style="height: 80vh; overflow: hidden; background: #525659"
+            >
+                <!-- Transparent overlay to prevent right click on iframe/canvas -->
+                <div
+                    (contextmenu)="$event.preventDefault()"
+                    class="position-absolute w-100 h-100"
+                    style="z-index: 10; pointer-events: none"
+                ></div>
+
+                <ng-container *ngIf="isPdf; else iframeView">
+                    <div
+                        class="d-flex justify-content-center align-items-center bg-dark p-2 text-white"
+                        style="z-index: 20; position: relative"
+                    >
+                        <button
+                            (click)="zoomOut()"
+                            class="btn btn-sm btn-secondary me-2"
+                            type="button"
+                        >
+                            <i class="mdi mdi-minus"></i>
+                        </button>
+                        <span class="align-self-center user-select-none"
+                            >{{ (zoom * 100) | number:'1.0-0' }}%</span
+                        >
+                        <button
+                            (click)="zoomIn()"
+                            class="btn btn-sm btn-secondary ms-2"
+                            type="button"
+                        >
+                            <i class="mdi mdi-plus"></i>
+                        </button>
+                    </div>
+                    <div
+                        class="pdf-container h-100"
+                        style="overflow: auto; padding-bottom: 50px"
+                    >
+                        <pdf-viewer
+                            (after-load-complete)="callBackFn($event)"
+                            (error)="onPdfError($event)"
+                            [autoresize]="true"
+                            [original-size]="false"
+                            [render-text]="true"
+                            [show-all]="true"
+                            [src]="fileSource"
+                            [zoom]="zoom"
+                            style="display: block; width: 100%; height: 100%"
+                        ></pdf-viewer>
+                    </div>
+                </ng-container>
+
+                <ng-template #iframeView>
+                    <iframe
+                        *ngIf="fileSource"
+                        [src]="fileSource"
+                        class="w-100 h-100 border-0"
+                    ></iframe>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
