@@ -6,4 +6,24 @@
 @import '../shared-examiner-styles';
 
 // Component-specific styles (if any) go below
-// Currently, all styles are shared
+.hint-toggle {
+   border: none;
+   background: transparent;
+}
+
+.hint-content {
+   margin-top: 0.75rem;
+   padding: 0.875rem 1rem;
+   border-radius: 8px;
+   border: 1px solid #dbeafe;
+   background: #eff6ff;
+   color: #1e3a8a;
+   white-space: pre-line;
+   line-height: 1.5;
+}
+
+.hint-empty-text {
+   display: inline-block;
+   color: #6b7280;
+   font-size: 0.95rem;
+}

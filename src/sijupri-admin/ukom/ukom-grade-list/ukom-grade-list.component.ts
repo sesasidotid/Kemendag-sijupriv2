@@ -82,12 +82,6 @@ export class UkomGradeListComponent {
         this.handleTabService()
     }
 
-    clearFilesName() {
-        if (this.fileHandler) {
-            this.fileHandler.clearFileName()
-        }
-    }
-
     handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/ukom_grade/search')
             .addPrimaryColumn(new PrimaryColumnBuilder('NIP', 'nip').build())
@@ -297,6 +291,15 @@ export class UkomGradeListComponent {
                 icon: 'mdi-export',
                 onClick: () =>
                     this.router.navigate([`/ukom/ukom-grade-list/export`]),
+            })
+            .addTab({
+                label: 'Surat Rekomendasi',
+                isActive: false,
+                icon: 'mdi-email-seal-outline',
+                onClick: () =>
+                    this.router.navigate([
+                        `/ukom/ukom-grade-list/letter-of-reccomendation`,
+                    ]),
             })
     }
 

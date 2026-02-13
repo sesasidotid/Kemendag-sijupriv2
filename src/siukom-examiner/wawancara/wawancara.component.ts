@@ -49,6 +49,7 @@ export class WawancaraComponent implements OnInit {
     submitQuestionLoading = signal(false)
     startExamLoading = signal(false)
     examStarted = signal(false)
+    visibleHints = signal<Record<string, boolean>>({})
 
     assessmentForm: FormGroup
     // Keep examScheduleDetail for getting roomUkomId needed for startExamByExaminer
@@ -372,5 +373,26 @@ export class WawancaraComponent implements OnInit {
                 q.answerDto.answerChoice != null
             )
         })
+    }
+
+    hasHint(question: ExamQuestion): boolean {
+        return !!question.hint?.trim()
+    }
+
+    toggleHint(question: ExamQuestion, index: number): void {
+        const key = this.getHintKey(question, index)
+        this.visibleHints.update((state) => ({
+            ...state,
+            [key]: !state[key],
+        }))
+    }
+
+    isHintVisible(question: ExamQuestion, index: number): boolean {
+        const key = this.getHintKey(question, index)
+        return !!this.visibleHints()[key]
+    }
+
+    private getHintKey(question: ExamQuestion, index: number): string {
+        return question.id || `index-${index}`
     }
 }

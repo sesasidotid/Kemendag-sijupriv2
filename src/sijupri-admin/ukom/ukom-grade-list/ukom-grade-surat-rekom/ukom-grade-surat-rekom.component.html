@@ -1,0 +1,102 @@
+<form (ngSubmit)="submitForm()" [formGroup]="suratRekomForm">
+    <div class="mb-3">
+        <label [for]="fields.dateLetterIssuance" class="form-label"
+            >Tanggal Penetapan Surat <span class="text-danger">*</span></label
+        >
+        <input
+            [formControlName]="fields.dateLetterIssuance"
+            [id]="fields.dateLetterIssuance"
+            appInvalidOnTouch
+            class="form-control"
+            type="date"
+        />
+        <div
+            *ngIf="getErrorMessage(fields.dateLetterIssuance, 'Tanggal Penetapan Surat') as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label [for]="fields.signingOfficial" class="form-label"
+            >Pejabat Yang Menandatangi <span class="text-danger">*</span>
+        </label>
+        <input
+            [formControlName]="fields.signingOfficial"
+            [id]="fields.signingOfficial"
+            appInvalidOnTouch
+            class="form-control"
+            placeholder="Contoh: Dr. John Doe"
+            type="text"
+        />
+        <div
+            *ngIf="getErrorMessage(fields.signingOfficial,'Pejabat Yang Menandatangi' ) as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label [for]="fields.officialPosition" class="form-label"
+            >Jabatan Pejabat <span class="text-danger">*</span></label
+        >
+        <input
+            [formControlName]="fields.officialPosition"
+            [id]="fields.officialPosition"
+            appInvalidOnTouch
+            class="form-control"
+            placeholder="Contoh: Kepala Pusat"
+            type="text"
+        />
+        <div
+            *ngIf="getErrorMessage(fields.officialPosition, 'Jabatan Pejabat') as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label [for]="fields.officialNumber" class="form-label"
+            >NIP Pejabat <span class="text-danger">*</span></label
+        >
+        <input
+            [formControlName]="fields.officialNumber"
+            [id]="fields.officialNumber"
+            appInvalidOnTouch
+            class="form-control"
+            placeholder="Contoh: NIP. 1987654321 2000 01 1 001"
+            type="text"
+        />
+        <div
+            *ngIf="getErrorMessage(fields.officialNumber, 'NIP Pejabat') as error"
+            class="invalid-feedback"
+        >
+            {{ error }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <app-file-handler [inputs]="inputs()"></app-file-handler>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+        <app-loading-button
+            (clicked)="previewLetterResult()"
+            [className]="'btn btn-soft-success'"
+            [icon]="'mdi mdi-eye-outline'"
+            [isLoading]="previewLoading()"
+            [label]="'Preview Hasil Surat Rekomendasi'"
+            [type]="'button'"
+        ></app-loading-button>
+        <app-loading-button
+            [className]="'btn btn-primary'"
+            [disabled]="suratRekomForm.invalid"
+            [icon]="'mdi mdi-content-save-outline'"
+            [isLoading]="submitLoading()"
+            [label]="'Simpan Surat Rekomendasi'"
+            [type]="'submit'"
+        ></app-loading-button>
+    </div>
+</form>

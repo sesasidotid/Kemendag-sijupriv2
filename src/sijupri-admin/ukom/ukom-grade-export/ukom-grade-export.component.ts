@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common'
 import {
     FormControl,
     FormGroup,
-    FormsModule,
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
@@ -29,7 +28,13 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 @Component({
     selector: 'app-ukom-grade-export',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, PagableComponent, LoadingButtonComponent, InvalidOnTouchDirective],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        PagableComponent,
+        LoadingButtonComponent,
+        InvalidOnTouchDirective,
+    ],
     templateUrl: './ukom-grade-export.component.html',
     styleUrl: './ukom-grade-export.component.scss',
 })
@@ -192,6 +197,15 @@ export class UkomGradeExportComponent {
                 icon: 'mdi-export',
                 onClick: () =>
                     this.router.navigate([`/ukom/ukom-grade-list/export`]),
+            })
+            .addTab({
+                label: 'Surat Rekomendasi',
+                isActive: false,
+                icon: 'mdi-email-seal-outline',
+                onClick: () =>
+                    this.router.navigate([
+                        `/ukom/ukom-grade-list/letter-of-reccomendation`,
+                    ]),
             })
     }
 

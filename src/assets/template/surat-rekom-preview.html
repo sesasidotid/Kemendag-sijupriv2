@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Surat Rekomendasi - Heryono Hadi Prasetyo</title>
+        <style>
+            /* CSS RESET & A4 SIMULATION */
+            body {
+                background-color: #f0f2f5;
+                margin: 0;
+                padding: 20px;
+                font-family: "Times New Roman", Times, serif;
+                display: flex;
+                justify-content: center;
+            }
+
+            .paper {
+                background: white;
+                width: 210mm;
+                height: 297mm;
+                padding: 20mm;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                box-sizing: border-box;
+                position: relative;
+            }
+
+            /* HEADER SECTION */
+            .header {
+                text-align: center;
+                border-bottom: 3px double #000;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: 14pt;
+                margin: 0;
+                text-transform: uppercase;
+            }
+            .header h2 {
+                font-size: 11pt;
+                margin: 2px 0;
+                text-transform: uppercase;
+            }
+            .header p {
+                font-size: 10pt;
+                margin: 0;
+                font-style: normal;
+            }
+
+            /* TITLE SECTION */
+            .doc-title {
+                text-align: center;
+                margin: 25px 0;
+            }
+
+            .doc-title h3 {
+                margin: 0;
+                font-size: 12pt;
+                text-decoration: underline;
+                text-transform: uppercase;
+            }
+
+            .doc-title p {
+                margin: 5px 0;
+                font-size: 11pt;
+            }
+
+            /* DATA TABLES */
+            .label {
+                font-weight: bold;
+                margin-bottom: 8px;
+                font-size: 11pt;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 11pt;
+                margin-bottom: 20px;
+            }
+
+            .info-table td {
+                vertical-align: top;
+                padding: 4px 0;
+            }
+            .info-table td:nth-child(1) {
+                width: 25px;
+            }
+            .info-table td:nth-child(2) {
+                width: 220px;
+            }
+
+            .results-table th,
+            .results-table td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: center;
+            }
+            .results-table th {
+                background-color: #f9f9f9;
+            }
+
+            /* SIGNATURE */
+            .footer-container {
+                margin-top: 40px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .qr-placeholder {
+                width: 100px;
+                height: 100px;
+                border: 1px solid #ddd;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 8pt;
+                color: #999;
+            }
+
+            .signature-box {
+                width: 280px;
+                font-size: 11pt;
+            }
+
+            /* PRINT MEDIA */
+            @media print {
+                body {
+                    background: none;
+                    padding: 0;
+                }
+                .paper {
+                    box-shadow: none;
+                    margin: 0;
+                    border: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="paper">
+            <div class="header">
+                <h1>Kementerian Perdagangan Republik Indonesia</h1>
+                <h2>Badan Pengembangan Sumber Daya Manusia Perdagangan</h2>
+                <p>
+                    Jalan Kramat Raya No. 172 Jakarta 10430 | www.kemendag.go.id
+                </p>
+            </div>
+
+            <div class="doc-title">
+                <h3>Surat Rekomendasi Hasil Uji Kompetensi</h3>
+                <h3>Jabatan Fungsional Analis Perdagangan</h3>
+                <p>NOMOR: KP.02.02/128/BPSDMP/KET/8/2025</p>
+            </div>
+
+            <div class="label">KETERANGAN PERORANGAN</div>
+            <table class="info-table">
+                <tr>
+                    <td>1</td>
+                    <td>Nama</td>
+                    <td>: Heryono Hadi Prasetyo</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>NIP</td>
+                    <td>: 196511091992031003</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Pangkat/Golongan Ruang/TMT</td>
+                    <td>: Pembina Utama Madya / IV/d/01 April 2025</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Pendidikan Tertinggi</td>
+                    <td>: S2 Manajemen</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Tempat dan Tanggal Lahir</td>
+                    <td>: Malang, 9 November 1965</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Jabatan Fungsional/TMT</td>
+                    <td>
+                        : Kepala Biro Pembinaan dan Pengembangan Sistem Resi
+                        Gudang dan Pasar Lelang Komoditas/05 Februari 2025
+                    </td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Unit Kerja</td>
+                    <td>
+                        : Biro Pembinaan dan Pengembangan Sistem Resi Gudang dan
+                        Pasar Lelang Komoditas
+                    </td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Instansi</td>
+                    <td>: Kementerian Perdagangan</td>
+                </tr>
+            </table>
+
+            <div class="label">HASIL UJI KOMPETENSI</div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Metode Uji Kompetensi</th>
+                        <th>Bobot</th>
+                        <th>Nilai</th>
+                        <th>Bobot x Nilai</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Uji Kompetensi Teknis</td>
+                        <td>50%</td>
+                        <td>81</td>
+                        <td>40,5</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Uji Kompetensi Manajerial dan Sosial Kultural</td>
+                        <td>50%</td>
+                        <td>84</td>
+                        <td>42</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="4" style="text-align: right">
+                            Nilai Akhir
+                        </th>
+                        <th>82,5</th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="label">REKOMENDASI</div>
+            <div style="font-size: 11pt; margin-bottom: 30px">
+                1. Lulus Uji Kompetensi untuk diangkat dalam Jabatan Fungsional
+                Analis Perdagangan Jenjang Ahli Utama. [cite: 11, 12]<br />
+                2. Surat Rekomendasi berlaku selama 2 (dua) tahun sejak
+                ditetapkan. [cite: 13]
+            </div>
+
+            <div class="footer-container">
+                <div class="qr-placeholder">QR Code</div>
+                <div class="signature-box">
+                    Ditetapkan di Jakarta [cite: 15]<br />
+                    Tanggal 27 Agustus 2025 [cite: 15]<br />
+                    Kepala Badan Pengembangan<br />
+                    Sumber Daya Manusia Perdagangan, [cite: 18]<br />
+                    <br /><br /><br />
+                    <strong>Mardyana Listyowati</strong> <br />
+                    NIP. 19670329 199403 2 003
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

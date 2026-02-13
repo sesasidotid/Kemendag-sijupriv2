@@ -121,10 +121,11 @@ export class PracticalWorkPageComponent implements OnInit {
             if (question?.answerDto?.answerText) {
                 this.videoForm
                     .get('videoLink')
-                    ?.setValue(this.question()?.answerDto?.answerText)
+                    ?.setValue(question.answerDto.answerText)
             }
+
             this.initFileHandlerInputs(question)
-        })
+        },{allowSignalWrites: true})
     }
 
     ngOnInit() {

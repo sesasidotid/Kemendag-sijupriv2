@@ -79,14 +79,29 @@
                                 </div>
                                 <div class="row-spacing">
                                     <div class="key-label">Kunci Jawaban:</div>
-                                    <a
-                                        [href]="question.attachmentUrl"
-                                        class="action-link"
-                                        target="_blank"
+                                    <button
+                                        (click)="toggleHint(question, i)"
+                                        *ngIf="hasHint(question); else noHint"
+                                        class="action-link hint-toggle"
+                                        type="button"
                                     >
-                                        [ Lihat Kunci Jawaban ]
-                                        <span class="external-icon">🔗</span>
-                                    </a>
+                                        [ {{ isHintVisible(question, i) ?
+                                        'Sembunyikan Kunci Jawaban' : 'Lihat
+                                        Kunci Jawaban' }} ]
+                                    </button>
+
+                                    <ng-template #noHint>
+                                        <span class="hint-empty-text"
+                                            >Kunci jawaban belum tersedia.</span
+                                        >
+                                    </ng-template>
+
+                                    <div
+                                        *ngIf="hasHint(question) && isHintVisible(question, i)"
+                                        class="hint-content"
+                                    >
+                                        {{ question.hint }}
+                                    </div>
                                 </div>
 
                                 <!-- Assessment Options -->

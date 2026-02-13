@@ -58,11 +58,11 @@ export class PracticalWorkComponent {
     participantId = signal('')
     draftService = inject(PracticalWorkDraftService)
     participantAnswer = signal<ExamQuestion>(null)
-    private saveTimeout: number | undefined
     startExamLoading = signal(false)
     examStarted = signal(false)
     examScheduleService = inject(UkomExamScheduleService)
     examScheduleDetail = signal<ExamSchedule | null>(null)
+    private saveTimeout: number | undefined
 
     constructor() {
         this.assessmentForm = this.fb.group({
@@ -158,6 +158,13 @@ export class PracticalWorkComponent {
                     )
                 },
             })
+    }
+
+    openAnswer(): void {
+        window.open(
+            this.participantAnswer()?.answerDto?.answerUploadUrl,
+            '_blank',
+        )
     }
 
     fetchQuestionsToGrade(afterStart: boolean = false) {

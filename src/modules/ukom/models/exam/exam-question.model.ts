@@ -15,6 +15,7 @@ export class ExamQuestion extends Serializable {
     association: unknown = undefined
     groupId: string | null | undefined = undefined
     weight: number | null | undefined = undefined
+    hint: string | null | undefined = undefined
     parentQuestionId: string | null | undefined = undefined
     multipleChoiceDtoList: CATChoice[] = undefined
     answerDto: ExamAnswerDto | null = undefined

@@ -1,4 +1,4 @@
-import { Component, input, signal, ViewChild } from '@angular/core'
+import { Component, signal, ViewChild } from '@angular/core'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { HandlerService } from '../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
@@ -97,6 +97,15 @@ export class UkomGradeImportComponent {
                 icon: 'mdi-export',
                 onClick: () =>
                     this.router.navigate([`/ukom/ukom-grade-list/export`]),
+            })
+            .addTab({
+                label: 'Surat Rekomendasi',
+                isActive: false,
+                icon: 'mdi-email-seal-outline',
+                onClick: () =>
+                    this.router.navigate([
+                        `/ukom/ukom-grade-list/letter-of-reccomendation`,
+                    ]),
             })
     }
 

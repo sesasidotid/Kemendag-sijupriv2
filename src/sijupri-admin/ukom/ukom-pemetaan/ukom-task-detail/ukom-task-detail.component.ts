@@ -137,11 +137,7 @@ export class UkomTaskDetailComponent {
                         participant.id,
                     )
                     .pipe(
-                        catchError((err) => {
-                            if (err.status === 404) {
-                                return of(null)
-                            }
-
+                        catchError(() => {
                             return of(null)
                         }),
                         map((response) => {

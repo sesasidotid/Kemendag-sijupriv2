@@ -1,9 +1,9 @@
 <app-exam-assessment-layout
-    [loading]="loadingQuestions()"
+    (backClicked)="backToDashboard()"
     [examScheduleId]="examId()"
+    [loading]="loadingQuestions()"
     [participantId]="participantId()"
     [showSavedIndicator]="!loadingQuestions() && allQuestionsAnsweredAndSaved() && questions().length > 0"
-    (backClicked)="backToDashboard()"
 >
     <ng-container
         *ngIf="!examStarted() && questions().length === 0; else examContent"
@@ -31,140 +31,172 @@
         </div>
     </ng-container>
     <ng-template #examContent>
-    <ng-container *ngIf="questions().length > 0; else noQuestions">
-        <form [formGroup]="assessmentForm">
-            <div class="question-list" formArrayName="answerDtoList">
-                <div
-                    *ngFor="let question of questions(); let i = index"
-                    [formGroupName]="i"
-                    class="question-card"
-                >
-                    <!-- Competency Header -->
-                    <div class="card-header">
-                        <span class="question-number"
-                            >{{ question.kompetensiIndikatorName }}</span
-                        >
-                        <h2 class="question-text">{{ question.question }}</h2>
-
-                        <!-- HAS DOCUMENT -->
-                        <button
-                            (click)="openDocument(question?.answerDto?.answerUploadUrl)"
-                            *ngIf="question?.answerDto?.answerUploadUrl; else noDocument"
-                            class="btn btn-primary mt-2"
-                        >
-                            <span class="mdi mdi-open-in-new me-2"></span>
-                            Lihat Dokumen Peserta
-                        </button>
-
-                        <!-- NO DOCUMENT -->
-                        <ng-template #noDocument>
-                            <div class="alert alert-warning mt-2 mb-0">
-                                <span class="mdi mdi-file-alert-outline me-2"></span>
-                                Peserta belum mengunggah dokumen untuk item ini
-                            </div>
-                        </ng-template>
-                    </div>
-
-                    <div class="card-body">
-                        <div
-                            [formGroupName]="'answerList'"
-                            class="checklist-section"
-                        >
-                            <!-- Checklist Section -->
-                            <div class="section-label">Checklist Validasi:</div>
-                            <div class="checklist-group">
-                                <div
-                                    class="form-check checkbox-card"
-                                    [ngClass]="getCheckboxState(i, 'valid')"
-                                >
-                                    <label
-                                        class="form-check-label w-100 checkbox-label"
-                                        for="valid-{{ i }}"
-                                    >
-                                        <input
-                                            class="form-check-input me-2"
-                                            formControlName="valid"
-                                            id="valid-{{ i }}"
-                                            type="checkbox"
-                                        />
-                                        <span class="checkbox-indicator"></span>
-                                        <span class="checkbox-text">Valid</span>
-                                    </label>
-                                </div>
-                                <div
-                                    class="form-check checkbox-card"
-                                    [ngClass]="getCheckboxState(i, 'memadai')"
-                                >
-                                    <label
-                                        class="form-check-label w-100 checkbox-label"
-                                        for="memadai-{{ i }}"
-                                    >
-                                        <input
-                                            class="form-check-input me-2"
-                                            formControlName="memadai"
-                                            id="memadai-{{ i }}"
-                                            type="checkbox"
-                                        />
-                                        <span class="checkbox-indicator"></span>
-                                        <span class="checkbox-text"
-                                            >Memadai</span
-                                        >
-                                    </label>
-                                </div>
-                            </div>
-                            <div
-                                [class.competent]="isItemCompetent(i)"
-                                [class.not-competent]="!isItemCompetent(i)"
-                                class="status-badge"
-                            >
-                                Status: {{ isItemCompetent(i) ? 'DITERIMA (Nilai Masuk)' : 'BELUM DITERIMA' }}
-                            </div>
-                            <p *ngIf="!isItemCompetent(i)" class="small-hint">
-                                *Harus Valid DAN Memadai untuk mendapatkan
-                                nilai.
-                            </p>
-                        </div>
-
-                        <!-- Notes Section -->
-                        <div class="notes-section">
-                            <label [for]="'note-' + i" class="section-label"
-                                >Catatan Penguji:</label
-                            >
-                            <textarea
-                                [id]="'note-' + i"
-                                class="form-control"
-                                formControlName="answerText"
-                                placeholder="Tuliskan catatan terkait bukti portofolio ini..."
-                                rows="4"
-                            >
-                            </textarea>
-                        </div>
-                    </div>
+        <ng-container *ngIf="questions().length > 0; else noQuestions">
+            <div class="assessment-container">
+                <div class="header-section">
+                    <h1>Form Penilaian Portofolio</h1>
+                    <p>
+                        Silakan isi penilaian untuk setiap pertanyaan di bawah
+                        ini.
+                    </p>
                 </div>
+                <form [formGroup]="assessmentForm">
+                    <div class="question-list" formArrayName="answerDtoList">
+                        <div
+                            *ngFor="let question of questions(); let i = index"
+                            [formGroupName]="i"
+                            class="question-card"
+                        >
+                            <!-- Competency Header -->
+                            <div class="card-header">
+                                <span class="question-number"
+                                    >{{ question.kompetensiIndikatorName
+                                    }}</span
+                                >
+                                <h2 class="question-text">
+                                    {{ question.question }}
+                                </h2>
+
+                                <!-- HAS DOCUMENT -->
+                                <button
+                                    (click)="openDocument(question?.answerDto?.answerUploadUrl)"
+                                    *ngIf="question?.answerDto?.answerUploadUrl; else noDocument"
+                                    class="btn btn-primary mt-2"
+                                >
+                                    <span
+                                        class="mdi mdi-open-in-new me-2"
+                                    ></span>
+                                    Lihat Dokumen Peserta
+                                </button>
+
+                                <!-- NO DOCUMENT -->
+                                <ng-template #noDocument>
+                                    <div class="alert alert-warning mb-0 mt-2">
+                                        <span
+                                            class="mdi mdi-file-alert-outline me-2"
+                                        ></span>
+                                        Peserta belum mengunggah dokumen untuk
+                                        item ini
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <div class="card-body">
+                                <div
+                                    [formGroupName]="'answerList'"
+                                    class="checklist-section"
+                                >
+                                    <!-- Checklist Section -->
+                                    <div class="section-label">
+                                        Checklist Validasi:
+                                    </div>
+                                    <div class="checklist-group">
+                                        <div
+                                            [ngClass]="getCheckboxState(i, 'valid')"
+                                            class="form-check checkbox-card"
+                                        >
+                                            <label
+                                                class="form-check-label w-100 checkbox-label"
+                                                for="valid-{{ i }}"
+                                            >
+                                                <input
+                                                    class="form-check-input me-2"
+                                                    formControlName="valid"
+                                                    id="valid-{{ i }}"
+                                                    type="checkbox"
+                                                />
+                                                <span
+                                                    class="checkbox-indicator"
+                                                ></span>
+                                                <span class="checkbox-text"
+                                                    >Valid</span
+                                                >
+                                            </label>
+                                        </div>
+                                        <div
+                                            [ngClass]="getCheckboxState(i, 'memadai')"
+                                            class="form-check checkbox-card"
+                                        >
+                                            <label
+                                                class="form-check-label w-100 checkbox-label"
+                                                for="memadai-{{ i }}"
+                                            >
+                                                <input
+                                                    class="form-check-input me-2"
+                                                    formControlName="memadai"
+                                                    id="memadai-{{ i }}"
+                                                    type="checkbox"
+                                                />
+                                                <span
+                                                    class="checkbox-indicator"
+                                                ></span>
+                                                <span class="checkbox-text"
+                                                    >Memadai</span
+                                                >
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div
+                                        [class.competent]="isItemCompetent(i)"
+                                        [class.not-competent]="!isItemCompetent(i)"
+                                        class="status-badge"
+                                    >
+                                        Status: {{ isItemCompetent(i) ?
+                                        'DITERIMA (Nilai Masuk)' : 'BELUM
+                                        DITERIMA' }}
+                                    </div>
+                                    <p
+                                        *ngIf="!isItemCompetent(i)"
+                                        class="small-hint"
+                                    >
+                                        *Harus Valid DAN Memadai untuk
+                                        mendapatkan nilai.
+                                    </p>
+                                </div>
+
+                                <!-- Notes Section -->
+                                <div class="notes-section">
+                                    <label
+                                        [for]="'note-' + i"
+                                        class="section-label"
+                                        >Catatan Penguji:</label
+                                    >
+                                    <textarea
+                                        [id]="'note-' + i"
+                                        class="form-control"
+                                        formControlName="answerText"
+                                        placeholder="Tuliskan catatan terkait bukti portofolio ini..."
+                                        rows="4"
+                                    >
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <app-loading-button
+                            (clicked)="submitAssessment()"
+                            [className]="'btn btn-primary btn-lg'"
+                            [disabled]="assessmentForm.invalid"
+                            [isLoading]="loadingSubmitForm()"
+                            [label]="'Simpan Penilaian'"
+                            [type]="'button'"
+                        ></app-loading-button>
+                    </div>
+                </form>
             </div>
-            <div class="mt-3 text-end">
-                <app-loading-button
-                    (clicked)="submitAssessment()"
-                    [className]="'btn btn-primary btn-lg'"
-                    [disabled]="assessmentForm.invalid"
-                    [isLoading]="loadingSubmitForm()"
-                    [label]="'Simpan Penilaian'"
-                    [type]="'button'"
-                ></app-loading-button>
+        </ng-container>
+        <ng-template #noQuestions>
+            <div class="no-questions-container">
+                <app-empty-state
+                    [buttonAction]="backToDashboard.bind(this)"
+                    [buttonText]="'Kembali ke Dashboard'"
+                    [description]="'Belum ada form penilaian yang tersedia untuk saat ini.'"
+                    [icon]="'mdi mdi-clipboard-text-outline'"
+                    [title]="'Form Penilaian Belum Tersedia'"
+                >
+                </app-empty-state>
             </div>
-        </form>
-    </ng-container>
-    <ng-template #noQuestions>
-        <div class="no-questions-container">
-            <app-empty-state
-                [buttonAction]="backToDashboard.bind(this)"
-                [buttonText]="'Kembali ke Dashboard'"
-                [description]="'Belum ada form penilaian yang tersedia untuk saat ini.'"
-                [icon]="'mdi mdi-clipboard-text-outline'"
-                [title]="'Form Penilaian Belum Tersedia'"
-            >
-            </app-empty-state>
-        </div>
-    </ng-template>
+        </ng-template>
     </ng-template>
 </app-exam-assessment-layout>

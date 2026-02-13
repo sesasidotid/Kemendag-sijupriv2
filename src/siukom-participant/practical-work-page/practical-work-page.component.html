@@ -38,6 +38,46 @@
             </ol>
         </div>
 
+        <!-- File Handler Card -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="mdi mdi-file-upload-outline me-2"></i>
+                    Dokumen Pendukung
+                </h5>
+            </div>
+            <div class="card-body">
+                <app-file-handler [inputs]="inputs()"></app-file-handler>
+
+                <div class="d-flex justify-content-end mt-3">
+                    <app-loading-button
+                        (clicked)="submitDocument()"
+                        [className]="'btn btn-primary'"
+                        [disabled]="!answerFile()"
+                        [isLoading]="submittingDocument()"
+                        [label]="' Simpan Dokumen'"
+                        [type]="'button'"
+                    ></app-loading-button>
+                    <!--                    <button-->
+                    <!--                        (click)="submitDocument()"-->
+                    <!--                        [disabled]="submittingDocument()"-->
+                    <!--                        class="btn btn-primary"-->
+                    <!--                        type="button"-->
+                    <!--                    >-->
+                    <!--                        <span-->
+                    <!--                            *ngIf="submittingDocument()"-->
+                    <!--                            class="spinner-border spinner-border-sm me-1"-->
+                    <!--                        ></span>-->
+                    <!--                        <i-->
+                    <!--                            *ngIf="!submittingDocument()"-->
+                    <!--                            class="mdi mdi-content-save me-1"-->
+                    <!--                        ></i>-->
+                    <!--                        Simpan Dokumen-->
+                    <!--                    </button>-->
+                </div>
+            </div>
+        </div>
+
         <!-- Video Link Card -->
         <form (ngSubmit)="submitVideoLink()" [formGroup]="videoForm">
             <div class="card mb-3 shadow-sm">
@@ -88,46 +128,6 @@
                 </div>
             </div>
         </form>
-
-        <!-- File Handler Card -->
-        <div class="card mb-3 shadow-sm">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="mdi mdi-file-upload-outline me-2"></i>
-                    Dokumen Pendukung
-                </h5>
-            </div>
-            <div class="card-body">
-                <app-file-handler [inputs]="inputs()"></app-file-handler>
-
-                <div class="d-flex justify-content-end mt-3">
-                    <app-loading-button
-                        (clicked)="submitDocument()"
-                        [className]="'btn btn-primary'"
-                        [disabled]="!answerFile()"
-                        [isLoading]="submittingDocument()"
-                        [label]="' Simpan Dokumen'"
-                        [type]="'button'"
-                    ></app-loading-button>
-                    <!--                    <button-->
-                    <!--                        (click)="submitDocument()"-->
-                    <!--                        [disabled]="submittingDocument()"-->
-                    <!--                        class="btn btn-primary"-->
-                    <!--                        type="button"-->
-                    <!--                    >-->
-                    <!--                        <span-->
-                    <!--                            *ngIf="submittingDocument()"-->
-                    <!--                            class="spinner-border spinner-border-sm me-1"-->
-                    <!--                        ></span>-->
-                    <!--                        <i-->
-                    <!--                            *ngIf="!submittingDocument()"-->
-                    <!--                            class="mdi mdi-content-save me-1"-->
-                    <!--                        ></i>-->
-                    <!--                        Simpan Dokumen-->
-                    <!--                    </button>-->
-                </div>
-            </div>
-        </div>
 
         <!-- Existing Answer Preview -->
         <div
