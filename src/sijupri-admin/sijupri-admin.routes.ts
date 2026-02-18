@@ -249,29 +249,6 @@ export const routes: Routes = [
                             import('./ukom/ukom-grade-list/ukom-grade-list.component').then(
                                 (m) => m.UkomGradeListComponent,
                             ),
-                        routes: [
-                            {
-                                path: 'import',
-                                loadComponent: () =>
-                                    import('./ukom/ukom-grade-import/ukom-grade-import.component').then(
-                                        (m) => m.UkomGradeImportComponent,
-                                    ),
-                            },
-                            {
-                                path: 'export',
-                                loadComponent: () =>
-                                    import('./ukom/ukom-grade-export/ukom-grade-export.component').then(
-                                        (m) => m.UkomGradeExportComponent,
-                                    ),
-                            },
-                            {
-                                path: 'letter-of-reccomendation',
-                                loadComponent: () =>
-                                    import('./ukom/ukom-grade-list/ukom-grade-surat-rekom/ukom-grade-surat-rekom.component').then(
-                                        (m) => m.UkomGradeSuratRekomComponent,
-                                    ),
-                            },
-                        ],
                     },
                     'Data Dukung UKom': {
                         components: () =>

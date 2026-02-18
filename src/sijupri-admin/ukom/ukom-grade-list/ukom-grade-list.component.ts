@@ -1,7 +1,6 @@
 import { Component, inject, signal, ViewChild } from '@angular/core'
 import { PagableComponent } from '../../../modules/base/components/pagable/pagable.component'
 import { Pagable } from '../../../modules/base/commons/pagable/pagable'
-import { Router } from '@angular/router'
 import {
     ActionColumnBuilder,
     PagableBuilder,
@@ -21,6 +20,14 @@ import { UkomGrade } from '@/modules/ukom/models/ukom-grade'
 import { UkomGradeUploadBatchComponent } from './ukom-grade-upload-batch/ukom-grade-upload-batch.component'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
+import { UkomGradeImportComponent } from '../ukom-grade-import/ukom-grade-import.component'
+import { UkomGradeExportComponent } from '../ukom-grade-export/ukom-grade-export.component'
+import { UkomGradeSuratRekomSetupComponent } from './ukom-grade-surat-rekom-setup/ukom-grade-surat-rekom-setup.component'
+import {
+    UkomGradeSuratRekomComponent
+} from '@/sijupri-admin/ukom/ukom-grade-list/ukom-grade-surat-rekom/ukom-grade-surat-rekom.component'
+
+type UkomGradeTabKey = 'list' | 'import' | 'export' | 'surat-rekom' | 'pengaturan-surat-rekom'
 
 @Component({
     selector: 'app-ukom-grade-list',
@@ -32,6 +39,10 @@ import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
         CommonModule,
         UkomGradeUploadBatchComponent,
         LoadingButtonComponent,
+        UkomGradeImportComponent,
+        UkomGradeExportComponent,
+        UkomGradeSuratRekomSetupComponent,
+        UkomGradeSuratRekomComponent
     ],
     templateUrl: './ukom-grade-list.component.html',
     styleUrl: './ukom-grade-list.component.scss',
@@ -51,6 +62,7 @@ export class UkomGradeListComponent {
     }
 
     refresh = signal(false)
+    activeTab = signal<UkomGradeTabKey>('list')
     isFinishExaminerAssessmentLoading = signal(false)
     inputs: FIleHandler = {
         files: {
@@ -70,12 +82,11 @@ export class UkomGradeListComponent {
     isModalUploadBatchOpen$ = new BehaviorSubject<boolean>(false)
 
     constructor(
-        private router: Router,
         private tabService: TabService,
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
-    ) {}
+    ) { }
 
     ngOnInit() {
         this.handlePagable()
@@ -273,34 +284,49 @@ export class UkomGradeListComponent {
 
         this.tabService
             .addTab({
-                label: 'List Nilai Ukom',
+                label: 'Daftar Nilai Ukom',
                 isActive: true,
                 icon: 'mdi-list-box',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`]),
+                onClick: () => this.setActiveTab('list'),
             })
             .addTab({
                 label: 'Import Nilai',
                 isActive: false,
                 icon: 'mdi-plus-circle',
-                onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/import`]),
+                onClick: () => this.setActiveTab('import'),
             })
             .addTab({
                 label: 'Export Nilai',
                 isActive: false,
                 icon: 'mdi-export',
-                onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/export`]),
+                onClick: () => this.setActiveTab('export'),
             })
             .addTab({
                 label: 'Surat Rekomendasi',
                 isActive: false,
                 icon: 'mdi-email-seal-outline',
-                onClick: () =>
-                    this.router.navigate([
-                        `/ukom/ukom-grade-list/letter-of-reccomendation`,
-                    ]),
+                onClick: () => this.setActiveTab('surat-rekom'),
             })
+            .addTab({
+                label: 'Pengaturan Surat Rekomendasi',
+                isActive: false,
+                icon: 'mdi-cog-outline',
+                onClick: () => this.setActiveTab('pengaturan-surat-rekom'),
+            })
+    }
+
+    setActiveTab(tab: UkomGradeTabKey) {
+        this.activeTab.set(tab)
+
+        const tabIndex: Record<UkomGradeTabKey, number> = {
+            list: 0,
+            import: 1,
+            export: 2,
+            'surat-rekom': 3,
+            'pengaturan-surat-rekom': 4,
+        }
+
+        this.tabService.changeTabActive(tabIndex[tab])
     }
 
     toggleModal() {

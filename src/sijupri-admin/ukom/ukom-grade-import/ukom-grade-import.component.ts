@@ -7,8 +7,6 @@ import { FormsModule } from '@angular/forms'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { Ukom } from '../../../modules/ukom/models/ukom.model'
-import { TabService } from '../../../modules/base/services/tab.service'
-import { Router } from '@angular/router'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { finalize } from 'rxjs'
 
@@ -59,55 +57,10 @@ export class UkomGradeImportComponent {
     }
 
     constructor(
-        private router: Router,
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private tabService: TabService,
-    ) {}
-
-    ngOnInit() {
-        setTimeout(() => {
-            this.handleTabService()
-        }, 0)
-    }
-
-    handleTabService() {
-        if (this.tabService.getTabsLength() > 0) {
-            this.tabService.clearTabs()
-        }
-
-        this.tabService
-            .addTab({
-                label: 'List Nilai Ukom',
-                isActive: false,
-                icon: 'mdi-list-box',
-                onClick: () => this.router.navigate([`/ukom/ukom-grade-list`]),
-            })
-            .addTab({
-                label: 'Import Nilai',
-                isActive: true,
-                icon: 'mdi-plus-circle',
-                onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/import`]),
-            })
-            .addTab({
-                label: 'Export Nilai',
-                isActive: false,
-                icon: 'mdi-export',
-                onClick: () =>
-                    this.router.navigate([`/ukom/ukom-grade-list/export`]),
-            })
-            .addTab({
-                label: 'Surat Rekomendasi',
-                isActive: false,
-                icon: 'mdi-email-seal-outline',
-                onClick: () =>
-                    this.router.navigate([
-                        `/ukom/ukom-grade-list/letter-of-reccomendation`,
-                    ]),
-            })
-    }
+    ) { }
 
     downloadTemplate() {
         this.apiService

@@ -1,0 +1,91 @@
+.preview-stage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+
+  height: min(80vh, calc(100vh - 220px));
+  max-height: min(80vh, calc(100vh - 220px));
+
+  overflow: auto;
+  padding: 1.5rem;
+
+  //border-radius: 0.5rem;
+  border: 1px solid var(--bs-border-color);
+
+  /* Stage background (document workspace) */
+  background-color: #e9ecef;
+}
+
+.paper-preview {
+  width: min(100%, 215mm);
+  min-height: 330mm;
+
+  background-color: #ffffff; /* force white paper */
+  box-sizing: border-box;
+  margin: 0 auto;
+
+  padding: 20mm 16mm;
+
+  position: relative;
+  overflow: hidden;
+
+  /* Stronger floating effect */
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+}
+
+/* Optional visual guide frame */
+.paper-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--bs-primary);
+  pointer-events: none;
+}
+
+.paper-content {
+  width: 100%;
+  min-height: calc(330mm - 40mm);
+
+  background-color: #ffffff; /* prevent transparency bleed */
+
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .preview-stage {
+    height: min(72vh, calc(100vh - 180px));
+    max-height: min(72vh, calc(100vh - 180px));
+    padding: 1rem;
+  }
+
+  .paper-preview {
+    padding: 14mm 10mm;
+  }
+}
+
+/* Print behavior */
+@media print {
+  .preview-stage {
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .paper-preview {
+    width: 215mm;
+    min-height: 330mm;
+    margin: 0;
+    border: 0;
+    padding: 20mm 16mm;
+    box-shadow: none;
+  }
+
+  .paper-preview::after {
+    display: none;
+  }
+}
