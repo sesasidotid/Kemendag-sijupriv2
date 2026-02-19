@@ -1,9 +1,9 @@
-import { ActivatedRoute } from '@angular/router'
-import { ApiService } from '../../../modules/base/services/api.service'
+import { ActivatedRoute, Router } from '@angular/router'
+import { ApiService } from '@/modules/base/services/api.service'
 import { Component, OnDestroy } from '@angular/core'
-import { Jenjang } from '../../../modules/maintenance/models/jenjang.modle'
-import { Pangkat } from '../../../modules/maintenance/models/pangkat.model'
-import { UkomTaskDetail } from '../../../modules/ukom/models/ukom-task-detail.modal'
+import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
+import { Pangkat } from '@/modules/maintenance/models/pangkat.model'
+import { UkomTaskDetail } from '@/modules/ukom/models/ukom-task-detail.modal'
 import {
     BehaviorSubject,
     catchError,
@@ -20,20 +20,20 @@ import {
     tap,
 } from 'rxjs'
 import { CommonModule } from '@angular/common'
-import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
-import { CATScore } from '../../../modules/ukom/models/cat/cat-score'
-import { Router } from '@angular/router'
-import { DataDokumenUkom } from '../../../modules/ukom/models/data-dukung'
-import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
-import { HandlerService } from '../../../modules/base/services/handler.service'
-import { ExamType } from '../../../modules/ukom/models/exam-type.model'
-import { MakalahScore } from '../../../modules/ukom/models/cat/makalah-score'
-import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
-import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
-import { UkomGradeTableComponent } from '../../../modules/base/components/ukom-grade-table/ukom-grade-table.component'
-import { UkomGradeService } from '../../../modules/ukom/services/ukom-grade.service'
-import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
+import { CATScore } from '@/modules/ukom/models/cat/cat-score'
+import { DataDokumenUkom } from '@/modules/ukom/models/data-dukung'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ExamType } from '@/modules/ukom/models/exam-type.model'
+import { MakalahScore } from '@/modules/ukom/models/cat/makalah-score'
+import { FilePreviewService } from '@/modules/base/services/file-preview.service'
+import { TanggalIndoPipe } from '@/modules/base/pipes/tanggal-indo.pipe'
+import { UkomGradeTableComponent } from '@/modules/base/components/ukom-grade-table/ukom-grade-table.component'
+import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
+import { UkomGrade } from '@/modules/ukom/models/ukom-grade'
+
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -48,23 +48,17 @@ import { UkomGrade } from '../../../modules/ukom/models/ukom-grade'
     styleUrl: './ukom-task-detail.component.scss',
 })
 export class UkomTaskDetailComponent implements OnDestroy {
-    private destroy$ = new Subject<void>()
-
     id: string
-
     jenjang: Jenjang = new Jenjang()
     pangkat: Pangkat = new Pangkat()
-
     ukomDetail = new UkomTaskDetail()
     ukomDetailLoading$ = new BehaviorSubject<boolean>(false)
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     dataDokumenUkom: DataDokumenUkom[] = []
-
     fileHandlerData: FIleHandler = {
         files: {},
         viewOnly: true,
     }
-
     pendidikanName: string
     provinsiName: string
     kabupatenName: string
@@ -73,18 +67,16 @@ export class UkomTaskDetailComponent implements OnDestroy {
     predikat2Name: string
     bidangJabatanName: string
     unitKerjaName: string | null = null
-
     predikatKinerjaList: any[] = []
     examType: ExamType[] = []
-
     scoreMap: Record<string, any> = {}
     isPredikatKerjaLoading$: BehaviorSubject<boolean> = new BehaviorSubject(
         false,
     )
     isAllSchoreLoading$: BehaviorSubject<boolean> = new BehaviorSubject(false)
     isLoading$: Observable<boolean>
-
     ukomGrade: UkomGrade
+    private destroy$ = new Subject<void>()
 
     constructor(
         private apiService: ApiService,
@@ -99,6 +91,17 @@ export class UkomTaskDetailComponent implements OnDestroy {
             this.isPredikatKerjaLoading$,
             this.ukomDetailLoading$,
         ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
+    }
+
+    get hasVisibleUkomDetails(): boolean {
+        if (!this.scoreMap) {
+            return false
+        }
+
+        const hasCatScore = this.scoreMap['CAT']?.id
+        const hasMakalahFile = this.scoreMap['MAKALAH']?.id
+
+        return !!(hasCatScore || hasMakalahFile)
     }
 
     ngOnInit() {
@@ -605,17 +608,6 @@ export class UkomTaskDetailComponent implements OnDestroy {
                     this.unitKerjaName = null
                 },
             })
-    }
-
-    get hasVisibleUkomDetails(): boolean {
-        if (!this.scoreMap) {
-            return false
-        }
-
-        const hasCatScore = this.scoreMap['CAT']?.id
-        const hasMakalahFile = this.scoreMap['MAKALAH']?.id
-
-        return !!(hasCatScore || hasMakalahFile)
     }
 
     viewFile() {

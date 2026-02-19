@@ -1,1 +1,29 @@
-<app-pagable [pagable]="pagable"></app-pagable>
+<div class="position-relative">
+    <div class="d-flex justify-content-md-end mb-3">
+        <app-loading-button
+            (clicked)="handleGenerateSuratRekom()"
+            [className]="'btn btn-primary'"
+            [icon]="'mdi mdi-file-document-plus'"
+            [isLoading]="generateSuratRekomLoading()"
+            [label]="'Generate Draft Surat Rekomendasi'"
+        ></app-loading-button>
+    </div>
+    <app-pagable [pagable]="pagable" [refresh]="refreshPagable()"></app-pagable>
+
+    <!-- Download Progress Overlay -->
+    <div *ngIf="hasActiveDownloads()" class="download-progress-overlay">
+        <div class="download-progress-card">
+            <div class="spinner-border text-primary mb-2" role="status">
+                <span class="visually-hidden">Downloading...</span>
+            </div>
+            <p class="text-muted mb-0">
+                <i class="ri-download-line me-1"></i>
+                Mengunduh file... Mohon tunggu
+            </p>
+            <small class="text-muted"
+                >File berukuran besar mungkin memakan waktu beberapa
+                menit</small
+            >
+        </div>
+    </div>
+</div>

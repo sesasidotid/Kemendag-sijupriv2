@@ -26,7 +26,6 @@ export class WawancaraExamScheduleRequest extends BaseExamScheduleRequest {
     endTime: string = undefined
     duration: string = undefined
     participantIdList: string[] = []
-    examinerIdList: string[] = []
 
     constructor(object: { [key: string]: any }) {
         super()
@@ -41,7 +40,6 @@ export class SeminarMakalahExamScheduleRequest extends BaseExamScheduleRequest {
     seminarEndTime: string = undefined
     duration: string = undefined
     participantIdList: string[] = []
-    examinerIdList: string[] = []
 
     constructor(object: { [key: string]: any }) {
         super()
@@ -54,7 +52,6 @@ export class OtherExamScheduleRequest extends BaseExamScheduleRequest {
     endTime: string = undefined
     secretKey: string = undefined
     participantIdList: string[] = []
-    examinerIdList: string[] = []
 
     constructor(object: { [key: string]: any }) {
         super()

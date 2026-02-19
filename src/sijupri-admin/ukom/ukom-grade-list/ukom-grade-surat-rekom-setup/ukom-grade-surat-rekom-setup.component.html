@@ -1,40 +1,47 @@
 <ng-container *ngIf="isLoadingTemplate(); else notLoading">
-    <div class="text-center py-5">
+    <div class="py-5 text-center">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-3 text-muted">
-            Memuat template surat rekomendasi...
-        </p>
+        <p class="text-muted mt-3">Memuat template surat rekomendasi...</p>
     </div>
 </ng-container>
 
 <ng-template #notLoading>
     <ng-container *ngIf="!templateHtml(); else templateContent">
-
         <!-- No Template State -->
-        <div class="text-center py-5">
+        <div class="py-5 text-center">
             <i class="mdi mdi-file-document-outline display-1 text-muted"></i>
             <h4 class="mt-3">Template Belum Diatur</h4>
             <p class="text-muted">
-                Silakan atur template surat rekomendasi terlebih dahulu untuk melanjutkan.
+                Silakan atur template surat rekomendasi terlebih dahulu untuk
+                melanjutkan.
             </p>
-            <button (click)="openSetupModal()" class="btn btn-primary mt-3" type="button">
+            <button
+                (click)="openSetupModal()"
+                class="btn btn-primary mt-3"
+                type="button"
+            >
                 <i class="mdi mdi-cog-outline me-1"></i>
                 Atur Template
             </button>
         </div>
-
     </ng-container>
 </ng-template>
 
 <ng-template #templateContent>
     <!-- Template Display -->
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div
+        class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2"
+    >
         <h5 class="card-title mb-0">
             Preview Template Surat Rekomendasi (F4/Folio)
         </h5>
-        <button (click)="openSetupModal()" class="btn btn-primary" type="button">
+        <button
+            (click)="openSetupModal()"
+            class="btn btn-primary"
+            type="button"
+        >
             <i class="mdi mdi-cog-outline me-1"></i>
             Atur Template
         </button>
@@ -42,55 +49,193 @@
 
     <div class="preview-stage">
         <div class="paper-preview">
-            <div class="paper-content" [innerHTML]="templateHtml()"></div>
+            <div [innerHTML]="templateHtml()" class="paper-content"></div>
         </div>
     </div>
 </ng-template>
 
-
 <!-- Setup Modal -->
-<app-modal *ngIf="showSetupModal()" (toggle)="closeSetupModal()" [enableFooter]="false" [size]="'lg'"
-    [title]="'Pengaturan Template Surat Rekomendasi'">
+<app-modal
+    (toggle)="closeSetupModal()"
+    *ngIf="showSetupModal()"
+    [enableFooter]="false"
+    [size]="'lg'"
+    [title]="'Pengaturan Template Surat Rekomendasi'"
+>
     <form (ngSubmit)="submitForm()" [formGroup]="suratRekomForm">
         <div class="mb-3">
-            <label [for]="fields.dateLetterIssuance" class="form-label">Tanggal Penetapan Surat <span
-                    class="text-danger">*</span></label>
-            <input [formControlName]="fields.dateLetterIssuance" [id]="fields.dateLetterIssuance" appInvalidOnTouch
-                class="form-control" type="date" />
-            <div *ngIf="getErrorMessage(fields.dateLetterIssuance, 'Tanggal Penetapan Surat') as error"
-                class="invalid-feedback">
+            <label [for]="fields.dateLetterIssuance" class="form-label"
+                >Tanggal Penetapan Surat
+                <span class="text-danger">*</span></label
+            >
+            <input
+                [formControlName]="fields.dateLetterIssuance"
+                [id]="fields.dateLetterIssuance"
+                appInvalidOnTouch
+                class="form-control"
+                type="date"
+            />
+            <div
+                *ngIf="getErrorMessage(fields.dateLetterIssuance, 'Tanggal Penetapan Surat') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label [for]="fields.signingOfficial" class="form-label">Pejabat Yang Menandatangi <span
-                    class="text-danger">*</span>
+            <label class="form-label"
+                >Nomor Surat <span class="text-danger">*</span></label
+            >
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <!-- Classification Code -->
+                <input
+                    [formControlName]="fields.classificationCode"
+                    appInvalidOnTouch
+                    class="form-control"
+                    placeholder="KP.02.02"
+                    style="max-width: 100px"
+                    type="text"
+                />
+
+                <span class="text-muted">/</span>
+
+                <!-- Auto Number (disabled placeholder) -->
+                <input
+                    class="form-control"
+                    disabled
+                    placeholder="nomor"
+                    style="max-width: 80px"
+                    type="text"
+                />
+
+                <span class="text-muted">/</span>
+
+                <!-- Issuing Unit -->
+                <input
+                    [formControlName]="fields.issuingUnit"
+                    appInvalidOnTouch
+                    class="form-control"
+                    placeholder="BPSDMP"
+                    style="max-width: 100px"
+                    type="text"
+                />
+
+                <span class="text-muted">/</span>
+
+                <!-- Letter Category -->
+                <input
+                    [formControlName]="fields.letterCategory"
+                    appInvalidOnTouch
+                    class="form-control"
+                    placeholder="KET"
+                    style="max-width: 80px"
+                    type="text"
+                />
+
+                <span class="text-muted">/</span>
+
+                <!-- Month (disabled, from date) -->
+                <input
+                    [value]="getMonthFromDate()"
+                    class="form-control"
+                    disabled
+                    placeholder="MM"
+                    style="max-width: 60px"
+                    type="text"
+                />
+
+                <span class="text-muted">/</span>
+
+                <!-- Year (disabled, from date) -->
+                <input
+                    [value]="getYearFromDate()"
+                    class="form-control"
+                    disabled
+                    placeholder="YYYY"
+                    style="max-width: 80px"
+                    type="text"
+                />
+            </div>
+            <small class="text-muted"
+                >Format: KP.02.02/$nomor/BPSDMP/KET/02/2026</small
+            >
+            <div
+                *ngIf="getErrorMessage(fields.classificationCode, 'Kode Klasifikasi') as error"
+                class="invalid-feedback d-block"
+            >
+                {{ error }}
+            </div>
+            <div
+                *ngIf="getErrorMessage(fields.issuingUnit, 'Unit Penerbit') as error"
+                class="invalid-feedback d-block"
+            >
+                {{ error }}
+            </div>
+            <div
+                *ngIf="getErrorMessage(fields.letterCategory, 'Kategori Surat') as error"
+                class="invalid-feedback d-block"
+            >
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label [for]="fields.signingOfficial" class="form-label"
+                >Pejabat Yang Menandatangi <span class="text-danger">*</span>
             </label>
-            <input [formControlName]="fields.signingOfficial" [id]="fields.signingOfficial" appInvalidOnTouch
-                class="form-control" placeholder="Contoh: Dr. John Doe" type="text" />
-            <div *ngIf="getErrorMessage(fields.signingOfficial,'Pejabat Yang Menandatangi' ) as error"
-                class="invalid-feedback">
+            <input
+                [formControlName]="fields.signingOfficial"
+                [id]="fields.signingOfficial"
+                appInvalidOnTouch
+                class="form-control"
+                placeholder="Contoh: Dr. John Doe"
+                type="text"
+            />
+            <div
+                *ngIf="getErrorMessage(fields.signingOfficial,'Pejabat Yang Menandatangi' ) as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label [for]="fields.officialPosition" class="form-label">Jabatan Pejabat <span
-                    class="text-danger">*</span></label>
-            <input [formControlName]="fields.officialPosition" [id]="fields.officialPosition" appInvalidOnTouch
-                class="form-control" placeholder="Contoh: Kepala Pusat" type="text" />
-            <div *ngIf="getErrorMessage(fields.officialPosition, 'Jabatan Pejabat') as error" class="invalid-feedback">
+            <label [for]="fields.officialPosition" class="form-label"
+                >Jabatan Pejabat <span class="text-danger">*</span></label
+            >
+            <input
+                [formControlName]="fields.officialPosition"
+                [id]="fields.officialPosition"
+                appInvalidOnTouch
+                class="form-control"
+                placeholder="Contoh: Kepala Pusat"
+                type="text"
+            />
+            <div
+                *ngIf="getErrorMessage(fields.officialPosition, 'Jabatan Pejabat') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label [for]="fields.officialNumber" class="form-label">NIP Pejabat <span
-                    class="text-danger">*</span></label>
-            <input [formControlName]="fields.officialNumber" [id]="fields.officialNumber" appInvalidOnTouch
-                class="form-control" placeholder="Contoh: NIP. 1987654321 2000 01 1 001" type="text" />
-            <div *ngIf="getErrorMessage(fields.officialNumber, 'NIP Pejabat') as error" class="invalid-feedback">
+            <label [for]="fields.officialNumber" class="form-label"
+                >NIP Pejabat <span class="text-danger">*</span></label
+            >
+            <input
+                [formControlName]="fields.officialNumber"
+                [id]="fields.officialNumber"
+                appInvalidOnTouch
+                class="form-control"
+                placeholder="Contoh: NIP. 1987654321 2000 01 1 001"
+                type="text"
+            />
+            <div
+                *ngIf="getErrorMessage(fields.officialNumber, 'NIP Pejabat') as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
@@ -100,13 +245,22 @@
         </div>
 
         <div class="d-flex justify-content-end gap-2">
-            <button (click)="closeSetupModal()" class="btn btn-secondary" type="button">
+            <button
+                (click)="closeSetupModal()"
+                class="btn btn-secondary"
+                type="button"
+            >
                 <i class="mdi mdi-close me-1"></i>
                 Batal
             </button>
-            <app-loading-button [className]="'btn btn-primary'" [disabled]="suratRekomForm.invalid"
-                [icon]="'mdi mdi-content-save-outline'" [isLoading]="submitLoading()" [label]="'Simpan'"
-                [type]="'submit'"></app-loading-button>
+            <app-loading-button
+                [className]="'btn btn-primary'"
+                [disabled]="suratRekomForm.invalid"
+                [icon]="'mdi mdi-content-save-outline'"
+                [isLoading]="submitLoading()"
+                [label]="'Simpan'"
+                [type]="'submit'"
+            ></app-loading-button>
         </div>
     </form>
 </app-modal>

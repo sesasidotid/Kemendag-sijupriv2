@@ -15,20 +15,18 @@ import {
     takeUntil,
     tap,
 } from 'rxjs'
-import { LoginContext } from '../../commons/login-context'
 import { ModalComponent } from '../modal/modal.component'
 import { CommonModule } from '@angular/common'
 import { ConverterService } from '../../services/converter.service'
 import { ApiService } from '../../services/api.service'
-import { Router, ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { NonjfRevisiUkomComponent } from '../nonjf-revisi-ukom/nonjf-revisi-ukom.component'
-import { DomSanitizer } from '@angular/platform-browser'
-import { SafeUrl } from '@angular/platform-browser'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { EmptyStateComponent } from '../empty-state/empty-state.component'
 import { LandingPageComponent } from '../../../landing-page/landing-page.component'
 import { CATScore } from '../../../ukom/models/cat/cat-score'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import { HandlerService } from '../../services/handler.service'
 import { ExamType } from '../../../ukom/models/exam-type.model'
 import { PredikatKinerja } from '../../../maintenance/models/predikat-kinerja.model'
@@ -41,6 +39,7 @@ import { KinerjaService } from '@/modules/complement/services/kinerja.service'
 import { ReplaceUkomWordPipe } from '../../pipes/replace-ukom-word.pipe'
 import { NonJFParticipant } from '@/modules/base/models/nonjf-participant.model'
 import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
+
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',
@@ -64,29 +63,24 @@ export enum JenisUkomEnum {
     styleUrl: './status-pendaftaran-ukom.component.scss',
 })
 export class StatusPendaftaranUkomComponent {
-    private destroy$ = new Subject<void>()
-
     pendingTask = new UkomTaskDetail()
+    finishTask = new UkomTaskDetail()
+
     groupedUkomPendingTaskHistory: {
         [key: string]: any[]
     } = {}
-
     ukomStep$ = new BehaviorSubject<number>(1)
     currentUkomStep$ = new BehaviorSubject<number>(1)
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
-
-    finishTask = new UkomTaskDetail()
     CATScore: CATScore = new CATScore()
     isCATModalOpen$ = new BehaviorSubject<boolean>(false)
     dataDokumenUkom: DokumenUkom[] = []
-
     fileHandlerData: FIleHandler = {
         files: {},
         viewOnly: true,
     }
     predikatKinerjaList: PredikatKinerja[] = []
-
     pendidikanName: string
     provinsiName: string
     kabupatenName: string
@@ -94,13 +88,10 @@ export class StatusPendaftaranUkomComponent {
     predikat1Name: string
     predikat2Name: string
     bidangJabatanName: string
-
     key: string
     participantId: string
-
     examType: ExamType[] = []
     scoreMap: Record<string, any> = {}
-
     isPredikatKerjaLoading$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
     isLoadingPendingTask$: BehaviorSubject<boolean> =
@@ -117,9 +108,9 @@ export class StatusPendaftaranUkomComponent {
     isAllSchoreLoading$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
     isLoading$: Observable<boolean>
-
     registrationStatus: string
     ukomGrade: UkomGrade
+    private destroy$ = new Subject<void>()
 
     constructor(
         private converterService: ConverterService,
@@ -143,6 +134,17 @@ export class StatusPendaftaranUkomComponent {
         ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
     }
 
+    get hasVisibleUkomDetails(): boolean {
+        if (!this.scoreMap) {
+            return false
+        }
+
+        const hasCatScore = this.scoreMap['CAT']?.id
+        const hasMakalahFile = this.scoreMap['MAKALAH']?.id
+
+        return !!(hasCatScore || hasMakalahFile)
+    }
+
     ngOnInit() {
         this.kinerjaService.fetchPredikatKinerja()
         this.initializeComponent()
@@ -153,43 +155,9 @@ export class StatusPendaftaranUkomComponent {
         this.destroy$.complete()
     }
 
-    private initializeComponent() {
-        this.isPredikatKerjaLoading$.next(true)
-
-        this.apiService
-            .getData('/api/v1/predikat_kinerja')
-            .pipe(
-                takeUntil(this.destroy$),
-                switchMap((res) => {
-                    this.predikatKinerjaList = res
-                    return this.activatedRoute.queryParamMap.pipe(take(1))
-                }),
-                tap((params) => {
-                    this.key = params.get('key')
-                }),
-                finalize(() => {
-                    this.isPredikatKerjaLoading$.next(false)
-                }),
-            )
-            .subscribe({
-                next: () => {
-                    if (this.key) {
-                        this.getPendingTask(this.key)
-                    } else {
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'ID tidak ditemukan dalam parameter route',
-                        )
-                    }
-                },
-                error: (err) => {
-                    console.error('Failed to initialize component:', err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal memuat data awal',
-                    )
-                },
-            })
+    getAllScores() {
+        // TODO : use the api to fetch latest score for all exam types instead of using the score from pendingTask, because the score in pendingTask is only updated when the participant finish the registration, so if the participant has a new score after finish the registration, the score in pendingTask will not be updated
+        // /api/v1/exam_grade/{examScheduleId}?key=DURDKPW1JG
     }
 
     getPendidikanList(pendidikanTerakhirCode: string) {
@@ -253,24 +221,6 @@ export class StatusPendaftaranUkomComponent {
 
     backToLandingPage() {
         this.router.navigate(['/'])
-    }
-
-    fetchPhotoProfile() {
-        this.apiService.getPhotoProfile(LoginContext.getUserId()).subscribe({
-            next: (blob) => {
-                if (blob.size === 0) {
-                    this.profileImageSrc = 'assets/no-profile.jpg'
-                    return
-                }
-                const objectUrl = URL.createObjectURL(blob)
-                this.profileImageSrc =
-                    this.sanitizer.bypassSecurityTrustUrl(objectUrl)
-            },
-            error: (err) => {
-                console.error('Error fetching profile image', err)
-                this.profileImageSrc = 'assets/no-profile.jpg'
-            },
-        })
     }
 
     getJenisUkomLabel(jenisUkom: string): string {
@@ -621,17 +571,6 @@ export class StatusPendaftaranUkomComponent {
         )
     }
 
-    get hasVisibleUkomDetails(): boolean {
-        if (!this.scoreMap) {
-            return false
-        }
-
-        const hasCatScore = this.scoreMap['CAT']?.id
-        const hasMakalahFile = this.scoreMap['MAKALAH']?.id
-
-        return !!(hasCatScore || hasMakalahFile)
-    }
-
     toggleModal() {
         this.isModalOpen$.next(!this.isModalOpen$.value)
     }
@@ -683,20 +622,6 @@ export class StatusPendaftaranUkomComponent {
         return correctChoice ? correctChoice.choiceId : ''
     }
 
-    getCompetencyPercentage(kompetensi: any): number {
-        if (
-            !kompetensi.questionDtoList ||
-            kompetensi.questionDtoList.length === 0
-        ) {
-            return 0
-        }
-
-        const correctAnswers = this.getCorrectAnswersCount(kompetensi)
-        const totalQuestions = kompetensi.questionDtoList.length
-
-        return Math.round((correctAnswers / totalQuestions) * 100)
-    }
-
     getCorrectAnswersCount(kompetensi: any): number {
         if (!kompetensi.questionDtoList) {
             return 0
@@ -709,14 +634,42 @@ export class StatusPendaftaranUkomComponent {
         ).length
     }
 
-    getWrongAnswersCount(kompetensi: any): number {
-        if (!kompetensi.questionDtoList) {
-            return 0
-        }
+    private initializeComponent() {
+        this.isPredikatKerjaLoading$.next(true)
 
-        return (
-            kompetensi.questionDtoList.length -
-            this.getCorrectAnswersCount(kompetensi)
-        )
+        this.apiService
+            .getData('/api/v1/predikat_kinerja')
+            .pipe(
+                takeUntil(this.destroy$),
+                switchMap((res) => {
+                    this.predikatKinerjaList = res
+                    return this.activatedRoute.queryParamMap.pipe(take(1))
+                }),
+                tap((params) => {
+                    this.key = params.get('key')
+                }),
+                finalize(() => {
+                    this.isPredikatKerjaLoading$.next(false)
+                }),
+            )
+            .subscribe({
+                next: () => {
+                    if (this.key) {
+                        this.getPendingTask(this.key)
+                    } else {
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'ID tidak ditemukan dalam parameter route',
+                        )
+                    }
+                },
+                error: (err) => {
+                    console.error('Failed to initialize component:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data awal',
+                    )
+                },
+            })
     }
 }

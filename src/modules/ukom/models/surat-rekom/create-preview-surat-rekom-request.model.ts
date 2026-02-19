@@ -8,6 +8,9 @@ export class CreatePreviewSuratRekomRequest extends Serializable {
     namaPenandatangan: string = undefined
     nipPenandatangan: string = undefined
     kopImg: string = undefined
+    numCode1: string = undefined
+    numCode3: string = undefined
+    numCode4: string = undefined
 
     constructor(body?: Partial<CreatePreviewSuratRekomRequest>) {
         super()

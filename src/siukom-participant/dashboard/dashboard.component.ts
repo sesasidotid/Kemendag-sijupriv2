@@ -156,10 +156,6 @@ export class DashboardComponent implements OnInit {
                     )
                     .pipe(
                         catchError((err) => {
-                            if (err.status === 404) {
-                                return of(null)
-                            }
-
                             return of(null)
                         }),
                         map((response) => {

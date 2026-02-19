@@ -14,7 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { Observable } from 'rxjs'
-import { finalize, map, take } from 'rxjs/operators'
+import { finalize, map } from 'rxjs/operators'
 import { JenisUkom } from '@/modules/ukom/models/jenis-ukom'
 import {
     ActionColumnBuilder,
@@ -35,12 +35,7 @@ import {
     MultiSelectComponent,
     MultiSelectOption,
 } from '@/modules/base/components/multi-select'
-import {
-    MultiSelectApiComponent,
-    MultiSelectApiParams,
-} from '@/modules/base/components/multi-select-api'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
-import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import {
     BaseExamScheduleRequest,
@@ -50,6 +45,7 @@ import {
     WawancaraExamScheduleRequest,
 } from '@/modules/ukom/models/exam-schedule/create-exam-schedule-request.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { RoomParticipant } from '@/modules/ukom/models/room/room-participant.model'
 
 interface DynamicFieldConfig {
     controlName: string
@@ -97,10 +93,6 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
                 visible: true,
                 required: false,
             },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
-            },
         ],
     },
     MAKALAH: {
@@ -108,10 +100,6 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
             { controlName: 'participantIdList', validators: [] },
-            // {
-            //     controlName: 'examinerIdList',
-            //     validators: [Validators.required],
-            // },
         ],
         secondary: {
             label: 'Jadwal Seminar',
@@ -126,10 +114,6 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
                     controlName: 'duration2',
                     validators: [Validators.required, Validators.min(1)],
                 },
-                {
-                    controlName: 'examinerIdList2',
-                    validators: [Validators.required],
-                },
             ],
         },
     },
@@ -142,10 +126,6 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
                 visible: true,
                 required: false,
             },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
-            },
         ],
     },
     PORTOFOLIO: {
@@ -156,10 +136,6 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
                 controlName: 'participantIdList',
                 visible: true,
                 required: false,
-            },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
             },
         ],
     },
@@ -172,10 +148,6 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
                 controlName: 'participantIdList',
                 visible: true,
                 required: false,
-            },
-            {
-                controlName: 'examinerIdList',
-                validators: [Validators.required],
             },
         ],
     },
@@ -194,7 +166,6 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
         ModalComponent,
         LoadingButtonComponent,
         MultiSelectComponent,
-        MultiSelectApiComponent,
         InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-exam-schedule-add.component.html',
@@ -209,7 +180,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
     ukomExamScheduleService = inject(UkomExamScheduleService)
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
     participantService = inject(UkomParticipantService)
-    examinerService = inject(UkomExaminerService)
     durationPipe = inject(DurationPipe)
 
     examScheduleForm: FormGroup
@@ -224,7 +194,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
     participants: MultiSelectOption[] = []
-    requiredValidator = Validators.required
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -348,13 +317,11 @@ export class UkomExamScheduleAddComponent implements OnInit {
             duration: [''],
             secretKey: [null],
             participantIdList: [null],
-            examinerIdList: [null],
             // Secondary form fields for MAKALAH/SEMINAR
             startTime2: [''],
             endTime2: [''],
             duration2: [''],
             participantIdList2: [null],
-            examinerIdList2: [null],
         })
 
         this.examScheduleForm
@@ -381,12 +348,10 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     'duration',
                     'secretKey',
                     'participantIdList',
-                    'examinerIdList',
                     'startTime2',
                     'endTime2',
                     'duration2',
                     'participantIdList2',
-                    'examinerIdList2',
                 ]
                 allFields.forEach((fieldName) => {
                     const control = this.examScheduleForm.get(fieldName)
@@ -434,10 +399,10 @@ export class UkomExamScheduleAddComponent implements OnInit {
         this.participantService
             .getParticipantListByRoomUkomId(this.roomId)
             .pipe(
-                map((participants) =>
+                map((participants: RoomParticipant[]) =>
                     participants.map((p) => ({
-                        id: p.id,
-                        label: `${p.name} (${p.nip})`,
+                        id: p.participantUkom?.id,
+                        label: `${p.participantUkom?.name} (${p.participantUkom?.nip})`,
                     })),
                 ),
             )
@@ -453,31 +418,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     )
                 },
             })
-    }
-
-    fetchExaminers = (params: MultiSelectApiParams): Observable<any> => {
-        const searchName = params['like_user|name'] || ''
-
-        return this.examinerService
-            .searchExaminerV2({
-                limit: params.limit,
-                page: params.page,
-                searchName: searchName,
-            })
-            .pipe(
-                map((response) => {
-                    if (response && response.data) {
-                        return {
-                            ...response,
-                            data: response.data.map((examiner) => ({
-                                id: examiner.id,
-                                label: examiner.user?.name || examiner.id,
-                            })),
-                        }
-                    }
-                    return response
-                }),
-            )
     }
 
     handleTabChange() {
@@ -668,41 +608,12 @@ export class UkomExamScheduleAddComponent implements OnInit {
                 )
                 break
 
-            case 'RCD-00002': {
-                const examinerId = this.mapExaminerIdFromErrorMessage(
-                    err?.error?.message,
+            case 'RCD-00002':
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Terdeteksi konflik jadwal ujian penguji',
                 )
-
-                if (!examinerId) {
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Terdeteksi konflik jadwal ujian penguji',
-                    )
-                    break
-                }
-
-                this.examinerService
-                    .searchExaminerV2({ id: examinerId })
-                    .pipe(take(1))
-                    .subscribe({
-                        next: (examiner) => {
-                            const examinerName =
-                                examiner?.data?.[0]?.user?.name ?? examinerId
-
-                            this.handlerService.handleAlert(
-                                'Error',
-                                `Penguji ${examinerName} memiliki jadwal ujian yang bentrok`,
-                            )
-                        },
-                        error: () => {
-                            this.handlerService.handleAlert(
-                                'Error',
-                                `Terdeteksi konflik jadwal ujian untuk penguji dengan ID ${examinerId}`,
-                            )
-                        },
-                    })
                 break
-            }
 
             default:
                 this.handlerService.handleAlert(
@@ -710,18 +621,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     'Gagal membuat jadwal ujian',
                 )
         }
-    }
-
-    private mapExaminerIdFromErrorMessage(errorMessage: string): string | null {
-        if (!errorMessage) return null
-
-        // UUID v4 pattern (covers your example)
-        const uuidRegex =
-            /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
-
-        const match = errorMessage.match(uuidRegex)
-
-        return match ? match[0] : null
     }
 
     private buildPrimaryRequest(examType: string): BaseExamScheduleRequest {
@@ -743,7 +642,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     endTime: v.endTime,
                     duration: v.duration,
                     participantIdList: v.participantIdList ?? [],
-                    examinerIdList: v.examinerIdList,
                 })
 
             case ExamTypeCategory.MAKALAH:
@@ -754,7 +652,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     seminarEndTime: v.endTime2,
                     duration: v.duration2,
                     participantIdList: v.participantIdList ?? [],
-                    examinerIdList: v.examinerIdList2,
                 })
 
             default:
@@ -762,7 +659,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     startTime: v.startTime,
                     endTime: v.endTime,
                     participantIdList: v.participantIdList ?? [],
-                    examinerIdList: v.examinerIdList,
                     secretKey: v.secretKey,
                 })
         }

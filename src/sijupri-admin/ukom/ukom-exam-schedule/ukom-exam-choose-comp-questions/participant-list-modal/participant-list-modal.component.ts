@@ -1,10 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import {
+    Component,
+    EventEmitter,
+    inject,
+    Input,
+    OnInit,
+    Output,
+} from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
 import { AgGridAngular } from 'ag-grid-angular'
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 
 @Component({
     selector: 'app-participant-list-modal',
@@ -18,6 +26,8 @@ export class ParticipantListModalComponent implements OnInit {
     @Input() examTypeCode: string = ''
 
     @Output() close = new EventEmitter<void>()
+
+    jenisUkomService = inject(JenisUkomService)
     columnDefs: ColDef[] = [
         {
             headerName: 'No',
@@ -57,10 +67,14 @@ export class ParticipantListModalComponent implements OnInit {
         {
             headerName: 'Jenis UKOM',
             field: 'participantUkom.jenisUkom',
-            width: 120,
+            width: 180,
             valueGetter: (params) => {
                 const participant = params.data as ParticipantScheduleList
-                return participant.participantUkom?.jenisUkom || '—'
+                return (
+                    this.jenisUkomService.getLabelByValue(
+                        participant.participantUkom?.jenisUkom,
+                    ) || '—'
+                )
             },
         },
         {

@@ -26,16 +26,12 @@ import { JenisUkom } from '@/modules/ukom/models/jenis-ukom'
 import { finalize, map } from 'rxjs/operators'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
-import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
 import {
     MultiSelectComponent,
     MultiSelectOption,
 } from '@/modules/base/components/multi-select'
-import {
-    MultiSelectApiComponent,
-    MultiSelectApiParams,
-} from '@/modules/base/components/multi-select-api'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+import { RoomParticipant } from '@/modules/ukom/models/room/room-participant.model'
 
 interface DynamicFieldConfig {
     controlName: string
@@ -133,7 +129,6 @@ const ALL_FORM_FIELDS = [
     'duration',
     'secretKey',
     'participantIdList',
-    'examinerIdList',
     'startTime2',
     'endTime2',
     'duration2',
@@ -147,7 +142,6 @@ const ALL_FORM_FIELDS = [
         ReactiveFormsModule,
         LoadingButtonComponent,
         MultiSelectComponent,
-        MultiSelectApiComponent,
         InvalidOnTouchDirective,
     ],
     templateUrl: './ukom-exam-schedule-update.component.html',
@@ -164,7 +158,6 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
     confirmationService = inject(ConfirmationService)
     formValidationService = inject(FormValidationService)
     participantService = inject(UkomParticipantService)
-    examinerService = inject(UkomExaminerService)
     fb = inject(FormBuilder)
 
     examScheduleForm: FormGroup
@@ -172,7 +165,6 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
     submitLoading = signal(false)
     jenisUkomList$: Observable<JenisUkom[]>
     participants: MultiSelectOption[] = []
-    selectedExaminers: MultiSelectOption[] = []
 
     examSchedule: ExamSchedule
 
@@ -198,10 +190,6 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
         return this.examSchedule?.examTypeCode
     }
 
-    get isCatExamType(): boolean {
-        return this.examTypeCode === 'CAT'
-    }
-
     ngOnInit() {
         this.jenisUkomList$ = this.ukomMiscellaneousService.getExamType()
         this.initForm()
@@ -214,7 +202,6 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             duration: [''],
             secretKey: [null],
             participantIdList: [null],
-            examinerIdList: [null],
             // Secondary form fields for MAKALAH/SEMINAR
             startTime2: [''],
             endTime2: [''],
@@ -278,10 +265,10 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
         this.participantService
             .getParticipantListByRoomUkomId(roomUkomId)
             .pipe(
-                map((participants) =>
+                map((participants: RoomParticipant[]) =>
                     participants.map((p) => ({
-                        id: p.id,
-                        label: `${p.name} (${p.nip})`,
+                        id: p.participantUkom?.id,
+                        label: `${p.participantUkom?.name} (${p.participantUkom?.nip})`,
                     })),
                 ),
             )
@@ -297,27 +284,6 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
                     )
                 },
             })
-    }
-
-    fetchExaminers = (params: MultiSelectApiParams): Observable<any> => {
-        const searchName = params['like_user|name'] || ''
-
-        return this.examinerService
-            .searchExaminer(params.limit, params.page, searchName)
-            .pipe(
-                map((response) => {
-                    if (response && response.data) {
-                        return {
-                            ...response,
-                            data: response.data.map((examiner) => ({
-                                id: examiner.id,
-                                label: examiner.user?.name || examiner.id,
-                            })),
-                        }
-                    }
-                    return response
-                }),
-            )
     }
 
     getExamScheduleDetail(id: string) {
@@ -406,26 +372,12 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
             ? data.participantScheduleList.map((p) => p.participantId)
             : []
 
-        // Extract examiner IDs and cache examiner data for display
-        const examinerIds = data.examinerScheduleList
-            ? data.examinerScheduleList.map((e) => e.examinerId)
-            : []
-
-        // Cache examiner data so multi-select-api can display labels
-        this.selectedExaminers = data.examinerScheduleList
-            ? data.examinerScheduleList.map((e) => ({
-                  id: e.examinerId,
-                  label: e.examinerUkom?.user?.name,
-              }))
-            : []
-
         this.examScheduleForm.patchValue({
             startTime: data.startTime,
             endTime: data.endTime,
             duration: data.duration ? Math.round(data.duration * 60) : 0,
             secretKey: data.secretKey,
             participantIdList: participantIds,
-            examinerIdList: examinerIds,
         })
 
         // Patch secondary form if exam has child schedule (MAKALAH -> SEMINAR)

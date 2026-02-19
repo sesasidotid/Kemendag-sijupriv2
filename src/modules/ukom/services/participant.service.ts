@@ -15,13 +15,18 @@ import { Task } from '@/modules/workflow/models/task.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { Participant } from '../models/cat/participant.model'
 import { ParticipantHistoryTask } from '../models/ukom-module-refactor/participant-history-task.model'
+import { RoomParticipant } from '../models/room/room-participant.model'
 
 @Injectable({
     providedIn: 'root',
 })
 export class UkomParticipantService {
     readonly BASE_PATH = '/api/v1/participant_ukom'
-
+    isSubmitTaskLoadingSubject = new BehaviorSubject<boolean>(false)
+    isSubmitTaskLoading$ = this.isSubmitTaskLoadingSubject.asObservable()
+    isSubmitUkomTaskNonJFLoadingSubject = new BehaviorSubject<boolean>(false)
+    isSubmitUkomTaskNonJFLoading$ =
+        this.isSubmitUkomTaskNonJFLoadingSubject.asObservable()
     private canJFRegisterUkomSubject = new BehaviorSubject<boolean>(false)
     isJFCanRegisterUkom$ = this.canJFRegisterUkomSubject.asObservable()
 
@@ -76,8 +81,6 @@ export class UkomParticipantService {
             })
     }
 
-    isSubmitTaskLoadingSubject = new BehaviorSubject<boolean>(false)
-    isSubmitTaskLoading$ = this.isSubmitTaskLoadingSubject.asObservable()
     submitUkomTask(body: Task, onSuccess?: () => void) {
         this.isSubmitTaskLoadingSubject.next(true)
 
@@ -102,9 +105,6 @@ export class UkomParticipantService {
             })
     }
 
-    isSubmitUkomTaskNonJFLoadingSubject = new BehaviorSubject<boolean>(false)
-    isSubmitUkomTaskNonJFLoading$ =
-        this.isSubmitUkomTaskNonJFLoadingSubject.asObservable()
     submitUkomTaskNonJF(body: Task, key: string, onSuccess?: () => void) {
         this.isSubmitUkomTaskNonJFLoadingSubject.next(true)
 
@@ -174,7 +174,7 @@ export class UkomParticipantService {
 
     getParticipantListByRoomUkomId(
         roomUkomId: string,
-    ): Observable<Participant[]> {
+    ): Observable<RoomParticipant[]> {
         return this.apiService.getData(`${this.BASE_PATH}/room/${roomUkomId}`)
     }
 }

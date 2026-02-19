@@ -160,30 +160,6 @@
         </small>
     </div>
 
-    <div *ngIf="isFieldVisible('examinerIdList')" class="mb-3">
-        <label class="form-label fw-bold" for="examinerIdList"
-            >Penguji
-            <span *ngIf="isFieldRequired('examinerIdList')" class="text-danger"
-                >*</span
-            >
-        </label>
-        <app-multi-select-api
-            [fetchFunction]="fetchExaminers"
-            [pageSize]="20"
-            [searchParamName]="'like_user|name'"
-            formControlName="examinerIdList"
-            id="examinerIdList"
-            placeholder="Pilih Penguji"
-            searchPlaceholder="Cari penguji..."
-        ></app-multi-select-api>
-        <div
-            *ngIf="getError('examinerIdList', 'Penguji') as error"
-            class="invalid-feedback"
-        >
-            {{ error}}
-        </div>
-    </div>
-
     <!-- Secondary form for MAKALAH (Seminar) -->
     <div *ngIf="hasSecondaryForm()" class="mb-3 mt-4">
         <hr />
@@ -280,32 +256,6 @@
             <small class="form-text text-muted"
                 >Kosongkan jika ingin seluruh perseta ikut ujian.
             </small>
-        </div>
-
-        <div *ngIf="isFieldVisible('examinerIdList2')" class="mb-3">
-            <label class="form-label fw-bold" for="examinerIdList2"
-                >Penguji
-                <span
-                    *ngIf="isFieldRequired('examinerIdList2')"
-                    class="text-danger"
-                    >*</span
-                >
-            </label>
-            <app-multi-select-api
-                [fetchFunction]="fetchExaminers"
-                [pageSize]="20"
-                [searchParamName]="'like_user|name'"
-                formControlName="examinerIdList2"
-                id="examinerIdList2"
-                placeholder="Pilih Penguji"
-                searchPlaceholder="Cari penguji..."
-            ></app-multi-select-api>
-            <div
-                *ngIf="getError('examinerIdList2', 'Penguji') as error"
-                class="invalid-feedback"
-            >
-                {{ error}}
-            </div>
         </div>
     </div>
 

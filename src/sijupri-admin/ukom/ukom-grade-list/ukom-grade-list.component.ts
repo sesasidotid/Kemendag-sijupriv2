@@ -23,11 +23,14 @@ import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
 import { UkomGradeImportComponent } from '../ukom-grade-import/ukom-grade-import.component'
 import { UkomGradeExportComponent } from '../ukom-grade-export/ukom-grade-export.component'
 import { UkomGradeSuratRekomSetupComponent } from './ukom-grade-surat-rekom-setup/ukom-grade-surat-rekom-setup.component'
-import {
-    UkomGradeSuratRekomComponent
-} from '@/sijupri-admin/ukom/ukom-grade-list/ukom-grade-surat-rekom/ukom-grade-surat-rekom.component'
+import { UkomGradeSuratRekomComponent } from '@/sijupri-admin/ukom/ukom-grade-list/ukom-grade-surat-rekom/ukom-grade-surat-rekom.component'
 
-type UkomGradeTabKey = 'list' | 'import' | 'export' | 'surat-rekom' | 'pengaturan-surat-rekom'
+type UkomGradeTabKey =
+    | 'list'
+    | 'import'
+    | 'export'
+    | 'surat-rekom'
+    | 'pengaturan-surat-rekom'
 
 @Component({
     selector: 'app-ukom-grade-list',
@@ -42,7 +45,7 @@ type UkomGradeTabKey = 'list' | 'import' | 'export' | 'surat-rekom' | 'pengatura
         UkomGradeImportComponent,
         UkomGradeExportComponent,
         UkomGradeSuratRekomSetupComponent,
-        UkomGradeSuratRekomComponent
+        UkomGradeSuratRekomComponent,
     ],
     templateUrl: './ukom-grade-list.component.html',
     styleUrl: './ukom-grade-list.component.scss',
@@ -86,7 +89,7 @@ export class UkomGradeListComponent {
         private confirmationService: ConfirmationService,
         private handlerService: HandlerService,
         private apiService: ApiService,
-    ) { }
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -302,7 +305,7 @@ export class UkomGradeListComponent {
                 onClick: () => this.setActiveTab('export'),
             })
             .addTab({
-                label: 'Surat Rekomendasi',
+                label: 'Draft Surat Rekomendasi',
                 isActive: false,
                 icon: 'mdi-email-seal-outline',
                 onClick: () => this.setActiveTab('surat-rekom'),

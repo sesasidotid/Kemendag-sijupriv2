@@ -1,0 +1,50 @@
+<app-modal
+    (toggle)="handleClose()"
+    [enableFooter]="false"
+    [title]="'Tambah Penguji ke Kelas'"
+>
+    <form (ngSubmit)="submit()" [formGroup]="examinerForm">
+        <div class="mb-3">
+            <label class="form-label fw-bold" for="examinerIdList">
+                Pilih Penguji <span class="text-danger">*</span>
+            </label>
+            <app-multi-select-api
+                [fetchFunction]="fetchExaminers"
+                [pageSize]="20"
+                [searchParamName]="'like_user|name'"
+                appInvalidOnTouch
+                formControlName="examinerIdList"
+                id="examinerIdList"
+                placeholder="Pilih Penguji"
+                searchPlaceholder="Cari penguji..."
+            ></app-multi-select-api>
+            <div
+                *ngIf="
+                    examinerForm.get('examinerIdList')?.invalid &&
+                    examinerForm.get('examinerIdList')?.touched
+                "
+                class="invalid-feedback d-block"
+            >
+                Penguji wajib dipilih
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-4 gap-2">
+            <button
+                (click)="handleClose()"
+                [disabled]="submitLoading()"
+                class="btn btn-secondary"
+                type="button"
+            >
+                Batal
+            </button>
+            <app-loading-button
+                [className]="'btn btn-primary'"
+                [disabled]="examinerForm.invalid"
+                [isLoading]="submitLoading()"
+                [label]="'Simpan'"
+                [type]="'submit'"
+            ></app-loading-button>
+        </div>
+    </form>
+</app-modal>

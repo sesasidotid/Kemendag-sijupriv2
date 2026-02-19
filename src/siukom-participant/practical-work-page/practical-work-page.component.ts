@@ -116,16 +116,19 @@ export class PracticalWorkPageComponent implements OnInit {
             { allowSignalWrites: true },
         )
 
-        effect(() => {
-            const question = this.question()
-            if (question?.answerDto?.answerText) {
-                this.videoForm
-                    .get('videoLink')
-                    ?.setValue(question.answerDto.answerText)
-            }
+        effect(
+            () => {
+                const question = this.question()
+                if (question?.answerDto?.answerText) {
+                    this.videoForm
+                        .get('videoLink')
+                        ?.setValue(question.answerDto.answerText)
+                }
 
-            this.initFileHandlerInputs(question)
-        },{allowSignalWrites: true})
+                this.initFileHandlerInputs(question)
+            },
+            { allowSignalWrites: true },
+        )
     }
 
     ngOnInit() {

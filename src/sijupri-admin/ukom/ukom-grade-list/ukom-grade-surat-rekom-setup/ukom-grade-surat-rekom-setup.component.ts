@@ -15,9 +15,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { finalize } from 'rxjs'
 import { SuratRekomService } from '@/modules/ukom/services/surat-rekom.service'
-import {
-    CreatePreviewSuratRekomRequest
-} from '@/modules/ukom/models/surat-rekom/create-preview-surat-rekom-request.model'
+import { CreatePreviewSuratRekomRequest } from '@/modules/ukom/models/surat-rekom/create-preview-surat-rekom-request.model'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 
@@ -43,6 +41,9 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
         signingOfficial: 'signingOfficial',
         officialPosition: 'officialPosition',
         officialNumber: 'officialNumber',
+        classificationCode: 'numCode1',
+        issuingUnit: 'numCode3',
+        letterCategory: 'numCode4',
     }
 
     fb = inject(FormBuilder)
@@ -60,9 +61,7 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
         files: {
             [this.fields.letterHead]: { label: 'Kop Surat', required: true },
         },
-        allowedTypes: [
-            { label: 'png', type: 'image/png' },
-        ],
+        allowedTypes: [{ label: 'png', type: 'image/png' }],
         maxSize: 5 * 1024 * 1024, // 5 MB
         listen: (key: string, base64Data: string) => {
             this.suratRekomForm
@@ -85,6 +84,9 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
             [this.fields.signingOfficial]: ['', Validators.required],
             [this.fields.officialPosition]: ['', Validators.required],
             [this.fields.officialNumber]: ['', Validators.required],
+            [this.fields.classificationCode]: ['', Validators.required],
+            [this.fields.issuingUnit]: ['', Validators.required],
+            [this.fields.letterCategory]: ['', Validators.required],
         })
     }
 
@@ -94,6 +96,20 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
             controlName,
             label,
         )
+    }
+
+    getMonthFromDate(): string {
+        const dateValue = this.suratRekomForm.get('dateLetterIssuance')?.value
+        if (!dateValue) return ''
+        const [, month] = dateValue.split('-')
+        return month || ''
+    }
+
+    getYearFromDate(): string {
+        const dateValue = this.suratRekomForm.get('dateLetterIssuance')?.value
+        if (!dateValue) return ''
+        const [year] = dateValue.split('-')
+        return year || ''
     }
 
     loadTemplate() {
@@ -106,7 +122,9 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
                 next: (response) => {
                     if (response && response.template) {
                         this.templateHtml.set(
-                            this.sanitizer.bypassSecurityTrustHtml(response.template)
+                            this.sanitizer.bypassSecurityTrustHtml(
+                                response.template,
+                            ),
                         )
                     } else {
                         this.templateHtml.set(null)
@@ -126,62 +144,6 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
     closeSetupModal() {
         this.showSetupModal.set(false)
     }
-
-    private buildPayload(): CreatePreviewSuratRekomRequest {
-        const dateValue: string =
-            this.suratRekomForm.get('dateLetterIssuance')?.value
-
-        if (!dateValue) {
-            throw new Error('dateLetterIssuance is required')
-        }
-
-        const [tahun, bulan, day] = dateValue.split('-')
-
-        const monthMap: Record<string, string> = {
-            '01': 'Januari',
-            '02': 'Februari',
-            '03': 'Maret',
-            '04': 'April',
-            '05': 'Mei',
-            '06': 'Juni',
-            '07': 'Juli',
-            '08': 'Agustus',
-            '09': 'September',
-            '10': 'Oktober',
-            '11': 'November',
-            '12': 'Desember',
-        }
-
-        const monthName = monthMap[bulan]
-
-        if (!monthName) {
-            throw new Error('Invalid month value')
-        }
-
-        const tanggalFormatted = `${day} ${monthName} ${tahun}`
-
-        const rawLetterHead: string =
-            this.suratRekomForm.get('letterHead')?.value
-
-        const cleanedBase64 = rawLetterHead
-            ? rawLetterHead.split(',')[1] ?? rawLetterHead
-            : undefined
-
-        return new CreatePreviewSuratRekomRequest({
-            bulan,
-            tahun,
-            tanggal: tanggalFormatted,
-            jabatanPenandatangan:
-                this.suratRekomForm.get('officialPosition')?.value,
-            namaPenandatangan:
-                this.suratRekomForm.get('signingOfficial')?.value,
-            nipPenandatangan:
-                this.suratRekomForm.get('officialNumber')?.value,
-            kopImg: cleanedBase64,
-        })
-    }
-
-
 
     submitForm() {
         if (this.suratRekomForm.invalid) {
@@ -228,5 +190,61 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
                     )
                 },
             })
+    }
+
+    private buildPayload(): CreatePreviewSuratRekomRequest {
+        const dateValue: string =
+            this.suratRekomForm.get('dateLetterIssuance')?.value
+
+        if (!dateValue) {
+            throw new Error('dateLetterIssuance is required')
+        }
+
+        const [tahun, bulan, day] = dateValue.split('-')
+
+        const monthMap: Record<string, string> = {
+            '01': 'Januari',
+            '02': 'Februari',
+            '03': 'Maret',
+            '04': 'April',
+            '05': 'Mei',
+            '06': 'Juni',
+            '07': 'Juli',
+            '08': 'Agustus',
+            '09': 'September',
+            '10': 'Oktober',
+            '11': 'November',
+            '12': 'Desember',
+        }
+
+        const monthName = monthMap[bulan]
+
+        if (!monthName) {
+            throw new Error('Invalid month value')
+        }
+
+        const tanggalFormatted = `${day} ${monthName} ${tahun}`
+
+        const rawLetterHead: string =
+            this.suratRekomForm.get('letterHead')?.value
+
+        const cleanedBase64 = rawLetterHead
+            ? (rawLetterHead.split(',')[1] ?? rawLetterHead)
+            : undefined
+
+        return new CreatePreviewSuratRekomRequest({
+            bulan,
+            tahun,
+            tanggal: tanggalFormatted,
+            jabatanPenandatangan:
+                this.suratRekomForm.get('officialPosition')?.value,
+            namaPenandatangan:
+                this.suratRekomForm.get('signingOfficial')?.value,
+            nipPenandatangan: this.suratRekomForm.get('officialNumber')?.value,
+            kopImg: cleanedBase64,
+            numCode1: this.suratRekomForm.get('numCode1')?.value,
+            numCode3: this.suratRekomForm.get('numCode3')?.value,
+            numCode4: this.suratRekomForm.get('numCode4')?.value,
+        })
     }
 }

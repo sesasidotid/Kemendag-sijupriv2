@@ -69,6 +69,12 @@
                             class="question-card"
                         >
                             <div class="card-header">
+                                <img
+                                    *ngIf="question.attachmentUrl"
+                                    [src]="question.attachmentUrl"
+                                    alt="Question Image"
+                                    class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                                />
                                 <span class="question-number"
                                     >{{ question.kompetensiIndikatorName
                                     }}</span
