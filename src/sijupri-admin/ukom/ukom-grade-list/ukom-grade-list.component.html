@@ -1,17 +1,31 @@
 <ng-container *ngIf="activeTab() === 'list'">
-    <div class="d-grid d-md-flex justify-content-md-end mb-3 gap-2">
-        <app-loading-button (clicked)="finishExaminerAssessment()" [className]="'btn btn-primary'"
-            [icon]="'mdi mdi-check-decagram'" [isLoading]="isFinishExaminerAssessmentLoading()"
-            [label]="'Finalisasi Penilaian Penguji'"></app-loading-button>
+    <div
+        class="d-flex flex-column flex-md-row justify-content-end align-items-end mb-3 gap-2"
+    >
+        <app-loading-button
+            (clicked)="finishExaminerAssessment()"
+            [className]="'btn btn-primary'"
+            [icon]="'mdi mdi-check-decagram'"
+            [isLoading]="isFinishExaminerAssessmentLoading()"
+            [label]="'Finalisasi Penilaian Penguji'"
+        ></app-loading-button>
 
-        <app-loading-button (clicked)="handleOpenBatchUploadModal()" [className]="'btn btn-primary'"
-            [icon]="'mdi mdi-upload'" [label]="'Upload Batch Surat Rekomendasi'"></app-loading-button>
+        <app-loading-button
+            (clicked)="handleOpenBatchUploadModal()"
+            [className]="'btn btn-primary'"
+            [icon]="'mdi mdi-upload'"
+            [label]="'Upload Batch Surat Rekomendasi'"
+        ></app-loading-button>
     </div>
 
     <app-pagable [pagable]="pagable" [refresh]="refresh()"></app-pagable>
 
-    <app-modal (toggle)="toggleModal()" *ngIf="isModalOpen$ | async" [enableFooter]="false"
-        [title]="'Upload Rekomendasi Hasil UKom'">
+    <app-modal
+        (toggle)="toggleModal()"
+        *ngIf="isModalOpen$ | async"
+        [enableFooter]="false"
+        [title]="'Upload Rekomendasi Hasil UKom'"
+    >
         <app-file-handler [inputs]="inputs"></app-file-handler>
         <ng-container *ngIf="isSubmitLoading$ | async; else noLoading">
             <button class="btn btn-success float-end" disabled>
@@ -21,23 +35,37 @@
             </button>
         </ng-container>
         <ng-template #noLoading>
-            <button (click)="onSubmit()" [disabled]="!payload.file_rekomendasi || (isSubmitLoading$ | async)"
-                class="btn btn-success float-end" type="button">
+            <button
+                (click)="onSubmit()"
+                [disabled]="!payload.file_rekomendasi || (isSubmitLoading$ | async)"
+                class="btn btn-success float-end"
+                type="button"
+            >
                 Simpan
             </button>
         </ng-template>
     </app-modal>
 
-    <app-modal (toggle)="handleCloseBatchUploadModal()" *ngIf="isModalUploadBatchOpen$ | async" [enableFooter]="false"
-        [title]="'Upload Batch Rekomendasi Hasil UKom'">
+    <app-modal
+        (toggle)="handleCloseBatchUploadModal()"
+        *ngIf="isModalUploadBatchOpen$ | async"
+        [enableFooter]="false"
+        [title]="'Upload Batch Rekomendasi Hasil UKom'"
+    >
         <app-ukom-grade-upload-batch
-            (uploadSuccess)="handleCloseBatchUploadModal(); refreshPagable()"></app-ukom-grade-upload-batch></app-modal>
+            (uploadSuccess)="handleCloseBatchUploadModal(); refreshPagable()"
+        ></app-ukom-grade-upload-batch
+    ></app-modal>
 </ng-container>
 
 <app-ukom-grade-import *ngIf="activeTab() === 'import'"></app-ukom-grade-import>
 
 <app-ukom-grade-export *ngIf="activeTab() === 'export'"></app-ukom-grade-export>
 
-<app-ukom-grade-surat-rekom *ngIf="activeTab() === 'surat-rekom'"></app-ukom-grade-surat-rekom>
+<app-ukom-grade-surat-rekom
+    *ngIf="activeTab() === 'surat-rekom'"
+></app-ukom-grade-surat-rekom>
 
-<app-ukom-grade-surat-rekom-setup *ngIf="activeTab() === 'pengaturan-surat-rekom'"></app-ukom-grade-surat-rekom-setup>
+<app-ukom-grade-surat-rekom-setup
+    *ngIf="activeTab() === 'pengaturan-surat-rekom'"
+></app-ukom-grade-surat-rekom-setup>
