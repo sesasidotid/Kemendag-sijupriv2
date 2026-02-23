@@ -671,21 +671,25 @@
             </div>
         </div>
 
-        <ng-container *ngIf="scoreMap | keyvalue as entries">
-            <div *ngIf="entries.length > 0" class="card">
-                <div *ngIf="hasVisibleUkomDetails" class="card-header">
-                    <h5 class="m-0">
-                        <i
-                            class="mdi mdi-checkbox-marked-circle-outline me-2"
-                        ></i>
-                        Detail UKom
-                    </h5>
-                </div>
+        <div
+            *ngIf="(examScoresByScheduleId | keyvalue)?.length > 0 && hasAnyScores()"
+            class="card"
+        >
+            <div class="card-header">
+                <h5 class="m-0">
+                    <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
+                    Detail UKom
+                </h5>
+            </div>
 
-                <div class="list-group">
+            <div class="list-group">
+                <ng-container
+                    *ngFor="let examSchedule of finishTask.examSchedule"
+                >
+                    <!-- CAT Score -->
                     <div
-                        *ngIf="scoreMap['CAT']?.id"
-                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
+                        *ngIf="examScoresByScheduleId[examSchedule.id] != null && examSchedule.examTypeCode === ExamTypeCategory.CAT"
+                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 flex-wrap border-0"
                     >
                         <div>
                             <h5 class="m-0">CAT</h5>
@@ -694,7 +698,7 @@
                             class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
                         >
                             <button
-                                (click)="toggleCATModal()"
+                                (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"
                                 class="btn btn-success"
                             >
                                 Lihat Nilai
@@ -702,8 +706,9 @@
                         </div>
                     </div>
 
+                    <!-- Makalah Score -->
                     <div
-                        *ngIf="scoreMap['MAKALAH']?.id"
+                        *ngIf="examScoresByScheduleId[examSchedule.id] != null && examSchedule.examTypeCode === ExamTypeCategory.MAKALAH"
                         class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
                     >
                         <div>
@@ -713,16 +718,38 @@
                             class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
                         >
                             <button
-                                (click)="viewFile()"
+                                (click)="viewFile(examSchedule.id)"
                                 class="btn btn-success"
                             >
                                 Lihat Makalah
                             </button>
                         </div>
                     </div>
-                </div>
-            </div></ng-container
-        >
+
+                    <!-- Other/Generic Scores -->
+                    <div
+                        *ngIf="examScoresByScheduleId[examSchedule.id] != null &&
+                               examSchedule.examTypeCode !== ExamTypeCategory.CAT &&
+                               examSchedule.examTypeCode !== ExamTypeCategory.MAKALAH"
+                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
+                    >
+                        <div>
+                            <h5 class="m-0">{{ examSchedule.examTypeCode }}</h5>
+                        </div>
+                        <div
+                            class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
+                        >
+                            <button
+                                (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"
+                                class="btn btn-success"
+                            >
+                                Lihat Nilai
+                            </button>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
 
         <ng-container *ngIf="ukomGrade.id">
             <app-ukom-grade-table
@@ -748,39 +775,23 @@
     ></app-nonjf-revisi-ukom>
 </app-modal>
 <app-modal
-    (toggle)="toggleCATModal()"
-    *ngIf=" isCATModalOpen$ | async"
+    (toggle)="toggleScoreModal()"
+    *ngIf="isCATModalOpen$ | async"
     [enableFooter]="false"
     [size]="'lg'"
     [title]="'Hasil Ujian'"
 >
-    <ng-container>
-        <div class="total-score-container">
-            <div class="total-score-value">
-                {{ scoreMap['CAT']?.score | number: '1.2-2' }}
-            </div>
-        </div>
+    <ng-container *ngIf="getSelectedScore() as selectedScore">
+        <!-- CAT Score Component -->
+        <app-cat-score
+            *ngIf="getSelectedExamType() === ExamTypeCategory.CAT"
+            [score]="selectedScore"
+        ></app-cat-score>
 
-        <div
-            *ngFor="let competencyGroup of getGroupedCompetencies()"
-            class="mb-3"
-        >
-            <div class="card mb-3 border-0">
-                <div class="card-header bg-primary text-white">
-                    <div
-                        class="d-flex justify-content-between align-items-center"
-                    >
-                        <h4 class="mb-0 text-white">
-                            {{ competencyGroup.name }}
-                        </h4>
-                        <span class="badge badge-light badge-lg">
-                            {{ competencyGroup.percentage }}% ({{
-                            competencyGroup.correct }}/{{ competencyGroup.total
-                            }})
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Generic Score Component for other types -->
+        <app-generic-score
+            *ngIf="getSelectedExamType() !== ExamTypeCategory.CAT"
+            [score]="selectedScore"
+        ></app-generic-score>
     </ng-container>
 </app-modal>

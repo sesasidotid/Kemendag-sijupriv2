@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { UkomTaskDetail } from '../../../ukom/models/ukom-task-detail.modal'
+import { UkomTaskDetail } from '@/modules/ukom/models/ukom-task-detail.modal'
 import {
     BehaviorSubject,
     catchError,
@@ -17,28 +17,33 @@ import {
 } from 'rxjs'
 import { ModalComponent } from '../modal/modal.component'
 import { CommonModule } from '@angular/common'
-import { ConverterService } from '../../services/converter.service'
-import { ApiService } from '../../services/api.service'
+import { ConverterService } from '@/modules/base/services/converter.service'
+import { ApiService } from '@/modules/base/services/api.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NonjfRevisiUkomComponent } from '../nonjf-revisi-ukom/nonjf-revisi-ukom.component'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { EmptyStateComponent } from '../empty-state/empty-state.component'
-import { LandingPageComponent } from '../../../landing-page/landing-page.component'
-import { CATScore } from '../../../ukom/models/cat/cat-score'
+import { LandingPageComponent } from '@/modules/landing-page/landing-page.component'
+import {
+    CATScore,
+    MakalahScore,
+} from '@/modules/ukom/models/exam/exam-score.model'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
-import { HandlerService } from '../../services/handler.service'
-import { ExamType } from '../../../ukom/models/exam-type.model'
-import { PredikatKinerja } from '../../../maintenance/models/predikat-kinerja.model'
-import { MakalahScore } from '../../../ukom/models/cat/makalah-score'
-import { FilePreviewService } from '../../services/file-preview.service'
-import { UkomGradeService } from '../../../ukom/services/ukom-grade.service'
-import { UkomGrade } from '../../../ukom/models/ukom-grade'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { PredikatKinerja } from '@/modules/maintenance/models/predikat-kinerja.model'
+import { FilePreviewService } from '@/modules/base/services/file-preview.service'
+import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
+import { UkomGrade } from '@/modules/ukom/models/ukom-grade'
 import { UkomGradeTableComponent } from '../ukom-grade-table/ukom-grade-table.component'
 import { KinerjaService } from '@/modules/complement/services/kinerja.service'
-import { ReplaceUkomWordPipe } from '../../pipes/replace-ukom-word.pipe'
+import { ReplaceUkomWordPipe } from '@/modules/base/pipes/replace-ukom-word.pipe'
 import { NonJFParticipant } from '@/modules/base/models/nonjf-participant.model'
 import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
+import { CatScoreComponent } from '@/modules/ukom/components/cat-score/cat-score.component'
+import { GenericScoreComponent } from '@/modules/ukom/components/generic-score/generic-score.component'
+import { Pendidikan } from '@/modules/maintenance/models/pendidikan.model'
 
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
@@ -58,6 +63,8 @@ export enum JenisUkomEnum {
         FileHandlerComponent,
         UkomGradeTableComponent,
         ReplaceUkomWordPipe,
+        CatScoreComponent,
+        GenericScoreComponent,
     ],
     templateUrl: './status-pendaftaran-ukom.component.html',
     styleUrl: './status-pendaftaran-ukom.component.scss',
@@ -73,7 +80,7 @@ export class StatusPendaftaranUkomComponent {
     currentUkomStep$ = new BehaviorSubject<number>(1)
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
-    CATScore: CATScore = new CATScore()
+    CATScore = new CATScore()
     isCATModalOpen$ = new BehaviorSubject<boolean>(false)
     dataDokumenUkom: DokumenUkom[] = []
     fileHandlerData: FIleHandler = {
@@ -90,8 +97,9 @@ export class StatusPendaftaranUkomComponent {
     bidangJabatanName: string
     key: string
     participantId: string
-    examType: ExamType[] = []
-    scoreMap: Record<string, any> = {}
+    examScoresByScheduleId: Record<string, any> = {}
+    selectedScheduleId: string | null = null
+    selectedExamTypeCode: string | null = null
     isPredikatKerjaLoading$: BehaviorSubject<boolean> =
         new BehaviorSubject<boolean>(false)
     isLoadingPendingTask$: BehaviorSubject<boolean> =
@@ -110,6 +118,7 @@ export class StatusPendaftaranUkomComponent {
     isLoading$: Observable<boolean>
     registrationStatus: string
     ukomGrade: UkomGrade
+    protected readonly ExamTypeCategory = ExamTypeCategory
     private destroy$ = new Subject<void>()
 
     constructor(
@@ -135,14 +144,27 @@ export class StatusPendaftaranUkomComponent {
     }
 
     get hasVisibleUkomDetails(): boolean {
-        if (!this.scoreMap) {
-            return false
-        }
+        return this.hasAnyScores()
+    }
 
-        const hasCatScore = this.scoreMap['CAT']?.id
-        const hasMakalahFile = this.scoreMap['MAKALAH']?.id
+    getScoreByScheduleId(scheduleId: string): any | null {
+        return this.examScoresByScheduleId[scheduleId] || null
+    }
 
-        return !!(hasCatScore || hasMakalahFile)
+    hasAnyScores(): boolean {
+        return Object.values(this.examScoresByScheduleId).some(
+            (score) => score !== null && score !== undefined,
+        )
+    }
+
+    getSelectedScore(): any {
+        return this.selectedScheduleId
+            ? this.examScoresByScheduleId[this.selectedScheduleId]
+            : null
+    }
+
+    getSelectedExamType(): string | null {
+        return this.selectedExamTypeCode
     }
 
     ngOnInit() {
@@ -155,18 +177,12 @@ export class StatusPendaftaranUkomComponent {
         this.destroy$.complete()
     }
 
-    getAllScores() {
-        // TODO : use the api to fetch latest score for all exam types instead of using the score from pendingTask, because the score in pendingTask is only updated when the participant finish the registration, so if the participant has a new score after finish the registration, the score in pendingTask will not be updated
-        // /api/v1/exam_grade/{examScheduleId}?key=DURDKPW1JG
-    }
-
     getPendidikanList(pendidikanTerakhirCode: string) {
         this.isLoadingPendidikan$.next(true)
         this.apiService.getData(`/api/v1/pendidikan`).subscribe({
-            next: (response) => {
+            next: (response: Pendidikan[]) => {
                 const matchedPendidikan = response.find(
-                    (pendidikan: any) =>
-                        pendidikan.code === pendidikanTerakhirCode,
+                    (pendidikan) => pendidikan.code === pendidikanTerakhirCode,
                 )
                 this.pendidikanName = matchedPendidikan
                     ? matchedPendidikan.name
@@ -215,8 +231,16 @@ export class StatusPendaftaranUkomComponent {
         })
     }
 
-    toggleCATModal() {
+    toggleScoreModal(scheduleId?: string, examTypeCode?: string) {
+        if (scheduleId && examTypeCode) {
+            this.selectedScheduleId = scheduleId
+            this.selectedExamTypeCode = examTypeCode
+        }
         this.isCATModalOpen$.next(!this.isCATModalOpen$.value)
+        if (!this.isCATModalOpen$.value) {
+            this.selectedScheduleId = null
+            this.selectedExamTypeCode = null
+        }
     }
 
     backToLandingPage() {
@@ -281,12 +305,18 @@ export class StatusPendaftaranUkomComponent {
             })
     }
 
-    getPredikatKinerja(code: string | null): string {
-        if (!code || code == null) return '-'
-        const predikat = this.predikatKinerjaList.find(
-            (predikat) => predikat.id === code,
-        )
-        return predikat ? predikat.name : '-'
+    getPredikatKinerja(name: string | null, code: string | null): string {
+        console.log(name, code)
+        if (name != null || code != null) return '-'
+
+        if (name) {
+            return name
+        } else {
+            const predikat = this.predikatKinerjaList.find(
+                (predikat) => predikat.id === code,
+            )
+            return predikat ? predikat.name : '-'
+        }
     }
 
     getPendingTask(key: string) {
@@ -310,12 +340,16 @@ export class StatusPendaftaranUkomComponent {
                             response.data.bidangJabatanCode,
                         )
                     }
-                    this.predikat1Name = this.getPredikatKinerja(
-                        response.data.predikatKinerja1Id,
-                    )
-                    this.predikat2Name = this.getPredikatKinerja(
-                        response.data.predikatKinerja2Id,
-                    )
+                    // this.predikat1Name = this.getPredikatKinerja(
+                    //     response.data.predikatKinerja1Name,
+                    //     response.data.predikatKinerja1Id,
+                    // )
+                    // this.predikat2Name = this.getPredikatKinerja(
+                    //     response.data.predikatKinerja2Name,
+                    //     response.data.predikatKinerja2Id,
+                    // )
+                    this.predikat1Name = response.data.predikatKinerja1Name ?? '-'
+                    this.predikat2Name = response.data.predikatKinerja2Name ??'-'
                     this.participantId = response.data.id
                 }),
                 tap((response: NonJFParticipant) => {
@@ -370,99 +404,66 @@ export class StatusPendaftaranUkomComponent {
             })
     }
 
-    getExamType(): Observable<ExamType[]> {
-        return this.apiService.getData('/api/v1/exam_type').pipe(
-            takeUntil(this.destroy$),
-            map((response: any[]) =>
-                response.map((item) => new ExamType(item)),
-            ),
-            tap((examTypes) => {
-                this.examType = examTypes
-            }),
-            catchError((error) => {
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengambil jenis ujian',
-                )
-                return of([])
-            }),
-        )
-    }
-
     getAllScoresFlow(key: string): void {
         this.isAllSchoreLoading$.next(true)
 
-        this.getExamType()
+        if (!this.finishTask.examSchedule?.length) {
+            console.warn('No exam schedules available')
+            this.isAllSchoreLoading$.next(false)
+            return
+        }
+
+        const requests = this.finishTask.examSchedule.map((examSchedule) => {
+            return this.apiService
+                .getData(`/api/v1/exam_grade/${examSchedule.id}?key=${key}`)
+                .pipe(
+                    takeUntil(this.destroy$),
+                    catchError((error) => {
+                        console.error(
+                            `Failed to fetch score for exam schedule ${examSchedule.id}:`,
+                            error,
+                        )
+                        return of(null)
+                    }),
+                    map((response) => {
+                        let scoreInstance: any = null
+                        if (response) {
+                            switch (examSchedule.examTypeCode) {
+                                case 'CAT':
+                                    scoreInstance = new CATScore(response)
+                                    break
+                                case 'MAKALAH':
+                                    scoreInstance = new MakalahScore(response)
+                                    break
+                                default:
+                                    scoreInstance = response
+                            }
+                        }
+                        return { examSchedule, scoreInstance }
+                    }),
+                )
+        })
+
+        forkJoin(requests)
             .pipe(
-                takeUntil(this.destroy$),
-                switchMap((examTypes: ExamType[]) => {
-                    if (!examTypes.length) {
-                        console.warn('No exam types available')
-                        return of([])
-                    }
-
-                    const requests = examTypes.map((type) => {
-                        const examCode = type.code
-                        return this.apiService
-                            .getData(
-                                `/api/v1/exam_grade/${examCode}?key=${key}`,
-                            )
-                            .pipe(
-                                takeUntil(this.destroy$),
-                                catchError((error) => {
-                                    console.error(
-                                        `Failed to fetch score for ${examCode}:`,
-                                        error,
-                                    )
-                                    return of(null)
-                                }),
-                                map((response) => {
-                                    if (!response) {
-                                        return {
-                                            examCode,
-                                            scoreInstance: null,
-                                        }
-                                    }
-
-                                    let scoreInstance: any
-                                    switch (examCode) {
-                                        case 'CAT':
-                                            scoreInstance = new CATScore(
-                                                response,
-                                            )
-                                            break
-                                        case 'MAKALAH':
-                                            scoreInstance = new MakalahScore(
-                                                response,
-                                            )
-                                            break
-                                        default:
-                                            scoreInstance = response
-                                    }
-                                    return {
-                                        examCode,
-                                        scoreInstance,
-                                    }
-                                }),
-                            )
-                    })
-
-                    return forkJoin(requests)
-                }),
                 tap((results) => {
                     results.forEach((result) => {
-                        if (result && result.examCode && result.scoreInstance) {
-                            this.scoreMap[result.examCode] =
-                                result.scoreInstance
+                        if (result?.examSchedule?.id) {
+                            this.examScoresByScheduleId[
+                                result.examSchedule.id
+                            ] = result.scoreInstance
                         }
                     })
                 }),
                 finalize(() => {
                     this.isAllSchoreLoading$.next(false)
                 }),
+                takeUntil(this.destroy$),
             )
             .subscribe({
-                next: () => {},
+                next: () => {
+                    console.log('Scores loaded:', this.examScoresByScheduleId)
+                },
                 error: (error) => {
                     this.handlerService.handleAlert(
                         'Error',
@@ -553,9 +554,9 @@ export class StatusPendaftaranUkomComponent {
         }
     }
 
-    viewFile() {
-        const answerDto =
-            this.scoreMap['MAKALAH']?.questionDtoList?.[0]?.answerDto
+    viewFile(scheduleId: string) {
+        const score = this.getScoreByScheduleId(scheduleId)
+        const answerDto = score?.questionDtoList?.[0]?.answerDto
 
         if (!answerDto) {
             this.handlerService.handleAlert(
@@ -577,61 +578,6 @@ export class StatusPendaftaranUkomComponent {
 
     convertDate(date: string) {
         return this.converterService.dateToHumanReadable(date)
-    }
-
-    getGroupedCompetencies(): any[] {
-        if (!this.scoreMap['CAT']?.kompetensiIndikatorDtoList) {
-            return []
-        }
-
-        const grouped = this.scoreMap['CAT']?.kompetensiIndikatorDtoList.reduce(
-            (acc: any, kompetensi: any) => {
-                const key = kompetensi.kompetensiId || 'default'
-
-                if (!acc[key]) {
-                    acc[key] = {
-                        name: kompetensi.kompetensiName || '-',
-                        items: [],
-                        total: 0,
-                        correct: 0,
-                    }
-                }
-
-                acc[key].items.push(kompetensi)
-                acc[key].total += kompetensi.questionDtoList?.length || 0
-                acc[key].correct += this.getCorrectAnswersCount(kompetensi)
-
-                return acc
-            },
-            {},
-        )
-
-        return Object.values(grouped).map((group: any) => ({
-            ...group,
-            percentage:
-                group.total > 0
-                    ? Math.round((group.correct / group.total) * 100)
-                    : 0,
-        }))
-    }
-
-    getCorrectAnswer(question: any): string {
-        const correctChoice = question.multipleChoiceDtoList.find(
-            (choice: any) => choice.correct,
-        )
-        return correctChoice ? correctChoice.choiceId : ''
-    }
-
-    getCorrectAnswersCount(kompetensi: any): number {
-        if (!kompetensi.questionDtoList) {
-            return 0
-        }
-
-        return kompetensi.questionDtoList.filter(
-            (question: any) =>
-                question.answerDto?.answerChoice ===
-                this.getCorrectAnswer(question),
-        ).length
     }
 
     private initializeComponent() {

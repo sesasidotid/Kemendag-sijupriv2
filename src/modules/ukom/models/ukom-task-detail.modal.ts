@@ -1,5 +1,7 @@
 import { Serializable } from '../../base/commons/serializable'
 import { DokumenUkom } from './ukom-registration-refactored/document.model'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+
 export class UkomTaskDetail extends Serializable {
     id: string | null = null
     objectId: string | null = null
@@ -71,6 +73,7 @@ export class UkomTaskDetail extends Serializable {
     rekomendasiFile: string | null = null
 
     documentUkomList: DokumenUkom[] = []
+    examSchedule: ExamSchedule[] = []
 
     userId?: string | null = null
 
