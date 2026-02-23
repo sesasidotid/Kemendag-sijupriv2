@@ -635,7 +635,7 @@
         </div>
 
         <div *ngIf="dataDokumenUkom.length > 0" class="card">
-            <div class="card-header">
+            <div class="card-header bg-light">
                 <div class="d-flex align-items-center flex-wrap gap-2">
                     <h5 class="d-flex align-items-center mb-0">
                         <i class="mdi mdi-file-document-check-outline me-2"></i>
@@ -673,81 +673,94 @@
 
         <div
             *ngIf="(examScoresByScheduleId | keyvalue)?.length > 0 && hasAnyScores()"
-            class="card"
+            class="card shadow-sm"
         >
-            <div class="card-header">
+            <div class="card-header bg-light">
                 <h5 class="m-0">
                     <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
                     Detail UKom
                 </h5>
             </div>
 
-            <div class="list-group">
-                <ng-container
-                    *ngFor="let examSchedule of finishTask.examSchedule"
-                >
-                    <!-- CAT Score -->
-                    <div
-                        *ngIf="examScoresByScheduleId[examSchedule.id] != null && examSchedule.examTypeCode === ExamTypeCategory.CAT"
-                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 flex-wrap border-0"
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <ng-container
+                        *ngFor="let examSchedule of finishTask.examSchedule"
                     >
-                        <div>
-                            <h5 class="m-0">CAT</h5>
-                        </div>
-                        <div
-                            class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
-                        >
-                            <button
-                                (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"
-                                class="btn btn-success"
-                            >
-                                Lihat Nilai
-                            </button>
-                        </div>
-                    </div>
+                        <!--                    <div-->
+                        <!--                        *ngIf="examScoresByScheduleId[examSchedule.id] != null && examSchedule.examTypeCode === ExamTypeCategory.CAT"-->
+                        <!--                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 flex-wrap border-0"-->
+                        <!--                    >-->
+                        <!--                        <div>-->
+                        <!--                            <h5 class="m-0">-->
+                        <!--                                {{ukomMiscellaneousService.getModuleDisplayName(examSchedule.examTypeCode)}}-->
+                        <!--                            </h5>-->
+                        <!--                        </div>-->
+                        <!--                        <div-->
+                        <!--                            class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"-->
+                        <!--                        >-->
+                        <!--                            <button-->
+                        <!--                                (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"-->
+                        <!--                                class="btn btn-success"-->
+                        <!--                            >-->
+                        <!--                                Lihat Nilai-->
+                        <!--                            </button>-->
+                        <!--                        </div>-->
+                        <!--                    </div>-->
 
-                    <!-- Makalah Score -->
-                    <div
-                        *ngIf="examScoresByScheduleId[examSchedule.id] != null && examSchedule.examTypeCode === ExamTypeCategory.MAKALAH"
-                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
-                    >
-                        <div>
-                            <h5 class="m-0">Makalah</h5>
-                        </div>
-                        <div
-                            class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
-                        >
-                            <button
-                                (click)="viewFile(examSchedule.id)"
-                                class="btn btn-success"
-                            >
-                                Lihat Makalah
-                            </button>
-                        </div>
-                    </div>
+                        <!--                    <div-->
+                        <!--                        *ngIf="examScoresByScheduleId[examSchedule.id] != null && examSchedule.examTypeCode === ExamTypeCategory.MAKALAH"-->
+                        <!--                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"-->
+                        <!--                    >-->
+                        <!--                        <div>-->
+                        <!--                            <h5 class="m-0">Makalah</h5>-->
+                        <!--                        </div>-->
+                        <!--                        <div-->
+                        <!--                            class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"-->
+                        <!--                        >-->
+                        <!--                            <button-->
+                        <!--                                (click)="viewFile(examSchedule.id)"-->
+                        <!--                                class="btn btn-success"-->
+                        <!--                            >-->
+                        <!--                                Lihat Makalah-->
+                        <!--                            </button>-->
+                        <!--                        </div>-->
+                        <!--                    </div>-->
 
-                    <!-- Other/Generic Scores -->
-                    <div
-                        *ngIf="examScoresByScheduleId[examSchedule.id] != null &&
-                               examSchedule.examTypeCode !== ExamTypeCategory.CAT &&
-                               examSchedule.examTypeCode !== ExamTypeCategory.MAKALAH"
-                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
-                    >
-                        <div>
-                            <h5 class="m-0">{{ examSchedule.examTypeCode }}</h5>
-                        </div>
+                        <!-- Generic Scores -->
                         <div
-                            class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
+                            *ngIf="examScoresByScheduleId[examSchedule.id] != null &&
+                           examSchedule.examTypeCode !== ExamTypeCategory.MAKALAH"
+                            class="list-group-item py-3"
                         >
-                            <button
-                                (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"
-                                class="btn btn-success"
+                            <div
+                                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
                             >
-                                Lihat Nilai
-                            </button>
+                                <!-- Left Content -->
+                                <div>
+                                    <h6 class="fw-semibold mb-1">
+                                        {{
+                                        ukomMiscellaneousService.getModuleDisplayName(examSchedule.examTypeCode)
+                                        }}
+                                    </h6>
+                                    <!--                                    <small class="text-muted">-->
+                                    <!--                                        ID: {{ examSchedule.id }}-->
+                                    <!--                                    </small>-->
+                                </div>
+
+                                <!-- Right Action -->
+                                <div>
+                                    <button
+                                        (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"
+                                        class="btn btn-success"
+                                    >
+                                        Lihat Nilai
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </ng-container>
+                    </ng-container>
+                </div>
             </div>
         </div>
 
@@ -779,7 +792,7 @@
     *ngIf="isCATModalOpen$ | async"
     [enableFooter]="false"
     [size]="'lg'"
-    [title]="'Hasil Ujian'"
+    [title]="'Hasil ' + ukomMiscellaneousService.getModuleDisplayName(getSelectedExamType())"
 >
     <ng-container *ngIf="getSelectedScore() as selectedScore">
         <!-- CAT Score Component -->

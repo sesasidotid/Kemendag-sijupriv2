@@ -359,9 +359,39 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
 
     private updateTooltipPosition(event: MouseEvent): void {
         const offset = 15
-        this.tooltipPosition$.next({
-            x: event.clientX + offset,
-            y: event.clientY + offset,
-        })
+        const tooltipWidth = 300 // max-width from CSS
+        const tooltipMinHeight = 200 // minimum estimated height
+
+        // Get viewport dimensions
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+
+        // Calculate initial position (bottom-right of cursor)
+        let x = event.clientX + offset
+        let y = event.clientY + offset
+
+        // Check if tooltip would overflow on the right
+        if (x + tooltipWidth > viewportWidth) {
+            // Position to the left of cursor
+            x = event.clientX - tooltipWidth - offset
+        }
+
+        // Check if tooltip would overflow at the bottom
+        if (y + tooltipMinHeight > viewportHeight) {
+            // Position above cursor
+            y = event.clientY - tooltipMinHeight - offset
+        }
+
+        // Ensure tooltip doesn't go off the left edge
+        if (x < 0) {
+            x = offset
+        }
+
+        // Ensure tooltip doesn't go off the top edge
+        if (y < 0) {
+            y = offset
+        }
+
+        this.tooltipPosition$.next({ x, y })
     }
 }

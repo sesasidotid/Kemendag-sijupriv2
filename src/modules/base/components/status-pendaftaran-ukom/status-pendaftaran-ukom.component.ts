@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { UkomTaskDetail } from '@/modules/ukom/models/ukom-task-detail.modal'
 import {
     BehaviorSubject,
@@ -21,7 +21,7 @@ import { ConverterService } from '@/modules/base/services/converter.service'
 import { ApiService } from '@/modules/base/services/api.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NonjfRevisiUkomComponent } from '../nonjf-revisi-ukom/nonjf-revisi-ukom.component'
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
+import { SafeUrl } from '@angular/platform-browser'
 import { EmptyStateComponent } from '../empty-state/empty-state.component'
 import { LandingPageComponent } from '@/modules/landing-page/landing-page.component'
 import {
@@ -44,6 +44,7 @@ import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/
 import { CatScoreComponent } from '@/modules/ukom/components/cat-score/cat-score.component'
 import { GenericScoreComponent } from '@/modules/ukom/components/generic-score/generic-score.component'
 import { Pendidikan } from '@/modules/maintenance/models/pendidikan.model'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
@@ -70,6 +71,7 @@ export enum JenisUkomEnum {
     styleUrl: './status-pendaftaran-ukom.component.scss',
 })
 export class StatusPendaftaranUkomComponent {
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
     pendingTask = new UkomTaskDetail()
     finishTask = new UkomTaskDetail()
 
@@ -126,7 +128,6 @@ export class StatusPendaftaranUkomComponent {
         private apiService: ApiService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
-        private sanitizer: DomSanitizer,
         private handlerService: HandlerService,
         private filePreviewService: FilePreviewService,
         private ukomGradeService: UkomGradeService,
@@ -168,7 +169,6 @@ export class StatusPendaftaranUkomComponent {
     }
 
     ngOnInit() {
-        this.kinerjaService.fetchPredikatKinerja()
         this.initializeComponent()
     }
 
@@ -348,8 +348,10 @@ export class StatusPendaftaranUkomComponent {
                     //     response.data.predikatKinerja2Name,
                     //     response.data.predikatKinerja2Id,
                     // )
-                    this.predikat1Name = response.data.predikatKinerja1Name ?? '-'
-                    this.predikat2Name = response.data.predikatKinerja2Name ??'-'
+                    this.predikat1Name =
+                        response.data.predikatKinerja1Name ?? '-'
+                    this.predikat2Name =
+                        response.data.predikatKinerja2Name ?? '-'
                     this.participantId = response.data.id
                 }),
                 tap((response: NonJFParticipant) => {

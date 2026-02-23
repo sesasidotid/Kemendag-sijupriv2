@@ -4,16 +4,16 @@
         <div class="total-score-value">
             {{ score?.score | number: '1.2-2' }}
         </div>
-        <div *ngIf="getMaxScore() > 0" class="total-score-breakdown">
-            <span [ngClass]="getBadgeClass(getPercentage())" class="badge">
-                {{ getPercentage() }}% ({{ getTotalScore() }}/{{ getMaxScore()
-                }})
-            </span>
-        </div>
+        <!--        <div *ngIf="getMaxScore() > 0" class="total-score-breakdown">-->
+        <!--            <span [ngClass]="getBadgeClass(getPercentage())" class="badge">-->
+        <!--                {{ getPercentage() }}% ({{ getTotalScore() }}/{{ getMaxScore()-->
+        <!--                }})-->
+        <!--            </span>-->
+        <!--        </div>-->
     </div>
 
-    <div class="alert alert-info mt-3 text-center">
-        <i class="mdi mdi-information-outline me-2"></i>
-        Nilai akhir telah dinilai oleh penguji
-    </div>
+    <!--    <div class="alert alert-info mt-3 text-center">-->
+    <!--        <i class="mdi mdi-information-outline me-2"></i>-->
+    <!--        Nilai akhir telah dinilai oleh penguji-->
+    <!--    </div>-->
 </div>

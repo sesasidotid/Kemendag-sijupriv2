@@ -135,7 +135,9 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
 
     getExaminerListId() {
         this.isLoadingExaminer.set(true)
-        const examScheduleId = this.childExamId() ?? this.examId()
+        // const examScheduleId = this.childExamId() ?? this.examId()
+        const examScheduleId = this.examId()
+
         this.ukomExamScheduleService
             .getExaminerListByExamScheduleId(examScheduleId)
             .pipe(

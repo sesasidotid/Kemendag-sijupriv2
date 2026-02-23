@@ -1,25 +1,29 @@
 <div class="card m-0">
-    <div class="card-header">
-        <div class="d-flex gap-2 flex-wrap align-items-center">
+    <div class="card-header bg-light">
+        <div class="d-flex align-items-center flex-wrap gap-2">
             <h5 class="m-0">
                 <i class="mdi mdi-certificate-outline me-2"></i>
                 Detail Nilai Ukom
             </h5>
             <ng-container *ngIf="gradeData?.passed; else notPassed">
-                <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">{{gradeData?.status ??
-                    "Lulus Uji Kompetensi"}}</span>
+                <span
+                    class="bg-success rounded-pill small fw-semibold px-3 py-1 text-white"
+                    >{{gradeData?.status ?? "Lulus Uji Kompetensi"}}</span
+                >
             </ng-container>
             <ng-template #notPassed>
-                <span class="bg-danger text-white rounded-pill px-3 py-1 small fw-semibold">{{gradeData?.status ??
-                    "Tidak Lulus Uji Kompetensi"}}</span>
+                <span
+                    class="bg-danger rounded-pill small fw-semibold px-3 py-1 text-white"
+                    >{{gradeData?.status ?? "Tidak Lulus Uji Kompetensi"}}</span
+                >
             </ng-template>
         </div>
     </div>
-    <div class="scroll-container ">
-        <table class="table m-0 table-hover">
+    <div class="scroll-container">
+        <table class="table-hover m-0 table">
             <tbody>
                 <tr>
-                    <th scope="row" class="w-25">NIP</th>
+                    <th class="w-25" scope="row">NIP</th>
                     <td>{{ nip }}</td>
                 </tr>
                 <tr>
@@ -30,7 +34,6 @@
                     <th scope="row">Skor CAT</th>
                     <!-- <td>{{ gradeData.nbCat ?? '-' }}</td> -->
                     <td>{{ gradeData?.catGrade?.score ?? '-' }}</td>
-
                 </tr>
                 <tr>
                     <th scope="row">Skor Wawancara</th>
@@ -63,8 +66,13 @@
                 <tr class="fw-bold">
                     <th scope="row">File Rekomendasi UKom</th>
                     <td>
-                        <ng-container *ngIf="rekomendasiUrl; else waitingTemplate">
-                            <button (click)="onDownloadFile()" class="btn btn-primary">
+                        <ng-container
+                            *ngIf="rekomendasiUrl; else waitingTemplate"
+                        >
+                            <button
+                                (click)="onDownloadFile()"
+                                class="btn btn-primary"
+                            >
                                 Download File Rekomendasi
                             </button>
                         </ng-container>
@@ -76,12 +84,10 @@
                         </ng-template>
                     </td>
                 </tr>
-
             </tbody>
         </table>
     </div>
 </div>
-
 
 <!-- <div class="scroll-container">
     <table class="table table-hover">

@@ -12,7 +12,13 @@ import { TabService } from '@/modules/base/services/tab.service'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs'
+import {
+    BehaviorSubject,
+    distinctUntilChanged,
+    map,
+    Observable,
+    tap,
+} from 'rxjs'
 import { UkomClassAddComponent } from '../ukom-class-add/ukom-class-add.component'
 import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
 import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
@@ -40,6 +46,7 @@ import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-sched
 import { ExamScheduleCalendar } from '@/modules/ukom/models/exam-schedule/exam-schedule-calendar.model'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-ukom-class-list',
@@ -505,12 +512,21 @@ export class UkomClassListComponent implements OnInit {
         this.examScheduleService
             .getAllExamScheduleCalendar({ startDate, endDate })
             .pipe(
+                tap((res) => console.log('API Response:', res)),
                 map((response) =>
-                    response.filter((item) => !!item.personalSchedule),
+                    response.filter(
+                        (item) =>
+                            item.examSchedule.examTypeCode ===
+                                ExamTypeCategory.WAWANCARA ||
+                            item.examSchedule.examTypeCode ===
+                                ExamTypeCategory.SEMINAR,
+                    ),
                 ),
+                tap((res) => console.log('Filtered Schedules:', res)),
             )
             .subscribe({
                 next: (response) => {
+                    console.log(response)
                     const schedules = this.transformToScheduleItems(response)
                     this.timelineSchedules.set(schedules)
                     this.hasLoadedSchedules.set(true)
