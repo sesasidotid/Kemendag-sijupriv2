@@ -36,13 +36,15 @@ export class CatExamTimerService {
             return
         }
 
+        const now = new Date().getTime()
         const startTime = new Date(startAt).getTime()
-        const durationMs = duration * 60 * 60 * 1000
-        const calculatedEndTime = startTime + durationMs
+        const durationMs = duration * 60 * 60 * 1000 // duration in hours
+        const elapsedTime = now - startTime // Time already spent
+        const remainingDuration = durationMs - elapsedTime // Time left from allocated duration
+        const calculatedEndTime = now + remainingDuration // When duration would end
         const hardEndTime = examEndTime.getTime()
         const effectiveEndTime = Math.min(calculatedEndTime, hardEndTime)
 
-        const now = new Date().getTime()
         const initialTimeLeft = effectiveEndTime - now
 
         if (initialTimeLeft <= 0) {
@@ -51,8 +53,6 @@ export class CatExamTimerService {
             this.triggerTimeExpired()
             return
         }
-
-        //test copilot
 
         this.remainingTime.set(this.formatTime(initialTimeLeft))
         this.remainingSeconds.set(Math.floor(initialTimeLeft / 1000))
@@ -91,6 +91,13 @@ export class CatExamTimerService {
     }
 
     /**
+     * Clean up timer
+     */
+    cleanup() {
+        this.stopCountdown()
+    }
+
+    /**
      * Format milliseconds to HH:MM:SS
      */
     private formatTime(ms: number): string {
@@ -117,12 +124,5 @@ export class CatExamTimerService {
         if (this.onTimeExpiredCallback) {
             this.onTimeExpiredCallback()
         }
-    }
-
-    /**
-     * Clean up timer
-     */
-    cleanup() {
-        this.stopCountdown()
     }
 }
