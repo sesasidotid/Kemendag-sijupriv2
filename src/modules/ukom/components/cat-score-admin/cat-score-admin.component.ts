@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, computed, input } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { CATScore } from '@/modules/ukom/models/exam/exam-score.model'
 import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-competency.model'
@@ -20,13 +20,11 @@ interface CompetencyGroup {
     styleUrl: './cat-score-admin.component.scss',
 })
 export class CatScoreAdminComponent {
-    @Input() score: CATScore | null = null
+    score = input<CATScore | null>(null)
 
-    /**
-     * Groups competencies by kompetensiId and calculates statistics
-     */
-    getGroupedCompetencies(): CompetencyGroup[] {
-        if (!this.score?.kompetensiIndikatorDtoList) {
+    groupedCompetencies = computed(() => {
+        const score = this.score()
+        if (!score?.kompetensiIndikatorDtoList) {
             return []
         }
 
@@ -37,7 +35,7 @@ export class CatScoreAdminComponent {
             correct: number
         }
 
-        const grouped = this.score.kompetensiIndikatorDtoList.reduce(
+        const grouped = score.kompetensiIndikatorDtoList.reduce(
             (acc, kompetensi) => {
                 const key = kompetensi.kompetensiId || 'default'
                 acc[key] ??= {
@@ -62,7 +60,7 @@ export class CatScoreAdminComponent {
                     ? Math.round((group.correct / group.total) * 100)
                     : 0,
         }))
-    }
+    })
 
     /**
      * Gets the correct answer choice ID for a question

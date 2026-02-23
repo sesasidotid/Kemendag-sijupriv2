@@ -1,0 +1,32 @@
+<div class="total-score-container">
+    <div class="total-score-value">{{ score()?.score | number: '1.2-2' }}</div>
+    <div class="text-muted mt-2">Total Nilai Makalah</div>
+</div>
+
+<div *ngIf="score()?.questionDtoList?.length" class="card mb-4 shadow-sm border-0">
+     <div class="card-header bg-primary text-white py-3">
+        <h5 class="mb-0 text-white fw-bold">Detail Penilaian</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="list-group">
+            <ng-container *ngFor="let item of score()?.questionDtoList; let i = index">
+                 <div class="list-group-item border-0 mb-3 shadow-sm rounded">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <h6 class="mb-1 fw-bold">Komponen Penilaian {{ i + 1 }}</h6>
+                        <span class="badge bg-info rounded-pill fs-6">{{ item.score | number:'1.2-2' }}</span>
+                    </div>
+                    <p class="mb-1" *ngIf="item.question">{{ item.question }}</p>
+                    <small class="text-muted" *ngIf="item.weight">Bobot: {{ item.weight }}</small>
+                 </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+<ng-container *ngIf="!score()?.questionDtoList?.length && !score()?.score">
+    <div class="text-center py-5">
+        <i class="mdi mdi-file-document-outline text-muted" style="font-size: 4rem;"></i>
+        <p class="text-muted mt-3">Belum ada nilai untuk makalah ini.</p>
+    </div>
+</ng-container>
+

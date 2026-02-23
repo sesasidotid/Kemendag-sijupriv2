@@ -18,6 +18,9 @@ import { ApiService } from '@/modules/base/services/api.service'
 import {
     CATScore,
     MakalahScore,
+    PortofolioScore,
+    PraktikScore,
+    StudiKasusScore,
 } from '@/modules/ukom/models/exam/exam-score.model'
 
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
@@ -35,6 +38,10 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
 import { TanggalIndoPipe } from '@/modules/base/pipes/tanggal-indo.pipe'
 import { ForcePasswordFormComponent } from '@/modules/base/components/force-password-form/force-password-form.component'
 import { CatScoreAdminComponent } from '@/modules/ukom/components/cat-score-admin/cat-score-admin.component'
+import { PortofolioScoreAdminComponent } from '@/modules/ukom/components/portofolio-score-admin/portofolio-score-admin.component'
+import { StudiKasusScoreAdminComponent } from '@/modules/ukom/components/studi-kasus-score-admin/studi-kasus-score-admin.component'
+import { PraktikScoreAdminComponent } from '@/modules/ukom/components/praktik-score-admin/praktik-score-admin.component'
+import { MakalahScoreAdminComponent } from '@/modules/ukom/components/makalah-score-admin/makalah-score-admin.component'
 import { PredikatKinerjaService } from '@/modules/maintenance/services/predikat-kinerja.service'
 import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
@@ -58,6 +65,10 @@ import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
         TanggalIndoPipe,
         ForcePasswordFormComponent,
         CatScoreAdminComponent,
+        PortofolioScoreAdminComponent,
+        StudiKasusScoreAdminComponent,
+        PraktikScoreAdminComponent,
+        MakalahScoreAdminComponent,
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss',
@@ -98,6 +109,7 @@ export class UkomTaskDetailComponent {
 
     scoreMap: Record<string, ScoreValue | null> = {}
     selectedExamId: string | null = null
+    selectedExamTypeCode: string | null = null
 
     isLoading$: Observable<boolean>
 
@@ -148,7 +160,23 @@ export class UkomTaskDetailComponent {
                                         scoreInstance = new CATScore(response)
                                         break
                                     case 'MAKALAH':
+                                    case 'WAWANCARA':
                                         scoreInstance = new MakalahScore(
+                                            response,
+                                        )
+                                        break
+                                    case 'STUDI_KASUS':
+                                        scoreInstance = new StudiKasusScore(
+                                            response,
+                                        )
+                                        break
+                                    case 'PRAKTIK':
+                                        scoreInstance = new PraktikScore(
+                                            response,
+                                        )
+                                        break
+                                    case 'PORTOFOLIO':
+                                        scoreInstance = new PortofolioScore(
                                             response,
                                         )
                                         break
@@ -171,7 +199,6 @@ export class UkomTaskDetailComponent {
                                 result.scoreInstance
                         }
                     })
-                    console.log(this.scoreMap)
                 }),
             )
             .subscribe()
@@ -281,13 +308,15 @@ export class UkomTaskDetailComponent {
         return `${ageYears} Tahun ${ageMonths} Bulan ${ageDays} Hari`
     }
 
-    toggleModal(examId?: string) {
-        if (examId !== undefined) {
+    toggleModal(examId?: string, examTypeCode?: string) {
+        if (examId !== undefined && examTypeCode !== undefined) {
             this.selectedExamId = examId
+            this.selectedExamTypeCode = examTypeCode
         }
         this.isModalOpen$.next(!this.isModalOpen$.value)
         if (!this.isModalOpen$.value) {
             this.selectedExamId = null
+            this.selectedExamTypeCode = null
         }
     }
 
@@ -428,11 +457,15 @@ export class UkomTaskDetailComponent {
             })
     }
 
-    getSelectedScore(): CATScore | null {
+    getSelectedScore(): ScoreValue | null {
         if (!this.selectedExamId) {
             return null
         }
-        return this.scoreMap[this.selectedExamId] as CATScore
+        return this.scoreMap[this.selectedExamId]
+    }
+
+    getSelectedExamType(): string | null {
+        return this.selectedExamTypeCode
     }
 
     deleteExamScore(exam_grade_id: string): void {

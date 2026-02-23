@@ -1,0 +1,92 @@
+<div class="total-score-container">
+    <div class="total-score-value">{{ score()?.score | number: '1.2-2' }}</div>
+</div>
+
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-primary text-white py-3">
+        <h5 class="mb-0 text-white fw-bold">Detail Praktik</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+            <ng-container *ngFor="let group of groupedQuestions(); let i = index">
+                <div class="col-12 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <!-- Parent Question -->
+                        <div class="card-header bg-white border-bottom-0 py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-primary">Pertanyaan {{ i + 1 }}</h6>
+                                    <p class="mb-0 mt-2 text-dark">{{ group.parent.question }}</p>
+                                </div>
+                                <span *ngIf="group.parent.weight" class="badge bg-secondary text-white ms-2">Bobot: {{ group.parent.weight }}</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body border-top">
+                            <!-- Parent Answer -->
+                             <div *ngIf="group.parent.answerDto">
+                                <h6 class="fw-bold mb-3">Jawaban:</h6>
+                                <p *ngIf="getAnswerText(group.parent)" class="p-3 bg-light rounded border mb-3">
+                                    {{ getAnswerText(group.parent) }}
+                                </p>
+
+                                <div *ngIf="hasUpload(group.parent)" class="d-flex align-items-center p-3 bg-light rounded border mb-3">
+                                    <i class="mdi mdi-file-document-outline fs-3 text-primary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">Dokumen Terlampir</h6>
+                                        <small class="text-muted">{{ group.parent.answerDto?.answerUpload || 'File tersedia' }}</small>
+                                    </div>
+                                    <a *ngIf="group.parent.answerDto?.answerUploadUrl"
+                                       [href]="group.parent.answerDto.answerUploadUrl" 
+                                       target="_blank"
+                                       class="btn btn-sm btn-outline-primary ms-auto">
+                                        <i class="mdi mdi-open-in-new me-1"></i> Buka File
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Child Questions -->
+                            <div *ngIf="group.children.length > 0" class="mt-4 ms-2">
+                                <h6 class="text-muted mb-3">Sub-Pertanyaan:</h6>
+                                <div *ngFor="let child of group.children" class="mb-3 ps-3 border-start border-3 border-info">
+                                    <p class="fw-bold mb-2">{{ child.question }}</p>
+
+                                    <!-- Child Answer -->
+                                    <div *ngIf="child.answerDto" class="bg-light p-3 rounded">
+                                        <p *ngIf="getAnswerText(child)" class="mb-2">{{ getAnswerText(child) }}</p>
+
+                                        <div *ngIf="hasUpload(child)" class="mt-2">
+                                             <a *ngIf="child.answerDto?.answerUploadUrl"
+                                               [href]="child.answerDto.answerUploadUrl"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-info">
+                                                <i class="mdi mdi-open-in-new me-1"></i> Lihat Dokumen
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="!child.answerDto" class="text-muted fst-italic">
+                                        <small>Belum ada jawaban sub-pertanyaan.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div *ngIf="!group.parent.answerDto && group.children.length === 0" class="alert alert-warning d-flex align-items-center mb-0 mt-3">
+                                <i class="mdi mdi-alert-circle-outline me-2 fs-5"></i>
+                                <div>Belum ada jawaban.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <!-- Empty State -->
+            <ng-container *ngIf="!groupedQuestions()?.length">
+                <div class="col-12 text-center py-5">
+                    <i class="mdi mdi-laptop text-muted" style="font-size: 4rem;"></i>
+                    <p class="text-muted mt-3">Tidak ada data penilaian praktik.</p>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+

@@ -6,16 +6,14 @@
 
   padding: 25px;
   border-radius: 50px;
-  // max-width: 320px;
   margin: 20px auto;
   text-align: center;
 }
 
-
 .total-score-value {
   font-size: 3rem;
   font-weight: bold;
-  color: #212529; /* Bootstrap Dark Gray */
+  color: #212529;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
@@ -23,3 +21,4 @@
     font-size: 1rem;
     padding: 0.5rem 1rem;
 }
+
