@@ -210,13 +210,20 @@ export class DashboardComponent implements OnInit {
                         ? this.examScheduleService.getExamByExaminerId(id)
                         : EMPTY
                 }),
-                finalize(() => this.loadingExamSchedule.set(false)),
                 map((exams) =>
                     exams.filter(
                         (exam) =>
-                            exam.examTypeCode !== ExamTypeCategory.MAKALAH,
+                            Array.isArray(exam.participantScheduleList) &&
+                            exam.participantScheduleList.length > 0,
                     ),
                 ),
+                finalize(() => this.loadingExamSchedule.set(false)),
+                // map((exams) =>
+                //     exams.filter(
+                //         (exam) =>
+                //             exam.examTypeCode !== ExamTypeCategory.MAKALAH,
+                //     ),
+                // ),
             )
             .subscribe({
                 next: (res) => this.schedules.set(res),
@@ -238,10 +245,11 @@ export class DashboardComponent implements OnInit {
     ) {
         switch (ukomType) {
             case ExamTypeCategory.WAWANCARA:
-                // this.startWawancaraExam(participantId, roomUkomId, examId)
                 this.router.navigate(['/interviews', examId, participantId])
                 break
             case ExamTypeCategory.MAKALAH:
+                this.router.navigate(['/paper', examId, participantId])
+                break
             case ExamTypeCategory.SEMINAR:
                 this.router.navigate(['/seminar-paper', examId, participantId])
                 break

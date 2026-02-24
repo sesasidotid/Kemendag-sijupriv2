@@ -54,7 +54,9 @@ export class ScheduleSlotService {
      */
     generateAllSlots(mainSchedule: MainSchedule): ScheduleSlot[] {
         const slots: ScheduleSlot[] = []
-        const durationMs = mainSchedule.duration * 60 * 60 * 1000
+        // const durationMs = mainSchedule.duration * 60 * 60 * 1000
+        const durationMinutes = Math.round(mainSchedule.duration * 60)
+        const durationMs = durationMinutes * 60 * 1000
 
         let currentSlotStart = new Date(mainSchedule.startTime)
         let slotIndex = 0

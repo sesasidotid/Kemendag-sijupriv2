@@ -21,8 +21,9 @@ export const DB_NAME = 'ukom_exam_db' as const
  * - v4: Added portfolio_answer
  * - v5: Added practical_work_answer
  * - v6: Added cat_flagged_questions
+ * - v7: Added makalah_answers (separate from seminar)
  */
-export const DB_VERSION = 6
+export const DB_VERSION = 7
 
 /**
  * Object Store Names
@@ -31,6 +32,7 @@ export const DB_VERSION = 6
 export const OBJECT_STORES = {
     WAWANCARA_ANSWERS: 'wawancara_answers',
     SEMINAR_MAKALAH_ANSWERS: 'seminar_makalah_answers',
+    MAKALAH_ANSWERS: 'makalah_answers',
     STUDI_KASUS_ANSWERS: 'studi_kasus_answers',
     PORTFOLIO_ANSWER: 'portfolio_answer',
     PRAKTIK: 'practical_work_answer',
@@ -65,6 +67,9 @@ export const STORE_CONFIGS: Record<
         keyPath: 'key',
     },
     [OBJECT_STORES.SEMINAR_MAKALAH_ANSWERS]: {
+        keyPath: 'key',
+    },
+    [OBJECT_STORES.MAKALAH_ANSWERS]: {
         keyPath: 'key',
     },
     [OBJECT_STORES.STUDI_KASUS_ANSWERS]: {

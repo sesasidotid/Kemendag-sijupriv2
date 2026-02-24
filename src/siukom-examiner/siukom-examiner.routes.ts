@@ -35,6 +35,13 @@ export const routes: Routes = [
                     ),
             },
             {
+                path: 'paper/:id/:participantId',
+                loadComponent: () =>
+                    import('./makalah/makalah.component').then(
+                        (m) => m.MakalahComponent,
+                    ),
+            },
+            {
                 path: 'portfolio/:id/:participantId',
                 loadComponent: () =>
                     import('./portofolio/portofolio.component').then(

@@ -16,7 +16,7 @@ import { finalize } from 'rxjs'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
-import { SeminarMakalahDraftService } from '@/siukom-examiner/seminer-makalah/seminer-makalah-draft.service'
+import { MakalahDraftService } from '@/siukom-examiner/makalah/makalah-draft.service'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
@@ -26,7 +26,7 @@ import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-sched
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 
 @Component({
-    selector: 'app-seminer-makalah',
+    selector: 'app-makalah',
     standalone: true,
     imports: [
         CommonModule,
@@ -36,16 +36,16 @@ import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.
         LoadingButtonComponent,
         ReactiveFormsModule,
     ],
-    templateUrl: './seminer-makalah.component.html',
-    styleUrls: ['./seminer-makalah.component.scss'],
+    templateUrl: './makalah.component.html',
+    styleUrls: ['./makalah.component.scss'],
 })
-export class SeminerMakalahComponent implements OnInit {
+export class MakalahComponent implements OnInit {
     handlerService = inject(HandlerService)
     confirmationService = inject(ConfirmationService)
     formValidationService = inject(FormValidationService)
     route = inject(ActivatedRoute)
     fb = inject(FormBuilder)
-    draftService = inject(SeminarMakalahDraftService)
+    draftService = inject(MakalahDraftService)
     router = inject(Router)
     examService = inject(ExamService)
 
@@ -118,7 +118,7 @@ export class SeminerMakalahComponent implements OnInit {
                     .startExamByExaminer(
                         new ExaminerExamStartRequest({
                             participantId: this.participantId(),
-                            examTypeCode: ExamTypeCategory.SEMINAR,
+                            examTypeCode: ExamTypeCategory.MAKALAH,
                             roomUkomId: this.examScheduleDetail().roomUkomId,
                             examScheduleId: this.examId(),
                         }),
@@ -425,3 +425,4 @@ export class SeminerMakalahComponent implements OnInit {
         })
     }
 }
+

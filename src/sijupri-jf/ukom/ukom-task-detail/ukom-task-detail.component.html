@@ -1,8 +1,11 @@
-<button class="btn btn-sm btn-outline-secondary mb-3" (click)="backToList()">
+<button (click)="backToList()" class="btn btn-sm btn-outline-secondary mb-3">
     <i class="mdi mdi-chevron-left"></i> Kembali
 </button>
 
-<div *ngIf="isLoading$ | async; else ukomHadItem" class="d-flex justify-content-center my-5">
+<div
+    *ngIf="isLoading$ | async; else ukomHadItem"
+    class="d-flex justify-content-center my-5"
+>
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
@@ -11,7 +14,6 @@
 <ng-template #ukomHadItem>
     <div class="row">
         <div class="col-lg-12">
-
             <div class="card">
                 <div class="card-header align-items-center d-flex">
                     <h5 class="m-0">
@@ -28,13 +30,12 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Status Pendaftar</label>
+                                <label class="form-label"
+                                    >Status Pendaftar</label
+                                >
                                 <p class="border-bottom">
-                                    {{
-                                    ukomDetail.participantStatus == 'jf'
-                                    ? 'JF Perdagangan'
-                                    : 'Non-JF Perdagangan'
-                                    }}
+                                    {{ ukomDetail.participantStatus == 'jf' ?
+                                    'JF Perdagangan' : 'Non-JF Perdagangan' }}
                                 </p>
                             </div>
                         </div>
@@ -86,14 +87,12 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Usia Menurut Surat Usulan</label>
+                                <label class="form-label"
+                                    >Usia Menurut Surat Usulan</label
+                                >
                                 <p class="border-bottom">
-                                    {{
-                                    calculateAge(
-                                    ukomDetail.tanggalLahir,
-                                    ukomDetail.tglSuratUsulan
-                                    )
-                                    }}
+                                    {{ calculateAge( ukomDetail.tanggalLahir,
+                                    ukomDetail.tglSuratUsulan ) }}
                                 </p>
                             </div>
                         </div>
@@ -105,7 +104,9 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Jenjang Pendidikan</label>
+                                <label class="form-label"
+                                    >Jenjang Pendidikan</label
+                                >
                                 <p class="border-bottom">
                                     {{ pendidikanName ?? '-' }}
                                 </p>
@@ -114,7 +115,9 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Program Studi/Jurusan</label>
+                                <label class="form-label"
+                                    >Program Studi/Jurusan</label
+                                >
                                 <p class="border-bottom">
                                     {{ ukomDetail.jurusan ?? '-' }}
                                 </p>
@@ -125,16 +128,13 @@
                             <div class="mb-3">
                                 <label class="form-label">Instansi</label>
                                 <p class="border-bottom">
-                                    {{
-                                    transformInstansiName(
-                                    ukomDetail.jenisInstansi
-                                    ) ?? '-'
-                                    }}
+                                    {{ transformInstansiName(
+                                    ukomDetail.jenisInstansi ) ?? '-' }}
                                 </p>
                             </div>
                         </div>
 
-                        <div class="col-lg-6" *ngIf="provinsiName">
+                        <div *ngIf="provinsiName" class="col-lg-6">
                             <div class="mb-3">
                                 <label class="form-label">Provinsi</label>
                                 <p class="border-bottom">
@@ -143,27 +143,26 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-6" *ngIf="kabupatenName">
+                        <div *ngIf="kabupatenName" class="col-lg-6">
                             <div class="mb-3">
                                 <label class="form-label">Kabupaten/Kota</label>
                                 <p class="border-bottom">
-                                    {{
-                                    kabupatenName
-                                    ? typeKabKota + ' ' + kabupatenName
-                                    : '-'
-                                    }}
+                                    {{ kabupatenName ? typeKabKota + ' ' +
+                                    kabupatenName : '-' }}
                                 </p>
                             </div>
                         </div>
 
-                        <div [ngClass]="{
+                        <div
+                            [ngClass]="{
                                 'col-lg-6':
                                     ukomDetail.jenisInstansi !=
                                     'PEMERINTAH_PROVINSI',
                                 'col-lg-12':
                                     ukomDetail.jenisInstansi ==
                                     'PEMERINTAH_PROVINSI'
-                            }">
+                            }"
+                        >
                             <div class="mb-3">
                                 <label class="form-label">Unit Kerja</label>
                                 <p class="border-bottom">
@@ -192,7 +191,9 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Jabatan Yang Dituju</label>
+                                <label class="form-label"
+                                    >Jabatan Yang Dituju</label
+                                >
                                 <p class="border-bottom">
                                     {{ ukomDetail.nextJabatanName ?? '-' }}
                                 </p>
@@ -201,7 +202,9 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Jenjang Yang Dituju</label>
+                                <label class="form-label"
+                                    >Jenjang Yang Dituju</label
+                                >
                                 <p class="border-bottom">
                                     {{ ukomDetail.nextJenjangName ?? '-' }}
                                 </p>
@@ -219,7 +222,9 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Bidang Jabatan Yang Dituju</label>
+                                <label class="form-label"
+                                    >Bidang Jabatan Yang Dituju</label
+                                >
                                 <p class="border-bottom">
                                     {{ bidangJabatanName ?? '-' }}
                                 </p>
@@ -235,8 +240,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenis UKom</label>
                                 <p class="border-bottom">
-                                    {{
-                                    getJenisUkomLabel(ukomDetail.jenisUkom)
+                                    {{ getJenisUkomLabel(ukomDetail.jenisUkom)
                                     }}
                                 </p>
                             </div>
@@ -244,20 +248,21 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Status Pendaftaran</label>
+                                <label class="form-label"
+                                    >Status Pendaftaran</label
+                                >
                                 <p class="border-bottom">
-                                    {{
-                                    ukomDetail.isMengulang
-                                    ? 'Mengulang'
-                                    : 'Baru'
-                                    }}
+                                    {{ ukomDetail.isMengulang ? 'Mengulang' :
+                                    'Baru' }}
                                 </p>
                             </div>
                         </div>
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Nomor Surat Usulan</label>
+                                <label class="form-label"
+                                    >Nomor Surat Usulan</label
+                                >
                                 <p class="border-bottom">
                                     {{ ukomDetail.noSuratUsulan ?? '-' }}
                                 </p>
@@ -266,10 +271,11 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Tanggal Surat Usulan</label>
+                                <label class="form-label"
+                                    >Tanggal Surat Usulan</label
+                                >
                                 <p class="border-bottom">
-                                    {{
-                                    ukomDetail.tglSuratUsulan | tanggalIndo
+                                    {{ ukomDetail.tglSuratUsulan | tanggalIndo
                                     }}
                                 </p>
                             </div>
@@ -277,8 +283,10 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Predikat Kinerja Pegawai Satu Tahun
-                                    Terakhir</label>
+                                <label class="form-label"
+                                    >Predikat Kinerja Pegawai Satu Tahun
+                                    Terakhir</label
+                                >
                                 <p class="border-bottom">
                                     {{ predikat1Name ?? '-'}}
                                 </p>
@@ -287,8 +295,10 @@
 
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label class="form-label">Predikat Kinerja Pegawai Dua Tahun
-                                    Terakhir</label>
+                                <label class="form-label"
+                                    >Predikat Kinerja Pegawai Dua Tahun
+                                    Terakhir</label
+                                >
                                 <p class="border-bottom">
                                     {{ predikat2Name ?? '-'}}
                                 </p>
@@ -299,53 +309,75 @@
             </div>
 
             <!-- Dokumen Pendaftaran -->
-            <div class="card" *ngIf="dataDokumenUkom.length > 0">
+            <div *ngIf="dataDokumenUkom.length > 0" class="card">
                 <div class="card-header">
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <h5 class="mb-0 d-flex align-items-center">
-                            <i class="mdi mdi-file-document-check-outline me-2"></i>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <h5 class="d-flex align-items-center mb-0">
+                            <i
+                                class="mdi mdi-file-document-check-outline me-2"
+                            ></i>
                             Dokumen Pendaftaran UKom
                         </h5>
 
-                        <span class="bg-success text-white rounded-pill px-3 py-1 small fw-semibold">
+                        <span
+                            class="bg-success rounded-pill small fw-semibold px-3 py-1 text-white"
+                        >
                             Lolos Seleksi Administrasi
                         </span>
                     </div>
                 </div>
                 <div class="card-body">
-                    <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
+                    <app-file-handler
+                        [inputs]="fileHandlerData"
+                    ></app-file-handler>
                 </div>
             </div>
 
-            <div class="card" *ngIf="scoreMap | keyvalue as entries">
+            <div *ngIf="scoreMap | keyvalue as entries" class="card">
                 <ng-container *ngIf="entries.length > 0">
-                    <div class="card-header" *ngIf="hasVisibleUkomDetails">
+                    <div *ngIf="hasVisibleUkomDetails" class="card-header">
                         <h5 class="m-0">
-                            <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
+                            <i
+                                class="mdi mdi-checkbox-marked-circle-outline me-2"
+                            ></i>
                             Detail UKom
                         </h5>
                     </div>
 
                     <div class="list-group">
-                        <div class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
-                            *ngIf="scoreMap['CAT']?.id">
+                        <div
+                            *ngIf="scoreMap['CAT']?.id"
+                            class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"
+                        >
                             <div>
                                 <h5 class="m-0">CAT</h5>
                             </div>
-                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                <button class="btn btn-success" (click)="toggleModal()">
+                            <div
+                                class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
+                            >
+                                <button
+                                    (click)="toggleModal()"
+                                    class="btn btn-success"
+                                >
                                     Lihat Nilai
                                 </button>
                             </div>
                         </div>
 
-                        <div class="list-group-item d-flex justify-content-between align-items-center"
-                            *ngIf="scoreMap['MAKALAH']?.id">
+                        <div
+                            *ngIf="scoreMap['MAKALAH']?.id"
+                            class="list-group-item d-flex justify-content-between align-items-center"
+                        >
                             <div>
                                 <h5 class="m-0">Makalah</h5>
                             </div>
-                            <div class="d-flex align-items-end gap-2 flex-sm-row flex-column mt-2 mt-sm-0">
-                                <button class="btn btn-success" (click)="viewFile()">
+                            <div
+                                class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
+                            >
+                                <button
+                                    (click)="viewFile()"
+                                    class="btn btn-success"
+                                >
                                     Lihat Makalah
                                 </button>
                             </div>
@@ -354,17 +386,28 @@
                 </ng-container>
             </div>
 
-            <ng-container *ngIf="ukomGrade.id">
-                <app-ukom-grade-table [nip]="ukomDetail.nip" [nama]="ukomDetail.name" [gradeData]="ukomGrade"
+            <ng-container
+                *ngIf="ukomGrade.id?.trim() && ukomDetail.rekomendasiUrl?.trim()"
+            >
+                <app-ukom-grade-table
+                    (downloadFile)=" downloadRekomendasi()"
+                    [gradeData]="ukomGrade"
+                    [nama]="ukomDetail.name"
+                    [nip]="ukomDetail.nip"
                     [rekomendasiUrl]="ukomDetail.rekomendasiUrl"
-                    (downloadFile)=" downloadRekomendasi()"></app-ukom-grade-table>
+                ></app-ukom-grade-table>
             </ng-container>
         </div>
     </div>
 </ng-template>
 
-<app-modal *ngIf="isModalOpen$ | async" [title]="'Hasil Ujian'" (toggle)="toggleModal()" [size]="'lg'"
-    [enableFooter]="false">
+<app-modal
+    (toggle)="toggleModal()"
+    *ngIf="isModalOpen$ | async"
+    [enableFooter]="false"
+    [size]="'lg'"
+    [title]="'Hasil Ujian'"
+>
     <ng-container>
         <div class="total-score-container">
             <div class="total-score-value">
@@ -372,17 +415,22 @@
             </div>
         </div>
 
-        <div *ngFor="let competencyGroup of getGroupedCompetencies()" class="mb-3">
-            <div class="card border-0 mb-3">
+        <div
+            *ngFor="let competencyGroup of getGroupedCompetencies()"
+            class="mb-3"
+        >
+            <div class="card mb-3 border-0">
                 <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div
+                        class="d-flex justify-content-between align-items-center"
+                    >
                         <h4 class="mb-0 text-white">
                             {{ competencyGroup.name }}
                         </h4>
                         <span class="badge badge-light badge-lg">
                             {{ competencyGroup.percentage }}% ({{
-                            competencyGroup.correct
-                            }}/{{ competencyGroup.total }})
+                            competencyGroup.correct }}/{{ competencyGroup.total
+                            }})
                         </span>
                     </div>
                 </div>

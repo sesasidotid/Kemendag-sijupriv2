@@ -687,47 +687,6 @@
                     <ng-container
                         *ngFor="let examSchedule of finishTask.examSchedule"
                     >
-                        <!--                    <div-->
-                        <!--                        *ngIf="examScoresByScheduleId[examSchedule.id] != null && examSchedule.examTypeCode === ExamTypeCategory.CAT"-->
-                        <!--                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 flex-wrap border-0"-->
-                        <!--                    >-->
-                        <!--                        <div>-->
-                        <!--                            <h5 class="m-0">-->
-                        <!--                                {{ukomMiscellaneousService.getModuleDisplayName(examSchedule.examTypeCode)}}-->
-                        <!--                            </h5>-->
-                        <!--                        </div>-->
-                        <!--                        <div-->
-                        <!--                            class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"-->
-                        <!--                        >-->
-                        <!--                            <button-->
-                        <!--                                (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"-->
-                        <!--                                class="btn btn-success"-->
-                        <!--                            >-->
-                        <!--                                Lihat Nilai-->
-                        <!--                            </button>-->
-                        <!--                        </div>-->
-                        <!--                    </div>-->
-
-                        <!--                    <div-->
-                        <!--                        *ngIf="examScoresByScheduleId[examSchedule.id] != null && examSchedule.examTypeCode === ExamTypeCategory.MAKALAH"-->
-                        <!--                        class="list-group-item d-flex justify-content-between align-items-center rounded-0 border-0"-->
-                        <!--                    >-->
-                        <!--                        <div>-->
-                        <!--                            <h5 class="m-0">Makalah</h5>-->
-                        <!--                        </div>-->
-                        <!--                        <div-->
-                        <!--                            class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"-->
-                        <!--                        >-->
-                        <!--                            <button-->
-                        <!--                                (click)="viewFile(examSchedule.id)"-->
-                        <!--                                class="btn btn-success"-->
-                        <!--                            >-->
-                        <!--                                Lihat Makalah-->
-                        <!--                            </button>-->
-                        <!--                        </div>-->
-                        <!--                    </div>-->
-
-                        <!-- Generic Scores -->
                         <div
                             *ngIf="examScoresByScheduleId[examSchedule.id] != null &&
                            examSchedule.examTypeCode !== ExamTypeCategory.MAKALAH"
@@ -736,19 +695,14 @@
                             <div
                                 class="d-flex justify-content-between align-items-center flex-wrap gap-3"
                             >
-                                <!-- Left Content -->
                                 <div>
                                     <h6 class="fw-semibold mb-1">
                                         {{
                                         ukomMiscellaneousService.getModuleDisplayName(examSchedule.examTypeCode)
                                         }}
                                     </h6>
-                                    <!--                                    <small class="text-muted">-->
-                                    <!--                                        ID: {{ examSchedule.id }}-->
-                                    <!--                                    </small>-->
                                 </div>
 
-                                <!-- Right Action -->
                                 <div>
                                     <button
                                         (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"
@@ -764,7 +718,9 @@
             </div>
         </div>
 
-        <ng-container *ngIf="ukomGrade.id">
+        <ng-container
+            *ngIf="ukomGrade.id?.trim() && finishTask.rekomendasiUrl?.trim()"
+        >
             <app-ukom-grade-table
                 (downloadFile)=" downloadRekomendasi()"
                 [gradeData]="ukomGrade"

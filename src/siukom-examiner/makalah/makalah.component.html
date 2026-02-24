@@ -1,0 +1,165 @@
+<app-exam-assessment-layout
+    (backClicked)="backToDashboard()"
+    [examScheduleId]="examId()"
+    [loading]="loadingQuestions()"
+    [participantId]="participantId()"
+    [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnsweredAndSaved() && questions().length > 0"
+>
+    <ng-container
+        *ngIf="!examStarted() && questions().length === 0; else examContent"
+    >
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Makalah</h1>
+                <p>
+                    Klik tombol di bawah ini untuk memulai sesi penilaian
+                    makalah peserta.
+                </p>
+            </div>
+            <!-- Start Exam Button Section -->
+            <div class="form-actions">
+                <app-loading-button
+                    (clicked)="startTheExam()"
+                    [className]="'btn btn-primary btn-lg'"
+                    [icon]="'mdi-clipboard-play-outline'"
+                    [isLoading]="startExamLoading()"
+                    [label]="'Mulai Ujian'"
+                    [type]="'button'"
+                ></app-loading-button>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #examContent>
+        <ng-container *ngIf="questions().length > 0; else noQuestions">
+            <form [formGroup]="assessmentForm">
+                <div class="assessment-container">
+                    <div class="header-section">
+                        <h1>Form Penilaian Makalah</h1>
+                        <p>
+                            Silakan isi penilaian untuk setiap pertanyaan di
+                            bawah ini.
+                        </p>
+                        <div class="d-flex justify-content-center mt-3">
+                            <!-- HAS ANSWER -->
+                            <button
+                                (click)="openAnswer()"
+                                *ngIf="participantAnswer()?.answerDto?.answerUploadUrl; else noAnswer"
+                                class="btn btn-primary"
+                            >
+                                <span class="mdi mdi-open-in-new me-2"></span>
+                                Lihat Jawaban Peserta
+                            </button>
+                            <!-- NO ANSWER -->
+                            <ng-template #noAnswer>
+                                <div class="no-answer-box">
+                                    <span
+                                        class="mdi mdi-file-alert-outline me-2"
+                                    ></span>
+                                    Peserta belum mengunggah makalah
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                    <div class="question-list" formArrayName="answerDtoList">
+                        <div
+                            *ngFor="let question of questions(); let i = index"
+                            [formGroupName]="i"
+                            class="question-card"
+                        >
+                            <div class="card-header">
+                                <img
+                                    *ngIf="question.attachmentUrl"
+                                    [src]="question.attachmentUrl"
+                                    alt="Question Image"
+                                    class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                                />
+                                <span class="question-number"
+                                    >{{ question.kompetensiIndikatorName
+                                    }}</span
+                                >
+                                <h2 class="question-text">
+                                    {{ question.question }}
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                <!-- Score Input -->
+                                <div class="mb-3">
+                                    <label
+                                        [for]="'score-' + i"
+                                        class="form-label"
+                                    >
+                                        Nilai <span class="text-danger">*</span>
+                                        <small class="text-muted"
+                                            >(0-{{ question.weight || 100
+                                            }})</small
+                                        >
+                                    </label>
+                                    <div class="">
+                                        <input
+                                            (blur)="validateScore(i)"
+                                            (input)="validateScore(i)"
+                                            [class.is-invalid]="isScoreInvalid(i)"
+                                            [id]="'score-' + i"
+                                            [max]="question.weight || 100"
+                                            class="form-control score-input"
+                                            formControlName="score"
+                                            min="0"
+                                            placeholder="Masukkan nilai"
+                                            type="number"
+                                        />
+                                        <div
+                                            *ngIf="getScoreError(i)"
+                                            class="invalid-feedback"
+                                        >
+                                            {{ getScoreError(i) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Note Input -->
+                                <div class="mb-3">
+                                    <label
+                                        [for]="'note-' + i"
+                                        class="form-label"
+                                        >Catatan Penilaian:</label
+                                    >
+                                    <textarea
+                                        [id]="'note-' + i"
+                                        class="form-control"
+                                        formControlName="answerText"
+                                        placeholder="Tuliskan alasan penilaian dan masukan..."
+                                        rows="4"
+                                    ></textarea>
+                                    <small class="form-text text-muted">
+                                        Petunjuk: Silahkan kosongkan apabila
+                                        Anda tidak melakukan penilaian.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-end" footer>
+                        <app-loading-button
+                            (clicked)="submitAssessment()"
+                            [className]="'btn btn-primary btn-lg'"
+                            [disabled]="assessmentForm.invalid"
+                            [isLoading]="submitting()"
+                            [label]="'Simpan Penilaian'"
+                            [type]="'button'"
+                        >
+                        </app-loading-button>
+                    </div>
+                </div>
+            </form>
+        </ng-container>
+        <ng-template #noQuestions>
+            <app-empty-state
+                [buttonAction]="backToDashboard.bind(this)"
+                [buttonText]="'Kembali ke Dashboard'"
+                [description]="'Belum ada form penilaian yang tersedia untuk saat ini.'"
+                [icon]="'mdi mdi-clipboard-text-outline'"
+                [title]="'Form Penilaian Belum Tersedia'"
+            >
+            </app-empty-state>
+        </ng-template>
+    </ng-template>
+</app-exam-assessment-layout>

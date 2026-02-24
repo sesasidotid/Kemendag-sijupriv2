@@ -24,10 +24,10 @@
             </div>
         </div>
         <!-- Current Examiners Info -->
-        <div class="alert alert-info mb-3">
-            <strong>Penguji Saat Ini:</strong>
-            <div>{{ getSelectedExaminerNames() }}</div>
-        </div>
+        <!--        <div class="alert alert-info mb-3">-->
+        <!--            <strong>Penguji Saat Ini:</strong>-->
+        <!--            <div>{{ getSelectedExaminerNames() }}</div>-->
+        <!--        </div>-->
         <!-- Examiner Selection -->
         <div class="available-examiners">
             <div class="alert alert-warning border">
@@ -66,13 +66,13 @@
             Silakan pilih minimal satu penguji sebelum menyimpan.
         </div>
         <!-- Selected Examiners Summary -->
-        <div
-            *ngIf="selectedExaminerIds().length > 0"
-            class="alert alert-success mt-3"
-        >
-            <i class="mdi mdi-check-circle me-2"></i>
-            <strong>{{ selectedExaminerIds().length }}</strong> penguji dipilih:
-            {{ getSelectedExaminerNames() }}
-        </div>
+        <!--        <div-->
+        <!--            *ngIf="selectedExaminerIds().length > 0"-->
+        <!--            class="alert alert-success mt-3"-->
+        <!--        >-->
+        <!--            <i class="mdi mdi-check-circle me-2"></i>-->
+        <!--            <strong>{{ selectedExaminerIds().length }}</strong> penguji dipilih:-->
+        <!--            {{ getSelectedExaminerNames() }}-->
+        <!--        </div>-->
     </div>
 </app-modal>
