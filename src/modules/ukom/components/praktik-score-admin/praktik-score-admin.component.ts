@@ -23,11 +23,14 @@ export class PraktikScoreAdminComponent {
     })
 
     hasUpload(question: any): boolean {
-        return !!(question.answerDto?.answerUpload || question.answerDto?.answerUploadUrl)
+        return !!(
+            question.answerDto?.answerUpload ||
+            question.answerDto?.answerUploadUrl
+        )
     }
 
     getAnswerText(question: any): string {
-         return question.answerDto?.answerText || '';
+        return question.answerDto?.answerText || ''
     }
 }
 

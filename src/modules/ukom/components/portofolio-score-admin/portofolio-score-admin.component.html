@@ -2,44 +2,67 @@
     <div class="total-score-value">{{ score()?.score | number: '1.2-2' }}</div>
 </div>
 
-<div class="card mb-4 shadow-sm border-0">
-    <div class="card-header bg-primary text-white py-3">
-        <h5 class="mb-0 text-white fw-bold">Detail Portofolio</h5>
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-header bg-primary py-3 text-white">
+        <h5 class="fw-bold mb-0 text-white">Detail Portofolio</h5>
     </div>
     <div class="card-body bg-light">
         <div class="row">
-            <ng-container *ngFor="let question of score()?.questionDtoList; let i = index">
+            <ng-container
+                *ngFor="let question of score()?.questionDtoList; let i = index"
+            >
                 <div class="col-12 mb-3">
                     <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-header bg-white border-bottom-0 py-3">
-                            <div class="d-flex justify-content-between align-items-start">
+                        <div class="card-header border-bottom-0 bg-white py-3">
+                            <div
+                                class="d-flex justify-content-between align-items-start"
+                            >
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-primary">Pertanyaan {{ i + 1 }}</h6>
-                                    <p class="mb-0 mt-2 text-dark">{{ question.question }}</p>
+                                    <p class="text-dark mb-0 mt-2">
+                                        {{ question.question }}
+                                    </p>
                                 </div>
-                                <span class="badge bg-secondary text-white ms-2">Bobot: {{ question.weight }}</span>
+                                <span class="badge bg-secondary ms-2 text-white"
+                                    >Bobot: {{ question.weight }}</span
+                                >
                             </div>
                         </div>
                         <div class="card-body border-top">
                             <h6 class="fw-bold mb-3">Jawaban Peserta:</h6>
 
                             <!-- Text Answer -->
-                            <div *ngIf="question.answerDto?.answerText" class="p-3 bg-light rounded mb-3 border">
-                                {{ question.answerDto?.answerText }}
-                            </div>
+                            <!--                            <div *ngIf="question.answerDto?.answerText" class="p-3 bg-light rounded mb-3 border">-->
+                            <!--                                {{ question.answerDto?.answerText }}-->
+                            <!--                            </div>-->
+                            <!--                            <div class="bg-light mb-3 rounded border p-3">-->
+                            <!--                                question.answerDto?.answerText-->
+                            <!--                            </div>-->
 
                             <!-- File Upload -->
-                            <div *ngIf="hasUpload(question)" class="d-flex align-items-center p-3 bg-light rounded border mb-3">
-                                <i class="mdi mdi-file-document-outline fs-3 text-primary me-3"></i>
+                            <div
+                                *ngIf="hasUpload(question)"
+                                class="d-flex align-items-center bg-light mb-3 rounded border p-3"
+                            >
+                                <i
+                                    class="mdi mdi-file-document-outline fs-3 text-primary me-3"
+                                ></i>
                                 <div>
-                                    <h6 class="mb-0 fw-bold">Dokumen Terlampir</h6>
-                                    <small class="text-muted">{{ question.answerDto?.answerUpload || 'File tersedia' }}</small>
+                                    <h6 class="fw-bold mb-0">
+                                        Dokumen Terlampir
+                                    </h6>
+                                    <small class="text-muted"
+                                        >{{ question.answerDto?.answerUpload ||
+                                        'File tersedia' }}</small
+                                    >
                                 </div>
-                                <a *ngIf="question.answerDto?.answerUploadUrl"
-                                   [href]="question.answerDto.answerUploadUrl"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary ms-auto">
-                                    <i class="mdi mdi-open-in-new me-1"></i> Buka File
+                                <a
+                                    *ngIf="question.answerDto?.answerUploadUrl"
+                                    [href]="question.answerDto.answerUploadUrl"
+                                    class="btn btn-sm btn-outline-primary ms-auto"
+                                    target="_blank"
+                                >
+                                    <i class="mdi mdi-open-in-new me-1"></i>
+                                    Buka File
                                 </a>
                             </div>
 
@@ -47,22 +70,49 @@
                             <div class="mt-4">
                                 <h6 class="fw-bold mb-2">Status Validasi:</h6>
                                 <div class="d-flex gap-2">
-                                    <span class="badge p-2 ft-md"
-                                          [ngClass]="question.answerDto?.answerList?.memadai ? 'bg-success' : 'bg-danger'">
-                                        <i [class]="question.answerDto?.answerList?.memadai ? 'mdi mdi-check-circle-outline' : 'mdi mdi-close-circle-outline'"></i>
-                                        {{ question.answerDto?.answerList?.memadai ? 'Memadai' : 'Tidak Memadai' }}
+                                    <span
+                                        [ngClass]="question.answerDto?.answerList?.memadai ? 'bg-success' : 'bg-danger'"
+                                        class="badge ft-md p-2"
+                                    >
+                                        <i
+                                            [class]="question.answerDto?.answerList?.memadai ? 'mdi mdi-check-circle-outline' : 'mdi mdi-close-circle-outline'"
+                                        ></i>
+                                        {{
+                                        question.answerDto?.answerList?.memadai
+                                        ? 'Memadai' : 'Tidak Memadai' }}
                                     </span>
-                                    <span class="badge p-2 ft-md"
-                                          [ngClass]="question.answerDto?.answerList?.valid ? 'bg-success' : 'bg-danger'">
-                                        <i [class]="question.answerDto?.answerList?.valid ? 'mdi mdi-check-circle-outline' : 'mdi mdi-close-circle-outline'"></i>
-                                        {{ question.answerDto?.answerList?.valid ? 'Valid' : 'Tidak Valid' }}
+                                    <span
+                                        [ngClass]="question.answerDto?.answerList?.valid ? 'bg-success' : 'bg-danger'"
+                                        class="badge ft-md p-2"
+                                    >
+                                        <i
+                                            [class]="question.answerDto?.answerList?.valid ? 'mdi mdi-check-circle-outline' : 'mdi mdi-close-circle-outline'"
+                                        ></i>
+                                        {{ question.answerDto?.answerList?.valid
+                                        ? 'Valid' : 'Tidak Valid' }}
                                     </span>
                                 </div>
                             </div>
 
+                            <! -- Reviewer Notes -->
+                            <div
+                                *ngIf="question.answerDto?.answerText"
+                                class="bg-light mt-4 rounded border p-3"
+                            >
+                                <h6 class="fw-bold mb-2">Catatan Reviewer:</h6>
+                                <p class="mb-0">
+                                    {{ question.answerDto?.answerText }}
+                                </p>
+                            </div>
+
                             <!-- No Answer State -->
-                            <div *ngIf="!question.answerDto" class="alert alert-warning d-flex align-items-center mb-0 mt-3">
-                                <i class="mdi mdi-alert-circle-outline me-2 fs-5"></i>
+                            <div
+                                *ngIf="!question.answerDto"
+                                class="alert alert-warning d-flex align-items-center mb-0 mt-3"
+                            >
+                                <i
+                                    class="mdi mdi-alert-circle-outline fs-5 me-2"
+                                ></i>
                                 <div>Belum ada jawaban.</div>
                             </div>
                         </div>
@@ -72,12 +122,16 @@
 
             <!-- Empty State -->
             <ng-container *ngIf="!score()?.questionDtoList?.length">
-                <div class="col-12 text-center py-5">
-                    <i class="mdi mdi-file-document-outline text-muted" style="font-size: 4rem;"></i>
-                    <p class="text-muted mt-3">Tidak ada data penilaian portofolio.</p>
+                <div class="col-12 py-5 text-center">
+                    <i
+                        class="mdi mdi-file-document-outline text-muted"
+                        style="font-size: 4rem"
+                    ></i>
+                    <p class="text-muted mt-3">
+                        Tidak ada data penilaian portofolio.
+                    </p>
                 </div>
             </ng-container>
         </div>
     </div>
 </div>
-
