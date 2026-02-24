@@ -30,15 +30,16 @@ export class ScheduleSlotService {
 
     /**
      * Parse date string as UTC+7 time (no timezone conversion)
-     * Input: '2025-01-15T08:00:00' -> Date with UTC time 08:00 (treated as UTC+7)
+     * Input: '2025-01-15T08:00:00' or '2025-01-15 08:00:00' -> Date with UTC time 08:00 (treated as UTC+7)
      */
     parseAsUTC7(dateString: string | Date): Date {
         if (dateString instanceof Date) {
             return dateString
         }
-        // Parse as UTC to avoid browser timezone interpretation
+        // Replace space with 'T' to normalize format (API may send "2026-02-24 09:50:02")
+        let cleanString = dateString.replace(' ', 'T')
         // Remove timezone suffix if present and append 'Z' to parse as UTC
-        const cleanString = dateString.replace(/[+-]\d{2}:\d{2}$/, '') + 'Z'
+        cleanString = cleanString.replace(/[+-]\d{2}:\d{2}$/, '') + 'Z'
         return new Date(cleanString)
     }
 
@@ -398,6 +399,7 @@ export class ScheduleSlotService {
 
     /**
      * Find participant scheduled in a specific slot
+     * Matches if participant's schedule falls within the same minute as slot start (ignores seconds/milliseconds)
      */
     private findParticipantInSlot(
         slotStart: Date,
@@ -407,7 +409,16 @@ export class ScheduleSlotService {
             participants.find((p) => {
                 if (!p.personalSchedule) return false
                 const scheduleTime = new Date(p.personalSchedule)
-                return scheduleTime.getTime() === slotStart.getTime()
+
+                // Match if within the same minute (ignore seconds and milliseconds)
+                // This handles cases where API sends "2026-02-24 09:50:02" for slot "2026-02-24 09:50:00"
+                const slotMinute = new Date(slotStart)
+                slotMinute.setUTCSeconds(0, 0)
+
+                const scheduleMinute = new Date(scheduleTime)
+                scheduleMinute.setUTCSeconds(0, 0)
+
+                return scheduleMinute.getTime() === slotMinute.getTime()
             }) || null
         )
     }
