@@ -1,0 +1,62 @@
+<div class="general-exam-container">
+    <!-- Header -->
+    <!--    <div class="header-section mb-4">-->
+    <!--        <div class="row">-->
+    <!--            <div class="col-md-6">-->
+    <!--                <div class="card bg-light">-->
+    <!--                    <div class="card-body text-center">-->
+    <!--                        <h5 class="card-title">-->
+    <!--                            {{ participantsWithExaminers().length }}-->
+    <!--                        </h5>-->
+    <!--                        <p class="card-text text-muted mb-0">Total Peserta</p>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--            <div class="col-md-6">-->
+    <!--                <div class="card bg-info bg-opacity-10">-->
+    <!--                    <div class="card-body text-center">-->
+    <!--                        <h5 class="card-title text-info">-->
+    <!--                            {{ examinerList().length }}-->
+    <!--                        </h5>-->
+    <!--                        <p class="card-text text-muted mb-0">Total Penguji</p>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!-- AG Grid Table -->
+    <div
+        *ngIf="participantsWithExaminers().length > 0; else noParticipants"
+        class="grid-section"
+    >
+        <ag-grid-angular
+            (gridReady)="onGridReady($event)"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [paginationPageSize]="20"
+            [pagination]="true"
+            [rowData]="participantsWithExaminers()"
+            [style.height.px]="600"
+            [style.width.%]="100"
+            [suppressCellFocus]="true"
+            class="ag-theme-alpine"
+        >
+        </ag-grid-angular>
+    </div>
+    <!-- Empty State -->
+    <ng-template #noParticipants>
+        <div class="alert alert-info text-center">
+            <i class="mdi mdi-information-outline me-2"></i>
+            Belum ada peserta terdaftar untuk ujian ini.
+        </div>
+    </ng-template>
+</div>
+<!-- Update Examiner Modal -->
+<app-update-examiner-modal
+    (close)="closeExaminerModal()"
+    (confirm)="confirmExaminerUpdate($event)"
+    *ngIf="showExaminerModal() && selectedParticipant()"
+    [examinerList]="examinerList()"
+    [participant]="selectedParticipant()!"
+>
+</app-update-examiner-modal>

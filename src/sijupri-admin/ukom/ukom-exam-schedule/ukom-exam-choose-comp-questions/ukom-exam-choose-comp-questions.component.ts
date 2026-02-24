@@ -26,6 +26,7 @@ import { ParticipantListModalComponent } from './participant-list-modal/particip
 import { ExaminerListModalComponent } from './examiner-list-modal/examiner-list-modal.component'
 import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
+import { UkomExamGeneralComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-general/ukom-exam-general.component'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -40,6 +41,7 @@ import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellan
         UkomExamMakalahComponent,
         ParticipantListModalComponent,
         ExaminerListModalComponent,
+        UkomExamGeneralComponent,
     ],
     templateUrl: './ukom-exam-choose-comp-questions.component.html',
     styleUrl: './ukom-exam-choose-comp-questions.component.scss',

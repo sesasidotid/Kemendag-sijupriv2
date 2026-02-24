@@ -2,10 +2,8 @@
 
 /**
  * Exam Schedule Automation Script
- *
- * Base start time is controlled via CONFIG.baseStart
- * Example:
- *   baseStart: "2026-02-19T12:00"
+ * Minute-accurate internal scheduling.
+ * Backend expects duration in HOURS → we convert at payload level.
  */
 
 // ============================================================================
@@ -17,85 +15,28 @@ const CONFIG = {
 
     bearerToken:
         "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJzaWp1cHJpLXdlYiIsImp0aSI6ImZkODM5YzU5NDZlYTZhYzQ5Nzg3OTljMDc2YWM4MDU2ZTRjZjExZmQ5NTViZDNkY2U1YjRiMGQ1NjExMTg0NjRiNDY4MGI5NmVhNGFhNWIzIiwiaWF0IjoxNzcwOTY1MjIzLjA3ODcyNCwibmJmIjoxNzcwOTY1MjIzLjA3ODczLCJleHAiOjE3NzM5NjUyMjIuOTA4MTc1LCJzdWIiOiIxMTExMTExMTExMTExMTExMTEiLCJzY29wZXMiOltdLCJkZXRhaWxzIjp7ImlkIjoiMTExMTExMTExMTExMTExMTExIiwibmFtZSI6IkdvbGRpYW4gUGFrcGFoYW4iLCJyb2xlX2NvZGVzIjpbIkFETUlOIl0sIm1lbnVfY29kZXMiOlsiTU5VX0FLUDAwMDEiLCJNTlVfQUtQMDAwMyIsIk1OVV9BS1AwMDAyIiwiTU5VX0FLUDAwMDQiLCJNTlVfQUtQMDAwNSIsIk1OVV9BS1AwMDA2IiwiTU5VX0ZPUjAwMDEiLCJNTlVfRk9SMDAwMiIsIk1OVV9GT1IwMDAzIiwiTU5VX0ZPUjAwMDQiLCJNTlVfRk9SMDAwNSIsIk1OVV9QQUswMDAxIiwiTU5VX1BBSzAwMDIiLCJNTlVfUEFLMDAwMyIsIk1OVV9VS00wMDAxIiwiTU5VX1VLTTAwMDIiLCJNTlVfVUtNMDAwMyIsIk1OVV9VS00wMDA0IiwiTU5VX1VLTTAwMDUiLCJNTlVfVUtNMDAwNiIsIk1OVV9VS00wMDA3IiwiTU5VX1VLTTAwMDgiLCJNTlVfVUtNMDAwOSIsIk1OVV9VS00wMDEwIiwiTU5VX1VLTTAwMTIiLCJNTlVfU0lQMDAwMSIsIk1OVV9TSVAwMDAyIiwiTU5VX1NJUDAwMDMiLCJNTlVfU0lQMDAwNCIsIk1OVV9TRUMwMDAxIiwiTU5VX1NFQzAwMDIiLCJNTlVfU0VDMDAwMyIsIk1OVV9NTlQwMDAxIiwiTU5VX01OVDAwMDIiLCJNTlVfTU5UMDAwMyIsIk1OVV9NTlQwMDA0IiwiTU5VX01OVDAwMDUiLCJNTlVfTU5UMDAwNiIsIk1OVV9NTlQwMDA3IiwiTU5VX01OVDAwMDgiLCJNTlVfUlBUMDAwMSIsIk1OVV9SUFQwMDAyIiwiTU5VX1JQVDAwMDMiLCJNTlVfUlBUMDAwNCIsIk1OVV9SUFQwMDA1Il0sImFwcGxpY2F0aW9uX2NvZGUiOiJzaWp1cHJpLWFkbWluIiwiaW5zdGFuc2lfaWQiOm51bGwsInVuaXRfa2VyamFfaWQiOm51bGwsInVybHMiOlsiL2FwaS92MS8qKnxDVUQiXX19.a3-ZVx3A8_3ro5L2RCpjOOSwAYXQjmWVy3JNBeq3mQXmD72IzIctFs52mDqu1GEyifnecDyRIR-kuDgyL0_dcWOGXQSKAvp39pMYHT8W8wovHL16u_5qevppkQrkJj7dmZWpOQ1fM4tjhCfc6y50NqW6NR2moeei1DknntFH-x4khtl_WaSOi4zL7XdKZUfAFm33JI2RjxENWQPn6eXXiFhdR6sX1iwd-O3XDCSYYy4Hmvr3BcQYA3IDGYd0xC06M24-HX2pBHbvKSdRb4cVW9iSe6gtqpksE1N4yDRv5hMpWif-kFXlk6hO4ftHQYtlViSpzO8Q6FtSqH3O8ARgXeb4J0MjM6xBKKisW0skL-ZFkPpjPWRHXFxckl0JIcZzesSwPyIY68ks7Eq1bub03K-qzR5HzObm67jTX8UveH_ukZDm9mkn7LMKeGmJsfS-1W1QmnsroxX3LhQd-zdu_mKgG9kR64In4FuVnhl9_niNmQ7P-dzifJNKJEV92VmkuRj5N8xTHHO7OEviHBA021ao6H7caCPSorjFPX5fG45ZqAUV5SvdmgehRoYY99qP80BoyOEPAkVUh_fEN67Y7ZcJIqmIpQIOSIT2AMZ-oMvAWZsCp8cJXT2dxfpnzhpFlTz6ZYZAu-aypeg2btuU85DZrQTXnvbz0gNDxVUFcZk",
-
-    baseStart: "2026-02-24T09:50",
+    baseStart: "2026-02-24T13:00",
 
     roomUkomId: "eb050024-4f81-4051-ba33-7bbb76560a1b",
 
     participantIdList: [],
 
-    durations: {
-        cat: 0.08,
-        wawancara: 0.03,
-        portofolio: 0.08,
-        praktik: 0.08,
-        studi_kasus: 0.08,
+    // SOURCE OF TRUTH = MINUTES
+    durationsMinutes: {
+        cat: 5,
+        wawancara: 2,
+        portofolio: 5,
+        praktik: 5,
+        studi_kasus: 5,
         makalah: {
-            makalah: 0.03,
-            seminar: 0.1,
+            makalah: 2,
+            seminar: 6,
         },
     },
 
     secretKeys: {
         cat: "1",
         studi_kasus: "1",
-    },
-}
-
-// ============================================================================
-// BASE PAYLOAD TEMPLATES
-// ============================================================================
-
-const PAYLOAD_TEMPLATES = {
-    cat: {
-        duration: 0.08,
-        endTime: "",
-        participantIdList: [],
-        roomUkomId: "",
-        secretKey: "1",
-        startTime: "",
-    },
-
-    wawancara: {
-        duration: 0.03,
-        endTime: "",
-        participantIdList: [],
-        roomUkomId: "",
-        startTime: "",
-    },
-
-    portofolio: {
-        endTime: "",
-        participantIdList: [],
-        roomUkomId: "",
-        secretKey: null,
-        startTime: "",
-    },
-
-    praktik: {
-        endTime: "",
-        participantIdList: [],
-        roomUkomId: "",
-        secretKey: null,
-        startTime: "",
-    },
-
-    studi_kasus: {
-        endTime: "",
-        participantIdList: [],
-        roomUkomId: "",
-        secretKey: "1",
-        startTime: "",
-    },
-
-    makalah: {
-        duration: 0.03,
-        makalahEndTime: "",
-        makalahStartTime: "",
-        participantIdList: [],
-        roomUkomId: "",
-        seminarEndTime: "",
-        seminarStartTime: "",
     },
 }
 
@@ -114,23 +55,80 @@ function getBaseStartTime() {
 }
 
 function formatDateTime(date) {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-    const day = String(date.getDate()).padStart(2, "0")
-    const hours = String(date.getHours()).padStart(2, "0")
-    const minutes = String(date.getMinutes()).padStart(2, "0")
+    const pad = (n) => String(n).padStart(2, "0")
 
-    return `${year}-${month}-${day}T${hours}:${minutes}`
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+        date.getDate(),
+    )}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
-function addHours(date, hours) {
+function addMinutes(date, minutes) {
     const newDate = new Date(date)
-    newDate.setMinutes(newDate.getMinutes() + Math.round(hours * 60))
+    newDate.setMinutes(newDate.getMinutes() + minutes)
     return newDate
 }
 
 function cloneObject(obj) {
     return JSON.parse(JSON.stringify(obj))
+}
+
+function minutesToHours(minutes) {
+    return minutes / 60 // no rounding
+}
+
+// ============================================================================
+// PAYLOAD TEMPLATES
+// ============================================================================
+
+const PAYLOAD_TEMPLATES = {
+    cat: {
+        duration: 0,
+        endTime: "",
+        participantIdList: [],
+        roomUkomId: "",
+        secretKey: "1",
+        startTime: "",
+    },
+    wawancara: {
+        duration: 0,
+        endTime: "",
+        participantIdList: [],
+        roomUkomId: "",
+        startTime: "",
+    },
+    portofolio: {
+        duration: 0,
+        endTime: "",
+        participantIdList: [],
+        roomUkomId: "",
+        secretKey: null,
+        startTime: "",
+    },
+    praktik: {
+        duration: 0,
+        endTime: "",
+        participantIdList: [],
+        roomUkomId: "",
+        secretKey: null,
+        startTime: "",
+    },
+    studi_kasus: {
+        duration: 0,
+        endTime: "",
+        participantIdList: [],
+        roomUkomId: "",
+        secretKey: "1",
+        startTime: "",
+    },
+    makalah: {
+        duration: 0,
+        makalahStartTime: "",
+        makalahEndTime: "",
+        seminarStartTime: "",
+        seminarEndTime: "",
+        participantIdList: [],
+        roomUkomId: "",
+    },
 }
 
 // ============================================================================
@@ -139,19 +137,18 @@ function cloneObject(obj) {
 
 function buildStandardPayload(examType, baseStart) {
     const template = cloneObject(PAYLOAD_TEMPLATES[examType])
-    const duration = CONFIG.durations[examType]
+    const durationMinutes = CONFIG.durationsMinutes[examType]
 
     const startTime = baseStart
-    const endTime = addHours(startTime, duration)
+    const endTime = addMinutes(startTime, durationMinutes)
 
     template.startTime = formatDateTime(startTime)
     template.endTime = formatDateTime(endTime)
     template.roomUkomId = CONFIG.roomUkomId
     template.participantIdList = CONFIG.participantIdList
 
-    if ("duration" in template && typeof duration === "number") {
-        template.duration = duration
-    }
+    // Backend expects HOURS
+    template.duration = minutesToHours(durationMinutes)
 
     if (examType in CONFIG.secretKeys) {
         template.secretKey = CONFIG.secretKeys[examType]
@@ -162,40 +159,47 @@ function buildStandardPayload(examType, baseStart) {
 
 function buildWawancaraPayload(baseStart) {
     const template = cloneObject(PAYLOAD_TEMPLATES.wawancara)
-    const duration = CONFIG.durations.wawancara
+    const durationMinutes = CONFIG.durationsMinutes.wawancara
+
+    // multiplied by 5 (business rule)
+    const totalMinutes = durationMinutes * 5
 
     const startTime = baseStart
-
-    // multiply duration by 5
-    const multipliedDuration = duration * 5
-    const endTime = addHours(startTime, multipliedDuration)
+    const endTime = addMinutes(startTime, totalMinutes)
 
     template.startTime = formatDateTime(startTime)
     template.endTime = formatDateTime(endTime)
     template.roomUkomId = CONFIG.roomUkomId
     template.participantIdList = CONFIG.participantIdList
-    template.duration = duration
+
+    // duration field remains single-slot duration (as before)
+    template.duration = minutesToHours(durationMinutes)
 
     return template
 }
 
 function buildMakalahPayload(baseStart) {
     const template = cloneObject(PAYLOAD_TEMPLATES.makalah)
-    const { makalah: makalahDuration, seminar: seminarDuration } =
-        CONFIG.durations.makalah
+
+    const makalahMinutes = CONFIG.durationsMinutes.makalah.makalah
+    const seminarMinutes = CONFIG.durationsMinutes.makalah.seminar
 
     const makalahStartTime = baseStart
-    const makalahEndTime = addHours(makalahStartTime, makalahDuration)
+    const makalahEndTime = addMinutes(makalahStartTime, makalahMinutes)
+
     const seminarStartTime = makalahEndTime
-    const seminarEndTime = addHours(seminarStartTime, seminarDuration)
+    const seminarEndTime = addMinutes(seminarStartTime, seminarMinutes)
 
     template.makalahStartTime = formatDateTime(makalahStartTime)
     template.makalahEndTime = formatDateTime(makalahEndTime)
     template.seminarStartTime = formatDateTime(seminarStartTime)
     template.seminarEndTime = formatDateTime(seminarEndTime)
+
     template.roomUkomId = CONFIG.roomUkomId
     template.participantIdList = CONFIG.participantIdList
-    template.duration = makalahDuration
+
+    // duration = makalah duration in HOURS (backend contract)
+    template.duration = minutesToHours(makalahMinutes)
 
     return template
 }
@@ -240,31 +244,11 @@ async function sendPostRequest(endpoint, payload) {
     return responseData
 }
 
-function toLocalISOString(date = new Date()) {
-    const pad = (n) => String(n).padStart(2, "0")
-
-    const year = date.getFullYear()
-    const month = pad(date.getMonth() + 1)
-    const day = pad(date.getDate())
-    const hours = pad(date.getHours())
-    const minutes = pad(date.getMinutes())
-    const seconds = pad(date.getSeconds())
-
-    const offsetMinutes = -date.getTimezoneOffset()
-    const sign = offsetMinutes >= 0 ? "+" : "-"
-    const absOffset = Math.abs(offsetMinutes)
-    const offsetHours = pad(Math.floor(absOffset / 60))
-    const offsetMins = pad(absOffset % 60)
-
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetMins}`
-}
-
 // ============================================================================
 // MAIN
 // ============================================================================
 
 async function main() {
-    console.log("Current Time: " + toLocalISOString())
     console.log("Exam Schedule Automation Script")
     console.log("=".repeat(80))
 

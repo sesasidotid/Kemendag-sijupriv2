@@ -569,7 +569,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
                 // normalize duration
                 if ((request as any).duration) {
                     ;(request as any).duration = Number(
-                        ((request as any).duration / 60).toFixed(2),
+                        ((request as any).duration / 60).toFixed(4),
                     )
                 }
 

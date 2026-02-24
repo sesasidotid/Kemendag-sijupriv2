@@ -407,7 +407,7 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
 
                 if (request.duration) {
                     request.duration = Number(
-                        (request.duration / 60).toFixed(2),
+                        (request.duration / 60).toFixed(4),
                     )
                 }
 
@@ -437,7 +437,7 @@ export class UkomExamScheduleUpdateComponent implements OnInit {
 
                                 if (childRequest.duration) {
                                     childRequest.duration = Number(
-                                        (childRequest.duration / 60).toFixed(2),
+                                        (childRequest.duration / 60).toFixed(4),
                                     )
                                 }
 

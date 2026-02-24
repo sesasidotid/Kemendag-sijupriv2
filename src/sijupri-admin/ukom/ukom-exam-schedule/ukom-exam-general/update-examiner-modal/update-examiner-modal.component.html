@@ -1,0 +1,78 @@
+<app-modal
+    (saveEvent)="onConfirm()"
+    (toggle)="onClose()"
+    [size]="'lg'"
+    [title]="'Ubah Penguji'"
+>
+    <div class="row g-3">
+        <!-- Participant Information -->
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Informasi Peserta</div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-md-4 text-muted">Nama Peserta</div>
+                    <div class="col-md-8 fw-medium">
+                        {{ participant.participantUkom?.name || 'Unknown' }}
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 text-muted">NIP</div>
+                    <div class="col-md-8">
+                        {{ participant.participantUkom?.nip || '—' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Current Examiners Info -->
+        <div class="alert alert-info mb-3">
+            <strong>Penguji Saat Ini:</strong>
+            <div>{{ getSelectedExaminerNames() }}</div>
+        </div>
+        <!-- Examiner Selection -->
+        <div class="available-examiners">
+            <div class="alert alert-warning border">
+                <i
+                    class="mdi mdi-information-slab-circle-outline text-warning me-2"
+                ></i>
+                <small>
+                    <strong>Catatan:</strong> Anda hanya dapat memilih satu
+                    penguji. Klik pada baris untuk memilih penguji.
+                </small>
+            </div>
+            <div *ngIf="examinerList.length === 0" class="alert alert-warning">
+                Tidak ada penguji tersedia.
+            </div>
+            <ag-grid-angular
+                (gridReady)="onGridReady($event)"
+                (selectionChanged)="onSelectionChanged($event)"
+                *ngIf="examinerList.length > 0"
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                [getRowClass]="getRowClass.bind(this)"
+                [rowData]="examinerList"
+                [rowMultiSelectWithClick]="true"
+                [rowSelection]="'multiple'"
+                [style.height]="calculateGridHeight()"
+                class="ag-theme-alpine"
+            >
+            </ag-grid-angular>
+        </div>
+        <!-- Validation Warning -->
+        <div
+            *ngIf="selectedExaminerIds().length === 0"
+            class="alert alert-warning mt-3"
+        >
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Silakan pilih minimal satu penguji sebelum menyimpan.
+        </div>
+        <!-- Selected Examiners Summary -->
+        <div
+            *ngIf="selectedExaminerIds().length > 0"
+            class="alert alert-success mt-3"
+        >
+            <i class="mdi mdi-check-circle me-2"></i>
+            <strong>{{ selectedExaminerIds().length }}</strong> penguji dipilih:
+            {{ getSelectedExaminerNames() }}
+        </div>
+    </div>
+</app-modal>

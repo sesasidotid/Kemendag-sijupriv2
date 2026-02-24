@@ -8,7 +8,7 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
-import { EMPTY, finalize, forkJoin, switchMap, timer } from 'rxjs'
+import { EMPTY, finalize, forkJoin, map, switchMap, timer } from 'rxjs'
 import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
 import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
@@ -211,6 +211,12 @@ export class DashboardComponent implements OnInit {
                         : EMPTY
                 }),
                 finalize(() => this.loadingExamSchedule.set(false)),
+                map((exams) =>
+                    exams.filter(
+                        (exam) =>
+                            exam.examTypeCode !== ExamTypeCategory.MAKALAH,
+                    ),
+                ),
             )
             .subscribe({
                 next: (res) => this.schedules.set(res),
