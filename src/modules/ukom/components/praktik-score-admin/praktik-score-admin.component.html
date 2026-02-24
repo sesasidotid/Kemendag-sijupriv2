@@ -9,18 +9,17 @@
     <div class="card-body bg-light">
         <div class="row">
             <ng-container
-                *ngFor="let group of groupedQuestions(); let i = index"
+                *ngFor="let group of groupedQuestions()"
             >
                 <div class="col-12 mb-3">
                     <div class="card h-100 border-0 shadow-sm">
-                        <!-- Parent Question -->
+                        <!-- Parent Question (Participant's Work) -->
                         <div class="card-header border-bottom-0 bg-white py-3">
                             <div
                                 class="d-flex justify-content-between align-items-start"
                             >
                                 <div>
-                                    <!--                                    <h6 class="mb-0 fw-bold text-primary">Pertanyaan {{ i + 1 }}</h6>-->
-                                    <p class="text-dark mb-0 mt-2">
+                                    <p class="text-dark mb-0 mt-2 fw-bold">
                                         {{ group.parent.question }}
                                     </p>
                                 </div>
@@ -33,9 +32,12 @@
                         </div>
 
                         <div class="card-body border-top">
-                            <!-- Parent Answer -->
-                            <div *ngIf="group.parent.answerDto">
-                                <h6 class="fw-bold mb-3">Jawaban:</h6>
+                            <!-- Parent Answer (Participant Upload/Text) -->
+                            <h6 class="fw-bold mb-3 text-primary">
+                                Jawaban Peserta:
+                            </h6>
+
+                            <div *ngIf="group.parent.answerDto; else noAnswer">
                                 <p
                                     *ngIf="getAnswerText(group.parent)"
                                     class="bg-light mb-3 rounded border p-3"
@@ -71,72 +73,62 @@
                                     </a>
                                 </div>
                             </div>
+                            <ng-template #noAnswer>
+                                <div
+                                    class="alert alert-warning d-flex align-items-center mb-3"
+                                >
+                                    <i
+                                        class="mdi mdi-alert-circle-outline fs-5 me-2"
+                                    ></i>
+                                    <div>Belum ada jawaban peserta.</div>
+                                </div>
+                            </ng-template>
 
-                            <!-- Child Questions -->
+                            <!-- Child Questions (Examiner Scores) -->
                             <div
                                 *ngIf="group.children.length > 0"
-                                class="ms-2 mt-4"
+                                class="mt-4 pt-3 border-top"
                             >
-                                <h6 class="text-muted mb-3">Sub-Pertanyaan:</h6>
+                                <h6 class="fw-bold mb-3 text-secondary">
+                                    Penilaian Asesor:
+                                </h6>
                                 <div
                                     *ngFor="let child of group.children"
-                                    class="border-start border-3 border-info mb-3 ps-3"
+                                    class="mb-3 ps-3 border-start border-3 border-info"
                                 >
-                                    <p class="fw-bold mb-2">
-                                        {{ child.question }}
-                                    </p>
-
-                                    <!-- Child Answer -->
                                     <div
-                                        *ngIf="child.answerDto"
-                                        class="bg-light rounded p-3"
+                                        class="d-flex justify-content-between align-items-start"
                                     >
-                                        <p
-                                            *ngIf="getAnswerText(child)"
-                                            class="mb-2"
-                                        >
-                                            {{ getAnswerText(child) }}
-                                        </p>
-
-                                        <div
-                                            *ngIf="hasUpload(child)"
-                                            class="mt-2"
-                                        >
-                                            <a
-                                                *ngIf="child.answerDto?.answerUploadUrl"
-                                                [href]="child.answerDto.answerUploadUrl"
-                                                class="btn btn-sm btn-outline-info"
-                                                target="_blank"
+                                        <div>
+                                            <p class="mb-1 text-dark">
+                                                {{ child.question }}
+                                            </p>
+                                        </div>
+                                        <div class="text-end ms-2">
+                                            <span
+                                                *ngIf="child.weight"
+                                                class="badge bg-light text-dark border me-1"
+                                                >Max: {{ child.weight }}</span
                                             >
-                                                <i
-                                                    class="mdi mdi-open-in-new me-1"
-                                                ></i>
-                                                Lihat Dokumen
-                                            </a>
+                                            <span
+                                                class="badge text-white"
+                                                [ngClass]="getAnswerScore(child) > 0 ? 'bg-success' : 'bg-warning'"
+                                            >
+                                                Nilai:
+                                                {{ getAnswerScore(child) }}
+                                            </span>
                                         </div>
                                     </div>
+                                    <!-- Optional: if child answer also has text/upload (unlikely for pure score but possible) -->
                                     <div
-                                        *ngIf="!child.answerDto"
-                                        class="text-muted fst-italic"
+                                        *ngIf="getAnswerText(child)"
+                                        class="mt-2 text-muted small fst-italic"
                                     >
-                                        <small
-                                            >Belum ada jawaban
-                                            sub-pertanyaan.</small
-                                        >
+                                        Catatan: {{ getAnswerText(child) }}
                                     </div>
                                 </div>
                             </div>
-
-                            <div
-                                *ngIf="!group.parent.answerDto && group.children.length === 0"
-                                class="alert alert-warning d-flex align-items-center mb-0 mt-3"
-                            >
-                                <i
-                                    class="mdi mdi-alert-circle-outline fs-5 me-2"
-                                ></i>
-                                <div>Belum ada jawaban.</div>
-                            </div>
-                        </div>
+                         </div>
                     </div>
                 </div>
             </ng-container>

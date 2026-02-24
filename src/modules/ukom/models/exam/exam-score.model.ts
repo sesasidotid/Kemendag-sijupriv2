@@ -75,6 +75,7 @@ export class StudiKasusScore extends BaseScore {
             score: number | null
             answerUpload?: string
             answerUploadUrl?: string
+            answerText?: string
         }
     }> = []
 

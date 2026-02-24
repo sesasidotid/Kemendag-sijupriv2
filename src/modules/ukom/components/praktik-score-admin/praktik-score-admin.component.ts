@@ -12,10 +12,9 @@ import { PraktikScore } from '@/modules/ukom/models/exam/exam-score.model'
 export class PraktikScoreAdminComponent {
     score = input<PraktikScore | null>(null)
 
-    groupedQuestions = computed(() => {
+        groupedQuestions = computed(() => {
         const list = this.score()?.questionDtoList || []
         const parents = list.filter((q) => !q.parentQuestionId)
-
         return parents.map((parent) => ({
             parent,
             children: list.filter((q) => q.parentQuestionId === parent.id),
@@ -32,5 +31,8 @@ export class PraktikScoreAdminComponent {
     getAnswerText(question: any): string {
         return question.answerDto?.answerText || ''
     }
-}
 
+    getAnswerScore(question: any): number {
+        return question.answerDto?.score ?? 0
+    }
+}
