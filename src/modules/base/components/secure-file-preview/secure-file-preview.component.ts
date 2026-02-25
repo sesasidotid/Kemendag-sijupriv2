@@ -4,10 +4,10 @@ import { CommonModule } from '@angular/common'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { PdfViewerModule } from 'ng2-pdf-viewer'
 import * as pdfjsLib from 'pdfjs-dist'
-import pdfWorker from 'pdfjs-dist/build/pdf.worker?url'
+// import pdfWorker from 'pdfjs-dist/build/pdf.worker?url'
 
 // Configure PDF.js worker using static import
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/assets/pdf.worker.min.mjs'
 
 @Component({
     selector: 'app-secure-file-preview',

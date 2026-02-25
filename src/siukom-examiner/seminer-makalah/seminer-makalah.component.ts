@@ -12,7 +12,7 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ExamService } from '@/modules/ukom/services/exam.service'
-import { finalize } from 'rxjs'
+import { catchError, finalize, of, switchMap } from 'rxjs'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { SaveExamAnswerRequest } from '@/modules/ukom/models/exam/exam-answer.model'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
@@ -373,18 +373,37 @@ export class SeminerMakalahComponent implements OnInit {
 
                 this.submitting.set(true)
 
+                // Start exam silently first
                 this.examService
-                    .saveExamAnswersForExaminerByExamScheduleId(
-                        this.examId(),
-                        payload,
+                    .startExamByExaminer(
+                        new ExaminerExamStartRequest({
+                            participantId: this.participantId(),
+                            examTypeCode: ExamTypeCategory.SEMINAR,
+                            roomUkomId: this.examScheduleDetail()?.roomUkomId || '',
+                            examScheduleId: this.examId(),
+                        }),
                     )
-                    .pipe(finalize(() => this.submitting.set(false)))
+                    .pipe(
+                        // Continue even if start exam fails (e.g. already started)
+                        catchError((err) => {
+                            console.warn('Silent start exam failed / already started:', err)
+                            return of(null)
+                        }),
+                        switchMap(() =>
+                            this.examService.saveExamAnswersForExaminerByExamScheduleId(
+                                this.examId(),
+                                payload,
+                            ),
+                        ),
+                        finalize(() => this.submitting.set(false)),
+                    )
                     .subscribe({
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Penilaian berhasil disimpan.',
                             )
+                            this.examStarted.set(true)
                             // Clear draft after successful save
                             this.draftService
                                 .remove(this.examId(), this.participantId())
