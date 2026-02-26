@@ -11,6 +11,7 @@ export class CreatePreviewSuratRekomRequest extends Serializable {
     numCode1: string = undefined
     numCode3: string = undefined
     numCode4: string = undefined
+    ditetapkan: string = undefined
 
     constructor(body?: Partial<CreatePreviewSuratRekomRequest>) {
         super()

@@ -84,6 +84,26 @@
         </div>
 
         <div class="mb-3">
+            <label [for]="fields.ditetapkan" class="form-label"
+                >Ditetapkan Di <span class="text-danger">*</span></label
+            >
+            <input
+                [formControlName]="fields.ditetapkan"
+                [id]="fields.ditetapkan"
+                appInvalidOnTouch
+                class="form-control"
+                placeholder="Contoh: Jakarta"
+                type="text"
+            />
+            <div
+                *ngIf="getErrorMessage(fields.ditetapkan, 'Ditetapkan Di') as error"
+                class="invalid-feedback"
+            >
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label"
                 >Nomor Surat <span class="text-danger">*</span></label
             >

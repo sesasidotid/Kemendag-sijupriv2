@@ -38,6 +38,7 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
     readonly fields = {
         letterHead: 'letterHead',
         dateLetterIssuance: 'dateLetterIssuance',
+        ditetapkan: 'ditetapkan',
         signingOfficial: 'signingOfficial',
         officialPosition: 'officialPosition',
         officialNumber: 'officialNumber',
@@ -81,6 +82,7 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
         this.suratRekomForm = this.fb.group({
             [this.fields.letterHead]: [null, Validators.required],
             [this.fields.dateLetterIssuance]: ['', Validators.required],
+            [this.fields.ditetapkan]: ['', Validators.required],
             [this.fields.signingOfficial]: ['', Validators.required],
             [this.fields.officialPosition]: ['', Validators.required],
             [this.fields.officialNumber]: ['', Validators.required],
@@ -245,6 +247,7 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
             numCode1: this.suratRekomForm.get('numCode1')?.value,
             numCode3: this.suratRekomForm.get('numCode3')?.value,
             numCode4: this.suratRekomForm.get('numCode4')?.value,
+            ditetapkan: this.suratRekomForm.get('ditetapkan')?.value,
         })
     }
 }

@@ -58,6 +58,7 @@ export class SuratRekomService {
                 numCode1: payload.numCode1,
                 numCode3: payload.numCode3,
                 numCode4: payload.numCode4,
+                ditetapkan: payload.ditetapkan,
             },
         }
         return this.apiService.postData(`${this.BASE_PATH}`, body).pipe(
