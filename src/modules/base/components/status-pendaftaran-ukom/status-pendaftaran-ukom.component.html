@@ -718,9 +718,10 @@
             </div>
         </div>
 
-        <ng-container
-            *ngIf="ukomGrade.id?.trim() && finishTask.rekomendasiUrl?.trim()"
-        >
+        <!--        <ng-container-->
+        <!--            *ngIf="ukomGrade.id?.trim() && finishTask.rekomendasiUrl?.trim()"-->
+        <!--        >-->
+        <ng-container *ngIf="ukomGrade.id?.trim()">
             <app-ukom-grade-table
                 (downloadFile)=" downloadRekomendasi()"
                 [gradeData]="ukomGrade"
