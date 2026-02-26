@@ -1,4 +1,12 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import {
+    Component,
+    effect,
+    ElementRef,
+    inject,
+    OnInit,
+    signal,
+    ViewChild,
+} from '@angular/core'
 import {
     FormBuilder,
     FormGroup,
@@ -17,7 +25,6 @@ import { finalize } from 'rxjs'
 import { SuratRekomService } from '@/modules/ukom/services/surat-rekom.service'
 import { CreatePreviewSuratRekomRequest } from '@/modules/ukom/models/surat-rekom/create-preview-surat-rekom-request.model'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 
 @Component({
     selector: 'app-ukom-grade-surat-rekom-setup',
@@ -35,6 +42,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
     styleUrl: './ukom-grade-surat-rekom-setup.component.scss',
 })
 export class UkomGradeSuratRekomSetupComponent implements OnInit {
+    // TODO: Make the template from backend 1 page size in A4 paper
+    @ViewChild('previewFrame') previewFrame!: ElementRef<HTMLIFrameElement>
+
     readonly fields = {
         letterHead: 'letterHead',
         dateLetterIssuance: 'dateLetterIssuance',
@@ -51,13 +61,11 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
     formValidationService = inject(FormValidationService)
     handlerService = inject(HandlerService)
     suratRekomService = inject(SuratRekomService)
-    sanitizer = inject(DomSanitizer)
     suratRekomForm: FormGroup
 
-    templateHtml = signal<SafeHtml | null>(null)
+    templateHtml = signal<string | null>(null)
     isLoadingTemplate = signal(false)
     showSetupModal = signal(false)
-
     inputs = signal<FIleHandler>({
         files: {
             [this.fields.letterHead]: { label: 'Kop Surat', required: true },
@@ -70,8 +78,19 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
                 ?.setValue(base64Data)
         },
     })
-
     submitLoading = signal(false)
+
+    constructor() {
+        effect(() => {
+            const htmlContent = this.templateHtml()
+            // Using a slightly longer timeout to ensure *ngIf has processed and DOM is ready
+            if (htmlContent) {
+                setTimeout(() => {
+                    this.updateIframeContent(htmlContent)
+                }, 100)
+            }
+        })
+    }
 
     ngOnInit() {
         this.initForm()
@@ -123,11 +142,7 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
             .subscribe({
                 next: (response) => {
                     if (response && response.template) {
-                        this.templateHtml.set(
-                            this.sanitizer.bypassSecurityTrustHtml(
-                                response.template,
-                            ),
-                        )
+                        this.templateHtml.set(response.template)
                     } else {
                         this.templateHtml.set(null)
                     }
@@ -137,6 +152,33 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
                     this.templateHtml.set(null)
                 },
             })
+    }
+
+    updateIframeContent(htmlString: string) {
+        // Double check if previewFrame is available
+        if (!this.previewFrame?.nativeElement) {
+            // If not available yet, try again shortly (retry logic)
+            setTimeout(() => this.updateIframeContent(htmlString), 100)
+            return
+        }
+
+        const iframe = this.previewFrame.nativeElement
+        // Add error handling/checking for contentWindow
+        const doc = iframe.contentDocument || iframe.contentWindow?.document
+
+        if (doc) {
+            doc.open()
+            doc.write(htmlString)
+            doc.close()
+        }
+    }
+
+    printPreview() {
+        const iframe = this.previewFrame?.nativeElement
+        if (iframe?.contentWindow) {
+            iframe.contentWindow.focus()
+            iframe.contentWindow.print()
+        }
     }
 
     openSetupModal() {
@@ -181,8 +223,9 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
                         'Surat Rekomendasi berhasil disimpan.',
                     )
                     this.closeSetupModal()
+                    // Reload template to update iframe
                     this.loadTemplate()
-                    this.suratRekomForm.reset()
+                    // this.suratRekomForm.reset() // Optional: based on requirements
                 },
                 error: (error) => {
                     console.error(error)
