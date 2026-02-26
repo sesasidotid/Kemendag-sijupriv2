@@ -391,14 +391,17 @@ export class DashboardComponent implements OnInit {
         examStartTime: string,
     ): boolean {
         const personalSchedule = pSchedule.personalSchedule
+        const isExamined = pSchedule.examined === true
 
-        // For WAWANCARA and SEMINAR: check if within personal schedule window
+        // For WAWANCARA and SEMINAR:
+        // Must have personal schedule
+        // Must be within schedule window
+        // Must NOT already be examined
         if (
             examType === ExamTypeCategory.WAWANCARA ||
             examType === ExamTypeCategory.SEMINAR
         ) {
-            if (!personalSchedule) {
-                // No personal schedule assigned yet
+            if (!personalSchedule || isExamined) {
                 return false
             }
 
@@ -407,14 +410,13 @@ export class DashboardComponent implements OnInit {
                 durationMinutes,
             )
 
-            // Current time should be >= personal schedule start and <= end
             return now >= personalSchedule && now <= scheduleEnd
         }
 
         // For PORTOFOLIO, STUDI_KASUS, PRAKTIK, MAKALAH:
-        // Show if exam has started and not yet examined
+        // Must have exam started
+        // Must NOT already be examined
         const isExamStarted = now >= examStartTime
-        const isExamined = pSchedule.examined === true
 
         return isExamStarted && !isExamined
     }

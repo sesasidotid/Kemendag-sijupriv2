@@ -1,0 +1,99 @@
+<div class="total-score-container">
+    <div class="total-score-value">{{ score()?.score | number: '1.2-2' }}</div>
+</div>
+
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-header bg-primary py-3 text-white">
+        <h5 class="fw-bold mb-0 text-white">Detail Wawancara</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+            <ng-container
+                *ngFor="let item of score()?.questionDtoList; let i = index"
+            >
+                <div class="col-12 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header border-bottom-0 bg-white py-3">
+                            <div
+                                class="d-flex justify-content-between align-items-start"
+                            >
+                                <div>
+                                    <h6 class="fw-bold text-primary mb-0">
+                                        Pertanyaan {{ i + 1 }}
+                                    </h6>
+                                    <p class="text-dark mb-0 mt-2">
+                                        {{ item.question }}
+                                    </p>
+                                </div>
+                                <div class="ms-2 text-end">
+                                    <span
+                                        *ngIf="item.weight"
+                                        class="badge bg-secondary d-block mb-1 text-white"
+                                    >
+                                        Bobot: {{ item.weight }}
+                                    </span>
+                                    <span
+                                        *ngIf="item.answerDto?.answerChoice"
+                                        [ngClass]="{
+                                            'bg-success': item.answerDto.answerChoice === 'kompeten',
+                                            'bg-danger': item.answerDto.answerChoice !== 'kompeten'
+                                        }"
+                                        class="badge d-block text-capitalize text-white"
+                                    >
+                                        {{ item.answerDto.answerChoice }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body border-top">
+                            <h6 class="fw-bold text-primary mb-3">
+                                Jawaban Peserta:
+                            </h6>
+
+                            <div
+                                *ngIf="item.answerDto?.answerText; else noAnswer"
+                            >
+                                <p class="bg-light mb-0 rounded border p-3">
+                                    {{ item.answerDto.answerText }}
+                                </p>
+                            </div>
+
+                            <ng-template #noAnswer>
+                                <div
+                                    class="alert alert-warning d-flex align-items-center mb-0"
+                                >
+                                    <i
+                                        class="mdi mdi-alert-circle-outline fs-5 me-2"
+                                    ></i>
+                                    <div>Belum ada jawaban peserta.</div>
+                                </div>
+                            </ng-template>
+
+                            <div *ngIf="item.hint" class="border-top mt-3 pt-3">
+                                <h6 class="fw-bold text-secondary mb-2">
+                                    Kunci Jawaban:
+                                </h6>
+                                <p class="text-muted small fst-italic mb-0">
+                                    {{ item.hint }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="!score()?.questionDtoList?.length">
+                <div class="col-12 py-5 text-center">
+                    <i
+                        class="mdi mdi-microphone-outline text-muted"
+                        style="font-size: 4rem"
+                    ></i>
+                    <p class="text-muted mt-3">
+                        Tidak ada data penilaian wawancara.
+                    </p>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>

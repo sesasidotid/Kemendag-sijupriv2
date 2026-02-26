@@ -43,7 +43,8 @@
                     <div class="mb-3">
                         <label class="form-label">Status Pendaftar</label>
                         <p class="border-bottom">
-                            {{ participant.participantStatus == 'jf' ? 'JF Perdagangan' : 'Non-JF Perdagangan' }}
+                            {{ participant.participantStatus == 'jf' ? 'JF
+                            Perdagangan' : 'Non-JF Perdagangan' }}
                         </p>
                     </div>
                 </div>
@@ -315,105 +316,46 @@
             </h5>
         </div>
 
-      <div class="card-body p-0">
-        <div class="list-group list-group-flush">
-            <ng-container
-                *ngFor="let exam of participant.roomUkomDto?.examScheduleDtoList"
-            >
-<!--                <div-->
-<!--                    *ngIf="scoreMap[exam.id] != null && exam.examTypeCode === ExamTypeCategory.CAT"-->
-<!--                    class="list-group-item d-flex justify-content-between align-items-center flex-wrap"-->
-<!--                >-->
-<!--                    <h5 class="m-0">-->
-<!--                        {{ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)}}-->
-<!--                    </h5>-->
-
-<!--                    <div-->
-<!--                        class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"-->
-<!--                    >-->
-<!--                        <button-->
-<!--                            (click)="toggleModal(exam.id, exam.examTypeCode)"-->
-<!--                            class="btn btn-success"-->
-<!--                        >-->
-<!--                            Lihat Nilai-->
-<!--                        </button>-->
-<!--                        <app-loading-button-->
-<!--                            (clicked)="deleteExamScore(scoreMap[exam.id]?.id)"-->
-<!--                            [className]="'btn btn-danger'"-->
-<!--                            [isLoading]="isDeleteExamScoreLoading$ | async"-->
-<!--                            [type]="'button'"-->
-<!--                            label="Hapus Nilai"-->
-<!--                        >-->
-<!--                        </app-loading-button>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-<!--                <div-->
-<!--                    *ngIf="scoreMap[exam.id] != null && exam.examTypeCode === ExamTypeCategory.MAKALAH"-->
-<!--                    class="list-group-item d-flex justify-content-between align-items-center flex-wrap"-->
-<!--                >-->
-<!--                    <h5 class="m-0">-->
-<!--                        {{ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)}}-->
-<!--                    </h5>-->
-<!--                    <div-->
-<!--                        class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"-->
-<!--                    >-->
-<!--                        <button-->
-<!--                            (click)="viewFile(exam.id)"-->
-<!--                            class="btn btn-primary"-->
-<!--                        >-->
-<!--                            Lihat File-->
-<!--                        </button>-->
-<!--                        <button-->
-<!--                            (click)="toggleModal(exam.id, exam.examTypeCode)"-->
-<!--                            class="btn btn-success"-->
-<!--                        >-->
-<!--                            Lihat Nilai-->
-<!--                        </button>-->
-<!--                        <app-loading-button-->
-<!--                            (clicked)="deleteExamScore(scoreMap[exam.id]?.id)"-->
-<!--                            [className]="'btn btn-danger'"-->
-<!--                            [isLoading]="isDeleteExamScoreLoading$ | async"-->
-<!--                            [type]="'button'"-->
-<!--                            label="Hapus Nilai"-->
-<!--                        >-->
-<!--                        </app-loading-button>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-                <div
-                    *ngIf="scoreMap[exam.id] != null &&
-                           exam.examTypeCode !== ExamTypeCategory.MAKALAH"
-                    class="list-group-item py-3 "
+        <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+                <ng-container
+                    *ngFor="let exam of participant.roomUkomDto?.examScheduleDtoList"
                 >
-                  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                  <div>
-                    <h6 class="fw-semibold mb-1">
-                        {{ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)}}
-                    </h6>
-                  </div>
                     <div
-                        class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
+                        *ngIf="scoreMap[exam.id] != null"
+                        class="list-group-item py-3"
                     >
-                        <button
-                            (click)="toggleModal(exam.id, exam.examTypeCode)"
-                            class="btn btn-success"
+                        <div
+                            class="d-flex justify-content-between align-items-center flex-wrap gap-3"
                         >
-                            Lihat Nilai
-                        </button>
-                        <app-loading-button
-                            (clicked)="deleteExamScore(scoreMap[exam.id]?.id)"
-                            [className]="'btn btn-danger'"
-                            [isLoading]="isDeleteExamScoreLoading$ | async"
-                            [type]="'button'"
-                            label="Hapus Nilai"
-                        >
-                        </app-loading-button>
-                    </div></div>
-                </div>
-            </ng-container>
+                            <div>
+                                <h6 class="fw-semibold mb-1">
+                                    {{ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)}}
+                                </h6>
+                            </div>
+                            <div
+                                class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
+                            >
+                                <button
+                                    (click)="toggleModal(exam.id, exam.examTypeCode)"
+                                    class="btn btn-success"
+                                >
+                                    Lihat Nilai
+                                </button>
+                                <app-loading-button
+                                    (clicked)="deleteExamScore(scoreMap[exam.id]?.id)"
+                                    [className]="'btn btn-danger'"
+                                    [isLoading]="isDeleteExamScoreLoading$ | async"
+                                    [type]="'button'"
+                                    label="Hapus Nilai"
+                                >
+                                </app-loading-button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
         </div>
-      </div>
     </div>
 </ng-template>
 
@@ -428,29 +370,45 @@
         <!-- CAT Score Component -->
         <app-cat-score-admin
             *ngIf="getSelectedExamType() === ExamTypeCategory.CAT"
-            [score]="$any(selectedScore)">
+            [score]="$any(selectedScore)"
+        >
         </app-cat-score-admin>
 
         <app-portofolio-score-admin
             *ngIf="getSelectedExamType() === ExamTypeCategory.PORTOFOLIO"
-            [score]="$any(selectedScore)">
+            [score]="$any(selectedScore)"
+        >
         </app-portofolio-score-admin>
 
         <app-studi-kasus-score-admin
             *ngIf="getSelectedExamType() === ExamTypeCategory.STUDI_KASUS"
-            [score]="$any(selectedScore)">
+            [score]="$any(selectedScore)"
+        >
         </app-studi-kasus-score-admin>
 
         <app-praktik-score-admin
             *ngIf="getSelectedExamType() === ExamTypeCategory.PRAKTIK"
-            [score]="$any(selectedScore)">
+            [score]="$any(selectedScore)"
+        >
         </app-praktik-score-admin>
 
+        <app-wawancara-score-admin
+            *ngIf="getSelectedExamType() === ExamTypeCategory.WAWANCARA"
+            [score]="$any(selectedScore)"
+        >
+        </app-wawancara-score-admin>
+
         <app-makalah-score-admin
-            *ngIf="getSelectedExamType() === ExamTypeCategory.MAKALAH || getSelectedExamType() === ExamTypeCategory.WAWANCARA"
-            [score]="$any(selectedScore)">
+            *ngIf="getSelectedExamType() === ExamTypeCategory.MAKALAH"
+            [score]="$any(selectedScore)"
+        >
         </app-makalah-score-admin>
 
+        <app-seminar-score-admin
+            *ngIf="getSelectedExamType() === ExamTypeCategory.SEMINAR"
+            [score]="$any(selectedScore)"
+        >
+        </app-seminar-score-admin>
     </ng-container>
 </app-modal>
 

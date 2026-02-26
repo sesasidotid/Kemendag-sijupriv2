@@ -1,16 +1,16 @@
 import { Component, computed, input } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { MakalahScore } from '@/modules/ukom/models/exam/exam-score.model'
+import { SeminarScore } from '@/modules/ukom/models/exam/exam-score.model'
 
 @Component({
-    selector: 'app-makalah-score-admin',
+    selector: 'app-seminar-score-admin',
     standalone: true,
     imports: [CommonModule],
-    templateUrl: './makalah-score-admin.component.html',
-    styleUrls: ['./makalah-score-admin.component.scss'],
+    templateUrl: './seminar-score-admin.component.html',
+    styleUrls: ['./seminar-score-admin.component.scss'],
 })
-export class MakalahScoreAdminComponent {
-    score = input<MakalahScore | null>(null)
+export class SeminarScoreAdminComponent {
+    score = input<SeminarScore | null>(null)
 
     groupedQuestions = computed(() => {
         const list = this.score()?.questionDtoList || []
@@ -36,3 +36,4 @@ export class MakalahScoreAdminComponent {
         return question.answerDto?.answerText || ''
     }
 }
+

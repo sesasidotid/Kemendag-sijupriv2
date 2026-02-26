@@ -11,6 +11,14 @@ import { StudiKasusScore } from '@/modules/ukom/models/exam/exam-score.model'
 })
 export class StudiKasusScoreAdminComponent {
     score = input<StudiKasusScore | null>(null)
+    groupedQuestions = computed(() => {
+        const list = this.score()?.questionDtoList || []
+        const parents = list.filter((q) => !q.parentQuestionId)
+        return parents.map((parent) => ({
+            parent,
+            children: list.filter((q) => q.parentQuestionId === parent.id),
+        }))
+    })
 
     hasUpload(question: any): boolean {
         return !!(
@@ -20,15 +28,10 @@ export class StudiKasusScoreAdminComponent {
     }
 
     getAnswerScore(question: any): number {
-        return question.answerDto?.score ?? 0;
+        return question.answerDto?.score ?? 0
     }
 
-    groupedQuestions = computed(() => {
-        const list = this.score()?.questionDtoList || []
-        const parents = list.filter((q) => !q.parentQuestionId)
-        return parents.map((parent) => ({
-            parent,
-            children: list.filter((q) => q.parentQuestionId === parent.id),
-        }))
-    })
+    getAnswerText(question: any): string {
+        return question.answerDto?.answerText || ''
+    }
 }

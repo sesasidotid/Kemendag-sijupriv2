@@ -4,7 +4,7 @@
 
 <div class="card mb-4 border-0 shadow-sm">
     <div class="card-header bg-primary py-3 text-white">
-        <h5 class="fw-bold mb-0 text-white">Detail Studi Kasus</h5>
+        <h5 class="fw-bold mb-0 text-white">Detail Seminar</h5>
     </div>
     <div class="card-body bg-light">
         <div class="row">
@@ -13,35 +13,32 @@
             >
                 <div class="col-12 mb-3">
                     <div class="card h-100 border-0 shadow-sm">
-                        <!-- Parent Question (Case Study) -->
                         <div class="card-header border-bottom-0 bg-white py-3">
                             <div
                                 class="d-flex justify-content-between align-items-start"
                             >
                                 <div>
                                     <h6 class="fw-bold text-primary mb-0">
-                                        Studi Kasus {{ i + 1 }}
+                                        Seminar {{ i + 1 }}
                                     </h6>
                                     <p class="text-dark mb-0 mt-2">
                                         {{ group.parent.question }}
                                     </p>
                                 </div>
-                                <div class="text-end">
-                                    <span
-                                        *ngIf="group.parent.weight"
-                                        class="badge bg-secondary d-block mb-1 text-white"
-                                    >
-                                        Bobot Total: {{ group.parent.weight }}
-                                    </span>
-                                </div>
+                                <span
+                                    *ngIf="group.parent.weight"
+                                    class="badge bg-secondary ms-2 text-white"
+                                >
+                                    Bobot: {{ group.parent.weight }}
+                                </span>
                             </div>
                         </div>
 
                         <div class="card-body border-top">
-                            <!-- Participant Answer -->
                             <h6 class="fw-bold text-primary mb-3">
                                 Jawaban Peserta:
                             </h6>
+
                             <div *ngIf="group.parent.answerDto; else noAnswer">
                                 <!-- File Upload -->
                                 <div
@@ -55,11 +52,11 @@
                                         <h6 class="fw-bold mb-0">
                                             Dokumen Terlampir
                                         </h6>
-                                        <small class="text-muted"
-                                            >{{
+                                        <small class="text-muted">
+                                            {{
                                             group.parent.answerDto?.answerUpload
-                                            || 'File tersedia' }}</small
-                                        >
+                                            || 'File tersedia' }}
+                                        </small>
                                     </div>
                                     <a
                                         *ngIf="group.parent.answerDto?.answerUploadUrl"
@@ -67,16 +64,17 @@
                                         class="btn btn-sm btn-outline-primary ms-auto"
                                         target="_blank"
                                     >
-                                        <i class="mdi mdi-open-in-new me-1"></i>
-                                        Buka File
+                                        <i class="mdi mdi-open-in-new me-1"></i
+                                        >Buka File
                                     </a>
                                 </div>
-                                <!-- Text Answer if exists -->
+
+                                <!-- Text Answer -->
                                 <p
-                                    *ngIf="group.parent.answerDto?.answerText"
+                                    *ngIf="getAnswerText(group.parent)"
                                     class="bg-light mb-3 rounded border p-3"
                                 >
-                                    {{ group.parent.answerDto.answerText }}
+                                    {{ getAnswerText(group.parent) }}
                                 </p>
                             </div>
 
@@ -87,11 +85,11 @@
                                     <i
                                         class="mdi mdi-alert-circle-outline fs-5 me-2"
                                     ></i>
-                                    <div>Belum ada jawaban studi kasus.</div>
+                                    <div>Belum ada jawaban peserta.</div>
                                 </div>
                             </ng-template>
 
-                            <!-- Child Questions (Criteria Scores) -->
+                            <!-- Child Questions (Penguji Scores) -->
                             <div
                                 *ngIf="group.children.length > 0"
                                 class="border-top mt-4 pt-3"
@@ -106,17 +104,16 @@
                                     <div
                                         class="d-flex justify-content-between align-items-start"
                                     >
-                                        <div>
-                                            <p class="text-dark mb-1">
-                                                {{ child.question }}
-                                            </p>
-                                        </div>
+                                        <p class="text-dark mb-1">
+                                            {{ child.question }}
+                                        </p>
                                         <div class="ms-2 text-end">
                                             <span
                                                 *ngIf="child.weight"
                                                 class="badge bg-light text-dark me-1 border"
-                                                >Bobot: {{ child.weight }}</span
                                             >
+                                                Bobot: {{ child.weight }}
+                                            </span>
                                             <span
                                                 [ngClass]="getAnswerScore(child) > 0 ? 'bg-success' : 'bg-warning'"
                                                 class="badge text-white"
@@ -143,11 +140,11 @@
             <ng-container *ngIf="!groupedQuestions()?.length">
                 <div class="col-12 py-5 text-center">
                     <i
-                        class="mdi mdi-clipboard-text-outline text-muted"
+                        class="mdi mdi-presentation text-muted"
                         style="font-size: 4rem"
                     ></i>
                     <p class="text-muted mt-3">
-                        Tidak ada data penilaian studi kasus.
+                        Tidak ada data penilaian seminar.
                     </p>
                 </div>
             </ng-container>

@@ -1,32 +1,153 @@
 <div class="total-score-container">
     <div class="total-score-value">{{ score()?.score | number: '1.2-2' }}</div>
-    <div class="text-muted mt-2">Total Nilai Makalah</div>
 </div>
 
-<div *ngIf="score()?.questionDtoList?.length" class="card mb-4 shadow-sm border-0">
-     <div class="card-header bg-primary text-white py-3">
-        <h5 class="mb-0 text-white fw-bold">Detail Penilaian</h5>
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-header bg-primary py-3 text-white">
+        <h5 class="fw-bold mb-0 text-white">Detail Makalah</h5>
     </div>
     <div class="card-body bg-light">
-        <div class="list-group">
-            <ng-container *ngFor="let item of score()?.questionDtoList; let i = index">
-                 <div class="list-group-item border-0 mb-3 shadow-sm rounded">
-                    <div class="d-flex w-100 justify-content-between align-items-center">
-                        <h6 class="mb-1 fw-bold">Komponen Penilaian {{ i + 1 }}</h6>
-                        <span class="badge bg-info rounded-pill fs-6">{{ item.score | number:'1.2-2' }}</span>
+        <div class="row">
+            <ng-container
+                *ngFor="let group of groupedQuestions(); let i = index"
+            >
+                <div class="col-12 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header border-bottom-0 bg-white py-3">
+                            <div
+                                class="d-flex justify-content-between align-items-start"
+                            >
+                                <div>
+                                    <h6 class="fw-bold text-primary mb-0">
+                                        Makalah {{ i + 1 }}
+                                    </h6>
+                                    <p class="text-dark mb-0 mt-2">
+                                        {{ group.parent.question }}
+                                    </p>
+                                </div>
+                                <span
+                                    *ngIf="group.parent.weight"
+                                    class="badge bg-secondary ms-2 text-white"
+                                >
+                                    Bobot: {{ group.parent.weight }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body border-top">
+                            <h6 class="fw-bold text-primary mb-3">
+                                Jawaban Peserta:
+                            </h6>
+
+                            <div *ngIf="group.parent.answerDto; else noAnswer">
+                                <!-- File Upload -->
+                                <div
+                                    *ngIf="hasUpload(group.parent)"
+                                    class="d-flex align-items-center bg-light mb-3 rounded border p-3"
+                                >
+                                    <i
+                                        class="mdi mdi-file-document-outline fs-3 text-primary me-3"
+                                    ></i>
+                                    <div>
+                                        <h6 class="fw-bold mb-0">
+                                            Dokumen Terlampir
+                                        </h6>
+                                        <small class="text-muted">
+                                            {{
+                                            group.parent.answerDto?.answerUpload
+                                            || 'File tersedia' }}
+                                        </small>
+                                    </div>
+                                    <a
+                                        *ngIf="group.parent.answerDto?.answerUploadUrl"
+                                        [href]="group.parent.answerDto.answerUploadUrl"
+                                        class="btn btn-sm btn-outline-primary ms-auto"
+                                        target="_blank"
+                                    >
+                                        <i class="mdi mdi-open-in-new me-1"></i
+                                        >Buka File
+                                    </a>
+                                </div>
+
+                                <!-- Text Answer -->
+                                <p
+                                    *ngIf="getAnswerText(group.parent)"
+                                    class="bg-light mb-3 rounded border p-3"
+                                >
+                                    {{ getAnswerText(group.parent) }}
+                                </p>
+                            </div>
+
+                            <ng-template #noAnswer>
+                                <div
+                                    class="alert alert-warning d-flex align-items-center mb-3"
+                                >
+                                    <i
+                                        class="mdi mdi-alert-circle-outline fs-5 me-2"
+                                    ></i>
+                                    <div>Belum ada jawaban peserta.</div>
+                                </div>
+                            </ng-template>
+
+                            <!-- Child Questions (Penguji Scores) -->
+                            <div
+                                *ngIf="group.children.length > 0"
+                                class="border-top mt-4 pt-3"
+                            >
+                                <h6 class="fw-bold text-secondary mb-3">
+                                    Penilaian Penguji:
+                                </h6>
+                                <div
+                                    *ngFor="let child of group.children"
+                                    class="border-start border-3 border-info mb-3 ps-3"
+                                >
+                                    <div
+                                        class="d-flex justify-content-between align-items-start"
+                                    >
+                                        <p class="text-dark mb-1">
+                                            {{ child.question }}
+                                        </p>
+                                        <div class="ms-2 text-end">
+                                            <span
+                                                *ngIf="child.weight"
+                                                class="badge bg-light text-dark me-1 border"
+                                            >
+                                                Bobot: {{ child.weight }}
+                                            </span>
+                                            <span
+                                                [ngClass]="getAnswerScore(child) > 0 ? 'bg-success' : 'bg-warning'"
+                                                class="badge text-white"
+                                            >
+                                                Nilai: {{ getAnswerScore(child)
+                                                }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        *ngIf="getAnswerText(child)"
+                                        class="text-muted small fst-italic mt-2"
+                                    >
+                                        Catatan: {{ getAnswerText(child) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="mb-1" *ngIf="item.question">{{ item.question }}</p>
-                    <small class="text-muted" *ngIf="item.weight">Bobot: {{ item.weight }}</small>
-                 </div>
+                </div>
+            </ng-container>
+
+            <!-- Empty State -->
+            <ng-container *ngIf="!groupedQuestions()?.length">
+                <div class="col-12 py-5 text-center">
+                    <i
+                        class="mdi mdi-file-document-outline text-muted"
+                        style="font-size: 4rem"
+                    ></i>
+                    <p class="text-muted mt-3">
+                        Tidak ada data penilaian makalah.
+                    </p>
+                </div>
             </ng-container>
         </div>
     </div>
 </div>
-
-<ng-container *ngIf="!score()?.questionDtoList?.length && !score()?.score">
-    <div class="text-center py-5">
-        <i class="mdi mdi-file-document-outline text-muted" style="font-size: 4rem;"></i>
-        <p class="text-muted mt-3">Belum ada nilai untuk makalah ini.</p>
-    </div>
-</ng-container>
-

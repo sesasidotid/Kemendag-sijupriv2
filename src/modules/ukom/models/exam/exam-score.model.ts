@@ -105,10 +105,52 @@ export class PraktikScore extends BaseScore {
 }
 
 /**
- * Model for Makalah & Wawancara: Simple structure with root score.
+ * Model for Makalah: Simple structure with root score and file upload.
  */
 export class MakalahScore extends BaseScore {
     questionDtoList: any[] = []
+
+    constructor(object?: { [key: string]: any }) {
+        super()
+        if (object) this.fromObject(object)
+    }
+}
+
+/**
+ * Model for Seminar: Same structure as Makalah — base upload question with child scored questions.
+ */
+export class SeminarScore extends BaseScore {
+    questionDtoList: any[] = []
+
+    constructor(object?: { [key: string]: any }) {
+        super()
+        if (object) this.fromObject(object)
+    }
+}
+
+/**
+ * Model for Wawancara: ESSAY questions with answerChoice (kompeten/tidak kompeten) and answerText.
+ */
+export class WawancaraScore extends BaseScore {
+    questionDtoList: Array<{
+        id: string
+        question: string
+        type: string
+        weight: number
+        hint: string | null
+        parentQuestionId: string | null
+        answerDto: {
+            id: string
+            answerText: string | null
+            answerUpload: string | null
+            answerUploadUrl: string | null
+            answerChoice: string | null
+            participantId: string
+            questionId: string
+            isUncertain: boolean
+            score: number | null
+        }
+    }> = []
 
     constructor(object?: { [key: string]: any }) {
         super()

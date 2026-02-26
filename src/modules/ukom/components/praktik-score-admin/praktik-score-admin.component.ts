@@ -10,9 +10,10 @@ import { PraktikScore } from '@/modules/ukom/models/exam/exam-score.model'
     styleUrls: ['./praktik-score-admin.component.scss'],
 })
 export class PraktikScoreAdminComponent {
+    // TODO: Add participant answer
     score = input<PraktikScore | null>(null)
 
-        groupedQuestions = computed(() => {
+    groupedQuestions = computed(() => {
         const list = this.score()?.questionDtoList || []
         const parents = list.filter((q) => !q.parentQuestionId)
         return parents.map((parent) => ({

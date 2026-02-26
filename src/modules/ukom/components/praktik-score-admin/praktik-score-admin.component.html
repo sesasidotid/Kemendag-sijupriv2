@@ -8,9 +8,7 @@
     </div>
     <div class="card-body bg-light">
         <div class="row">
-            <ng-container
-                *ngFor="let group of groupedQuestions()"
-            >
+            <ng-container *ngFor="let group of groupedQuestions()">
                 <div class="col-12 mb-3">
                     <div class="card h-100 border-0 shadow-sm">
                         <!-- Parent Question (Participant's Work) -->
@@ -19,7 +17,7 @@
                                 class="d-flex justify-content-between align-items-start"
                             >
                                 <div>
-                                    <p class="text-dark mb-0 mt-2 fw-bold">
+                                    <p class="text-dark fw-bold mb-0 mt-2">
                                         {{ group.parent.question }}
                                     </p>
                                 </div>
@@ -33,7 +31,7 @@
 
                         <div class="card-body border-top">
                             <!-- Parent Answer (Participant Upload/Text) -->
-                            <h6 class="fw-bold mb-3 text-primary">
+                            <h6 class="fw-bold text-primary mb-3">
                                 Jawaban Peserta:
                             </h6>
 
@@ -87,48 +85,48 @@
                             <!-- Child Questions (Examiner Scores) -->
                             <div
                                 *ngIf="group.children.length > 0"
-                                class="mt-4 pt-3 border-top"
+                                class="border-top mt-4 pt-3"
                             >
-                                <h6 class="fw-bold mb-3 text-secondary">
-                                    Penilaian Asesor:
+                                <h6 class="fw-bold text-secondary mb-3">
+                                    Penilaian Penguji:
                                 </h6>
                                 <div
                                     *ngFor="let child of group.children"
-                                    class="mb-3 ps-3 border-start border-3 border-info"
+                                    class="border-start border-3 border-info mb-3 ps-3"
                                 >
                                     <div
                                         class="d-flex justify-content-between align-items-start"
                                     >
                                         <div>
-                                            <p class="mb-1 text-dark">
+                                            <p class="text-dark mb-1">
                                                 {{ child.question }}
                                             </p>
                                         </div>
-                                        <div class="text-end ms-2">
+                                        <div class="ms-2 text-end">
                                             <span
                                                 *ngIf="child.weight"
-                                                class="badge bg-light text-dark border me-1"
-                                                >Max: {{ child.weight }}</span
+                                                class="badge bg-light text-dark me-1 border"
+                                                >Bobot: {{ child.weight }}</span
                                             >
                                             <span
-                                                class="badge text-white"
                                                 [ngClass]="getAnswerScore(child) > 0 ? 'bg-success' : 'bg-warning'"
+                                                class="badge text-white"
                                             >
-                                                Nilai:
-                                                {{ getAnswerScore(child) }}
+                                                Nilai: {{ getAnswerScore(child)
+                                                }}
                                             </span>
                                         </div>
                                     </div>
                                     <!-- Optional: if child answer also has text/upload (unlikely for pure score but possible) -->
                                     <div
                                         *ngIf="getAnswerText(child)"
-                                        class="mt-2 text-muted small fst-italic"
+                                        class="text-muted small fst-italic mt-2"
                                     >
                                         Catatan: {{ getAnswerText(child) }}
                                     </div>
                                 </div>
                             </div>
-                         </div>
+                        </div>
                     </div>
                 </div>
             </ng-container>

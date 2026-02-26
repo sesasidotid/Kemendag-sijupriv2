@@ -30,15 +30,6 @@
                         <div class="card-body border-top">
                             <h6 class="fw-bold mb-3">Jawaban Peserta:</h6>
 
-                            <!-- Text Answer -->
-                            <!--                            <div *ngIf="question.answerDto?.answerText" class="p-3 bg-light rounded mb-3 border">-->
-                            <!--                                {{ question.answerDto?.answerText }}-->
-                            <!--                            </div>-->
-                            <!--                            <div class="bg-light mb-3 rounded border p-3">-->
-                            <!--                                question.answerDto?.answerText-->
-                            <!--                            </div>-->
-
-                            <!-- File Upload -->
                             <div
                                 *ngIf="hasUpload(question)"
                                 class="d-flex align-items-center bg-light mb-3 rounded border p-3"
@@ -99,7 +90,7 @@
                                 *ngIf="question.answerDto?.answerText"
                                 class="bg-light mt-4 rounded border p-3"
                             >
-                                <h6 class="fw-bold mb-2">Catatan Reviewer:</h6>
+                                <h6 class="fw-bold mb-2">Catatan Penguji:</h6>
                                 <p class="mb-0">
                                     {{ question.answerDto?.answerText }}
                                 </p>

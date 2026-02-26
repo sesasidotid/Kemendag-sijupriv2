@@ -20,7 +20,9 @@ import {
     MakalahScore,
     PortofolioScore,
     PraktikScore,
+    SeminarScore,
     StudiKasusScore,
+    WawancaraScore,
 } from '@/modules/ukom/models/exam/exam-score.model'
 
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
@@ -42,6 +44,8 @@ import { PortofolioScoreAdminComponent } from '@/modules/ukom/components/portofo
 import { StudiKasusScoreAdminComponent } from '@/modules/ukom/components/studi-kasus-score-admin/studi-kasus-score-admin.component'
 import { PraktikScoreAdminComponent } from '@/modules/ukom/components/praktik-score-admin/praktik-score-admin.component'
 import { MakalahScoreAdminComponent } from '@/modules/ukom/components/makalah-score-admin/makalah-score-admin.component'
+import { WawancaraScoreAdminComponent } from '@/modules/ukom/components/wawancara-score-admin/wawancara-score-admin.component'
+import { SeminarScoreAdminComponent } from '@/modules/ukom/components/seminar-score-admin/seminar-score-admin.component'
 import { PredikatKinerjaService } from '@/modules/maintenance/services/predikat-kinerja.service'
 import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
@@ -69,6 +73,8 @@ import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
         StudiKasusScoreAdminComponent,
         PraktikScoreAdminComponent,
         MakalahScoreAdminComponent,
+        WawancaraScoreAdminComponent,
+        SeminarScoreAdminComponent,
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss',
@@ -156,26 +162,35 @@ export class UkomTaskDetailComponent {
                             let scoreInstance: ScoreValue | null = null
                             if (response) {
                                 switch (examSchedule.examTypeCode) {
-                                    case 'CAT':
+                                    case ExamTypeCategory.CAT:
                                         scoreInstance = new CATScore(response)
                                         break
-                                    case 'MAKALAH':
-                                    case 'WAWANCARA':
+                                    case ExamTypeCategory.MAKALAH:
                                         scoreInstance = new MakalahScore(
                                             response,
                                         )
                                         break
-                                    case 'STUDI_KASUS':
+                                    case ExamTypeCategory.SEMINAR:
+                                        scoreInstance = new SeminarScore(
+                                            response,
+                                        )
+                                        break
+                                    case ExamTypeCategory.WAWANCARA:
+                                        scoreInstance = new WawancaraScore(
+                                            response,
+                                        )
+                                        break
+                                    case ExamTypeCategory.STUDI_KASUS:
                                         scoreInstance = new StudiKasusScore(
                                             response,
                                         )
                                         break
-                                    case 'PRAKTIK':
+                                    case ExamTypeCategory.PRAKTIK:
                                         scoreInstance = new PraktikScore(
                                             response,
                                         )
                                         break
-                                    case 'PORTOFOLIO':
+                                    case ExamTypeCategory.PORTOFOLIO:
                                         scoreInstance = new PortofolioScore(
                                             response,
                                         )
