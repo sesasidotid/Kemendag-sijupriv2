@@ -43,20 +43,18 @@ jobs:
         run: |
           scp -i ~/.ssh/id_ed25519 dist.zip sesasi@103.217.144.101:/sesasi/app/sijupri-fe/
 
-      - name: Deploy on server (atomic)
+      - name: Deploy on server
         run: |
           ssh -i ~/.ssh/id_ed25519 sesasi@103.217.144.101 << 'EOF'
             set -e
             cd /sesasi/app/sijupri-fe/
 
-            rm -rf dist-new
-            mkdir dist-new
-            unzip -o dist.zip -d dist-new
-
+            # Backup existing dist
             if [ -d "dist" ]; then
               mv dist dist-backup-$(date +%Y%m%d%H%M%S)
             fi
 
-            mv dist-new dist
+            # Extract directly (zip already contains dist/)
+            unzip -o dist.zip
             rm dist.zip
           EOF
