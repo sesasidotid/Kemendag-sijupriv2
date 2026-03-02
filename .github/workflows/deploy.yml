@@ -5,6 +5,10 @@ on:
     branches:
       - main-v2
 
+concurrency:
+  group: deploy-frontend-main-v2
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
