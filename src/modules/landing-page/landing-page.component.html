@@ -381,6 +381,32 @@
                         </ng-template>
                     </div>
                 </div>
+                <div
+                    *ngIf="dokumenPromosiDanPindah.length > 0"
+                    class="req-parent"
+                >
+                    <h6 class="req-title">
+                        Syarat Khusus Untuk Jenjang Ahli Madya / Ahli Utama
+                    </h6>
+                    <div class="req-items">
+                        <div>
+                            <div
+                                *ngFor="let item of dokumenPromosiDanPindah"
+                                class="req-item"
+                            >
+                                <i-lucide
+                                    [color]="'#49AB49'"
+                                    [img]="SquareCheck"
+                                ></i-lucide>
+                                <p class="capitalize">
+                                    {{ item.dokumenPersyaratanName +
+                                    (item.jabatanName ? ' (' + item.jabatanName
+                                    + ')' : '') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <a
                     class="btn btn-secondary grad-button"
                     routerLink="ukom/external"
@@ -425,14 +451,16 @@
                     </div>
                 </div>
                 <div
-                    *ngIf="dokumenPromosiDanPindah.length > 0"
+                    *ngIf="dokumenKenaikanDanPindah.length > 0"
                     class="req-parent"
                 >
-                    <h6 class="req-title">Syarat Khusus Untuk Jenjang Madya</h6>
+                    <h6 class="req-title">
+                        Syarat Khusus Untuk Jenjang Ahli Madya / Ahli Utama
+                    </h6>
                     <div class="req-items">
                         <div>
                             <div
-                                *ngFor="let item of dokumenPromosiDanPindah"
+                                *ngFor="let item of dokumenKenaikanDanPindah"
                                 class="req-item"
                             >
                                 <i-lucide

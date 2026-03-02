@@ -192,7 +192,7 @@
 // }
 
 import { CommonModule } from '@angular/common'
-import { Component } from '@angular/core'
+import { Component, Input } from '@angular/core'
 import {
     FormControl,
     FormGroup,
@@ -201,12 +201,12 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
-import { LucideAngularModule, SquareX, SquareCheck } from 'lucide-angular'
+import { LucideAngularModule, SquareCheck, SquareX } from 'lucide-angular'
 import * as L from 'leaflet'
 import { DataDokumenUkom } from '../ukom/models/data-dukung'
 import { ApiService } from '../base/services/api.service'
-import { forkJoin, map, of, timer } from 'rxjs'
-import { Input } from '@angular/core'
+import { forkJoin, map } from 'rxjs'
+
 @Component({
     selector: 'app-landing-page',
     standalone: true,
@@ -226,7 +226,6 @@ export class LandingPageComponent {
     currentYear: number = new Date().getFullYear()
     isMenuOpen = false
     ukomForm!: FormGroup
-    private map: L.Map | undefined
     greenIcon = L.icon({
         iconUrl: 'leaf-green.png',
         shadowUrl: 'leaf-shadow.png',
@@ -237,15 +236,14 @@ export class LandingPageComponent {
         shadowAnchor: [4, 62], // the same for the shadow
         popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
     })
-
     readonly SquareX = SquareX
     readonly SquareCheck = SquareCheck
-
     dokumenPromosi: DataDokumenUkom[] = []
     dokumenPindahJabatan: DataDokumenUkom[] = []
     dokumenKenaikanJenjang: DataDokumenUkom[] = []
     dokumenKenaikanDanPindah: DataDokumenUkom[] = []
     dokumenPromosiDanPindah: DataDokumenUkom[] = []
+    private map: L.Map | undefined
 
     constructor(
         private router: Router,
@@ -315,13 +313,23 @@ export class LandingPageComponent {
                         kenaikanJenjang: filteredKenaikan,
                         pindahJabatan: filteredPindah,
                         promosi: filteredPromosi,
+                        // dokumenKenaikanDanPindah: uniqueByNameAndJenjang(
+                        //     [...kenaikanJenjang, ...pindahJabatan].filter(
+                        //         (doc) => jenjangCodes.includes(doc.jenjangCode),
+                        //     ),
+                        // ).sort(sortByName),
                         dokumenKenaikanDanPindah: uniqueByNameAndJenjang(
-                            [...kenaikanJenjang, ...pindahJabatan].filter(
-                                (doc) => jenjangCodes.includes(doc.jenjangCode),
+                            [...pindahJabatan].filter((doc) =>
+                                jenjangCodes.includes(doc.jenjangCode),
                             ),
                         ).sort(sortByName),
+                        // dokumenPromosiDanPindah: uniqueByNameAndJenjang(
+                        //     [...promosi, ...pindahJabatan].filter((doc) =>
+                        //         jenjangCodes.includes(doc.jenjangCode),
+                        //     ),
+                        // ).sort(sortByName),
                         dokumenPromosiDanPindah: uniqueByNameAndJenjang(
-                            [...promosi, ...pindahJabatan].filter((doc) =>
+                            [...promosi].filter((doc) =>
                                 jenjangCodes.includes(doc.jenjangCode),
                             ),
                         ).sort(sortByName),
@@ -345,21 +353,6 @@ export class LandingPageComponent {
             )
     }
 
-    private filterUniqueByName(data: DataDokumenUkom[]): DataDokumenUkom[] {
-        const seen = new Set<string>()
-        return data.filter((item) => {
-            if (
-                !item.dokumenPersyaratanName ||
-                seen.has(item.dokumenPersyaratanName) ||
-                item.jenjangCode === 'JJ7'
-            ) {
-                return false
-            }
-            seen.add(item.dokumenPersyaratanName)
-            return true
-        })
-    }
-
     formatJabatanJenjang(item: any): string {
         const names = [item.jabatanName, item.jenjangName]
             .filter(Boolean)
@@ -381,5 +374,23 @@ export class LandingPageComponent {
                 queryParams: { key: this.ukomForm.value.ukomCode },
             })
         }
+    }
+
+    private filterUniqueByName(data: DataDokumenUkom[]): DataDokumenUkom[] {
+        const seen = new Set<string>()
+        const excludedJenjang = ['JJ7', 'JJ8']
+
+        return data.filter((item) => {
+            if (
+                !item.dokumenPersyaratanName ||
+                seen.has(item.dokumenPersyaratanName) ||
+                excludedJenjang.includes(item.jenjangCode)
+            ) {
+                return false
+            }
+
+            seen.add(item.dokumenPersyaratanName)
+            return true
+        })
     }
 }
