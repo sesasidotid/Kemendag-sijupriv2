@@ -121,13 +121,23 @@ export class LandingPageComponent {
                         kenaikanJenjang: filteredKenaikan,
                         pindahJabatan: filteredPindah,
                         promosi: filteredPromosi,
+                        // dokumenKenaikanDanPindah: uniqueByNameAndJenjang(
+                        //     [...kenaikanJenjang, ...pindahJabatan].filter(
+                        //         (doc) => jenjangCodes.includes(doc.jenjangCode),
+                        //     ),
+                        // ).sort(sortByName),
                         dokumenKenaikanDanPindah: uniqueByNameAndJenjang(
-                            [...kenaikanJenjang, ...pindahJabatan].filter(
-                                (doc) => jenjangCodes.includes(doc.jenjangCode),
+                            [...pindahJabatan].filter((doc) =>
+                                jenjangCodes.includes(doc.jenjangCode),
                             ),
                         ).sort(sortByName),
+                        // dokumenPromosiDanPindah: uniqueByNameAndJenjang(
+                        //     [...promosi, ...pindahJabatan].filter((doc) =>
+                        //         jenjangCodes.includes(doc.jenjangCode),
+                        //     ),
+                        // ).sort(sortByName),
                         dokumenPromosiDanPindah: uniqueByNameAndJenjang(
-                            [...promosi, ...pindahJabatan].filter((doc) =>
+                            [...promosi].filter((doc) =>
                                 jenjangCodes.includes(doc.jenjangCode),
                             ),
                         ).sort(sortByName),
@@ -153,14 +163,17 @@ export class LandingPageComponent {
 
     private filterUniqueByName(data: DataDokumenUkom[]): DataDokumenUkom[] {
         const seen = new Set<string>()
+        const excludedJenjang = ['JJ7', 'JJ8']
+
         return data.filter((item) => {
             if (
                 !item.dokumenPersyaratanName ||
                 seen.has(item.dokumenPersyaratanName) ||
-                item.jenjangCode === 'JJ7'
+                excludedJenjang.includes(item.jenjangCode)
             ) {
                 return false
             }
+
             seen.add(item.dokumenPersyaratanName)
             return true
         })
