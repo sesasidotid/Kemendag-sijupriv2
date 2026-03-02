@@ -3,8 +3,6 @@ import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { JF } from '../../../modules/siap/models/jf.model'
 import { CommonModule } from '@angular/common'
 import { PesertaUkom } from '../../../modules/ukom/models/peserta-ukom.model'
-import { ApiService } from '../../../modules/base/services/api.service'
-import { HandlerService } from '../../../modules/base/services/handler.service'
 import { FileHandlerComponent } from '../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../modules/base/commons/file-handler/file-handler'
 import { ConfirmationService } from '../../../modules/base/services/confirmation.service'
@@ -16,6 +14,7 @@ import { UkomParticipantService } from '@/modules/ukom/services/participant.serv
 import { Task } from '@/modules/workflow/models/task.model'
 import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+
 @Component({
     selector: 'app-ukom-revision',
     standalone: true,
@@ -74,9 +73,9 @@ export class UkomRevisionComponent {
     }
 
     loadRejectedDokumen() {
-        if (!this.pendingTask?.documentUkomList?.length) return
+        if (!this.pendingTask?.dokumenUkomList?.length) return
 
-        this.rejectedDokumen = this.pendingTask.documentUkomList.filter(
+        this.rejectedDokumen = this.pendingTask.dokumenUkomList.filter(
             (d) => d.dokumenStatus.toLowerCase() === 'reject',
         )
 
@@ -119,7 +118,7 @@ export class UkomRevisionComponent {
             if (this.detectedDokumen.hasOwnProperty(key)) {
                 const detected = this.detectedDokumen[key]
 
-                const existingDokumen = this.pendingTask.documentUkomList.find(
+                const existingDokumen = this.pendingTask.dokumenUkomList.find(
                     (dokumen) => dokumen.dokumenPersyaratanId === key,
                 )
 

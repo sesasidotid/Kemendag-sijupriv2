@@ -73,6 +73,7 @@ export class UkomTaskDetail extends Serializable {
     rekomendasiFile: string | null = null
 
     documentUkomList: DokumenUkom[] = []
+    dokumenUkomList: DokumenUkom[] = []
     examSchedule: ExamSchedule[] = []
 
     userId?: string | null = null

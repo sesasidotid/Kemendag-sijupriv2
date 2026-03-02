@@ -4,9 +4,7 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { UkomTaskDetail } from '../../../../modules/ukom/models/ukom-task-detail.modal'
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component'
-import { FilePreviewComponent } from '../file-preview/file-preview.component'
-import { forkJoin, map } from 'rxjs'
+import { forkJoin, map, Observable } from 'rxjs'
 import {
     FormBuilder,
     FormGroup,
@@ -15,7 +13,6 @@ import {
     Validators,
 } from '@angular/forms'
 import { Pangkat } from '../../../maintenance/models/pangkat.model'
-import { Observable } from 'rxjs'
 import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
 import { Task } from '@/modules/workflow/models/task.model'
 import { NonJFParticipantUkomTask } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
@@ -31,14 +28,13 @@ import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 import { Provinsi } from '@/modules/maintenance/models/provinsi.model'
 import { KabKota } from '@/modules/maintenance/models/kab-kota.model'
 import { DokumenUkom } from '@/modules/ukom/models/ukom-registration-refactored/document.model'
+
 @Component({
     selector: 'app-nonjf-revisi-ukom',
     standalone: true,
     imports: [
         FileHandlerComponent,
         CommonModule,
-        ConfirmationDialogComponent,
-        FilePreviewComponent,
         ReactiveFormsModule,
         FormsModule,
         LoadingButtonComponent,
@@ -239,9 +235,9 @@ export class NonjfRevisiUkomComponent {
     }
 
     loadRejectedDokumen() {
-        if (!this.pendingTask?.documentUkomList?.length) return
+        if (!this.pendingTask?.dokumenUkomList?.length) return
 
-        this.rejectedDokumen = this.pendingTask.documentUkomList.filter(
+        this.rejectedDokumen = this.pendingTask.dokumenUkomList.filter(
             (d) => d.dokumenStatus.toLowerCase() === 'reject',
         )
 
@@ -284,7 +280,7 @@ export class NonjfRevisiUkomComponent {
             if (this.detectedDokumen.hasOwnProperty(key)) {
                 const detected = this.detectedDokumen[key]
 
-                const existingDokumen = this.pendingTask.documentUkomList.find(
+                const existingDokumen = this.pendingTask.dokumenUkomList.find(
                     (dokumen) => dokumen.dokumenPersyaratanId === key,
                 )
 
