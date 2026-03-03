@@ -4,17 +4,17 @@
             <div class="row">
                 <div class="col-lg-12 row">
                     <div class="col-lg-6 mb-3">
-                        <label for="jenis_ukom" class="form-label">
+                        <label class="form-label" for="jenis_ukom">
                             Mengikuti Uji Kompetensi Jenis?
                             <span class="text-danger">*</span>
                         </label>
                         <select
                             class="form-select"
+                            formControlName="jenis_ukom"
                             id="jenis_ukom"
                             name="jenis_ukom"
-                            formControlName="jenis_ukom"
                         >
-                            <option value="" selected disabled hidden>
+                            <option disabled hidden selected value="">
                                 Pilih Jenis UKom
                             </option>
                             <option [value]="'KENAIKAN_JENJANG'">
@@ -23,9 +23,9 @@
                             <option [value]="'PERPINDAHAN_JABATAN'">
                                 Perpindahan Jabatan
                             </option>
-                            <option [value]="'PROMOSI_JF'">
-                                Promosi Jabatan Fungsional
-                            </option>
+                            <!--                            <option [value]="'PROMOSI_JF'">-->
+                            <!--                                Promosi Jabatan Fungsional-->
+                            <!--                            </option>-->
                         </select>
 
                         <div
@@ -45,16 +45,16 @@
                 <div class="col-lg-12 row">
                     <div class="col-lg-6 mb-3">
                         <div class="mb-3"></div>
-                        <label for="isMengulang" class="form-label">
+                        <label class="form-label" for="isMengulang">
                             Status Pendaftaran
                             <span class="text-danger">*</span>
                         </label>
                         <select
                             class="form-select"
-                            id="isMengulang"
                             formControlName="isMengulang"
+                            id="isMengulang"
                         >
-                            <option value="" disabled selected hidden>
+                            <option disabled hidden selected value="">
                                 Pilih Status Pendaftaran
                             </option>
                             <option value="false">Baru</option>
@@ -77,21 +77,21 @@
 
                 <div class="col-lg-12 row">
                     <div class="col-lg-6 mb-3">
-                        <label for="next_jabatan_code" class="form-label">
+                        <label class="form-label" for="next_jabatan_code">
                             Jabatan Yang Di Tuju
                             <span class="text-danger">*</span>
                         </label>
                         <select
-                            class="form-select"
-                            name="next_jabatan_code"
-                            id="next_jabatan_code"
-                            formControlName="next_jabatan_code"
                             [disabled]="
                                 passwordForm.get('jenis_ukom')?.value ===
                                 'KENAIKAN_JENJANG'
                             "
+                            class="form-select"
+                            formControlName="next_jabatan_code"
+                            id="next_jabatan_code"
+                            name="next_jabatan_code"
                         >
-                            <option value="" selected hidden>
+                            <option hidden selected value="">
                                 Pilih Jabatan Yang Di Tuju
                             </option>
                             <option
@@ -117,21 +117,21 @@
 
                 <div class="col-lg-12 row">
                     <div class="col-lg-6 mb-3">
-                        <label for="next_jenjang_code" class="form-label">
+                        <label class="form-label" for="next_jenjang_code">
                             Jenjang Yang Di Tuju
                             <span class="text-danger">*</span>
                         </label>
                         <select
-                            class="form-select"
-                            name="next_jenjang_code"
-                            id="next_jenjang_code"
-                            formControlName="next_jenjang_code"
                             [disabled]="
                                 passwordForm.get('jenis_ukom')?.value ===
                                 'KENAIKAN_JENJANG'
                             "
+                            class="form-select"
+                            formControlName="next_jenjang_code"
+                            id="next_jenjang_code"
+                            name="next_jenjang_code"
                         >
-                            <option value="" selected hidden>
+                            <option hidden selected value="">
                                 Pilih Jenjang Yang Di Tuju
                             </option>
                             <option
@@ -158,20 +158,20 @@
                 <div class="col-lg-12 row">
                     <div class="col-lg-6 mb-3">
                         <div
-                            class="mb-3"
                             *ngIf="(bidangJabatanList$ | async)?.length > 0"
+                            class="mb-3"
                         >
-                            <label for="bidang_jabatan_code" class="form-label"
+                            <label class="form-label" for="bidang_jabatan_code"
                                 >Bidang Jabatan Yang Dituju
                                 <span class="text-danger">*</span></label
                             >
                             <select
                                 class="form-select"
-                                name="bidang_jabatan_code"
-                                id="bidang_jabatan_code"
                                 formControlName="bidang_jabatan_code"
+                                id="bidang_jabatan_code"
+                                name="bidang_jabatan_code"
                             >
-                                <option selected value="" hidden>
+                                <option hidden selected value="">
                                     Pilih Bidang Jabatan Yang Dituju
                                 </option>
 
@@ -203,16 +203,16 @@
                 <div class="col-lg-12 row">
                     <div class="col-lg-6 mb-3">
                         <div class="mb-3">
-                            <label for="no_surat_usulan" class="form-label"
+                            <label class="form-label" for="no_surat_usulan"
                                 >Nomor Surat Usulan
                                 <span class="text-danger">*</span></label
                             >
                             <input
-                                type="text"
                                 class="form-control"
+                                formControlName="no_surat_usulan"
                                 id="no_surat_usulan"
                                 required
-                                formControlName="no_surat_usulan"
+                                type="text"
                             />
                             <div
                                 *ngIf="
@@ -232,16 +232,16 @@
                 <div class="col-lg-12 row">
                     <div class="col-lg-6 mb-3">
                         <div class="mb-3">
-                            <label for="tglSuratUsulan" class="form-label"
+                            <label class="form-label" for="tglSuratUsulan"
                                 >Tanggal Surat Usulan
                                 <span class="text-danger">*</span></label
                             >
                             <input
-                                type="date"
                                 class="form-control"
+                                formControlName="tglSuratUsulan"
                                 id="tglSuratUsulan"
                                 required
-                                formControlName="tglSuratUsulan"
+                                type="date"
                             />
                             <div
                                 *ngIf="
@@ -266,15 +266,15 @@
 
                 <div class="col-lg-12">
                     <div class="col-lg-6 mb-3">
-                        <label for="password" class="form-label"
+                        <label class="form-label" for="password"
                             >Password <span class="text-danger">*</span></label
                         >
                         <input
-                            type="password"
                             class="form-control"
+                            formControlName="password"
                             id="password"
                             required
-                            formControlName="password"
+                            type="password"
                         />
                         <div
                             *ngIf="
@@ -287,16 +287,16 @@
                     </div>
 
                     <div class="col-lg-6 mb-3">
-                        <label for="confirmPassword" class="form-label"
+                        <label class="form-label" for="confirmPassword"
                             >Konfirmasi Password
                             <span class="text-danger">*</span></label
                         >
                         <input
-                            type="password"
                             class="form-control"
+                            formControlName="confirmPassword"
                             id="confirmPassword"
                             required
-                            formControlName="confirmPassword"
+                            type="password"
                         />
                         <div
                             *ngIf="
@@ -328,15 +328,15 @@
                             </div>
                         </button> -->
                         <app-loading-button
-                            [isLoading]="hadItemsLoading$ | async"
                             [disabled]="!passwordForm.valid || isAnyFileMissing()"
+                            [isLoading]="hadItemsLoading$ | async"
                             [type]="'submit'"
                         >
                         </app-loading-button>
                     </div>
                     <div
-                        class="text-danger mt-2 text-end"
                         *ngIf="(ukomTaskService.eligibility$ | async).eligible === false"
+                        class="text-danger mt-2 text-end"
                     >
                         <!-- Anda belum bisa mendaftar UKom. {{
                         (ukomTaskService.eligibility$ | async).message }} -->
