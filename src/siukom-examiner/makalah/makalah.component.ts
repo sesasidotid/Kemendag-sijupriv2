@@ -392,7 +392,8 @@ export class MakalahComponent implements OnInit {
                                     console.warn('Failed to clear draft:', err),
                                 )
                             // Refetch questions to get updated answerDto
-                            this.fetchQuestionsToGrade()
+                            // this.fetchQuestionsToGrade()
+                            this.backToDashboard()
                         },
                         error: (err) => {
                             console.error('Error save the answer:', err)
@@ -425,4 +426,3 @@ export class MakalahComponent implements OnInit {
         })
     }
 }
-

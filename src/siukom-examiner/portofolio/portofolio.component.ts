@@ -1,12 +1,12 @@
 import { Component, effect, inject, OnInit, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import {
+    AbstractControl,
     FormArray,
     FormBuilder,
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    AbstractControl,
     ValidationErrors,
 } from '@angular/forms'
 import { HandlerService } from '@/modules/base/services/handler.service'
@@ -56,27 +56,11 @@ export class PortofolioComponent implements OnInit {
     examId = signal('')
     participantId = signal('')
     draftService = inject(PortfolioDraftService)
-    private saveTimeout: number | undefined
     startExamLoading = signal(false)
     examStarted = signal(false)
     examScheduleService = inject(UkomExamScheduleService)
     examScheduleDetail = signal<ExamSchedule | null>(null)
-
-    /**
-     * Custom validator to ensure checkbox value is boolean (not null)
-     */
-    private booleanRequiredValidator(
-        control: AbstractControl,
-    ): ValidationErrors | null {
-        const value = control.value
-        if (value === null || value === undefined) {
-            return { required: true }
-        }
-        if (typeof value !== 'boolean') {
-            return { required: true }
-        }
-        return null
-    }
+    private saveTimeout: number | undefined
 
     constructor() {
         this.assessmentForm = this.fb.group({
@@ -402,7 +386,8 @@ export class PortofolioComponent implements OnInit {
                                 .catch((err) =>
                                     console.warn('Failed to clear draft:', err),
                                 )
-                            this.fetchQuestionsToGrade()
+                            // this.fetchQuestionsToGrade()
+                            this.backToDashboard()
                         },
                         error: (err) => {
                             console.error('Error submitting assessment', err)
@@ -414,5 +399,21 @@ export class PortofolioComponent implements OnInit {
                     })
             },
         })
+    }
+
+    /**
+     * Custom validator to ensure checkbox value is boolean (not null)
+     */
+    private booleanRequiredValidator(
+        control: AbstractControl,
+    ): ValidationErrors | null {
+        const value = control.value
+        if (value === null || value === undefined) {
+            return { required: true }
+        }
+        if (typeof value !== 'boolean') {
+            return { required: true }
+        }
+        return null
     }
 }

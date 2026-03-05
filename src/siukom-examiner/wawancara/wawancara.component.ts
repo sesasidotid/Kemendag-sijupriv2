@@ -325,7 +325,8 @@ export class WawancaraComponent implements OnInit {
                                 .catch((err) =>
                                     console.warn('Failed to clear draft:', err),
                                 )
-                            this.fetchQuestionsToGrade()
+                            // this.fetchQuestionsToGrade()
+                            this.backToDashboard()
                         },
                         error: (err) => {
                             console.error('Error save the answer:', err)

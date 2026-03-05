@@ -400,7 +400,8 @@ export class PracticalWorkComponent {
                                 .catch((err) =>
                                     console.warn('Failed to clear draft:', err),
                                 )
-                            this.fetchQuestionsToGrade()
+                            this.backToDashboard()
+                            // this.fetchQuestionsToGrade()
                         },
                         error: (err) => {
                             console.error('Error submitting assessment', err)

@@ -53,11 +53,11 @@ export class StudiKasusComponent implements OnInit {
     questions = signal<ExamQuestion[]>([])
     assessmentForm: FormGroup
     participantAnswer = signal<ExamQuestion | null>(null)
-    private saveTimeout: number | undefined
     startExamLoading = signal(false)
     examStarted = signal(false)
     examScheduleService = inject(UkomExamScheduleService)
     examScheduleDetail = signal<ExamSchedule | null>(null)
+    private saveTimeout: number | undefined
 
     constructor() {
         this.assessmentForm = this.fb.group({
@@ -413,7 +413,9 @@ export class StudiKasusComponent implements OnInit {
                                     console.warn('Failed to clear draft:', err),
                                 )
                             // Refetch questions to get updated answerDto
-                            this.fetchQuestionsToGrade()
+                            // this.fetchQuestionsToGrade()
+
+                            this.backToDashboard()
                         },
                         error: (err) => {
                             console.error('Error save the answer:', err)

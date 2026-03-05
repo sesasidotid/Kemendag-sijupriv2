@@ -379,14 +379,18 @@ export class SeminerMakalahComponent implements OnInit {
                         new ExaminerExamStartRequest({
                             participantId: this.participantId(),
                             examTypeCode: ExamTypeCategory.SEMINAR,
-                            roomUkomId: this.examScheduleDetail()?.roomUkomId || '',
+                            roomUkomId:
+                                this.examScheduleDetail()?.roomUkomId || '',
                             examScheduleId: this.examId(),
                         }),
                     )
                     .pipe(
                         // Continue even if start exam fails (e.g. already started)
                         catchError((err) => {
-                            console.warn('Silent start exam failed / already started:', err)
+                            console.warn(
+                                'Silent start exam failed / already started:',
+                                err,
+                            )
                             return of(null)
                         }),
                         switchMap(() =>
@@ -411,7 +415,8 @@ export class SeminerMakalahComponent implements OnInit {
                                     console.warn('Failed to clear draft:', err),
                                 )
                             // Refetch questions to get updated answerDto
-                            this.fetchQuestionsToGrade()
+                            // this.fetchQuestionsToGrade()
+                            this.backToDashboard()
                         },
                         error: (err) => {
                             console.error('Error save the answer:', err)

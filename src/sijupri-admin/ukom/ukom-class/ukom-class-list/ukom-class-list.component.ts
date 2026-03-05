@@ -314,7 +314,7 @@ export class UkomClassListComponent implements OnInit {
                                 if (err.error.code == 'UKM-00001') {
                                     this.handlerService.handleAlert(
                                         'Error',
-                                        'Gagal menghapus kelas. Kelas memiliki jadwal ujian',
+                                        'Gagal menghapus kelas. Kelas masih aktif atau sedang digunakan',
                                     )
                                     return
                                 }
