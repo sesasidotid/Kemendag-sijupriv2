@@ -8,39 +8,41 @@
 </div>
 
 <ng-template #noLoading>
-    <button class="btn btn-sm btn-outline-secondary mb-3" (click)="onBack()">
+    <button (click)="onBack()" class="btn btn-sm btn-outline-secondary mb-3">
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
 
     <div class="row">
         <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label">
+            <label class="form-label" for="firstnameInput">
                 Tanggal Mulai
             </label>
             <p class="border-bottom pb-2">{{ rwKinerja.dateStart }}</p>
         </div>
         <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label"
+            <label class="form-label" for="firstnameInput"
                 >Tanggal Selesai</label
             >
             <p class="border-bottom pb-2">{{ rwKinerja.dateEnd }}</p>
         </div>
         <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label">Angka Kredit</label>
+            <label class="form-label" for="firstnameInput"
+                >Akumulasi Angka Kredit</label
+            >
             <p class="border-bottom pb-2">{{ rwKinerja.angkaKredit }}</p>
         </div>
         <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label">Rating Hasil</label>
+            <label class="form-label" for="firstnameInput">Rating Hasil</label>
             <p class="border-bottom pb-2">{{ rwKinerja.ratingHasilName }}</p>
         </div>
         <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label"
+            <label class="form-label" for="firstnameInput"
                 >Rating Kinerja</label
             >
             <p class="border-bottom pb-2">{{ rwKinerja.ratingKinerjaName }}</p>
         </div>
         <div class="col-md-6 mb-3">
-            <label for="firstnameInput" class="form-label"
+            <label class="form-label" for="firstnameInput"
                 >Predikat Kinerja</label
             >
             <p class="border-bottom pb-2">

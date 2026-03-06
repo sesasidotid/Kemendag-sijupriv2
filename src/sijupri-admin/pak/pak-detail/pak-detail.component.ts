@@ -48,26 +48,29 @@ export class PakDetailComponent {
     handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/rw_kinerja/search')
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build()
+                new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tgl Mulai', 'dateStart').build()
+                new PrimaryColumnBuilder('Tgl Mulai', 'dateStart').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build()
+                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Angka Kredit', 'angkaKredit').build()
+                new PrimaryColumnBuilder(
+                    'Akumulasi Angka Kredit',
+                    'angkaKredit',
+                ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((rwKinerja: any) => {
                         this.router.navigate([
-                            `/pak/pak-list/${this.nip}/${rwKinerja.id}`
+                            `/pak/pak-list/${this.nip}/${rwKinerja.id}`,
                         ])
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -76,14 +79,14 @@ export class PakDetailComponent {
                             .checked
                         if (isChecked) {
                             const exists = this.rwKinerjaList.some(
-                                item => item.id === rwKinerja.id
+                                (item) => item.id === rwKinerja.id,
                             )
                             if (!exists) {
                                 this.rwKinerjaList.push(rwKinerja)
                             }
                         } else {
                             const index = this.rwKinerjaList.findIndex(
-                                item => item.id === rwKinerja.id
+                                (item) => item.id === rwKinerja.id,
                             )
                             if (index !== -1) {
                                 this.rwKinerjaList.splice(index, 1)
@@ -96,16 +99,16 @@ export class PakDetailComponent {
                     .setInputType('checkbox')
                     .setChecked((rwKinerja: any) => {
                         return this.rwKinerjaList.some(
-                            item => item.id === rwKinerja.id
+                            (item) => item.id === rwKinerja.id,
                         )
                     })
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
                     .setProperty('nip')
                     .withDefaultValue(this.nip)
-                    .build()
+                    .build(),
             )
             .build()
     }

@@ -3,23 +3,29 @@
         <div class="card card-profile shadow-sm">
             <div class="card-body p-4">
                 <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div
+                        class="d-flex justify-content-between align-items-start"
+                    >
                         <div class="profile-user">
-                            <img [src]="profileImageSrc"
+                            <img
+                                [src]="profileImageSrc"
+                                alt="user-profile-image"
                                 class="rounded-circle avatar-md img-thumbnail user-profile-image"
-                                alt="user-profile-image" />
+                            />
                         </div>
-                        <span class="badge rounded-pill text-bg-success">Aktif</span>
+                        <span class="badge rounded-pill text-bg-success"
+                            >Aktif</span
+                        >
                     </div>
                     <div class="mt-3">
-                        <h4 class="text-white fs-18">{{ jf.name }}</h4>
+                        <h4 class="fs-18 text-white">{{ jf.name }}</h4>
                         <h6 class="text-muted fs-14">NIP : {{ jf.nip }}</h6>
                     </div>
                     <hr class="text-white" />
                     <div class="row text-white">
                         <!-- First Name -->
                         <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
+                            <label class="form-label" for="firstnameInput">
                                 NIK
                             </label>
                             <p class="text-muted">
@@ -27,19 +33,16 @@
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
+                            <label class="form-label" for="firstnameInput">
                                 Jenis Kelamin
                             </label>
                             <p class="text-muted">
-                                {{
-                                jf.jenisKelaminName
-                                ? jf.jenisKelaminName
-                                : '-'
-                                }}
+                                {{ jf.jenisKelaminName ? jf.jenisKelaminName :
+                                '-' }}
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
+                            <label class="form-label" for="firstnameInput">
                                 Tempat Lahir
                             </label>
                             <p class="text-muted">
@@ -47,7 +50,7 @@
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
+                            <label class="form-label" for="firstnameInput">
                                 Tanggal Lahir
                             </label>
                             <p class="text-muted">
@@ -55,7 +58,7 @@
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
+                            <label class="form-label" for="firstnameInput">
                                 Email
                             </label>
                             <p class="text-muted">
@@ -63,7 +66,7 @@
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
+                            <label class="form-label" for="firstnameInput">
                                 No. HP
                             </label>
                             <p class="text-muted">
@@ -71,13 +74,17 @@
                             </p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="firstnameInput" class="form-label">
+                            <label class="form-label" for="firstnameInput">
                                 KTP
                             </label>
                             <p class="text-muted">
                                 {{ jf.ktp ? jf.ktp : '-' }}
                             </p>
-                            <button class="btn btn-soft-primary" *ngIf="jf.ktpUrl" (click)="preview(jf.ktp, jf.ktpUrl)">
+                            <button
+                                (click)="preview(jf.ktp, jf.ktpUrl)"
+                                *ngIf="jf.ktpUrl"
+                                class="btn btn-soft-primary"
+                            >
                                 Lihat
                             </button>
                         </div>
@@ -87,7 +94,10 @@
         </div>
     </div>
     <div class="col-xl-8">
-        <div *ngIf="pendingTaskloading$ | async; else hadItem" class="d-flex justify-content-center my-4">
+        <div
+            *ngIf="pendingTaskloading$ | async; else hadItem"
+            class="d-flex justify-content-center my-4"
+        >
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
@@ -96,141 +106,171 @@
         <ng-template #hadItem>
             <div class="row" id="accordion">
                 <div class="">
-                    <div *ngFor="let pendingTask of pendingTaskList" class="card col-12 mb-2">
+                    <div
+                        *ngFor="let pendingTask of pendingTaskList"
+                        class="card col-12 mb-2"
+                    >
                         <div class="card-header">
                             <h5 class="mb-0">
                                 Kinerja
-                                <a [class]="
+                                <a
+                                    (click)="toggleExpand(pendingTask)"
+                                    [attr.aria-controls]="pendingTask.id"
+                                    [attr.aria-expanded]="
+                                        pendingTask['isOpen'] || false
+                                    "
+                                    [class]="
                                         pendingTask['isOpen']
                                             ? 'btn btn-sm float-end btn-soft-danger'
                                             : 'btn btn-sm float-end btn-soft-info'
-                                    " data-bs-toggle="collapse" href="#{{ pendingTask.id }}" role="button"
-                                    [attr.aria-expanded]="
-                                        pendingTask['isOpen'] || false
-                                    " [attr.aria-controls]="pendingTask.id" (click)="toggleExpand(pendingTask)">
-                                    {{
-                                    pendingTask['isOpen']
-                                    ? 'Tutup'
-                                    : 'Detail'
-                                    }}
+                                    "
+                                    data-bs-toggle="collapse"
+                                    href="#{{ pendingTask.id }}"
+                                    role="button"
+                                >
+                                    {{ pendingTask['isOpen'] ? 'Tutup' :
+                                    'Detail' }}
                                 </a>
                             </h5>
-                            <p class="text-muted mb-0 mt-2 fs-13">
-                                Diajukan :
-                                {{
-                                getTaskDate(
-                                pendingTask.lastUpdated.toString()
-                                )
-                                }}
+                            <p class="text-muted fs-13 mb-0 mt-2">
+                                Diajukan : {{ getTaskDate(
+                                pendingTask.lastUpdated.toString() ) }}
                             </p>
                         </div>
-                        <div class="collapse" [ngClass]="{
+                        <div
+                            [ngClass]="{
                     'show': pendingTask['isOpen'] || false,
-                    }" id="{{ pendingTask.id }}">
-                            <div *ngIf="
+                    }"
+                            class="collapse"
+                            id="{{ pendingTask.id }}"
+                        >
+                            <div
+                                *ngIf="
                                     (detailTaskloading$ | async) &&
                                         openedAccordion.includes(
                                             pendingTask.id
                                         );
                                     else detailHadItem
-                                " class="d-flex justify-content-center my-4">
+                                "
+                                class="d-flex justify-content-center my-4"
+                            >
                                 <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
+                                    <span class="visually-hidden"
+                                        >Loading...</span
+                                    >
                                 </div>
                             </div>
                             <ng-template #detailHadItem>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div *ngIf="pendingTask['object']" class="container">
+                                        <div
+                                            *ngIf="pendingTask['object']"
+                                            class="container"
+                                        >
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="type" class="form-label">
+                                                    <label
+                                                        class="form-label"
+                                                        for="type"
+                                                    >
                                                         Tipe
                                                     </label>
-                                                    <p class="border-bottom pb-2">
-                                                        {{
-                                                        pendingTask[
-                                                        'object'
-                                                        ].type
-                                                        }}
+                                                    <p
+                                                        class="border-bottom pb-2"
+                                                    >
+                                                        {{ pendingTask[ 'object'
+                                                        ].type }}
                                                     </p>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="dateStart" class="form-label">
+                                                    <label
+                                                        class="form-label"
+                                                        for="dateStart"
+                                                    >
                                                         Tanggal Mulai
                                                     </label>
-                                                    <p class="border-bottom pb-2">
-                                                        {{
-                                                        pendingTask[
-                                                        'object'
-                                                        ].dateStart
-                                                        }}
+                                                    <p
+                                                        class="border-bottom pb-2"
+                                                    >
+                                                        {{ pendingTask[ 'object'
+                                                        ].dateStart }}
                                                     </p>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="dateEnd" class="form-label">
+                                                    <label
+                                                        class="form-label"
+                                                        for="dateEnd"
+                                                    >
                                                         Tanggal Akhir
                                                     </label>
-                                                    <p class="border-bottom pb-2">
-                                                        {{
-                                                        pendingTask[
-                                                        'object'
-                                                        ].dateEnd
-                                                        }}
+                                                    <p
+                                                        class="border-bottom pb-2"
+                                                    >
+                                                        {{ pendingTask[ 'object'
+                                                        ].dateEnd }}
                                                     </p>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="angkaKredit" class="form-label">
-                                                        Angka Kredit
+                                                    <label
+                                                        class="form-label"
+                                                        for="angkaKredit"
+                                                    >
+                                                        Akumulasi Angka Kredit
                                                     </label>
-                                                    <p class="border-bottom pb-2">
-                                                        {{
-                                                        pendingTask[
-                                                        'object'
-                                                        ].angkaKredit
-                                                        }}
+                                                    <p
+                                                        class="border-bottom pb-2"
+                                                    >
+                                                        {{ pendingTask[ 'object'
+                                                        ].angkaKredit }}
                                                     </p>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="ratingHasilName" class="form-label">
+                                                    <label
+                                                        class="form-label"
+                                                        for="ratingHasilName"
+                                                    >
                                                         Rating Hasil
                                                     </label>
-                                                    <p class="border-bottom pb-2">
-                                                        {{
-                                                        pendingTask[
-                                                        'object'
-                                                        ].ratingHasilName
-                                                        }}
+                                                    <p
+                                                        class="border-bottom pb-2"
+                                                    >
+                                                        {{ pendingTask[ 'object'
+                                                        ].ratingHasilName }}
                                                     </p>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="ratingKinerjaName" class="form-label">
+                                                    <label
+                                                        class="form-label"
+                                                        for="ratingKinerjaName"
+                                                    >
                                                         Rating Kinerja
                                                     </label>
-                                                    <p class="border-bottom pb-2">
-                                                        {{
-                                                        pendingTask[
-                                                        'object'
-                                                        ].ratingKinerjaName
-                                                        }}
+                                                    <p
+                                                        class="border-bottom pb-2"
+                                                    >
+                                                        {{ pendingTask[ 'object'
+                                                        ].ratingKinerjaName }}
                                                     </p>
                                                 </div>
                                                 <div class="col-md-12 mb-3">
-                                                    <label for="predikatKinerjaName" class="form-label">
+                                                    <label
+                                                        class="form-label"
+                                                        for="predikatKinerjaName"
+                                                    >
                                                         Predikat Kinerja
                                                     </label>
-                                                    <p class="border-bottom pb-2">
-                                                        {{
-                                                        pendingTask[
-                                                        'object'
-                                                        ]
-                                                        .predikatKinerjaName
+                                                    <p
+                                                        class="border-bottom pb-2"
+                                                    >
+                                                        {{ pendingTask[ 'object'
+                                                        ] .predikatKinerjaName
                                                         }}
                                                     </p>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
                                                     <div class="row">
-                                                        <app-file-handler [inputs]="{
+                                                        <app-file-handler
+                                                            [inputs]="{
                                                         files: {
                                                             docEvaluasi: { label: 'Dokumen Evaluasi', source: pendingTask['object'].docEvaluasiUrl },
                                                             docPredikat: { label: 'Dokumen Predikat', source: pendingTask['object'].docPredikatUrl },
@@ -238,13 +278,14 @@
                                                             docPenetapanAk: { label: 'Dokumen Penetapan', source: pendingTask['object'].docPenetapanAkUrl },
                                                         },
                                                         viewOnly: true
-                                                      }"></app-file-handler>
+                                                      }"
+                                                        ></app-file-handler>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="text-center float-end m-2 mt-3">
+                                    <div class="float-end m-2 mt-3 text-center">
                                         <!-- <button
                       type="button"
                       class="btn btn-success me-1"
@@ -261,38 +302,66 @@
                     >
                       Tolak
                     </button> -->
-                                        <ng-container *ngIf="
+                                        <ng-container
+                                            *ngIf="
                                                 submitTaskLoading$ | async;
                                                 else submitNoLoading
-                                            ">
-                                            <button class="btn btn-success me-1" disabled>
-                                                <div class="spinner-border spinner-sm-custom" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
+                                            "
+                                        >
+                                            <button
+                                                class="btn btn-success me-1"
+                                                disabled
+                                            >
+                                                <div
+                                                    class="spinner-border spinner-sm-custom"
+                                                    role="status"
+                                                >
+                                                    <span
+                                                        class="visually-hidden"
+                                                        >Loading...</span
+                                                    >
                                                 </div>
                                             </button>
-                                            <button class="btn btn-danger" disabled>
-                                                <div class="spinner-border spinner-sm-custom" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
+                                            <button
+                                                class="btn btn-danger"
+                                                disabled
+                                            >
+                                                <div
+                                                    class="spinner-border spinner-sm-custom"
+                                                    role="status"
+                                                >
+                                                    <span
+                                                        class="visually-hidden"
+                                                        >Loading...</span
+                                                    >
                                                 </div>
                                             </button>
                                         </ng-container>
 
                                         <ng-template #submitNoLoading>
-                                            <button type="button" class="btn btn-success me-1" (click)="
+                                            <button
+                                                (click)="
                                                     openConfirmationDialog(
                                                         pendingTask,
                                                         'approve'
                                                     )
-                                                ">
+                                                "
+                                                class="btn btn-success me-1"
+                                                type="button"
+                                            >
                                                 Terima
                                             </button>
-                                            <button type="button" class="btn btn-danger" (click)="
+                                            <button
+                                                (click)="
                                                     openConfirmationDialog(
                                                         pendingTask,
                                                         'reject',
                                                         true
                                                     )
-                                                ">
+                                                "
+                                                class="btn btn-danger"
+                                                type="button"
+                                            >
                                                 Tolak
                                             </button>
                                         </ng-template>

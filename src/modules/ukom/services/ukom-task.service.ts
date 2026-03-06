@@ -12,6 +12,7 @@ import {
 import { UkomTaskDetail } from '../models/ukom-task-detail.modal'
 import { Task } from '../../workflow/models/task.model'
 import { Eligibility } from '@/modules/ukom/models/ukom-registration-refactored/eligibility.model'
+
 @Injectable({
     providedIn: 'root',
 })
@@ -96,33 +97,6 @@ export class UkomTaskService {
             )
     }
 
-    private mapEligibilityMessage(code: string, message: string): string {
-        switch (code) {
-            case 'UEL-00000':
-                return 'Profil belum lengkap (email dan nomor telepon).'
-            case 'UEL-00001':
-                return 'Riwayat jabatan tidak ditemukan.'
-            case 'UEL-00002':
-                return 'Riwayat pangkat tidak ditemukan.'
-            case 'UEL-00003':
-                return 'Riwayat pendidikan tidak ditemukan.'
-            case 'UEL-00004':
-                return 'Riwayat kinerja tidak ditemukan.'
-            case 'UEL-00005':
-                return 'Angka kredit di bawah ambang batas.'
-            case 'UEL-00006':
-                return 'Rating hasil tidak memenuhi syarat.'
-            case 'UEL-00007':
-                return 'Rating kinerja tidak memenuhi syarat.'
-            case 'UEL-00008':
-                return 'Predikat kinerja tidak memenuhi syarat.'
-            case 'UEL-00009':
-                return 'Pendaftaran sudah ada.'
-            default:
-                return message
-        }
-    }
-
     checkEligibility(jenisUkom: string, nip: string): void {
         this.eligibilityLoadingSubject.next(true)
 
@@ -158,5 +132,32 @@ export class UkomTaskService {
             .subscribe((eligibility) => {
                 this.eligibleSubject.next(eligibility)
             })
+    }
+
+    private mapEligibilityMessage(code: string, message: string): string {
+        switch (code) {
+            case 'UEL-00000':
+                return 'Profil belum lengkap (email dan nomor telepon).'
+            case 'UEL-00001':
+                return 'Riwayat jabatan tidak ditemukan.'
+            case 'UEL-00002':
+                return 'Riwayat pangkat tidak ditemukan.'
+            case 'UEL-00003':
+                return 'Riwayat pendidikan tidak ditemukan.'
+            case 'UEL-00004':
+                return 'Riwayat kinerja tidak ditemukan.'
+            case 'UEL-00005':
+                return 'Akumulasi Angka kredit di bawah ambang batas.'
+            case 'UEL-00006':
+                return 'Rating hasil tidak memenuhi syarat.'
+            case 'UEL-00007':
+                return 'Rating kinerja tidak memenuhi syarat.'
+            case 'UEL-00008':
+                return 'Predikat kinerja tidak memenuhi syarat.'
+            case 'UEL-00009':
+                return 'Pendaftaran sudah ada.'
+            default:
+                return message
+        }
     }
 }
