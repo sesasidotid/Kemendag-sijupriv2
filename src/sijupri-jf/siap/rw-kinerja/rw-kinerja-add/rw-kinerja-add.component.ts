@@ -62,7 +62,7 @@ export class RwKinerjaAddComponent {
     inputs: FIleHandler = {
         files: {
             docEvaluas: {
-                label: 'Upload Dokumen Evaluasi kinerja',
+                label: 'Upload Dokumen Evaluasi Kinerja',
                 fileName: this.rwKinerja.docEvaluasi,
                 source: this.rwKinerja.docEvaluasiUrl,
                 required: true,
