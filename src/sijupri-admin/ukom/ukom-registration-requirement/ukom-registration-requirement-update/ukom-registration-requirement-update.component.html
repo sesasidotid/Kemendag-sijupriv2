@@ -1,18 +1,18 @@
 <form (ngSubmit)="submit()" [formGroup]="form">
     <div class="mb-3">
         <label class="form-label fw-bold" for="angkaKreditThreshold">
-            Angka Kredit Threshold <span class="text-danger">*</span>
+            Akumulasi Angka Kredit Threshold <span class="text-danger">*</span>
         </label>
         <input
             appInvalidOnTouch
             class="form-control"
             formControlName="angkaKreditThreshold"
             id="angkaKreditThreshold"
-            placeholder="Angka Kredit Threshold"
+            placeholder="Akumulasi Angka Kredit Threshold"
             type="number"
         />
         <div
-            *ngIf="getError('angkaKreditThreshold', 'Angka Kredit Threshold') as error"
+            *ngIf="getError('angkaKreditThreshold', 'Akumulasi Angka Kredit Threshold') as error"
             class="invalid-feedback"
         >
             {{ error }}

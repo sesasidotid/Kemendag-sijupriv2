@@ -107,13 +107,16 @@ export class RwKinerjaPendingComponent {
     handlePagable () {
         this.pagable = new PagableBuilder('/api/v1/rw_kinerja/task/search')
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tanggal', 'dateCreated').build()
+                new PrimaryColumnBuilder('Tanggal', 'dateCreated').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Angka Kredit', 'objectName').build()
+                new PrimaryColumnBuilder(
+                    'Akumulasi Angka Kredit',
+                    'objectName',
+                ).build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'flowName').build()
+                new PrimaryColumnBuilder('Status', 'flowName').build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -127,10 +130,10 @@ export class RwKinerjaPendingComponent {
                     }, 'info')
                     .addInactiveCondition(
                         (pendingTask: PendingTask) =>
-                            pendingTask.flowId == 'siap_flow_1'
+                            pendingTask.flowId == 'siap_flow_1',
                     )
                     .withIcon('update')
-                    .build()
+                    .build(),
             )
             .build()
     }

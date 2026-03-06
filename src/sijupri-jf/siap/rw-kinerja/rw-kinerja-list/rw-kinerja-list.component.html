@@ -12,25 +12,25 @@
     <ng-template #hadItem>
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label">
+                <label class="form-label" for="firstnameInput">
                     Tanggal Mulai
                 </label>
                 <p class="border-bottom pb-2">{{ rwKinerja.dateStart }}</p>
             </div>
             <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label"
+                <label class="form-label" for="firstnameInput"
                     >Tanggal Selesai</label
                 >
                 <p class="border-bottom pb-2">{{ rwKinerja.dateEnd }}</p>
             </div>
             <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label"
-                    >Angka Kredit</label
+                <label class="form-label" for="firstnameInput"
+                    >Akumulasi Angka Kredit</label
                 >
                 <p class="border-bottom pb-2">{{ rwKinerja.angkaKredit }}</p>
             </div>
             <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label"
+                <label class="form-label" for="firstnameInput"
                     >Rating Hasil</label
                 >
                 <p class="border-bottom pb-2">
@@ -38,7 +38,7 @@
                 </p>
             </div>
             <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label"
+                <label class="form-label" for="firstnameInput"
                     >Rating Kinerja</label
                 >
                 <p class="border-bottom pb-2">
@@ -46,7 +46,7 @@
                 </p>
             </div>
             <div class="col-md-6 mb-3">
-                <label for="firstnameInput" class="form-label"
+                <label class="form-label" for="firstnameInput"
                     >Predikat Kinerja</label
                 >
                 <p class="border-bottom pb-2">
@@ -69,8 +69,8 @@
         </div>
         <div class="row">
             <div class="col-lg-12">
-                <div class="hstack gap-2 justify-content-end">
-                    <a class="btn btn-secondary" (click)="isDetailOpen = false"
+                <div class="hstack justify-content-end gap-2">
+                    <a (click)="isDetailOpen = false" class="btn btn-secondary"
                         >Kembali</a
                     >
                 </div>

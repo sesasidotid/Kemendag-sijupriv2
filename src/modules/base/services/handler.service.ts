@@ -82,7 +82,7 @@ export class HandlerService {
         },
         'UEL-00005': {
             subject: 'Error',
-            message: 'Angka Kredit di bawah threshold',
+            message: 'Akumulasi Angka Kredit di bawah threshold',
         },
         'UEL-00006': {
             subject: 'Error',

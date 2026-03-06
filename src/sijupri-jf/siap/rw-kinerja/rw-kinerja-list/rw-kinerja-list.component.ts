@@ -48,16 +48,19 @@ export class RwKinerjaListComponent {
 
         this.pagable = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build()
+                new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tgl Mulai', 'dateStart').build()
+                new PrimaryColumnBuilder('Tgl Mulai', 'dateStart').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build()
+                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Angka Kredit', 'angkaKredit').build()
+                new PrimaryColumnBuilder(
+                    'Akumulasi Angka Kredit',
+                    'angkaKredit',
+                ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -66,25 +69,25 @@ export class RwKinerjaListComponent {
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('type')
                     .withField('Tahunan/Bulanan', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
                     .setProperty('dateStart')
                     .withField('Tgl Mulai', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
                     .setProperty('dateEnd')
                     .withField('Tgl Selesai', 'text')
-                    .build()
+                    .build(),
             )
             .build()
     }

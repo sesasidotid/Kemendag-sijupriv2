@@ -74,7 +74,7 @@ export class UkomRegistrationRequirementComponent {
                     // Angka Kredit column
                     .addPrimaryColumn(
                         new PrimaryColumnBuilder(
-                            'Angka Kredit',
+                            'Akumulasi Angka Kredit',
                             'angkaKreditThreshold',
                         ).build(),
                     )
@@ -177,6 +177,20 @@ export class UkomRegistrationRequirementComponent {
         this.initTabs()
     }
 
+    refreshPagable() {
+        this.refresh = !this.refresh
+    }
+
+    closeUpdateModal() {
+        this.isUpdateModalOpen = false
+        this.selectedRule = undefined
+    }
+
+    openUpdateModal(body: UkomRegistrationRequirement) {
+        this.selectedRule = body
+        this.isUpdateModalOpen = true
+    }
+
     private initTabs() {
         this.tabService
             .addTab({
@@ -193,10 +207,6 @@ export class UkomRegistrationRequirementComponent {
         setTimeout(() => this.tabService.changeTabActive(0), 0)
     }
 
-    refreshPagable() {
-        this.refresh = !this.refresh
-    }
-
     private handleDeleteRule(id: string) {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
@@ -207,15 +217,5 @@ export class UkomRegistrationRequirementComponent {
                 )
             },
         })
-    }
-
-    closeUpdateModal() {
-        this.isUpdateModalOpen = false
-        this.selectedRule = undefined
-    }
-
-    openUpdateModal(body: UkomRegistrationRequirement) {
-        this.selectedRule = body
-        this.isUpdateModalOpen = true
     }
 }

@@ -22,19 +22,55 @@ export class RwKinerjaListComponent {
     this.activatedRoute.paramMap.subscribe(params => {
       var nip = params.get('id');
 
-      this.pagable = new PagableBuilder("/api/v1/rw_kinerja/search")
-        .addPrimaryColumn(new PrimaryColumnBuilder("Tahunan/Bulanan", 'type').build())
-        .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Mulai", 'dateStart').build())
-        .addPrimaryColumn(new PrimaryColumnBuilder("Tgl Selesai", 'dateEnd').build())
-        .addPrimaryColumn(new PrimaryColumnBuilder("Angka Kredit", 'angkaKredit').build())
-        .addActionColumn(new ActionColumnBuilder().setAction((rwKinerja: any) => {
-          this.router.navigate([`/${rwKinerja.id}`])
-        }, "info").withIcon("detail").build())
-        .addFilter(new PageFilterBuilder("like").setProperty("pangkat|name").withField("Tahunan/Bulanan", "text").build())
-        .addFilter(new PageFilterBuilder("equal").setProperty("dateStart").withField("Tgl Mulai", "text").build())
-        .addFilter(new PageFilterBuilder("equal").setProperty("dateEnd").withField("Tgl Selesai", "text").build())
-        .addFilter(new PageFilterBuilder("equal").setProperty("nip").withDefaultValue(nip).build())
-        .build();
+      this.pagable = new PagableBuilder('/api/v1/rw_kinerja/search')
+          .addPrimaryColumn(
+              new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build(),
+          )
+          .addPrimaryColumn(
+              new PrimaryColumnBuilder('Tgl Mulai', 'dateStart').build(),
+          )
+          .addPrimaryColumn(
+              new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build(),
+          )
+          .addPrimaryColumn(
+              new PrimaryColumnBuilder(
+                  'Akumulasi Angka Kredit',
+                  'angkaKredit',
+              ).build(),
+          )
+          .addActionColumn(
+              new ActionColumnBuilder()
+                  .setAction((rwKinerja: any) => {
+                      this.router.navigate([`/${rwKinerja.id}`])
+                  }, 'info')
+                  .withIcon('detail')
+                  .build(),
+          )
+          .addFilter(
+              new PageFilterBuilder('like')
+                  .setProperty('pangkat|name')
+                  .withField('Tahunan/Bulanan', 'text')
+                  .build(),
+          )
+          .addFilter(
+              new PageFilterBuilder('equal')
+                  .setProperty('dateStart')
+                  .withField('Tgl Mulai', 'text')
+                  .build(),
+          )
+          .addFilter(
+              new PageFilterBuilder('equal')
+                  .setProperty('dateEnd')
+                  .withField('Tgl Selesai', 'text')
+                  .build(),
+          )
+          .addFilter(
+              new PageFilterBuilder('equal')
+                  .setProperty('nip')
+                  .withDefaultValue(nip)
+                  .build(),
+          )
+          .build()
     });
   }
 }
