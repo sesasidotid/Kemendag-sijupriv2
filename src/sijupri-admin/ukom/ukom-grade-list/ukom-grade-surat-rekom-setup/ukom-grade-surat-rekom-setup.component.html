@@ -17,14 +17,24 @@
                 Silakan atur template surat rekomendasi terlebih dahulu untuk
                 melanjutkan.
             </p>
-            <button
-                (click)="openSetupModal()"
-                class="btn btn-primary mt-3"
-                type="button"
-            >
-                <i class="mdi mdi-cog-outline me-1"></i>
-                Atur Template
-            </button>
+            <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
+                <button
+                    (click)="openCounterModal()"
+                    class="btn btn-outline-primary"
+                    type="button"
+                >
+                    <i class="mdi mdi-numeric me-1"></i>
+                    Atur Nomor
+                </button>
+                <button
+                    (click)="openSetupModal()"
+                    class="btn btn-primary"
+                    type="button"
+                >
+                    <i class="mdi mdi-cog-outline me-1"></i>
+                    Atur Template
+                </button>
+            </div>
         </div>
     </ng-container>
 </ng-template>
@@ -44,6 +54,14 @@
             <!--                <i class="mdi mdi-printer-outline me-1"></i>-->
             <!--                Print Preview-->
             <!--            </button>-->
+            <button
+                (click)="openCounterModal()"
+                class="btn btn-outline-primary"
+                type="button"
+            >
+                <i class="mdi mdi-numeric me-1"></i>
+                Atur Nomor
+            </button>
             <button
                 (click)="openSetupModal()"
                 class="btn btn-primary"
@@ -132,14 +150,23 @@
 
                 <span class="text-muted">/</span>
 
-                <!-- Auto Number (disabled placeholder) -->
+                <!-- Counter Number -->
                 <input
+                    [value]="counterNumDisplay()"
                     class="form-control"
                     disabled
                     placeholder="nomor"
                     style="max-width: 80px"
                     type="text"
                 />
+
+                <button
+                    (click)="openCounterModal()"
+                    class="btn btn-outline-primary btn-sm"
+                    type="button"
+                >
+                    Ubah
+                </button>
 
                 <span class="text-muted">/</span>
 
@@ -303,3 +330,51 @@
         </div>
     </form>
 </app-modal>
+
+<!-- Counter Modal -->
+<app-modal
+    (toggle)="closeCounterModal()"
+    *ngIf="showCounterModal()"
+    [enableFooter]="false"
+    [size]="'sm'"
+    [title]="'Pengaturan Nomor Surat'"
+>
+    <form (ngSubmit)="submitCounterForm()" [formGroup]="counterForm">
+        <div class="mb-3">
+            <label class="form-label" for="counterValue"
+                >Nomor Surat <span class="text-danger">*</span></label
+            >
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="value"
+                id="counterValue"
+                min="1"
+                type="number"
+            />
+            <div *ngIf="getCounterErrorMessage() as error" class="invalid-feedback">
+                {{ error }}
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button
+                (click)="closeCounterModal()"
+                class="btn btn-secondary"
+                type="button"
+            >
+                <i class="mdi mdi-close me-1"></i>
+                Batal
+            </button>
+            <app-loading-button
+                [className]="'btn btn-primary'"
+                [disabled]="counterForm.invalid"
+                [icon]="'mdi mdi-content-save-outline'"
+                [isLoading]="counterSubmitLoading()"
+                [label]="'Simpan Nomor'"
+                [type]="'submit'"
+            ></app-loading-button>
+        </div>
+    </form>
+</app-modal>
+

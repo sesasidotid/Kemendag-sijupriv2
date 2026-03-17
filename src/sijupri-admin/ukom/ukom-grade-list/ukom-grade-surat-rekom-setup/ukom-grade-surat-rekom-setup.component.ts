@@ -22,7 +22,10 @@ import { CommonModule } from '@angular/common'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { finalize } from 'rxjs'
-import { SuratRekomService } from '@/modules/ukom/services/surat-rekom.service'
+import {
+    SuratRekomCounterResponse,
+    SuratRekomService,
+} from '@/modules/ukom/services/surat-rekom.service'
 import { CreatePreviewSuratRekomRequest } from '@/modules/ukom/models/surat-rekom/create-preview-surat-rekom-request.model'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 
@@ -62,10 +65,15 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
     handlerService = inject(HandlerService)
     suratRekomService = inject(SuratRekomService)
     suratRekomForm: FormGroup
+    counterForm: FormGroup
 
     templateHtml = signal<string | null>(null)
     isLoadingTemplate = signal(false)
     showSetupModal = signal(false)
+    showCounterModal = signal(false)
+    currentCounterNum = signal<number | null>(null)
+    isLoadingCounter = signal(false)
+    counterSubmitLoading = signal(false)
     inputs = signal<FIleHandler>({
         files: {
             [this.fields.letterHead]: { label: 'Kop Surat', required: true },
@@ -95,6 +103,7 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
     ngOnInit() {
         this.initForm()
         this.loadTemplate()
+        this.loadCounter()
     }
 
     initForm() {
@@ -108,6 +117,10 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
             [this.fields.classificationCode]: ['', Validators.required],
             [this.fields.issuingUnit]: ['', Validators.required],
             [this.fields.letterCategory]: ['', Validators.required],
+        })
+
+        this.counterForm = this.fb.group({
+            value: [null, [Validators.required, Validators.min(1)]],
         })
     }
 
@@ -131,6 +144,11 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
         if (!dateValue) return ''
         const [year] = dateValue.split('-')
         return year || ''
+    }
+
+    counterNumDisplay(): string {
+        if (this.isLoadingCounter()) return '...'
+        return `${this.currentCounterNum() ?? ''}`
     }
 
     loadTemplate() {
@@ -187,6 +205,70 @@ export class UkomGradeSuratRekomSetupComponent implements OnInit {
 
     closeSetupModal() {
         this.showSetupModal.set(false)
+    }
+
+    openCounterModal() {
+        this.counterForm.patchValue({ value: this.currentCounterNum() })
+        this.showCounterModal.set(true)
+    }
+
+    closeCounterModal() {
+        this.showCounterModal.set(false)
+    }
+
+    getCounterErrorMessage(): string | null {
+        return this.formValidationService.getErrorMessage(
+            this.counterForm.get('value'),
+            'value',
+            'Nomor Surat',
+        )
+    }
+
+    loadCounter() {
+        this.isLoadingCounter.set(true)
+        this.suratRekomService
+            .getRekomCounter()
+            .pipe(finalize(() => this.isLoadingCounter.set(false)))
+            .subscribe({
+                next: (response: SuratRekomCounterResponse) => {
+                    this.currentCounterNum.set(response?.num ?? null)
+                },
+                error: (error) => {
+                    console.error(error)
+                    this.currentCounterNum.set(null)
+                },
+            })
+    }
+
+    submitCounterForm() {
+        if (this.counterForm.invalid) {
+            this.handlerService.handleAlert('Error', 'Nomor surat wajib diisi.')
+            return
+        }
+
+        const value = Number(this.counterForm.get('value')?.value)
+        this.counterSubmitLoading.set(true)
+
+        this.suratRekomService
+            .updateRekomCounter(value)
+            .pipe(finalize(() => this.counterSubmitLoading.set(false)))
+            .subscribe({
+                next: () => {
+                    this.handlerService.handleAlert(
+                        'Success',
+                        'Nomor surat berhasil diperbarui.',
+                    )
+                    this.closeCounterModal()
+                    this.loadCounter()
+                },
+                error: (error) => {
+                    console.error(error)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memperbarui nomor surat.',
+                    )
+                },
+            })
     }
 
     submitForm() {

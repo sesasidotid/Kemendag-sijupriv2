@@ -599,6 +599,8 @@ export class UkomExamScheduleAddComponent implements OnInit {
         console.error(err)
 
         const errorCode = err?.error?.code
+        const message = err?.error?.message
+        const params = err?.error?.params
 
         switch (errorCode) {
             case 'ESS-00001':
@@ -609,10 +611,18 @@ export class UkomExamScheduleAddComponent implements OnInit {
                 break
 
             case 'RCD-00002':
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Terdeteksi konflik jadwal ujian penguji',
-                )
+                if (message == 'participant already have a shcedule') {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        `Terdeteksi konflik jadwal ujian peserta dengan nama ${params?.name} (${params?.nip})`,
+                    )
+                } else {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Terdeteksi konflik jadwal ujian penguji',
+                    )
+                }
+
                 break
 
             default:

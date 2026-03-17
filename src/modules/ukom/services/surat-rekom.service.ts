@@ -7,11 +7,17 @@ import { catchError } from 'rxjs/operators'
 import { SuratRekomModel } from '@/modules/ukom/models/surat-rekom/surat-rekom.model'
 import { CreatePreviewSuratRekomRequest } from '@/modules/ukom/models/surat-rekom/create-preview-surat-rekom-request.model'
 
+export interface SuratRekomCounterResponse {
+    code: string
+    num: number
+}
+
 @Injectable({
     providedIn: 'root',
 })
 export class SuratRekomService {
     readonly BASE_PATH = '/api/v1/surat_rekom'
+    readonly COUNTER_PATH = '/api/v1/counter/REKOM_UKOM'
 
     apiService = inject(ApiService)
     handlerService = inject(HandlerService)
@@ -92,5 +98,25 @@ export class SuratRekomService {
                     throw err
                 }),
             )
+    }
+
+    getRekomCounter(): Observable<SuratRekomCounterResponse> {
+        return this.apiService.getData(this.COUNTER_PATH).pipe(
+            catchError((err) => {
+                console.error(err)
+                this.handlerService.handleException(err)
+                throw err
+            }),
+        )
+    }
+
+    updateRekomCounter(value: number): Observable<void> {
+        return this.apiService.putData(this.COUNTER_PATH, { value }).pipe(
+            catchError((err) => {
+                console.error(err)
+                this.handlerService.handleException(err)
+                throw err
+            }),
+        )
     }
 }
