@@ -21,6 +21,7 @@ export class ExamSchedule extends Serializable {
     examAttendance?: ExamAttendance | null | undefined = undefined
     roomUkom?: RoomUkomDetail | null | undefined = undefined
     graded?: boolean | null | undefined = undefined
+    examiners?: string
 
     constructor(object?: Partial<ExamSchedule>) {
         super()

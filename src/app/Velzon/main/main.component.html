@@ -4,17 +4,30 @@
     <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">
-                <div class="row" *ngIf="this.applicationCode !== 'sijupri-external'">
+                <div
+                    *ngIf="this.applicationCode !== 'sijupri-external'"
+                    class="row"
+                >
                     <div class="col-12 opacity-75">
-                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                        <div
+                            class="page-title-box d-sm-flex align-items-center justify-content-between"
+                        >
                             <h4 class="mb-sm-0 font-size-18">{{ title }}</h4>
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
-                                    <ng-container *ngFor="let route of routeTrail; let last = last">
-                                        <li *ngIf="!last" class="breadcrumb-item active">
+                                    <ng-container
+                                        *ngFor="let route of routeTrail; let last = last"
+                                    >
+                                        <li
+                                            *ngIf="!last"
+                                            class="breadcrumb-item active"
+                                        >
                                             {{ route.title }}
                                         </li>
-                                        <li *ngIf="last" class="breadcrumb-item active">
+                                        <li
+                                            *ngIf="last"
+                                            class="breadcrumb-item active"
+                                        >
                                             {{ route.title }}
                                         </li>
                                     </ng-container>
@@ -25,12 +38,23 @@
                 </div>
 
                 <div class="card">
-                    <ul class="nav justify-content-start arrow-navtabs nav-primary bg-light mb-3" role="tablist">
-                        <li class="nav-item cursor-pointer" *ngFor="let tab of tabService.tabs$ | async">
-                            <a class="nav-link {{ tab.isActive ? 'active' : 'inactive' }}" role="tab"
-                                (click)="onTabClick(tab)">
+                    <ul
+                        class="nav justify-content-start arrow-navtabs nav-primary bg-light mb-3"
+                        role="tablist"
+                    >
+                        <li
+                            *ngFor="let tab of tabService.tabs$ | async"
+                            class="nav-item cursor-pointer"
+                        >
+                            <a
+                                (click)="onTabClick(tab)"
+                                class="nav-link {{ tab.isActive ? 'active' : 'inactive' }}"
+                                role="tab"
+                            >
                                 <span class="me-2">
-                                    <i class="{{ tab.icon ? 'mdi ' + tab.icon : 'mdi mdi-account-circle' }}"></i>
+                                    <i
+                                        class="{{ tab.icon ? 'mdi ' + tab.icon : 'mdi mdi-account-circle' }}"
+                                    ></i>
                                 </span>
                                 <span class="">{{ tab.label }}</span>
                             </a>

@@ -60,9 +60,6 @@ export class MultiSelectComponent
     readonly ChevronDown = ChevronDown
     readonly Search = Search
 
-    private onChange: (value: (string | number)[]) => void = () => {}
-    private onTouched: () => void = () => {}
-
     constructor(private elementRef: ElementRef) {}
 
     @HostListener('document:click', ['$event'])
@@ -166,6 +163,10 @@ export class MultiSelectComponent
             this.selectedIds.includes(option.id),
         )
     }
+
+    private onChange: (value: (string | number)[]) => void = () => {}
+
+    private onTouched: () => void = () => {}
 
     private emitChanges(): void {
         this.onChange(this.selectedIds)

@@ -46,6 +46,8 @@ import {
 } from '@/modules/ukom/models/exam-schedule/create-exam-schedule-request.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { RoomParticipant } from '@/modules/ukom/models/room/room-participant.model'
+import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
+import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
 
 interface DynamicFieldConfig {
     controlName: string
@@ -181,6 +183,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
     participantService = inject(UkomParticipantService)
     durationPipe = inject(DurationPipe)
+    ukomExaminerService = inject(UkomExaminerService)
 
     examScheduleForm: FormGroup
     submitLoading = signal(false)
@@ -194,6 +197,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
     participants: MultiSelectOption[] = []
+    examinerInRoom = signal<ExaminerUkom[]>([])
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -211,6 +215,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
             this.roomId = params.get('id')
             this.initPagable()
             this.getParticipantListOptions()
+            this.getExaminerList()
         })
         this.initTabs()
         this.initForm()
@@ -248,6 +253,13 @@ export class UkomExamScheduleAddComponent implements OnInit {
                         return this.ukomMiscellaneousService.getModuleDisplayName(
                             data.examTypeCode,
                         )
+                    })
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Penguji', (data: ExamSchedule) => {
+                        return this.mapExaminersToNames(data.examiners)
                     })
                     .build(),
             )
@@ -418,6 +430,21 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     )
                 },
             })
+    }
+
+    getExaminerList() {
+        this.ukomExaminerService.fetchExaminerByRoomId(this.roomId).subscribe({
+            next: (examinerList) => {
+                this.examinerInRoom.set(examinerList)
+            },
+            error: (err) => {
+                console.error(err)
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal memuat daftar penguji',
+                )
+            },
+        })
     }
 
     handleTabChange() {
@@ -672,5 +699,25 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     secretKey: v.secretKey,
                 })
         }
+    }
+
+    private mapExaminerIdToName(examinerId: string): string {
+        const examiner = this.examinerInRoom().find(
+            (item) => item.id === examinerId,
+        )
+
+        return examiner?.name ?? examinerId
+    }
+
+    private mapExaminersToNames(examiners?: string): string {
+        if (!examiners) return '-'
+
+        const examinerNames = examiners
+            .split(',')
+            .map((examinerId) => examinerId.trim())
+            .filter((examinerId) => !!examinerId)
+            .map((examinerId) => this.mapExaminerIdToName(examinerId))
+
+        return examinerNames.length > 0 ? examinerNames.join(', ') : '-'
     }
 }

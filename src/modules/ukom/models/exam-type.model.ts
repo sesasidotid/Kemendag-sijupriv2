@@ -18,7 +18,6 @@ export enum ExamTypeCategory {
     WAWANCARA = 'WAWANCARA',
     SEMINAR = 'SEMINAR',
     PRAKTIK = 'PRAKTIK',
-    MAKALA = 'MAKALA',
     PORTOFOLIO = 'PORTOFOLIO',
     MAKALAH = 'MAKALAH',
     STUDI_KASUS = 'STUDI_KASUS',

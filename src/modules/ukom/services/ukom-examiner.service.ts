@@ -64,4 +64,8 @@ export class UkomExaminerService {
 
         return this.api.getData(fullPath)
     }
+
+    fetchExaminerByRoomId(roomId: string): Observable<ExaminerUkom[]> {
+        return this.api.getData(`${this.BASE_PATH}/room/${roomId}`)
+    }
 }

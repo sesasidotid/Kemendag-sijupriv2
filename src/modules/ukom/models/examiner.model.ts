@@ -1,4 +1,5 @@
 import { Serializable } from '../../base/commons/serializable'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 export class ExaminerUkom extends Serializable {
     id: string = undefined
@@ -16,6 +17,7 @@ export class ExaminerUkom extends Serializable {
     password: string | undefined = undefined
     name: string | undefined = undefined
     user: ExaminerUkomUser | undefined = undefined
+    examTypeList: ExamTypeCategory[] = []
 
     constructor(object?: { [key: string]: any }) {
         super()

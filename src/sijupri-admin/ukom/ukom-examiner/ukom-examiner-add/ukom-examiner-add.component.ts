@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, EventEmitter, inject, Output } from '@angular/core'
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core'
 import { LucideAngularModule } from 'lucide-angular'
 import {
     FormControl,
@@ -9,7 +9,7 @@ import {
     Validators,
 } from '@angular/forms'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { BehaviorSubject, finalize } from 'rxjs'
+import { BehaviorSubject, finalize, map } from 'rxjs'
 import { Router } from '@angular/router'
 import { ApiService } from '@/modules/base/services/api.service'
 import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
@@ -17,6 +17,9 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
+import { MultiSelectComponent } from '@/modules/base/components/multi-select'
+import { ExamType } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-ukom-examiner-add',
@@ -28,19 +31,21 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
         ReactiveFormsModule,
         LoadingButtonComponent,
         InvalidOnTouchDirective,
+        MultiSelectComponent,
     ],
     templateUrl: './ukom-examiner-add.component.html',
     styleUrl: './ukom-examiner-add.component.scss',
 })
 export class UkomExaminerAddComponent {
     formValidationService = inject(FormValidationService)
-    @Output() changeTabActive: EventEmitter<any> = new EventEmitter()
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
+    @Output() changeTabActive = new EventEmitter()
 
     examinerForm: FormGroup
     submitLoading$ = new BehaviorSubject<boolean>(false)
 
-    examinerData: ExaminerUkom = new ExaminerUkom()
-
+    examinerData = new ExaminerUkom()
+    examTypeListOptions = signal<{ id: string; label: string }[]>([])
     constructor(
         private confirmationService: ConfirmationService,
         private router: Router,
@@ -50,6 +55,38 @@ export class UkomExaminerAddComponent {
 
     ngOnInit() {
         this.handleFormInit()
+        this.fetchExamTypeList()
+    }
+
+    fetchExamTypeList() {
+        this.ukomMiscellaneousService
+            .getExamType()
+            .pipe(
+                map((examType) => {
+                    const filtered = examType.filter(
+                        (u) => !['MAKALA', 'CAT'].includes(u.code),
+                    )
+                    const hasSeminar = filtered.some(
+                        (u) => u.code === 'SEMINAR',
+                    )
+
+                    if (!hasSeminar) {
+                        filtered.push(new ExamType({ code: 'SEMINAR' }))
+                    }
+
+                    return filtered.map((u) => ({
+                        id: u.code,
+                        label: this.ukomMiscellaneousService.getModuleDisplayName(
+                            u.code,
+                        ),
+                    }))
+                }),
+            )
+            .subscribe({
+                next: (response) => {
+                    this.examTypeListOptions.set(response)
+                },
+            })
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
@@ -71,6 +108,7 @@ export class UkomExaminerAddComponent {
                 Validators.required,
                 this.passwordMatchValidator.bind(this),
             ]),
+            examTypeList: new FormControl(null, Validators.required),
         })
     }
 
@@ -100,6 +138,8 @@ export class UkomExaminerAddComponent {
                     this.examinerForm.get('jenisKelaminCode').value
                 this.examinerData.password =
                     this.examinerForm.get('password').value
+                this.examinerData.examTypeList =
+                    this.examinerForm.get('examTypeList').value
 
                 this.apiService
                     .postData('/api/v1/examiner_ukom', this.examinerData)

@@ -4,7 +4,7 @@ import {
     ExamTypeCategory,
 } from '@/modules/ukom/models/exam-type.model'
 import { inject, Injectable } from '@angular/core'
-import { Observable, of } from 'rxjs'
+import { map, Observable, of } from 'rxjs'
 import { catchError } from 'rxjs/operators'
 
 @Injectable({
@@ -16,6 +16,10 @@ export class UkomMiscellaneousService {
 
     getExamType(): Observable<ExamType[]> {
         return this.apiService.getData('/api/v1/exam_type').pipe(
+            map((examType: ExamType[]) => {
+                const filtered = examType.filter((u) => u.code !== 'MAKALA')
+                return filtered
+            }),
             catchError((error) => {
                 console.error('Failed to fetch exam types:', error)
                 return of([])

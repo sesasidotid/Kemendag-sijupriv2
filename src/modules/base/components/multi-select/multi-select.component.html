@@ -1,23 +1,23 @@
 <div class="multi-select-container">
     <!-- Main Select Box -->
     <div
-        class="multi-select-input form-control"
+        (click)="toggleDropdown()"
         [class.disabled]="disabled"
         [class.open]="isDropdownOpen"
-        (click)="toggleDropdown()"
+        class="multi-select-input form-control"
     >
         <!-- Selected Items Display -->
-        <div class="selected-items" *ngIf="selectedIds.length > 0">
+        <div *ngIf="selectedIds.length > 0" class="selected-items">
             <span
                 *ngFor="let option of getSelectedOptions()"
                 class="badge bg-primary mb-1 me-1"
             >
                 {{ option.label }}
                 <button
-                    type="button"
-                    class="btn-remove"
                     (click)="removeOption(option.id, $event)"
                     [disabled]="disabled"
+                    class="btn-remove"
+                    type="button"
                 >
                     <lucide-angular [img]="X" [size]="14"></lucide-angular>
                 </button>
@@ -25,34 +25,34 @@
         </div>
 
         <!-- Placeholder -->
-        <span class="placeholder-text" *ngIf="selectedIds.length === 0">
+        <span *ngIf="selectedIds.length === 0" class="placeholder-text">
             {{ placeholder }}
         </span>
 
         <!-- Dropdown Arrow -->
         <div class="dropdown-arrow">
             <button
-                type="button"
-                class="btn-clear me-1"
-                *ngIf="selectedIds.length > 0 && !disabled"
                 (click)="clearAll($event)"
+                *ngIf="selectedIds.length > 0 && !disabled"
+                class="btn-clear me-1"
                 title="Clear all"
+                type="button"
             >
                 <lucide-angular [img]="X" [size]="16"></lucide-angular>
             </button>
             <lucide-angular
+                [class.rotated]="isDropdownOpen"
                 [img]="ChevronDown"
                 [size]="20"
-                [class.rotated]="isDropdownOpen"
             ></lucide-angular>
         </div>
     </div>
 
     <!-- Dropdown Menu -->
     <div
-        class="dropdown-menu"
         *ngIf="isDropdownOpen"
         [style.max-height]="maxHeight"
+        class="dropdown-menu"
     >
         <!-- Search Input -->
         <div class="search-container">
@@ -61,12 +61,12 @@
                     <lucide-angular [img]="Search" [size]="16"></lucide-angular>
                 </span>
                 <input
-                    type="text"
-                    class="form-control"
-                    [placeholder]="searchPlaceholder"
-                    [(ngModel)]="searchTerm"
-                    (input)="onSearchChange($event)"
                     (click)="$event.stopPropagation()"
+                    (input)="onSearchChange($event)"
+                    [(ngModel)]="searchTerm"
+                    [placeholder]="searchPlaceholder"
+                    class="form-control"
+                    type="text"
                 />
             </div>
         </div>
@@ -88,16 +88,16 @@
             </div>
 
             <div
-                *ngFor="let option of filteredOptions"
-                class="option-item"
-                [class.selected]="isSelected(option.id)"
                 (click)="toggleOption(option.id)"
+                *ngFor="let option of filteredOptions"
+                [class.selected]="isSelected(option.id)"
+                class="option-item"
             >
                 <input
-                    type="checkbox"
-                    class="form-check-input me-2"
-                    [checked]="isSelected(option.id)"
                     (click)="$event.stopPropagation()"
+                    [checked]="isSelected(option.id)"
+                    class="form-check-input me-2"
+                    type="checkbox"
                 />
                 <span>{{ option.label }}</span>
             </div>
