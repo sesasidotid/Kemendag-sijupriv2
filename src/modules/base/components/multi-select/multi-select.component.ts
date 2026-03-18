@@ -55,6 +55,7 @@ export class MultiSelectComponent
     searchTerm: string = ''
     isDropdownOpen: boolean = false
     filteredOptions: MultiSelectOption[] = []
+    dropdownStyle: { [key: string]: string } = {}
 
     readonly X = X
     readonly ChevronDown = ChevronDown
@@ -64,12 +65,21 @@ export class MultiSelectComponent
 
     @HostListener('document:click', ['$event'])
     onClickOutside(event: Event): void {
-        if (!this.elementRef.nativeElement.contains(event.target)) {
+        const clickedInside = this.elementRef.nativeElement.contains(
+            event.target,
+        )
+        if (!clickedInside) {
             if (this.isDropdownOpen) {
-                this.isDropdownOpen = false
-                this.searchTerm = ''
-                this.filterOptions()
+                this.closeDropdown()
             }
+        }
+    }
+
+    @HostListener('window:scroll')
+    @HostListener('window:resize')
+    onWindowScroll(): void {
+        if (this.isDropdownOpen) {
+            this.updatePosition()
         }
     }
 
@@ -106,9 +116,33 @@ export class MultiSelectComponent
     toggleDropdown(): void {
         if (!this.disabled) {
             this.isDropdownOpen = !this.isDropdownOpen
-            if (!this.isDropdownOpen) {
+            if (this.isDropdownOpen) {
+                this.updatePosition()
+            } else {
                 this.searchTerm = ''
                 this.filterOptions()
+            }
+        }
+    }
+
+    closeDropdown(): void {
+        this.isDropdownOpen = false
+        this.searchTerm = ''
+        this.filterOptions()
+    }
+
+    updatePosition(): void {
+        const inputElement = this.elementRef.nativeElement.querySelector(
+            '.multi-select-input',
+        )
+        if (inputElement) {
+            const rect = inputElement.getBoundingClientRect()
+            this.dropdownStyle = {
+                position: 'fixed',
+                top: `${rect.bottom}px`,
+                left: `${rect.left}px`,
+                width: `${rect.width}px`,
+                zIndex: '1055', // Higher than bootstrap modal (1050)
             }
         }
     }
@@ -138,6 +172,8 @@ export class MultiSelectComponent
             this.selectedIds = [...this.selectedIds, optionId]
         }
         this.emitChanges()
+        // If we are using fixed positioning, we might need to manually trigger change detection if strategies differ,
+        // but currently we are in the same component.
     }
 
     isSelected(optionId: string | number): boolean {

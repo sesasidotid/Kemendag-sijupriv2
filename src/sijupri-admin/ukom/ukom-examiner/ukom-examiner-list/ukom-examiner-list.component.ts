@@ -4,11 +4,11 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder,
+    PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
-import { BehaviorSubject, finalize } from 'rxjs'
+import { BehaviorSubject, finalize, map } from 'rxjs'
 import { TabService } from '../../../../modules/base/services/tab.service'
 import { Router } from '@angular/router'
 import { UkomExaminerAddComponent } from '../ukom-examiner-add/ukom-examiner-add.component'
@@ -16,13 +16,7 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
-import {
-    FormControl,
-    FormGroup,
-    FormsModule,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms'
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
@@ -30,7 +24,6 @@ import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
 import { MultiSelectComponent } from '@/modules/base/components/multi-select/multi-select.component'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { ExamType } from '@/modules/ukom/models/exam-type.model'
-import { map } from 'rxjs'
 
 @Component({
     selector: 'app-ukom-examiner-list',
@@ -145,7 +138,7 @@ export class UkomExaminerListComponent implements OnInit {
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis Kelamin', (data: any) =>
+                    .withDynamicValue('Jenis Kelamin', (data: ExaminerUkom) =>
                         data.jenisKelaminCode === 'M'
                             ? 'Pria'
                             : data.jenisKelaminCode === 'F'
@@ -155,8 +148,26 @@ export class UkomExaminerListComponent implements OnInit {
                     .build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Status', 'status', ['user']).build(),
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Jenis UKom', (data: ExaminerUkom) => {
+                        const jenisUkomList = data.examinerTypeList
+                            .flat() // flatten one level
+                            .map((item) =>
+                                this.ukomMiscellaneousService.getModuleDisplayName(
+                                    item.examType,
+                                ),
+                            )
+                            .filter(Boolean)
+                            .join(', ')
+
+                        return jenisUkomList || '-'
+                    })
+
+                    .build(),
             )
+            // .addPrimaryColumn(
+            //     new PrimaryColumnBuilder('Status', 'status', ['user']).build(),
+            // )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((data: ExaminerUkom) => {
