@@ -24,6 +24,8 @@ import { TanggalIndoPipe } from '@/modules/base/pipes/tanggal-indo.pipe'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { RoomParticipant } from '@/modules/ukom/models/room/room-participant.model'
 import { AddExaminerModalComponent } from './add-examiner-modal/add-examiner-modal.component'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
+import { RoomExmainer } from '@/modules/ukom/models/room/room-examiner.model'
 
 @Component({
     selector: 'app-ukom-class-detail',
@@ -51,6 +53,7 @@ export class UkomClassDetailComponent implements OnInit {
     isLoading$: Observable<boolean>
 
     jenisUkomService = inject(JenisUkomService)
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
 
     constructor(
         private apiService: ApiService,
@@ -140,6 +143,24 @@ export class UkomClassDetailComponent implements OnInit {
                     'Username',
                     'examinerUkom|nip',
                 ).build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Jenis UKom', (data: RoomExmainer) => {
+                        const jenisUkomList = data.examinerUkom.examinerTypeList
+                            .flat() // flatten one level
+                            .map((item) =>
+                                this.ukomMiscellaneousService.getModuleDisplayName(
+                                    item.examType,
+                                ),
+                            )
+                            .filter(Boolean)
+                            .join(', ')
+
+                        return jenisUkomList || '-'
+                    })
+
+                    .build(),
             )
             .build()
     }
