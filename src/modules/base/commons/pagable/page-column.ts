@@ -16,6 +16,7 @@ export class PageColumn {
 
     cellClass: (row: any) => string
     cellStyle: (row: any) => Record<string, string>
+    title: (row: any) => string
 
     constructor(object: {
         columnType?: 'primary' | 'action'
@@ -32,6 +33,7 @@ export class PageColumn {
         sortable?: boolean
         cellClass?: (row: any) => string
         cellStyle?: (row: any) => Record<string, string>
+        title?: (row: any) => string
     }) {
         this.columnType = object.columnType
         this.label = object.label
@@ -47,5 +49,6 @@ export class PageColumn {
         this.sortable = object.sortable !== undefined ? object.sortable : true
         this.cellClass = object.cellClass
         this.cellStyle = object.cellStyle
+        this.title = object.title
     }
 }

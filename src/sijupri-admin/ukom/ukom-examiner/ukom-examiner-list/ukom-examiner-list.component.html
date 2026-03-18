@@ -3,40 +3,72 @@
 </ng-container>
 
 <ng-container *ngIf="(this.tabService.activeTab$ | async) === 1">
-    <app-ukom-examiner-add (changeTabActive)="handleTabChange(0)"></app-ukom-examiner-add>
+    <app-ukom-examiner-add
+        (changeTabActive)="handleTabChange(0)"
+    ></app-ukom-examiner-add>
 </ng-container>
 
-<app-modal *ngIf="isModalOpen$ | async" [title]="'Update Penguji'" (toggle)="toggleModal()" [enableFooter]="false">
+<app-modal
+    (toggle)="toggleModal()"
+    *ngIf="isModalOpen$ | async"
+    [enableFooter]="false"
+    [title]="'Update Penguji'"
+>
     <form [formGroup]="editExaminerForm">
         <div class="mb-3">
-            <label for="name" class="form-label fw-bold">Nama <span class="text-danger">*</span></label>
-            <input appInvalidOnTouch type="text" class="form-control" id="name" formControlName="name" />
-            <div *ngIf="getErrorMessage('name','Nama' ) as error" class="invalid-feedback">
+            <label class="form-label fw-bold" for="name"
+                >Nama <span class="text-danger">*</span></label
+            >
+            <input
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="name"
+                id="name"
+                type="text"
+            />
+            <div
+                *ngIf="getErrorMessage('name','Nama' ) as error"
+                class="invalid-feedback"
+            >
                 {{ error }}
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="jenisKelaminCode" class="form-label fw-bold">Jenis Kelamin <span
-                    class="text-danger">*</span></label>
-            <select appInvalidOnTouch id="jenisKelaminCode" class="form-select" name="jenisKelaminCode"
-                formControlName="jenisKelaminCode">
+            <label class="form-label fw-bold" for="jenisKelaminCode"
+                >Jenis Kelamin <span class="text-danger">*</span></label
+            >
+            <select
+                appInvalidOnTouch
+                class="form-select"
+                formControlName="jenisKelaminCode"
+                id="jenisKelaminCode"
+                name="jenisKelaminCode"
+            >
                 <option [value]="'F'">Wanita</option>
                 <option [value]="'M'">Pria</option>
             </select>
-            <div *ngIf="getErrorMessage(
+            <div
+                *ngIf="getErrorMessage(
                                     'jenisKelaminCode',
                                     'Jenis Kelamin'
                                 ) as error
-                            " class="invalid-feedback">
-                {{ error }}
+                            "
+                class="invalid-feedback"
+            >
+                {{ error }}x
             </div>
         </div>
 
         <div class="text-end">
-            <app-loading-button [isLoading]="isLoading$ | async" [disabled]="editExaminerForm.invalid"
-                [className]="'btn btn-primary'" [label]="'Simpan'" [type]="'button'"
-                (clicked)="submit()"></app-loading-button>
+            <app-loading-button
+                (clicked)="submit()"
+                [className]="'btn btn-primary'"
+                [disabled]="editExaminerForm.invalid"
+                [isLoading]="isLoading$ | async"
+                [label]="'Simpan'"
+                [type]="'button'"
+            ></app-loading-button>
         </div>
     </form>
 </app-modal>

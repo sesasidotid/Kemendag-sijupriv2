@@ -141,6 +141,7 @@ export class PrimaryColumnBuilder {
     private sortable: boolean = false // Default to true
     private cellClass: (row: any) => string
     private cellStyle: (row: any) => Record<string, string>
+    private title: (row: any) => string
 
     constructor(label?: string, property?: string, parentsProperty?: string[]) {
         if (label) {
@@ -202,6 +203,11 @@ export class PrimaryColumnBuilder {
         return this
     }
 
+    withTitle(fn: (row: any) => string): PrimaryColumnBuilder {
+        this.title = fn
+        return this
+    }
+
     build(): PageColumn {
         return new PageColumn({
             columnType: 'primary',
@@ -212,6 +218,7 @@ export class PrimaryColumnBuilder {
             sortable: this.sortable,
             cellClass: this.cellClass,
             cellStyle: this.cellStyle,
+            title: this.title,
         })
     }
 }

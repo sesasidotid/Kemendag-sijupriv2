@@ -47,7 +47,7 @@ import {
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { RoomParticipant } from '@/modules/ukom/models/room/room-participant.model'
 import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
-import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
+import { RoomExmainer } from '@/modules/ukom/models/room/room-examiner.model'
 
 interface DynamicFieldConfig {
     controlName: string
@@ -197,7 +197,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
     participants: MultiSelectOption[] = []
-    examinerInRoom = signal<ExaminerUkom[]>([])
+    examinerInRoom = signal<RoomExmainer[]>([])
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -259,6 +259,9 @@ export class UkomExamScheduleAddComponent implements OnInit {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Penguji', (data: ExamSchedule) => {
+                        return this.mapExaminersToNames(data.examiners)
+                    })
+                    .withTitle((data: ExamSchedule) => {
                         return this.mapExaminersToNames(data.examiners)
                     })
                     .build(),
@@ -703,21 +706,26 @@ export class UkomExamScheduleAddComponent implements OnInit {
 
     private mapExaminerIdToName(examinerId: string): string {
         const examiner = this.examinerInRoom().find(
-            (item) => item.id === examinerId,
+            (item) => item.examinerId === examinerId,
         )
 
-        return examiner?.name ?? examinerId
+        return examiner?.examinerUkom?.user?.name ?? examinerId
     }
 
     private mapExaminersToNames(examiners?: string): string {
         if (!examiners) return '-'
 
-        const examinerNames = examiners
-            .split(',')
-            .map((examinerId) => examinerId.trim())
-            .filter((examinerId) => !!examinerId)
+        const uniqueExaminerIds = [...new Set(
+            examiners
+                .split(',')
+                .map((examinerId) => examinerId.trim())
+                .filter((examinerId) => !!examinerId)
+        )]
+
+        const examinerNames = uniqueExaminerIds
             .map((examinerId) => this.mapExaminerIdToName(examinerId))
 
         return examinerNames.length > 0 ? examinerNames.join(', ') : '-'
     }
+
 }

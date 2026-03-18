@@ -3,6 +3,7 @@ import { ApiService } from '@/modules/base/services/api.service'
 import { PaginationWrapper } from '@/modules/base/models/pagination.model'
 import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
 import { Observable } from 'rxjs'
+import { RoomExmainer } from '@/modules/ukom/models/room/room-examiner.model'
 
 export interface SearchExaminerParams {
     limit?: number
@@ -65,7 +66,7 @@ export class UkomExaminerService {
         return this.api.getData(fullPath)
     }
 
-    fetchExaminerByRoomId(roomId: string): Observable<ExaminerUkom[]> {
+    fetchExaminerByRoomId(roomId: string): Observable<RoomExmainer[]> {
         return this.api.getData(`${this.BASE_PATH}/room/${roomId}`)
     }
 }
