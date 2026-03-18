@@ -18,6 +18,7 @@ export class ExaminerUkom extends Serializable {
     name: string | undefined = undefined
     user: ExaminerUkomUser | undefined = undefined
     examTypeList: ExamTypeCategory[] = []
+    examinerTypeList: ExaminerTypeList[] = []
 
     constructor(object?: { [key: string]: any }) {
         super()
@@ -36,4 +37,10 @@ export class ExaminerUkomUser extends Serializable {
         super()
         if (object) this.fromObject(object)
     }
+}
+
+export class ExaminerTypeList extends Serializable {
+    id: string = undefined
+    examType: ExamTypeCategory = undefined
+    examinerId: string = undefined
 }

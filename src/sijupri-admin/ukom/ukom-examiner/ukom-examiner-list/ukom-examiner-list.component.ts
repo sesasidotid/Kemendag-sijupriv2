@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
@@ -26,6 +26,11 @@ import {
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
+import { MultiSelectComponent } from '@/modules/base/components/multi-select/multi-select.component'
+import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
+import { ExamType } from '@/modules/ukom/models/exam-type.model'
+import { map } from 'rxjs'
 
 @Component({
     selector: 'app-ukom-examiner-list',
@@ -39,18 +44,22 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
         ReactiveFormsModule,
         LoadingButtonComponent,
         InvalidOnTouchDirective,
+        MultiSelectComponent,
     ],
     templateUrl: './ukom-examiner-list.component.html',
     styleUrl: './ukom-examiner-list.component.scss',
 })
 export class UkomExaminerListComponent implements OnInit {
     formValidationService = inject(FormValidationService)
+    ukomMiscellaneousService = inject(UkomMiscellaneousService)
     pagable: Pagable
     refreshToggle: boolean = false
 
     isModalOpen$ = new BehaviorSubject<boolean>(false)
     editExaminerForm: FormGroup
     isLoading$ = new BehaviorSubject<boolean>(false)
+
+    examTypeListOptions = signal<{ id: string; label: string }[]>([])
 
     constructor(
         public tabService: TabService,
@@ -64,6 +73,38 @@ export class UkomExaminerListComponent implements OnInit {
         this.handleTabService()
         this.handleFormInit()
         this.handlePagable()
+        this.fetchExamTypeList()
+    }
+
+    fetchExamTypeList() {
+        this.ukomMiscellaneousService
+            .getExamType()
+            .pipe(
+                map((examType) => {
+                    const filtered = examType.filter(
+                        (u) => !['MAKALA', 'CAT'].includes(u.code),
+                    )
+                    const hasSeminar = filtered.some(
+                        (u) => u.code === 'SEMINAR',
+                    )
+
+                    if (!hasSeminar) {
+                        filtered.push(new ExamType({ code: 'SEMINAR' }))
+                    }
+
+                    return filtered.map((u) => ({
+                        id: u.code,
+                        label: this.ukomMiscellaneousService.getModuleDisplayName(
+                            u.code,
+                        ),
+                    }))
+                }),
+            )
+            .subscribe({
+                next: (response) => {
+                    this.examTypeListOptions.set(response)
+                },
+            })
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
@@ -118,7 +159,7 @@ export class UkomExaminerListComponent implements OnInit {
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((data: any) => {
+                    .setAction((data: ExaminerUkom) => {
                         this.setDefaultFormValues(data)
                         this.toggleModal()
                     }, 'primary')
@@ -141,15 +182,20 @@ export class UkomExaminerListComponent implements OnInit {
             name: new FormControl('', Validators.required),
             nip: new FormControl('', Validators.required),
             jenisKelaminCode: new FormControl('', Validators.required),
+            examTypeList: new FormControl([], Validators.required),
         })
     }
 
-    setDefaultFormValues(data: any) {
+    setDefaultFormValues(data: ExaminerUkom) {
         this.editExaminerForm.patchValue({
             id: data.id || '',
             name: data.user.name || '',
             nip: data.nip || '',
             jenisKelaminCode: data.jenisKelaminCode || '',
+            examTypeList:
+                data.examinerTypeList?.map(
+                    (et: any) => et.examType?.code || et.examType,
+                ) || [],
         })
     }
 
@@ -171,6 +217,7 @@ export class UkomExaminerListComponent implements OnInit {
             name: this.editExaminerForm.value.name,
             nip: this.editExaminerForm.value.nip,
             jenisKelaminCode: this.editExaminerForm.value.jenisKelaminCode,
+            examTypeList: this.editExaminerForm.value.examTypeList,
         }
 
         this.confirmationService.open(false).subscribe({

@@ -715,17 +715,19 @@ export class UkomExamScheduleAddComponent implements OnInit {
     private mapExaminersToNames(examiners?: string): string {
         if (!examiners) return '-'
 
-        const uniqueExaminerIds = [...new Set(
-            examiners
-                .split(',')
-                .map((examinerId) => examinerId.trim())
-                .filter((examinerId) => !!examinerId)
-        )]
+        const uniqueExaminerIds = [
+            ...new Set(
+                examiners
+                    .split(',')
+                    .map((examinerId) => examinerId.trim())
+                    .filter((examinerId) => !!examinerId),
+            ),
+        ]
 
-        const examinerNames = uniqueExaminerIds
-            .map((examinerId) => this.mapExaminerIdToName(examinerId))
+        const examinerNames = uniqueExaminerIds.map((examinerId) =>
+            this.mapExaminerIdToName(examinerId),
+        )
 
         return examinerNames.length > 0 ? examinerNames.join(', ') : '-'
     }
-
 }
