@@ -2,8 +2,8 @@ export const environment = {
     production: true,
     appBaseHref: '/sijupri',
     // appBaseHref: '',
-    // apiBaseUrl: 'http://sijupri.sesasi.xyz:8000',
-    apiBaseUrl: 'https://pusbinjfdag.id',
+    apiBaseUrl: 'http://sijupri.sesasi.xyz:8000',
+    // apiBaseUrl: 'https://pusbinjfdag.id',
     // apiBaseUrl: 'https://sijupri.kemendag.go.id:8000',
     firebaseConfig: {
         apiKey: 'AIzaSyBHvB-ce9lpJdWbDJCBP2XLVJHYzV62oLw',

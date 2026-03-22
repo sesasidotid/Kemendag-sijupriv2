@@ -18,7 +18,7 @@ import {
 import { RWKinerja } from '../../../../modules/siap/models/rw-kinerja.model'
 import { PendingTask } from '../../../../modules/workflow/models/pending-task.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
+import { HandlerService } from '../../../../modules/base/services/handler.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { Task } from '../../../../modules/workflow/models/task.model'
 import { RatingKinerja } from '../../../../modules/maintenance/models/rating-kinerja.model'
@@ -28,6 +28,7 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 import { BehaviorSubject } from 'rxjs'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { PendingTaskService } from '../../../../modules/workflow/services/pending-task.service'
 
 @Component({
     selector: 'app-rw-kinerja-pending',
@@ -44,6 +45,7 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
 })
 export class RwKinerjaPendingComponent {
     pagable: Pagable
+    refresh: boolean = false
     isDetailOpen: boolean = false
     rwKinerja: RWKinerja = new RWKinerja()
     ratingKinerjaList: RatingKinerja[] = []
@@ -77,9 +79,10 @@ export class RwKinerjaPendingComponent {
 
     constructor (
         private apiService: ApiService,
-        private alertService: AlertService,
+        private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
+        private formValidationService: FormValidationService,
+        private pendingTaskService: PendingTaskService
     ) {}
 
     ngOnInit () {
@@ -135,7 +138,42 @@ export class RwKinerjaPendingComponent {
                     .withIcon('update')
                     .build(),
             )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((pendingTask: PendingTask) => {
+                        this.deletePendingTask(pendingTask)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build(),
+            )
             .build()
+    }
+
+    deletePendingTask (pendingTask: PendingTask) {
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
+
+                this.pendingTaskService
+                    .deletePendingTaskByInstanceId(pendingTask.instanceId)
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil menghapus data antrian'
+                            )
+                            this.refresh = !this.refresh
+                        },
+                        error: error => {
+                            console.log('error', error)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal menghapus data antrian'
+                            )
+                        }
+                    })
+            }
+        })
     }
 
     handleFormInit () {
@@ -350,9 +388,9 @@ export class RwKinerjaPendingComponent {
             },
             error: error => {
                 console.log('error', error)
-                this.alertService.showToast(
+                this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mendapatkan data rating kinerja!'
+                    'Gagal mengambil data rating kinerja'
                 )
                 this.ratingLoading$.next(false)
             }
@@ -371,9 +409,9 @@ export class RwKinerjaPendingComponent {
             },
             error: error => {
                 console.log('error', error)
-                this.alertService.showToast(
+                this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mendapatkan data predikat kinerja!'
+                    'Gagal mengambil data predikat kinerja'
                 )
                 this.predikatLoading$.next(false)
             }
@@ -392,9 +430,9 @@ export class RwKinerjaPendingComponent {
             },
             error: error => {
                 console.log('error', error)
-                this.alertService.showToast(
+                this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mendapatkan data riwayat kinerja!'
+                    'Gagal mengambil data riwayat kinerja'
                 )
                 this.rwKinerjaLoading$.next(false)
             }
@@ -446,18 +484,18 @@ export class RwKinerjaPendingComponent {
                     .postData(`/api/v1/rw_kinerja/task/submit`, task)
                     .subscribe({
                         next: () => {
-                            this.alertService.showToast(
+                            this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil mengubah data riwayat kinerja.'
+                                'Berhasil menyimpan perubahan data'
                             )
                             this.submitLoading$.next(false)
                             this.back()
                         },
                         error: error => {
                             console.log('error', error)
-                            this.alertService.showToast(
+                            this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal mengubah data riwayat kinerja!'
+                                'Gagal menyimpan perubahan data'
                             )
                             this.submitLoading$.next(false)
                         }

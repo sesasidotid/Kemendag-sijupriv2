@@ -22,7 +22,6 @@ export class PendingTaskService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.message)
                 throw error
             }),
         )
@@ -39,5 +38,14 @@ export class PendingTaskService {
                     return new PendingTask(response)
                 }),
             )
+    }
+
+    deletePendingTaskByInstanceId(instanceId: string): Observable<void> {
+        return this.apiService.deleteData(`${this.BASE_PATH}/delete/${instanceId}`).pipe(
+            catchError((error) => {
+                console.error('Error deleting pending task', error)
+                throw error
+            }),
+        )
     }
 }
