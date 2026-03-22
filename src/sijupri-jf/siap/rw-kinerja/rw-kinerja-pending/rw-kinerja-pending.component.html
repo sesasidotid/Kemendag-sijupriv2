@@ -1,86 +1,27 @@
-<app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
-<form (submit)="submit()" *ngIf="isDetailOpen" [formGroup]="rwKinerjaForm">
-    <div *ngIf="pendingTask.remark" class="alert alert-warning" role="alert">
-        {{ pendingTask.remark }}
-    </div>
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label class="form-label" for="firstnameInput">
-                    Tahunan/Bulanan <span class="text-danger">*</span>
-                </label>
-                <select class="form-select" formControlName="type" name="type">
-                    <option hidden selected value="">
-                        Pilih Tahunan/Bulanan
-                    </option>
-                    <option [value]="'tahunan'">Tahunan</option>
-                    <option [value]="'bulanan'">Bulanan</option>
-                </select>
-                <div
-                    *ngIf="getErrorMessage('type', 'Tipe') as error"
-                    class="text-danger"
-                >
-                    {{ error }}
-                </div>
-            </div>
-        </div>
+<ng-container *ngIf="!isDetailOpen">
+    <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+</ng-container>
 
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label class="form-label" for="yearPicker">
-                    Tahun Penilaian <span class="text-danger">*</span>
-                </label>
-                <select
-                    (change)="
-                        isAnnual ? onYearSelected() : onMonthRangeSelected()
-                    "
-                    class="form-select"
-                    formControlName="year"
-                    id="yearPicker"
-                >
-                    <option hidden selected value="">Pilih Tahun</option>
-                    <option *ngFor="let year of years" [value]="year">
-                        {{ year }}
-                    </option>
-                </select>
-                <div
-                    *ngIf="getErrorMessage('year', 'Tahun') as error"
-                    class="text-danger"
-                >
-                    {{ error }}
-                </div>
-            </div>
+<ng-container *ngIf="isDetailOpen">
+    <form (submit)="submit()" *ngIf="isDetailOpen" [formGroup]="rwKinerjaForm">
+        <div *ngIf="pendingTask.remark" class="alert alert-warning" role="alert">
+            {{ pendingTask.remark }}
         </div>
-
-        <ng-container *ngIf="!isAnnual">
+        <div class="row">
             <div class="col-lg-6">
                 <div class="mb-3">
-                    <label class="form-label" for="monthStartPicker">
-                        Bulan Mulai Penilaian <span class="text-danger">*</span>
+                    <label class="form-label" for="firstnameInput">
+                        Tahunan/Bulanan <span class="text-danger">*</span>
                     </label>
-                    <select
-                        (change)="onMonthRangeSelected()"
-                        class="form-select"
-                        formControlName="monthStart"
-                        id="monthStartPicker"
-                    >
+                    <select class="form-select" formControlName="type" name="type">
                         <option hidden selected value="">
-                            Pilih Bulan Mulai
+                            Pilih Tahunan/Bulanan
                         </option>
-                        <option
-                            *ngFor="let month of months"
-                            [value]="month.value"
-                        >
-                            {{ month.name }}
-                        </option>
+                        <option [value]="'tahunan'">Tahunan</option>
+                        <option [value]="'bulanan'">Bulanan</option>
                     </select>
                     <div
-                        *ngIf="
-                            getErrorMessage(
-                                'monthStart',
-                                'Bulan Mulai'
-                            ) as error
-                        "
+                        *ngIf="getErrorMessage('type', 'Tipe') as error"
                         class="text-danger"
                     >
                         {{ error }}
@@ -90,210 +31,274 @@
 
             <div class="col-lg-6">
                 <div class="mb-3">
-                    <label class="form-label" for="monthEndPicker">
-                        Bulan Selesai Penilaian
-                        <span class="text-danger">*</span>
+                    <label class="form-label" for="yearPicker">
+                        Tahun Penilaian <span class="text-danger">*</span>
                     </label>
                     <select
-                        (change)="onMonthRangeSelected()"
+                        (change)="
+                            isAnnual ? onYearSelected() : onMonthRangeSelected()
+                        "
                         class="form-select"
-                        formControlName="monthEnd"
-                        id="monthEndPicker"
+                        formControlName="year"
+                        id="yearPicker"
                     >
-                        <option hidden selected value="">
-                            Pilih Bulan Selesai
-                        </option>
-                        <option
-                            *ngFor="let month of months"
-                            [value]="month.value"
-                        >
-                            {{ month.name }}
+                        <option hidden selected value="">Pilih Tahun</option>
+                        <option *ngFor="let year of years" [value]="year">
+                            {{ year }}
                         </option>
                     </select>
                     <div
-                        *ngIf="
-                            getErrorMessage(
-                                'monthEnd',
-                                'Bulan Selesai'
-                            ) as error
-                        "
+                        *ngIf="getErrorMessage('year', 'Tahun') as error"
                         class="text-danger"
                     >
                         {{ error }}
                     </div>
                 </div>
             </div>
-        </ng-container>
 
-        <input formControlName="dateStart" type="hidden" />
-        <input formControlName="dateEnd" type="hidden" />
-
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label class="form-label" for="ratingHasilId">
-                    Rating Hasil Kinerja <span class="text-danger">*</span>
-                </label>
-                <select
-                    [disabled]="!ratingKinerjaList || (ratingLoading$ | async)"
-                    class="form-select"
-                    formControlName="ratingHasilId"
-                    id="ratingHasilId"
-                    name="ratingHasilId"
-                >
-                    <option hidden selected value="">Pilih Rating Hasil</option>
-                    <option
-                        *ngFor="let ratingKinerja of ratingKinerjaList"
-                        [value]="ratingKinerja.id"
-                    >
-                        {{ ratingKinerja.name }}
-                    </option>
-                </select>
-                <div
-                    *ngIf="
-                        getErrorMessage(
-                            'ratingHasilId',
-                            'Rating Hasil Kinerja'
-                        ) as error
-                    "
-                    class="text-danger"
-                >
-                    {{ error }}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label class="form-label" for="firstnameInput">
-                    Rating Perilaku Kinerja <span class="text-danger">*</span>
-                </label>
-                <select
-                    [disabled]="!ratingKinerjaList && (ratingLoading$ | async)"
-                    class="form-select"
-                    formControlName="ratingKinerjaId"
-                    id="ratingKinerjaId"
-                    name="ratingKinerjaId"
-                >
-                    <option hidden selected value="">
-                        Pilih Rating Kinerja
-                    </option>
-                    <option
-                        *ngFor="let ratingKinerja of ratingKinerjaList"
-                        [value]="ratingKinerja.id"
-                    >
-                        {{ ratingKinerja.name }}
-                    </option>
-                </select>
-                <div
-                    *ngIf="
-                        getErrorMessage(
-                            'ratingKinerjaId',
-                            'Rating Perilaku Kinerja'
-                        ) as error
-                    "
-                    class="text-danger"
-                >
-                    {{ error }}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label class="form-label" for="firstnameInput">
-                    Predikat Kinerja <span class="text-danger">*</span>
-                </label>
-
-                <select
-                    [disabled]="
-                        !predikatKinerjaList && (predikatLoading$ | async)
-                    "
-                    class="form-select"
-                    formControlName="predikatKinerjaId"
-                    id="predikatKinerjaId"
-                    name="predikatKinerjaId"
-                >
-                    <option hidden selected value="">
-                        Pilih Predikat Kinerja
-                    </option>
-                    <option
-                        *ngFor="let predikatKinerja of predikatKinerjaList"
-                        [value]="predikatKinerja.id"
-                    >
-                        {{ predikatKinerja.name }}
-                    </option>
-                </select>
-                <div
-                    *ngIf="
-                        getErrorMessage(
-                            'predikatKinerjaId',
-                            'Predikat Kinerja'
-                        ) as error
-                    "
-                    class="text-danger"
-                >
-                    {{ error }}
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="mb-3">
-                <label class="form-label" for="lastnameInput"
-                    >Akumulasi Angka Kredit
-                    <span class="text-danger">*</span></label
-                >
-                <input
-                    class="form-control"
-                    formControlName="angkaKredit"
-                    name="angkaKredit"
-                    type="number"
-                />
-                <div
-                    *ngIf="
-                        getErrorMessage('angkaKredit', 'Akumulasi Angka Kredit') as error
-                    "
-                    class="text-danger"
-                >
-                    {{ error }}
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12">
-            <div *ngIf="inputs" class="row">
-                <app-file-handler [inputs]="inputs"></app-file-handler>
-            </div>
-        </div>
-        <div class="col-lg-12">
-            <div class="hstack justify-content-end gap-2">
-                <button
-                    (click)="back()"
-                    class="btn btn-soft-secondary me-2"
-                    type="submit"
-                >
-                    Kembali
-                </button>
-                <ng-container *ngIf="submitLoading$ | async; else noLoading">
-                    <button class="btn btn-primary" disabled>
+            <ng-container *ngIf="!isAnnual">
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="monthStartPicker">
+                            Bulan Mulai Penilaian <span class="text-danger">*</span>
+                        </label>
+                        <select
+                            (change)="onMonthRangeSelected()"
+                            class="form-select"
+                            formControlName="monthStart"
+                            id="monthStartPicker"
+                        >
+                            <option hidden selected value="">
+                                Pilih Bulan Mulai
+                            </option>
+                            <option
+                                *ngFor="let month of months"
+                                [value]="month.value"
+                            >
+                                {{ month.name }}
+                            </option>
+                        </select>
                         <div
-                            class="spinner-border spinner-sm-custom"
-                            role="status"
+                            *ngIf="
+                                getErrorMessage(
+                                    'monthStart',
+                                    'Bulan Mulai'
+                                ) as error
+                            "
+                            class="text-danger"
                         >
-                            <span class="visually-hidden">Loading...</span>
+                            {{ error }}
                         </div>
-                    </button>
-                </ng-container>
-                <ng-template #noLoading>
-                    <button
-                        [disabled]="
-                            rwKinerjaForm.invalid || (submitLoading$ | async)
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="monthEndPicker">
+                            Bulan Selesai Penilaian
+                            <span class="text-danger">*</span>
+                        </label>
+                        <select
+                            (change)="onMonthRangeSelected()"
+                            class="form-select"
+                            formControlName="monthEnd"
+                            id="monthEndPicker"
+                        >
+                            <option hidden selected value="">
+                                Pilih Bulan Selesai
+                            </option>
+                            <option
+                                *ngFor="let month of months"
+                                [value]="month.value"
+                            >
+                                {{ month.name }}
+                            </option>
+                        </select>
+                        <div
+                            *ngIf="
+                                getErrorMessage(
+                                    'monthEnd',
+                                    'Bulan Selesai'
+                                ) as error
+                            "
+                            class="text-danger"
+                        >
+                            {{ error }}
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <input formControlName="dateStart" type="hidden" />
+            <input formControlName="dateEnd" type="hidden" />
+
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label class="form-label" for="ratingHasilId">
+                        Rating Hasil Kinerja <span class="text-danger">*</span>
+                    </label>
+                    <select
+                        [disabled]="!ratingKinerjaList || (ratingLoading$ | async)"
+                        class="form-select"
+                        formControlName="ratingHasilId"
+                        id="ratingHasilId"
+                        name="ratingHasilId"
+                    >
+                        <option hidden selected value="">Pilih Rating Hasil</option>
+                        <option
+                            *ngFor="let ratingKinerja of ratingKinerjaList"
+                            [value]="ratingKinerja.id"
+                        >
+                            {{ ratingKinerja.name }}
+                        </option>
+                    </select>
+                    <div
+                        *ngIf="
+                            getErrorMessage(
+                                'ratingHasilId',
+                                'Rating Hasil Kinerja'
+                            ) as error
                         "
-                        class="btn btn-primary"
+                        class="text-danger"
+                    >
+                        {{ error }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label class="form-label" for="firstnameInput">
+                        Rating Perilaku Kinerja <span class="text-danger">*</span>
+                    </label>
+                    <select
+                        [disabled]="!ratingKinerjaList && (ratingLoading$ | async)"
+                        class="form-select"
+                        formControlName="ratingKinerjaId"
+                        id="ratingKinerjaId"
+                        name="ratingKinerjaId"
+                    >
+                        <option hidden selected value="">
+                            Pilih Rating Kinerja
+                        </option>
+                        <option
+                            *ngFor="let ratingKinerja of ratingKinerjaList"
+                            [value]="ratingKinerja.id"
+                        >
+                            {{ ratingKinerja.name }}
+                        </option>
+                    </select>
+                    <div
+                        *ngIf="
+                            getErrorMessage(
+                                'ratingKinerjaId',
+                                'Rating Perilaku Kinerja'
+                            ) as error
+                        "
+                        class="text-danger"
+                    >
+                        {{ error }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label class="form-label" for="firstnameInput">
+                        Predikat Kinerja <span class="text-danger">*</span>
+                    </label>
+
+                    <select
+                        [disabled]="
+                            !predikatKinerjaList && (predikatLoading$ | async)
+                        "
+                        class="form-select"
+                        formControlName="predikatKinerjaId"
+                        id="predikatKinerjaId"
+                        name="predikatKinerjaId"
+                    >
+                        <option hidden selected value="">
+                            Pilih Predikat Kinerja
+                        </option>
+                        <option
+                            *ngFor="let predikatKinerja of predikatKinerjaList"
+                            [value]="predikatKinerja.id"
+                        >
+                            {{ predikatKinerja.name }}
+                        </option>
+                    </select>
+                    <div
+                        *ngIf="
+                            getErrorMessage(
+                                'predikatKinerjaId',
+                                'Predikat Kinerja'
+                            ) as error
+                        "
+                        class="text-danger"
+                    >
+                        {{ error }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label class="form-label" for="lastnameInput"
+                        >Akumulasi Angka Kredit
+                        <span class="text-danger">*</span></label
+                    >
+                    <input
+                        class="form-control"
+                        formControlName="angkaKredit"
+                        name="angkaKredit"
+                        type="number"
+                    />
+                    <div
+                        *ngIf="
+                            getErrorMessage('angkaKredit', 'Akumulasi Angka Kredit') as error
+                        "
+                        class="text-danger"
+                    >
+                        {{ error }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div *ngIf="inputs" class="row">
+                    <app-file-handler [inputs]="inputs"></app-file-handler>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="hstack justify-content-end gap-2">
+                    <button
+                        (click)="back()"
+                        class="btn btn-soft-secondary me-2"
                         type="submit"
                     >
-                        Simpan
+                        Kembali
                     </button>
-                </ng-template>
+                    <ng-container *ngIf="submitLoading$ | async; else noLoading">
+                        <button class="btn btn-primary" disabled>
+                            <div
+                                class="spinner-border spinner-sm-custom"
+                                role="status"
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </ng-container>
+                    <ng-template #noLoading>
+                        <button
+                            [disabled]="
+                                rwKinerjaForm.invalid || (submitLoading$ | async)
+                            "
+                            class="btn btn-primary"
+                            type="submit"
+                        >
+                            Simpan
+                        </button>
+                    </ng-template>
+                </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</ng-container>
