@@ -69,4 +69,8 @@ export class UkomExaminerService {
     fetchExaminerByRoomId(roomId: string): Observable<RoomExmainer[]> {
         return this.api.getData(`${this.BASE_PATH}/room/${roomId}`)
     }
+
+    deleteExaminerByUsername(username:string){
+        return this.api.deleteData(`${this.BASE_PATH}/${username}`)
+    }
 }

@@ -30,6 +30,7 @@ import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
 import { MultiSelectComponent } from '@/modules/base/components/multi-select/multi-select.component'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { ExamType } from '@/modules/ukom/models/exam-type.model'
+import { UkomExaminerService } from '@/modules/ukom/services/ukom-examiner.service'
 
 @Component({
     selector: 'app-ukom-examiner-list',
@@ -49,6 +50,7 @@ import { ExamType } from '@/modules/ukom/models/exam-type.model'
     styleUrl: './ukom-examiner-list.component.scss',
 })
 export class UkomExaminerListComponent implements OnInit {
+    ukomExaminerService = inject(UkomExaminerService)
     formValidationService = inject(FormValidationService)
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
     pagable: Pagable
@@ -155,25 +157,14 @@ export class UkomExaminerListComponent implements OnInit {
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
-                    .withDynamicValue('Jenis UKom', (data: ExaminerUkom) => {
-                        const jenisUkomList = data.examinerTypeList
-                            .flat() // flatten one level
-                            .map((item) =>
-                                this.ukomMiscellaneousService.getModuleDisplayName(
-                                    item.examType,
-                                ),
-                            )
-                            .filter(Boolean)
-                            .join(', ')
-
-                        return jenisUkomList || '-'
-                    })
-
+                    .withDynamicValue('Jenis UKom', (data: ExaminerUkom) =>
+                        this.getJenisUkomDisplay(data),
+                    )
+                    .withTitle((data: ExaminerUkom) =>
+                        this.getJenisUkomDisplay(data),
+                    )
                     .build(),
             )
-            // .addPrimaryColumn(
-            //     new PrimaryColumnBuilder('Status', 'status', ['user']).build(),
-            // )
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((data: ExaminerUkom) => {
@@ -181,6 +172,14 @@ export class UkomExaminerListComponent implements OnInit {
                         this.toggleModal()
                     }, 'primary')
                     .withIcon('update')
+                    .build(),
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: ExaminerUkom) => {
+                        this.delete(data)
+                    }, 'danger')
+                    .withIcon('danger')
                     .build(),
             )
             .addFilter(
@@ -268,5 +267,43 @@ export class UkomExaminerListComponent implements OnInit {
                     })
             },
         })
+    }
+
+    delete(examiner: ExaminerUkom) {
+        this.confirmationService.open(false).subscribe({
+            next: (response) => {
+                if (!response.confirmed) return
+
+                this.ukomExaminerService
+                    .deleteExaminerByUsername(examiner.nip)
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil menghapus penguji',
+                            )
+                            this.handleRefreshToggle()
+                        },
+                        error: (error) => {
+                            console.log(error)
+                            this.handlerService.handleException(error)
+                        },
+                    })
+            },
+        })
+    }
+
+    private getJenisUkomDisplay(data: ExaminerUkom): string {
+        const jenisUkomList = data.examinerTypeList
+            ?.flat()
+            ?.map((item) =>
+                this.ukomMiscellaneousService.getModuleDisplayName(
+                    item.examType,
+                ),
+            )
+            ?.filter(Boolean)
+            ?.join(', ')
+
+        return jenisUkomList || '-'
     }
 }
