@@ -4,7 +4,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
@@ -16,7 +16,13 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { ModalComponent } from '../../../../modules/base/components/modal/modal.component'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
+import {
+    FormControl,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators,
+} from '@angular/forms'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
