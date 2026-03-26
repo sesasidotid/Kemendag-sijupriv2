@@ -67,6 +67,7 @@ export class UkomGradeListComponent {
     refresh = signal(false)
     activeTab = signal<UkomGradeTabKey>('list')
     isFinishExaminerAssessmentLoading = signal(false)
+    isSendGradeToParticipantsLoading = signal(false)
     inputs: FIleHandler = {
         files: {
             file_rekom: { label: 'File Rekomendasi' },
@@ -462,6 +463,40 @@ export class UkomGradeListComponent {
                             this.handlerService.handleAlert(
                                 'Error',
                                 'Gagal menyelesaikan penilaian penguji',
+                            )
+                        },
+                    })
+            },
+        })
+    }
+
+    sendGradeToParticipants() {
+        this.confirmationService.open(false).subscribe({
+            next: ({ confirmed }) => {
+                if (!confirmed) return
+
+                this.isSendGradeToParticipantsLoading.set(true)
+
+                this.examGradeService
+                    .sendGradeToParticipantsByAdmin()
+                    .pipe(
+                        finalize(() => {
+                            this.isSendGradeToParticipantsLoading.set(false)
+                        }),
+                    )
+                    .subscribe({
+                        next: () => {
+                            this.handlerService.handleAlert(
+                                'Success',
+                                'Berhasil mengirim nilai ke peserta',
+                            )
+                            this.refreshPagable()
+                        },
+                        error: (err) => {
+                            console.error('Error sending grade to participants:', err)
+                            this.handlerService.handleAlert(
+                                'Error',
+                                'Gagal mengirim nilai ke peserta',
                             )
                         },
                     })
