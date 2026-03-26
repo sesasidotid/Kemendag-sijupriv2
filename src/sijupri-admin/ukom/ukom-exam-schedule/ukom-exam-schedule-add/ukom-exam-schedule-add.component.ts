@@ -124,6 +124,10 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
             {
+                controlName: 'duration',
+                validators: [Validators.required, Validators.min(1)],
+            },
+            {
                 controlName: 'participantIdList',
                 visible: true,
                 required: false,
