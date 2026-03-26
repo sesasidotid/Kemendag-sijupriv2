@@ -24,6 +24,7 @@ import { UkomGradeImportComponent } from '../ukom-grade-import/ukom-grade-import
 import { UkomGradeExportComponent } from '../ukom-grade-export/ukom-grade-export.component'
 import { UkomGradeSuratRekomSetupComponent } from './ukom-grade-surat-rekom-setup/ukom-grade-surat-rekom-setup.component'
 import { UkomGradeSuratRekomComponent } from '@/sijupri-admin/ukom/ukom-grade-list/ukom-grade-surat-rekom/ukom-grade-surat-rekom.component'
+import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
 
 type UkomGradeTabKey =
     | 'list'
@@ -54,6 +55,7 @@ export class UkomGradeListComponent {
     @ViewChild(FileHandlerComponent) fileHandler: FileHandlerComponent
 
     examGradeService = inject(ExamGradeService)
+    ukomGradeService = inject(UkomGradeService)
 
     pagable!: Pagable
     isModalOpen$ = new BehaviorSubject<boolean>(false)
@@ -477,7 +479,7 @@ export class UkomGradeListComponent {
 
                 this.isSendGradeToParticipantsLoading.set(true)
 
-                this.examGradeService
+                this.ukomGradeService
                     .sendGradeToParticipantsByAdmin()
                     .pipe(
                         finalize(() => {
@@ -493,7 +495,10 @@ export class UkomGradeListComponent {
                             this.refreshPagable()
                         },
                         error: (err) => {
-                            console.error('Error sending grade to participants:', err)
+                            console.error(
+                                'Error sending grade to participants:',
+                                err,
+                            )
                             this.handlerService.handleAlert(
                                 'Error',
                                 'Gagal mengirim nilai ke peserta',

@@ -32,8 +32,4 @@ export class ExamGradeService {
     finishExaminerGradeByAdmin() {
         return this.apiService.postData(`${this.BASE_PATH}/trigger`, {})
     }
-
-    sendGradeToParticipantsByAdmin() {
-        return this.apiService.postData(`${this.BASE_PATH}/publish_all`, {})
-    }
 }
