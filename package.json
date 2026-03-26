@@ -8,7 +8,8 @@
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
         "stale-run": "npx http-server dist/fe-template-angular/browser -p 4300 -c-1",
-        "admin": "ng build --configuration development && npm run stale-run"
+        "admin": "ng build --configuration development && npm run stale-run",
+        "seed:participant-ukom": "node script/createParticipantUkomTask.mjs"
     },
     "private": true,
     "dependencies": {

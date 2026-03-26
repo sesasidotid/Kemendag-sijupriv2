@@ -70,7 +70,7 @@ export class UkomExaminerService {
         return this.api.getData(`${this.BASE_PATH}/room/${roomId}`)
     }
 
-    deleteExaminerByUsername(username:string){
+    deleteExaminerByUsername(username: string) {
         return this.api.deleteData(`${this.BASE_PATH}/${username}`)
     }
 }
