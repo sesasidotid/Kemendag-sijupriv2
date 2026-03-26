@@ -53,6 +53,12 @@ jobs:
             set -e
             cd /sesasi/app/sijupri-fe/
 
+            BACKUP_COUNT=$(ls -1d dist-backup-* 2>/dev/null | wc -l)
+            if [ "$BACKUP_COUNT" -gt 3 ]; then
+              echo "Cleaning up old backups. Current count: $BACKUP_COUNT"
+              ls -1d dist-backup-* | sort | head -n -3 | xargs rm -rf
+            fi
+
             # Backup existing dist
             if [ -d "dist" ]; then
               mv dist dist-backup-$(date +%Y%m%d%H%M%S)

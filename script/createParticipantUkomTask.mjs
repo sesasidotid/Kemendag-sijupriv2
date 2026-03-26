@@ -18,7 +18,7 @@ const CONFIG = {
     requestCount: 5,
 
     // Delay between requests in milliseconds.
-    delayMs: 300,
+    delayMs: 5000,
 
     // Use --dry-run to print payload without sending request.
     dryRun: false,
