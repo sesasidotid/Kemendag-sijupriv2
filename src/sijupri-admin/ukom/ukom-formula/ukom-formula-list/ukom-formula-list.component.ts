@@ -28,6 +28,7 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import { PageFilter } from '@/modules/base/commons/pagable/page-filter'
 import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
 import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
+import { FormulaDetail } from '@/modules/ukom/models/formula-detail'
 
 @Component({
     selector: 'app-ukom-formula-list',
@@ -83,9 +84,12 @@ export class UkomFormulaListComponent implements OnInit {
     handlePagable() {
         this.pagable$.next(
             new PagableBuilder('/api/v1/ukom_formula/search')
-
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Jabatan', 'jabatanName').build(),
+                    new PrimaryColumnBuilder('Jabatan', 'jabatanName')
+                        .withTitle(
+                            (formula: FormulaDetail) => formula.jabatanName,
+                        )
+                        .build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder('Jenjang', 'jenjangName').build(),
@@ -118,6 +122,12 @@ export class UkomFormulaListComponent implements OnInit {
                     ).build(),
                 )
                 .addPrimaryColumn(
+                    new PrimaryColumnBuilder(
+                        'Studi Kasus',
+                        'studiKasusPercentage',
+                    ).build(),
+                )
+                .addPrimaryColumn(
                     new PrimaryColumnBuilder('UKT', 'uktPercentage').build(),
                 )
                 .addPrimaryColumn(
@@ -143,9 +153,8 @@ export class UkomFormulaListComponent implements OnInit {
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
-                        .setAction((data: any) => {
+                        .setAction((data: FormulaDetail) => {
                             this.setDefaultFormValues(data)
-
                             this.toggleModal()
                         }, 'primary')
                         .withIcon('update')
@@ -153,7 +162,7 @@ export class UkomFormulaListComponent implements OnInit {
                 )
                 .addActionColumn(
                     new ActionColumnBuilder()
-                        .setAction((data: any) => {
+                        .setAction((data: FormulaDetail) => {
                             this.router.navigate([
                                 `ukom/ukom-formula/${data.id}`,
                             ])
@@ -196,34 +205,36 @@ export class UkomFormulaListComponent implements OnInit {
     handleFormInit() {
         this.editFormulaForm = new FormGroup({
             id: new FormControl(''),
-            cat_percentage: new FormControl('', Validators.required),
-            wawancara_percentage: new FormControl('', Validators.required),
-            seminar_percentage: new FormControl('', Validators.required),
-            praktik_percentage: new FormControl('', Validators.required),
-            portofolio_percentage: new FormControl('', Validators.required),
-            ukt_percentage: new FormControl('', Validators.required),
-            ukmsk_percentage: new FormControl('', Validators.required),
-            grade_threshold: new FormControl('', Validators.required),
-            ukt_threshold: new FormControl('', Validators.required),
-            jpm_threshold: new FormControl('', Validators.required),
+            catPercentage: new FormControl('', Validators.required),
+            wawancaraPercentage: new FormControl('', Validators.required),
+            seminarPercentage: new FormControl('', Validators.required),
+            praktikPercentage: new FormControl('', Validators.required),
+            portofolioPercentage: new FormControl('', Validators.required),
+            studiKasusPercentage: new FormControl('', Validators.required),
+            uktPercentage: new FormControl('', Validators.required),
+            ukmskPercentage: new FormControl('', Validators.required),
+            gradeThreshold: new FormControl('', Validators.required),
+            uktThreshold: new FormControl('', Validators.required),
+            jpmThreshold: new FormControl('', Validators.required),
         })
     }
 
     setDefaultFormValues(data: any) {
         this.editFormulaForm.patchValue({
             id: data.id ?? '',
-            jabatan_code: data.jabatanCode ?? '',
-            jenjang_code: data.jenjangCode ?? '',
-            cat_percentage: data.catPercentage ?? '',
-            wawancara_percentage: data.wawancaraPercentage ?? '',
-            seminar_percentage: data.seminarPercentage ?? '',
-            praktik_percentage: data.praktikPercentage ?? '',
-            portofolio_percentage: data.portofolioPercentage ?? '',
-            ukt_percentage: data.uktPercentage ?? '',
-            ukmsk_percentage: data.ukmskPercentage ?? '',
-            grade_threshold: data.gradeThreshold ?? '',
-            ukt_threshold: data.uktThreshold ?? '',
-            jpm_threshold: data.jpmThreshold ?? '',
+            jabatanCode: data.jabatanCode ?? '',
+            jenjangCode: data.jenjangCode ?? '',
+            catPercentage: data.catPercentage ?? '',
+            wawancaraPercentage: data.wawancaraPercentage ?? '',
+            seminarPercentage: data.seminarPercentage ?? '',
+            praktikPercentage: data.praktikPercentage ?? '',
+            portofolioPercentage: data.portofolioPercentage ?? '',
+            studiKasusPercentage: data.studiKasusPercentage ?? '',
+            uktPercentage: data.uktPercentage ?? '',
+            ukmskPercentage: data.ukmskPercentage ?? '',
+            gradeThreshold: data.gradeThreshold ?? '',
+            uktThreshold: data.uktThreshold ?? '',
+            jpmThreshold: data.jpmThreshold ?? '',
         })
     }
 
@@ -262,21 +273,22 @@ export class UkomFormulaListComponent implements OnInit {
 
                 const payload = {
                     id: this.editFormulaForm.value.id,
-                    cat_percentage: this.editFormulaForm.value.cat_percentage,
-                    wawancara_percentage:
-                        this.editFormulaForm.value.wawancara_percentage,
-                    seminar_percentage:
-                        this.editFormulaForm.value.seminar_percentage,
-                    praktik_percentage:
-                        this.editFormulaForm.value.praktik_percentage,
-                    portofolio_percentage:
-                        this.editFormulaForm.value.portofolio_percentage,
-                    ukt_percentage: this.editFormulaForm.value.ukt_percentage,
-                    ukmsk_percentage:
-                        this.editFormulaForm.value.ukmsk_percentage,
-                    grade_threshold: this.editFormulaForm.value.grade_threshold,
-                    ukt_threshold: this.editFormulaForm.value.ukt_threshold,
-                    jpm_threshold: this.editFormulaForm.value.jpm_threshold,
+                    catPercentage: this.editFormulaForm.value.catPercentage,
+                    wawancaraPercentage:
+                        this.editFormulaForm.value.wawancaraPercentage,
+                    seminarPercentage:
+                        this.editFormulaForm.value.seminarPercentage,
+                    praktikPercentage:
+                        this.editFormulaForm.value.praktikPercentage,
+                    portofolioPercentage:
+                        this.editFormulaForm.value.portofolioPercentage,
+                    studiKasusPercentage:
+                        this.editFormulaForm.value.studiKasusPercentage,
+                    uktPercentage: this.editFormulaForm.value.uktPercentage,
+                    ukmskPercentage: this.editFormulaForm.value.ukmskPercentage,
+                    gradeThreshold: this.editFormulaForm.value.gradeThreshold,
+                    uktThreshold: this.editFormulaForm.value.uktThreshold,
+                    jpmThreshold: this.editFormulaForm.value.jpmThreshold,
                 }
 
                 this.apiService
