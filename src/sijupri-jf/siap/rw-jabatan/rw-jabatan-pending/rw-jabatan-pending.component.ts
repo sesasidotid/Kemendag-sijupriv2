@@ -28,6 +28,7 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { BehaviorSubject } from 'rxjs'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { PendingTaskService } from '../../../../modules/workflow/services/pending-task.service'
 
 @Component({
     selector: 'app-rw-jabatan-pending',
@@ -44,6 +45,7 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
 })
 export class RwJabatanPendingComponent {
     pagable: Pagable
+    refresh: boolean = false
     isDetailOpen: boolean = false
     rwJabatan: RWJabatan = new RWJabatan()
     jabatanList: Jabatan[]
@@ -62,7 +64,8 @@ export class RwJabatanPendingComponent {
         private apiService: ApiService,
         private alertService: AlertService,
         private confirmationService: ConfirmationService,
-        private formValidationService: FormValidationService
+        private formValidationService: FormValidationService,
+        private pendingTaskService: PendingTaskService
     ) {}
 
     ngOnInit () {
@@ -102,6 +105,14 @@ export class RwJabatanPendingComponent {
                     .withIcon('update')
                     .build()
             )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((pendingTask: PendingTask) => {
+                        this.deletePendingTask(pendingTask)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build()
+            )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('objectName')
@@ -109,6 +120,33 @@ export class RwJabatanPendingComponent {
                     .build()
             )
             .build()
+    }
+
+    deletePendingTask (pendingTask: PendingTask) {
+        this.confirmationService.open(false).subscribe({
+            next: result => {
+                if (!result.confirmed) return
+
+                this.pendingTaskService
+                    .deletePendingTaskByInstanceId(pendingTask.instanceId)
+                    .subscribe({
+                        next: () => {
+                            this.alertService.showToast(
+                                'Success',
+                                'Berhasil menghapus data antrian'
+                            )
+                            this.refresh = !this.refresh
+                        },
+                        error: error => {
+                            console.log('error', error)
+                            this.alertService.showToast(
+                                'Error',
+                                'Gagal menghapus data antrian'
+                            )
+                        }
+                    })
+            }
+        })
     }
 
     handleFormInit () {
