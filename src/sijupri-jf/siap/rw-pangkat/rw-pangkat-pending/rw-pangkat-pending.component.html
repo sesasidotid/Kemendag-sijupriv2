@@ -1,4 +1,4 @@
-<app-pagable *ngIf="!isDetailOpen" [pagable]="pagable"></app-pagable>
+<app-pagable *ngIf="!isDetailOpen" [pagable]="pagable" [refresh]="refresh"></app-pagable>
 <div *ngIf="rwPangkatLoading$ | async; else akpHadItem" class="d-flex justify-content-center my-5">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
