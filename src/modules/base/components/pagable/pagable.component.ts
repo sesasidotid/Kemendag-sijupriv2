@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Pagable } from '../../commons/pagable/pagable'
+import { PageFilter } from '../../commons/pagable/page-filter'
 import { HttpClient } from '@angular/common/http'
 import { finalize, Subscription } from 'rxjs'
 
@@ -138,6 +139,19 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
         }
     }
 
+    onFilterValueChange(
+        filter: PageFilter,
+        value: string | number | boolean,
+    ): void {
+        if (filter?.onChange) {
+            filter.onChange(value)
+        }
+    }
+
+    private shouldSendFilterToApi(filter: PageFilter): boolean {
+        return !filter.excludeFromApi
+    }
+
     updateQueryParams() {
         if (this.filtersChanged()) {
             this.page = 1
@@ -158,6 +172,11 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
 
         if (this.pagable.filterList) {
             this.pagable.filterList.forEach((filter) => {
+                if (!this.shouldSendFilterToApi(filter)) {
+                    queryParams[filter.key] = null
+                    return
+                }
+
                 if (filter.value) {
                     queryParams[filter.key] = filter.value
                 } else {
@@ -232,6 +251,10 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
 
         if (this.pagable.filterList) {
             this.pagable.filterList.forEach((filter) => {
+                if (!this.shouldSendFilterToApi(filter)) {
+                    return
+                }
+
                 if (filter.value) {
                     query += `&${filter.key}=${filter.value}`
                 }

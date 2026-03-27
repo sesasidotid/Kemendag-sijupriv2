@@ -7,7 +7,7 @@
                         <div class="mb-0 cursor-pointer" *ngIf="fillter.fieldType == 'select'">
                             <label class="col-form-label p-1"><b>{{ fillter.label }}</b></label>
                             <select class="form-select p-1 cursor-pointer" [(ngModel)]="fillter.value"
-                                name="{{ fillter.label }}">
+                                (ngModelChange)="onFilterValueChange(fillter, $event)" name="{{ fillter.label }}">
                                 <option [value]="''">Pilih</option>
                                 <ng-container *ngFor="let data of fillter.optionList">
                                     <option [value]="data.value">

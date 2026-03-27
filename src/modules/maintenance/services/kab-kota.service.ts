@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core'
 import { KabKota } from '../models/kab-kota.model'
 import { catchError, map, Observable } from 'rxjs'
 import { ApiService } from '../../base/services/api.service'
-import { AlertService } from '../../base/services/alert.service'
 
 @Injectable({
     providedIn: 'root',
@@ -10,10 +9,7 @@ import { AlertService } from '../../base/services/alert.service'
 export class KabKotaService {
     readonly BASE_PATH = '/api/v1/kab_kota'
 
-    constructor(
-        private apiService: ApiService,
-        private alertService: AlertService,
-    ) {}
+    constructor(private apiService: ApiService) {}
 
     findAll(): Observable<KabKota[]> {
         return this.apiService.getData(this.BASE_PATH).pipe(
@@ -24,7 +20,6 @@ export class KabKotaService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -37,7 +32,6 @@ export class KabKotaService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -58,7 +52,6 @@ export class KabKotaService {
                 }),
                 catchError((error) => {
                     console.error('Error fetching data', error)
-                    this.alertService.showToast('Error', error.error.message)
                     throw error
                 }),
             )
@@ -68,7 +61,6 @@ export class KabKotaService {
         this.apiService.postData(this.BASE_PATH, kabKota).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -78,7 +70,6 @@ export class KabKotaService {
         this.apiService.putData(this.BASE_PATH, kabKota).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
@@ -88,7 +79,6 @@ export class KabKotaService {
         this.apiService.deleteData(`${this.BASE_PATH}/${id}`).pipe(
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )

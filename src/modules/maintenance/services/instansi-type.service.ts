@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core'
 import { ApiService } from '../../base/services/api.service'
 import { InstansiType } from '../models/instansi-type.model'
 import { catchError, map, Observable } from 'rxjs'
-import { AlertService } from '../../base/services/alert.service'
 
 @Injectable({
     providedIn: 'root',
@@ -10,10 +9,7 @@ import { AlertService } from '../../base/services/alert.service'
 export class InstansiTypeService {
     readonly BASE_PATH = '/api/v1/instansi_type'
 
-    constructor(
-        private apiService: ApiService,
-        private alertService: AlertService,
-    ) {}
+    constructor(private apiService: ApiService) {}
 
     findAll(): Observable<InstansiType[]> {
         return this.apiService.getData(this.BASE_PATH).pipe(
@@ -25,7 +21,6 @@ export class InstansiTypeService {
             }),
             catchError((error) => {
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', error.error.message)
                 throw error
             }),
         )
