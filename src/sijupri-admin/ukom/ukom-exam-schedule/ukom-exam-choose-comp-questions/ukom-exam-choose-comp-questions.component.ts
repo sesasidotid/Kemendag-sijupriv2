@@ -183,13 +183,21 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
             )
             .subscribe({
                 next: ([parentRes, childRes]) => {
-                    // merge arrays
-                    const merged = [...parentRes, ...childRes]
+                    const parentMapped = parentRes.map((item) => ({
+                        ...item,
+                        examType: this.examDetail().examTypeCode,
+                    }))
 
-                    // optional: remove duplicates
+                    const childMapped = childRes.map((item) => ({
+                        ...item,
+                        examType: this.examDetail().examScheduleChild?.examTypeCode,
+                    }))
+
+                    const merged = [...parentMapped, ...childMapped]
+
                     const unique = merged.filter(
                         (item, index, self) =>
-                            index === self.findIndex((i) => i.id === item.id),
+                            index === self.findIndex(i => i.id === item.id)
                     )
 
                     this.examinerList.set(unique)

@@ -31,6 +31,7 @@ import { DurationPipe } from '@/modules/base/pipes/duration.pipe'
 import { RescheduleModalComponent } from './reschedule-modal/reschedule-modal.component'
 import { UpdateExaminerModalComponent } from './update-examiner-modal/update-examiner-modal.component'
 import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-schedule/update-examiner-for-participant-request.model'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 @Component({
     selector: 'app-ukom-exam-makalah',
@@ -50,7 +51,17 @@ import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-
 export class UkomExamMakalahComponent implements OnInit {
     examinerList = input<ExaminerScheduleList[]>([])
     participantList = input<ParticipantScheduleList[]>([])
+    examinerListSeminar = computed(() =>
+        this.examinerList().filter(
+            (item) => item.examType === ExamTypeCategory.SEMINAR,
+        ),
+    )
 
+    examinerListMakalah = computed(() =>
+        this.examinerList().filter(
+            (item) => item.examType === ExamTypeCategory.MAKALAH,
+        ),
+    )
     examId = signal('')
     examScheduleDetail = signal<ExamSchedule>(null)
     seminarScheduleDetail = computed(() => {
@@ -449,9 +460,8 @@ export class UkomExamMakalahComponent implements OnInit {
                 const makalahP = makalahByParticipantId.get(
                     seminarP.participantId,
                 )
-                const examinerIdKomponenA = this.resolveExaminerScheduleId(
-                    makalahP,
-                )
+                const examinerIdKomponenA =
+                    this.resolveExaminerScheduleId(makalahP)
                 const examinerKomponenA = examinerIdKomponenA
                     ? (examinerMap.get(examinerIdKomponenA) ?? 'Unknown')
                     : 'Belum ada'
@@ -519,8 +529,10 @@ export class UkomExamMakalahComponent implements OnInit {
             typeof supervised === 'object' &&
             'examinerScheduleId' in supervised
         ) {
-            return (supervised as { examinerScheduleId?: string })
-                .examinerScheduleId ?? null
+            return (
+                (supervised as { examinerScheduleId?: string })
+                    .examinerScheduleId ?? null
+            )
         }
 
         return null

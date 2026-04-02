@@ -1,11 +1,14 @@
 import { Serializable } from '@/modules/base/commons/serializable'
 import { ExaminerUkom } from '@/modules/ukom/models/examiner.model'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
 export class ExaminerScheduleList extends Serializable {
     id: string = undefined
     examinerId: string = undefined
     examScheduleId: string = undefined
     examinerUkom: ExaminerUkom = undefined
+
+    examType: ExamTypeCategory | undefined = undefined
 
     constructor(object?: Partial<ExaminerScheduleList>) {
         super()
