@@ -96,7 +96,8 @@ export class UkomExamPraktikComponent implements OnInit {
                 this.examScheduleDetail.set(exam)
 
                 const hasExaminerReference = participants.some(
-                    (participant) => !!this.resolveExaminerScheduleId(participant),
+                    (participant) =>
+                        !!this.resolveExaminerScheduleId(participant),
                 )
 
                 if (hasExaminerReference && examiners.length === 0) {

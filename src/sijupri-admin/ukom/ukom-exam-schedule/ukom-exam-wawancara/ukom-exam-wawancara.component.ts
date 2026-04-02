@@ -97,7 +97,8 @@ export class UkomExamWawancaraComponent implements OnInit {
                 this.examScheduleDetail.set(exam)
 
                 const hasExaminerReference = participants.some(
-                    (participant) => !!this.resolveExaminerScheduleId(participant),
+                    (participant) =>
+                        !!this.resolveExaminerScheduleId(participant),
                 )
 
                 if (hasExaminerReference && examiners.length === 0) {
@@ -334,7 +335,7 @@ export class UkomExamWawancaraComponent implements OnInit {
         examiners: ExaminerScheduleList[],
     ): void {
         const examinerMap = this.buildExaminerMap(examiners)
-        // console.log('examinerMap', examinerMap)
+        console.log('examinerMap', examinerMap)
 
         // console.log('participantScheduleList', participantScheduleList)
 
@@ -372,6 +373,17 @@ export class UkomExamWawancaraComponent implements OnInit {
         // Generate all slots
         const slots = this.slotService.generateAllSlots(mainSchedule)
         this.allSlots.set(slots)
+
+        if (this.gridApi) {
+            const api = this.gridApi as any;
+            if (api.setRowData) {
+                api.setRowData(slots);
+            } else if (api.setGridOption) {
+                api.setGridOption('rowData', slots);
+            } else {
+                api.refreshCells();
+            }
+        }
     }
 
     private resolveExaminerScheduleId(
