@@ -40,7 +40,8 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import {
     BaseExamScheduleRequest,
     CatExamScheduleRequest,
-    OtherExamScheduleRequest, PraktikExamScheduleRequest,
+    OtherExamScheduleRequest,
+    PraktikExamScheduleRequest,
     SeminarMakalahExamScheduleRequest,
     WawancaraExamScheduleRequest,
 } from '@/modules/ukom/models/exam-schedule/create-exam-schedule-request.model'
@@ -251,29 +252,73 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     })
                     .build(),
             )
+            // .addPrimaryColumn(
+            //     new PrimaryColumnBuilder()
+            //         .withDynamicValue('Jenis Ukom', (data: ExamSchedule) => {
+            //             if (data.examScheduleChild){}
+            //             return this.ukomMiscellaneousService.getModuleDisplayName(
+            //                 data.examTypeCode,
+            //             )
+            //         })
+            //         .build(),
+            // )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jenis Ukom', (data: ExamSchedule) => {
-                        return this.ukomMiscellaneousService.getModuleDisplayName(
-                            data.examTypeCode,
-                        )
+                        const allSchedules = [
+                            data,
+                            ...(data.examScheduleChild
+                                ? [data.examScheduleChild]
+                                : []),
+                        ]
+
+                        return allSchedules
+                            .map((item) =>
+                                this.ukomMiscellaneousService.getModuleDisplayName(
+                                    item.examTypeCode,
+                                ),
+                            )
+                            .join(' / ')
                     })
                     .build(),
             )
+            // .addPrimaryColumn(
+            //     new PrimaryColumnBuilder()
+            //         .withDynamicValue('Penguji', (data: ExamSchedule) => {
+            //             return this.mapExaminersToNames(data.examiners)
+            //         })
+            //         .withTitle((data: ExamSchedule) => {
+            //             return this.mapExaminersToNames(data.examiners)
+            //         })
+            //         .build(),
+            // )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Penguji', (data: ExamSchedule) => {
-                        return this.mapExaminersToNames(data.examiners)
+                        const mergedExaminers = this.mergeExaminerStrings(
+                            data.examiners,
+                            data.examScheduleChild?.examiners,
+                        )
+
+                        return this.mapExaminersToNames(mergedExaminers)
                     })
                     .withTitle((data: ExamSchedule) => {
-                        return this.mapExaminersToNames(data.examiners)
+                        const mergedExaminers = this.mergeExaminerStrings(
+                            data.examiners,
+                            data.examScheduleChild?.examiners,
+                        )
+
+                        return this.mapExaminersToNames(mergedExaminers)
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Durasi', (data: ExamSchedule) => {
-                        return this.durationPipe.transform(data.duration)
+                        const duration =
+                            data.examScheduleChild?.duration ?? data.duration
+
+                        return this.durationPipe.transform(duration)
                     })
                     .build(),
             )
@@ -722,6 +767,21 @@ export class UkomExamScheduleAddComponent implements OnInit {
         return examiner?.examinerUkom?.user?.name ?? examinerId
     }
 
+    private mergeExaminerStrings(
+        parent?: string,
+        child?: string,
+    ): string | undefined {
+        const allIds = [
+            ...(parent?.split(',') ?? []),
+            ...(child?.split(',') ?? []),
+        ]
+            .map((id) => id.trim())
+            .filter(Boolean)
+
+        const unique = [...new Set(allIds)]
+
+        return unique.length ? unique.join(',') : undefined
+    }
     private mapExaminersToNames(examiners?: string): string {
         if (!examiners) return '-'
 
