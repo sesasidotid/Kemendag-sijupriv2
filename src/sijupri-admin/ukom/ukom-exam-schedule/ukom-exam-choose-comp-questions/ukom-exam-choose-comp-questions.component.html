@@ -112,12 +112,13 @@
         </ng-container>
 
         <ng-container *ngIf="typeUkom() === ExamTypeCategory.PRAKTIK">
-            <app-ukom-exam-general
+            <app-ukom-exam-praktik
                 (participantListRefresh)="refreshParticipantList()"
                 [examDetail]="examDetail()"
                 [examinerList]="examinerList()"
                 [participantList]="participantList()"
-            ></app-ukom-exam-general>
+                [roomUkomDetail]="roomUkomDetail"
+            ></app-ukom-exam-praktik>
         </ng-container>
 
         <ng-container *ngIf="typeUkom() === ExamTypeCategory.PORTOFOLIO">

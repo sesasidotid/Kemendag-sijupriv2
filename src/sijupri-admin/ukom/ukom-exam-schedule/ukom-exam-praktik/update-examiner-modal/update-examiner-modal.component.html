@@ -1,0 +1,71 @@
+<app-modal
+    (saveEvent)="onConfirm()"
+    (toggle)="onClose()"
+    [size]="'lg'"
+    [title]="'Ubah Penguji'"
+>
+    <div class="row g-3">
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Informasi Peserta</div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-md-4 text-muted">Nama Peserta</div>
+                    <div class="col-md-8 fw-medium">
+                        {{ participant.participantName }}
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 text-muted">NIP</div>
+                    <div class="col-md-8">{{ participant.participantNip }}</div>
+                </div>
+                <div *ngIf="currentSlot" class="row">
+                    <div class="col-md-4 text-muted">Jadwal</div>
+                    <div class="col-md-8">
+                        {{ currentSlot.startTime | date: 'dd MMM yyyy, HH:mm' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info mb-3">
+            <strong>Penguji Saat Ini:</strong>
+            <div>{{ participant.examinerName || 'Belum ada penguji' }}</div>
+        </div>
+
+        <div class="available-examiners">
+            <div class="alert alert-warning border">
+                <i
+                    class="mdi mdi-information-slab-circle-outline text-warning me-2"
+                ></i>
+                <small>
+                    <strong>Catatan:</strong> Pastikan penguji yang dipilih
+                    tersedia pada waktu yang dijadwalkan
+                </small>
+            </div>
+
+            <div *ngIf="examinerList.length === 0" class="alert alert-warning">
+                Tidak ada penguji tersedia.
+            </div>
+
+            <ag-grid-angular
+                (gridReady)="onGridReady($event)"
+                (selectionChanged)="onSelectionChanged($event)"
+                *ngIf="examinerList.length > 0"
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                [getRowClass]="getRowClass.bind(this)"
+                [rowData]="examinerList"
+                [rowSelection]="'single'"
+                [style.height]="calculateGridHeight()"
+                class="ag-theme-alpine"
+            >
+            </ag-grid-angular>
+        </div>
+
+        <div *ngIf="!selectedExaminerId" class="alert alert-warning mt-3">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Silakan pilih penguji sebelum menyimpan.
+        </div>
+    </div>
+</app-modal>
+

@@ -1,1 +1,126 @@
-<p>ukom-exam-praktik works!</p>
+<div class="schedule-viewer-container">
+    <div class="header-section mb-4">
+        <div *ngIf="examScheduleDetailLoading()" class="py-5 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Memuat...</span>
+            </div>
+            <p class="mt-2">Memuat data jadwal...</p>
+        </div>
+
+        <div
+            *ngIf="!examScheduleDetailLoading() && mainSchedule()"
+            class="schedule-summary"
+        >
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                {{ scheduleSummary.total }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Total Slot</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-success">
+                                {{ scheduleSummary.occupied }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Terisi</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-info">
+                                {{ scheduleSummary.available }}
+                            </h5>
+                            <p class="card-text text-muted mb-0">Tersedia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        *ngIf="!examScheduleDetailLoading() && allSlots().length > 0"
+        class="grid-section"
+    >
+        <ag-grid-angular
+            (gridReady)="onGridReady($event)"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [paginationPageSize]="20"
+            [pagination]="true"
+            [rowData]="allSlots()"
+            [style.height.px]="600"
+            [style.width.%]="100"
+            [suppressCellFocus]="true"
+            class="ag-theme-alpine"
+        >
+        </ag-grid-angular>
+
+        <div class="legend mt-3">
+            <div class="d-flex flex-wrap gap-3">
+                <div class="legend-item">
+                    <span
+                        class="legend-box"
+                        style="background-color: #d1e7dd"
+                    ></span>
+                    <span class="legend-label">Slot Terisi</span>
+                </div>
+                <div class="legend-item">
+                    <span
+                        class="legend-box"
+                        style="background-color: #f8f9fa"
+                    ></span>
+                    <span class="legend-label">Slot Tersedia</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        *ngIf="!examScheduleDetailLoading() && allSlots().length === 0 && mainSchedule()"
+        class="alert alert-warning text-center"
+    >
+        <i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i>
+        <h5>Tidak Ada Slot</h5>
+        <p class="mb-0">
+            Tidak ada slot waktu tersedia untuk konfigurasi jadwal ini.
+        </p>
+    </div>
+
+    <div
+        *ngIf="!examScheduleDetailLoading() && !mainSchedule()"
+        class="alert alert-info text-center"
+    >
+        <i class="bi bi-info-circle fs-1 d-block mb-2"></i>
+        <h5>Tidak Ada Data Jadwal</h5>
+        <p class="mb-0">Silakan pilih jadwal ujian untuk melihat timetable.</p>
+    </div>
+</div>
+
+<app-reschedule-modal
+    (close)="closeRescheduleModal()"
+    (confirm)="confirmReschedule($event)"
+    *ngIf="showRescheduleModal() && selectedParticipant()"
+    [availableSlots]="availableSlotsForReschedule()"
+    [currentSlot]="currentParticipantSlot()"
+    [participant]="selectedParticipant()!"
+>
+</app-reschedule-modal>
+
+<app-update-examiner-modal
+    (close)="closeExaminerModal()"
+    (confirm)="confirmExaminerUpdate($event)"
+    *ngIf="showExaminerModal() && selectedParticipantForExaminer()"
+    [currentSlot]="currentSlotForExaminer()"
+    [examinerList]="examinerList()"
+    [participant]="selectedParticipantForExaminer()!"
+>
+</app-update-examiner-modal>

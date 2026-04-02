@@ -27,6 +27,7 @@ import { ExaminerListModalComponent } from './examiner-list-modal/examiner-list-
 import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { UkomExamGeneralComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-general/ukom-exam-general.component'
+import { UkomExamPraktikComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-praktik/ukom-exam-praktik.component'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -42,6 +43,7 @@ import { UkomExamGeneralComponent } from '@/sijupri-admin/ukom/ukom-exam-schedul
         ParticipantListModalComponent,
         ExaminerListModalComponent,
         UkomExamGeneralComponent,
+        UkomExamPraktikComponent,
     ],
     templateUrl: './ukom-exam-choose-comp-questions.component.html',
     styleUrl: './ukom-exam-choose-comp-questions.component.scss',
