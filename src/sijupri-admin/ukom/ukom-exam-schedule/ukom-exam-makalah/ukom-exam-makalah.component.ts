@@ -57,8 +57,6 @@ export class UkomExamMakalahComponent implements OnInit {
         return this.examScheduleDetail()?.examScheduleChild
     })
 
-    // Makalah participant list (fetched internally using makalah exam schedule ID)
-    // Used to resolve Komponen A examiners from examScheduleSupervised
     makalahParticipantList = signal<ParticipantScheduleList[]>([])
 
     participantListRefresh = output()
@@ -126,11 +124,13 @@ export class UkomExamMakalahComponent implements OnInit {
                 const seminarScheduleDetail = this.seminarScheduleDetail()
                 const participantList = this.participantList()
                 const makalahParticipantList = this.makalahParticipantList()
+                const examinerList = this.examinerList()
                 if (seminarScheduleDetail && participantList.length >= 0) {
                     this.transformToMainSchedule(
                         seminarScheduleDetail,
                         participantList,
                         makalahParticipantList,
+                        examinerList,
                     )
                 }
             },
@@ -425,9 +425,10 @@ export class UkomExamMakalahComponent implements OnInit {
         examSchedule: ExamSchedule,
         seminarParticipantList: ParticipantScheduleList[],
         makalahParticipantList: ParticipantScheduleList[],
+        examinerList: ExaminerScheduleList[],
     ): void {
         // Both Komponen A and B&C use the same examiner pool
-        const examinerMap = this.buildExaminerMap(this.examinerList())
+        const examinerMap = this.buildExaminerMap(examinerList)
         console.log('examinerMap', examinerMap)
 
         // Build lookup: participantId -> makalah participant schedule data
@@ -448,17 +449,16 @@ export class UkomExamMakalahComponent implements OnInit {
                 const makalahP = makalahByParticipantId.get(
                     seminarP.participantId,
                 )
-                const makalahSupervised = makalahP?.examScheduleSupervised?.[0]
-                const examinerIdKomponenA =
-                    makalahSupervised?.examinerScheduleId ?? null
+                const examinerIdKomponenA = this.resolveExaminerScheduleId(
+                    makalahP,
+                )
                 const examinerKomponenA = examinerIdKomponenA
                     ? (examinerMap.get(examinerIdKomponenA) ?? 'Unknown')
                     : 'Belum ada'
 
                 // Komponen B&C: from seminar participant's examScheduleSupervised
-                const seminarSupervised = seminarP.examScheduleSupervised?.[0]
                 const examinerIdKomponenBC =
-                    seminarSupervised?.examinerScheduleId ?? null
+                    this.resolveExaminerScheduleId(seminarP)
                 const examinerKomponenBC = examinerIdKomponenBC
                     ? (examinerMap.get(examinerIdKomponenBC) ?? 'Unknown')
                     : 'Belum ada'
@@ -501,6 +501,29 @@ export class UkomExamMakalahComponent implements OnInit {
         // Generate all slots
         const slots = this.slotService.generateAllSlots(mainSchedule)
         this.allSlots.set(slots)
+    }
+
+    private resolveExaminerScheduleId(
+        participant: ParticipantScheduleList | undefined,
+    ): string | null {
+        if (!participant) return null
+
+        const supervised = participant.examScheduleSupervised as unknown
+
+        if (Array.isArray(supervised)) {
+            return supervised[0]?.examinerScheduleId ?? null
+        }
+
+        if (
+            supervised &&
+            typeof supervised === 'object' &&
+            'examinerScheduleId' in supervised
+        ) {
+            return (supervised as { examinerScheduleId?: string })
+                .examinerScheduleId ?? null
+        }
+
+        return null
     }
 
     /**

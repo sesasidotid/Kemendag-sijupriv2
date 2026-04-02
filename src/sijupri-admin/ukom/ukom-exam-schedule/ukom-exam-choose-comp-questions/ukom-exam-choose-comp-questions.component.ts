@@ -10,7 +10,7 @@ import {
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { CommonModule } from '@angular/common'
-import { combineLatest, finalize, take } from 'rxjs'
+import { combineLatest, finalize, forkJoin, of, take } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { UkomExamCatComponent } from '../ukom-exam-cat/ukom-exam-cat.component'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
@@ -136,20 +136,61 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     }
 
     getExaminerListId() {
+        // this.isLoadingExaminer.set(true)
+        // // const examScheduleId = this.childExamId() ?? this.examId()
+        // const examScheduleId = this.examId()
+        //
+        // this.ukomExamScheduleService
+        //     .getExaminerListByExamScheduleId(examScheduleId)
+        //     .pipe(
+        //         finalize(() => {
+        //             this.isLoadingExaminer.set(false)
+        //         }),
+        //     )
+        //     .subscribe({
+        //         next: (res) => {
+        //             this.examinerList.set(res)
+        //         },
+        //         error: (err) => {
+        //             console.error(err)
+        //             this.handlerService.handleAlert(
+        //                 'Error',
+        //                 'Gagal mendapatkan daftar penguji',
+        //             )
+        //         },
+        //     })
         this.isLoadingExaminer.set(true)
-        // const examScheduleId = this.childExamId() ?? this.examId()
-        const examScheduleId = this.examId()
 
-        this.ukomExamScheduleService
-            .getExaminerListByExamScheduleId(examScheduleId)
+        const examId = this.examId()
+        const childExamId = this.childExamId()
+
+        const parent$ =
+            this.ukomExamScheduleService.getExaminerListByExamScheduleId(examId)
+
+        const child$ = childExamId
+            ? this.ukomExamScheduleService.getExaminerListByExamScheduleId(
+                  childExamId,
+              )
+            : of([])
+
+        forkJoin([parent$, child$])
             .pipe(
                 finalize(() => {
                     this.isLoadingExaminer.set(false)
                 }),
             )
             .subscribe({
-                next: (res) => {
-                    this.examinerList.set(res)
+                next: ([parentRes, childRes]) => {
+                    // merge arrays
+                    const merged = [...parentRes, ...childRes]
+
+                    // optional: remove duplicates
+                    const unique = merged.filter(
+                        (item, index, self) =>
+                            index === self.findIndex((i) => i.id === item.id),
+                    )
+
+                    this.examinerList.set(unique)
                 },
                 error: (err) => {
                     console.error(err)
