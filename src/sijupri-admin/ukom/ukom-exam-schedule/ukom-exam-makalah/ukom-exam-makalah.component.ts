@@ -136,6 +136,21 @@ export class UkomExamMakalahComponent implements OnInit {
                 const participantList = this.participantList()
                 const makalahParticipantList = this.makalahParticipantList()
                 const examinerList = this.examinerList()
+
+                const hasExaminerReference =
+                    participantList.some(
+                        (participant) =>
+                            !!this.resolveExaminerScheduleId(participant),
+                    ) ||
+                    makalahParticipantList.some(
+                        (participant) =>
+                            !!this.resolveExaminerScheduleId(participant),
+                    )
+
+                if (hasExaminerReference && examinerList.length === 0) {
+                    return
+                }
+
                 if (seminarScheduleDetail && participantList.length >= 0) {
                     this.transformToMainSchedule(
                         seminarScheduleDetail,

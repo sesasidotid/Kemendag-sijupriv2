@@ -82,11 +82,29 @@ export class UkomExamPraktikComponent implements OnInit {
             () => {
                 const exam = this.examDetail()
                 const participants = this.participantList()
-                this.examinerList()
-                if (!exam?.id) return
+                const examiners = this.examinerList()
+
+                if (!exam?.id) {
+                    this.examScheduleDetailLoading.set(false)
+                    this.mainSchedule.set(null)
+                    this.allSlots.set([])
+                    return
+                }
+
+                this.examScheduleDetailLoading.set(true)
 
                 this.examScheduleDetail.set(exam)
-                this.transformToMainSchedule(exam, participants)
+
+                const hasExaminerReference = participants.some(
+                    (participant) => !!this.resolveExaminerScheduleId(participant),
+                )
+
+                if (hasExaminerReference && examiners.length === 0) {
+                    return
+                }
+
+                this.transformToMainSchedule(exam, participants, examiners)
+                this.examScheduleDetailLoading.set(false)
             },
             { allowSignalWrites: true },
         )
@@ -281,8 +299,9 @@ export class UkomExamPraktikComponent implements OnInit {
     private transformToMainSchedule(
         examSchedule: ExamSchedule,
         participantScheduleList: ParticipantScheduleList[],
+        examiners: ExaminerScheduleList[],
     ): void {
-        const examinerMap = this.buildExaminerMap(this.examinerList())
+        const examinerMap = this.buildExaminerMap(examiners)
 
         const participantSchedules: ParticipantSchedule[] =
             participantScheduleList.map((p) => {
