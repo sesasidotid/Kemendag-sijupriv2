@@ -106,6 +106,10 @@ const UKOM_UPDATE_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
         primary: [
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
+            {
+                controlName: 'duration',
+                validators: [Validators.required, Validators.min(1)],
+            },
         ],
     },
     PORTOFOLIO: {

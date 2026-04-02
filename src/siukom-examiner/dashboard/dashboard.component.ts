@@ -150,7 +150,7 @@ export class DashboardComponent implements OnInit {
     // Reference data for mapping codes to names
     private jabatanList = signal<Jabatan[]>([])
     // Participants currently ready for examination
-    // For WAWANCARA/SEMINAR: within personal schedule + duration window
+    // For WAWANCARA/SEMINAR/PRAKTIK: within personal schedule + duration window
     private jenjangList = signal<Jenjang[]>([])
     private bidangJabatanList = signal<BidangJabatan[]>([])
     private router = inject(Router)
@@ -380,7 +380,7 @@ export class DashboardComponent implements OnInit {
 
     /**
      * Check if participant is ready for examination based on exam type
-     * - WAWANCARA/SEMINAR: current time is within personal schedule + duration
+     * - WAWANCARA/SEMINAR/PRAKTIK: current time is within personal schedule + duration
      * - Others: exam has started and participant not yet examined
      */
     private isParticipantReadyForExam(
@@ -393,14 +393,11 @@ export class DashboardComponent implements OnInit {
         const personalSchedule = pSchedule.personalSchedule
         const isExamined = pSchedule.examined === true
 
-        // For WAWANCARA and SEMINAR:
+        // For WAWANCARA, PRAKTIK and SEMINAR:
         // Must have personal schedule
         // Must be within schedule window
         // Must NOT already be examined
-        if (
-            examType === ExamTypeCategory.WAWANCARA ||
-            examType === ExamTypeCategory.SEMINAR
-        ) {
+        if (this.isPersonalScheduleWindowExam(examType)) {
             if (!personalSchedule || isExamined) {
                 return false
             }
@@ -413,12 +410,22 @@ export class DashboardComponent implements OnInit {
             return now >= personalSchedule && now <= scheduleEnd
         }
 
-        // For PORTOFOLIO, STUDI_KASUS, PRAKTIK, MAKALAH:
+        // For PORTOFOLIO, STUDI_KASUS, MAKALAH:
         // Must have exam started
         // Must NOT already be examined
         const isExamStarted = now >= examStartTime
 
         return isExamStarted && !isExamined
+    }
+
+    private isPersonalScheduleWindowExam(
+        examType: ExamTypeCategory,
+    ): boolean {
+        return (
+            examType === ExamTypeCategory.WAWANCARA ||
+            examType === ExamTypeCategory.SEMINAR ||
+            examType === ExamTypeCategory.PRAKTIK
+        )
     }
 
     /**

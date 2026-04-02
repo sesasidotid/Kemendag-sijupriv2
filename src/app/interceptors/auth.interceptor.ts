@@ -10,6 +10,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req).pipe(
         catchError((error) => {
             const currentRoute = router.url
+
             const EXACT_ROUTES = ['/']
             const PREFIX_ROUTES = [
                 '/login',
@@ -22,32 +23,37 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                 '/ukm-clarrify',
             ]
 
-            const shouldIgnore =
-                EXACT_ROUTES.includes(currentRoute) ||
-                PREFIX_ROUTES.some(
-                    (route) =>
-                        currentRoute === route ||
-                        currentRoute.startsWith(route + '/'),
-                )
+            // --- role check ---
+            const appCode = LoginContext.getApplicationCode()
 
-            console.log('test', shouldIgnore)
-            console.error('err', error)
+            const isParticipantOrExaminer =
+                appCode === 'siukom-participant' ||
+                appCode === 'siukom-examiner'
 
-            // if (
-            //     !shouldIgnore &&
-            //     error?.error?.message === 'Unauthenticated.' &&
-            //     error?.error?.code === 'Unhandled Error'
-            // )
-            if (
-                !shouldIgnore &&
+            // --- error check ---
+            const isUnauthenticated =
                 error?.error?.cause === 'Unauthenticated.' &&
                 error?.error?.code === 'Unhandled Error'
-            ) {
-                if (
-                    LoginContext.getApplicationCode() === 'siukom-participant'
-                ) {
-                    console.log('test2')
 
+            // --- route checks ---
+            const isExactIgnored = EXACT_ROUTES.includes(currentRoute)
+            const isPrefixIgnored = PREFIX_ROUTES.some(
+                (route) =>
+                    currentRoute === route ||
+                    currentRoute.startsWith(route + '/'),
+            )
+
+            /**
+             * Ignore logic:
+             * - "/" ignored ONLY if NOT participant/examiner
+             * - prefix routes always ignored
+             */
+            const shouldIgnore =
+                (isExactIgnored && !isParticipantOrExaminer) || isPrefixIgnored
+
+            // --- main logic ---
+            if (!shouldIgnore && isUnauthenticated) {
+                if (isParticipantOrExaminer) {
                     router.navigate(['/login-cat']).then(() => {
                         window.location.reload()
                     })
@@ -55,10 +61,11 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                     router.navigate(['/login']).then(() => {
                         window.location.reload()
                     })
-                    console.log('test3')
                 }
+
                 LoginContext.release()
             }
+
             throw error
         }),
     )

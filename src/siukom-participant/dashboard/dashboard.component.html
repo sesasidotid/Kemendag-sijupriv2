@@ -369,7 +369,7 @@
                         >
                             <!-- 1. Has score -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score !== undefined && scoreMap[exam.id]?.score !== null"
+                                *ngIf="scoreMap[exam.id]?.score != null"
                             >
                                 <button
                                     (click)="openScoreModal(exam.id)"
@@ -385,7 +385,7 @@
 
                             <!-- 2. No score yet -->
                             <ng-container
-                                *ngIf="scoreMap[exam.id]?.score === undefined || scoreMap[exam.id]?.score === null"
+                                *ngIf="scoreMap[exam.id]?.score == null"
                             >
                                 <!-- 2a. Upcoming -->
                                 <div

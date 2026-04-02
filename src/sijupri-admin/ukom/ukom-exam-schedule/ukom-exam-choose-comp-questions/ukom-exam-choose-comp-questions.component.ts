@@ -190,14 +190,15 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
 
                     const childMapped = childRes.map((item) => ({
                         ...item,
-                        examType: this.examDetail().examScheduleChild?.examTypeCode,
+                        examType:
+                            this.examDetail().examScheduleChild?.examTypeCode,
                     }))
 
                     const merged = [...parentMapped, ...childMapped]
 
                     const unique = merged.filter(
                         (item, index, self) =>
-                            index === self.findIndex(i => i.id === item.id)
+                            index === self.findIndex((i) => i.id === item.id),
                     )
 
                     this.examinerList.set(unique)
