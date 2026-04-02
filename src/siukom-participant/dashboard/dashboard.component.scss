@@ -392,6 +392,10 @@
   gap: 0.75rem;
 }
 
+.schedule-actions .praktik-upload-button {
+  width: 100%;
+}
+
 // Apply to local buttons and to buttons inside app-loading-button
 .btn-action-success,
 :host ::ng-deep .btn-action-success {
@@ -424,6 +428,11 @@
 .note-text {
   font-size: 0.9rem;
   color: #1f2937;
+}
+
+.note-action {
+  margin-top: 0.75rem;
+  width: 100%;
 }
 
 .empty-state-full {

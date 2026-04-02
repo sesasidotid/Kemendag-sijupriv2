@@ -54,7 +54,7 @@
                 <ng-template #noLink>
                     <div class="alert-banner">
                         <span class="mdi mdi-alert-circle-outline me-2"></span>
-                        Link Zoom belum tersedia. Silakan hubungi panitia.
+                        Ujian Daring belum tersedia. Silakan hubungi panitia.
                     </div>
                 </ng-template>
             </div>
@@ -74,11 +74,6 @@
                     >{{ roomUkom.examScheduleDtoList.length }}</span
                 >
             </div>
-
-            <!--            <p class="section-description">-->
-            <!--                Setiap ujian di bawah ini menampilkan status dan tindakan yang-->
-            <!--                bisa Anda lakukan sekarang.-->
-            <!--            </p>-->
 
             <div class="schedule-cards">
                 <article
@@ -337,8 +332,8 @@
                                             Wawancara Sedang Berlangsung
                                         </div>
                                         <div class="note-text">
-                                            Silakan bergabung ke Zoom melalui
-                                            tautan di atas.
+                                            Silakan bergabung ke ujian daring
+                                            melalui tautan di atas.
                                         </div>
                                     </div>
                                 </div>
@@ -384,41 +379,75 @@
                             </ng-container>
 
                             <!-- 2. No score yet -->
-                            <ng-container
+                            <div
                                 *ngIf="scoreMap[exam.id]?.score == null"
+                                class="d-grid gap-3"
                             >
                                 <!-- 2a. Upcoming -->
                                 <div
                                     *ngIf="isExamUpcoming(exam)"
-                                    class="status-info status-info-upcoming"
+                                    class="info-note info-note-upcoming"
                                 >
                                     <span
                                         class="mdi mdi-clock-outline me-2"
                                     ></span>
-                                    Ujian belum dimulai
+                                    <div>
+                                        <div class="note-title">
+                                            Praktik Belum Dimulai
+                                        </div>
+                                        <div class="note-text">
+                                            Silakan dapat mengunggah video
+                                            persiapan praktik jika dibutuhkan
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- 2b. Ongoing -->
-                                <app-loading-button
-                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                <div
                                     *ngIf="isExamOngoing(exam)"
-                                    [className]="'btn-action-primary'"
-                                    [isLoading]="startPraktikLoading()"
-                                    [label]="'Mulai Praktik'"
-                                ></app-loading-button>
+                                    class="info-note info-note-ongoing"
+                                >
+                                    <span
+                                        class="mdi mdi-video-outline me-2"
+                                    ></span>
+                                    <div>
+                                        <div class="note-title">
+                                            Praktik Sedang Berlangsung
+                                        </div>
+                                        <div class="note-text">
+                                            Silakan bergabung ke ujian daring
+                                            melalui tautan di atas.
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--                                <app-loading-button-->
+                                <!--                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"-->
+                                <!--                                    *ngIf="isExamOngoing(exam)"-->
+                                <!--                                    [className]="'btn-action-primary'"-->
+                                <!--                                    [isLoading]="startPraktikLoading()"-->
+                                <!--                                    [label]="'Mulai Praktik'"-->
+                                <!--                                ></app-loading-button>-->
 
                                 <!-- 2c. Expired - neutral style for PRAKTIK -->
                                 <div
-                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam)"
+                                    *ngIf="isExamExpired(exam.endTime) && !isExamUpcoming(exam) && !isExamOngoing(exam)"
                                     class="status-info status-info-neutral"
                                 >
                                     <span
                                         class="mdi mdi-clock-check-outline me-2"
                                     ></span>
                                     Ujian telah selesai. Saat ini sedang
-                                    menunggu penilaian dari penguji.
+                                    menunggu penilaian dari penguji. Silahkan
+                                    unggah hasil praktik jika dibutuhkan.
                                 </div>
-                            </ng-container>
+
+                                <app-loading-button
+                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    [className]="'btn-action-primary'"
+                                    [isLoading]="startPraktikLoading()"
+                                    [label]="'Unggah video persiapan / hasil praktik'"
+                                ></app-loading-button>
+                            </div>
                         </ng-container>
 
                         <!-- STUDI KASUS -->
@@ -593,8 +622,8 @@
                                             Seminar Sedang Berlangsung
                                         </div>
                                         <div class="note-text">
-                                            Silakan bergabung ke Zoom melalui
-                                            tautan di atas.
+                                            Silakan bergabung ke ujian daring
+                                            melalui tautan di atas.
                                         </div>
                                     </div>
                                 </div>

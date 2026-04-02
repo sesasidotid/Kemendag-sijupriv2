@@ -390,7 +390,8 @@ export class DashboardComponent implements OnInit {
     isPersonalScheduleExam(exam: ExamSchedule): boolean {
         return (
             exam.examTypeCode === ExamTypeCategory.WAWANCARA ||
-            exam.examTypeCode === ExamTypeCategory.SEMINAR
+            exam.examTypeCode === ExamTypeCategory.SEMINAR ||
+            exam.examTypeCode === ExamTypeCategory.PRAKTIK
         )
     }
 
