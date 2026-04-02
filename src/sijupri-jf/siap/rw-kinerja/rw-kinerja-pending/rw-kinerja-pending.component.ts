@@ -1,12 +1,11 @@
 import { Component } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PageFilterBuilder,
     PrimaryColumnBuilder
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import { CommonModule } from '@angular/common'
 import {
     FormControl,
@@ -15,20 +14,19 @@ import {
     ReactiveFormsModule,
     Validators
 } from '@angular/forms'
-import { RWKinerja } from '../../../../modules/siap/models/rw-kinerja.model'
-import { PendingTask } from '../../../../modules/workflow/models/pending-task.model'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { Task } from '../../../../modules/workflow/models/task.model'
-import { RatingKinerja } from '../../../../modules/maintenance/models/rating-kinerja.model'
-import { PredikatKinerja } from '../../../../modules/maintenance/models/predikat-kinerja.model'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
+import { RWKinerja } from '@/modules/siap/models/rw-kinerja.model'
+import { PendingTask } from '@/modules/workflow/models/pending-task.model'
+import { ApiService } from '@/modules/base/services/api.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { Task } from '@/modules/workflow/models/task.model'
+import { RatingKinerja } from '@/modules/maintenance/models/rating-kinerja.model'
+import { PredikatKinerja } from '@/modules/maintenance/models/predikat-kinerja.model'
+import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { BehaviorSubject } from 'rxjs'
-import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
-import { PendingTaskService } from '../../../../modules/workflow/services/pending-task.service'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { PendingTaskService } from '@/modules/workflow/services/pending-task.service'
 
 @Component({
     selector: 'app-rw-kinerja-pending',
@@ -45,9 +43,9 @@ import { PendingTaskService } from '../../../../modules/workflow/services/pendin
 })
 export class RwKinerjaPendingComponent {
     pagable: Pagable
-    refresh: boolean = false
-    isDetailOpen: boolean = false
-    rwKinerja: RWKinerja = new RWKinerja()
+    refresh= false
+    isDetailOpen = false
+    rwKinerja = new RWKinerja()
     ratingKinerjaList: RatingKinerja[] = []
     predikatKinerjaList: PredikatKinerja[] = []
     pendingTask: PendingTask

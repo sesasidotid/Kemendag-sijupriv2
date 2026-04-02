@@ -27,18 +27,6 @@ import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exa
 import { ExaminerScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-examiner-list.model'
 import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-schedule/update-examiner-for-participant-request.model'
 
-/**
- * Admin Schedule Viewer with Manual Rescheduling
- *
- * Features:
- * - Slot-based timetable view using AG Grid
- * - Manual reschedule capability with validation
- * - Enforces business rules:
- *   - No overlapping slots
- *   - Must be within main schedule
- *   - Automatically skips 12:00-13:00 (lunch break) - resumes at 13:00
- *   - Automatically skips 20:00-06:00 (night hours) - resumes at 06:00
- */
 @Component({
     selector: 'app-ukom-exam-wawancara',
     standalone: true,
@@ -290,23 +278,6 @@ export class UkomExamWawancaraComponent implements OnInit {
                     return slot.participantSchedule?.examinerName || '—'
                 },
             },
-            // {
-            //     headerName: 'Status',
-            //     width: 120,
-            //     cellClass: 'text-center',
-            //     valueGetter: (params) => {
-            //         const slot = params.data as ScheduleSlot
-            //         if (slot.isOccupied) return 'Terisi'
-            //         return 'Tersedia'
-            //     },
-            //     cellStyle: (params) => {
-            //         const slot = params.data as ScheduleSlot
-            //         if (slot.isOccupied) {
-            //             return { color: '#198754', fontWeight: '500' }
-            //         }
-            //         return { color: '#6c757d' }
-            //     },
-            // },
             {
                 headerName: 'Aksi',
                 width: 250,
@@ -338,10 +309,6 @@ export class UkomExamWawancaraComponent implements OnInit {
         ]
     }
 
-    /**
-     * Transform ExamSchedule to MainSchedule and generate slots
-     * All dates are parsed as UTC+7 times (no timezone conversion)
-     */
     private transformToMainSchedule(
         examSchedule: ExamSchedule,
         participantScheduleList: ParticipantScheduleList[],

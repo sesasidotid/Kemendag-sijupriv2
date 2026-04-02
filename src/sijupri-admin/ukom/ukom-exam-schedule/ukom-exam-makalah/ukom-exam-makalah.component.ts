@@ -48,14 +48,14 @@ import { UpdateExaminerForParticipantRequest } from '@/modules/ukom/models/exam-
     styleUrl: './ukom-exam-makalah.component.scss',
 })
 export class UkomExamMakalahComponent implements OnInit {
+    examinerList = input<ExaminerScheduleList[]>([])
+    participantList = input<ParticipantScheduleList[]>([])
+
     examId = signal('')
     examScheduleDetail = signal<ExamSchedule>(null)
     seminarScheduleDetail = computed(() => {
         return this.examScheduleDetail()?.examScheduleChild
     })
-
-    examinerList = input<ExaminerScheduleList[]>([])
-    participantList = input<ParticipantScheduleList[]>([])
 
     // Makalah participant list (fetched internally using makalah exam schedule ID)
     // Used to resolve Komponen A examiners from examScheduleSupervised
@@ -374,23 +374,6 @@ export class UkomExamMakalahComponent implements OnInit {
                 },
                 autoHeight: true,
             },
-            // {
-            //     headerName: 'Status',
-            //     width: 120,
-            //     cellClass: 'text-center',
-            //     valueGetter: (params) => {
-            //         const slot = params.data as ScheduleSlot
-            //         if (slot.isOccupied) return 'Terisi'
-            //         return 'Tersedia'
-            //     },
-            //     cellStyle: (params) => {
-            //         const slot = params.data as ScheduleSlot
-            //         if (slot.isOccupied) {
-            //             return { color: '#198754', fontWeight: '500' }
-            //         }
-            //         return { color: '#6c757d' }
-            //     },
-            // },
             {
                 headerName: 'Aksi',
                 width: 250,

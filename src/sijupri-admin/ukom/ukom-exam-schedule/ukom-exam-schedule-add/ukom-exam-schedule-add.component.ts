@@ -40,7 +40,7 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import {
     BaseExamScheduleRequest,
     CatExamScheduleRequest,
-    OtherExamScheduleRequest,
+    OtherExamScheduleRequest, PraktikExamScheduleRequest,
     SeminarMakalahExamScheduleRequest,
     WawancaraExamScheduleRequest,
 } from '@/modules/ukom/models/exam-schedule/create-exam-schedule-request.model'
@@ -697,7 +697,13 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     duration: v.duration2,
                     participantIdList: v.participantIdList ?? [],
                 })
-
+            case ExamTypeCategory.PRAKTIK:
+                return new PraktikExamScheduleRequest({
+                    startTime: v.startTime,
+                    endTime: v.endTime,
+                    duration: v.duration,
+                    participantIdList: v.participantIdList ?? [],
+                })
             default:
                 return new OtherExamScheduleRequest({
                     startTime: v.startTime,

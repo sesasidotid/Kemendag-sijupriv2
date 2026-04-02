@@ -47,6 +47,18 @@ export class SeminarMakalahExamScheduleRequest extends BaseExamScheduleRequest {
     }
 }
 
+export class PraktikExamScheduleRequest extends BaseExamScheduleRequest {
+    startTime: string = undefined
+    endTime: string = undefined
+    duration: string = undefined
+    participantIdList: string[] = []
+
+    constructor(object: { [key: string]: any }) {
+        super()
+        this.fromObject(object)
+    }
+}
+
 export class OtherExamScheduleRequest extends BaseExamScheduleRequest {
     startTime: string = undefined
     endTime: string = undefined
