@@ -26,7 +26,7 @@ export class ScheduleSlotService {
     private readonly MIDDAY_UNAVAILABLE_END_HOUR = 13 // 13:00
 
     /** Feature toggle */
-    private disableUnavailableHours = true
+    private disableUnavailableHours = false
 
     /**
      * Parse date string as UTC+7 time (no timezone conversion)
@@ -327,76 +327,38 @@ export class ScheduleSlotService {
             return true
         }
 
-        const startHour = this.getHour(slotStart)
-        const endHour = this.getHour(slotEnd)
-        const endMinute = this.getMinutes(slotEnd)
+        // 00:00 to 08:00
+        const morningNightStart = new Date(slotStart)
+        morningNightStart.setUTCHours(0, 0, 0, 0)
 
-        // Check if slot start is in blackout period
-        if (
-            startHour >= this.UNAVAILABLE_START_HOUR ||
-            startHour < this.UNAVAILABLE_END_HOUR
-        ) {
-            return true
-        }
+        const morningNightEnd = new Date(slotStart)
+        morningNightEnd.setUTCHours(this.UNAVAILABLE_END_HOUR, 0, 0, 0)
 
-        // Check if slot end is in blackout period (considering minutes)
-        if (endHour < this.UNAVAILABLE_END_HOUR) {
-            return true
-        }
+        // 17:00 to 24:00
+        const eveningNightStart = new Date(slotStart)
+        eveningNightStart.setUTCHours(this.UNAVAILABLE_START_HOUR, 0, 0, 0)
 
-        // Check if slot end exactly at 06:00 (edge case)
-        if (endHour === this.UNAVAILABLE_END_HOUR && endMinute === 0) {
-            return true
-        }
+        const eveningNightEnd = new Date(slotStart)
+        eveningNightEnd.setUTCDate(eveningNightEnd.getUTCDate() + 1)
+        eveningNightEnd.setUTCHours(0, 0, 0, 0)
 
-        // Check if slot crosses into blackout period
-        if (endHour >= this.UNAVAILABLE_START_HOUR) {
-            return true
-        }
+        const inMorningNight = slotStart < morningNightEnd && slotEnd > morningNightStart
+        const inEveningNight = slotStart < eveningNightEnd && slotEnd > eveningNightStart
 
-        return false
+        return inMorningNight || inEveningNight
     }
 
     private isSlotInMiddayUnavailableHours(
         slotStart: Date,
         slotEnd: Date,
     ): boolean {
-        const startHour = this.getHour(slotStart)
-        const endHour = this.getHour(slotEnd)
-        const endMinute = this.getMinutes(slotEnd)
+        const lunchStart = new Date(slotStart)
+        lunchStart.setUTCHours(this.MIDDAY_UNAVAILABLE_START_HOUR, 0, 0, 0)
 
-        // Slot starts during 12–13
-        if (
-            startHour >= this.MIDDAY_UNAVAILABLE_START_HOUR &&
-            startHour < this.MIDDAY_UNAVAILABLE_END_HOUR
-        ) {
-            return true
-        }
+        const lunchEnd = new Date(slotStart)
+        lunchEnd.setUTCHours(this.MIDDAY_UNAVAILABLE_END_HOUR, 0, 0, 0)
 
-        // Slot ends during 12–13 (but not exactly at 12:00)
-        if (
-            endHour > this.MIDDAY_UNAVAILABLE_START_HOUR &&
-            endHour < this.MIDDAY_UNAVAILABLE_END_HOUR
-        ) {
-            return true
-        }
-
-        // Edge case: slot ends exactly at 13:00
-        if (endHour === this.MIDDAY_UNAVAILABLE_END_HOUR && endMinute === 0) {
-            return true
-        }
-
-        // Check if slot spans across the 12:00-13:00 period
-        // (starts before 12:00 and ends after 13:00)
-        if (
-            startHour < this.MIDDAY_UNAVAILABLE_START_HOUR &&
-            (endHour > this.MIDDAY_UNAVAILABLE_END_HOUR ||
-                (endHour === this.MIDDAY_UNAVAILABLE_END_HOUR && endMinute > 0))
-        ) {
-            return true
-        }
-
-        return false
+        return slotStart < lunchEnd && slotEnd > lunchStart
     }
 
     /**
