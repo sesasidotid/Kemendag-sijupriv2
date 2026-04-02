@@ -314,22 +314,30 @@ export class UkomExamWawancaraComponent implements OnInit {
         participantScheduleList: ParticipantScheduleList[],
     ): void {
         const examinerMap = this.buildExaminerMap(this.examinerList())
+        // console.log('examinerMap', examinerMap)
+
+        // console.log('participantScheduleList', participantScheduleList)
 
         const participantSchedules: ParticipantSchedule[] =
-            participantScheduleList.map((p) => ({
-                id: p.id,
-                participantId: p.participantId,
-                examScheduleId: p.examScheduleId,
-                personalSchedule: p.personalSchedule
-                    ? this.slotService.parseAsUTC7(p.personalSchedule)
-                    : null,
-                participantName: p.participantUkom?.name || 'Unknown',
-                participantNip: p.participantUkom?.nip || 'Unknown',
-                examinerName:
-                    examinerMap.get(
-                        p.examScheduleSupervised[0]?.examinerScheduleId,
-                    ) ?? 'Unknown',
-            })) || []
+            participantScheduleList.map((p) => {
+                const examinerScheduleId = this.resolveExaminerScheduleId(p)
+
+                return {
+                    id: p.id,
+                    participantId: p.participantId,
+                    examScheduleId: p.examScheduleId,
+                    personalSchedule: p.personalSchedule
+                        ? this.slotService.parseAsUTC7(p.personalSchedule)
+                        : null,
+                    participantName: p.participantUkom?.name || 'Unknown',
+                    participantNip: p.participantUkom?.nip || 'Unknown',
+                    examinerName: examinerScheduleId
+                        ? (examinerMap.get(examinerScheduleId) ?? 'Unknown')
+                        : 'Unknown',
+                }
+            }) || []
+
+        // console.log('participantSchedules', participantSchedules)
 
         const mainSchedule: MainSchedule = {
             id: examSchedule.id,
@@ -344,6 +352,27 @@ export class UkomExamWawancaraComponent implements OnInit {
         // Generate all slots
         const slots = this.slotService.generateAllSlots(mainSchedule)
         this.allSlots.set(slots)
+    }
+
+    private resolveExaminerScheduleId(
+        participant: ParticipantScheduleList,
+    ): string | undefined {
+        const supervised = participant.examScheduleSupervised as unknown
+
+        if (Array.isArray(supervised)) {
+            return supervised[0]?.examinerScheduleId
+        }
+
+        if (
+            supervised &&
+            typeof supervised === 'object' &&
+            'examinerScheduleId' in supervised
+        ) {
+            return (supervised as { examinerScheduleId?: string })
+                .examinerScheduleId
+        }
+
+        return undefined
     }
 
     /**

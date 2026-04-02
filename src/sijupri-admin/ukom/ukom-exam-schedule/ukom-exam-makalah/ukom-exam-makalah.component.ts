@@ -300,6 +300,22 @@ export class UkomExamMakalahComponent implements OnInit {
         this.performExaminerUpdate(requestKomponenA, requestKomponenBC)
     }
 
+    /**
+     * Fetch makalah participant list to get examScheduleSupervised for Komponen A
+     */
+    fetchMakalahParticipantList(): void {
+        this.examScheduleService
+            .getParticipantListByExamScheduleId(this.examId())
+            .subscribe({
+                next: (res) => {
+                    this.makalahParticipantList.set(res)
+                },
+                error: (err) => {
+                    console.error('Error fetching makalah participants:', err)
+                },
+            })
+    }
+
     private initializeColumnDefs(): void {
         this.columnDefs = [
             {
@@ -412,6 +428,7 @@ export class UkomExamMakalahComponent implements OnInit {
     ): void {
         // Both Komponen A and B&C use the same examiner pool
         const examinerMap = this.buildExaminerMap(this.examinerList())
+        console.log('examinerMap', examinerMap)
 
         // Build lookup: participantId -> makalah participant schedule data
         const makalahByParticipantId = new Map<
@@ -421,6 +438,8 @@ export class UkomExamMakalahComponent implements OnInit {
         makalahParticipantList.forEach((p) => {
             makalahByParticipantId.set(p.participantId, p)
         })
+        console.log('makalahByParticipantId', makalahByParticipantId)
+        console.log('seminarParticipantList', seminarParticipantList)
 
         // Use seminar participant list as the base (since it has personalSchedule for slots)
         const participantSchedules: ParticipantSchedule[] =
@@ -466,6 +485,7 @@ export class UkomExamMakalahComponent implements OnInit {
                     examinerIdKomponenBC: examinerIdKomponenBC,
                 }
             }) || []
+        console.log('participantSchedules', participantSchedules)
 
         const mainSchedule: MainSchedule = {
             id: examSchedule.id,
@@ -474,28 +494,13 @@ export class UkomExamMakalahComponent implements OnInit {
             duration: examSchedule.duration,
             participantScheduleList: participantSchedules,
         }
+        console.log(mainSchedule)
 
         this.mainSchedule.set(mainSchedule)
 
         // Generate all slots
         const slots = this.slotService.generateAllSlots(mainSchedule)
         this.allSlots.set(slots)
-    }
-
-    /**
-     * Fetch makalah participant list to get examScheduleSupervised for Komponen A
-     */
-    fetchMakalahParticipantList(): void {
-        this.examScheduleService
-            .getParticipantListByExamScheduleId(this.examId())
-            .subscribe({
-                next: (res) => {
-                    this.makalahParticipantList.set(res)
-                },
-                error: (err) => {
-                    console.error('Error fetching makalah participants:', err)
-                },
-            })
     }
 
     /**
