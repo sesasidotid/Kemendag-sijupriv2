@@ -227,6 +227,8 @@ export class RwPangkatPendingComponent {
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwPangkat = new RWPangkat()
+        this.fileLoadHandler()
+        this.rwPangkatForm.reset()
     }
 
     submit () {

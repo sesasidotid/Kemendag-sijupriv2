@@ -3,7 +3,7 @@ import { PagableComponent } from '@/modules/base/components/pagable/pagable.comp
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '@/modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import { CommonModule } from '@angular/common'
@@ -12,7 +12,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { RWKinerja } from '@/modules/siap/models/rw-kinerja.model'
 import { PendingTask } from '@/modules/workflow/models/pending-task.model'
@@ -36,14 +36,14 @@ import { PendingTaskService } from '@/modules/workflow/services/pending-task.ser
         CommonModule,
         FormsModule,
         FileHandlerComponent,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     templateUrl: './rw-kinerja-pending.component.html',
-    styleUrl: './rw-kinerja-pending.component.scss'
+    styleUrl: './rw-kinerja-pending.component.scss',
 })
 export class RwKinerjaPendingComponent {
     pagable: Pagable
-    refresh= false
+    refresh = false
     isDetailOpen = false
     rwKinerja = new RWKinerja()
     ratingKinerjaList: RatingKinerja[] = []
@@ -70,42 +70,42 @@ export class RwKinerjaPendingComponent {
         { value: '09', name: 'September' },
         { value: '10', name: 'Oktober' },
         { value: '11', name: 'November' },
-        { value: '12', name: 'Desember' }
+        { value: '12', name: 'Desember' },
     ]
 
     inputs: FIleHandler
 
-    constructor (
+    constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
         private confirmationService: ConfirmationService,
         private formValidationService: FormValidationService,
-        private pendingTaskService: PendingTaskService
+        private pendingTaskService: PendingTaskService,
     ) {}
 
-    ngOnInit () {
+    ngOnInit() {
         this.populateYears()
         this.handlePagable()
         this.handleFormInit()
         this.handleSubscribe()
     }
 
-    populateYears () {
+    populateYears() {
         const currentYear = new Date().getFullYear()
         for (let i = currentYear; i >= currentYear - 20; i--) {
             this.years.push(i)
         }
     }
 
-    getErrorMessage (controlName: string, label: string): string | null {
+    getErrorMessage(controlName: string, label: string): string | null {
         return this.formValidationService.getErrorMessage(
             this.rwKinerjaForm.get(controlName),
             controlName,
-            label
+            label,
         )
     }
 
-    handlePagable () {
+    handlePagable() {
         this.pagable = new PagableBuilder('/api/v1/rw_kinerja/task/search')
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tanggal', 'dateCreated').build(),
@@ -124,8 +124,8 @@ export class RwKinerjaPendingComponent {
                     .setAction((pendingTask: PendingTask) => {
                         this.pendingTask = pendingTask
                         if (pendingTask.flowId == 'siap_flow_2') {
-                            this.getRatingKinerjaList(this.pendingTask.id)
                             this.getPredikatKinerjaList()
+                            this.getRatingKinerjaList(this.pendingTask.id)
                             this.isDetailOpen = true
                         }
                     }, 'info')
@@ -147,9 +147,9 @@ export class RwKinerjaPendingComponent {
             .build()
     }
 
-    deletePendingTask (pendingTask: PendingTask) {
+    deletePendingTask(pendingTask: PendingTask) {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
 
                 this.pendingTaskService
@@ -158,23 +158,23 @@ export class RwKinerjaPendingComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menghapus data antrian'
+                                'Berhasil menghapus data antrian',
                             )
                             this.refresh = !this.refresh
                         },
-                        error: error => {
+                        error: (error) => {
                             console.log('error', error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menghapus data antrian'
+                                'Gagal menghapus data antrian',
                             )
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 
-    handleFormInit () {
+    handleFormInit() {
         this.rwKinerjaForm = new FormGroup({
             predikatKinerjaId: new FormControl('', [Validators.required]),
             ratingHasilId: new FormControl('', [Validators.required]),
@@ -182,7 +182,7 @@ export class RwKinerjaPendingComponent {
             type: new FormControl('', [Validators.required]),
             angkaKredit: new FormControl('', [
                 Validators.required,
-                Validators.pattern('^[0-9]+(\\.[0-9]+)?$')
+                Validators.pattern('^[0-9]+(\\.[0-9]+)?$'),
             ]),
             fileDocEvaluasi: new FormControl('', [Validators.required]),
             fileDocPredikat: new FormControl('', [Validators.required]),
@@ -193,11 +193,11 @@ export class RwKinerjaPendingComponent {
             monthEnd: new FormControl('', []),
             // Hidden controls for actual date values
             dateStart: new FormControl('', [Validators.required]),
-            dateEnd: new FormControl('', [Validators.required])
+            dateEnd: new FormControl('', [Validators.required]),
         })
     }
 
-    patchFormValue () {
+    patchFormValue() {
         const data = this.rwKinerja
 
         this.rwKinerjaForm.patchValue({
@@ -207,7 +207,7 @@ export class RwKinerjaPendingComponent {
             ratingHasilId: data.ratingHasilId,
             ratingKinerjaId: data.ratingKinerjaId,
             type: data.type,
-            angkaKredit: data.angkaKredit
+            angkaKredit: data.angkaKredit,
         })
 
         this.isAnnual = data.type === 'tahunan'
@@ -224,7 +224,7 @@ export class RwKinerjaPendingComponent {
             this.rwKinerjaForm
                 .get('monthStart')
                 ?.setValue(
-                    (startDate.getMonth() + 1).toString().padStart(2, '0')
+                    (startDate.getMonth() + 1).toString().padStart(2, '0'),
                 )
             this.rwKinerjaForm
                 .get('monthEnd')
@@ -239,26 +239,26 @@ export class RwKinerjaPendingComponent {
         }
     }
 
-    handleSubscribe () {
+    handleSubscribe() {
         const typeControl = this.rwKinerjaForm.get('type')
-        typeControl?.valueChanges.subscribe(type => {
+        typeControl?.valueChanges.subscribe((type) => {
             this.isAnnual = type === 'tahunan'
             this.updateFormControlsForType(type)
         })
     }
 
-    updateFormControlsForType (type: string) {
+    updateFormControlsForType(type: string) {
         if (type === 'tahunan') {
             this.rwKinerjaForm.removeControl('monthStart')
             this.rwKinerjaForm.removeControl('monthEnd')
         } else if (type === 'bulanan') {
             this.rwKinerjaForm.addControl(
                 'monthStart',
-                new FormControl('', Validators.required)
+                new FormControl('', Validators.required),
             )
             this.rwKinerjaForm.addControl(
                 'monthEnd',
-                new FormControl('', Validators.required)
+                new FormControl('', Validators.required),
             )
         }
         this.rwKinerjaForm.get('dateStart')?.setValue('')
@@ -271,13 +271,13 @@ export class RwKinerjaPendingComponent {
         }
     }
 
-    onYearSelected () {
+    onYearSelected() {
         const year = this.rwKinerjaForm.get('year')?.value
         this.rwKinerjaForm.get('dateStart')?.setValue(`${year}-01-01`)
         this.rwKinerjaForm.get('dateEnd')?.setValue(`${year}-12-31`)
     }
 
-    onMonthRangeSelected () {
+    onMonthRangeSelected() {
         const startMonth = this.rwKinerjaForm.get('monthStart')?.value
         const endMonth = this.rwKinerjaForm.get('monthEnd')?.value
         const selectedYear = this.rwKinerjaForm.get('year')?.value
@@ -288,7 +288,7 @@ export class RwKinerjaPendingComponent {
             const startDate = new Date(
                 selectedYear,
                 parseInt(startMonth) - 1,
-                1
+                1,
             )
             const endDate = new Date(selectedYear, parseInt(endMonth), 0)
 
@@ -315,163 +315,142 @@ export class RwKinerjaPendingComponent {
         }
     }
 
-    formatDate (date: Date): string {
+    formatDate(date: Date): string {
         const year = date.getFullYear()
         const month = (date.getMonth() + 1).toString().padStart(2, '0')
         const day = date.getDate().toString().padStart(2, '0')
         return `${year}-${month}-${day}`
     }
 
-    fileLoadHandler () {
+    fileLoadHandler() {
         this.inputs = {
             files: {
                 docEvaluas: {
                     label: 'Upload Dokumen Evaluasi Kinerja',
                     source: this.rwKinerja.docEvaluasiUrl,
                     fileName: this.rwKinerja.docEvaluasi,
-                    required: true
+                    required: true,
                 },
                 docPredikat: {
                     label: 'Upload Dokumen Konversi Predikat Kinerja',
                     source: this.rwKinerja.docPredikatUrl,
                     fileName: this.rwKinerja.docPredikat,
-                    required: true
+                    required: true,
                 },
                 docAkumulasiAk: {
                     label: 'Upload Dokumen Akumulasi Angka Kredit',
                     source: this.rwKinerja.docAkumulasiAkUrl,
                     fileName: this.rwKinerja.docAkumulasiAk,
-                    required: true
+                    required: true,
                 },
                 docPenetapanAk: {
                     label: 'Upload Dokumen Penetapan Angka Kredit',
                     source: this.rwKinerja.docPenetapanAkUrl,
                     fileName: this.rwKinerja.docPenetapanAk,
-                    required: true
-                }
+                    required: true,
+                },
             },
             maxSize: 2 * 1024 * 1024,
             allowedTypes: [{ type: 'application/pdf' }],
             listen: (key: string, source: string, base64Data: string) => {
                 if (key == 'docEvaluas')
                     this.rwKinerjaForm.patchValue({
-                        fileDocEvaluasi: base64Data
+                        fileDocEvaluasi: base64Data,
                     })
                 if (key == 'docPredikat')
                     this.rwKinerjaForm.patchValue({
-                        fileDocPredikat: base64Data
+                        fileDocPredikat: base64Data,
                     })
                 if (key == 'docAkumulasiAk')
                     this.rwKinerjaForm.patchValue({
-                        fileDocAkumulasiAk: base64Data
+                        fileDocAkumulasiAk: base64Data,
                     })
                 if (key == 'docPenetapanAk')
                     this.rwKinerjaForm.patchValue({
-                        fileDocPenetapanAk: base64Data
+                        fileDocPenetapanAk: base64Data,
                     })
-            }
+            },
         }
     }
 
-    getRatingKinerjaList (pending_task_id: string) {
+    getRatingKinerjaList(pending_task_id: string) {
         this.ratingLoading$.next(true)
         this.apiService.getData(`/api/v1/rating_kinerja`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.ratingKinerjaList = response.map(
                     (ratingKinerja: { [key: string]: any }) =>
-                        new RatingKinerja(ratingKinerja)
+                        new RatingKinerja(ratingKinerja),
                 )
                 this.getPendingRWKinerja(pending_task_id)
                 this.ratingLoading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
                 this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mengambil data rating kinerja'
+                    'Gagal mengambil data rating kinerja',
                 )
                 this.ratingLoading$.next(false)
-            }
+            },
         })
     }
 
-    getPredikatKinerjaList () {
+    getPredikatKinerjaList() {
         this.predikatLoading$.next(true)
         this.apiService.getData(`/api/v1/predikat_kinerja`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.predikatKinerjaList = response.map(
                     (predikatKinerja: { [key: string]: any }) =>
-                        new PredikatKinerja(predikatKinerja)
+                        new PredikatKinerja(predikatKinerja),
                 )
                 this.predikatLoading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
                 this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mengambil data predikat kinerja'
+                    'Gagal mengambil data predikat kinerja',
                 )
                 this.predikatLoading$.next(false)
-            }
+            },
         })
     }
 
-    getPendingRWKinerja (id: string) {
+    getPendingRWKinerja(id: string) {
         this.rwKinerjaLoading$.next(true)
         this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
-            next: response => {
+            next: (response) => {
                 const pendingTask = new PendingTask(response)
                 this.rwKinerja = new RWKinerja(pendingTask.objectTask.object)
                 this.fileLoadHandler()
                 this.patchFormValue()
                 this.rwKinerjaLoading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
                 this.handlerService.handleAlert(
                     'Error',
-                    'Gagal mengambil data riwayat kinerja'
+                    'Gagal mengambil data riwayat kinerja',
                 )
                 this.rwKinerjaLoading$.next(false)
-            }
+            },
         })
     }
 
-    back () {
-        this.ratingKinerjaList = []
-        this.predikatKinerjaList = []
+    back() {
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwKinerja = new RWKinerja()
+        this.fileLoadHandler()
+        this.rwKinerjaForm.reset()
     }
 
-    handlePayload () {
-        this.rwKinerja.dateEnd = this.rwKinerjaForm.value.dateEnd
-        this.rwKinerja.dateStart = this.rwKinerjaForm.value.dateStart
-        this.rwKinerja.predikatKinerjaId =
-            this.rwKinerjaForm.value.predikatKinerjaId
-        this.rwKinerja.ratingHasilId = this.rwKinerjaForm.value.ratingHasilId
-        this.rwKinerja.ratingKinerjaId =
-            this.rwKinerjaForm.value.ratingKinerjaId
-        this.rwKinerja.type = this.rwKinerjaForm.value.type
-        this.rwKinerja.angkaKredit = this.rwKinerjaForm.value.angkaKredit
-        this.rwKinerja.fileDocEvaluasi =
-            this.rwKinerjaForm.value.fileDocEvaluasi
-        this.rwKinerja.fileDocPredikat =
-            this.rwKinerjaForm.value.fileDocPredikat
-        this.rwKinerja.fileDocAkumulasiAk =
-            this.rwKinerjaForm.value.fileDocAkumulasiAk
-        this.rwKinerja.fileDocPenetapanAk =
-            this.rwKinerjaForm.value.fileDocPenetapanAk
-    }
-
-    submit () {
+    submit() {
         this.confirmationService.open(false).subscribe({
-            next: result => {
+            next: (result) => {
                 if (!result.confirmed) return
                 this.submitLoading$.next(true)
 
-                // this.handlePayload()
                 this.rwKinerja = new RWKinerja(this.rwKinerjaForm.value)
                 const task = new Task()
                 task.id = this.pendingTask.id
@@ -484,21 +463,21 @@ export class RwKinerjaPendingComponent {
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Berhasil menyimpan perubahan data'
+                                'Berhasil menyimpan perubahan data',
                             )
                             this.submitLoading$.next(false)
                             this.back()
                         },
-                        error: error => {
+                        error: (error) => {
                             console.log('error', error)
                             this.handlerService.handleAlert(
                                 'Error',
-                                'Gagal menyimpan perubahan data'
+                                'Gagal menyimpan perubahan data',
                             )
                             this.submitLoading$.next(false)
-                        }
+                        },
                     })
-            }
+            },
         })
     }
 }
