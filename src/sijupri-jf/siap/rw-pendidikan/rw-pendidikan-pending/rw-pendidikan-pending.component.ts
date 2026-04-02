@@ -236,6 +236,8 @@ export class RwPendidikanPendingComponent {
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwPendidikan = new RWPendidikan()
+        this.fileLoadHandler()
+        this.rwPendidikanForm.reset()
     }
 
     submit () {

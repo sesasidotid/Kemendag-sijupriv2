@@ -277,6 +277,8 @@ export class RwJabatanPendingComponent {
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwJabatan = new RWJabatan()
+        this.fileLoadHandler()
+        this.rwJabatanForm.reset()
     }
 
     submit () {

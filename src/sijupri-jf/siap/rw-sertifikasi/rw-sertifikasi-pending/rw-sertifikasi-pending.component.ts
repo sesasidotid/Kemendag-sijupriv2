@@ -332,6 +332,8 @@ export class RwSertifikasiPendingComponent {
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwSertifikasi = new RWSertifikasi()
+        this.fileLoadHandler()
+        this.rwSertifikasiForm.reset()
     }
 
     submit () {

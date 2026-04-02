@@ -239,6 +239,8 @@ export class RwKompetensiPendingComponent {
         this.pendingTask = null
         this.isDetailOpen = false
         this.rwKompetensi = new RWKompetensi()
+        this.fileLoadHandler()
+        this.rwKompetensiForm.reset()
     }
 
     submit () {

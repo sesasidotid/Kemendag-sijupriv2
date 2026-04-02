@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, ElementRef, Input, ViewChild } from '@angular/core'
+import { Component, ElementRef, Input, ViewChild, OnChanges, SimpleChanges } from '@angular/core'
 import { FilePreviewService } from '../../services/file-preview.service'
 import { FIleHandler } from '../../commons/file-handler/file-handler'
 import { FileConverterService } from '../../services/file-converter.service'
@@ -13,7 +13,7 @@ import { HandlerService } from '../../services/handler.service'
     templateUrl: './file-handler.component.html',
     styleUrl: './file-handler.component.scss',
 })
-export class FileHandlerComponent {
+export class FileHandlerComponent implements OnChanges {
     @ViewChild('container') containerRef!: ElementRef
 
     @Input() inputs: FIleHandler
@@ -45,6 +45,17 @@ export class FileHandlerComponent {
     }
 
     ngOnInit() {
+        this.loadFiles()
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['inputs'] && !changes['inputs'].firstChange) {
+            this.fileNames = {}
+            this.loadFiles()
+        }
+    }
+
+    loadFiles() {
         for (const key in this.inputs.files) {
             if (
                 this.inputs.files[key].fileName &&
