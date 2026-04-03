@@ -2,21 +2,24 @@ import { Serializable } from '../../base/commons/serializable'
 
 export class UkomGrade extends Serializable {
     id: string = undefined
-    nbCat: number = undefined
-    catGradeId: string = undefined
-    catGradeScore: number = undefined
-    nbWawancara: number = undefined
-    wawancaraGradeId: string = undefined
-    wawancaraGradeScore: number = undefined
-    nbSeminar: number = undefined
-    seminarGradeId: string = undefined
-    seminarGradeScore: number = undefined
-    nbPraktik: number = undefined
-    praktikGradeId: string = undefined
-    praktikGradeScore: number = undefined
-    nbPortofolio: number = undefined
-    portofolioGradeId: string = undefined
-    portofolioGradeScore: number = undefined
+    nbCat: number | null = undefined
+    catGradeId: string | null = undefined
+    catGradeScore: number | null = undefined
+    nbWawancara: number | null = undefined
+    wawancaraGradeId: string | null = undefined
+    wawancaraGradeScore: number | null = undefined
+    nbSeminar: number | null = undefined
+    seminarGradeId: string | null = undefined
+    seminarGradeScore: number | null = undefined
+    nbPraktik: number | null = undefined
+    praktikGradeId: string | null = undefined
+    praktikGradeScore: number | null = undefined
+    nbPortofolio: number | null = undefined
+    portofolioGradeId: string | null = undefined
+    portofolioGradeScore: number | null = undefined
+    studiKasusGradeId: string | null = undefined
+    studiKasusGradeScore: number | null = undefined
+    nbStudiKasus: number | null = undefined
     jpm: number = undefined
     score: number = undefined
     ukt: number = undefined
@@ -39,6 +42,7 @@ export class UkomGrade extends Serializable {
     seminarGrade: Grade = undefined
     praktikGrade: Grade = undefined
     portofolioGrade: Grade = undefined
+    studiKasusGrade: Grade = undefined
     constructor(object?: Partial<UkomGrade>) {
         super()
         if (object) this.fromObject(object)

@@ -147,6 +147,13 @@ export class UkomGradeListComponent {
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
+                    .withDynamicValue('Skor Studi Kasus', (item: UkomGrade) => {
+                        return this.rounding(item.studiKasusGradeScore)
+                    })
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
                     .withDynamicValue('UKT', (item: UkomGrade) => {
                         return this.rounding(item.ukt)
                     })
@@ -180,7 +187,13 @@ export class UkomGradeListComponent {
                     })
                     .build(),
             )
-
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('NB Studi Kasus', (item: UkomGrade) => {
+                        return this.rounding(item.nbStudiKasus)
+                    })
+                    .build(),
+            )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Portofolio', (item: UkomGrade) => {
