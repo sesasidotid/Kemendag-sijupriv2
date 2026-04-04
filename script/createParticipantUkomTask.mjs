@@ -15,7 +15,7 @@ const CONFIG = {
     bearerToken: "",
 
     // Runs this many POST requests.
-    requestCount: 5,
+    requestCount: 2,
 
     // Delay between requests in milliseconds.
     delayMs: 5000,

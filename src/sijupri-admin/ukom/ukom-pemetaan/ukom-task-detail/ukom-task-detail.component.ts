@@ -253,7 +253,7 @@ export class UkomTaskDetailComponent {
     assignPredikat1ById(predikatId: string) {
         this.predikatKinerjaService.findById(predikatId).subscribe({
             next: (response) => {
-                this.predikat1Name = response.name ?? null
+                this.predikat1Name = response.name ?? '-'
             },
         })
     }
@@ -261,7 +261,7 @@ export class UkomTaskDetailComponent {
     assignPredikat2ById(predikatId: string) {
         this.predikatKinerjaService.findById(predikatId).subscribe({
             next: (response) => {
-                this.predikat2Name = response.name ?? null
+                this.predikat2Name = response.name ?? '-'
             },
         })
     }
@@ -415,11 +415,11 @@ export class UkomTaskDetailComponent {
                         )
                     }
 
-                    if (participant.predikatKinerja1Id) {
+                    if (participant.predikatKinerja1Id != null) {
                         this.assignPredikat1ById(participant.predikatKinerja1Id)
                     }
 
-                    if (participant.predikatKinerja2Id) {
+                    if (participant.predikatKinerja2Id != null) {
                         this.assignPredikat2ById(participant.predikatKinerja2Id)
                     }
 
