@@ -26,8 +26,8 @@ export class ScheduleSlotService {
     private readonly MIDDAY_UNAVAILABLE_END_HOUR = 13 // 13:00
 
     /** Feature toggle */
-    private disableUnavailableHours = false
-
+    private disableUnavailableHours = true
+    private disableWeekend = true
     /**
      * Parse date string as UTC+7 time (no timezone conversion)
      * Input: '2025-01-15T08:00:00' or '2025-01-15 08:00:00' -> Date with UTC time 08:00 (treated as UTC+7)
@@ -72,8 +72,13 @@ export class ScheduleSlotService {
             }
 
             // Check if slot falls on weekend
-            if (this.isWeekend(currentSlotStart)) {
-                // Skip to next Monday 08:00
+            // if (this.isWeekend(currentSlotStart)) {
+            //     // Skip to next Monday 08:00
+            //     const nextAvailableTime = this.getNextWeekday(currentSlotStart)
+            //     currentSlotStart = nextAvailableTime
+            //     continue
+            // }
+            if (!this.disableWeekend && this.isWeekend(currentSlotStart)) {
                 const nextAvailableTime = this.getNextWeekday(currentSlotStart)
                 currentSlotStart = nextAvailableTime
                 continue

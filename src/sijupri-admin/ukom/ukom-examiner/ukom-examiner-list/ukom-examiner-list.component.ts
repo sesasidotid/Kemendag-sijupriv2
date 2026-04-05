@@ -275,7 +275,7 @@ export class UkomExaminerListComponent implements OnInit {
                 if (!response.confirmed) return
 
                 this.ukomExaminerService
-                    .deleteExaminerByUsername(examiner.nip)
+                    .deleteExaminerByUsername(examiner.id)
                     .subscribe({
                         next: () => {
                             this.handlerService.handleAlert(
