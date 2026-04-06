@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core'
 import { ApiService } from './api.service'
 import { SystemConfig } from '../models/system-config.model'
-import { BehaviorSubject, catchError, finalize, map, of } from 'rxjs'
+import {
+    BehaviorSubject,
+    catchError,
+    finalize,
+    map,
+    Observable,
+    of,
+} from 'rxjs'
 
 @Injectable({
     providedIn: 'root',
@@ -16,6 +23,15 @@ export class SystemConfigService {
     isLoading$ = this.isLoadingSubject.asObservable()
 
     constructor(private apiService: ApiService) {}
+
+    getAll(): Observable<SystemConfig[]> {
+        return this.apiService.getData(`${this.BASE_PATH}`).pipe(
+            catchError((err) => {
+                console.error(err)
+                return of([])
+            }),
+        )
+    }
 
     checkUkomRegistration() {
         this.isLoadingSubject.next(true)

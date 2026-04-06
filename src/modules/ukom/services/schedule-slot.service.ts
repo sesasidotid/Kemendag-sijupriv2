@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { SystemConfigService } from '../../base/services/system-config.service'
 import {
     MainSchedule,
     ParticipantSchedule,
@@ -20,14 +21,19 @@ import {
     providedIn: 'root',
 })
 export class ScheduleSlotService {
-    private readonly UNAVAILABLE_START_HOUR = 17 // 17:00 UTC+7
-    private readonly UNAVAILABLE_END_HOUR = 8 // 08:00 UTC+7
-    private readonly MIDDAY_UNAVAILABLE_START_HOUR = 12 // 12:00
-    private readonly MIDDAY_UNAVAILABLE_END_HOUR = 13 // 13:00
+    private UNAVAILABLE_START_HOUR = 17 // 17:00 UTC+7
+    private UNAVAILABLE_END_HOUR = 8 // 08:00 UTC+7
+    private MIDDAY_UNAVAILABLE_START_HOUR = 12 // 12:00
+    private MIDDAY_UNAVAILABLE_END_HOUR = 13 // 13:00
 
     /** Feature toggle */
     private disableUnavailableHours = true
     private disableWeekend = true
+
+    constructor(private systemConfigService: SystemConfigService) {
+        this.loadConfig()
+    }
+
     /**
      * Parse date string as UTC+7 time (no timezone conversion)
      * Input: '2025-01-15T08:00:00' or '2025-01-15 08:00:00' -> Date with UTC time 08:00 (treated as UTC+7)
@@ -221,6 +227,31 @@ export class ScheduleSlotService {
         return `${day}/${month}/${year} ${hours}:${minutes} WIB`
     }
 
+    private loadConfig() {
+        this.systemConfigService.getAll().subscribe((data) => {
+            const findVal = (code: string) =>
+                data.find((c: any) => c.code === code)?.value
+
+            const startAt = findVal('UKOM_SCHEDULE_START_AT')
+            if (startAt != null) this.UNAVAILABLE_END_HOUR = Number(startAt)
+
+            const endAt = findVal('UKOM_SCHEDULE_END_AT')
+            if (endAt != null) this.UNAVAILABLE_START_HOUR = Number(endAt)
+
+            const lunchStart = findVal('UKOM_SCHEDULE_START_LUNCH_AT')
+            if (lunchStart != null)
+                this.MIDDAY_UNAVAILABLE_START_HOUR = Number(lunchStart)
+
+            const lunchEnd = findVal('UKOM_SCHEDULE_END_LUNCH_AT')
+            if (lunchEnd != null)
+                this.MIDDAY_UNAVAILABLE_END_HOUR = Number(lunchEnd)
+
+            const weekendAllowed = findVal('UKOM_SCHEDULE_IS_WEEKEN_ALLOWED')
+            if (weekendAllowed != null)
+                this.disableWeekend = weekendAllowed.toLowerCase() === 'tidak'
+        })
+    }
+
     /**
      * Get hour from date (treating it as UTC+7)
      * Uses UTC methods to ignore browser timezone
@@ -347,8 +378,10 @@ export class ScheduleSlotService {
         eveningNightEnd.setUTCDate(eveningNightEnd.getUTCDate() + 1)
         eveningNightEnd.setUTCHours(0, 0, 0, 0)
 
-        const inMorningNight = slotStart < morningNightEnd && slotEnd > morningNightStart
-        const inEveningNight = slotStart < eveningNightEnd && slotEnd > eveningNightStart
+        const inMorningNight =
+            slotStart < morningNightEnd && slotEnd > morningNightStart
+        const inEveningNight =
+            slotStart < eveningNightEnd && slotEnd > eveningNightStart
 
         return inMorningNight || inEveningNight
     }
