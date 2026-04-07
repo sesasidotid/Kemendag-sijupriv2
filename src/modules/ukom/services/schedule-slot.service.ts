@@ -27,7 +27,7 @@ export class ScheduleSlotService {
     private MIDDAY_UNAVAILABLE_END_HOUR = 13 // 13:00
 
     /** Feature toggle */
-    private disableUnavailableHours = true
+    private disableUnavailableHours = false
     private disableWeekend = true
 
     constructor(private systemConfigService: SystemConfigService) {

@@ -7,7 +7,10 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { ExamType, ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import {
+    ExamType,
+    ExamTypeCategory,
+} from '@/modules/ukom/models/exam-type.model'
 import { finalize, Observable } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ImportQuestionRequest } from '@/modules/ukom/models/ukom-module-refactor/import-question-request.model'
@@ -20,7 +23,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '@/modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { PageFilter } from '@/modules/base/commons/pagable/page-filter'
@@ -161,9 +164,9 @@ export class UkomQuestionImportComponent {
                         .build(),
                 )
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Pertanyaan', 'question').withTitle((data:UkomQuestion)=>(
-                        data.question
-                    )).build(),
+                    new PrimaryColumnBuilder('Pertanyaan', 'question')
+                        .withTitle((data: UkomQuestion) => data.question)
+                        .build(),
                 )
                 // .addPrimaryColumn(
                 //     new PrimaryColumnBuilder('Modul Ukom', 'moduleId').build(),

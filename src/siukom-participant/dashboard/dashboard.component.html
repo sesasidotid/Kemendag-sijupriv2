@@ -436,22 +436,24 @@
                                     <span
                                         class="mdi mdi-clock-check-outline me-2"
                                     ></span>
-                                  <div>
-                                  <div class="note-title">
-                                    Jadwal Praktik Telah Berakhir
-                                  </div>
-                                  <div class="note-text">
-                                    Ujian telah selesai. Saat ini sedang
-                                    menunggu penilaian dari penguji. Silahkan
-                                    unggah hasil praktik jika dibutuhkan.
-                                  </div></div>
+                                    <div>
+                                        <div class="note-title">
+                                            Jadwal Praktik Telah Berakhir
+                                        </div>
+                                        <div class="note-text">
+                                            Ujian telah selesai. Saat ini sedang
+                                            menunggu penilaian dari penguji.
+                                            Silahkan unggah laporan praktikum
+                                            jika dibutuhkan.
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <app-loading-button
                                     (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
                                     [className]="'btn-action-primary'"
                                     [isLoading]="startPraktikLoading()"
-                                    [label]="'Unggah video persiapan / hasil praktik'"
+                                    [label]="'Unggah video persiapan / laporan praktik'"
                                 ></app-loading-button>
                             </div>
                         </ng-container>

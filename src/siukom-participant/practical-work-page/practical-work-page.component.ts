@@ -84,7 +84,10 @@ export class PracticalWorkPageComponent implements OnInit {
     answerFile = signal('')
     inputs = signal<FIleHandler>({
         files: {
-            answerFile: { label: 'Dokumen Hasil Kerja', required: false },
+            answerFile: {
+                label: 'Unggah laporan praktikum Anda disini',
+                required: false,
+            },
         },
         allowedTypes: [{ label: 'pdf', type: 'application/pdf' }],
         maxSize: 2 * 1024 * 1024,
@@ -282,7 +285,7 @@ export class PracticalWorkPageComponent implements OnInit {
                         next: (res) => {
                             this.handlerService.handleAlert(
                                 'Success',
-                                'Dokumen pendukung berhasil diunggah',
+                                'Laporan praktikum berhasil diunggah',
                             )
                             // Refetch question to update preview with new answer
                             this.getQuestion()
@@ -309,7 +312,7 @@ export class PracticalWorkPageComponent implements OnInit {
         this.inputs.set({
             files: {
                 answerFile: {
-                    label: 'Dokumen Hasil Kerja',
+                    label: 'Unggah laporan praktikum Anda disini',
                     required: false,
                     ...(hasAnswer && {
                         fileName: question.answerDto.answerUpload,
