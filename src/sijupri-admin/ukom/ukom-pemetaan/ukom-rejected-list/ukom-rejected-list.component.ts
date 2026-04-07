@@ -6,9 +6,8 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder,
+    PrimaryColumnBuilder
 } from '../../../../modules/base/commons/pagable/pagable-builder'
-import { ApiService } from '../../../../modules/base/services/api.service'
 import { CommonModule } from '@angular/common'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { FailedTask } from '@/modules/ukom/models/ukom-registration-refactored/failed-task.model'
@@ -78,7 +77,8 @@ export class UkomRejectedListComponent {
             )
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('name')
+                    // .setProperty('user|name')
+                    .setProperty('objectName')
                     .withField('Nama', 'text')
                     .build(),
             )
