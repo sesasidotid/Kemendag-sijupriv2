@@ -340,6 +340,12 @@ export class DashboardComponent implements OnInit {
         return this.formatPersonalScheduleStart(time) + ' (WIB)'
     }
 
+    canEnterExam(pSchedule: any, exam: GroupedExam): boolean {
+        const now = this.nowGmt7()
+        const time = pSchedule.personalSchedule ?? exam.schedule.startTime
+        return now >= time
+    }
+
     formatDateRange(startTime: string, endTime: string): string {
         const start = this.parseRawDate(startTime)
         const end = this.parseRawDate(endTime)
@@ -463,7 +469,14 @@ export class DashboardComponent implements OnInit {
             } else if (now < startTime) {
                 status = 'upcoming'
             } else {
-                status = 'completed'
+                const participants = schedule.participantScheduleList || []
+                const allExamined = participants.length > 0 ? participants.every((p) => p.examined === true) : true
+
+                if (!allExamined) {
+                    status = 'ongoing'
+                } else {
+                    status = 'completed'
+                }
             }
 
             grouped.push({

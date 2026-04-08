@@ -295,6 +295,7 @@
                                 </div>
                             </div>
                             <button
+                                *ngIf="canEnterExam(pSchedule, exam)"
                                 (click)="
                                         enterExam(
                                             pSchedule.participantId,
@@ -648,6 +649,7 @@
                                 </div>
                             </div>
                             <button
+                                *ngIf="canEnterExam(pSchedule, exam)"
                                 (click)="
                                         enterExam(
                                             pSchedule.participantId,
