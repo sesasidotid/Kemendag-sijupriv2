@@ -40,6 +40,7 @@ export class SeminarMakalahExamScheduleRequest extends BaseExamScheduleRequest {
     seminarEndTime: string = undefined
     duration: string = undefined
     participantIdList: string[] = []
+    examinerAmount: number = undefined
 
     constructor(object: { [key: string]: any }) {
         super()

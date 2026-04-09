@@ -105,6 +105,39 @@
         <small class="form-text text-muted"> Durasi ujian dalam menit </small>
     </div>
 
+    <div *ngIf="isFieldVisible('examinerAmount')" class="mb-3">
+        <label class="form-label fw-bold" for="examinerAmount">
+            Jumlah Penguji
+            <span *ngIf="isFieldRequired('examinerAmount')" class="text-danger"
+                >*</span
+            >
+        </label>
+
+        <div class="input-group">
+            <select
+                appInvalidOnTouch
+                class="form-control"
+                formControlName="examinerAmount"
+                id="examinerAmount"
+            >
+                <option disabled selected value="">Pilih jumlah penguji</option>
+                <option [value]="1">1</option>
+                <option [value]="2">2</option>
+            </select>
+
+            <div
+                *ngIf="getError('examinerAmount', 'Jumlah Penguji')"
+                class="invalid-feedback"
+            >
+                {{ getError('examinerAmount', 'Jumlah Penguji') }}
+            </div>
+        </div>
+
+        <small class="form-text text-muted">
+            Jumlah penguji hanya boleh 1 atau 2
+        </small>
+    </div>
+
     <div *ngIf="isFieldVisible('secretKey')" class="mb-3">
         <label class="form-label fw-bold" for="secretKey"
             >Secret Key

@@ -1,13 +1,7 @@
 import { CommonModule, Location } from '@angular/common'
 import { Component, inject, OnInit, signal } from '@angular/core'
 import { LucideAngularModule } from 'lucide-angular'
-import {
-    FormBuilder,
-    FormGroup,
-    FormsModule,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms'
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -19,7 +13,7 @@ import { JenisUkom } from '@/modules/ukom/models/jenis-ukom'
 import {
     ActionColumnBuilder,
     PagableBuilder,
-    PrimaryColumnBuilder,
+    PrimaryColumnBuilder
 } from '@/modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
@@ -31,10 +25,7 @@ import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.
 import { DurationPipe } from '@/modules/base/pipes/duration.pipe'
 import { UkomExamScheduleUpdateComponent } from '../ukom-exam-schedule-update/ukom-exam-schedule-update.component'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
-import {
-    MultiSelectComponent,
-    MultiSelectOption,
-} from '@/modules/base/components/multi-select'
+import { MultiSelectComponent, MultiSelectOption } from '@/modules/base/components/multi-select'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import {
@@ -43,7 +34,7 @@ import {
     OtherExamScheduleRequest,
     PraktikExamScheduleRequest,
     SeminarMakalahExamScheduleRequest,
-    WawancaraExamScheduleRequest,
+    WawancaraExamScheduleRequest
 } from '@/modules/ukom/models/exam-schedule/create-exam-schedule-request.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { RoomParticipant } from '@/modules/ukom/models/room/room-participant.model'
@@ -103,6 +94,13 @@ const UKOM_FORM_CONFIG: Record<string, ExamTypeFormConfig> = {
             { controlName: 'startTime', validators: [Validators.required] },
             { controlName: 'endTime', validators: [Validators.required] },
             { controlName: 'participantIdList', validators: [] },
+            {
+                controlName: 'examinerAmount',
+                validators: [
+                    Validators.required,
+                    Validators.pattern(/^(1|2)$/),
+                ],
+            },
         ],
         secondary: {
             label: 'Jadwal Seminar',
@@ -252,16 +250,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     })
                     .build(),
             )
-            // .addPrimaryColumn(
-            //     new PrimaryColumnBuilder()
-            //         .withDynamicValue('Jenis Ukom', (data: ExamSchedule) => {
-            //             if (data.examScheduleChild){}
-            //             return this.ukomMiscellaneousService.getModuleDisplayName(
-            //                 data.examTypeCode,
-            //             )
-            //         })
-            //         .build(),
-            // )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Jenis Ukom', (data: ExamSchedule) => {
@@ -282,16 +270,6 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     })
                     .build(),
             )
-            // .addPrimaryColumn(
-            //     new PrimaryColumnBuilder()
-            //         .withDynamicValue('Penguji', (data: ExamSchedule) => {
-            //             return this.mapExaminersToNames(data.examiners)
-            //         })
-            //         .withTitle((data: ExamSchedule) => {
-            //             return this.mapExaminersToNames(data.examiners)
-            //         })
-            //         .build(),
-            // )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Penguji', (data: ExamSchedule) => {
@@ -741,6 +719,7 @@ export class UkomExamScheduleAddComponent implements OnInit {
                     seminarEndTime: v.endTime2,
                     duration: v.duration2,
                     participantIdList: v.participantIdList ?? [],
+                    examinerAmount: v.examinerAmount,
                 })
             case ExamTypeCategory.PRAKTIK:
                 return new PraktikExamScheduleRequest({
