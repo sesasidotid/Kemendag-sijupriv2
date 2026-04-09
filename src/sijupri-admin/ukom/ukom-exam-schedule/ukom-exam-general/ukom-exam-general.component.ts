@@ -55,19 +55,25 @@ export class UkomExamGeneralComponent {
     participantsWithExaminers = computed(() => {
         const examinerMap = this.examinerMap()
         return this.participantList().map((participant) => {
+            const supervisedData = participant.examScheduleSupervised
+            const supervisedList = Array.isArray(supervisedData)
+                ? supervisedData
+                : supervisedData
+                  ? [supervisedData]
+                  : []
+
             // Get examiners from examScheduleSupervised array
             const examinerNames =
-                participant.examScheduleSupervised
-                    ?.map((supervised) => {
+                supervisedList
+                    .map((supervised) => {
                         const examinerId = supervised.examinerScheduleId
                         return examinerMap.get(examinerId) || 'Unknown'
                     })
                     .join(', ') || 'Belum ada penguji'
 
-            const examinerIds =
-                participant.examScheduleSupervised?.map(
-                    (supervised) => supervised.examinerScheduleId,
-                ) || []
+            const examinerIds = supervisedList.map(
+                (supervised: any) => supervised.examinerScheduleId,
+            )
 
             return {
                 ...participant,

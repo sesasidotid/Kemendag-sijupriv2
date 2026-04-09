@@ -262,7 +262,7 @@ export class UkomExamWawancaraComponent implements OnInit {
                 field: 'endTime',
                 width: 140,
                 valueFormatter: (params) =>
-                    this.slotService.formatTimeSlot(params.value),
+                    this.slotService.formatDateTime(params.value),
             },
             {
                 headerName: 'Peserta',
@@ -375,13 +375,13 @@ export class UkomExamWawancaraComponent implements OnInit {
         this.allSlots.set(slots)
 
         if (this.gridApi) {
-            const api = this.gridApi as any;
+            const api = this.gridApi as any
             if (api.setRowData) {
-                api.setRowData(slots);
+                api.setRowData(slots)
             } else if (api.setGridOption) {
-                api.setGridOption('rowData', slots);
+                api.setGridOption('rowData', slots)
             } else {
-                api.refreshCells();
+                api.refreshCells()
             }
         }
     }

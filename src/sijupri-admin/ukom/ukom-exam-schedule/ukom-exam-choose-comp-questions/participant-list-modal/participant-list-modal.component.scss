@@ -5,3 +5,9 @@
 //        }
 //    }
 //}
+
+::ng-deep .ag-theme-alpine {
+    .row-has-schedule {
+        background-color: var(--bs-success-bg-subtle, #d1e7dd) !important;
+    }
+}

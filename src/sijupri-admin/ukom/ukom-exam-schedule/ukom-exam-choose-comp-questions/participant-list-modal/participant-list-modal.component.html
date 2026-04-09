@@ -11,7 +11,7 @@
         </div>
 
         <ag-grid-angular (gridReady)="onGridReady($event)" *ngIf="participantList.length > 0" [columnDefs]="columnDefs"
-            [defaultColDef]="defaultColDef" [pagination]="true" [paginationPageSize]="20" [rowData]="participantList"
+            [defaultColDef]="defaultColDef" [rowClassRules]="rowClassRules" [pagination]="true" [paginationPageSize]="20" [rowData]="participantList"
             [suppressCellFocus]="true" class="ag-theme-alpine" style="height: 500px; width: 100%">
         </ag-grid-angular>
     </div>

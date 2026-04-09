@@ -11,8 +11,15 @@ import { FormsModule } from '@angular/forms'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exam-schedule-participant-list.model'
 import { AgGridAngular } from 'ag-grid-angular'
-import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
+import {
+    ColDef,
+    GridApi,
+    GridReadyEvent,
+    RowClassRules,
+} from 'ag-grid-community'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { ScheduleSlotService } from '@/modules/ukom/services/schedule-slot.service'
 
 @Component({
     selector: 'app-participant-list-modal',
@@ -28,6 +35,7 @@ export class ParticipantListModalComponent implements OnInit {
     @Output() close = new EventEmitter<void>()
 
     jenisUkomService = inject(JenisUkomService)
+    slotService = inject(ScheduleSlotService)
     columnDefs: ColDef[] = [
         {
             headerName: 'No',
@@ -96,6 +104,14 @@ export class ParticipantListModalComponent implements OnInit {
             },
         },
     ]
+
+    rowClassRules: RowClassRules = {
+        'row-has-schedule': (params) => {
+            const data = params.data as ParticipantScheduleList
+            return !!data.personalSchedule
+        },
+    }
+
     defaultColDef: ColDef = {
         sortable: true,
         filter: true,
@@ -103,7 +119,35 @@ export class ParticipantListModalComponent implements OnInit {
     }
     private gridApi!: GridApi
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        if (
+            this.examTypeCode &&
+            ![
+                ExamTypeCategory.CAT,
+                ExamTypeCategory.PORTOFOLIO,
+                ExamTypeCategory.STUDI_KASUS,
+            ].includes(this.examTypeCode as ExamTypeCategory)
+        ) {
+            this.columnDefs = [
+                ...this.columnDefs,
+                {
+                    headerName: 'Jadwal Peserta',
+                    field: 'personalSchedule',
+                    width: 200,
+                    valueGetter: (params) => {
+                        const participant =
+                            params.data as ParticipantScheduleList
+                        // return participant.personalSchedule || '—'
+                        return this.slotService.formatDateTime(
+                            this.slotService.parseAsUTC7(
+                                participant.personalSchedule,
+                            ),
+                        )
+                    },
+                },
+            ]
+        }
+    }
 
     onGridReady(params: GridReadyEvent): void {
         this.gridApi = params.api

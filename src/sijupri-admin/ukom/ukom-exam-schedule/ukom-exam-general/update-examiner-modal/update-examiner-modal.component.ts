@@ -94,11 +94,15 @@ export class UpdateExaminerModalComponent implements OnInit {
     ngOnInit(): void {
         // Get current examiner IDs from participant's examScheduleSupervised
         if (this.participant.examScheduleSupervised) {
-            const currentIds = this.participant.examScheduleSupervised.map(
+            const supervisedData = this.participant.examScheduleSupervised
+            const supervisedList = Array.isArray(supervisedData)
+                ? supervisedData
+                : [supervisedData]
+
+            const currentIds = supervisedList.map(
                 (supervised) => supervised.examinerScheduleId,
             )
             this.currentExaminerIds.set(currentIds)
-            // Initialize with first current examiner (single selection)
             if (currentIds.length > 0) {
                 this.selectedExaminerId.set(currentIds[0])
                 this.selectedExaminerIds.set([currentIds[0]])

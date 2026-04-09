@@ -230,7 +230,7 @@ export class UkomExamPraktikComponent implements OnInit {
                 field: 'endTime',
                 width: 140,
                 valueFormatter: (params) =>
-                    this.slotService.formatTimeSlot(params.value),
+                    this.slotService.formatDateTime(params.value),
             },
             {
                 headerName: 'Peserta',
