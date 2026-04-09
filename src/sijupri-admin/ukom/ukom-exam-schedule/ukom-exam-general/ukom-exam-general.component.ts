@@ -19,7 +19,7 @@ import { AlertService } from '@/modules/base/services/alert.service'
 
 /**
  * Generic component for displaying exam schedules without time slots
- * Used for: PRAKTIK, PORTOFOLIO, STUDI_KASUS
+ * Used for: PORTOFOLIO, STUDI_KASUS
  *
  * Features:
  * - Displays participant list with their examiners
@@ -40,10 +40,8 @@ export class UkomExamGeneralComponent {
     examinerList = input.required<ExaminerScheduleList[]>()
     participantList = input<ParticipantScheduleList[]>([])
 
-    // Modal state
     showExaminerModal = signal<boolean>(false)
     selectedParticipant = signal<ParticipantScheduleList | null>(null)
-    // Build examiner map for quick lookup
     examinerMap = computed(() => {
         const map = new Map<string, string>()
         this.examinerList().forEach((examiner) => {
@@ -51,7 +49,6 @@ export class UkomExamGeneralComponent {
         })
         return map
     })
-    // Enhanced participant data with examiner names
     participantsWithExaminers = computed(() => {
         const examinerMap = this.examinerMap()
         return this.participantList().map((participant) => {
@@ -62,7 +59,6 @@ export class UkomExamGeneralComponent {
                   ? [supervisedData]
                   : []
 
-            // Get examiners from examScheduleSupervised array
             const examinerNames =
                 supervisedList
                     .map((supervised) => {
@@ -82,7 +78,6 @@ export class UkomExamGeneralComponent {
             }
         })
     })
-    // AG Grid configuration
     columnDefs: ColDef[] = [
         {
             headerName: 'No',
@@ -108,20 +103,26 @@ export class UkomExamGeneralComponent {
         },
         {
             headerName: 'Penguji',
-            field: 'examinerNamesDisplay',
             flex: 1,
+            valueGetter: (params: any) => {
+                const examinerNames = params.data?.examinerNamesDisplay
+
+                if (!examinerNames || examinerNames.length === 0) {
+                    return 'Belum ada penguji'
+                }
+
+                return examinerNames
+            },
             cellRenderer: (params: any) => {
-                const examinerNames = params.value
-                if (examinerNames === 'Belum ada penguji') {
+                if (params.value === 'Belum ada penguji') {
                     return '<span class="text-muted">Belum ada penguji</span>'
                 }
-                return examinerNames
+                return params.value
             },
         },
         {
             headerName: 'Aksi',
             width: 180,
-            // cellClass: 'text-center',
             cellRenderer: () => {
                 return `<button class="btn btn-sm btn-info" data-action="update-examiner">
                     <i class="mdi mdi-account-edit me-1"></i>Ubah Penguji
@@ -142,45 +143,31 @@ export class UkomExamGeneralComponent {
         filter: true,
         resizable: true,
     }
-    // Service injection
     private examScheduleService = inject(UkomExamScheduleService)
     private alertService = inject(AlertService)
     private gridApi!: GridApi
 
-    /**
-     * Handle AG Grid ready event
-     */
     onGridReady(params: GridReadyEvent): void {
         this.gridApi = params.api
         this.gridApi.sizeColumnsToFit()
     }
 
-    /**
-     * Open examiner update modal for a participant
-     */
     openExaminerModal(participant: ParticipantScheduleList): void {
         this.selectedParticipant.set(participant)
         this.showExaminerModal.set(true)
     }
 
-    /**
-     * Close examiner update modal
-     */
     closeExaminerModal(): void {
         this.showExaminerModal.set(false)
         this.selectedParticipant.set(null)
     }
 
-    /**
-     * Confirm examiner update action
-     */
     confirmExaminerUpdate(event: {
         participant: ParticipantScheduleList
         examinerIds: string[]
     }): void {
         const { participant, examinerIds } = event
 
-        // Validate that exactly one examiner is selected
         if (examinerIds.length !== 1) {
             this.alertService.showToast(
                 'Warning',
@@ -189,13 +176,11 @@ export class UkomExamGeneralComponent {
             return
         }
 
-        // Create request payload
         const request = new UpdateExaminerForParticipantRequest({
             participantScheduleId: participant.id,
             examinerScheduleIdList: examinerIds,
         })
 
-        // Call API to update examiner
         this.examScheduleService
             .updateExaminerForParticipantScheduleByParticipantScheduleId(
                 request,
@@ -207,10 +192,7 @@ export class UkomExamGeneralComponent {
                         'Penguji berhasil diubah',
                     )
 
-                    // Close modal
                     this.closeExaminerModal()
-
-                    // Refresh participant list
                     this.participantListRefresh.emit()
                 },
                 error: (error) => {

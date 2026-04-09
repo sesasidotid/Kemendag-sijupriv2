@@ -10,7 +10,7 @@ import {
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { CommonModule } from '@angular/common'
-import { combineLatest, finalize, forkJoin, of, take } from 'rxjs'
+import { finalize, forkJoin, of } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { UkomExamCatComponent } from '../ukom-exam-cat/ukom-exam-cat.component'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
@@ -28,6 +28,7 @@ import { ParticipantScheduleList } from '@/modules/ukom/models/exam-schedule/exa
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { UkomExamGeneralComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-general/ukom-exam-general.component'
 import { UkomExamPraktikComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-praktik/ukom-exam-praktik.component'
+import { toSignal } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -70,12 +71,9 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     examinerList = signal<ExaminerScheduleList[]>([])
     participantList = signal<ParticipantScheduleList[]>([])
 
-    // Modal state
     showParticipantListModal = signal<boolean>(false)
     showExaminerListModal = signal<boolean>(false)
 
-    roomId = signal('')
-    examId = signal('')
     childExamId = computed(() => {
         return this.examDetail()?.examScheduleChild?.id ?? null
     })
@@ -83,21 +81,14 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
         return this.examDetail()?.examTypeCode
     })
     examScheduleService = inject(UkomExamScheduleService)
+    route = inject(ActivatedRoute)
+    handlerService = inject(HandlerService)
+    router = inject(Router)
     protected readonly ExamTypeCategory = ExamTypeCategory
+    private paramMap = toSignal(this.route.paramMap)
+    examId = computed(() => this.paramMap()?.get('id'))
 
-    constructor(
-        private activatedRoute: ActivatedRoute,
-        private handlerService: HandlerService,
-        private router: Router,
-    ) {
-        effect(
-            () => {
-                const roomId = this.roomId()
-                if (!roomId) return
-                this.getRoomDetail()
-            },
-            { allowSignalWrites: true },
-        )
+    constructor() {
         effect(
             () => {
                 const examId = this.examId()
@@ -107,17 +98,20 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
             },
             { allowSignalWrites: true },
         )
+
         effect(
             () => {
-                const examScheduleId = this.childExamId() ?? this.examId()
-                if (!examScheduleId) return
+                const detail = this.examDetail()
+                const examId = this.examId()
+
+                if (!detail || !examId) return
+
                 this.getExaminerListId()
             },
             { allowSignalWrites: true },
         )
         effect(
             () => {
-                // For participants: use childExamId if available (for MAKALAH), otherwise use examId
                 const participantScheduleId =
                     this.childExamId() ?? this.examId()
                 if (!participantScheduleId) return
@@ -127,40 +121,9 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
         )
     }
 
-    ngOnInit() {
-        combineLatest([
-            this.activatedRoute.paramMap.pipe(take(1)),
-            this.activatedRoute.queryParamMap.pipe(take(1)),
-        ]).subscribe(([paramMap, queryParamMap]) => {
-            this.roomId.set(paramMap.get('roomid'))
-            this.examId.set(paramMap.get('id'))
-        })
-    }
+    ngOnInit() {}
 
     getExaminerListId() {
-        // this.isLoadingExaminer.set(true)
-        // // const examScheduleId = this.childExamId() ?? this.examId()
-        // const examScheduleId = this.examId()
-        //
-        // this.ukomExamScheduleService
-        //     .getExaminerListByExamScheduleId(examScheduleId)
-        //     .pipe(
-        //         finalize(() => {
-        //             this.isLoadingExaminer.set(false)
-        //         }),
-        //     )
-        //     .subscribe({
-        //         next: (res) => {
-        //             this.examinerList.set(res)
-        //         },
-        //         error: (err) => {
-        //             console.error(err)
-        //             this.handlerService.handleAlert(
-        //                 'Error',
-        //                 'Gagal mendapatkan daftar penguji',
-        //             )
-        //         },
-        //     })
         this.isLoadingExaminer.set(true)
 
         const examId = this.examId()
@@ -262,37 +225,10 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     }
 
     back() {
-        this.router.navigate(
-            [
-                `/ukom/ukom-room-list/${this.roomUkomDetail.id}/add-ukom-schedule`,
-            ],
-            {
-                replaceUrl: true,
-            },
-        )
-    }
-
-    getRoomDetail() {
-        this.isLoadingRoomDetail.set(true)
-        this.ukomRoomService
-            .getRoomDetailByRoomId(this.roomId())
-            .pipe(
-                finalize(() => {
-                    this.isLoadingRoomDetail.set(false)
-                }),
-            )
-            .subscribe({
-                next: (res) => {
-                    this.roomUkomDetail = res
-                },
-                error: (err) => {
-                    console.error(err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mendapatkan detail ruang UKOM',
-                    )
-                },
-            })
+        this.router.navigate(['../../add-ukom-schedule'], {
+            relativeTo: this.route,
+            replaceUrl: true,
+        })
     }
 
     getExamDetail() {
