@@ -6,18 +6,18 @@
  * - Configurable split
  * - Fixed time window (baseStart → baseEnd)
  */
+import "dotenv/config"
 
 const CONFIG = {
     baseUrl: "http://sijupri.sesasi.xyz:8000",
-    bearerToken:
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJzaWp1cHJpLXdlYiIsImp0aSI6IjY3ZjFlZDYyNGQ1Zjg4Yjc1YjZkN2RiOWI1ZDk1OGEyMzdjYmEyYzQyZDE1ZmY5OTAwYTk2M2JiMGI0Nzc2OTcxNGQ3NTZmMTU5MGI1OWM0IiwiaWF0IjoxNzc1NzE4MDg2Ljc5MzI2LCJuYmYiOjE3NzU3MTgwODYuNzkzMjY1LCJleHAiOjE3Nzg3MTgwODYuNjYzOTU4LCJzdWIiOiIxMTExMTExMTExMTExMTExMTEiLCJzY29wZXMiOltdLCJkZXRhaWxzIjp7ImlkIjoiMTExMTExMTExMTExMTExMTExIiwibmFtZSI6IkdvbGRpYW4gUGFrcGFoYW4iLCJyb2xlX2NvZGVzIjpbIkFETUlOIl0sIm1lbnVfY29kZXMiOlsiTU5VX0FLUDAwMDEiLCJNTlVfQUtQMDAwMyIsIk1OVV9BS1AwMDAyIiwiTU5VX0FLUDAwMDQiLCJNTlVfQUtQMDAwNSIsIk1OVV9BS1AwMDA2IiwiTU5VX0ZPUjAwMDEiLCJNTlVfRk9SMDAwMiIsIk1OVV9GT1IwMDAzIiwiTU5VX0ZPUjAwMDQiLCJNTlVfRk9SMDAwNSIsIk1OVV9QQUswMDAxIiwiTU5VX1BBSzAwMDIiLCJNTlVfUEFLMDAwMyIsIk1OVV9VS00wMDAxIiwiTU5VX1VLTTAwMDIiLCJNTlVfVUtNMDAwMyIsIk1OVV9VS00wMDA0IiwiTU5VX1VLTTAwMDUiLCJNTlVfVUtNMDAwNiIsIk1OVV9VS00wMDA3IiwiTU5VX1VLTTAwMDgiLCJNTlVfVUtNMDAwOSIsIk1OVV9VS00wMDEwIiwiTU5VX1VLTTAwMTIiLCJNTlVfU0lQMDAwMSIsIk1OVV9TSVAwMDAyIiwiTU5VX1NJUDAwMDMiLCJNTlVfU0lQMDAwNCIsIk1OVV9TRUMwMDAxIiwiTU5VX1NFQzAwMDIiLCJNTlVfU0VDMDAwMyIsIk1OVV9NTlQwMDAxIiwiTU5VX01OVDAwMDIiLCJNTlVfTU5UMDAwMyIsIk1OVV9NTlQwMDA0IiwiTU5VX01OVDAwMDUiLCJNTlVfTU5UMDAwNiIsIk1OVV9NTlQwMDA3IiwiTU5VX01OVDAwMDgiLCJNTlVfUlBUMDAwMSIsIk1OVV9SUFQwMDAyIiwiTU5VX1JQVDAwMDMiLCJNTlVfUlBUMDAwNCIsIk1OVV9SUFQwMDA1Il0sImFwcGxpY2F0aW9uX2NvZGUiOiJzaWp1cHJpLWFkbWluIiwiaW5zdGFuc2lfaWQiOm51bGwsInVuaXRfa2VyamFfaWQiOm51bGwsInVybHMiOlsiL2FwaS92MS8qKnxDVUQiXX19.fg5k5Fh7QlTR_JBfqQVlWiY0dhvX4gYbKmwvNepPxs0-I1BPAJOL_VHQBvo7xI63oo-fOyUmlUpWaODfKr3enQFr9ALzHMOhZroh_oC3LE1wiNbWK8xLaDd69wKQ8ldyyFLAJAuPOcTOh7vVg4X5mn06zzN7AmHtEfQGjhkOWPrmdY6jd0T3CCl6JwQIZ_Sba7gAuM_VHVhirbncS_qq6Lf3bacIQGEz6FkLpkpX017vx79UnK8n29MC0uMFyjAGCvEMBmwqsjJYoR_BSzhz7HmDb57c5LE-KishAtzR9x54JQyAex1Do-KAZFScRtPp0j3FlYBbQyxGGNA_kwlyxF3_7uUhBTFegZQqBvSrm1hXz3RobsRK3XtZw2gnPq-jw6PJzOv0FzJmmljjTFB4ybP8hIWkRvbPn2LLJ_aGkIqeWm34kmL3av3ZDrfwitFpKjUewdxCleDG8Y0l8WIyGlOJAbaQtIlhelVt020mdeoUwztMRw1MLMTp0nRh-6kcBZWDHw82j3xP4pWWo2oQ5Z3PfwwOUr38llTy7f8IsvTfnO_wWDOxz9qupwLO4Y6irkbSXazfHugI52MqIqAbQm2m6EWy3eBsndKqLF8hkuxvsgkNFdDplD9mWc-HI3hzxQDVlTgtQhQ6k4wF6MNvL8mSvjL8Nt5vxMC2cMRMzbg",
+    bearerToken: process.env.BEARER_TOKEN,
 
-    baseStart: "2026-04-13T1030:00",
+    baseStart: "2026-04-13T13:00",
     baseEnd: "2026-04-17T12:00", // ✅ NEW
 
     roomUkomIds: [
         "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
-        "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
+        // "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
     ],
 
     durationsMinutes: {
@@ -43,6 +43,10 @@ const CONFIG = {
         portofolio: 2,
         praktik: 2,
         studi_kasus: 2,
+        makalah: 2,
+    },
+
+    examinerAmount: {
         makalah: 2,
     },
 
@@ -219,13 +223,7 @@ function buildWawancaraPayload(baseStart, baseEnd, participants, roomId) {
     return t
 }
 
-function buildMakalahPayload(
-    baseStart,
-    baseEnd,
-    participants,
-    splitCount,
-    roomId,
-) {
+function buildMakalahPayload(baseStart, baseEnd, participants, roomId) {
     const t = clone(PAYLOAD_TEMPLATES.makalah)
 
     // 🔥 Special timeline
@@ -243,7 +241,7 @@ function buildMakalahPayload(
     t.roomUkomId = roomId
     t.participantIdList = participants
     t.duration = minutesToHours(CONFIG.durationsMinutes.makalah.makalah)
-    t.examinerAmount = splitCount
+    t.examinerAmount = CONFIG.examinerAmount.makalah
 
     return t
 }
@@ -284,15 +282,6 @@ async function main() {
     const baseStart = getBaseStartTime()
     const baseEnd = getBaseEndTime()
 
-    // const endpoints = {
-    //     cat: "/api/v1/exam_schedule/cat",
-    //     wawancara: "/api/v1/exam_schedule/wawancara",
-    //     portofolio: "/api/v1/exam_schedule/portofolio",
-    //     praktik: "/api/v1/exam_schedule/praktik",
-    //     studi_kasus: "/api/v1/exam_schedule/studi_kasus",
-    //     makalah: "/api/v1/exam_schedule/makalah",
-    // }
-
     for (const roomId of CONFIG.roomUkomIds) {
         console.log("\n" + "=".repeat(80))
         console.log(`ROOM: ${roomId}`)
@@ -325,7 +314,6 @@ async function main() {
                             baseStart,
                             baseEnd,
                             group,
-                            splitCount,
                             roomId,
                         )
                     } else {

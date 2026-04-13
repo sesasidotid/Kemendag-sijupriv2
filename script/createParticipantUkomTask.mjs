@@ -6,13 +6,14 @@
  * For each request, this script replaces every occurrence of the placeholder
  * 18-digit number inside the payload template with a new random 18-digit number.
  */
+import "dotenv/config"
 
 const CONFIG = {
     baseUrl: "http://sijupri.sesasi.xyz:8000",
     endpoint: "/api/v1/participant_ukom/task",
 
     // Optional. Fill if your API requires auth.
-    bearerToken: "",
+    bearerToken: process.env.BEARER_TOKEN,
 
     // Runs this many POST requests.
     requestCount: 2,

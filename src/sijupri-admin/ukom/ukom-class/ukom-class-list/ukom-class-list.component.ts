@@ -165,7 +165,9 @@ export class UkomClassListComponent implements OnInit {
         this.pagable$.next(
             new PagableBuilder('/api/v1/room_ukom/search')
                 .addPrimaryColumn(
-                    new PrimaryColumnBuilder('Nama', 'name').build(),
+                    new PrimaryColumnBuilder('Nama', 'name')
+                        .withTitle((data: RoomUkom) => data.name)
+                        .build(),
                 )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder(

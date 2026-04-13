@@ -251,9 +251,10 @@ export class UkomExamScheduleAddComponent implements OnInit {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Waktu selesai', (data: ExamSchedule) => {
-                        const formattedDate = this.tanggalWaktuPipe.transform(
-                            data.endTime,
-                        )
+                        const endTime =
+                            data.examScheduleChild?.endTime ?? data.endTime
+                        const formattedDate =
+                            this.tanggalWaktuPipe.transform(endTime)
 
                         return formattedDate
                     })

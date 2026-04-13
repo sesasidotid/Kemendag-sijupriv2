@@ -98,7 +98,11 @@ export class UkomKompetensiListComponent {
     handlePagable() {
         this.pagable = new PagableBuilder(`/api/v1/kompetensi/search`)
             .addPrimaryColumn(new PrimaryColumnBuilder('Kode', 'code').build())
-            .addPrimaryColumn(new PrimaryColumnBuilder('Nama', 'name').withTitle((data)=>(data.name)).build())
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Nama', 'name')
+                    .withTitle((data) => data.name)
+                    .build(),
+            )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue(
