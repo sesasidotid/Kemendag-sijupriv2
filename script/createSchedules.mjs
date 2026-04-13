@@ -2,28 +2,26 @@
 
 /**
  * Exam Schedule Automation Script
- * Minute-accurate internal scheduling.
- * Backend expects duration in HOURS → we convert at payload level.
+ * - Multi-room
+ * - Configurable split
+ * - Fixed time window (baseStart → baseEnd)
  */
 
-// ============================================================================
-// CONFIGURATION
-// ============================================================================
-
 const CONFIG = {
-    baseUrl: "http://103.217.144.101:8000",
-
+    baseUrl: "http://sijupri.sesasi.xyz:8000",
     bearerToken:
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJzaWp1cHJpLXdlYiIsImp0aSI6ImZkODM5YzU5NDZlYTZhYzQ5Nzg3OTljMDc2YWM4MDU2ZTRjZjExZmQ5NTViZDNkY2U1YjRiMGQ1NjExMTg0NjRiNDY4MGI5NmVhNGFhNWIzIiwiaWF0IjoxNzcwOTY1MjIzLjA3ODcyNCwibmJmIjoxNzcwOTY1MjIzLjA3ODczLCJleHAiOjE3NzM5NjUyMjIuOTA4MTc1LCJzdWIiOiIxMTExMTExMTExMTExMTExMTEiLCJzY29wZXMiOltdLCJkZXRhaWxzIjp7ImlkIjoiMTExMTExMTExMTExMTExMTExIiwibmFtZSI6IkdvbGRpYW4gUGFrcGFoYW4iLCJyb2xlX2NvZGVzIjpbIkFETUlOIl0sIm1lbnVfY29kZXMiOlsiTU5VX0FLUDAwMDEiLCJNTlVfQUtQMDAwMyIsIk1OVV9BS1AwMDAyIiwiTU5VX0FLUDAwMDQiLCJNTlVfQUtQMDAwNSIsIk1OVV9BS1AwMDA2IiwiTU5VX0ZPUjAwMDEiLCJNTlVfRk9SMDAwMiIsIk1OVV9GT1IwMDAzIiwiTU5VX0ZPUjAwMDQiLCJNTlVfRk9SMDAwNSIsIk1OVV9QQUswMDAxIiwiTU5VX1BBSzAwMDIiLCJNTlVfUEFLMDAwMyIsIk1OVV9VS00wMDAxIiwiTU5VX1VLTTAwMDIiLCJNTlVfVUtNMDAwMyIsIk1OVV9VS00wMDA0IiwiTU5VX1VLTTAwMDUiLCJNTlVfVUtNMDAwNiIsIk1OVV9VS00wMDA3IiwiTU5VX1VLTTAwMDgiLCJNTlVfVUtNMDAwOSIsIk1OVV9VS00wMDEwIiwiTU5VX1VLTTAwMTIiLCJNTlVfU0lQMDAwMSIsIk1OVV9TSVAwMDAyIiwiTU5VX1NJUDAwMDMiLCJNTlVfU0lQMDAwNCIsIk1OVV9TRUMwMDAxIiwiTU5VX1NFQzAwMDIiLCJNTlVfU0VDMDAwMyIsIk1OVV9NTlQwMDAxIiwiTU5VX01OVDAwMDIiLCJNTlVfTU5UMDAwMyIsIk1OVV9NTlQwMDA0IiwiTU5VX01OVDAwMDUiLCJNTlVfTU5UMDAwNiIsIk1OVV9NTlQwMDA3IiwiTU5VX01OVDAwMDgiLCJNTlVfUlBUMDAwMSIsIk1OVV9SUFQwMDAyIiwiTU5VX1JQVDAwMDMiLCJNTlVfUlBUMDAwNCIsIk1OVV9SUFQwMDA1Il0sImFwcGxpY2F0aW9uX2NvZGUiOiJzaWp1cHJpLWFkbWluIiwiaW5zdGFuc2lfaWQiOm51bGwsInVuaXRfa2VyamFfaWQiOm51bGwsInVybHMiOlsiL2FwaS92MS8qKnxDVUQiXX19.a3-ZVx3A8_3ro5L2RCpjOOSwAYXQjmWVy3JNBeq3mQXmD72IzIctFs52mDqu1GEyifnecDyRIR-kuDgyL0_dcWOGXQSKAvp39pMYHT8W8wovHL16u_5qevppkQrkJj7dmZWpOQ1fM4tjhCfc6y50NqW6NR2moeei1DknntFH-x4khtl_WaSOi4zL7XdKZUfAFm33JI2RjxENWQPn6eXXiFhdR6sX1iwd-O3XDCSYYy4Hmvr3BcQYA3IDGYd0xC06M24-HX2pBHbvKSdRb4cVW9iSe6gtqpksE1N4yDRv5hMpWif-kFXlk6hO4ftHQYtlViSpzO8Q6FtSqH3O8ARgXeb4J0MjM6xBKKisW0skL-ZFkPpjPWRHXFxckl0JIcZzesSwPyIY68ks7Eq1bub03K-qzR5HzObm67jTX8UveH_ukZDm9mkn7LMKeGmJsfS-1W1QmnsroxX3LhQd-zdu_mKgG9kR64In4FuVnhl9_niNmQ7P-dzifJNKJEV92VmkuRj5N8xTHHO7OEviHBA021ao6H7caCPSorjFPX5fG45ZqAUV5SvdmgehRoYY99qP80BoyOEPAkVUh_fEN67Y7ZcJIqmIpQIOSIT2AMZ-oMvAWZsCp8cJXT2dxfpnzhpFlTz6ZYZAu-aypeg2btuU85DZrQTXnvbz0gNDxVUFcZk",
-    baseStart: "2026-02-26T15:15",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJzaWp1cHJpLXdlYiIsImp0aSI6IjY3ZjFlZDYyNGQ1Zjg4Yjc1YjZkN2RiOWI1ZDk1OGEyMzdjYmEyYzQyZDE1ZmY5OTAwYTk2M2JiMGI0Nzc2OTcxNGQ3NTZmMTU5MGI1OWM0IiwiaWF0IjoxNzc1NzE4MDg2Ljc5MzI2LCJuYmYiOjE3NzU3MTgwODYuNzkzMjY1LCJleHAiOjE3Nzg3MTgwODYuNjYzOTU4LCJzdWIiOiIxMTExMTExMTExMTExMTExMTEiLCJzY29wZXMiOltdLCJkZXRhaWxzIjp7ImlkIjoiMTExMTExMTExMTExMTExMTExIiwibmFtZSI6IkdvbGRpYW4gUGFrcGFoYW4iLCJyb2xlX2NvZGVzIjpbIkFETUlOIl0sIm1lbnVfY29kZXMiOlsiTU5VX0FLUDAwMDEiLCJNTlVfQUtQMDAwMyIsIk1OVV9BS1AwMDAyIiwiTU5VX0FLUDAwMDQiLCJNTlVfQUtQMDAwNSIsIk1OVV9BS1AwMDA2IiwiTU5VX0ZPUjAwMDEiLCJNTlVfRk9SMDAwMiIsIk1OVV9GT1IwMDAzIiwiTU5VX0ZPUjAwMDQiLCJNTlVfRk9SMDAwNSIsIk1OVV9QQUswMDAxIiwiTU5VX1BBSzAwMDIiLCJNTlVfUEFLMDAwMyIsIk1OVV9VS00wMDAxIiwiTU5VX1VLTTAwMDIiLCJNTlVfVUtNMDAwMyIsIk1OVV9VS00wMDA0IiwiTU5VX1VLTTAwMDUiLCJNTlVfVUtNMDAwNiIsIk1OVV9VS00wMDA3IiwiTU5VX1VLTTAwMDgiLCJNTlVfVUtNMDAwOSIsIk1OVV9VS00wMDEwIiwiTU5VX1VLTTAwMTIiLCJNTlVfU0lQMDAwMSIsIk1OVV9TSVAwMDAyIiwiTU5VX1NJUDAwMDMiLCJNTlVfU0lQMDAwNCIsIk1OVV9TRUMwMDAxIiwiTU5VX1NFQzAwMDIiLCJNTlVfU0VDMDAwMyIsIk1OVV9NTlQwMDAxIiwiTU5VX01OVDAwMDIiLCJNTlVfTU5UMDAwMyIsIk1OVV9NTlQwMDA0IiwiTU5VX01OVDAwMDUiLCJNTlVfTU5UMDAwNiIsIk1OVV9NTlQwMDA3IiwiTU5VX01OVDAwMDgiLCJNTlVfUlBUMDAwMSIsIk1OVV9SUFQwMDAyIiwiTU5VX1JQVDAwMDMiLCJNTlVfUlBUMDAwNCIsIk1OVV9SUFQwMDA1Il0sImFwcGxpY2F0aW9uX2NvZGUiOiJzaWp1cHJpLWFkbWluIiwiaW5zdGFuc2lfaWQiOm51bGwsInVuaXRfa2VyamFfaWQiOm51bGwsInVybHMiOlsiL2FwaS92MS8qKnxDVUQiXX19.fg5k5Fh7QlTR_JBfqQVlWiY0dhvX4gYbKmwvNepPxs0-I1BPAJOL_VHQBvo7xI63oo-fOyUmlUpWaODfKr3enQFr9ALzHMOhZroh_oC3LE1wiNbWK8xLaDd69wKQ8ldyyFLAJAuPOcTOh7vVg4X5mn06zzN7AmHtEfQGjhkOWPrmdY6jd0T3CCl6JwQIZ_Sba7gAuM_VHVhirbncS_qq6Lf3bacIQGEz6FkLpkpX017vx79UnK8n29MC0uMFyjAGCvEMBmwqsjJYoR_BSzhz7HmDb57c5LE-KishAtzR9x54JQyAex1Do-KAZFScRtPp0j3FlYBbQyxGGNA_kwlyxF3_7uUhBTFegZQqBvSrm1hXz3RobsRK3XtZw2gnPq-jw6PJzOv0FzJmmljjTFB4ybP8hIWkRvbPn2LLJ_aGkIqeWm34kmL3av3ZDrfwitFpKjUewdxCleDG8Y0l8WIyGlOJAbaQtIlhelVt020mdeoUwztMRw1MLMTp0nRh-6kcBZWDHw82j3xP4pWWo2oQ5Z3PfwwOUr38llTy7f8IsvTfnO_wWDOxz9qupwLO4Y6irkbSXazfHugI52MqIqAbQm2m6EWy3eBsndKqLF8hkuxvsgkNFdDplD9mWc-HI3hzxQDVlTgtQhQ6k4wF6MNvL8mSvjL8Nt5vxMC2cMRMzbg",
 
-    roomUkomId: "2225f317-b116-4226-86de-82020e69ac68",
+    baseStart: "2026-04-13T1030:00",
+    baseEnd: "2026-04-17T12:00", // ✅ NEW
 
-    participantIdList: [],
+    roomUkomIds: [
+        "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
+        "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
+    ],
 
-    // SOURCE OF TRUTH = MINUTES
     durationsMinutes: {
-        cat: 5,
+        cat: 10,
         wawancara: 5,
         portofolio: 5,
         praktik: 5,
@@ -38,6 +36,24 @@ const CONFIG = {
         cat: "1",
         studi_kasus: "1",
     },
+
+    splitConfig: {
+        cat: 1,
+        wawancara: 2,
+        portofolio: 2,
+        praktik: 2,
+        studi_kasus: 2,
+        makalah: 2,
+    },
+
+    endpoints: {
+        // cat: "/api/v1/exam_schedule/cat",
+        // wawancara: "/api/v1/exam_schedule/wawancara",
+        // portofolio: "/api/v1/exam_schedule/portofolio",
+        // praktik: "/api/v1/exam_schedule/praktik",
+        // studi_kasus: "/api/v1/exam_schedule/studi_kasus",
+        makalah: "/api/v1/exam_schedule/makalah",
+    },
 }
 
 // ============================================================================
@@ -45,35 +61,75 @@ const CONFIG = {
 // ============================================================================
 
 function getBaseStartTime() {
-    const date = new Date(CONFIG.baseStart)
-    if (isNaN(date.getTime())) {
-        throw new Error(
-            `Invalid CONFIG.baseStart format. Expected YYYY-MM-DDTHH:mm`,
-        )
-    }
-    return date
+    const d = new Date(CONFIG.baseStart)
+    if (isNaN(d.getTime())) throw new Error("Invalid baseStart")
+    return d
+}
+
+function getBaseEndTime() {
+    const d = new Date(CONFIG.baseEnd)
+    if (isNaN(d.getTime())) throw new Error("Invalid baseEnd")
+    return d
 }
 
 function formatDateTime(date) {
     const pad = (n) => String(n).padStart(2, "0")
-
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
         date.getDate(),
     )}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
 function addMinutes(date, minutes) {
-    const newDate = new Date(date)
-    newDate.setMinutes(newDate.getMinutes() + minutes)
-    return newDate
+    const d = new Date(date)
+    d.setMinutes(d.getMinutes() + minutes)
+    return d
 }
 
-function cloneObject(obj) {
+function clone(obj) {
     return JSON.parse(JSON.stringify(obj))
 }
 
 function minutesToHours(minutes) {
-    return minutes / 60 // no rounding
+    return minutes / 60
+}
+
+// ============================================================================
+// FETCH PARTICIPANTS
+// ============================================================================
+
+async function fetchParticipantIds(roomId) {
+    const url = `${CONFIG.baseUrl}/api/v1/participant_ukom/room/${roomId}`
+
+    const res = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${CONFIG.bearerToken}`,
+        },
+    })
+
+    if (!res.ok) {
+        throw new Error(`Failed fetch participants for room ${roomId}`)
+    }
+
+    const data = await res.json()
+    return data.map((item) => item.participantUkom.id)
+}
+
+// ============================================================================
+// SPLIT
+// ============================================================================
+
+function splitParticipants(list, count) {
+    if (count <= 1) return [list]
+
+    const size = Math.ceil(list.length / count)
+    const result = []
+
+    for (let i = 0; i < count; i++) {
+        const chunk = list.slice(i * size, (i + 1) * size)
+        if (chunk.length) result.push(chunk)
+    }
+
+    return result
 }
 
 // ============================================================================
@@ -82,141 +138,127 @@ function minutesToHours(minutes) {
 
 const PAYLOAD_TEMPLATES = {
     cat: {
-        duration: 0,
-        endTime: "",
-        participantIdList: [],
         roomUkomId: "",
-        secretKey: "1",
         startTime: "",
+        endTime: "",
+        duration: "",
+        secretKey: "",
+        participantIdList: [],
     },
     wawancara: {
-        duration: 0,
-        endTime: "",
-        participantIdList: [],
         roomUkomId: "",
         startTime: "",
+        endTime: "",
+        duration: "",
+        participantIdList: [],
     },
     portofolio: {
-        duration: 0,
+        roomUkomId: "",
+        startTime: "",
         endTime: "",
         participantIdList: [],
-        roomUkomId: "",
-        secretKey: null,
-        startTime: "",
     },
     praktik: {
-        duration: 0,
-        endTime: "",
-        participantIdList: [],
         roomUkomId: "",
-        secretKey: null,
         startTime: "",
+        endTime: "",
+        duration: "",
+        participantIdList: [],
     },
     studi_kasus: {
-        duration: 0,
-        endTime: "",
-        participantIdList: [],
         roomUkomId: "",
-        secretKey: "1",
         startTime: "",
+        endTime: "",
+        secretKey: "",
+        participantIdList: [],
     },
     makalah: {
-        duration: 0,
+        roomUkomId: "",
         makalahStartTime: "",
         makalahEndTime: "",
         seminarStartTime: "",
         seminarEndTime: "",
+        duration: "",
+        examinerAmount: 1,
         participantIdList: [],
-        roomUkomId: "",
     },
 }
 
 // ============================================================================
-// PAYLOAD BUILDERS
+// BUILDERS
 // ============================================================================
 
-function buildStandardPayload(examType, baseStart) {
-    const template = cloneObject(PAYLOAD_TEMPLATES[examType])
-    const durationMinutes = CONFIG.durationsMinutes[examType]
+function buildStandardPayload(type, baseStart, baseEnd, participants, roomId) {
+    const t = clone(PAYLOAD_TEMPLATES[type])
+    const minutes = CONFIG.durationsMinutes[type]
 
-    const startTime = baseStart
-    const endTime = addMinutes(startTime, durationMinutes)
+    t.startTime = formatDateTime(baseStart)
+    t.endTime = formatDateTime(baseEnd)
+    t.roomUkomId = roomId
+    t.participantIdList = participants
+    t.duration = minutesToHours(minutes)
 
-    template.startTime = formatDateTime(startTime)
-    template.endTime = formatDateTime(endTime)
-    template.roomUkomId = CONFIG.roomUkomId
-    template.participantIdList = CONFIG.participantIdList
-
-    // Backend expects HOURS
-    template.duration = minutesToHours(durationMinutes)
-
-    if (examType in CONFIG.secretKeys) {
-        template.secretKey = CONFIG.secretKeys[examType]
+    if (["cat", "studi_kasus"].includes(type)) {
+        t.secretKey = CONFIG.secretKeys[type]
     }
 
-    return template
+    return t
 }
 
-function buildWawancaraPayload(baseStart) {
-    const template = cloneObject(PAYLOAD_TEMPLATES.wawancara)
-    const durationMinutes = CONFIG.durationsMinutes.wawancara
+function buildWawancaraPayload(baseStart, baseEnd, participants, roomId) {
+    const t = clone(PAYLOAD_TEMPLATES.wawancara)
 
-    // multiplied by 5 (business rule)
-    const totalMinutes = durationMinutes * 5
+    const base = CONFIG.durationsMinutes.wawancara
 
-    const startTime = baseStart
-    const endTime = addMinutes(startTime, totalMinutes)
+    t.startTime = formatDateTime(baseStart)
+    t.endTime = formatDateTime(baseEnd)
+    t.roomUkomId = roomId
+    t.participantIdList = participants
+    t.duration = minutesToHours(base)
 
-    template.startTime = formatDateTime(startTime)
-    template.endTime = formatDateTime(endTime)
-    template.roomUkomId = CONFIG.roomUkomId
-    template.participantIdList = CONFIG.participantIdList
-
-    // duration field remains single-slot duration (as before)
-    template.duration = minutesToHours(durationMinutes)
-
-    return template
+    return t
 }
 
-function buildMakalahPayload(baseStart) {
-    const template = cloneObject(PAYLOAD_TEMPLATES.makalah)
+function buildMakalahPayload(
+    baseStart,
+    baseEnd,
+    participants,
+    splitCount,
+    roomId,
+) {
+    const t = clone(PAYLOAD_TEMPLATES.makalah)
 
-    const makalahMinutes = CONFIG.durationsMinutes.makalah.makalah
-    const seminarMinutes = CONFIG.durationsMinutes.makalah.seminar
+    // 🔥 Special timeline
+    const makalahStart = addMinutes(baseStart, -10)
+    const makalahEnd = baseStart
 
-    const makalahStartTime = baseStart
-    const makalahEndTime = addMinutes(makalahStartTime, makalahMinutes)
+    const seminarStart = baseStart
+    const seminarEnd = baseEnd
 
-    const seminarStartTime = makalahEndTime
-    const seminarEndTime = addMinutes(seminarStartTime, seminarMinutes)
+    t.makalahStartTime = formatDateTime(makalahStart)
+    t.makalahEndTime = formatDateTime(makalahEnd)
+    t.seminarStartTime = formatDateTime(seminarStart)
+    t.seminarEndTime = formatDateTime(seminarEnd)
 
-    template.makalahStartTime = formatDateTime(makalahStartTime)
-    template.makalahEndTime = formatDateTime(makalahEndTime)
-    template.seminarStartTime = formatDateTime(seminarStartTime)
-    template.seminarEndTime = formatDateTime(seminarEndTime)
+    t.roomUkomId = roomId
+    t.participantIdList = participants
+    t.duration = minutesToHours(CONFIG.durationsMinutes.makalah.makalah)
+    t.examinerAmount = splitCount
 
-    template.roomUkomId = CONFIG.roomUkomId
-    template.participantIdList = CONFIG.participantIdList
-
-    // duration = makalah duration in HOURS (backend contract)
-    template.duration = minutesToHours(makalahMinutes)
-
-    return template
+    return t
 }
 
 // ============================================================================
 // HTTP
 // ============================================================================
 
-async function sendPostRequest(endpoint, payload) {
+async function sendPost(endpoint, payload) {
     const url = `${CONFIG.baseUrl}${endpoint}`
 
-    console.log("\n" + "=".repeat(80))
-    console.log(`Sending request to: ${endpoint}`)
-    console.log("=".repeat(80))
+    console.log("\n→", endpoint)
     console.log(JSON.stringify(payload, null, 2))
 
-    const response = await fetch(url, {
+    const res = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -225,23 +267,13 @@ async function sendPostRequest(endpoint, payload) {
         body: JSON.stringify(payload),
     })
 
-    const responseText = await response.text()
-    let responseData
+    const text = await res.text()
 
-    try {
-        responseData = JSON.parse(responseText)
-    } catch {
-        responseData = responseText
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${text}`)
     }
 
-    if (!response.ok) {
-        throw new Error(
-            `HTTP ${response.status}: ${JSON.stringify(responseData)}`,
-        )
-    }
-
-    console.log(`Success (${response.status})`)
-    return responseData
+    console.log("✔ Success")
 }
 
 // ============================================================================
@@ -249,69 +281,73 @@ async function sendPostRequest(endpoint, payload) {
 // ============================================================================
 
 async function main() {
-    console.log("Exam Schedule Automation Script")
-    console.log("=".repeat(80))
-
     const baseStart = getBaseStartTime()
-    console.log(`Base start time: ${formatDateTime(baseStart)}`)
+    const baseEnd = getBaseEndTime()
 
-    const schedules = [
-        {
-            name: "cat",
-            endpoint: "/api/v1/exam_schedule/cat",
-            buildPayload: () => buildStandardPayload("cat", baseStart),
-        },
-        {
-            name: "portofolio",
-            endpoint: "/api/v1/exam_schedule/portofolio",
-            buildPayload: () => buildStandardPayload("portofolio", baseStart),
-        },
-        {
-            name: "praktik",
-            endpoint: "/api/v1/exam_schedule/praktik",
-            buildPayload: () => buildStandardPayload("praktik", baseStart),
-        },
-        {
-            name: "studi_kasus",
-            endpoint: "/api/v1/exam_schedule/studi_kasus",
-            buildPayload: () => buildStandardPayload("studi_kasus", baseStart),
-        },
-        {
-            name: "wawancara",
-            endpoint: "/api/v1/exam_schedule/wawancara",
-            buildPayload: () => buildWawancaraPayload(baseStart),
-        },
-        {
-            name: "makalah",
-            endpoint: "/api/v1/exam_schedule/makalah",
-            buildPayload: () => buildMakalahPayload(baseStart),
-        },
-    ]
+    // const endpoints = {
+    //     cat: "/api/v1/exam_schedule/cat",
+    //     wawancara: "/api/v1/exam_schedule/wawancara",
+    //     portofolio: "/api/v1/exam_schedule/portofolio",
+    //     praktik: "/api/v1/exam_schedule/praktik",
+    //     studi_kasus: "/api/v1/exam_schedule/studi_kasus",
+    //     makalah: "/api/v1/exam_schedule/makalah",
+    // }
 
-    let success = 0
-    let failed = 0
+    for (const roomId of CONFIG.roomUkomIds) {
+        console.log("\n" + "=".repeat(80))
+        console.log(`ROOM: ${roomId}`)
+        console.log("=".repeat(80))
 
-    for (const schedule of schedules) {
-        try {
-            const payload = schedule.buildPayload()
-            await sendPostRequest(schedule.endpoint, payload)
-            success++
-        } catch (err) {
-            console.error(`Error in ${schedule.name}:`, err.message)
-            failed++
+        const participants = await fetchParticipantIds(roomId)
+        console.log(`Participants: ${participants.length}`)
+
+        for (const type of Object.keys(CONFIG.endpoints)) {
+            const splitCount = CONFIG.splitConfig[type] || 1
+            const groups = splitParticipants(participants, splitCount)
+
+            console.log(
+                `\n--- ${type.toUpperCase()} (split: ${splitCount}) ---`,
+            )
+
+            for (const group of groups) {
+                try {
+                    let payload
+
+                    if (type === "wawancara") {
+                        payload = buildWawancaraPayload(
+                            baseStart,
+                            baseEnd,
+                            group,
+                            roomId,
+                        )
+                    } else if (type === "makalah") {
+                        payload = buildMakalahPayload(
+                            baseStart,
+                            baseEnd,
+                            group,
+                            splitCount,
+                            roomId,
+                        )
+                    } else {
+                        payload = buildStandardPayload(
+                            type,
+                            baseStart,
+                            baseEnd,
+                            group,
+                            roomId,
+                        )
+                    }
+
+                    await sendPost(CONFIG.endpoints[type], payload)
+                } catch (err) {
+                    console.error(`Error (${roomId} - ${type}):`, err.message)
+                }
+            }
         }
     }
-
-    console.log("\n" + "=".repeat(80))
-    console.log("SUMMARY")
-    console.log("=".repeat(80))
-    console.log(`Success: ${success}`)
-    console.log(`Failed: ${failed}`)
-
-    process.exit(failed > 0 ? 1 : 0)
 }
 
-main().catch((err) => {
-    console.error("Fatal error:", err)
+main().catch((e) => {
+    console.error("Fatal:", e)
     process.exit(1)
 })

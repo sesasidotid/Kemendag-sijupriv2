@@ -21,7 +21,7 @@
                             >Nama Kelas</label
                         >
                         <div class="fw-semibold fs-5">
-                            {{ roomUkomDetail.name }}
+                            {{ roomUkomDetail()?.name ?? '-'}}
                         </div>
                     </div>
 
@@ -89,7 +89,7 @@
         <ng-container *ngIf="typeUkom() === ExamTypeCategory.CAT">
             <app-ukom-exam-cat
                 [examDetail]="examDetail()"
-                [roomUkomDetail]="roomUkomDetail"
+                [roomUkomDetail]="roomUkomDetail()"
             ></app-ukom-exam-cat>
         </ng-container>
 
@@ -99,7 +99,7 @@
                 [examDetail]="examDetail()"
                 [examinerList]="examinerList()"
                 [participantList]="participantList()"
-                [roomUkomDetail]="roomUkomDetail"
+                [roomUkomDetail]="roomUkomDetail()"
             ></app-ukom-exam-wawancara>
         </ng-container>
 
@@ -117,7 +117,7 @@
                 [examDetail]="examDetail()"
                 [examinerList]="examinerList()"
                 [participantList]="participantList()"
-                [roomUkomDetail]="roomUkomDetail"
+                [roomUkomDetail]="roomUkomDetail()"
             ></app-ukom-exam-praktik>
         </ng-container>
 

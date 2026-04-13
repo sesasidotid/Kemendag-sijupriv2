@@ -1,5 +1,4 @@
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 import {
     Component,
     computed,
@@ -29,6 +28,7 @@ import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellan
 import { UkomExamGeneralComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-general/ukom-exam-general.component'
 import { UkomExamPraktikComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-praktik/ukom-exam-praktik.component'
 import { toSignal } from '@angular/core/rxjs-interop'
+import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -53,7 +53,7 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
     ukomRoomService = inject(UkomRoomService)
     ukomExamScheduleService = inject(UkomExamScheduleService)
-    roomUkomDetail = new RoomUkomDetail()
+    // roomUkomDetail = new RoomUkomDetail()
     examDetail = signal<ExamSchedule>(null)
 
     isLoadingRoomDetail = signal(false)
@@ -70,7 +70,7 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     )
     examinerList = signal<ExaminerScheduleList[]>([])
     participantList = signal<ParticipantScheduleList[]>([])
-
+    roomUkomDetail = signal<RoomUkomDetail>(null)
     showParticipantListModal = signal<boolean>(false)
     showExaminerListModal = signal<boolean>(false)
 
@@ -84,9 +84,11 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     route = inject(ActivatedRoute)
     handlerService = inject(HandlerService)
     router = inject(Router)
+
     protected readonly ExamTypeCategory = ExamTypeCategory
     private paramMap = toSignal(this.route.paramMap)
     examId = computed(() => this.paramMap()?.get('id'))
+    roomId = computed(() => this.paramMap()?.get('roomid'))
 
     constructor() {
         effect(
@@ -116,6 +118,16 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
                     this.childExamId() ?? this.examId()
                 if (!participantScheduleId) return
                 this.getParticipantList()
+            },
+            { allowSignalWrites: true },
+        )
+
+        effect(
+            () => {
+                const roomId = this.roomId()
+                if (!roomId) return
+
+                this.getRoomDetail()
             },
             { allowSignalWrites: true },
         )
@@ -199,6 +211,29 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
                     this.handlerService.handleAlert(
                         'Error',
                         'Gagal mendapatkan daftar peserta',
+                    )
+                },
+            })
+    }
+
+    getRoomDetail() {
+        this.isLoadingRoomDetail.set(true)
+        this.ukomRoomService
+            .getRoomDetailByRoomId(this.roomId())
+            .pipe(
+                finalize(() => {
+                    this.isLoadingRoomDetail.set(false)
+                }),
+            )
+            .subscribe({
+                next: (res) => {
+                    this.roomUkomDetail.set(res)
+                },
+                error: (err) => {
+                    console.error(err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mendapatkan detail ruangan',
                     )
                 },
             })

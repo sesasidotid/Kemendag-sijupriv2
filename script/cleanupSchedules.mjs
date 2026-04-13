@@ -1,22 +1,33 @@
 #!/usr/bin/env node
 
 /**
- * Exam Schedule Cleanup Script
+ * Exam Schedule Cleanup Script (Multi-Room)
  *
- * Fetches all exam schedules for a room, then deletes each by ID.
- *
- * Usage: node cleanupSchedules.mjs
+ * - Fetch schedules per room
+ * - Delete each schedule by ID
+ * - Per-room + global summary
  */
 
 const CONFIG = {
-    baseUrl: "http://103.217.144.101:8000",
+    baseUrl: "http://sijupri.sesasi.xyz:8000",
     bearerToken:
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJzaWp1cHJpLXdlYiIsImp0aSI6ImZkODM5YzU5NDZlYTZhYzQ5Nzg3OTljMDc2YWM4MDU2ZTRjZjExZmQ5NTViZDNkY2U1YjRiMGQ1NjExMTg0NjRiNDY4MGI5NmVhNGFhNWIzIiwiaWF0IjoxNzcwOTY1MjIzLjA3ODcyNCwibmJmIjoxNzcwOTY1MjIzLjA3ODczLCJleHAiOjE3NzM5NjUyMjIuOTA4MTc1LCJzdWIiOiIxMTExMTExMTExMTExMTExMTEiLCJzY29wZXMiOltdLCJkZXRhaWxzIjp7ImlkIjoiMTExMTExMTExMTExMTExMTExIiwibmFtZSI6IkdvbGRpYW4gUGFrcGFoYW4iLCJyb2xlX2NvZGVzIjpbIkFETUlOIl0sIm1lbnVfY29kZXMiOlsiTU5VX0FLUDAwMDEiLCJNTlVfQUtQMDAwMyIsIk1OVV9BS1AwMDAyIiwiTU5VX0FLUDAwMDQiLCJNTlVfQUtQMDAwNSIsIk1OVV9BS1AwMDA2IiwiTU5VX0ZPUjAwMDEiLCJNTlVfRk9SMDAwMiIsIk1OVV9GT1IwMDAzIiwiTU5VX0ZPUjAwMDQiLCJNTlVfRk9SMDAwNSIsIk1OVV9QQUswMDAxIiwiTU5VX1BBSzAwMDIiLCJNTlVfUEFLMDAwMyIsIk1OVV9VS00wMDAxIiwiTU5VX1VLTTAwMDIiLCJNTlVfVUtNMDAwMyIsIk1OVV9VS00wMDA0IiwiTU5VX1VLTTAwMDUiLCJNTlVfVUtNMDAwNiIsIk1OVV9VS00wMDA3IiwiTU5VX1VLTTAwMDgiLCJNTlVfVUtNMDAwOSIsIk1OVV9VS00wMDEwIiwiTU5VX1VLTTAwMTIiLCJNTlVfU0lQMDAwMSIsIk1OVV9TSVAwMDAyIiwiTU5VX1NJUDAwMDMiLCJNTlVfU0lQMDAwNCIsIk1OVV9TRUMwMDAxIiwiTU5VX1NFQzAwMDIiLCJNTlVfU0VDMDAwMyIsIk1OVV9NTlQwMDAxIiwiTU5VX01OVDAwMDIiLCJNTlVfTU5UMDAwMyIsIk1OVV9NTlQwMDA0IiwiTU5VX01OVDAwMDUiLCJNTlVfTU5UMDAwNiIsIk1OVV9NTlQwMDA3IiwiTU5VX01OVDAwMDgiLCJNTlVfUlBUMDAwMSIsIk1OVV9SUFQwMDAyIiwiTU5VX1JQVDAwMDMiLCJNTlVfUlBUMDAwNCIsIk1OVV9SUFQwMDA1Il0sImFwcGxpY2F0aW9uX2NvZGUiOiJzaWp1cHJpLWFkbWluIiwiaW5zdGFuc2lfaWQiOm51bGwsInVuaXRfa2VyamFfaWQiOm51bGwsInVybHMiOlsiL2FwaS92MS8qKnxDVUQiXX19.a3-ZVx3A8_3ro5L2RCpjOOSwAYXQjmWVy3JNBeq3mQXmD72IzIctFs52mDqu1GEyifnecDyRIR-kuDgyL0_dcWOGXQSKAvp39pMYHT8W8wovHL16u_5qevppkQrkJj7dmZWpOQ1fM4tjhCfc6y50NqW6NR2moeei1DknntFH-x4khtl_WaSOi4zL7XdKZUfAFm33JI2RjxENWQPn6eXXiFhdR6sX1iwd-O3XDCSYYy4Hmvr3BcQYA3IDGYd0xC06M24-HX2pBHbvKSdRb4cVW9iSe6gtqpksE1N4yDRv5hMpWif-kFXlk6hO4ftHQYtlViSpzO8Q6FtSqH3O8ARgXeb4J0MjM6xBKKisW0skL-ZFkPpjPWRHXFxckl0JIcZzesSwPyIY68ks7Eq1bub03K-qzR5HzObm67jTX8UveH_ukZDm9mkn7LMKeGmJsfS-1W1QmnsroxX3LhQd-zdu_mKgG9kR64In4FuVnhl9_niNmQ7P-dzifJNKJEV92VmkuRj5N8xTHHO7OEviHBA021ao6H7caCPSorjFPX5fG45ZqAUV5SvdmgehRoYY99qP80BoyOEPAkVUh_fEN67Y7ZcJIqmIpQIOSIT2AMZ-oMvAWZsCp8cJXT2dxfpnzhpFlTz6ZYZAu-aypeg2btuU85DZrQTXnvbz0gNDxVUFcZk",
-    roomUkomId: "36dab9e9-74ae-4067-b120-e6c412c0998b",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJzaWp1cHJpLXdlYiIsImp0aSI6IjY3ZjFlZDYyNGQ1Zjg4Yjc1YjZkN2RiOWI1ZDk1OGEyMzdjYmEyYzQyZDE1ZmY5OTAwYTk2M2JiMGI0Nzc2OTcxNGQ3NTZmMTU5MGI1OWM0IiwiaWF0IjoxNzc1NzE4MDg2Ljc5MzI2LCJuYmYiOjE3NzU3MTgwODYuNzkzMjY1LCJleHAiOjE3Nzg3MTgwODYuNjYzOTU4LCJzdWIiOiIxMTExMTExMTExMTExMTExMTEiLCJzY29wZXMiOltdLCJkZXRhaWxzIjp7ImlkIjoiMTExMTExMTExMTExMTExMTExIiwibmFtZSI6IkdvbGRpYW4gUGFrcGFoYW4iLCJyb2xlX2NvZGVzIjpbIkFETUlOIl0sIm1lbnVfY29kZXMiOlsiTU5VX0FLUDAwMDEiLCJNTlVfQUtQMDAwMyIsIk1OVV9BS1AwMDAyIiwiTU5VX0FLUDAwMDQiLCJNTlVfQUtQMDAwNSIsIk1OVV9BS1AwMDA2IiwiTU5VX0ZPUjAwMDEiLCJNTlVfRk9SMDAwMiIsIk1OVV9GT1IwMDAzIiwiTU5VX0ZPUjAwMDQiLCJNTlVfRk9SMDAwNSIsIk1OVV9QQUswMDAxIiwiTU5VX1BBSzAwMDIiLCJNTlVfUEFLMDAwMyIsIk1OVV9VS00wMDAxIiwiTU5VX1VLTTAwMDIiLCJNTlVfVUtNMDAwMyIsIk1OVV9VS00wMDA0IiwiTU5VX1VLTTAwMDUiLCJNTlVfVUtNMDAwNiIsIk1OVV9VS00wMDA3IiwiTU5VX1VLTTAwMDgiLCJNTlVfVUtNMDAwOSIsIk1OVV9VS00wMDEwIiwiTU5VX1VLTTAwMTIiLCJNTlVfU0lQMDAwMSIsIk1OVV9TSVAwMDAyIiwiTU5VX1NJUDAwMDMiLCJNTlVfU0lQMDAwNCIsIk1OVV9TRUMwMDAxIiwiTU5VX1NFQzAwMDIiLCJNTlVfU0VDMDAwMyIsIk1OVV9NTlQwMDAxIiwiTU5VX01OVDAwMDIiLCJNTlVfTU5UMDAwMyIsIk1OVV9NTlQwMDA0IiwiTU5VX01OVDAwMDUiLCJNTlVfTU5UMDAwNiIsIk1OVV9NTlQwMDA3IiwiTU5VX01OVDAwMDgiLCJNTlVfUlBUMDAwMSIsIk1OVV9SUFQwMDAyIiwiTU5VX1JQVDAwMDMiLCJNTlVfUlBUMDAwNCIsIk1OVV9SUFQwMDA1Il0sImFwcGxpY2F0aW9uX2NvZGUiOiJzaWp1cHJpLWFkbWluIiwiaW5zdGFuc2lfaWQiOm51bGwsInVuaXRfa2VyamFfaWQiOm51bGwsInVybHMiOlsiL2FwaS92MS8qKnxDVUQiXX19.fg5k5Fh7QlTR_JBfqQVlWiY0dhvX4gYbKmwvNepPxs0-I1BPAJOL_VHQBvo7xI63oo-fOyUmlUpWaODfKr3enQFr9ALzHMOhZroh_oC3LE1wiNbWK8xLaDd69wKQ8ldyyFLAJAuPOcTOh7vVg4X5mn06zzN7AmHtEfQGjhkOWPrmdY6jd0T3CCl6JwQIZ_Sba7gAuM_VHVhirbncS_qq6Lf3bacIQGEz6FkLpkpX017vx79UnK8n29MC0uMFyjAGCvEMBmwqsjJYoR_BSzhz7HmDb57c5LE-KishAtzR9x54JQyAex1Do-KAZFScRtPp0j3FlYBbQyxGGNA_kwlyxF3_7uUhBTFegZQqBvSrm1hXz3RobsRK3XtZw2gnPq-jw6PJzOv0FzJmmljjTFB4ybP8hIWkRvbPn2LLJ_aGkIqeWm34kmL3av3ZDrfwitFpKjUewdxCleDG8Y0l8WIyGlOJAbaQtIlhelVt020mdeoUwztMRw1MLMTp0nRh-6kcBZWDHw82j3xP4pWWo2oQ5Z3PfwwOUr38llTy7f8IsvTfnO_wWDOxz9qupwLO4Y6irkbSXazfHugI52MqIqAbQm2m6EWy3eBsndKqLF8hkuxvsgkNFdDplD9mWc-HI3hzxQDVlTgtQhQ6k4wF6MNvL8mSvjL8Nt5vxMC2cMRMzbg",
+
+    // ✅ multi-room
+    roomUkomIds: [
+        "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
+        "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
+        // add more room IDs here
+    ],
 }
 
-async function fetchAllSchedules() {
-    const url = `${CONFIG.baseUrl}/api/v1/exam_schedule/room/${CONFIG.roomUkomId}`
+// ============================================================================
+// API
+// ============================================================================
+
+async function fetchAllSchedules(roomUkomId) {
+    const url = `${CONFIG.baseUrl}/api/v1/exam_schedule/room/${roomUkomId}`
+
     const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -24,14 +35,19 @@ async function fetchAllSchedules() {
             Authorization: `Bearer ${CONFIG.bearerToken}`,
         },
     })
+
     if (!response.ok) {
-        throw new Error(`Failed to fetch schedules: ${response.status}`)
+        throw new Error(
+            `Failed to fetch schedules for room ${roomUkomId}: ${response.status}`,
+        )
     }
+
     return await response.json()
 }
 
 async function deleteSchedule(id) {
     const url = `${CONFIG.baseUrl}/api/v1/exam_schedule/${id}`
+
     const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -39,11 +55,17 @@ async function deleteSchedule(id) {
             Authorization: `Bearer ${CONFIG.bearerToken}`,
         },
     })
+
     if (!response.ok) {
         throw new Error(`Failed to delete schedule ${id}: ${response.status}`)
     }
+
     return await response.text()
 }
+
+// ============================================================================
+// UTIL
+// ============================================================================
 
 function toLocalISOString(date = new Date()) {
     const pad = (n) => String(n).padStart(2, "0")
@@ -64,40 +86,71 @@ function toLocalISOString(date = new Date()) {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetMins}`
 }
 
-async function main() {
-    console.log("Current Time: " + toLocalISOString())
+// ============================================================================
+// MAIN
+// ============================================================================
 
+async function main() {
+    console.log("Current Time:", toLocalISOString())
     console.log("Exam Schedule Cleanup Script")
-    console.log("Fetching all schedules...")
-    let schedules
-    try {
-        schedules = await fetchAllSchedules()
-    } catch (err) {
-        console.error("Error fetching schedules:", err.message)
-        process.exit(1)
-    }
-    if (!Array.isArray(schedules) || schedules.length === 0) {
-        console.log("No schedules found.")
-        process.exit(0)
-    }
-    let success = 0
-    let failed = 0
-    for (const schedule of schedules) {
+
+    let totalSuccess = 0
+    let totalFailed = 0
+
+    for (const roomId of CONFIG.roomUkomIds) {
+        console.log("\n" + "=".repeat(80))
+        console.log(`ROOM: ${roomId}`)
+        console.log("=".repeat(80))
+
+        let schedules
+
+        // 1. Fetch schedules
         try {
-            await deleteSchedule(schedule.id)
-            console.log(`Deleted schedule: ${schedule.id}`)
-            success++
+            console.log("Fetching schedules...")
+            schedules = await fetchAllSchedules(roomId)
         } catch (err) {
-            console.error(
-                `Failed to delete schedule ${schedule.id}:`,
-                err.message,
-            )
-            failed++
+            console.error(`Error fetching (${roomId}):`, err.message)
+            totalFailed++
+            continue
         }
+
+        if (!Array.isArray(schedules) || schedules.length === 0) {
+            console.log("No schedules found.")
+            continue
+        }
+
+        let success = 0
+        let failed = 0
+
+        // 2. Delete schedules sequentially
+        for (const schedule of schedules) {
+            try {
+                await deleteSchedule(schedule.id)
+                console.log(`Deleted: ${schedule.id}`)
+                success++
+            } catch (err) {
+                console.error(`Failed (${schedule.id}):`, err.message)
+                failed++
+            }
+        }
+
+        console.log(`Room Summary → Success: ${success}, Failed: ${failed}`)
+
+        totalSuccess += success
+        totalFailed += failed
     }
-    console.log("Cleanup complete.")
-    console.log(`Success: ${success}, Failed: ${failed}`)
-    process.exit(failed > 0 ? 1 : 0)
+
+    // ========================================================================
+    // FINAL SUMMARY
+    // ========================================================================
+
+    console.log("\n" + "=".repeat(80))
+    console.log("FINAL SUMMARY")
+    console.log("=".repeat(80))
+    console.log(`Total Success: ${totalSuccess}`)
+    console.log(`Total Failed: ${totalFailed}`)
+
+    process.exit(totalFailed > 0 ? 1 : 0)
 }
 
 main().catch((err) => {

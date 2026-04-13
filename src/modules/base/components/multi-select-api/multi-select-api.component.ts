@@ -337,7 +337,6 @@ export class MultiSelectApiComponent
 
     getSelectedOptions(): MultiSelectApiOption[] {
         return this.selectedIds.map((id) => {
-            console.log('qq', this.selectedOptionsCache)
             const cached = this.selectedOptionsCache.get(id)
             if (cached) {
                 return cached
