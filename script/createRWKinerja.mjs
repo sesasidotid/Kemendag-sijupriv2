@@ -6,7 +6,7 @@ const CONFIG = {
     createEndpoint: "/api/v1/rw_kinerja/task",
     listEndpoint: "/api/v1/jf/task/kinerja/group/572910058728827528",
     submitEndpoint: "/api/v1/rw_kinerja/task/submit",
-    
+
     adminToken: process.env.BEARER_TOKEN,
     userToken: process.env.USER_BEARER_TOKEN,
     // Array of payloads → will call API for each item
