@@ -40,6 +40,8 @@ export class UkomExamCatComponent implements OnChanges {
     indicatorQuestionCounts: Map<string, number> = new Map()
     indicatorAvailableQuestions: Map<string, number> = new Map()
 
+    targetRandomCount: number | null = null
+
     constructor(
         private apiService: ApiService,
         private handlerService: HandlerService,
@@ -161,6 +163,70 @@ export class UkomExamCatComponent implements OnChanges {
         this.handlerService.handleAlert(
             'Success',
             'Semua jumlah pertanyaan telah direset',
+        )
+    }
+
+    randomizeAll() {
+        if (!this.targetRandomCount || this.targetRandomCount < 1) {
+            this.handlerService.handleAlert(
+                'Warning',
+                'Masukkan target jumlah total soal yang diinginkan dengan benar',
+            )
+            return
+        }
+
+        let totalAvailable = 0
+        const availablePerIndicator: {
+            id: string
+            available: number
+            current: number
+        }[] = []
+
+        this.IndikatorKompetensiUkom.forEach((indicator) => {
+            const available = this.getAvailableQuestionCount(indicator.id)
+            totalAvailable += available
+            if (available > 0) {
+                availablePerIndicator.push({
+                    id: indicator.id,
+                    available,
+                    current: 0,
+                })
+            }
+            this.indicatorQuestionCounts.set(indicator.id, 0)
+        })
+
+        if (this.targetRandomCount > totalAvailable) {
+            this.handlerService.handleAlert(
+                'Warning',
+                `Maksimal total soal yang tersedia adalah ${totalAvailable}`,
+            )
+            return
+        }
+
+        let remainingTarget = this.targetRandomCount
+
+        while (remainingTarget > 0) {
+            const validIndicators = availablePerIndicator.filter(
+                (ind) => ind.current < ind.available,
+            )
+            if (validIndicators.length === 0) break
+
+            const randomIndex = Math.floor(
+                Math.random() * validIndicators.length,
+            )
+            validIndicators[randomIndex].current += 1
+            remainingTarget--
+        }
+
+        availablePerIndicator.forEach((ind) => {
+            if (ind.current > 0) {
+                this.indicatorQuestionCounts.set(ind.id, ind.current)
+            }
+        })
+
+        this.handlerService.handleAlert(
+            'Success',
+            'Jumlah pertanyaan berhasil diacak sesuai target',
         )
     }
 
