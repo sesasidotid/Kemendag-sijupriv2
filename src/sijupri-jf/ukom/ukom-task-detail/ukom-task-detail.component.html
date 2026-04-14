@@ -334,12 +334,18 @@
                         <div
                             class="d-flex justify-content-between align-items-center flex-wrap gap-3"
                         >
-                            <div>
+                            <div class="flex-grow-1">
                                 <h6 class="fw-semibold mb-1">
                                     {{
                                     ukomMiscellaneousService.getModuleDisplayName(examSchedule.examTypeCode)
                                     }}
                                 </h6>
+
+                                <div class="text-muted small">
+                                    {{
+                                    scheduleMap().get(examSchedule.id)?.startTime
+                                    | tanggalWaktuIndo }}
+                                </div>
                             </div>
 
                             <div>
@@ -379,13 +385,13 @@
         <!-- CAT Score Component -->
         <app-cat-score
             *ngIf="selectedExamTypeCode() === ExamTypeCategory.CAT"
-            [score]="selectedScore"
+            [score]="$any(selectedScore)"
         ></app-cat-score>
 
         <!-- Generic Score Component for other types -->
         <app-generic-score
             *ngIf="selectedExamTypeCode() !== ExamTypeCategory.CAT"
-            [score]="selectedScore"
+            [score]="$any(selectedScore)"
         ></app-generic-score>
     </ng-container>
 </app-modal>

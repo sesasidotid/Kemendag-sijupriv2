@@ -434,10 +434,17 @@ export class UkomExamWawancaraComponent implements OnInit {
                 error: (err) => {
                     console.error('Reschedule failed', err)
 
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengubah jadwal. Silakan coba lagi.',
-                    )
+                    if (err.error.code === 'RCD-00002') {
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'Gagal mengubah jadwal. Peserta memiliki jadwal pada waktu tersebut',
+                        )
+                    } else {
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'Gagal mengubah jadwal. Silakan coba lagi.',
+                        )
+                    }
                 },
             })
     }

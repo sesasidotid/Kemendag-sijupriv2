@@ -11,7 +11,6 @@ import {
     map,
     Observable,
     of,
-    switchMap,
     tap,
 } from 'rxjs'
 import { ApiService } from '@/modules/base/services/api.service'
@@ -57,6 +56,8 @@ import { ProvinsiService } from '@/modules/maintenance/services/provinsi.service
 import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jabatan.service'
 import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 
 @Component({
     selector: 'app-ukom-task-detail',
@@ -75,6 +76,8 @@ import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
         MakalahScoreAdminComponent,
         WawancaraScoreAdminComponent,
         SeminarScoreAdminComponent,
+        TanggalIndoPipe,
+        TanggalWaktuIndoPipe,
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss',
@@ -122,6 +125,7 @@ export class UkomTaskDetailComponent {
     isDeleteExamScoreLoading$ = new BehaviorSubject<boolean>(false)
 
     isToggleUpdatePasswordModal$ = new BehaviorSubject<boolean>(false)
+    scheduleMap = new Map<string, ExamSchedule>()
     protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor(
@@ -380,11 +384,11 @@ export class UkomTaskDetailComponent {
         this.participantService
             .getParticipantByParticipantId(this.participantId)
             .pipe(
-                switchMap((participant) => {
-                    return this.participantService.getParticipantUkom(
-                        participant.nip,
-                    )
-                }),
+                // switchMap((participant) => {
+                //     return this.participantService.getParticipantUkom(
+                //         participant.nip,
+                //     )
+                // }),
                 finalize(() => {
                     this.ukomDetailLoading$.next(false)
                 }),
@@ -392,6 +396,13 @@ export class UkomTaskDetailComponent {
             .subscribe({
                 next: (participant) => {
                     this.participant = participant
+                    const schedules =
+                        participant?.roomUkomDto?.examScheduleDtoList ?? []
+
+                    for (const s of schedules) {
+                        this.scheduleMap.set(s.id, s)
+                    }
+
                     if (!participant.unitKerjaName) {
                         this.getUnitKerjaById(participant.unitKerjaId)
                     }
@@ -527,5 +538,9 @@ export class UkomTaskDetailComponent {
         this.isToggleUpdatePasswordModal$.next(
             !this.isToggleUpdatePasswordModal$.value,
         )
+    }
+
+    getScheduleStartTime(scheduleId: string): string | null {
+        return this.scheduleMap.get(scheduleId)?.startTime ?? null
     }
 }

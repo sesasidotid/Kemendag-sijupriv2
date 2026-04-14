@@ -34,6 +34,9 @@ import { CatScoreComponent } from '@/modules/ukom/components/cat-score/cat-score
 import { GenericScoreComponent } from '@/modules/ukom/components/generic-score/generic-score.component'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
+import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 
 @Component({
     selector: 'app-ukom-task-detail',
@@ -47,6 +50,7 @@ import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
         CatScoreComponent,
         GenericScoreComponent,
         ModalComponent,
+        TanggalWaktuIndoPipe,
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss',
@@ -77,13 +81,26 @@ export class UkomTaskDetailComponent implements OnInit {
             this.participantScoreLoading(),
     )
     allParticipantScoreLoading = signal(false)
-    examScoresByScheduleId: Record<string, any> = {}
+    examScoresByScheduleId: Record<string, ScoreValue> = {}
     selectedScheduleId = signal<string>(null)
     selectedExamTypeCode = signal<string>(null)
     isScoreModalOpen = signal(false)
     typeKabKota = signal<string>(null)
     kabKotaService = inject(KabKotaService)
+    scheduleMap = computed(() => {
+        const schedules =
+            this.ukomDetail().roomUkomDto?.examScheduleDtoList ?? []
+
+        const map = new Map<string, ExamSchedule>()
+
+        for (const s of schedules) {
+            map.set(s.id, s)
+        }
+
+        return map
+    })
     protected readonly ExamTypeCategory = ExamTypeCategory
+    protected readonly CATScore = CATScore
 
     constructor(
         private apiService: ApiService,
@@ -319,7 +336,7 @@ export class UkomTaskDetailComponent implements OnInit {
                             return of(null)
                         }),
                         map((res) => {
-                            let scoreInstance = null
+                            let scoreInstance: ScoreValue = null
                             if (res) {
                                 switch (examSchedule.examTypeCode) {
                                     case ExamTypeCategory.CAT:
@@ -364,7 +381,7 @@ export class UkomTaskDetailComponent implements OnInit {
             })
     }
 
-    getSelectedScore(): any {
+    getSelectedScore() {
         return this.selectedScheduleId()
             ? this.examScoresByScheduleId[this.selectedScheduleId()]
             : null

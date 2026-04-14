@@ -580,10 +580,17 @@ export class UkomExamMakalahComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Reschedule error:', err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengubah jadwal peserta.',
-                    )
+                    if (err.error.code === 'RCD-00002') {
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'Gagal mengubah jadwal. Peserta memiliki jadwal pada waktu tersebut',
+                        )
+                    } else {
+                        this.handlerService.handleAlert(
+                            'Error',
+                            'Gagal mengubah jadwal. Silakan coba lagi.',
+                        )
+                    }
                 },
             })
     }

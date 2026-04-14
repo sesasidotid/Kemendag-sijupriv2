@@ -695,12 +695,17 @@
                             <div
                                 class="d-flex justify-content-between align-items-center flex-wrap gap-3"
                             >
-                                <div>
+                                <div class="flex-grow-1">
                                     <h6 class="fw-semibold mb-1">
                                         {{
                                         ukomMiscellaneousService.getModuleDisplayName(examSchedule.examTypeCode)
                                         }}
                                     </h6>
+
+                                    <div class="text-muted small">
+                                        {{ getScheduleStartTime(examSchedule.id)
+                                        | tanggalWaktuIndo }}
+                                    </div>
                                 </div>
 
                                 <div>

@@ -45,6 +45,8 @@ import { CatScoreComponent } from '@/modules/ukom/components/cat-score/cat-score
 import { GenericScoreComponent } from '@/modules/ukom/components/generic-score/generic-score.component'
 import { Pendidikan } from '@/modules/maintenance/models/pendidikan.model'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
+import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
+import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
@@ -66,6 +68,7 @@ export enum JenisUkomEnum {
         ReplaceUkomWordPipe,
         CatScoreComponent,
         GenericScoreComponent,
+        TanggalWaktuIndoPipe,
     ],
     templateUrl: './status-pendaftaran-ukom.component.html',
     styleUrl: './status-pendaftaran-ukom.component.scss',
@@ -120,6 +123,7 @@ export class StatusPendaftaranUkomComponent {
     isLoading$: Observable<boolean>
     registrationStatus: string
     ukomGrade: UkomGrade
+    scheduleMap = new Map<string, ExamSchedule>()
     protected readonly ExamTypeCategory = ExamTypeCategory
     private destroy$ = new Subject<void>()
 
@@ -377,6 +381,9 @@ export class StatusPendaftaranUkomComponent {
                         this.finishTask = response.data
                         this.dataDokumenUkom = response.data.documentUkomList
                         this.mapDokumenUkom()
+
+                        this.buildScheduleMap() // <-- HERE
+
                         this.getAllScoresFlow(key)
                     }
 
@@ -406,6 +413,19 @@ export class StatusPendaftaranUkomComponent {
             })
     }
 
+    buildScheduleMap() {
+        this.scheduleMap.clear()
+
+        const schedules = this.finishTask?.examSchedule ?? []
+
+        for (const s of schedules) {
+            this.scheduleMap.set(s.id, s)
+        }
+    }
+    getScheduleStartTime(scheduleId: string): string | null {
+        return this.scheduleMap.get(scheduleId)?.startTime ?? null
+    }
+    
     getAllScoresFlow(key: string): void {
         this.isAllSchoreLoading$.next(true)
 

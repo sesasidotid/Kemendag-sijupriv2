@@ -276,7 +276,7 @@
                         <label class="form-label"
                             >Predikat Kinerja Pegawai Satu Tahun Terakhir</label
                         >
-                        <p class="border-bottom">{{ predikat1Name ?? '-'  }}</p>
+                        <p class="border-bottom">{{ predikat1Name ?? '-' }}</p>
                     </div>
                 </div>
 
@@ -316,6 +316,46 @@
             </h5>
         </div>
 
+        <!--        <div class="card-body p-0">-->
+        <!--            <div class="list-group list-group-flush">-->
+        <!--                <ng-container-->
+        <!--                    *ngFor="let exam of participant.roomUkomDto?.examScheduleDtoList"-->
+        <!--                >-->
+        <!--                    <div-->
+        <!--                        *ngIf="scoreMap[exam.id] != null"-->
+        <!--                        class="list-group-item py-3"-->
+        <!--                    >-->
+        <!--                        <div-->
+        <!--                            class="d-flex justify-content-between align-items-center flex-wrap gap-3"-->
+        <!--                        >-->
+        <!--                            <div>-->
+        <!--                                <h6 class="fw-semibold mb-1">-->
+        <!--                                    {{ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)}}-->
+        <!--                                </h6>-->
+        <!--                            </div>-->
+        <!--                            <div-->
+        <!--                                class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"-->
+        <!--                            >-->
+        <!--                                <button-->
+        <!--                                    (click)="toggleModal(exam.id, exam.examTypeCode)"-->
+        <!--                                    class="btn btn-success"-->
+        <!--                                >-->
+        <!--                                    Lihat Nilai-->
+        <!--                                </button>-->
+        <!--                                <app-loading-button-->
+        <!--                                    (clicked)="deleteExamScore(scoreMap[exam.id]?.id)"-->
+        <!--                                    [className]="'btn btn-danger'"-->
+        <!--                                    [isLoading]="isDeleteExamScoreLoading$ | async"-->
+        <!--                                    [type]="'button'"-->
+        <!--                                    label="Hapus Nilai"-->
+        <!--                                >-->
+        <!--                                </app-loading-button>-->
+        <!--                            </div>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </ng-container>-->
+        <!--            </div>-->
+        <!--        </div>-->
         <div class="card-body p-0">
             <div class="list-group list-group-flush">
                 <ng-container
@@ -326,13 +366,24 @@
                         class="list-group-item py-3"
                     >
                         <div
-                            class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+                            class="d-flex justify-content-between align-items-start flex-wrap gap-3"
                         >
-                            <div>
+                            <!-- LEFT: Info -->
+                            <div class="flex-grow-1">
                                 <h6 class="fw-semibold mb-1">
-                                    {{ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)}}
+                                    {{
+                                    ukomMiscellaneousService.getModuleDisplayName(exam.examTypeCode)
+                                    }}
                                 </h6>
+
+                                <!-- NEW: Datetime Info -->
+                                <div class="text-muted small">
+                                    {{ getScheduleStartTime(exam.id) |
+                                    tanggalWaktuIndo }}
+                                </div>
                             </div>
+
+                            <!-- RIGHT: Actions -->
                             <div
                                 class="d-flex align-items-end flex-sm-row flex-column mt-sm-0 mt-2 gap-2"
                             >
@@ -342,6 +393,7 @@
                                 >
                                     Lihat Nilai
                                 </button>
+
                                 <app-loading-button
                                     (clicked)="deleteExamScore(scoreMap[exam.id]?.id)"
                                     [className]="'btn btn-danger'"

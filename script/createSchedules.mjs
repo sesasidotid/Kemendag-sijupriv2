@@ -1,11 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * Exam Schedule Automation Script
- * - Multi-room
- * - Configurable split
- * - Fixed time window (baseStart → baseEnd)
- */
 import dotenv from "dotenv"
 import path from "path"
 import { fileURLToPath } from "url"
@@ -20,24 +14,23 @@ const CONFIG = {
     baseUrl: "http://sijupri.sesasi.xyz:8000",
     bearerToken: process.env.BEARER_TOKEN,
 
-    baseStart: "2026-04-14T09:30",
-    baseEnd: "2026-04-17T12:00", // ✅ NEW
+    baseStart: "2026-04-14T15:37",
+    baseEnd: "2026-04-14T16:00",
 
-    roomUkomIds: [
-        "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
-        "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
+    participantIds: [
+        "f0be4c17-70ea-4e4a-8dd8-4e9f0c6c6744",
+        "5d37a492-2ff3-4794-9949-f2a785f0a2f0",
+        // "uuid-2",
     ],
+    participantLimit: 2,
+
+    roomUkomIds: ["22c1a104-877f-4a22-9dd8-b76a5f04edf6"],
 
     durationsMinutes: {
-        cat: 10,
-        wawancara: 5,
-        portofolio: 5,
-        praktik: 5,
-        studi_kasus: 5,
-        makalah: {
-            makalah: 5,
-            seminar: 5,
-        },
+        cat: 5,
+        wawancara: 1,
+        praktik: 1,
+        makalah: 1,
     },
 
     secretKeys: {
@@ -47,11 +40,11 @@ const CONFIG = {
 
     splitConfig: {
         cat: 1,
-        wawancara: 2,
-        portofolio: 2,
-        praktik: 2,
-        studi_kasus: 2,
-        makalah: 2,
+        wawancara: 1,
+        portofolio: 1,
+        praktik: 1,
+        studi_kasus: 1,
+        makalah: 1,
     },
 
     examinerAmount: {
@@ -60,11 +53,11 @@ const CONFIG = {
 
     endpoints: {
         cat: "/api/v1/exam_schedule/cat",
-        // wawancara: "/api/v1/exam_schedule/wawancara",
-        // portofolio: "/api/v1/exam_schedule/portofolio",
-        // praktik: "/api/v1/exam_schedule/praktik",
-        // studi_kasus: "/api/v1/exam_schedule/studi_kasus",
-        // makalah: "/api/v1/exam_schedule/makalah",
+        wawancara: "/api/v1/exam_schedule/wawancara",
+        portofolio: "/api/v1/exam_schedule/portofolio",
+        praktik: "/api/v1/exam_schedule/praktik",
+        studi_kasus: "/api/v1/exam_schedule/studi_kasus",
+        makalah: "/api/v1/exam_schedule/makalah",
     },
 }
 
@@ -103,6 +96,26 @@ function clone(obj) {
 
 function minutesToHours(minutes) {
     return minutes / 60
+}
+
+// ============================================================================
+// 🔥 HYBRID SELECTION
+// ============================================================================
+
+function selectParticipants(list, { ids, limit }) {
+    // 1. PRIORITY: ID-based selection
+    if (ids && ids.length > 0) {
+        const set = new Set(ids)
+        return list.filter((id) => set.has(id))
+    }
+
+    // 2. FALLBACK: limit-based selection
+    if (limit && limit > 0) {
+        return list.slice(0, limit)
+    }
+
+    // 3. DEFAULT: all
+    return list
 }
 
 // ============================================================================
@@ -197,7 +210,7 @@ const PAYLOAD_TEMPLATES = {
 }
 
 // ============================================================================
-// BUILDERS
+// BUILDERS (unchanged)
 // ============================================================================
 
 function buildStandardPayload(type, baseStart, baseEnd, participants, roomId) {
@@ -220,13 +233,11 @@ function buildStandardPayload(type, baseStart, baseEnd, participants, roomId) {
 function buildWawancaraPayload(baseStart, baseEnd, participants, roomId) {
     const t = clone(PAYLOAD_TEMPLATES.wawancara)
 
-    const base = CONFIG.durationsMinutes.wawancara
-
     t.startTime = formatDateTime(baseStart)
     t.endTime = formatDateTime(baseEnd)
     t.roomUkomId = roomId
     t.participantIdList = participants
-    t.duration = minutesToHours(base)
+    t.duration = minutesToHours(CONFIG.durationsMinutes.wawancara)
 
     return t
 }
@@ -234,28 +245,24 @@ function buildWawancaraPayload(baseStart, baseEnd, participants, roomId) {
 function buildMakalahPayload(baseStart, baseEnd, participants, roomId) {
     const t = clone(PAYLOAD_TEMPLATES.makalah)
 
-    // 🔥 Special timeline
-    const makalahStart = addMinutes(baseStart, -10)
+    const makalahStart = addMinutes(baseStart, -5)
     const makalahEnd = baseStart
-
-    const seminarStart = baseStart
-    const seminarEnd = baseEnd
 
     t.makalahStartTime = formatDateTime(makalahStart)
     t.makalahEndTime = formatDateTime(makalahEnd)
-    t.seminarStartTime = formatDateTime(seminarStart)
-    t.seminarEndTime = formatDateTime(seminarEnd)
+    t.seminarStartTime = formatDateTime(baseStart)
+    t.seminarEndTime = formatDateTime(baseEnd)
 
     t.roomUkomId = roomId
     t.participantIdList = participants
-    t.duration = minutesToHours(CONFIG.durationsMinutes.makalah.makalah)
+    t.duration = minutesToHours(CONFIG.durationsMinutes.makalah)
     t.examinerAmount = CONFIG.examinerAmount.makalah
 
     return t
 }
 
 // ============================================================================
-// HTTP
+// HTTP (unchanged)
 // ============================================================================
 
 async function sendPost(endpoint, payload) {
@@ -295,8 +302,16 @@ async function main() {
         console.log(`ROOM: ${roomId}`)
         console.log("=".repeat(80))
 
-        const participants = await fetchParticipantIds(roomId)
-        console.log(`Participants: ${participants.length}`)
+        let participants = await fetchParticipantIds(roomId)
+        console.log(`Participants (raw): ${participants.length}`)
+
+        // 🔥 HYBRID APPLY
+        participants = selectParticipants(participants, {
+            ids: CONFIG.participantIds,
+            limit: CONFIG.participantLimit,
+        })
+
+        console.log(`Participants (used): ${participants.length}`)
 
         for (const type of Object.keys(CONFIG.endpoints)) {
             const splitCount = CONFIG.splitConfig[type] || 1

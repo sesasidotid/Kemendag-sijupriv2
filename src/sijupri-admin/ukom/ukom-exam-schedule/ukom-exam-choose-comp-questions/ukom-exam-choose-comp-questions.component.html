@@ -68,8 +68,8 @@
                                 type="button"
                             >
                                 <i class="mdi mdi-account-tie me-2"></i>
-                                Lihat Daftar Penguji ({{ examinerList().length
-                                }})
+                                Lihat Daftar Penguji ({{
+                                uniqueExaminers().length }})
                             </button>
                             <button
                                 (click)="openParticipantListModal()"
@@ -146,7 +146,7 @@
     (close)="closeExaminerListModal()"
     *ngIf="showExaminerListModal()"
     [examTypeCode]="typeUkom()"
-    [examinerList]="examinerList()"
+    [examinerList]="uniqueExaminers()"
 >
 </app-examiner-list-modal>
 

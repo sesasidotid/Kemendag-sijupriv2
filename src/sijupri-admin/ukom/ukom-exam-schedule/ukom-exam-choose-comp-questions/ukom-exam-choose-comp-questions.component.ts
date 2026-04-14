@@ -69,6 +69,20 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
             this.isLoadingExaminer(),
     )
     examinerList = signal<ExaminerScheduleList[]>([])
+    readonly uniqueExaminers = computed(() => {
+        const list = this.examinerList()
+
+        const map = new Map<string, ExaminerScheduleList>()
+
+        for (const item of list) {
+            const id = item.examinerId
+            if (id && !map.has(id)) {
+                map.set(id, item)
+            }
+        }
+
+        return Array.from(map.values())
+    })
     participantList = signal<ParticipantScheduleList[]>([])
     roomUkomDetail = signal<RoomUkomDetail>(null)
     showParticipantListModal = signal<boolean>(false)

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, input, Output } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
@@ -13,9 +13,9 @@ import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community'
     templateUrl: './examiner-list-modal.component.html',
     styleUrls: ['./examiner-list-modal.component.scss'],
 })
-export class ExaminerListModalComponent implements OnInit {
-    @Input() examinerList: ExaminerScheduleList[] = []
-    @Input() examTypeCode: string = ''
+export class ExaminerListModalComponent {
+    examinerList = input<ExaminerScheduleList[]>([])
+    examTypeCode = input<string>('')
 
     @Output() close = new EventEmitter<void>()
     columnDefs: ColDef[] = [

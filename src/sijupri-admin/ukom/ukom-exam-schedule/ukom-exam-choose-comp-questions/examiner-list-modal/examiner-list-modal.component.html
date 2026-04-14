@@ -2,27 +2,27 @@
     (toggle)="onClose()"
     [enableFooter]="false"
     [size]="'lg'"
-    [title]="'Daftar Penguji ' + examTypeCode"
+    [title]="'Daftar Penguji ' + examTypeCode()"
 >
     <div class="examiner-list-content">
         <div class="alert alert-info mb-3">
             <i class="mdi mdi-information-outline me-2"></i>
-            <strong>Total Penguji:</strong> {{ examinerList.length }} orang
+            <strong>Total Penguji:</strong> {{ examinerList().length }} orang
         </div>
 
-        <div *ngIf="examinerList.length === 0" class="alert alert-warning">
+        <div *ngIf="examinerList().length === 0" class="alert alert-warning">
             <i class="bi bi-exclamation-triangle me-2"></i>
             Tidak ada penguji terdaftar untuk ujian ini.
         </div>
 
         <ag-grid-angular
             (gridReady)="onGridReady($event)"
-            *ngIf="examinerList.length > 0"
+            *ngIf="examinerList().length > 0"
             [columnDefs]="columnDefs"
             [defaultColDef]="defaultColDef"
             [paginationPageSize]="20"
             [pagination]="true"
-            [rowData]="examinerList"
+            [rowData]="examinerList()"
             [suppressCellFocus]="true"
             class="ag-theme-alpine"
             style="height: 500px; width: 100%"
