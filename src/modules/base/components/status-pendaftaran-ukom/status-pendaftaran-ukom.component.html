@@ -688,8 +688,7 @@
                         *ngFor="let examSchedule of finishTask.examSchedule"
                     >
                         <div
-                            *ngIf="examScoresByScheduleId[examSchedule.id] != null &&
-                           examSchedule.examTypeCode !== ExamTypeCategory.MAKALAH"
+                            *ngIf="examScoresByScheduleId[examSchedule.id] != null"
                             class="list-group-item py-3"
                         >
                             <div

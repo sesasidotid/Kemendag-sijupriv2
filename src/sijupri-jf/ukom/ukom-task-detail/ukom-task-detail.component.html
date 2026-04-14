@@ -326,9 +326,13 @@
                 <ng-container
                     *ngFor="let examSchedule of ukomDetail().roomUkomDto?.examScheduleDtoList"
                 >
+                    <!--                    <div-->
+                    <!--                        *ngIf="examScoresByScheduleId[examSchedule.id] != null &&-->
+                    <!--                           examSchedule.examTypeCode !== ExamTypeCategory.MAKALAH"-->
+                    <!--                        class="list-group-item py-3"-->
+                    <!--                    >-->
                     <div
-                        *ngIf="examScoresByScheduleId[examSchedule.id] != null &&
-                           examSchedule.examTypeCode !== ExamTypeCategory.MAKALAH"
+                        *ngIf="examScoresByScheduleId[examSchedule.id] != null"
                         class="list-group-item py-3"
                     >
                         <div

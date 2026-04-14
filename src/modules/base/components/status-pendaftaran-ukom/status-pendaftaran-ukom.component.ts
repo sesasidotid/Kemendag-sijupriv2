@@ -425,7 +425,7 @@ export class StatusPendaftaranUkomComponent {
     getScheduleStartTime(scheduleId: string): string | null {
         return this.scheduleMap.get(scheduleId)?.startTime ?? null
     }
-    
+
     getAllScoresFlow(key: string): void {
         this.isAllSchoreLoading$.next(true)
 

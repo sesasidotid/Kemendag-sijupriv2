@@ -289,8 +289,8 @@ export class UkomTaskDetailComponent implements OnInit {
         }
         this.isScoreModalOpen.update((v) => !v)
         if (!this.isScoreModalOpen()) {
-            this.selectedScheduleId = null
-            this.selectedExamTypeCode = null
+            this.selectedScheduleId.set(null)
+            this.selectedExamTypeCode.set(null)
         }
     }
 
@@ -300,7 +300,7 @@ export class UkomTaskDetailComponent implements OnInit {
         this.ukomGradeService
             .findGradeParticipantJF(this.id)
             .pipe(
-                finalize(() => (this, this.participantScoreLoading.set(false))),
+                finalize(() => this.participantScoreLoading.set(false)),
             )
             .subscribe({
                 next: (response) => {

@@ -225,16 +225,16 @@
                                         ></span>
                                         Lihat Nilai
                                     </button>
-                                    <button
-                                        (click)="viewUploadedMakalah(exam.id)"
-                                        class="btn btn-outline-primary"
-                                        type="button"
-                                    >
-                                        <span
-                                            class="mdi mdi-file-document me-2"
-                                        ></span>
-                                        Lihat File
-                                    </button>
+                                    <!--                                    <button-->
+                                    <!--                                        (click)="viewUploadedMakalah(exam.id)"-->
+                                    <!--                                        class="btn btn-outline-primary"-->
+                                    <!--                                        type="button"-->
+                                    <!--                                    >-->
+                                    <!--                                        <span-->
+                                    <!--                                            class="mdi mdi-file-document me-2"-->
+                                    <!--                                        ></span>-->
+                                    <!--                                        Lihat File-->
+                                    <!--                                    </button>-->
                                 </div>
                             </ng-container>
 
@@ -420,13 +420,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!--                                <app-loading-button-->
-                                <!--                                    (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"-->
-                                <!--                                    *ngIf="isExamOngoing(exam)"-->
-                                <!--                                    [className]="'btn-action-primary'"-->
-                                <!--                                    [isLoading]="startPraktikLoading()"-->
-                                <!--                                    [label]="'Mulai Praktik'"-->
-                                <!--                                ></app-loading-button>-->
 
                                 <!-- 2c. Expired - neutral style for PRAKTIK -->
                                 <div
@@ -443,14 +436,15 @@
                                         <div class="note-text">
                                             Ujian telah selesai. Saat ini sedang
                                             menunggu penilaian dari penguji.
-                                            Silahkan unggah laporan praktikum
-                                            jika dibutuhkan.
+                                            <!--                                            Silahkan unggah laporan praktikum-->
+                                            <!--                                            jika dibutuhkan.-->
                                         </div>
                                     </div>
                                 </div>
 
                                 <app-loading-button
                                     (clicked)="startExam(exam.roomUkomId, exam.examTypeCode, exam.id)"
+                                    *ngIf="!isExamExpired(exam.endTime)"
                                     [className]="'btn-action-primary'"
                                     [isLoading]="startPraktikLoading()"
                                     [label]="'Unggah video persiapan / laporan praktikum'"
