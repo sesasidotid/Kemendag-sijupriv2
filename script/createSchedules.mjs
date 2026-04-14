@@ -6,18 +6,26 @@
  * - Configurable split
  * - Fixed time window (baseStart → baseEnd)
  */
-import "dotenv/config"
+import dotenv from "dotenv"
+import path from "path"
+import { fileURLToPath } from "url"
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+dotenv.config({
+    path: path.resolve(__dirname, "../.env"),
+})
 
 const CONFIG = {
     baseUrl: "http://sijupri.sesasi.xyz:8000",
     bearerToken: process.env.BEARER_TOKEN,
 
-    baseStart: "2026-04-13T13:00",
+    baseStart: "2026-04-14T09:30",
     baseEnd: "2026-04-17T12:00", // ✅ NEW
 
     roomUkomIds: [
         "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
-        // "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
+        "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
     ],
 
     durationsMinutes: {
@@ -51,12 +59,12 @@ const CONFIG = {
     },
 
     endpoints: {
-        // cat: "/api/v1/exam_schedule/cat",
+        cat: "/api/v1/exam_schedule/cat",
         // wawancara: "/api/v1/exam_schedule/wawancara",
         // portofolio: "/api/v1/exam_schedule/portofolio",
         // praktik: "/api/v1/exam_schedule/praktik",
         // studi_kasus: "/api/v1/exam_schedule/studi_kasus",
-        makalah: "/api/v1/exam_schedule/makalah",
+        // makalah: "/api/v1/exam_schedule/makalah",
     },
 }
 

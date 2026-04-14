@@ -136,7 +136,14 @@ export class UkomParticipantService {
     getParticipantByParticipantId(
         participantId: string,
     ): Observable<Participant> {
-        return this.apiService.getData(`${this.BASE_PATH}/${participantId}`)
+        return this.apiService
+            .getData(`${this.BASE_PATH}/${participantId}`)
+            .pipe(
+                catchError((error) => {
+                    console.error('Error getParticipantByParticipantId', error)
+                    throw error
+                }),
+            )
     }
     deleteTaskById(id: string): Observable<void> {
         return this.apiService.deleteData(`${this.BASE_PATH}/${id}`)

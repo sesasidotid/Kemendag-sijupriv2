@@ -1,3 +1,4 @@
+<script src="cat-page.component.ts"></script>
 <div
     appDisableKeyboardShortcuts
     appDisableRightClick
@@ -30,14 +31,13 @@
                             Terima kasih
                         </p>
                         <h2 class="fw-bold mb-3">
-                            Anda sudah menyelesaikan CAT
+                            Anda telah menyelesaikan CAT
                         </h2>
                         <p class="mb-4">
-                            Mohon menunggu hingga waktu pengerjaan berakhir.
-                            Setelah waktu habis, skor Anda akan ditampilkan
-                            otomatis.
+                            Sistem sedang memproses hasil CAT Anda. Silakan
+                            kembali ke dashboard dan lakukan refresh halaman
+                            secara berkala untuk melihat skor Anda.
                         </p>
-
                         <div
                             [class.danger]="remainingSeconds() < 60"
                             [class.warning]="remainingSeconds() < 300"
@@ -94,8 +94,14 @@
                             </ng-container>
                         </div>
 
+                        <!--                        <button-->
+                        <!--                            [routerLink]="['/']"-->
+                        <!--                            class="btn btn-primary mt-4"-->
+                        <!--                        >-->
+                        <!--                            Kembali-->
+                        <!--                        </button>-->
                         <button
-                            [routerLink]="['/']"
+                            (click)="backWithNoConfirmation()"
                             class="btn btn-primary mt-4"
                         >
                             Kembali

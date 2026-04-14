@@ -156,12 +156,18 @@ export class CatPageComponent {
             next: ({ confirmed }) => {
                 if (confirmed) {
                     this.router.navigate(['/'])
+                    this.securityService.exitFullScreen()
                 }
             },
             error: (err) => {
                 console.error('Error during confirmation:', err)
             },
         })
+    }
+
+    backWithNoConfirmation() {
+        this.router.navigate(['/'])
+        this.securityService.exitFullScreen()
     }
 
     // ========== Question Navigation ==========
