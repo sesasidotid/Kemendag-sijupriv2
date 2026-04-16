@@ -1,5 +1,3 @@
 <div class="total-score-container">
-  <div class="total-score-value">
-    {{ score?.score | number: '1.2-2' }}
-  </div>
+    <div class="total-score-value">{{ score?.score | truncateDecimal:2 }}</div>
 </div>

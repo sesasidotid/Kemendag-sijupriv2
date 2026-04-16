@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common'
 import { CATScore } from '@/modules/ukom/models/exam/exam-score.model'
 import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-competency.model'
 import { CATQuestions } from '@/modules/ukom/models/cat/cat-questions'
+import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
 
 @Component({
     selector: 'app-cat-score',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TruncateDecimalPipe],
     templateUrl: './cat-score.component.html',
     styleUrl: './cat-score.component.scss',
 })

@@ -1,11 +1,12 @@
 import { Component, computed, input } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { PraktikScore } from '@/modules/ukom/models/exam/exam-score.model'
+import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
 
 @Component({
     selector: 'app-praktik-score-admin',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TruncateDecimalPipe],
     templateUrl: './praktik-score-admin.component.html',
     styleUrls: ['./praktik-score-admin.component.scss'],
 })

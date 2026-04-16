@@ -1,12 +1,16 @@
 <div class="total-score-container">
-    <div class="total-score-value">{{ score()?.score | number: '1.2-2' }}</div>
+    <div class="total-score-value">
+        {{ score()?.score | truncateDecimal:2 }}
+    </div>
 </div>
 
 <ng-container *ngFor="let competencyGroup of groupedCompetencies()">
-    <div class="card mb-4 shadow-sm border-0">
-        <div class="card-header bg-primary text-white py-3">
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-primary py-3 text-white">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-white fw-bold">{{ competencyGroup.name }}</h5>
+                <h5 class="fw-bold mb-0 text-white">
+                    {{ competencyGroup.name }}
+                </h5>
                 <span class="badge bg-light text-primary badge-lg fs-6">
                     {{ competencyGroup.percentage }}% ({{
                     competencyGroup.correct }}/{{ competencyGroup.total }})
@@ -15,7 +19,7 @@
         </div>
 
         <div class="card-body bg-light">
-             <!-- Sub-competencies -->
+            <!-- Sub-competencies -->
             <div class="row">
                 <div
                     *ngFor="let kompetensi of competencyGroup.items"
@@ -23,9 +27,9 @@
                 >
                     <div class="card h-100 border-0 shadow-sm">
                         <div
-                            class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center py-3"
+                            class="card-header border-bottom-0 d-flex justify-content-between align-items-center bg-white py-3"
                         >
-                            <h6 class="mb-0 fw-bold">{{ kompetensi.name }}</h6>
+                            <h6 class="fw-bold mb-0">{{ kompetensi.name }}</h6>
                             <span
                                 [ngClass]="{
                                     'bg-success':
@@ -46,11 +50,16 @@
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover mb-0">
+                                <table class="table-hover mb-0 table">
                                     <thead class="table-light">
                                         <tr>
                                             <th class="ps-3">Pertanyaan</th>
-                                            <th class="text-end pe-3" style="width: 100px;">Status</th>
+                                            <th
+                                                class="pe-3 text-end"
+                                                style="width: 100px"
+                                            >
+                                                Status
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -59,16 +68,24 @@
                                                 let question of kompetensi.questionDtoList
                                             "
                                         >
-                                            <td class="ps-3 align-middle">{{ question.question }}</td>
-                                            <td class="text-end pe-3 align-middle">
+                                            <td class="ps-3 align-middle">
+                                                {{ question.question }}
+                                            </td>
+                                            <td
+                                                class="pe-3 text-end align-middle"
+                                            >
                                                 <span
-                                                    class="badge rounded-pill"
                                                     [ngClass]="{
                                                         'bg-success-subtle text-success': question.answerDto?.answerChoice === getCorrectAnswer(question),
                                                         'bg-danger-subtle text-danger': question.answerDto?.answerChoice !== getCorrectAnswer(question)
                                                     }"
+                                                    class="badge rounded-pill"
                                                 >
-                                                    {{ question.answerDto?.answerChoice === getCorrectAnswer(question) ? 'Benar' : 'Salah' }}
+                                                    {{
+                                                    question.answerDto?.answerChoice
+                                                    ===
+                                                    getCorrectAnswer(question) ?
+                                                    'Benar' : 'Salah' }}
                                                 </span>
                                             </td>
                                         </tr>

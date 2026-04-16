@@ -1,11 +1,12 @@
 import { Component, computed, input } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { SeminarScore } from '@/modules/ukom/models/exam/exam-score.model'
+import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
 
 @Component({
     selector: 'app-seminar-score-admin',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TruncateDecimalPipe],
     templateUrl: './seminar-score-admin.component.html',
     styleUrls: ['./seminar-score-admin.component.scss'],
 })
@@ -36,4 +37,3 @@ export class SeminarScoreAdminComponent {
         return question.answerDto?.answerText || ''
     }
 }
-

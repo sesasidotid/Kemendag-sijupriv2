@@ -1,11 +1,12 @@
 import { Component, computed, input } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { StudiKasusScore } from '@/modules/ukom/models/exam/exam-score.model'
+import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
 
 @Component({
     selector: 'app-studi-kasus-score-admin',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TruncateDecimalPipe],
     templateUrl: './studi-kasus-score-admin.component.html',
     styleUrls: ['./studi-kasus-score-admin.component.scss'],
 })

@@ -1,11 +1,12 @@
 import { Component, input } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { WawancaraScore } from '@/modules/ukom/models/exam/exam-score.model'
+import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
 
 @Component({
     selector: 'app-wawancara-score-admin',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TruncateDecimalPipe],
     templateUrl: './wawancara-score-admin.component.html',
     styleUrls: ['./wawancara-score-admin.component.scss'],
 })

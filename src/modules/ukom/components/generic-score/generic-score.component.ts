@@ -6,6 +6,7 @@ import {
     PraktikScore,
     StudiKasusScore,
 } from '@/modules/ukom/models/exam/exam-score.model'
+import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
 
 type GenericScore =
     | PortofolioScore
@@ -16,7 +17,7 @@ type GenericScore =
 @Component({
     selector: 'app-generic-score',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TruncateDecimalPipe],
     templateUrl: './generic-score.component.html',
     styleUrl: './generic-score.component.scss',
 })

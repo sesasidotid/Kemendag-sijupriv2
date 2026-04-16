@@ -25,6 +25,7 @@ import { UkomGradeExportComponent } from '../ukom-grade-export/ukom-grade-export
 import { UkomGradeSuratRekomSetupComponent } from './ukom-grade-surat-rekom-setup/ukom-grade-surat-rekom-setup.component'
 import { UkomGradeSuratRekomComponent } from '@/sijupri-admin/ukom/ukom-grade-list/ukom-grade-surat-rekom/ukom-grade-surat-rekom.component'
 import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
+import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
 
 type UkomGradeTabKey =
     | 'list'
@@ -50,6 +51,7 @@ type UkomGradeTabKey =
     ],
     templateUrl: './ukom-grade-list.component.html',
     styleUrl: './ukom-grade-list.component.scss',
+    providers: [TruncateDecimalPipe],
 })
 export class UkomGradeListComponent {
     @ViewChild(FileHandlerComponent) fileHandler: FileHandlerComponent
@@ -86,6 +88,7 @@ export class UkomGradeListComponent {
     }
 
     isModalUploadBatchOpen$ = new BehaviorSubject<boolean>(false)
+    truncateDecimalPipe = inject(TruncateDecimalPipe)
 
     constructor(
         private tabService: TabService,
@@ -112,7 +115,9 @@ export class UkomGradeListComponent {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor CAT', (item: UkomGrade) => {
-                        return this.rounding(item.catGradeScore)
+                        return this.truncateDecimalPipe.transform(
+                            item.catGradeScore,
+                        )
                     })
                     .build(),
             )
@@ -120,119 +125,139 @@ export class UkomGradeListComponent {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Wawancara', (item: UkomGrade) => {
-                        return this.rounding(item.wawancaraGradeScore)
+                        return this.truncateDecimalPipe.transform(
+                            item.wawancaraGradeScore,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Seminar', (item: UkomGrade) => {
-                        return this.rounding(item.seminarGradeScore)
+                        return this.truncateDecimalPipe.transform(
+                            item.seminarGradeScore,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Praktik', (item: UkomGrade) => {
-                        return this.rounding(item.praktikGradeScore)
+                        return this.truncateDecimalPipe.transform(
+                            item.praktikGradeScore,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Portofolio', (item: UkomGrade) => {
-                        return this.rounding(item.portofolioGradeScore)
+                        return this.truncateDecimalPipe.transform(
+                            item.portofolioGradeScore,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Studi Kasus', (item: UkomGrade) => {
-                        return this.rounding(item.studiKasusGradeScore)
+                        return this.truncateDecimalPipe.transform(
+                            item.studiKasusGradeScore,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('UKT', (item: UkomGrade) => {
-                        return this.rounding(item.ukt)
+                        return this.truncateDecimalPipe.transform(item.ukt)
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB CAT', (item: UkomGrade) => {
-                        return this.rounding(item.nbCat)
+                        return this.truncateDecimalPipe.transform(item.nbCat)
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Wawancara', (item: UkomGrade) => {
-                        return this.rounding(item.nbWawancara)
+                        return this.truncateDecimalPipe.transform(
+                            item.nbWawancara,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Seminar', (item: UkomGrade) => {
-                        return this.rounding(item.nbSeminar)
+                        return this.truncateDecimalPipe.transform(
+                            item.nbSeminar,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Praktik', (item: UkomGrade) => {
-                        return this.rounding(item.nbPraktik)
+                        return this.truncateDecimalPipe.transform(
+                            item.nbPraktik,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Studi Kasus', (item: UkomGrade) => {
-                        return this.rounding(item.nbStudiKasus)
+                        return this.truncateDecimalPipe.transform(
+                            item.nbStudiKasus,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Portofolio', (item: UkomGrade) => {
-                        return this.rounding(item.nbPortofolio)
+                        return this.truncateDecimalPipe.transform(
+                            item.nbPortofolio,
+                        )
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB UKT', (item: UkomGrade) => {
-                        return this.rounding(item.nbUkt)
+                        return this.truncateDecimalPipe.transform(item.nbUkt)
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('RUKMSK', (item: UkomGrade) => {
-                        return this.rounding(item.score)
+                        return this.truncateDecimalPipe.transform(item.score)
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('UKMSK', (item: UkomGrade) => {
-                        return this.rounding(item.jpm)
+                        return this.truncateDecimalPipe.transform(item.jpm)
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB UKMSK', (item: UkomGrade) => {
-                        return this.rounding(item.ukmsk)
+                        return this.truncateDecimalPipe.transform(item.ukmsk)
                     })
                     .build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Nilai Akhir', (item: UkomGrade) => {
-                        return this.rounding(item.grade)
+                        return this.truncateDecimalPipe.transform(item.grade)
                     })
                     .build(),
             )
@@ -360,20 +385,6 @@ export class UkomGradeListComponent {
                 file_rekomendasi: '',
             }
         }
-    }
-
-    rounding(value: string | number | null | undefined): string {
-        if (value === null || value === undefined) {
-            return '-'
-        }
-
-        const num = parseFloat(value.toString())
-
-        if (isNaN(num)) {
-            return '-' // handle cases like "", "abc"
-        }
-
-        return num.toFixed(2)
     }
 
     onDelete(id: string) {
