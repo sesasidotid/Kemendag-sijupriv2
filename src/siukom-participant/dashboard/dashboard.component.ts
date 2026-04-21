@@ -75,6 +75,8 @@ export class DashboardComponent implements OnInit {
     isModalOpen = signal(false)
     selectedExamId = signal<string | null>(null)
 
+    isResignModalOpen = signal(false)
+
     roomUkom = new RoomUkom()
     scoreMap: Record<string, ScoreValue | null> = {}
 
@@ -427,6 +429,28 @@ export class DashboardComponent implements OnInit {
             !this.isExamExpired(exam.endTime) &&
             this.isExamNotStartedYet(exam.startTime)
         )
+    }
+
+    canResignRoom(): boolean {
+        if (
+            !this.roomUkom ||
+            !this.roomUkom.examScheduleDtoList ||
+            this.roomUkom.examScheduleDtoList.length === 0
+        ) {
+            return false
+        }
+        return this.roomUkom.examScheduleDtoList.every((exam) =>
+            this.isExamUpcoming(exam),
+        )
+    }
+
+    toggleResignModal() {
+        this.isResignModalOpen.update((value) => !value)
+    }
+
+    proceedResignation() {
+        this.isResignModalOpen.set(false)
+        this.router.navigate(['/resignation'])
     }
 
     private parseToGmt7(dateStr: string): Date {

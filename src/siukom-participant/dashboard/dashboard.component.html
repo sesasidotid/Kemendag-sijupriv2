@@ -57,6 +57,16 @@
                         Ujian Daring belum tersedia. Silakan hubungi panitia.
                     </div>
                 </ng-template>
+
+                <button
+                    (click)="toggleResignModal()"
+                    *ngIf="canResignRoom()"
+                    class="btn btn-outline-danger w-100 mt-3"
+                    type="button"
+                >
+                    <span class="mdi mdi-cancel me-2"></span>
+                    Batalkan Keikutsertaan
+                </button>
             </div>
         </div>
     </div>
@@ -728,4 +738,31 @@
             Tipe ujian tidak dikenali
         </div>
     </ng-container>
+</app-modal>
+
+<app-modal
+    (toggle)="toggleResignModal()"
+    *ngIf="isResignModalOpen()"
+    [enableFooter]="false"
+    [size]="'md'"
+    [title]="'Batalkan Keikutsertaan Kelas'"
+>
+    <div class="alert alert-warning">
+        <span class="mdi mdi-alert-circle-outline me-2"></span>
+        Anda akan mengajukan permohonan pengunduran diri untuk kelas ini.
+        Seluruh jadwal ujian yang ada akan dibatalkan.
+    </div>
+    <p>
+        Pengajuan pengunduran diri membutuhkan persetujuan dari Admin. Apakah
+        Anda yakin ingin melanjutkan?
+    </p>
+
+    <div class="d-flex justify-content-end w-100 mt-4 gap-2" modal-footer>
+        <button (click)="toggleResignModal()" class="btn btn-secondary">
+            Batal
+        </button>
+        <button (click)="proceedResignation()" class="btn btn-danger">
+            Lanjutkan Pengunduran Diri
+        </button>
+    </div>
 </app-modal>
