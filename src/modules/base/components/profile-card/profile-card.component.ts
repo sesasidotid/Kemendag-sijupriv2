@@ -1,38 +1,27 @@
-import { Component } from '@angular/core'
-import {
-    Router,
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet
-} from '@angular/router'
+import { Component, OnInit } from '@angular/core'
+import { Router, RouterLink } from '@angular/router'
 import { CommonModule } from '@angular/common'
-import { LoginContext } from '../../commons/login-context'
-import { ApiService } from '../../services/api.service'
-import { SafeUrl, DomSanitizer } from '@angular/platform-browser'
-import { FileHandlerComponent } from '../file-handler/file-handler.component'
-import { ConfirmationService } from '../../services/confirmation.service'
-import { HandlerService } from '../../services/handler.service'
-import { User } from '../../../security/models/user.model'
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { ApiService } from '@/modules/base/services/api.service'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { User } from '@/modules/security/models/user.model'
+
 @Component({
     selector: 'app-profile-card',
     standalone: true,
-    imports: [
-        CommonModule,
-        RouterOutlet,
-        RouterLink,
-        RouterLinkActive,
-        FileHandlerComponent
-    ],
+    imports: [CommonModule, RouterLink],
     templateUrl: './profile-card.component.html',
-    styleUrl: './profile-card.component.scss'
+    styleUrl: './profile-card.component.scss',
 })
-export class ProfileCardComponent {
-    nip: string = LoginContext.getUserId()
-    name: string = LoginContext.getName()
+export class ProfileCardComponent implements OnInit {
+    nip = LoginContext.getUserId()
+    name = LoginContext.getName()
     profileImageSrc: SafeUrl = 'assets/no-profile.jpg'
     file: File | null = null
     filePreview: string = ''
-    userDetail: User = new User()
+    userDetail = new User()
 
     currentRoute: string = this.router.url
 
@@ -41,8 +30,8 @@ export class ProfileCardComponent {
         private apiService: ApiService,
         private sanitizer: DomSanitizer,
         private confirmationService: ConfirmationService,
-        private handlerService: HandlerService
-    ) { }
+        private handlerService: HandlerService,
+    ) {}
 
     ngOnInit() {
         this.fetchPhotoProfile()
@@ -51,27 +40,28 @@ export class ProfileCardComponent {
 
     getUserDetails() {
         this.apiService.getData(`/api/v1/user/${this.nip}`).subscribe({
-            next: res => {
+            next: (res) => {
                 this.userDetail = res
-            }
+            },
         })
     }
 
     fetchPhotoProfile() {
         this.apiService.getPhotoProfile(this.nip).subscribe({
-            next: blob => {
+            next: (blob) => {
                 console.log('Profile image fetched', blob)
                 if (blob.size === 0) {
                     this.profileImageSrc = 'assets/no-profile.jpg'
                     return
                 }
                 const objectUrl = URL.createObjectURL(blob)
-                this.profileImageSrc = this.sanitizer.bypassSecurityTrustUrl(objectUrl)
+                this.profileImageSrc =
+                    this.sanitizer.bypassSecurityTrustUrl(objectUrl)
             },
-            error: err => {
+            error: (err) => {
                 console.error('Error fetching profile image', err)
                 this.profileImageSrc = 'assets/no-profile.jpg'
-            }
+            },
         })
     }
 
@@ -99,7 +89,7 @@ export class ProfileCardComponent {
             const payload = { imgProfileFile: base64Image }
 
             this.confirmationService.open(false).subscribe({
-                next: response => {
+                next: (response) => {
                     if (!response.confirmed) {
                         return
                     }
@@ -109,7 +99,7 @@ export class ProfileCardComponent {
                             next: () => {
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Profile image saved'
+                                    'Profile image saved',
                                 )
 
                                 this.filePreview = base64Image
@@ -117,18 +107,18 @@ export class ProfileCardComponent {
 
                                 window.location.reload()
                             },
-                            error: err => {
+                            error: (err) => {
                                 console.error('Error saving profile image', err)
                                 alert('Failed to save profile image')
-                            }
+                            },
                         })
                 },
-                error: err => {
+                error: (err) => {
                     this.handlerService.handleAlert(
                         'Error',
-                        'Failed to save profile image'
+                        'Failed to save profile image',
                     )
-                }
+                },
             })
         }
 

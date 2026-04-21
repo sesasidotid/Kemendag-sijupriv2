@@ -1,5 +1,5 @@
-import { FormValidationService } from './../../../../modules/base/services/form-validation.service';
-import { Component } from '@angular/core'
+import { FormValidationService } from './../../../../modules/base/services/form-validation.service'
+import { Component, OnInit } from '@angular/core'
 import { JF } from '../../../../modules/siap/models/jf.model'
 import { AlertService } from '../../../../modules/base/services/alert.service'
 import { LoginContext } from '../../../../modules/base/commons/login-context'
@@ -9,7 +9,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { Router } from '@angular/router'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
@@ -19,6 +19,7 @@ import { JenisKelamin } from '../../../../modules/maintenance/models/jenis-kelam
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
+
 @Component({
     selector: 'app-jf-detail',
     standalone: true,
@@ -26,15 +27,16 @@ import { fileValidator } from '../../../../modules/base/validators/file-format.v
         CommonModule,
         FormsModule,
         FileHandlerComponent,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     templateUrl: './jf-detail.component.html',
-    styleUrl: './jf-detail.component.scss'
+    styleUrl: './jf-detail.component.scss',
 })
-export class JfDetailComponent {
-    jf: JF = new JF()
+export class JfDetailComponent implements OnInit {
+    nip = LoginContext.getUserId()
+
+    jf = new JF()
     jenisKelaminList: JenisKelamin[] = []
-    nip: string = ''
     isEditOpen: boolean = false
     loading$ = new BehaviorSubject<boolean>(true)
     submitLoading$ = new BehaviorSubject<boolean>(false)
@@ -47,16 +49,19 @@ export class JfDetailComponent {
         private confirmationService: ConfirmationService,
         private router: Router,
         private formValidationService: FormValidationService,
-    ) { }
+    ) {}
 
     ngOnInit() {
-        this.nip = LoginContext.getUserId()
         this.getJf()
         this.handleFormInit()
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.jfDetailForm.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.jfDetailForm.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handleFormInit() {
@@ -64,34 +69,36 @@ export class JfDetailComponent {
             name: new FormControl(this.jf.name, [Validators.required]),
             phone: new FormControl(this.jf.phone, [
                 Validators.required,
-                Validators.pattern(/^\d{10,15}$/)
+                Validators.pattern(/^\d{10,15}$/),
             ]),
             email: new FormControl(this.jf.email, [
                 Validators.required,
-                Validators.email
+                Validators.email,
             ]),
-            tempatLahir: new FormControl(this.jf.tempatLahir, [Validators.required]),
+            tempatLahir: new FormControl(this.jf.tempatLahir, [
+                Validators.required,
+            ]),
             tanggalLahir: new FormControl(this.jf.tanggalLahir, [
-                Validators.required
+                Validators.required,
             ]),
             jenisKelaminCode: new FormControl(this.jf.jenisKelaminCode, [
-                Validators.required
+                Validators.required,
             ]),
             nik: new FormControl(this.jf.nik, [
                 Validators.required,
-                Validators.pattern(/^\d{16}$/)
+                Validators.pattern(/^\d{16}$/),
             ]),
             fileKtp: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
-            ])
+                fileValidator(['application/pdf'], 2),
+            ]),
         })
     }
 
     getJf() {
         this.loading$.next(true)
         this.apiService.getData(`/api/v1/jf/${this.nip}`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.jf = response
                 this.fileLoadHandler()
                 this.inputs.files['ktp'].source = this.jf.ktpUrl
@@ -103,16 +110,19 @@ export class JfDetailComponent {
                     tempatLahir: this.jf.tempatLahir,
                     tanggalLahir: this.jf.tanggalLahir,
                     jenisKelaminCode: this.jf.jenisKelaminCode,
-                    nik: this.jf.nik
+                    nik: this.jf.nik,
                 })
 
                 this.loading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 this.loading$.next(false)
                 console.error('Error fetching data', error)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data profil!')
-            }
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data profil!',
+                )
+            },
         })
     }
 
@@ -120,36 +130,36 @@ export class JfDetailComponent {
         this.inputs = {
             files: {
                 ktp: {
-                    label: 'Upload Dokumen KTP',
+                    label: 'Dokumen KTP',
                     fileName: this.jf.ktp,
                     source: this.jf.ktpUrl,
-                    required: true
-                }
+                    required: true,
+                },
             },
             maxSize: 2 * 1024 * 1024,
             allowedTypes: [{ type: 'application/pdf' }],
             viewOnly: true,
             listen: (key: string, source: string, base64Data: string) => {
                 this.jfDetailForm.patchValue({ fileKtp: base64Data })
-            }
+            },
         }
     }
 
     getJenisKelamin() {
         this.apiService.getData(`/api/v1/jenis_kelamin`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.jenisKelaminList = response.map(
                     (jenisKelamin: { [key: string]: any }) =>
-                        new JenisKelamin(jenisKelamin)
+                        new JenisKelamin(jenisKelamin),
                 )
             },
-            error: error => {
+            error: (error) => {
                 console.error('Error fetching data', error)
                 this.alertService.showToast(
                     'Error',
-                    'Gagal mendapatkan data jenis kelamin!'
+                    'Gagal mendapatkan data jenis kelamin!',
                 )
-            }
+            },
         })
     }
 
@@ -173,31 +183,33 @@ export class JfDetailComponent {
             this.jf.fileKtp = this.jfDetailForm.value.fileKtp
 
             this.confirmationService.open(false).subscribe({
-                next: result => {
+                next: (result) => {
                     if (!result.confirmed) return
                     this.submitLoading$.next(true)
                     this.jf.nip = this.nip
 
-                    this.apiService.putData(`/api/v1/jf/task`, this.jf).subscribe({
-                        next: () => {
-                            this.alertService.showToast(
-                                'Success',
-                                'Berhasil mengajukan perubahan data.'
-                            )
-                            this.submitLoading$.next(false)
-                            this.router.navigate(['/profile/pending'])
-                        },
-                        error: error => {
-                            if (error.error.message == 'WFL00002') {
+                    this.apiService
+                        .putData(`/api/v1/jf/task`, this.jf)
+                        .subscribe({
+                            next: () => {
                                 this.alertService.showToast(
-                                    'Error',
-                                    'Sudah ada perubahan data yang sedang menunggu persetujuan.'
+                                    'Success',
+                                    'Berhasil mengajukan perubahan data.',
                                 )
-                            }
-                            this.submitLoading$.next(false)
-                        }
-                    })
-                }
+                                this.submitLoading$.next(false)
+                                this.router.navigate(['/profile/pending'])
+                            },
+                            error: (error) => {
+                                if (error.error.message == 'WFL00002') {
+                                    this.alertService.showToast(
+                                        'Error',
+                                        'Sudah ada perubahan data yang sedang menunggu persetujuan.',
+                                    )
+                                }
+                                this.submitLoading$.next(false)
+                            },
+                        })
+                },
             })
         }
     }
