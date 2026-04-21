@@ -1,44 +1,3 @@
-// import { Injectable } from '@angular/core'
-// import { AlertService } from './alert.service'
-// import { Router } from '@angular/router'
-
-// type Subject = 'Error' | 'Warning' | 'Info' | 'Success'
-
-// @Injectable({
-//     providedIn: 'root',
-// })
-// export class HandlerService {
-//     constructor(
-//         private alertService: AlertService,
-//         private router: Router,
-//     ) {}
-
-//     handleException(error: any) {
-//         switch (error.error.code) {
-//             case 'RCD-00001':
-//                 this.alertService.showToast('Info', 'Data tidak ditemukan')
-//                 break
-//             case 'RCD-00002':
-//                 this.alertService.showToast('Info', 'Data sudah ada')
-//                 break
-//             default:
-//                 this.alertService.showToast(
-//                     'Error',
-//                     `Masalah Tidak Dijaga (${error.message})`,
-//                 )
-//             // this.router.navigate(['/500']);
-//         }
-//     }
-
-//     handleAlert(subject: Subject, message: string) {
-//         this.alertService.showToast(subject, message)
-//     }
-
-//     handleNavigate(...path: string[]) {
-//         this.router.navigate(path)
-//     }
-// }
-
 import { Injectable } from '@angular/core'
 import { AlertService } from './alert.service'
 import { Router } from '@angular/router'
@@ -57,7 +16,25 @@ export class HandlerService {
     private errorMessages: Record<string, ErrorEntry> = {
         // RCD codes
         'RCD-00001': { subject: 'Info', message: 'Data tidak ditemukan' },
-        'RCD-00002': { subject: 'Info', message: 'Data sudah ada' },
+        'RCD-00002': {
+            subject: 'Error',
+            message: (error) => {
+                const rawMessage: string = error?.message || ''
+
+                const isExaminer = /examiner/i.test(rawMessage)
+                const isParticipant = /participant|peserta/i.test(rawMessage)
+
+                if (isExaminer) {
+                    return 'Gagal mengubah jadwal. Penguji memiliki jadwal pada waktu tersebut'
+                }
+
+                if (isParticipant) {
+                    return 'Gagal mengubah jadwal. Peserta memiliki jadwal pada waktu tersebut'
+                }
+
+                return 'Data sudah ada'
+            },
+        },
 
         // UEL codes
         'UEL-00000': {

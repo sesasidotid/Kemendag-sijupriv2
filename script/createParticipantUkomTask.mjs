@@ -32,25 +32,13 @@ const CONFIG = {
     fixedDynamicValue: "183781606383047389",
 
     payloadTemplate: {
-        bidangJabatanCode: "",
+        bidangJabatanCode: "BJ2",
         dokumenUkomList: [
             {
                 dokumenFile: "data:application/pdf;base64,",
-                dokumenPersyaratanId: "881dbd80-14b8-4e09-8c1d-2bb6ab05fb1b",
+                dokumenPersyaratanId: "fa3ad21e-3402-419a-ac73-d4caf088cd7e",
                 dokumenPersyaratanName:
-                    "1. Surat Usulan Uji Kompetensi_691524057187877304_1774496323299_1. Surat Usulan Uji Kompetensi",
-            },
-            {
-                dokumenFile: "data:application/pdf;base64,",
-                dokumenPersyaratanId: "bab600da-e2df-4621-bb43-1817e43903b9",
-                dokumenPersyaratanName:
-                    "2. Surat Keterangan (Sesuai Contoh Formulir)_691524057187877304_1774496323299_2. Surat Keterangan (Sesuai Contoh Formulir)",
-            },
-            {
-                dokumenFile: "data:application/pdf;base64,",
-                dokumenPersyaratanId: "c7d5b12a-c91c-45a1-a78b-9208642917a9",
-                dokumenPersyaratanName:
-                    "3. Surat Keterangan lowongan kebutuhan JF_691524057187877304_1774496323299_3. Surat Keterangan lowongan kebutuhan JF",
+                    "Dokumen Syarat Ukom_213213213123213213_1776763060174_Dokumen Syarat Ukom",
             },
         ],
         email: "feisal@sesasi.id",
@@ -62,8 +50,8 @@ const CONFIG = {
         jurusan: "183781606383047389",
         kabupatenKotaId: "",
         name: "183781606383047389",
-        nextJabatanCode: "JB10",
-        nextJenjangCode: "JJ4",
+        nextJabatanCode: "JB1",
+        nextJenjangCode: "JJ5",
         nip: "183781606383047389",
         noSuratUsulan: "183781606383047389",
         pangkatCode: "PK7",

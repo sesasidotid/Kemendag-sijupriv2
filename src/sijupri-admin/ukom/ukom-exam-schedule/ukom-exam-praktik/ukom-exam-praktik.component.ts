@@ -380,17 +380,7 @@ export class UkomExamPraktikComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Reschedule failed', err)
-                    if (err.error.code === 'RCD-00002') {
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengubah jadwal. Peserta memiliki jadwal pada waktu tersebut',
-                        )
-                    } else {
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengubah jadwal. Silakan coba lagi.',
-                        )
-                    }
+                    this.handlerService.handleException(err)
                 },
             })
     }
@@ -418,11 +408,7 @@ export class UkomExamPraktikComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Update examiner failed', err)
-
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengubah penguji. Silakan coba lagi.',
-                    )
+                    this.handlerService.handleException(err)
                 },
             })
     }

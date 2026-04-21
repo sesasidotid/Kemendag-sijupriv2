@@ -335,9 +335,6 @@ export class UkomExamWawancaraComponent implements OnInit {
         examiners: ExaminerScheduleList[],
     ): void {
         const examinerMap = this.buildExaminerMap(examiners)
-        console.log('examinerMap', examinerMap)
-
-        // console.log('participantScheduleList', participantScheduleList)
 
         const participantSchedules: ParticipantSchedule[] =
             participantScheduleList.map((p) => {
@@ -433,18 +430,7 @@ export class UkomExamWawancaraComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Reschedule failed', err)
-
-                    if (err.error.code === 'RCD-00002') {
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengubah jadwal. Peserta memiliki jadwal pada waktu tersebut',
-                        )
-                    } else {
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengubah jadwal. Silakan coba lagi.',
-                        )
-                    }
+                    this.handlerService.handleException(err)
                 },
             })
     }
@@ -476,11 +462,7 @@ export class UkomExamWawancaraComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Update examiner failed', err)
-
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mengubah penguji. Silakan coba lagi.',
-                    )
+                    this.handlerService.handleException(err)
                 },
             })
     }
