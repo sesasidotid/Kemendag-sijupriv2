@@ -95,6 +95,10 @@
             {{ schedule.nextJabatanName }}
         </div>
         <div class="tooltip-body">
+          <div class="tooltip-row">
+            <span class="tooltip-label">Nama Penguji:</span>
+            <span class="tooltip-value">{{ schedule.examinerName ?? '-'}}</span>
+          </div>
             <div class="tooltip-row">
                 <span class="tooltip-label">Nama:</span>
                 <span class="tooltip-value">{{ schedule.name }}</span>

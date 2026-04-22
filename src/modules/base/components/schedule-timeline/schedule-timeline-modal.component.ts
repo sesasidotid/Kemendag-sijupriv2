@@ -145,24 +145,27 @@ export class ScheduleTimelineModalComponent implements OnInit {
             return
         }
 
-        // Prepare data for export
         const exportData = this.schedules.map((schedule, index) => {
-            // Handle format "2026-02-06 13:53:00" (space between date and time)
-            const startTime = new Date(
-                schedule.personalSchedule.replace(' ', 'T'),
-            )
-            const endTime = new Date(
-                startTime.getTime() + schedule.duration * 60 * 60 * 1000,
-            )
+            const startTime = schedule.personalSchedule
+                ? new Date(schedule.personalSchedule.replace(' ', 'T'))
+                : null
+
+            const endTime = schedule.personalScheduleEnd
+                ? new Date(schedule.personalScheduleEnd.replace('_', 'T'))
+                : null
+
 
             return {
                 No: index + 1,
+                'Name Penguji': schedule.examinerName ?? '-',
                 'Nama Peserta': schedule.name,
                 NIP: schedule.nip || '-',
-                Tanggal: this.formatDate(startTime),
-                'Waktu Mulai': this.formatTime(startTime),
-                'Waktu Selesai': this.formatTime(endTime),
-                Durasi: this.formatDuration(schedule.duration * 60),
+                Tanggal: startTime ? this.formatDate(startTime) : '-',
+                'Waktu Mulai': startTime ? this.formatTime(startTime) : '-',
+                'Waktu Selesai': endTime ? this.formatTime(endTime) : '-',
+                Durasi: schedule.duration
+                    ? this.formatDuration(Math.round(schedule.duration * 60))
+                    : '-',
                 'Jabatan yang Dituju': schedule.nextJabatanName || '-',
                 'Jenjang yang Dituju': schedule.nextJenjangName || '-',
                 'Jenis Ujian': schedule.jenisUjian,
