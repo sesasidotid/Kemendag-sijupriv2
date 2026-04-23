@@ -362,7 +362,7 @@ export class UkomQuestionImportComponent {
         console.log('Studi kasus file emit', list)
     }
 
-    handleAllFileUploadedChange(uploaded: boolean){
+    handleAllFileUploadedChange(uploaded: boolean) {
         console.log('Studi kasus file emit', uploaded)
     }
 }
