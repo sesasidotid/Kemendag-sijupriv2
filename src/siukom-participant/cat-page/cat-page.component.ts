@@ -1,23 +1,19 @@
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
-import { Component, effect, HostListener, inject } from '@angular/core'
+import {
+    Component,
+    computed,
+    effect,
+    HostListener,
+    inject,
+    signal,
+} from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
-import {
-    BehaviorSubject,
-    combineLatest,
-    EMPTY,
-    finalize,
-    map,
-    Observable,
-    startWith,
-    Subject,
-    switchMap,
-    take,
-} from 'rxjs'
+import { EMPTY, finalize, Subject, switchMap, take, tap } from 'rxjs'
 import { ReactiveFormsModule } from '@angular/forms'
 import { ExamAttendance } from '@/modules/ukom/models/cat/exam-attendance'
 import { CatService } from '@/modules/ukom/services/cat.service'
@@ -59,13 +55,16 @@ export class CatPageComponent {
     examAttendance = new ExamAttendance()
     // Exam state
     examEndTime: Date | null = null
-    isLoadingRoomUkom$ = new BehaviorSubject<boolean>(false)
+    isLoadingRoomUkom = signal<boolean>(false)
+    isLoadingQuestions = signal<boolean>(false)
     showWarning = this.securityService.showWarning
     violationCount = this.securityService.violationCount
     isFullscreen = this.securityService.isFullscreen
     isSubmitted = this.securityService.isSubmitted
     violationPanelOpen = false
-    isLoading$: Observable<boolean>
+    isLoading = computed(() => {
+        return this.isLoadingQuestions() || this.isLoadingRoomUkom()
+    })
     private participantService = inject(UkomParticipantService)
     private handler = inject(HandlerService)
     private confirmationService = inject(ConfirmationService)
@@ -88,10 +87,6 @@ export class CatPageComponent {
     private destroy$ = new Subject<void>()
 
     constructor() {
-        this.isLoading$ = combineLatest([
-            this.isLoadingRoomUkom$.pipe(startWith(true)),
-        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
-
         effect(
             () => {
                 if (this.isSubmitted()) {
@@ -298,7 +293,7 @@ export class CatPageComponent {
     // ========== Data Loading ==========
 
     getRoomUkom() {
-        this.isLoadingRoomUkom$.next(true)
+        this.isLoadingRoomUkom.set(true)
         const nip = this.userID.replace('PU-', '')
 
         this.participantService
@@ -337,7 +332,7 @@ export class CatPageComponent {
                         participantUkom.id,
                     )
                 }),
-                finalize(() => this.isLoadingRoomUkom$.next(false)),
+                finalize(() => this.isLoadingRoomUkom.set(false)),
             )
             .subscribe({
                 next: (attendance) => {
@@ -376,6 +371,7 @@ export class CatPageComponent {
     }
 
     async getQuestion() {
+        this.isLoadingQuestions.set(true)
         // Initialize answer service with exam schedule ID for IndexedDB storage
         await this.answerService.initializeForExam(
             this.securityService.examScheduleId,
@@ -384,13 +380,19 @@ export class CatPageComponent {
         this.answerService
             .loadQuestions(this.securityService.examScheduleId)
             .pipe(
-                switchMap((response) => {
+                tap((response) => {
+                    if (response.data.length === 0) {
+                        this.securityService.markNoData()
+                    }
                     this.data = response.data
+                }),
+                switchMap(() => {
                     return this.answerService.fetchExamState(
                         this.EXAM_TYPE,
                         this.roomUkom.id,
                     )
                 }),
+                finalize(() => this.isLoadingQuestions.set(false)),
             )
             .subscribe({
                 next: (states) => {
