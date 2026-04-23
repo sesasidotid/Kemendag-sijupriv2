@@ -13,7 +13,10 @@ import {
 } from '@/modules/ukom/models/exam-type.model'
 import { finalize, Observable } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { ImportQuestionRequest } from '@/modules/ukom/models/ukom-module-refactor/import-question-request.model'
+import {
+    ImportQuestionListUpload,
+    ImportQuestionRequest,
+} from '@/modules/ukom/models/ukom-module-refactor/import-question-request.model'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import { TabService } from '@/modules/base/services/tab.service'
@@ -31,6 +34,7 @@ import { take } from 'rxjs/operators'
 import { UkomQuestion } from '@/modules/ukom/models/ukom-question'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { ApiService } from '@/modules/base/services/api.service'
+import { UploadStudyCaseFileComponent } from '@/sijupri-admin/ukom/ukom-question/ukom-question-import/upload-study-case-file/upload-study-case-file.component'
 
 @Component({
     selector: 'app-ukom-question-import',
@@ -42,6 +46,7 @@ import { ApiService } from '@/modules/base/services/api.service'
         ReactiveFormsModule,
         InvalidOnTouchDirective,
         PagableComponent,
+        UploadStudyCaseFileComponent,
     ],
     templateUrl: './ukom-question-import.component.html',
     styleUrl: './ukom-question-import.component.scss',
@@ -168,9 +173,6 @@ export class UkomQuestionImportComponent {
                         .withTitle((data: UkomQuestion) => data.question)
                         .build(),
                 )
-                // .addPrimaryColumn(
-                //     new PrimaryColumnBuilder('Modul Ukom', 'moduleId').build(),
-                // )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
                         .withDynamicValue(
@@ -354,5 +356,13 @@ export class UkomQuestionImportComponent {
         }
 
         return false
+    }
+
+    handleListUploadChange(list: ImportQuestionListUpload[]) {
+        console.log('Studi kasus file emit', list)
+    }
+
+    handleAllFileUploadedChange(uploaded: boolean){
+        console.log('Studi kasus file emit', uploaded)
     }
 }

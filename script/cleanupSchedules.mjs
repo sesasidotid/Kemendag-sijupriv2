@@ -24,6 +24,7 @@ const CONFIG = {
     roomUkomIds: [
         "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
         "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
+        "31dc93c9-4e54-46b4-b2b4-aadd0f054743",
         // add more room IDs here
     ],
 }

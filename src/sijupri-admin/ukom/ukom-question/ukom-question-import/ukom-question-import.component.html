@@ -46,6 +46,15 @@
             class="mt-3"
         ></app-file-handler>
 
+        @if (examTypeCode.value === ExamTypeCategory.STUDI_KASUS){
+        <app-upload-study-case-file
+            (isAllFileUploadedChange)="handleAllFileUploadedChange($event)"
+            (listUploadChange)="handleListUploadChange($event)"
+        ></app-upload-study-case-file>
+        }
+
+        <ng-container></ng-container>
+
         <ng-container *ngIf="examTypeCode.value">
             <a
                 (click)="handleDownloadTemplate(); $event.preventDefault()"

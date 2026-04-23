@@ -318,6 +318,7 @@ export class UkomGradeListComponent {
                     .withIcon('danger')
                     .build(),
             )
+            .withQueryParams()
             .build()
     }
 
