@@ -368,19 +368,34 @@ export class UkomExamWawancaraComponent implements OnInit {
         this.mainSchedule.set(mainSchedule)
 
         // Generate all slots
-        const slots = this.slotService.generateAllSlots(mainSchedule)
-        this.allSlots.set(slots)
+        // const slots = this.slotService.generateAllSlots(mainSchedule)
+        // this.allSlots.set(slots)
+        //
+        // if (this.gridApi) {
+        //     const api = this.gridApi as any
+        //     if (api.setRowData) {
+        //         api.setRowData(slots)
+        //     } else if (api.setGridOption) {
+        //         api.setGridOption('rowData', slots)
+        //     } else {
+        //         api.refreshCells()
+        //     }
+        // }
+        this.slotService.generateAllSlots(mainSchedule).subscribe((slots) => {
+            this.allSlots.set(slots)
 
-        if (this.gridApi) {
-            const api = this.gridApi as any
-            if (api.setRowData) {
-                api.setRowData(slots)
-            } else if (api.setGridOption) {
-                api.setGridOption('rowData', slots)
-            } else {
-                api.refreshCells()
+            if (this.gridApi) {
+                const api = this.gridApi as any
+
+                if (api.setRowData) {
+                    api.setRowData(slots)
+                } else if (api.setGridOption) {
+                    api.setGridOption('rowData', slots)
+                } else {
+                    api.refreshCells()
+                }
             }
-        }
+        })
     }
 
     private resolveExaminerScheduleId(

@@ -1,4 +1,4 @@
-import { inject, Injectable, signal, effect } from '@angular/core'
+import { effect, inject, Injectable, signal, untracked } from '@angular/core'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ApiService } from '@/modules/base/services/api.service'
 import { interval, Subscription } from 'rxjs'
@@ -13,25 +13,24 @@ import { CatExamQueueService } from './cat-exam-queue.service'
     providedIn: 'root',
 })
 export class CatExamSecurityService {
+    readonly isUnloading = signal(false)
+    readonly isSubmitted = signal(false)
+    readonly isNoData = signal(false)
+    // Violation management
+    MAX_VIOLATIONS: number = 10
+    examScheduleId: string | undefined
+    readonly showWarning = signal(false)
+    readonly warningCountdown = signal(30)
+    // Translation Detection
+    readonly isTranslated = signal(false)
     private handler = inject(HandlerService)
     private api = inject(ApiService)
     private queueService = inject(CatExamQueueService)
-
-    readonly isUnloading = signal(false)
-    readonly isSubmitted = signal(false)
     private isInside = true
     private warningInterval: ReturnType<typeof setInterval> | undefined
     private INITIAL_WARNING_TIME = 30
-
-    // Violation management
-    MAX_VIOLATIONS: number = 10
-
-    examScheduleId: string | undefined
     private mouseAwayStartTime: number | undefined
     private currentMouseAwayDuration = 0
-
-    readonly showWarning = signal(false)
-    readonly warningCountdown = signal(30)
     private _violationCount = signal(0)
     readonly violationCount = this._violationCount.asReadonly()
     private lastViolationReason = signal<string>('')
@@ -42,14 +41,10 @@ export class CatExamSecurityService {
      * Callbacks for security events
      */
     private onExamFinishCallback?: () => void
-
-    private isOnline = navigator.onLine
     // todo : remove this debug flag in production
+    private isOnline = navigator.onLine
     // private isOnline = false
     private connectionCheckSub?: Subscription
-
-    // Translation Detection
-    readonly isTranslated = signal(false)
     private translationObserver?: MutationObserver
 
     private isMouseTrackingReady = false
@@ -59,6 +54,215 @@ export class CatExamSecurityService {
         this.setupViolationWatcher()
         this.startConnectionCheck()
         this.queueService.cleanupOldQueues()
+    }
+
+    setExamScheduleId(id: string) {
+        this.examScheduleId = id
+        this.loadSystemConfig()
+    }
+
+    setInitialState(violationCount: number, mouseAwayDuration: number) {
+        this._violationCount.set(violationCount)
+        this.currentMouseAwayDuration = mouseAwayDuration
+
+        const remaining = Math.max(
+            0,
+            this.INITIAL_WARNING_TIME - this.currentMouseAwayDuration,
+        )
+        this.warningCountdown.set(remaining)
+    }
+
+    /**
+     * Initialize security measures for the exam
+     */
+    initializeSecurity(onExamFinish: () => void) {
+        this.onExamFinishCallback = onExamFinish
+        this.enterFullScreen()
+        this.setupEventListeners()
+        setTimeout(() => {
+            this.isMouseTrackingReady = true
+        }, 1000)
+        if (this.isOnline) {
+            this.sendPendingQueues()
+        }
+    }
+
+    /**
+     * Clean up security measures
+     */
+    cleanup() {
+        this.pauseWarningCountdown()
+        this.removeEventListeners()
+        this.connectionCheckSub?.unsubscribe()
+        this.translationObserver?.disconnect()
+        this.isMouseTrackingReady = false
+    }
+
+    clearWarningCountdown() {
+        this.warningCountdown.set(this.INITIAL_WARNING_TIME)
+    }
+
+    /**
+     * Add a violation
+     */
+    addViolation(reason: string) {
+        if (
+            this.isUnloading() ||
+            this.isSubmitted() ||
+            this.isTranslated() ||
+            this.isNoData()
+        )
+            return
+
+        const now = Date.now()
+        if (now - this.lastViolationTime < 1000) {
+            return
+        }
+
+        this.lastViolationTime = now
+        if (reason) this.lastViolationReason.set(reason)
+
+        if (this._violationCount() < this.MAX_VIOLATIONS) {
+            this._violationCount.update((count) => count + 1)
+        }
+
+        if (this.isOnline) {
+            this.sendViolation(reason)
+        } else {
+            if (this.examScheduleId) {
+                this.queueService.addViolation(this.examScheduleId, {
+                    reason,
+                    timestamp: now,
+                })
+            }
+        }
+    }
+
+    /**
+     * Request fullscreen mode
+     */
+    enterFullScreen() {
+        const elem = document.documentElement as HTMLElement & {
+            mozRequestFullScreen?: () => Promise<void>
+            webkitRequestFullscreen?: () => Promise<void>
+            msRequestFullscreen?: () => Promise<void>
+        }
+
+        const requestFullScreen =
+            elem.requestFullscreen ||
+            elem.mozRequestFullScreen ||
+            elem.webkitRequestFullscreen ||
+            elem.msRequestFullscreen
+
+        if (requestFullScreen) {
+            requestFullScreen.call(elem).catch((err) => {
+                console.error('Failed to enter fullscreen:', err)
+            })
+        } else {
+            console.warn('Fullscreen API is not supported in this browser.')
+        }
+    }
+
+    /**
+     * Request exit fullscreen mode
+     */
+    exitFullScreen() {
+        const exit =
+            document.exitFullscreen ||
+            (document as any).mozCancelFullScreen ||
+            (document as any).webkitExitFullscreen ||
+            (document as any).msExitFullscreen
+
+        if (exit) {
+            exit.call(document).catch((err: any) => {
+                console.error('Failed to exit fullscreen:', err)
+            })
+        } else {
+            console.warn('Fullscreen API is not supported in this browser.')
+        }
+    }
+
+    /**
+     * Handle visibility change (tab switching)
+     * Only adds violation - the effect will handle alerts and auto-submit
+     */
+    handleVisibilityChange() {
+        if (document.hidden) {
+            this.addViolation(
+                'Anda meninggalkan halaman ujian (berpindah tab/window)',
+            )
+        }
+    }
+
+    handleBlur() {
+        // If blur happens but tab is NOT hidden, it's suspicious ALT+TAB or OS switch
+        if (!document.hidden) {
+            this.addViolation(
+                'Anda meninggalkan halaman ujian (berpindah tab/window atau aktivitas mencurigakan lainya). Jika merasa tidak sesuai, segera hubungi panitia',
+            )
+        }
+    }
+
+    /**
+     * Handle mouse movement to detect if user is leaving exam area
+     */
+    handleMouseMove(event: MouseEvent) {
+        if (this.isSubmitted() || !this.isMouseTrackingReady) return
+
+        const inside = this.isMouseInsideExamArea(event)
+
+        if (inside !== this.isInside) {
+            this.isInside = inside
+
+            if (!inside && this.isFullscreen()) {
+                this.showWarning.set(true)
+                this.startWarningCountdown()
+            } else {
+                this.showWarning.set(false)
+                this.pauseWarningCountdown()
+            }
+        }
+    }
+
+    handleFullscreenExit() {
+        if (!document.fullscreenElement) {
+            this._isFullscreen.set(false)
+
+            this.addViolation(
+                'Anda keluar dari fullscreen, mohon tetap berada dalam model fullscreen saat waktu ujian berlangsung',
+            )
+        } else {
+            this._isFullscreen.set(true)
+        }
+    }
+
+    /**
+     * Mark that page is unloading
+     */
+    markUnloading() {
+        this.isUnloading.set(true)
+    }
+
+    /**
+     * Mark that exam is submitted
+     */
+    markSubmitted() {
+        this.isSubmitted.set(true)
+    }
+
+    markNoData() {
+        this.isNoData.set(true)
+    }
+
+    /**
+     * Clear violations (call after successful submission)
+     */
+    clearViolations() {
+        this.clearViolationCount()
+        this.clearWarningCountdown()
+        if (this.examScheduleId) {
+            this.queueService.clearQueue(this.examScheduleId)
+        }
     }
 
     private detectTranslation() {
@@ -91,22 +295,6 @@ export class CatExamSecurityService {
             attributes: true,
             attributeFilter: ['class', 'lang'],
         })
-    }
-
-    setExamScheduleId(id: string) {
-        this.examScheduleId = id
-        this.loadSystemConfig()
-    }
-
-    setInitialState(violationCount: number, mouseAwayDuration: number) {
-        this._violationCount.set(violationCount)
-        this.currentMouseAwayDuration = mouseAwayDuration
-
-        const remaining = Math.max(
-            0,
-            this.INITIAL_WARNING_TIME - this.currentMouseAwayDuration,
-        )
-        this.warningCountdown.set(remaining)
     }
 
     private loadSystemConfig() {
@@ -178,67 +366,6 @@ export class CatExamSecurityService {
         }
     }
 
-    /**
-     * Initialize security measures for the exam
-     */
-    initializeSecurity(onExamFinish: () => void) {
-        this.onExamFinishCallback = onExamFinish
-        this.enterFullScreen()
-        this.setupEventListeners()
-        setTimeout(() => {
-            this.isMouseTrackingReady = true
-        }, 1000)
-        if (this.isOnline) {
-            this.sendPendingQueues()
-        }
-    }
-
-    /**
-     * Clean up security measures
-     */
-    cleanup() {
-        this.pauseWarningCountdown()
-        this.removeEventListeners()
-        this.connectionCheckSub?.unsubscribe()
-        this.translationObserver?.disconnect()
-        this.isMouseTrackingReady = false
-    }
-
-    clearWarningCountdown() {
-        this.warningCountdown.set(this.INITIAL_WARNING_TIME)
-    }
-
-    /**
-     * Add a violation
-     */
-    addViolation(reason: string) {
-        if (this.isUnloading() || this.isSubmitted() || this.isTranslated())
-            return
-
-        const now = Date.now()
-        if (now - this.lastViolationTime < 1000) {
-            return
-        }
-
-        this.lastViolationTime = now
-        if (reason) this.lastViolationReason.set(reason)
-
-        if (this._violationCount() < this.MAX_VIOLATIONS) {
-            this._violationCount.update((count) => count + 1)
-        }
-
-        if (this.isOnline) {
-            this.sendViolation(reason)
-        } else {
-            if (this.examScheduleId) {
-                this.queueService.addViolation(this.examScheduleId, {
-                    reason,
-                    timestamp: now,
-                })
-            }
-        }
-    }
-
     private sendViolation(reason: string) {
         if (!this.examScheduleId) return
 
@@ -292,7 +419,6 @@ export class CatExamSecurityService {
                             this.queueService.removeViolations(
                                 this.examScheduleId,
                                 1,
-
                             )
                         }
                         resolve()
@@ -324,50 +450,6 @@ export class CatExamSecurityService {
     }
 
     /**
-     * Request fullscreen mode
-     */
-    enterFullScreen() {
-        const elem = document.documentElement as HTMLElement & {
-            mozRequestFullScreen?: () => Promise<void>
-            webkitRequestFullscreen?: () => Promise<void>
-            msRequestFullscreen?: () => Promise<void>
-        }
-
-        const requestFullScreen =
-            elem.requestFullscreen ||
-            elem.mozRequestFullScreen ||
-            elem.webkitRequestFullscreen ||
-            elem.msRequestFullscreen
-
-        if (requestFullScreen) {
-            requestFullScreen.call(elem).catch((err) => {
-                console.error('Failed to enter fullscreen:', err)
-            })
-        } else {
-            console.warn('Fullscreen API is not supported in this browser.')
-        }
-    }
-
-    /**
-     * Request exit fullscreen mode
-     */
-    exitFullScreen() {
-        const exit =
-            document.exitFullscreen ||
-            (document as any).mozCancelFullScreen ||
-            (document as any).webkitExitFullscreen ||
-            (document as any).msExitFullscreen
-
-        if (exit) {
-            exit.call(document).catch((err: any) => {
-                console.error('Failed to exit fullscreen:', err)
-            })
-        } else {
-            console.warn('Fullscreen API is not supported in this browser.')
-        }
-    }
-
-    /**
      * Watch for violation threshold and show warnings
      * Auto-submit is triggered by backend response in sendViolation()
      * This effect runs automatically whenever violationCount changes
@@ -375,7 +457,7 @@ export class CatExamSecurityService {
     private setupViolationWatcher() {
         effect(() => {
             const currentViolations = this._violationCount()
-            const reason = this.lastViolationReason()
+            const reason = untracked(() => this.lastViolationReason())
 
             if (currentViolations > 0 && reason) {
                 this.handler.handleAlert(
@@ -385,48 +467,6 @@ export class CatExamSecurityService {
                 )
             }
         })
-    }
-
-    /**
-     * Handle visibility change (tab switching)
-     * Only adds violation - the effect will handle alerts and auto-submit
-     */
-    handleVisibilityChange() {
-        if (document.hidden) {
-            this.addViolation(
-                'Anda meninggalkan halaman ujian (berpindah tab/window)',
-            )
-        }
-    }
-
-    handleBlur() {
-        // If blur happens but tab is NOT hidden, it's suspicious ALT+TAB or OS switch
-        if (!document.hidden) {
-            this.addViolation(
-                'Anda meninggalkan halaman ujian (berpindah tab/window atau aktivitas mencurigakan lainya). Jika merasa tidak sesuai, segera hubungi panitia',
-            )
-        }
-    }
-
-    /**
-     * Handle mouse movement to detect if user is leaving exam area
-     */
-    handleMouseMove(event: MouseEvent) {
-        if (this.isSubmitted() || !this.isMouseTrackingReady) return
-
-        const inside = this.isMouseInsideExamArea(event)
-
-        if (inside !== this.isInside) {
-            this.isInside = inside
-
-            if (!inside && this.isFullscreen()) {
-                this.showWarning.set(true)
-                this.startWarningCountdown()
-            } else {
-                this.showWarning.set(false)
-                this.pauseWarningCountdown()
-            }
-        }
     }
 
     /**
@@ -471,18 +511,6 @@ export class CatExamSecurityService {
                 }
             }
         }, 1000)
-    }
-
-    handleFullscreenExit() {
-        if (!document.fullscreenElement) {
-            this._isFullscreen.set(false)
-
-            this.addViolation(
-                'Anda keluar dari fullscreen, mohon tetap berada dalam model fullscreen saat waktu ujian berlangsung',
-            )
-        } else {
-            this._isFullscreen.set(true)
-        }
     }
 
     /**
@@ -590,20 +618,6 @@ export class CatExamSecurityService {
     }
 
     /**
-     * Mark that page is unloading
-     */
-    markUnloading() {
-        this.isUnloading.set(true)
-    }
-
-    /**
-     * Mark that exam is submitted
-     */
-    markSubmitted() {
-        this.isSubmitted.set(true)
-    }
-
-    /**
      * Setup event listeners
      */
     private setupEventListeners() {
@@ -621,16 +635,6 @@ export class CatExamSecurityService {
     private handleExamFinish() {
         if (this.onExamFinishCallback) {
             this.onExamFinishCallback()
-        }
-    }
-    /**
-     * Clear violations (call after successful submission)
-     */
-    clearViolations() {
-        this.clearViolationCount()
-        this.clearWarningCountdown()
-        if (this.examScheduleId) {
-            this.queueService.clearQueue(this.examScheduleId)
         }
     }
 }

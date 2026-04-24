@@ -525,8 +525,11 @@ export class UkomExamMakalahComponent implements OnInit {
         this.mainSchedule.set(mainSchedule)
 
         // Generate all slots
-        const slots = this.slotService.generateAllSlots(mainSchedule)
-        this.allSlots.set(slots)
+        // const slots = this.slotService.generateAllSlots(mainSchedule)
+        // this.allSlots.set(slots)
+        this.slotService.generateAllSlots(mainSchedule).subscribe((slots) => {
+            this.allSlots.set(slots)
+        })
     }
 
     private resolveExaminerScheduleId(

@@ -94,6 +94,36 @@ export class DashboardComponent implements OnInit {
             .toString()
             .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
     })
+
+    ongoingParticipantSchedules = computed(() => {
+        const now = this.nowGmt7()
+        const exams = this.roomUkom.examScheduleDtoList || []
+        const result: ExamSchedule[] = []
+
+        exams.forEach((exam) => {
+            if (this.isPersonalScheduleExam(exam)) {
+                if (this.hasScore(exam.id)) return
+
+                const personalSchedule = exam.personalSchedule
+                if (!personalSchedule) return
+
+                const durationMinutes = (exam.duration || 0) * 60
+                const scheduleEnd = this.addMinutesToDateTime(
+                    personalSchedule,
+                    durationMinutes,
+                )
+
+                if (now >= personalSchedule && now <= scheduleEnd) {
+                    result.push(exam)
+                }
+            }
+        })
+
+        return result.sort((a, b) =>
+            a.personalSchedule.localeCompare(b.personalSchedule),
+        )
+    })
+
     protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor(
@@ -469,5 +499,23 @@ export class DashboardComponent implements OnInit {
         const [hour, minute, second] = timePart.split(':').map(Number)
 
         return { year, month, day, hour, minute, second }
+    }
+
+    private addMinutesToDateTime(dateTimeStr: string, minutes: number): string {
+        const { year, month, day, hour, minute, second } =
+            this.parseRawDate(dateTimeStr)
+
+        // Create date in local context
+        const date = new Date(year, month - 1, day, hour, minute, second)
+        date.setMinutes(date.getMinutes() + minutes)
+
+        const yyyy = date.getFullYear()
+        const mm = (date.getMonth() + 1).toString().padStart(2, '0')
+        const dd = date.getDate().toString().padStart(2, '0')
+        const hh = date.getHours().toString().padStart(2, '0')
+        const mi = date.getMinutes().toString().padStart(2, '0')
+        const ss = date.getSeconds().toString().padStart(2, '0')
+
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
     }
 }
