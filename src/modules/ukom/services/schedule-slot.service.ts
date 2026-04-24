@@ -5,6 +5,8 @@ import {
     ParticipantSchedule,
     ScheduleSlot,
 } from '../models/schedule-slot.model'
+import { Observable, tap } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 /**
  * Schedule Slot Service
@@ -31,7 +33,7 @@ export class ScheduleSlotService {
     private disableWeekend = true
 
     constructor(private systemConfigService: SystemConfigService) {
-        this.loadConfig()
+        // this.loadConfig()
     }
 
     /**
@@ -56,71 +58,10 @@ export class ScheduleSlotService {
      *   - Slot 1: 13:00-15:00 ✅
      *   - Slot 2: 15:00-17:00 ✅
      */
-    generateAllSlots(mainSchedule: MainSchedule): ScheduleSlot[] {
-        const slots: ScheduleSlot[] = []
-        // const durationMs = mainSchedule.duration * 60 * 60 * 1000
-        const durationMinutes = Math.round(mainSchedule.duration * 60)
-        const durationMs = durationMinutes * 60 * 1000
-
-        let currentSlotStart = new Date(mainSchedule.startTime)
-        let slotIndex = 0
-
-        while (currentSlotStart < mainSchedule.endTime) {
-            const currentSlotEnd = new Date(
-                currentSlotStart.getTime() + durationMs,
-            )
-
-            // Stop if slot end exceeds main schedule end
-            if (currentSlotEnd > mainSchedule.endTime) {
-                break
-            }
-
-            if (this.disableWeekend && this.isWeekend(currentSlotStart)) {
-                const nextAvailableTime = this.getNextWeekday(currentSlotStart)
-                currentSlotStart = nextAvailableTime
-                continue
-            }
-
-            const isUnavailable = this.isSlotInUnavailableHours(
-                currentSlotStart,
-                currentSlotEnd,
-            )
-
-            // If slot is unavailable, skip it and jump to after the break
-            if (isUnavailable) {
-                const nextAvailableTime =
-                    this.getNextAvailableTimeAfterBreak(currentSlotStart)
-
-                // If we jumped to a new time, restart from there
-                if (nextAvailableTime > currentSlotStart) {
-                    currentSlotStart = nextAvailableTime
-                    continue // Re-evaluate with new start time
-                } else {
-                    // No valid jump found, just move to next slot end
-                    currentSlotStart = new Date(currentSlotEnd)
-                    continue
-                }
-            }
-
-            const occupiedParticipant = this.findParticipantInSlot(
-                currentSlotStart,
-                mainSchedule.participantScheduleList,
-            )
-
-            slots.push({
-                slotIndex: slotIndex,
-                startTime: new Date(currentSlotStart),
-                endTime: new Date(currentSlotEnd),
-                isOccupied: !!occupiedParticipant,
-                isUnavailable: false, // We skip unavailable slots now
-                participantSchedule: occupiedParticipant || undefined,
-            })
-
-            slotIndex++
-            currentSlotStart = new Date(currentSlotEnd)
-        }
-
-        return slots
+    generateAllSlots(mainSchedule: MainSchedule): Observable<ScheduleSlot[]> {
+        return this.loadConfig$().pipe(
+            map(() => this.generateAllSlotsInternal(mainSchedule)),
+        )
     }
 
     /**
@@ -218,30 +159,130 @@ export class ScheduleSlotService {
         return `${day}/${month}/${year} ${hours}:${minutes} WIB`
     }
 
-    private loadConfig() {
-        this.systemConfigService.getAll().subscribe((data) => {
-            const findVal = (code: string) =>
-                data.find((c: any) => c.code === code)?.value
+    private generateAllSlotsInternal(
+        mainSchedule: MainSchedule,
+    ): ScheduleSlot[] {
+        const slots: ScheduleSlot[] = []
+        // const durationMs = mainSchedule.duration * 60 * 60 * 1000
+        const durationMinutes = Math.round(mainSchedule.duration * 60)
+        const durationMs = durationMinutes * 60 * 1000
 
-            const startAt = findVal('UKOM_SCHEDULE_START_AT')
-            if (startAt != null) this.UNAVAILABLE_END_HOUR = Number(startAt)
+        let currentSlotStart = new Date(mainSchedule.startTime)
+        let slotIndex = 0
 
-            const endAt = findVal('UKOM_SCHEDULE_END_AT')
-            if (endAt != null) this.UNAVAILABLE_START_HOUR = Number(endAt)
+        while (currentSlotStart < mainSchedule.endTime) {
+            const currentSlotEnd = new Date(
+                currentSlotStart.getTime() + durationMs,
+            )
 
-            const lunchStart = findVal('UKOM_SCHEDULE_START_LUNCH_AT')
-            if (lunchStart != null)
-                this.MIDDAY_UNAVAILABLE_START_HOUR = Number(lunchStart)
+            // Stop if slot end exceeds main schedule end
+            if (currentSlotEnd > mainSchedule.endTime) {
+                break
+            }
 
-            const lunchEnd = findVal('UKOM_SCHEDULE_END_LUNCH_AT')
-            if (lunchEnd != null)
-                this.MIDDAY_UNAVAILABLE_END_HOUR = Number(lunchEnd)
+            if (this.disableWeekend && this.isWeekend(currentSlotStart)) {
+                const nextAvailableTime = this.getNextWeekday(currentSlotStart)
+                currentSlotStart = nextAvailableTime
+                continue
+            }
 
-            const weekendAllowed = findVal('UKOM_SCHEDULE_IS_WEEKEN_ALLOWED')
-            if (weekendAllowed != null)
-                this.disableWeekend = weekendAllowed.toLowerCase() === 'tidak'
-        })
+            const isUnavailable = this.isSlotInUnavailableHours(
+                currentSlotStart,
+                currentSlotEnd,
+            )
+
+            // If slot is unavailable, skip it and jump to after the break
+            if (isUnavailable) {
+                const nextAvailableTime =
+                    this.getNextAvailableTimeAfterBreak(currentSlotStart)
+
+                // If we jumped to a new time, restart from there
+                if (nextAvailableTime > currentSlotStart) {
+                    currentSlotStart = nextAvailableTime
+                    continue // Re-evaluate with new start time
+                } else {
+                    // No valid jump found, just move to next slot end
+                    currentSlotStart = new Date(currentSlotEnd)
+                    continue
+                }
+            }
+
+            const occupiedParticipant = this.findParticipantInSlot(
+                currentSlotStart,
+                mainSchedule.participantScheduleList,
+            )
+
+            slots.push({
+                slotIndex: slotIndex,
+                startTime: new Date(currentSlotStart),
+                endTime: new Date(currentSlotEnd),
+                isOccupied: !!occupiedParticipant,
+                isUnavailable: false, // We skip unavailable slots now
+                participantSchedule: occupiedParticipant || undefined,
+            })
+
+            slotIndex++
+            currentSlotStart = new Date(currentSlotEnd)
+        }
+
+        return slots
     }
+
+    private loadConfig$(): Observable<void> {
+        return this.systemConfigService.getAll().pipe(
+            tap((data) => {
+                const findVal = (code: string) =>
+                    data.find((c: any) => c.code === code)?.value
+
+                const startAt = findVal('UKOM_SCHEDULE_START_AT')
+                if (startAt != null) this.UNAVAILABLE_END_HOUR = Number(startAt)
+
+                const endAt = findVal('UKOM_SCHEDULE_END_AT')
+                if (endAt != null) this.UNAVAILABLE_START_HOUR = Number(endAt)
+
+                const lunchStart = findVal('UKOM_SCHEDULE_START_LUNCH_AT')
+                if (lunchStart != null)
+                    this.MIDDAY_UNAVAILABLE_START_HOUR = Number(lunchStart)
+
+                const lunchEnd = findVal('UKOM_SCHEDULE_END_LUNCH_AT')
+                if (lunchEnd != null)
+                    this.MIDDAY_UNAVAILABLE_END_HOUR = Number(lunchEnd)
+
+                const weekendAllowed = findVal(
+                    'UKOM_SCHEDULE_IS_WEEKEN_ALLOWED',
+                )
+                if (weekendAllowed != null)
+                    this.disableWeekend =
+                        weekendAllowed.toLowerCase() === 'tidak'
+            }),
+            map(() => void 0),
+        )
+    }
+
+    // private loadConfig() {
+    //     this.systemConfigService.getAll().subscribe((data) => {
+    //         const findVal = (code: string) =>
+    //             data.find((c: any) => c.code === code)?.value
+    //
+    //         const startAt = findVal('UKOM_SCHEDULE_START_AT')
+    //         if (startAt != null) this.UNAVAILABLE_END_HOUR = Number(startAt)
+    //
+    //         const endAt = findVal('UKOM_SCHEDULE_END_AT')
+    //         if (endAt != null) this.UNAVAILABLE_START_HOUR = Number(endAt)
+    //
+    //         const lunchStart = findVal('UKOM_SCHEDULE_START_LUNCH_AT')
+    //         if (lunchStart != null)
+    //             this.MIDDAY_UNAVAILABLE_START_HOUR = Number(lunchStart)
+    //
+    //         const lunchEnd = findVal('UKOM_SCHEDULE_END_LUNCH_AT')
+    //         if (lunchEnd != null)
+    //             this.MIDDAY_UNAVAILABLE_END_HOUR = Number(lunchEnd)
+    //
+    //         const weekendAllowed = findVal('UKOM_SCHEDULE_IS_WEEKEN_ALLOWED')
+    //         if (weekendAllowed != null)
+    //             this.disableWeekend = weekendAllowed.toLowerCase() === 'tidak'
+    //     })
+    // }
 
     /**
      * Get hour from date (treating it as UTC+7)
