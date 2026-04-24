@@ -2,7 +2,7 @@ import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellan
 import { CommonModule } from '@angular/common'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { UkomModulesService } from '@/modules/ukom/services/ukom-modules.service'
-import { Component, inject, signal, ViewChild } from '@angular/core'
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core'
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
@@ -34,6 +34,7 @@ import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { ApiService } from '@/modules/base/services/api.service'
 import { UploadStudyCaseFileComponent } from '@/sijupri-admin/ukom/ukom-question/ukom-question-import/upload-study-case-file/upload-study-case-file.component'
 import { toSignal } from '@angular/core/rxjs-interop'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 
 @Component({
     selector: 'app-ukom-question-import',
@@ -45,34 +46,33 @@ import { toSignal } from '@angular/core/rxjs-interop'
         ReactiveFormsModule,
         InvalidOnTouchDirective,
         UploadStudyCaseFileComponent,
+        PagableComponent,
     ],
     templateUrl: './ukom-question-import.component.html',
     styleUrl: './ukom-question-import.component.scss',
 })
-export class UkomQuestionImportComponent {
+export class UkomQuestionImportComponent implements OnInit {
     tabService = inject(TabService)
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
 
     @ViewChild('templateHandler') templateHandler!: FileHandlerComponent
-    @ViewChild('studiKasusHandler') studiKasusHandler!: FileHandlerComponent
 
-    // TODO: revert value to '' after done
-    // Reason: temporary workaround for <issue/context>
-    // Date: 2026-04-24
-    examTypeCode = new FormControl('STUDI_KASUS', Validators.required)
+    examTypeCode = new FormControl('', Validators.required)
 
     examTypeList$: Observable<ExamType[]>
     isLoading = false
 
     // collected files
     templateFileBase64 = ''
-    studiKasusFileBase64 = ''
+    studiKasusUploadedList: ImportQuestionListUpload[] = []
+    isStudiKasusUploaded = false
 
     activeTab = toSignal(this.tabService.activeTab$, { initialValue: 0 })
 
     pagable = signal<Pagable>(null)
 
     refresh = signal(false)
+    resetUploadComponent = signal(false)
 
     /** TEMPLATE (EXCEL) */
     templateInputs: FIleHandler = {
@@ -94,20 +94,6 @@ export class UkomQuestionImportComponent {
         },
     }
 
-    /** STUDI KASUS (PDF) */
-    studiKasusInputs: FIleHandler = {
-        files: {
-            upload_soal: {
-                label: 'File Studi Kasus',
-                required: true,
-            },
-        },
-        allowedTypes: [{ label: 'pdf', type: 'application/pdf' }],
-        listen: (_key: string, source: string) => {
-            this.studiKasusFileBase64 = source
-            console.log('update')
-        },
-    }
     apiService = inject(ApiService)
     protected readonly ExamTypeCategory = ExamTypeCategory
 
@@ -125,8 +111,8 @@ export class UkomQuestionImportComponent {
 
         this.examTypeCode.valueChanges.subscribe((value) => {
             if (value !== ExamTypeCategory.STUDI_KASUS) {
-                this.studiKasusFileBase64 = ''
-                this.studiKasusHandler?.clearFileName()
+                this.studiKasusUploadedList = []
+                this.isStudiKasusUploaded = false
             }
         })
 
@@ -316,7 +302,7 @@ export class UkomQuestionImportComponent {
                 }
 
                 if (this.examTypeCode.value === ExamTypeCategory.STUDI_KASUS) {
-                    body.uploadSoal = this.studiKasusFileBase64
+                    body.uploadSoalList = this.studiKasusUploadedList
                 }
 
                 this.ukomModulesService
@@ -329,9 +315,13 @@ export class UkomQuestionImportComponent {
                                 'Berhasil mengimpor pertanyaan',
                             )
                             this.templateHandler.clearFileName()
-                            this.studiKasusHandler?.clearFileName()
                             this.templateFileBase64 = ''
-                            this.studiKasusFileBase64 = ''
+                            this.studiKasusUploadedList = []
+                            this.isStudiKasusUploaded = false
+
+                            // trigger a reset to the study case component
+                            this.resetUploadComponent.set(true)
+                            setTimeout(() => this.resetUploadComponent.set(false), 300)
                         },
                         error: () => {
                             this.handlerService.handleAlert(
@@ -351,7 +341,8 @@ export class UkomQuestionImportComponent {
 
         if (
             this.examTypeCode.value === ExamTypeCategory.STUDI_KASUS &&
-            !this.studiKasusFileBase64
+            (!this.isStudiKasusUploaded ||
+                this.studiKasusUploadedList.length === 0)
         ) {
             return true
         }
@@ -360,10 +351,12 @@ export class UkomQuestionImportComponent {
     }
 
     handleListUploadChange(list: ImportQuestionListUpload[]) {
+        this.studiKasusUploadedList = list
         console.log('Studi kasus file emit', list)
     }
 
     handleAllFileUploadedChange(uploaded: boolean) {
+        this.isStudiKasusUploaded = uploaded
         console.log('Studi kasus file emit', uploaded)
     }
 }

@@ -4,8 +4,7 @@ import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 export class ImportQuestionRequest extends Serializable {
     examType: ExamTypeCategory = undefined
     fileQuestion: string = undefined
-    uploadSoal?: string = undefined
-    uploadSoalList?: ImportQuestionListUpload[]
+    uploadSoalList?: ImportQuestionListUpload[] = undefined
     constructor(object?: Partial<ImportQuestionRequest>) {
         super()
         if (object) this.fromObject(object)
