@@ -42,9 +42,7 @@ export class ScheduleSlotService {
         if (dateString instanceof Date) {
             return dateString
         }
-        // Replace space with 'T' to normalize format (API may send "2026-02-24 09:50:02")
         let cleanString = dateString.replace(' ', 'T')
-        // Remove timezone suffix if present and append 'Z' to parse as UTC
         cleanString = cleanString.replace(/[+-]\d{2}:\d{2}$/, '') + 'Z'
         return new Date(cleanString)
     }
@@ -77,14 +75,7 @@ export class ScheduleSlotService {
                 break
             }
 
-            // Check if slot falls on weekend
-            // if (this.isWeekend(currentSlotStart)) {
-            //     // Skip to next Monday 08:00
-            //     const nextAvailableTime = this.getNextWeekday(currentSlotStart)
-            //     currentSlotStart = nextAvailableTime
-            //     continue
-            // }
-            if (!this.disableWeekend && this.isWeekend(currentSlotStart)) {
+            if (this.disableWeekend && this.isWeekend(currentSlotStart)) {
                 const nextAvailableTime = this.getNextWeekday(currentSlotStart)
                 currentSlotStart = nextAvailableTime
                 continue
@@ -162,23 +153,23 @@ export class ScheduleSlotService {
         }
 
         // Check if on weekend
-        if (this.isWeekend(newSlotTime)) {
-            return {
-                valid: false,
-                reason: 'Akhir pekan (Sabtu & Minggu) tidak tersedia',
-            }
-        }
+        // if (this.isWeekend(newSlotTime)) {
+        //     return {
+        //         valid: false,
+        //         reason: 'Akhir pekan (Sabtu & Minggu) tidak tersedia',
+        //     }
+        // }
 
         // Check unavailable hours
-        const slotEndTime = new Date(
-            newSlotTime.getTime() + mainSchedule.duration * 60 * 60 * 1000,
-        )
-        if (this.isSlotInUnavailableHours(newSlotTime, slotEndTime)) {
-            return {
-                valid: false,
-                reason: 'Slot berada di jam tidak tersedia (17:00-08:00 atau 12:00-13:00)',
-            }
-        }
+        // const slotEndTime = new Date(
+        //     newSlotTime.getTime() + mainSchedule.duration * 60 * 60 * 1000,
+        // )
+        // if (this.isSlotInUnavailableHours(newSlotTime, slotEndTime)) {
+        //     return {
+        //         valid: false,
+        //         reason: 'Slot berada di jam tidak tersedia (17:00-08:00 atau 12:00-13:00)',
+        //     }
+        // }
 
         // Check overlap with other participants
         const overlappingParticipant =
@@ -315,7 +306,7 @@ export class ScheduleSlotService {
             nextTime.setUTCHours(this.MIDDAY_UNAVAILABLE_END_HOUR, 0, 0, 0)
 
             // Check if 13:00 falls on weekend, if so skip to Monday 08:00
-            if (this.isWeekend(nextTime)) {
+            if (this.disableWeekend && this.isWeekend(nextTime)) {
                 return this.getNextWeekday(nextTime)
             }
 
@@ -338,7 +329,7 @@ export class ScheduleSlotService {
             }
 
             // Check if next time falls on weekend, if so skip to Monday 08:00
-            if (this.isWeekend(nextTime)) {
+            if (this.disableWeekend && this.isWeekend(nextTime)) {
                 return this.getNextWeekday(nextTime)
             }
 
