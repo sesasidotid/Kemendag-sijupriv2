@@ -15,6 +15,7 @@ import {
     FIleHandler,
 } from '@/modules/base/commons/file-handler/file-handler'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
 
 @Component({
     selector: 'app-upload-study-case-file',
@@ -28,35 +29,86 @@ export class UploadStudyCaseFileComponent implements OnInit {
     isAllFileUploadedChange = output<boolean>()
 
     listUploadInputs: FIleHandler = { files: {} }
-    uploadedMap = signal<{ [key: string]: ImportQuestionListUpload }>({})
+
+    uploadedMap = signal<Record<string, ImportQuestionListUpload>>({})
+    private bidangJabatanService = inject(BidangJabatanService)
+    bidangJabatanList = toSignal(this.bidangJabatanService.bidangJabatanList$, {
+        initialValue: [],
+    })
     isAllFilled = computed(() => {
         const bidangList = this.bidangJabatanList()
         const uploaded = this.uploadedMap()
 
-        if (!bidangList?.length) return false
+        if (!bidangList.length) return false
 
         return bidangList.every((b) => uploaded[b.code]?.filePdf)
     })
-    private bidangJabatanService = inject(BidangJabatanService)
-    bidangJabatanList = toSignal(this.bidangJabatanService.bidangJabatanList$, {
-        initialValue: [],
+    jabatanMap = computed<Record<string, string>>(() => {
+        const bidangList = this.bidangJabatanList()
+        const jabatanLookup = this.jabatanLookup()
+
+        return bidangList.reduce(
+            (acc, bidang) => {
+                const jabatanName = jabatanLookup[bidang.jabatanCode] ?? '-'
+                acc[bidang.code] = `${jabatanName} - ${bidang.name}`
+                return acc
+            },
+            {} as Record<string, string>,
+        )
     })
     isBidangJabatanLoading = toSignal(
         this.bidangJabatanService.isBidangJabatanListLoading$,
         { initialValue: false },
     )
+    private jabatanService = inject(JabatanService)
+    jabatanList = toSignal(this.jabatanService.jabatanList$, {
+        initialValue: [],
+    })
+    jabatanLookup = computed<Record<string, string>>(() => {
+        const list = this.jabatanList()
+
+        return list.reduce(
+            (acc, item) => {
+                acc[item.code] = item.name
+                return acc
+            },
+            {} as Record<string, string>,
+        )
+    })
 
     constructor() {
         effect(() => {
-            const _ = this.bidangJabatanList()
-            this.setupFileHandler()
+            const bidangList = this.bidangJabatanList()
+            const jabatanMap = this.jabatanMap()
+
+            if (!bidangList.length) {
+                this.listUploadInputs = { files: {} }
+                return
+            }
+
+            const files: Record<string, EygileFile> = {}
+
+            for (const bidang of bidangList) {
+                files[bidang.code] = {
+                    label: jabatanMap[bidang.code],
+                    required: true,
+                    id: bidang.code,
+                }
+            }
+
+            this.listUploadInputs = {
+                files,
+                allowedExtensions: ['application/pdf'],
+                maxSize: 5 * 1024 * 1024,
+                listen: (key: string, _: any, base64Data: string) => {
+                    this.handleFileChange(key, base64Data)
+                },
+            }
         })
 
         effect(() => {
             const uploaded = this.uploadedMap()
-            const list = Object.values(uploaded)
-
-            this.listUploadChange.emit(list)
+            this.listUploadChange.emit(Object.values(uploaded))
         })
 
         effect(() => {
@@ -66,39 +118,7 @@ export class UploadStudyCaseFileComponent implements OnInit {
 
     ngOnInit() {
         this.bidangJabatanService.fetchBidangJabatan()
-    }
-
-    private setupFileHandler() {
-        const bidangList = this.bidangJabatanList()
-
-        if (!bidangList?.length) {
-            this.listUploadInputs = { files: {} }
-            return
-        }
-
-        const files: { [key: string]: EygileFile } = {}
-
-        for (const bidang of bidangList) {
-            files[bidang.code] = {
-                label: bidang.name,
-                required: true,
-                id: bidang.code,
-            }
-        }
-
-        this.listUploadInputs = {
-            files,
-            allowedExtensions: ['application/pdf'],
-            maxSize: 5 * 1024 * 1024, // 5MB
-            listen: (
-                key: string,
-                source: string,
-                base64Data: string,
-                label: string,
-            ) => {
-                this.handleFileChange(key, base64Data)
-            },
-        }
+        this.jabatanService.fetchJabatan()
     }
 
     private handleFileChange(key: string, base64: string) {
