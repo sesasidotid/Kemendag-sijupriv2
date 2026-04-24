@@ -16,3 +16,14 @@ export class KompetensiUkom extends Serializable {
         if (object) this.fromObject(object)
     }
 }
+
+export class KompetensiUkomSearchQueryParams extends Serializable {
+    eq_jabatanCode?: string = undefined
+    eq_jenjangCode?: string = undefined
+    eq_bidangJabatanCode?: string = undefined
+
+    constructor(object?: Partial<KompetensiUkomSearchQueryParams>) {
+        super()
+        if (object) this.fromObject(object)
+    }
+}

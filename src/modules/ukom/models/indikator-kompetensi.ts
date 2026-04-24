@@ -13,3 +13,12 @@ export class IndikatorKompetensiUkom extends Serializable {
         if (object) this.fromObject(object)
     }
 }
+
+export class IndikatorKompetensiQueryParams extends Serializable {
+    eq_kompetensiId?: string = undefined
+
+    constructor(object: Partial<IndikatorKompetensiQueryParams>) {
+        super()
+        if (object) this.fromObject(object)
+    }
+}

@@ -5,7 +5,7 @@ export class ImportQuestionRequest extends Serializable {
     examType: ExamTypeCategory = undefined
     fileQuestion: string = undefined
     uploadSoal?: string = undefined
-    listUpload?: ImportQuestionListUpload[]
+    uploadSoalList?: ImportQuestionListUpload[]
     constructor(object?: Partial<ImportQuestionRequest>) {
         super()
         if (object) this.fromObject(object)
@@ -13,8 +13,8 @@ export class ImportQuestionRequest extends Serializable {
 }
 
 export class ImportQuestionListUpload extends Serializable {
-    bidangId: string = undefined
-    filePdf: string = undefined
+    code: string = undefined // indicator code
+    file: string = undefined
 
     constructor(object?: Partial<ImportQuestionListUpload>) {
         super()

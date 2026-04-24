@@ -20,7 +20,6 @@ import {
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import { TabService } from '@/modules/base/services/tab.service'
-import { toSignal } from '@angular/core/rxjs-interop'
 import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
@@ -28,13 +27,13 @@ import {
     PageFilterBuilder,
     PrimaryColumnBuilder,
 } from '@/modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { PageFilter } from '@/modules/base/commons/pagable/page-filter'
 import { take } from 'rxjs/operators'
 import { UkomQuestion } from '@/modules/ukom/models/ukom-question'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
 import { ApiService } from '@/modules/base/services/api.service'
 import { UploadStudyCaseFileComponent } from '@/sijupri-admin/ukom/ukom-question/ukom-question-import/upload-study-case-file/upload-study-case-file.component'
+import { toSignal } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-ukom-question-import',
@@ -45,7 +44,6 @@ import { UploadStudyCaseFileComponent } from '@/sijupri-admin/ukom/ukom-question
         LoadingButtonComponent,
         ReactiveFormsModule,
         InvalidOnTouchDirective,
-        PagableComponent,
         UploadStudyCaseFileComponent,
     ],
     templateUrl: './ukom-question-import.component.html',
@@ -58,7 +56,10 @@ export class UkomQuestionImportComponent {
     @ViewChild('templateHandler') templateHandler!: FileHandlerComponent
     @ViewChild('studiKasusHandler') studiKasusHandler!: FileHandlerComponent
 
-    examTypeCode = new FormControl('', Validators.required)
+    // TODO: revert value to '' after done
+    // Reason: temporary workaround for <issue/context>
+    // Date: 2026-04-24
+    examTypeCode = new FormControl('STUDI_KASUS', Validators.required)
 
     examTypeList$: Observable<ExamType[]>
     isLoading = false
