@@ -320,8 +320,7 @@ export class UkomQuestionImportComponent implements OnInit {
                             this.isStudiKasusUploaded = false
 
                             // trigger a reset to the study case component
-                            this.resetUploadComponent.set(true)
-                            setTimeout(() => this.resetUploadComponent.set(false), 300)
+                            this.resetUploadComponent.update(v=> !v)
                         },
                         error: () => {
                             this.handlerService.handleAlert(

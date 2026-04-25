@@ -11,7 +11,7 @@ import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
     styleUrls: ['./praktik-score-admin.component.scss'],
 })
 export class PraktikScoreAdminComponent {
-    // TODO: Add participant answer
+    // TODO: Add participant answer, the link and the file if any
     score = input<PraktikScore | null>(null)
 
     groupedQuestions = computed(() => {

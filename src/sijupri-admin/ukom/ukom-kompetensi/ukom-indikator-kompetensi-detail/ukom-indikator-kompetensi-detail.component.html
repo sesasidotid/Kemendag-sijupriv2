@@ -114,6 +114,18 @@
                                                 <p class="mb-0">
                                                     {{ pertanyaan.question }}
                                                 </p>
+                                                <div *ngIf="pertanyaan.attachmentUrl && moduleType === 'STUDI_KASUS'" class="mt-3">
+                                                    <app-file-handler [inputs]="{
+                                                        files: {
+                                                            attachment: {
+                                                                label: 'File Lampiran',
+                                                                fileName: pertanyaan.attachment,
+                                                                source: pertanyaan.attachmentUrl
+                                                            }
+                                                        },
+                                                        viewOnly: true
+                                                    }"></app-file-handler>
+                                                </div>
                                             </div>
                                         </div>
                                     </ng-container>

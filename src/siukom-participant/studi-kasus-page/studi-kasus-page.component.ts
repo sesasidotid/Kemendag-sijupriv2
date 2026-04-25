@@ -135,9 +135,10 @@ export class StudiKasusPageComponent implements OnInit {
             )
             .subscribe({
                 next: (res) => {
-                    const selectedQuestion = res.data.find(
-                        (q) => q.id === 'base_studi_kasus_question',
-                    )
+                    // const selectedQuestion = res.data.find(
+                    //     (q) => q.id === 'base_studi_kasus_question',
+                    // )
+                    const selectedQuestion = res.data[0]
 
                     this.question.set(selectedQuestion)
                     if (!silent) {

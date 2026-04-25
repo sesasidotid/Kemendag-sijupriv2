@@ -14,8 +14,8 @@ const CONFIG = {
     baseUrl: "http://sijupri.sesasi.xyz:8000",
     bearerToken: process.env.BEARER_TOKEN,
 
-    baseStart: "2026-04-23T14:39",
-    baseEnd: "2026-04-24T16:00",
+    baseStart: "2026-04-25T09:15",
+    baseEnd: "2026-04-25T15:00",
 
     participantIds: [
         // "67a69dd9-bffc-46d2-8a38-fb2eca0e86b5",
@@ -52,9 +52,10 @@ const CONFIG = {
 
     roomUkomIds: [
         "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
-        "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
+        // "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
         // "31dc93c9-4e54-46b4-b2b4-aadd0f054743",
-        "6ed3c903-08ef-4639-96b0-8880716ec7bc",
+        // "6ed3c903-08ef-4639-96b0-8880716ec7bc",
+        "112e8955-0a54-4261-ab1f-06589a501042"
     ],
 
     durationsMinutes: {
@@ -86,8 +87,8 @@ const CONFIG = {
         // cat: "/api/v1/exam_schedule/cat",
         // wawancara: "/api/v1/exam_schedule/wawancara",
         // portofolio: "/api/v1/exam_schedule/portofolio",
-        praktik: "/api/v1/exam_schedule/praktik",
-        // studi_kasus: "/api/v1/exam_schedule/studi_kasus",
+        // praktik: "/api/v1/exam_schedule/praktik",
+        studi_kasus: "/api/v1/exam_schedule/studi_kasus",
         // makalah: "/api/v1/exam_schedule/makalah",
     },
 }

@@ -9,11 +9,12 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 import { UkomQuestion } from '@/modules/ukom/models/ukom-question'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 
 @Component({
     selector: 'app-ukom-indikator-kompetensi-detail',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, FileHandlerComponent],
     templateUrl: './ukom-indikator-kompetensi-detail.component.html',
     styleUrl: './ukom-indikator-kompetensi-detail.component.scss',
 })

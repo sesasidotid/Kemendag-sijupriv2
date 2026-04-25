@@ -32,7 +32,7 @@ const CONFIG = {
     fixedDynamicValue: "183781606383047389",
 
     payloadTemplate: {
-        bidangJabatanCode: "BJ17",
+        bidangJabatanCode: null,
         dokumenUkomList: [
             {
                 dokumenFile: "data:application/pdf;base64,",
@@ -50,8 +50,8 @@ const CONFIG = {
         jurusan: "183781606383047389",
         kabupatenKotaId: "",
         name: "183781606383047389",
-        nextJabatanCode: "JB7",
-        nextJenjangCode: "JJ5",
+        nextJabatanCode: "JB10",
+        nextJenjangCode: "JJ2",
         nip: "183781606383047389",
         noSuratUsulan: "183781606383047389",
         pangkatCode: "PK7",
