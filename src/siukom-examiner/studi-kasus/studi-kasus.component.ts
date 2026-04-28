@@ -195,12 +195,17 @@ export class StudiKasusComponent implements OnInit {
             .subscribe({
                 next: async (result) => {
                     const data = result.data
-                    const baseQuestion = data.find(
-                        (item) => item.id === 'base_studi_kasus_question',
-                    )
-                    const otherQuestions = data.filter(
-                        (item) => item.id !== 'base_studi_kasus_question',
-                    )
+                    // const baseQuestion = data.find(
+                    //     (item) => item.id === 'base_studi_kasus_question',
+                    // )
+                    // const otherQuestions = data.filter(
+                    //     (item) => item.id !== 'base_studi_kasus_question',
+                    // )
+                    const isBaseQuestion = (q: ExamQuestion) =>
+                        q.id?.startsWith('studi_kasus_')
+
+                    const baseQuestion = data.find(isBaseQuestion)
+                    const otherQuestions = data.filter((q) => !isBaseQuestion(q))
                     this.participantAnswer.set(baseQuestion || null)
 
                     // If we have questions on initial load, exam has already started

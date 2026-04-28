@@ -29,25 +29,18 @@
             <div *ngIf="!pendingTask.jenisUkom; else hadData" class="col-lg-12">
                 <app-empty-state
                     *ngIf="!(ukomParticipantService.isJFCanRegisterUkom$ | async)"
-                    [description]="
-                        'Silahkan tunggu proses UKom yang sedang berjalan selesai terlebih dahulu.'
-                    "
-                    [title]="
-                        'Anda belum bisa mendaftar UKom. Masih ada proses UKom yang berjalan'
-                    "
+                    [title]="'Anda Masih Mengikuti UKom'"
+                    [description]="'Selesaikan proses UKom yang sedang berjalan sebelum mendaftar kembali.'"
                 ></app-empty-state>
 
                 <app-empty-state
                     *ngIf="!wannaRequest && (ukomParticipantService.isJFCanRegisterUkom$ | async)"
                     [buttonAction]="reqChange.bind(this)"
-                    [buttonText]="'Ajukan Ukom'"
-                    [description]="
-                        'Anda bisa mengajukan pendaftaran UKom dengan menekan tombol dibawah ini.'
-                    "
-                    [title]="'Belum ada pendaftaran UKom yang berjalan'"
+                    [buttonText]="'Ajukan UKom'"
+                    [title]="'Belum Ada UKom Berjalan'"
+                    [description]="'Anda dapat mengajukan pendaftaran UKom untuk memulai proses.'"
                 ></app-empty-state>
-
-                <div *ngIf="wannaRequest" class="card">
+                <div *ngIf="wannaRequest" class="card shadow-sm">
                     <div class="card-header align-items-center d-flex">
                         <h4 class="card-title flex-grow-1 mb-0">
                             Pendaftaran Ukom
@@ -63,7 +56,7 @@
                                         class="form-label"
                                         for="firstnameInput"
                                     >
-                                        First Name
+                                        Nama
                                     </label>
                                     <p class="border-bottom">
                                         {{ jf.name ?? '-' }}
@@ -123,7 +116,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="emailInput">
                                         NIK
@@ -133,7 +126,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
+                            <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="emailInput">
                                         Jabatan
@@ -143,7 +136,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
+                            <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="emailInput">
                                         Jenjang
@@ -153,7 +146,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
+                            <div class="col-lg-6">
                                 <div class="mb-3">
                                     <label class="form-label" for="emailInput">
                                         Pangkat

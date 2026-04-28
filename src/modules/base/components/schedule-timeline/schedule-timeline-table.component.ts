@@ -40,6 +40,7 @@ interface ScheduleTableRow {
     lane: number
     hasConflict: boolean
     conflictCount: number
+    examinerName: string
 }
 
 @Component({
@@ -100,15 +101,6 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
         this.gridApi.sizeColumnsToFit()
     }
 
-    // Export to CSV
-    exportToCsv(): void {
-        if (this.gridApi) {
-            this.gridApi.exportDataAsCsv({
-                fileName: `schedule-timeline-${new Date().toISOString().split('T')[0]}.csv`,
-            })
-        }
-    }
-
     close(): void {
         this.closeTimeline.emit()
     }
@@ -122,6 +114,19 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
                 valueFormatter: (params) => `${params.value}`,
                 cellClass: 'text-center',
                 pinned: 'left',
+            },
+            {
+                headerName: 'Nama Penguji',
+                field: 'examinerName',
+                width: 180,
+                pinned: 'left',
+                cellStyle: (params) => {
+                    const row = params.data as ScheduleTableRow
+                    return {
+                        borderLeft: `4px solid ${row.color}`,
+                        fontWeight: '500',
+                    }
+                },
             },
             {
                 headerName: 'Nama Peserta',
@@ -203,19 +208,6 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
                 cellClass: 'text-center',
                 valueFormatter: (params) => `#${params.value + 1}`,
             },
-            // {
-            //     headerName: 'Konflik',
-            //     field: 'hasConflict',
-            //     width: 100,
-            //     cellClass: 'text-center',
-            //     cellRenderer: (params: any) => {
-            //         const row = params.data as ScheduleTableRow
-            //         if (row.hasConflict) {
-            //             return `<span class="badge bg-warning text-dark">${row.conflictCount} tumpang</span>`
-            //         }
-            //         return '<span class="badge bg-success">Tidak</span>'
-            //     },
-            // },
         ]
     }
 
@@ -234,7 +226,7 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
         // Convert to processed rows
         const rows: ScheduleTableRow[] = this.schedules.map((s, index) => {
             const startTime = this.parseDateTime(s.personalSchedule)
-            const durationMinutes = s.duration * 60
+            const durationMinutes = Math.round(s.duration * 60)
             const endTime = new Date(
                 startTime.getTime() + durationMinutes * 60000,
             )
@@ -263,6 +255,8 @@ export class ScheduleTimelineTableComponent implements OnInit, OnChanges {
                 lane: 0,
                 hasConflict: false,
                 conflictCount: 0,
+                examinerName: s.examinerName || '-'
+
             }
         })
 

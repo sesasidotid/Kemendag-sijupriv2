@@ -16,6 +16,7 @@ export interface ScheduleItem {
     participantScheduleId: string
     examScheduleId?: string
     personalSchedule: string // ISO datetime string
+    personalScheduleEnd: string | null // ISO datetime string (optional, can be computed from start + duration)
     duration: number // hours (e.g., 0.25, 0.5, 1)
     participantId?: string
     name: string
@@ -27,6 +28,7 @@ export interface ScheduleItem {
     unitKerjaName?: string
     jenisUkom: string // subclass identifier
     jenisUjian: string
+    examinerName: string | null
 }
 
 // Processed schedule with computed values
@@ -222,7 +224,7 @@ export class ScheduleTimelineComponent implements OnInit, OnChanges {
         // Convert to processed schedules with computed times
         const processed: ProcessedSchedule[] = this.schedules.map((s) => {
             const startTime = this.parseDateTime(s.personalSchedule)
-            const durationMinutes = s.duration * 60
+            const durationMinutes = Math.round(s.duration * 60)
             const endTime = new Date(
                 startTime.getTime() + durationMinutes * 60000,
             )

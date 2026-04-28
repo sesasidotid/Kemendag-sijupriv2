@@ -525,8 +525,11 @@ export class UkomExamMakalahComponent implements OnInit {
         this.mainSchedule.set(mainSchedule)
 
         // Generate all slots
-        const slots = this.slotService.generateAllSlots(mainSchedule)
-        this.allSlots.set(slots)
+        // const slots = this.slotService.generateAllSlots(mainSchedule)
+        // this.allSlots.set(slots)
+        this.slotService.generateAllSlots(mainSchedule).subscribe((slots) => {
+            this.allSlots.set(slots)
+        })
     }
 
     private resolveExaminerScheduleId(
@@ -580,17 +583,7 @@ export class UkomExamMakalahComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Reschedule error:', err)
-                    if (err.error.code === 'RCD-00002') {
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengubah jadwal. Peserta memiliki jadwal pada waktu tersebut',
-                        )
-                    } else {
-                        this.handlerService.handleAlert(
-                            'Error',
-                            'Gagal mengubah jadwal. Silakan coba lagi.',
-                        )
-                    }
+                    this.handlerService.handleException(err)
                 },
             })
     }
@@ -626,10 +619,7 @@ export class UkomExamMakalahComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Update examiner error:', err)
-                this.handlerService.handleAlert(
-                    'Error',
-                    'Gagal mengubah penguji.',
-                )
+                this.handlerService.handleException(err)
             },
         })
     }

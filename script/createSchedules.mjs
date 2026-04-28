@@ -14,17 +14,49 @@ const CONFIG = {
     baseUrl: "http://sijupri.sesasi.xyz:8000",
     bearerToken: process.env.BEARER_TOKEN,
 
-    baseStart: "2026-04-14T15:37",
-    baseEnd: "2026-04-14T16:00",
+    baseStart: "2026-04-25T09:15",
+    baseEnd: "2026-04-25T15:00",
 
     participantIds: [
-        "f0be4c17-70ea-4e4a-8dd8-4e9f0c6c6744",
-        "5d37a492-2ff3-4794-9949-f2a785f0a2f0",
-        // "uuid-2",
+        // "67a69dd9-bffc-46d2-8a38-fb2eca0e86b5",
+        // "49e2bfb8-8db5-44c8-9454-c5ee5602d3fd",
+        // "c7c0c78a-0fa6-4af2-916c-dd77e115b84e",
+        // "c134438d-4c17-42dd-8cff-4d4a45e0aa38",
+        // "edfb2bef-4754-4bb2-a8be-d665fa954b50",
+        // "e1a29dac-6a4a-4da8-a037-d2991f3e6509",
+        // "7c359a99-45b8-425a-9632-868c55e2f091",
+        // "a7aa4a8f-2e9e-4993-8ee4-3c33278c8cdc",
+        // "0a6682fd-20b0-4ea2-b197-5534d10c0116",
+        // "caba5790-3ba7-4f69-9091-c9960844ec8a",
+        // "f74b223d-9d75-4896-83b1-1747aa45ae7b",
+        // "ab5bceab-1f5d-4512-92d8-67c9a5d1e342",
+        // "e23b2c7a-0430-4aaa-8065-2cf3c79512d2",
+        // "f83893d6-ab69-4943-9d7b-dddc7f52665d",
+        // "76bd86aa-c779-45b4-bbd3-cd4661ed6757",
+        // "c1fe9c1b-46f4-45cd-8fe0-87a6f1df24aa",
+        // "4123e286-229b-48f7-9eaf-029606d74817",
+        // "a192c9b9-3d8a-44ee-be95-3ffa6ed29b29",
+        // "eb042bd1-a80a-404b-b26c-054e29797dae",
+        // "af909cb7-7727-4baa-b21f-c9ddd24d5164",
+        // "b00e863e-c730-472e-8399-59252cc28986",
+        // "35a6b4c6-9cb3-4a77-adc7-900e7bcba224",
+        // "c8388ed0-d425-462c-babf-cc8e35854a78",
+        // "d15b5cfd-c6d0-4c82-89cd-ec55736fbba1",
+        // "6e7efa77-851f-47d6-a80b-49fb5b98a724",
+        // "5b118fec-dac3-4c5e-800b-fde22e4f3009",
+        // "d9ff0f5d-44bd-46e4-9768-bde42f3078da",
+        // "7e96613e-afb1-48d6-b67c-66be0ac0111b",
+        // "42c15812-f045-490e-9d32-223e2eaf01c6",
     ],
-    participantLimit: 2,
+    participantLimit: 100,
 
-    roomUkomIds: ["22c1a104-877f-4a22-9dd8-b76a5f04edf6"],
+    roomUkomIds: [
+        "22c1a104-877f-4a22-9dd8-b76a5f04edf6",
+        // "49e222e9-0e93-45ab-a8b4-403fd7f860d3",
+        // "31dc93c9-4e54-46b4-b2b4-aadd0f054743",
+        // "6ed3c903-08ef-4639-96b0-8880716ec7bc",
+        "112e8955-0a54-4261-ab1f-06589a501042"
+    ],
 
     durationsMinutes: {
         cat: 5,
@@ -48,16 +80,16 @@ const CONFIG = {
     },
 
     examinerAmount: {
-        makalah: 2,
+        makalah: 1,
     },
 
     endpoints: {
-        cat: "/api/v1/exam_schedule/cat",
-        wawancara: "/api/v1/exam_schedule/wawancara",
-        portofolio: "/api/v1/exam_schedule/portofolio",
-        praktik: "/api/v1/exam_schedule/praktik",
+        // cat: "/api/v1/exam_schedule/cat",
+        // wawancara: "/api/v1/exam_schedule/wawancara",
+        // portofolio: "/api/v1/exam_schedule/portofolio",
+        // praktik: "/api/v1/exam_schedule/praktik",
         studi_kasus: "/api/v1/exam_schedule/studi_kasus",
-        makalah: "/api/v1/exam_schedule/makalah",
+        // makalah: "/api/v1/exam_schedule/makalah",
     },
 }
 

@@ -10,22 +10,25 @@ import {
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
-import { Observable } from 'rxjs'
+import {
+    BehaviorSubject,
+    combineLatest,
+    forkJoin,
+    Observable,
+    startWith,
+} from 'rxjs'
 import { DokumenUkomPersyaratan } from '../../../maintenance/models/dokumen-persyaratan-ukom'
 import { FIleHandler } from '../../commons/file-handler/file-handler'
 import { ApiService } from '../../services/api.service'
 import { HandlerService } from '../../services/handler.service'
 import { ConfirmationService } from '../../services/confirmation.service'
 import { CommonModule } from '@angular/common'
-import { finalize, map, tap } from 'rxjs/operators'
+import { filter, finalize, map, tap } from 'rxjs/operators'
 import { QRCodeModule } from 'angularx-qrcode'
 import { Router, RouterModule } from '@angular/router'
 import { LandingPageComponent } from '../../../landing-page/landing-page.component'
-import { BehaviorSubject } from 'rxjs'
 import { KabKota } from '../../../maintenance/models/kab-kota.model'
 import { Provinsi } from '../../../maintenance/models/provinsi.model'
-import { forkJoin, combineLatest, startWith, of } from 'rxjs'
-import { filter } from 'rxjs/operators'
 import { PredikatKinerja } from '../../../maintenance/models/predikat-kinerja.model'
 import { Pendidikan } from '../../../maintenance/models/pendidikan.model'
 import { BidangJabatan } from '../../../maintenance/models/bidang-jabatan.model'
@@ -36,6 +39,7 @@ import {
 } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { UkomDocumentService } from '@/modules/ukom/services/document.service'
+
 @Component({
     selector: 'app-ukom-register',
     standalone: true,
@@ -120,10 +124,6 @@ export class UkomRegisterComponent {
     pendidikanList: Pendidikan[] = []
 
     registerComplete = false
-
-    private instansiSubject = new BehaviorSubject<string>('')
-    instansi$ = this.instansiSubject.asObservable()
-
     stringCode: string = ''
     inputs: FIleHandler = {
         files: {},
@@ -143,28 +143,15 @@ export class UkomRegisterComponent {
             }
         },
     }
-
     hadItemsLoading$ = new BehaviorSubject<boolean>(false)
     imageUrl = ''
     isImageLoading = true
-
-    onLoad() {
-        this.isImageLoading = false
-    }
-
-    onError() {
-        this.isImageLoading = false
-        this.imageUrl = ''
-    }
-
     nonJFNIP: string
-
     isRegisterOpenLoading$ = new BehaviorSubject<boolean>(false)
     isPredikatKinerjaLoading$ = new BehaviorSubject<boolean>(false)
     isPendidikanLoading$ = new BehaviorSubject<boolean>(false)
     isProvinsiLoading$ = new BehaviorSubject<boolean>(false)
     isLoading$: Observable<boolean>
-
     jenisInstansiList = [
         { value: 'KEMENTERIAN_PERDAGANGAN', label: 'Kementerian Perdagangan' },
         {
@@ -188,6 +175,9 @@ export class UkomRegisterComponent {
             label: 'Pemerintah Kabupaten/Kota',
         },
     ]
+    isCopied = false
+    private instansiSubject = new BehaviorSubject<string>('')
+    instansi$ = this.instansiSubject.asObservable()
 
     constructor(
         private apiService: ApiService,
@@ -204,6 +194,15 @@ export class UkomRegisterComponent {
             this.isPendidikanLoading$,
             this.isProvinsiLoading$,
         ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
+    }
+
+    onLoad() {
+        this.isImageLoading = false
+    }
+
+    onError() {
+        this.isImageLoading = false
+        this.imageUrl = ''
     }
 
     ngOnInit() {
@@ -778,7 +777,6 @@ export class UkomRegisterComponent {
             })
     }
 
-    isCopied = false
     copyToClipboard(text: string) {
         navigator.clipboard.writeText(text).then(() => {
             this.isCopied = true

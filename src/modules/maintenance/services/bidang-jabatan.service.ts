@@ -83,4 +83,15 @@ export class BidangJabatanService {
             )
             .subscribe()
     }
+
+    findByJabatanCode(jabatanCode: string): Observable<BidangJabatan[]> {
+        return this.apiService
+            .getData(`${this.BASE_PATH}/jabatan/${jabatanCode}`)
+            .pipe(
+                catchError((error) => {
+                    console.error('Error fetching data', error)
+                    throw error
+                }),
+            )
+    }
 }

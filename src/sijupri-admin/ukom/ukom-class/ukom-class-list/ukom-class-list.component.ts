@@ -37,7 +37,6 @@ import { RoomUkom } from '@/modules/ukom/models/room-ukom.model'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import {
-    generateDemoScheduleData,
     ScheduleItem,
     ScheduleTimelineModalComponent,
 } from '@/modules/base/components/schedule-timeline'
@@ -86,7 +85,6 @@ export class UkomClassListComponent implements OnInit {
 
     isTimelineModalOpen = signal(false)
     timelineSchedules = signal<ScheduleItem[]>([])
-    demoTimelineSchedules = signal<ScheduleItem[]>(generateDemoScheduleData())
     dateRangeForm: FormGroup
     isLoadingSchedules = signal(false)
     hasLoadedSchedules = signal(false)
@@ -514,17 +512,17 @@ export class UkomClassListComponent implements OnInit {
         this.examScheduleService
             .getAllExamScheduleCalendar({ startDate, endDate })
             .pipe(
-                tap((res) => console.log('API Response:', res)),
                 map((response) =>
                     response.filter(
                         (item) =>
                             item.examSchedule.examTypeCode ===
                                 ExamTypeCategory.WAWANCARA ||
                             item.examSchedule.examTypeCode ===
+                                ExamTypeCategory.PRAKTIK ||
+                            item.examSchedule.examTypeCode ===
                                 ExamTypeCategory.SEMINAR,
                     ),
                 ),
-                tap((res) => console.log('Filtered Schedules:', res)),
             )
             .subscribe({
                 next: (response) => {
@@ -600,19 +598,13 @@ export class UkomClassListComponent implements OnInit {
         data: ExamScheduleCalendar[],
     ): ScheduleItem[] {
         return data.map((item) => {
-            const duration =
-                item.personalScheduleEnd && item.personalSchedule
-                    ? this.calculateDuration(
-                          item.personalSchedule,
-                          item.personalScheduleEnd,
-                      )
-                    : 1 // default 1 hour
-
+            console.log(item)
             return {
                 participantScheduleId: item.id,
                 examScheduleId: item.examScheduleId,
                 personalSchedule: item.personalSchedule,
-                duration: duration,
+                personalScheduleEnd: item.personalScheduleEnd,
+                duration: item.examSchedule.duration,
                 participantId: item.participantId,
                 name: item.participantUkom?.name,
                 email: item.participantUkom?.email,
@@ -631,18 +623,12 @@ export class UkomClassListComponent implements OnInit {
                 jenisUjian: this.ukomMiscellaneousService.getModuleDisplayName(
                     item.examSchedule?.examTypeCode,
                 ),
+                examinerName: item.examScheduleSupervised?.examinerSchedule?.examinerUkom.user.name
             } as ScheduleItem
         })
     }
 
-    // Calculate duration in hours between two datetime strings
-    private calculateDuration(start: string, end: string): number {
-        const startDate = new Date(start)
-        const endDate = new Date(end)
-        const diffMs = endDate.getTime() - startDate.getTime()
-        const diffHours = diffMs / (1000 * 60 * 60)
-        return Math.max(diffHours, 0.25) // minimum 15 minutes (0.25 hours)
-    }
+
 
     // Format date to YYYY-MM-DD
     private formatDate(date: Date): string {

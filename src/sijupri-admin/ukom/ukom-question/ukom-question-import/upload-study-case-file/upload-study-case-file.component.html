@@ -1,0 +1,140 @@
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+        <h5 class="card-title mb-0">1. Kategori Jabatan</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Jabatan</label>
+                <select
+                    (ngModelChange)="selectedJabatan.set($event); onJabatanChange()"
+                    [ngModel]="selectedJabatan()"
+                    class="form-select"
+                >
+                    <option [ngValue]="null">Pilih Jabatan</option>
+                    <option
+                        *ngFor="let jab of jabatanList()"
+                        [ngValue]="jab.code"
+                    >
+                        {{ jab.name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Jenjang</label>
+                <select
+                    (ngModelChange)="selectedJenjang.set($event); onJenjangChange()"
+                    [disabled]="!selectedJabatan()"
+                    [ngModel]="selectedJenjang()"
+                    class="form-select"
+                >
+                    <option [ngValue]="null">Pilih Jenjang</option>
+                    <option
+                        *ngFor="let jen of jenjangList()"
+                        [ngValue]="jen.code"
+                    >
+                        {{ jen.name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Bidang (Opsional)</label>
+                <select
+                    (ngModelChange)="selectedBidang.set($event); onBidangChange()"
+                    [disabled]="!selectedJabatan() || !bidangList().length"
+                    [ngModel]="selectedBidang()"
+                    class="form-select"
+                >
+                    <option [ngValue]="null">Pilih Bidang</option>
+                    <option
+                        *ngFor="let bid of bidangList()"
+                        [ngValue]="bid.code"
+                    >
+                        {{ bid.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="selectedJenjang()" class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+        <h5 class="card-title mb-0">2. Pemilihan Kompetensi & Indikator</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label fw-bold">Kompetensi</label>
+                <select
+                    (ngModelChange)="selectedKompetensi.set($event); onKompetensiChange()"
+                    [ngModel]="selectedKompetensi()"
+                    class="form-select"
+                >
+                    <option [ngValue]="null">Pilih Kompetensi</option>
+                    <option
+                        *ngFor="let comp of kompetensiList()"
+                        [ngValue]="comp.id"
+                    >
+                        {{ comp.name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-bold">Indikator</label>
+                <div class="d-flex gap-2">
+                    <div class="flex-grow-1">
+                        <app-multi-select
+                            (selectionChange)="currentIndikatorSelection.set($event)"
+                            [disabled]="!selectedKompetensi() || !indikatorList().length"
+                            [ngModel]="currentIndikatorSelection()"
+                            [options]="indikatorList()"
+                            placeholder="Pilih Indikator (bisa lebih dari satu)"
+                        >
+                        </app-multi-select>
+                    </div>
+                    <button
+                        (click)="addIndikators()"
+                        [disabled]="!currentIndikatorSelection().length"
+                        class="btn btn-success"
+                    >
+                        Tambah Indikator
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div
+    *ngIf="(selectedIndikatorMap() | keyvalue).length > 0"
+    class="card border-primary mb-4 shadow-sm"
+>
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0 text-white">Indikator Terpilih</h5>
+    </div>
+    <div class="card-body">
+        <ul class="list-group mb-4">
+            <li
+                *ngFor="let item of selectedIndikatorMap() | keyvalue"
+                class="list-group-item d-flex justify-content-between align-items-center"
+            >
+                {{ item.value.label }}
+                <button
+                    (click)="removeIndikator(item.key)"
+                    class="btn btn-sm btn-danger"
+                >
+                    Hapus
+                </button>
+            </li>
+        </ul>
+
+        <div>
+            <h6 class="fw-bold mb-3">Upload File Studi Kasus</h6>
+            <app-file-handler [inputs]="listUploadInputs()"></app-file-handler>
+        </div>
+    </div>
+</div>

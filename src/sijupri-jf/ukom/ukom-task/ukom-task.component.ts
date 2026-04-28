@@ -15,12 +15,10 @@ import { ConverterService } from '../../../modules/base/services/converter.servi
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { UkomRevisionComponent } from '../ukom-revision/ukom-revision.component'
-import { DomSanitizer } from '@angular/platform-browser'
-import { SafeUrl } from '@angular/platform-browser'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { TanggalIndoPipe } from '../../../modules/base/pipes/tanggal-indo.pipe'
 import { SystemConfigService } from '@/modules/base/services/system-config.service'
 import { AgeCalculatorPipe } from '@/modules/base/pipes/age-calculator.pipe'
-import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { KinerjaService } from '@/modules/complement/services/kinerja.service'
 import { PendidikanService } from '@/modules/complement/services/pendidikan-ukom.service'
@@ -30,6 +28,7 @@ import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jaba
 import { JfService } from '@/modules/siap/services/jf.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { ReplaceUkomWordPipe } from '@/modules/base/pipes/replace-ukom-word.pipe'
+
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
     KENAIKAN_JENJANG = 'Kenaikan Jenjang',

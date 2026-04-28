@@ -5,7 +5,7 @@
     class="root-cat"
     translate="no"
 >
-    <ng-container *ngIf="isLoading$ | async; else content">
+    <ng-container *ngIf="isLoading(); else content">
         <div class="card parent min-vh-80">
             <div class="py-5 text-center">
                 <div class="spinner-border text-primary" role="status">
@@ -17,7 +17,7 @@
     </ng-container>
 
     <ng-template #content>
-        <ng-container *ngIf="isSubmitted(); else hadItem">
+        <ng-container *ngIf="isSubmitted(); else notSubmitted">
             <div class="card parent">
                 <div
                     class="d-flex flex-column flex-lg-row align-items-center justify-content-between w-100 gap-4"
@@ -94,12 +94,6 @@
                             </ng-container>
                         </div>
 
-                        <!--                        <button-->
-                        <!--                            [routerLink]="['/']"-->
-                        <!--                            class="btn btn-primary mt-4"-->
-                        <!--                        >-->
-                        <!--                            Kembali-->
-                        <!--                        </button>-->
                         <button
                             (click)="backWithNoConfirmation()"
                             class="btn btn-primary mt-4"
@@ -119,9 +113,10 @@
             </div>
         </ng-container>
 
-        <ng-template #hadItem>
+        <ng-template #notSubmitted>
+            @if (data.length > 0) {
             <div class="parent">
-                <div *ngIf="data.length > 0" class="exam-layout">
+                <div class="exam-layout">
                     <section class="card question-pane">
                         <div class="question-scroll">
                             <div
@@ -294,6 +289,46 @@
                     </aside>
                 </div>
             </div>
+            } @else {
+            <div class="card parent">
+                <div
+                    class="d-flex flex-column flex-lg-row align-items-center justify-content-between w-100 gap-4"
+                >
+                    <div
+                        class="max-w-50ch order-lg-1 text-lg-start container order-2 text-center"
+                    >
+                        <p
+                            class="text-uppercase text-warning fw-semibold small mb-2 tracking-wide"
+                        >
+                            Terjadi kendala
+                        </p>
+                        <h2 class="fw-bold mb-3">
+                            Soal belum dapat ditampilkan
+                        </h2>
+                        <p class="mb-4">
+                            Mohon maaf, saat ini terjadi masalah saat memuat
+                            soal CAT. Silakan hubungi panitia untuk bantuan
+                            lebih lanjut.
+                        </p>
+
+                        <button
+                            (click)="backWithNoConfirmation()"
+                            class="btn btn-primary"
+                        >
+                            Kembali ke Dashboard
+                        </button>
+                    </div>
+
+                    <div class="order-lg-2 flex-grow-1 order-1">
+                        <img
+                            alt="Ilustrasi bantuan"
+                            class="img-fluid illustration-size"
+                            src="assets/binbot/binbot-concerned-helper.webp"
+                        />
+                    </div>
+                </div>
+            </div>
+            }
         </ng-template>
     </ng-template>
 
@@ -372,9 +407,7 @@
     </ng-container>
 
     <!-- Fullscreen Security Overlay -->
-    <ng-container
-        *ngIf="!isFullscreen() && !isSubmitted() && !(isLoading$ | async)"
-    >
+    <ng-container *ngIf="!isFullscreen() && !isSubmitted() && !isLoading()">
         <div class="fullscreen-overlay">
             <div class="fullscreen-overlay__content">
                 <div class="fullscreen-overlay__icon">
