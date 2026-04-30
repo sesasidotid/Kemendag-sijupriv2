@@ -304,9 +304,11 @@ export class StudiKasusComponent implements OnInit {
             scoreControl.value !== ''
         ) {
             let score = Number(scoreControl.value)
-            if (score < 0) score = 0
-            if (score > maxScore) score = maxScore
-            scoreControl.setValue(score)
+            if (score < 0) {
+                scoreControl.setValue(0)
+            } else if (score > maxScore) {
+                scoreControl.setValue(maxScore)
+            }
         }
         scoreControl?.markAsTouched()
     }

@@ -283,6 +283,8 @@ export class UkomTaskDetailComponent {
     transformInstansiName(value: string): string {
         if (!value) return null
 
+        if (value === 'KEMENTERIAN_ESDM') return 'Kementrian ESDM'
+
         return value
             .toLowerCase() // Ubah ke lowercase semua dulu
             .replace(/_/g, ' ') // Ganti underscore dengan spasi
