@@ -39,9 +39,9 @@
 
         @if (examTypeCode.value === ExamTypeCategory.STUDI_KASUS){
         <app-upload-study-case-file
-            [reset]="resetUploadComponent()"
             (isAllFileUploadedChange)="handleAllFileUploadedChange($event)"
             (listUploadChange)="handleListUploadChange($event)"
+            [reset]="resetUploadComponent()"
         ></app-upload-study-case-file>
         }
 
@@ -50,7 +50,7 @@
         <ng-container *ngIf="examTypeCode.value">
             <a
                 (click)="handleDownloadTemplate(); $event.preventDefault()"
-                class="link d-block mt-3"
+                class="link mt-3"
                 href="#"
             >
                 <span class="mdi mdi-download"></span>

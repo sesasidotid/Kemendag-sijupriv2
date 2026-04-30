@@ -46,7 +46,7 @@ import { IndikatorKompetensiQueryParams } from '@/modules/ukom/models/indikator-
 export class UploadStudyCaseFileComponent implements OnInit {
     listUploadChange = output<ImportQuestionListUpload[]>()
     isAllFileUploadedChange = output<boolean>()
-    reset = input<boolean>(false)
+    reset = input<number>(0)
     // Selections
     selectedJabatan = signal<string | null>(null)
     selectedJenjang = signal<string | null>(null)
@@ -111,11 +111,14 @@ export class UploadStudyCaseFileComponent implements OnInit {
     private indikatorService = inject(IndikatorService)
 
     constructor() {
-        effect(() => {
-            if (this.reset()) {
-                this.resetState()
-            }
-        })
+        effect(
+            () => {
+                if (this.reset() > 0) {
+                    this.resetState()
+                }
+            },
+            { allowSignalWrites: true }
+        )
 
         effect(() => {
             const uploaded = this.uploadedMap()
@@ -133,6 +136,7 @@ export class UploadStudyCaseFileComponent implements OnInit {
     }
 
     resetState() {
+        console.log('reset run')
         this.selectedJabatan.set(null)
         this.selectedJenjang.set(null)
         this.selectedBidang.set(null)
