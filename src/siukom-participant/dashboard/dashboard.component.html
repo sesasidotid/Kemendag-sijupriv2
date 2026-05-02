@@ -58,15 +58,24 @@
                     </div>
                 </ng-template>
 
-                <button
-                    (click)="toggleResignModal()"
-                    *ngIf="canResignRoom()"
-                    class="btn btn-outline-danger w-100 mt-3"
-                    type="button"
-                >
-                    <span class="mdi mdi-cancel me-2"></span>
-                    Batalkan Keikutsertaan
-                </button>
+<!--                <button-->
+<!--                    (click)="toggleResignModal()"-->
+<!--                    *ngIf="canResignRoom()"-->
+<!--                    class="btn btn-outline-danger w-100 mt-3"-->
+<!--                    type="button"-->
+<!--                >-->
+<!--                    <span class="mdi mdi-cancel me-2"></span>-->
+<!--                    Batalkan Keikutsertaan-->
+<!--                </button>-->
+              <button
+                (click)="toggleResignModal()"
+                *ngIf="false"
+                class="btn btn-outline-danger w-100 mt-3"
+                type="button"
+              >
+                <span class="mdi mdi-cancel me-2"></span>
+                Batalkan Keikutsertaan
+              </button>
             </div>
         </div>
     </div>
@@ -841,7 +850,7 @@
         Anda yakin ingin melanjutkan?
     </p>
 
-    <div class="d-flex justify-content-end w-100 mt-4 gap-2" modal-footer>
+    <div class="d-flex justify-content-end w-100 mt-4 gap-2">
         <button (click)="toggleResignModal()" class="btn btn-secondary">
             Batal
         </button>
