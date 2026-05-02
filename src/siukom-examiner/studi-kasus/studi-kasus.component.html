@@ -40,7 +40,21 @@
                             Silakan isi penilaian untuk setiap pertanyaan di
                             bawah ini.
                         </p>
-                        <div class="d-flex justify-content-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <ng-container
+                                *ngIf="participantAnswer()?.attachmentUrl"
+                            >
+                                <button
+                                    (click)="openQuestionObject()"
+                                    class="btn btn-outline-primary"
+                                >
+                                    <span
+                                        class="mdi mdi-open-in-new me-2"
+                                    ></span>
+                                    Lihat Soal Studi Kasus
+                                </button>
+                            </ng-container>
+
                             <ng-container
                                 *ngIf="participantAnswer()?.answerDto?.answerUploadUrl; else noSupportingDocument"
                             >

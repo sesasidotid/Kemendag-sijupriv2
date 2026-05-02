@@ -23,6 +23,7 @@ import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-sched
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import { SecureFilePreviewService } from '@/modules/base/services/secure-file-preview.service'
 
 @Component({
     selector: 'app-studi-kasus',
@@ -56,6 +57,7 @@ export class StudiKasusComponent implements OnInit {
     startExamLoading = signal(false)
     examStarted = signal(false)
     examScheduleService = inject(UkomExamScheduleService)
+    secureFilePreviewService = inject(SecureFilePreviewService)
     examScheduleDetail = signal<ExamSchedule | null>(null)
     private saveTimeout: number | undefined
 
@@ -262,6 +264,21 @@ export class StudiKasusComponent implements OnInit {
         window.open(
             this.participantAnswer()?.answerDto?.answerUploadUrl,
             '_blank',
+        )
+    }
+
+    openQuestionObject(): void {
+        const question = this.participantAnswer()
+        if (!question?.attachmentUrl) {
+            this.handlerService.handleAlert(
+                'Error',
+                'Soal studi kasus tidak ditemukan.',
+            )
+            return
+        }
+        this.secureFilePreviewService.open(
+            question.attachment,
+            question.attachmentUrl,
         )
     }
 
