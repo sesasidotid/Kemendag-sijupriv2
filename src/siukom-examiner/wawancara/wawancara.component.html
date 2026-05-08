@@ -1,14 +1,12 @@
 <app-exam-assessment-layout
     (backClicked)="backToDashboard()"
     [examScheduleId]="examId()"
-    [loading]="loadingQuestions()"
+    [loading]="attendanceLoading() || loadingQuestions()"
     [participantId]="participantId()"
     [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnsweredAndSaved() && examStarted()"
 >
     <!-- Start Exam Screen -->
-    <ng-container
-        *ngIf="!examStarted() && questions().length === 0; else examContent"
-    >
+    <ng-container *ngIf="!examStarted(); else examContent">
         <div class="assessment-container">
             <div class="header-section">
                 <h1>Form Penilaian Wawancara</h1>

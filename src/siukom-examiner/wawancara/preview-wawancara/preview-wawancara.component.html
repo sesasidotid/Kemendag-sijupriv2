@@ -1,0 +1,131 @@
+<ng-container *ngIf="!loadingQuestions(); else loadingState">
+    <ng-container *ngIf="questions().length > 0; else noQuestions">
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Wawancara</h1>
+                <p>Pratinjau tampilan penilaian wawancara peserta.</p>
+            </div>
+
+            <div class="question-list">
+                <div
+                    *ngFor="let question of questions(); let i = index"
+                    class="question-card"
+                >
+                    <!-- Question Header -->
+                    <div class="card-header">
+                        <img
+                            *ngIf="question.attachmentUrl"
+                            [src]="question.attachmentUrl"
+                            alt="Question Image"
+                            class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                        />
+                        <span class="question-number"
+                            >{{ question.kompetensiIndikatorName }}</span
+                        >
+                        <h2 class="question-text">
+                            {{ question.question }}
+                        </h2>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="form-group row-spacing">
+                            <label>Jawaban Peserta:</label>
+                            <textarea
+                                class="form-control large-textarea"
+                                [value]="question.answerDto?.answerText || ''"
+                                placeholder="Jawaban peserta belum tersedia."
+                                readonly
+                                rows="5"
+                            >
+                            </textarea>
+                        </div>
+                        <div class="row-spacing">
+                            <div class="key-label">Kunci Jawaban:</div>
+                            <button
+                                (click)="toggleHint(question, i)"
+                                *ngIf="hasHint(question); else noHint"
+                                class="action-link hint-toggle"
+                                type="button"
+                            >
+                                [ {{ isHintVisible(question, i) ?
+                                'Sembunyikan Kunci Jawaban' : 'Lihat Kunci Jawaban'
+                                }} ]
+                            </button>
+
+                            <ng-template #noHint>
+                                <span class="hint-empty-text"
+                                    >Kunci jawaban belum tersedia.</span
+                                >
+                            </ng-template>
+
+                            <div
+                                *ngIf="hasHint(question) && isHintVisible(question, i)"
+                                class="hint-content"
+                            >
+                                {{ question.hint }}
+                            </div>
+                        </div>
+
+                        <!-- Assessment Options -->
+                        <div class="assessment-section row-spacing">
+                            <div class="assessment-label">
+                                Penilaian:
+                                <span class="text-danger">*</span>
+                            </div>
+
+                            <div class="radio-group">
+                                <!-- Competent Option -->
+                                <label
+                                    [class.selected]="question.answerDto?.answerChoice === 'kompeten'"
+                                    class="radio-card competent-option"
+                                >
+                                    <input
+                                        [checked]="question.answerDto?.answerChoice === 'kompeten'"
+                                        disabled
+                                        type="radio"
+                                    />
+                                    <span class="radio-text">Kompeten</span>
+                                </label>
+
+                                <!-- Not Competent Option -->
+                                <label
+                                    [class.selected]="question.answerDto?.answerChoice === 'tidak_kompeten'"
+                                    class="radio-card incompetent-option"
+                                >
+                                    <input
+                                        [checked]="question.answerDto?.answerChoice === 'tidak_kompeten'"
+                                        disabled
+                                        type="radio"
+                                    />
+                                    <span class="radio-text">Tidak Kompeten</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #noQuestions>
+        <div class="no-questions-container">
+            <span class="no-questions-icon mdi mdi-clipboard-text-outline"></span>
+            <h2>Form Penilaian Belum Tersedia</h2>
+            <p>Belum ada form penilaian yang tersedia untuk saat ini.</p>
+        </div>
+    </ng-template>
+</ng-container>
+
+<ng-template #loadingState>
+    <div class="assessment-container">
+        <div class="header-section">
+            <h1>Form Penilaian Wawancara</h1>
+            <p>Memuat pratinjau penilaian...</p>
+        </div>
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Memuat...</span>
+            </div>
+        </div>
+    </div>
+</ng-template>

@@ -184,7 +184,7 @@ $font-size-3xl: 28px;
    ============================================ */
 .action-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: $spacing-md;
 
   @media (max-width: 400px) {
@@ -238,6 +238,22 @@ $font-size-3xl: 28px;
 
 .action-card-body {
   flex: 1;
+}
+
+.action-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.action-card-actions .btn-action-primary {
+  width: 100%;
+}
+
+.action-card-actions .btn-preview-form {
+  width: 100%;
+  background: #ffffff;
+  border-width: 2px;
 }
 
 .action-card-body .participant-name {
@@ -463,11 +479,12 @@ $font-size-3xl: 28px;
   border-radius: $radius-md;
   padding: $spacing-md;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: $spacing-md;
 
-  @media (max-width: 576px) {
+  @media (max-width: 1024px) {
     flex-direction: column;
+    align-items: flex-start;
   }
 }
 
@@ -536,6 +553,25 @@ $font-size-3xl: 28px;
   font-weight: 600;
 }
 
+.participant-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  align-self: stretch;
+  min-width: 200px;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.participant-actions .btn-enter-exam,
+.participant-actions .btn-preview-form {
+  width: 100%;
+  //flex: 1 1 0;
+}
+
 /* Enter Exam Button - Primary blue */
 .btn-enter-exam {
   background: $primary-color;
@@ -544,7 +580,8 @@ $font-size-3xl: 28px;
   border-radius: $radius-md;
   padding: $spacing-sm $spacing-md;
   font-size: $font-size-base;
-  font-weight: 600;
+  //flex: 1 1 0;
+  flex: 0 0 0;
   cursor: pointer;
   min-height: 48px;
   white-space: nowrap;
@@ -559,7 +596,44 @@ $font-size-3xl: 28px;
     outline-offset: 2px;
   }
 
-  @media (max-width: 576px) {
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+}
+
+.btn-preview-form {
+  background: $bg-card;
+  color: $primary-color;
+  border: 1px solid $primary-color;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background: $primary-light;
+    border-color: $primary-hover;
+    color: $primary-hover;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($primary-color, 0.35);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 1024px) {
     width: 100%;
   }
 }
