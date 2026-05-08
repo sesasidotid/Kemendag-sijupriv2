@@ -7,9 +7,8 @@ import { ExamAttendance } from '../models/cat/exam-attendance'
     providedIn: 'root',
 })
 export class CatService {
-    private serverTimezoneOffset = '+07:00'
-
     apiService = inject(ApiService)
+    private serverTimezoneOffset = '+07:00'
 
     getExamAttendance(
         examScheduleId: string,
@@ -17,6 +16,12 @@ export class CatService {
     ): Observable<ExamAttendance> {
         return this.apiService.getData(
             `/api/v1/exam_attendance/${examScheduleId}/${participantId}`,
+        )
+    }
+
+    deleteExamAttendance(examScheduleId: string): Observable<void> {
+        return this.apiService.deleteData(
+            `/api/v1/exam_attendance/exam_schedule/${examScheduleId}`,
         )
     }
 
