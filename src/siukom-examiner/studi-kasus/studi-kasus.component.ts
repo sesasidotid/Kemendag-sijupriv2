@@ -25,6 +25,8 @@ import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { SecureFilePreviewService } from '@/modules/base/services/secure-file-preview.service'
 
+import { CatService } from '@/modules/ukom/services/cat.service'
+
 @Component({
     selector: 'app-studi-kasus',
     standalone: true,
@@ -47,7 +49,9 @@ export class StudiKasusComponent implements OnInit {
     draftService = inject(StudiKasusDraftService)
     router = inject(Router)
     examService = inject(ExamService)
+    catService = inject(CatService)
     loadingQuestions = signal(false)
+    attendanceLoading = signal(false)
     submitting = signal(false)
     examId = signal('')
     participantId = signal('')
@@ -76,7 +80,7 @@ export class StudiKasusComponent implements OnInit {
                 const examId = this.examId()
                 const participantId = this.participantId()
                 if (examId && participantId) {
-                    this.fetchQuestionsToGrade()
+                    this.getAttendace()
                 }
             },
             { allowSignalWrites: true },
@@ -130,6 +134,25 @@ export class StudiKasusComponent implements OnInit {
         })
     }
 
+    getAttendace() {
+        this.attendanceLoading.set(true)
+        this.catService
+            .getExamAttendance(this.examId(), this.participantId())
+            .pipe(finalize(() => this.attendanceLoading.set(false)))
+            .subscribe({
+                next: (res) => {
+                    if (res && res.startAt) {
+                        this.examStarted.set(true)
+                        this.fetchQuestionsToGrade()
+                    }
+                },
+                error: (err) => {
+                    this.handlerService.handleException(err)
+                    console.error('Failed to get exam attendance:', err)
+                },
+            })
+    }
+
     startTheExam() {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
@@ -153,8 +176,7 @@ export class StudiKasusComponent implements OnInit {
                                 'Success',
                                 'Berhasil memulai ujian.',
                             )
-                            this.examStarted.set(true)
-                            this.fetchQuestionsToGrade(true)
+                            this.getAttendace()
                         },
                         error: (err) => {
                             console.error(err)
@@ -185,7 +207,7 @@ export class StudiKasusComponent implements OnInit {
             })
     }
 
-    fetchQuestionsToGrade(afterStart: boolean = false) {
+    fetchQuestionsToGrade() {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
@@ -209,11 +231,6 @@ export class StudiKasusComponent implements OnInit {
                     const baseQuestion = data.find(isBaseQuestion)
                     const otherQuestions = data.filter((q) => !isBaseQuestion(q))
                     this.participantAnswer.set(baseQuestion || null)
-
-                    // If we have questions on initial load, exam has already started
-                    if (!afterStart && otherQuestions.length > 0) {
-                        this.examStarted.set(true)
-                    }
 
                     // Load draft first
                     const draft = await this.draftService.load(

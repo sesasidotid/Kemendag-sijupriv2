@@ -26,6 +26,8 @@ import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.
 import { ExaminerExamStartRequest } from '@/modules/ukom/models/exam/start-exam-request.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 
+import { CatService } from '@/modules/ukom/services/cat.service'
+
 @Component({
     selector: 'app-practical-work',
     standalone: true,
@@ -45,9 +47,11 @@ export class PracticalWorkComponent {
     handlerService = inject(HandlerService)
     confirmationService = inject(ConfirmationService)
     examService = inject(ExamService)
+    catService = inject(CatService)
     route = inject(ActivatedRoute)
     router = inject(Router)
     loadingQuestions = signal(false)
+    attendanceLoading = signal(false)
     questions = signal<ExamQuestion[]>([])
     formValidationService = inject(FormValidationService)
     fb = inject(FormBuilder)
@@ -79,7 +83,7 @@ export class PracticalWorkComponent {
                 const examId = this.examId()
                 const participantId = this.participantId()
                 if (examId && participantId) {
-                    this.fetchQuestionsToGrade()
+                    this.getAttendace()
                 }
             },
             { allowSignalWrites: true },
@@ -105,6 +109,25 @@ export class PracticalWorkComponent {
         })
     }
 
+    getAttendace() {
+        this.attendanceLoading.set(true)
+        this.catService
+            .getExamAttendance(this.examId(), this.participantId())
+            .pipe(finalize(() => this.attendanceLoading.set(false)))
+            .subscribe({
+                next: (res) => {
+                    if (res && res.startAt) {
+                        this.examStarted.set(true)
+                        this.fetchQuestionsToGrade()
+                    }
+                },
+                error: (err) => {
+                    this.handlerService.handleException(err)
+                    console.error('Failed to get exam attendance:', err)
+                },
+            })
+    }
+
     startTheExam() {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
@@ -128,8 +151,7 @@ export class PracticalWorkComponent {
                                 'Success',
                                 'Berhasil memulai ujian.',
                             )
-                            this.examStarted.set(true)
-                            this.fetchQuestionsToGrade(true)
+                            this.getAttendace()
                         },
                         error: (err) => {
                             console.error(err)
@@ -167,7 +189,7 @@ export class PracticalWorkComponent {
         )
     }
 
-    fetchQuestionsToGrade(afterStart: boolean = false) {
+    fetchQuestionsToGrade() {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
@@ -187,11 +209,6 @@ export class PracticalWorkComponent {
                     )
 
                     this.participantAnswer.set(baseQuestion)
-
-                    // If we have questions on initial load, exam has already started
-                    if (!afterStart && otherQuestions.length > 0) {
-                        this.examStarted.set(true)
-                    }
 
                     const draft = await this.draftService.load(
                         this.examId(),

@@ -1,12 +1,12 @@
 <app-exam-assessment-layout
     (backClicked)="backToDashboard()"
     [examScheduleId]="examId()"
-    [loading]="loadingQuestions()"
+    [loading]="attendanceLoading() || loadingQuestions()"
     [participantId]="participantId()"
-    [showSavedIndicator]="!loadingQuestions() && allQuestionsAnsweredAndSaved() && questions().length > 0"
+    [showSavedIndicator]="!loadingQuestions() && allQuestionsAnsweredAndSaved() && examStarted()"
 >
     <ng-container
-        *ngIf="!examStarted() && questions().length === 0; else examContent"
+        *ngIf="!examStarted(); else examContent"
     >
         <div class="assessment-container">
             <div class="header-section">
