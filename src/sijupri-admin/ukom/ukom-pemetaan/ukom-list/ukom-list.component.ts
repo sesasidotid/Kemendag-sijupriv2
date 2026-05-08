@@ -20,6 +20,7 @@ import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
 import { UkomExportVerifikasiComponent } from '../ukom-export-verifikasi/ukom-export-verifikasi.component'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
+
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
@@ -137,7 +138,7 @@ export class UkomListComponent {
                     .build(),
             )
             .addFilter(
-                new PageFilterBuilder('equal')
+                new PageFilterBuilder('like')
                     .setProperty('jenisUkom')
                     .withField('Jenis UKom', 'select')
                     .withDefaultValue('')
@@ -156,6 +157,14 @@ export class UkomListComponent {
                             value: 'PROMOSI_JF',
                         },
                     ])
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('like')
+                    .setProperty('nextJabatanCode')
+                    .withField('Jabatan Yang Dituju', 'select')
+                    .withDefaultValue('')
+                    .setOptionList([])
                     .build(),
             )
             .withQueryParams()
@@ -198,7 +207,7 @@ export class UkomListComponent {
         const currentPagable = this.pagable$.value
 
         const existingFilterList = currentPagable.filterList.map((item) =>
-            item.key === 'eq_nextJabatanCode'
+            item.key === 'like_nextJabatanCode'
                 ? {
                       ...item,
                       optionList: this.jabatanList.map((jabatan) => ({
@@ -210,7 +219,7 @@ export class UkomListComponent {
         )
 
         const filterList = existingFilterList.some(
-            (item) => item.key === 'eq_nextJabatanCode',
+            (item) => item.key === 'like_nextJabatanCode',
         )
             ? existingFilterList
             : [
@@ -218,7 +227,7 @@ export class UkomListComponent {
                   new PageFilter({
                       label: 'Jabatan Yang Dituju',
                       fieldType: 'select',
-                      key: 'eq_nextJabatanCode',
+                      key: 'like_nextJabatanCode',
                       value: '',
                       optionList: this.jabatanList.map((jabatan) => ({
                           label: jabatan.name,
