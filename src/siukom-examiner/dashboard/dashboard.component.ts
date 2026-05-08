@@ -18,6 +18,11 @@ import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
 import { BidangJabatan } from '@/modules/maintenance/models/bidang-jabatan.model'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { PreviewWawancaraComponent } from '@/siukom-examiner/wawancara/preview-wawancara/preview-wawancara.component'
+import { PreviewStudiKasusComponent } from '@/siukom-examiner/studi-kasus/preview-studi-kasus/preview-studi-kasus.component'
+import { PreviewMakalahComponent } from '@/siukom-examiner/makalah/preview-makalah/preview-makalah.component'
+import { PreviewPortofolioComponent } from '@/siukom-examiner/portofolio/preview-portofolio/preview-portofolio.component'
+import { PreviewPracticalWorkComponent } from '@/siukom-examiner/practical-work/preview-practical-work/preview-practical-work.component'
+import { PreviewSeminerMakalahComponent } from '@/siukom-examiner/seminer-makalah/preview-seminer-makalah/preview-seminer-makalah.component'
 
 type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
 
@@ -61,7 +66,16 @@ const MONTHS = [
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, ModalComponent, PreviewWawancaraComponent],
+    imports: [
+        CommonModule,
+        ModalComponent,
+        PreviewWawancaraComponent,
+        PreviewStudiKasusComponent,
+        PreviewMakalahComponent,
+        PreviewPortofolioComponent,
+        PreviewPracticalWorkComponent,
+        PreviewSeminerMakalahComponent,
+    ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
 })

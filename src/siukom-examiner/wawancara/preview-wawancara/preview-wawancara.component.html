@@ -13,26 +13,26 @@
                 >
                     <!-- Question Header -->
                     <div class="card-header">
-                        <img
-                            *ngIf="question.attachmentUrl"
-                            [src]="question.attachmentUrl"
-                            alt="Question Image"
-                            class="img-fluid img-custom-300 mb-1 rounded object-cover"
-                        />
+                        <div class="mb-4 text-center">
+                            <img
+                                *ngIf="question.attachmentUrl"
+                                [src]="question.attachmentUrl"
+                                alt="Question Image"
+                                class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                            />
+                        </div>
                         <span class="question-number"
                             >{{ question.kompetensiIndikatorName }}</span
                         >
-                        <h2 class="question-text">
-                            {{ question.question }}
-                        </h2>
+                        <h2 class="question-text">{{ question.question }}</h2>
                     </div>
 
                     <div class="card-body">
                         <div class="form-group row-spacing">
                             <label>Jawaban Peserta:</label>
                             <textarea
-                                class="form-control large-textarea"
                                 [value]="question.answerDto?.answerText || ''"
+                                class="form-control large-textarea"
                                 placeholder="Jawaban peserta belum tersedia."
                                 readonly
                                 rows="5"
@@ -47,9 +47,8 @@
                                 class="action-link hint-toggle"
                                 type="button"
                             >
-                                [ {{ isHintVisible(question, i) ?
-                                'Sembunyikan Kunci Jawaban' : 'Lihat Kunci Jawaban'
-                                }} ]
+                                [ {{ isHintVisible(question, i) ? 'Sembunyikan
+                                Kunci Jawaban' : 'Lihat Kunci Jawaban' }} ]
                             </button>
 
                             <ng-template #noHint>
@@ -97,7 +96,9 @@
                                         disabled
                                         type="radio"
                                     />
-                                    <span class="radio-text">Tidak Kompeten</span>
+                                    <span class="radio-text"
+                                        >Tidak Kompeten</span
+                                    >
                                 </label>
                             </div>
                         </div>
@@ -109,7 +110,9 @@
 
     <ng-template #noQuestions>
         <div class="no-questions-container">
-            <span class="no-questions-icon mdi mdi-clipboard-text-outline"></span>
+            <span
+                class="no-questions-icon mdi mdi-clipboard-text-outline"
+            ></span>
             <h2>Form Penilaian Belum Tersedia</h2>
             <p>Belum ada form penilaian yang tersedia untuk saat ini.</p>
         </div>
@@ -122,7 +125,7 @@
             <h1>Form Penilaian Wawancara</h1>
             <p>Memuat pratinjau penilaian...</p>
         </div>
-        <div class="text-center py-4">
+        <div class="py-4 text-center">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Memuat...</span>
             </div>

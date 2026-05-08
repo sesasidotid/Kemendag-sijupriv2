@@ -1,0 +1,153 @@
+<ng-container *ngIf="!loadingQuestions(); else loadingState">
+    <ng-container *ngIf="questions().length > 0; else noQuestions">
+        <div class="assessment-container">
+            <div class="header-section">
+                <h1>Form Penilaian Portofolio</h1>
+                <p>Pratinjau tampilan penilaian portfolio peserta.</p>
+            </div>
+
+            <div class="question-list">
+                <div
+                    *ngFor="let question of questions(); let i = index"
+                    class="question-card"
+                >
+                    <div class="card-header">
+                        <div class="mb-4 text-center">
+                            <img
+                                *ngIf="question.attachmentUrl"
+                                [src]="question.attachmentUrl"
+                                alt="Question Image"
+                                class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                            />
+                        </div>
+                        <span class="question-number"
+                            >{{ question.kompetensiIndikatorName }}</span
+                        >
+                        <h2 class="question-text">{{ question.question }}</h2>
+
+                        <button
+                            (click)="openDocument(question?.answerDto?.answerUploadUrl)"
+                            *ngIf="question?.answerDto?.answerUploadUrl; else noDocument"
+                            class="btn btn-primary mt-2"
+                        >
+                            <span class="mdi mdi-open-in-new me-2"></span>
+                            Lihat Dokumen Peserta
+                        </button>
+
+                        <ng-template #noDocument>
+                            <div class="alert alert-warning mb-0 mt-2">
+                                <span
+                                    class="mdi mdi-file-alert-outline me-2"
+                                ></span>
+                                Peserta belum mengunggah dokumen untuk item ini
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="checklist-section">
+                            <div class="section-label">Checklist Validasi:</div>
+                            <div class="checklist-group">
+                                <div
+                                    [ngClass]="getCheckboxState(question, 'valid')"
+                                    class="form-check checkbox-card"
+                                >
+                                    <label
+                                        class="form-check-label w-100 checkbox-label"
+                                    >
+                                        <input
+                                            [checked]="
+                                                question.answerDto?.answerList?.valid === true
+                                            "
+                                            class="form-check-input me-2"
+                                            disabled
+                                            type="checkbox"
+                                        />
+                                        <span class="checkbox-indicator"></span>
+                                        <span class="checkbox-text">Valid</span>
+                                    </label>
+                                </div>
+                                <div
+                                    [ngClass]="getCheckboxState(question, 'memadai')"
+                                    class="form-check checkbox-card"
+                                >
+                                    <label
+                                        class="form-check-label w-100 checkbox-label"
+                                    >
+                                        <input
+                                            [checked]="
+                                                question.answerDto?.answerList?.memadai === true
+                                            "
+                                            class="form-check-input me-2"
+                                            disabled
+                                            type="checkbox"
+                                        />
+                                        <span class="checkbox-indicator"></span>
+                                        <span class="checkbox-text"
+                                            >Memadai</span
+                                        >
+                                    </label>
+                                </div>
+                            </div>
+                            <div
+                                [class.competent]="isItemCompetent(question)"
+                                [class.not-competent]="!isItemCompetent(question)"
+                                class="status-badge"
+                            >
+                                Status: {{ isItemCompetent(question) ? 'DITERIMA
+                                (Nilai Masuk)' : 'BELUM DITERIMA' }}
+                            </div>
+                            <p
+                                *ngIf="!isItemCompetent(question)"
+                                class="small-hint"
+                            >
+                                *Harus Valid DAN Memadai untuk mendapatkan
+                                nilai.
+                            </p>
+                        </div>
+
+                        <div class="notes-section">
+                            <label class="section-label"
+                                >Catatan Penguji:</label
+                            >
+                            <textarea
+                                class="form-control"
+                                placeholder="Tuliskan catatan terkait bukti portofolio ini..."
+                                readonly
+                                rows="4"
+                            >
+{{
+                                question.answerDto?.answerText || ''
+                            }}</textarea
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #noQuestions>
+        <div class="no-questions-container">
+            <span
+                class="no-questions-icon mdi mdi-clipboard-text-outline"
+            ></span>
+            <h2>Form Penilaian Belum Tersedia</h2>
+            <p>Belum ada form penilaian yang tersedia untuk saat ini.</p>
+        </div>
+    </ng-template>
+</ng-container>
+
+<ng-template #loadingState>
+    <div class="assessment-container">
+        <div class="header-section">
+            <h1>Form Penilaian Portofolio</h1>
+            <p>Memuat pratinjau penilaian...</p>
+        </div>
+        <div class="py-4 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Memuat...</span>
+            </div>
+        </div>
+    </div>
+</ng-template>

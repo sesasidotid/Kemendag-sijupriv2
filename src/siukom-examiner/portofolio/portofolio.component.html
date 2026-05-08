@@ -5,9 +5,7 @@
     [participantId]="participantId()"
     [showSavedIndicator]="!loadingQuestions() && allQuestionsAnsweredAndSaved() && examStarted()"
 >
-    <ng-container
-        *ngIf="!examStarted(); else examContent"
-    >
+    <ng-container *ngIf="!examStarted(); else examContent">
         <div class="assessment-container">
             <div class="header-section">
                 <h1>Form Penilaian Portofolio</h1>
@@ -50,12 +48,14 @@
                         >
                             <!-- Competency Header -->
                             <div class="card-header">
-                                <img
-                                    *ngIf="question.attachmentUrl"
-                                    [src]="question.attachmentUrl"
-                                    alt="Question Image"
-                                    class="img-fluid img-custom-300 mb-1 rounded object-cover"
-                                />
+                                <div class="mb-4 text-center">
+                                    <img
+                                        *ngIf="question.attachmentUrl"
+                                        [src]="question.attachmentUrl"
+                                        alt="Question Image"
+                                        class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                                    />
+                                </div>
                                 <span class="question-number"
                                     >{{ question.kompetensiIndikatorName
                                     }}</span

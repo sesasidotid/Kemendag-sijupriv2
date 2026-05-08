@@ -35,41 +35,31 @@ import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
     styleUrl: './portfolio-page.component.scss',
 })
 export class PortfolioPageComponent implements OnInit {
-    protected readonly ExamTypeCategory = ExamTypeCategory
-
     resetKey = signal<string | null>(null)
-
     examId = signal('')
     questionLoading = signal(false)
     submitLoading = signal(false)
     questions = signal<ExamQuestion[]>([])
-
     // Error states
     criticalError = signal<boolean>(false)
     errorMessage = signal<string>('')
-
     // Track which questions are currently being saved
     savingQuestions = new Map<string, boolean>()
-
     answerMap = new Map<string, UploadedFile[]>()
-
     // Track which questions have been touched by the user (for validation)
     touchedQuestions = new Set<string>()
-
     // Pre-computed MultiFileHandler inputs for each question to maintain stable references
     multiFileHandlerInputsMap = new Map<string, MultiFileHandler>()
-
     router = inject(Router)
     route = inject(ActivatedRoute)
     confirmationService = inject(ConfirmationService)
     handlerService = inject(HandlerService)
-
     examService = inject(ExamService)
     pdfMergeService = inject(PdfMergeService)
-
     participantService = inject(UkomParticipantService)
     participant: Participant
     readonly userId: string
+    protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor() {
         const raw = LoginContext.getUserId()
@@ -152,9 +142,9 @@ export class PortfolioPageComponent implements OnInit {
                     console.error('Error fetching question:', err)
                     if (!silent) {
                         this.criticalError.set(true)
-                        if (err.error?.cause === 'attendance not found') {
+                        if (err?.error?.code == 'STRT-00003') {
                             this.errorMessage.set(
-                                'Anda belum memulai jadwal ujian ini. Silahkan mulai ujian di dashboard anda.',
+                                'Ujian sudah berakhir atau penguji telah melakukan penilaian.',
                             )
                         } else {
                             this.errorMessage.set(

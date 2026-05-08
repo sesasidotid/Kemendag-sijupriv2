@@ -679,8 +679,9 @@
                                     </span>
                                 </div>
                             </div>
-                            <button
-                                (click)="
+                            <div class="participant-actions">
+                                <button
+                                    (click)="
                                         enterExam(
                                             pSchedule.participantId,
                                             exam.schedule.id,
@@ -688,12 +689,13 @@
                                             exam.schedule.roomUkomId
                                         )
                                     "
-                                *ngIf="canEnterExam(pSchedule, exam)"
-                                class="btn-enter-exam"
-                                type="button"
-                            >
-                                Masuk Ujian
-                            </button>
+                                    *ngIf="canEnterExam(pSchedule, exam)"
+                                    class="btn-enter-exam"
+                                    type="button"
+                                >
+                                    Masuk Ujian
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -732,11 +734,43 @@
         <ng-container
             *ngIf="selectedPreviewParticipant() as previewParticipant"
         >
-            <app-preview-wawancara
-                *ngIf="selectedPreviewType() === ExamTypeCategory.WAWANCARA"
-                [examScheduleId]="previewExam.id"
-                [participantId]="previewParticipant.participantId"
-            ></app-preview-wawancara>
+            <ng-container [ngSwitch]="selectedPreviewType()">
+                <app-preview-wawancara
+                    *ngSwitchCase="ExamTypeCategory.WAWANCARA"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-wawancara>
+
+                <app-preview-studi-kasus
+                    *ngSwitchCase="ExamTypeCategory.STUDI_KASUS"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-studi-kasus>
+
+                <app-preview-makalah
+                    *ngSwitchCase="ExamTypeCategory.MAKALAH"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-makalah>
+
+                <app-preview-portofolio
+                    *ngSwitchCase="ExamTypeCategory.PORTOFOLIO"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-portofolio>
+
+                <app-preview-practical-work
+                    *ngSwitchCase="ExamTypeCategory.PRAKTIK"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-practical-work>
+
+                <app-preview-seminer-makalah
+                    *ngSwitchCase="ExamTypeCategory.SEMINAR"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-seminer-makalah>
+            </ng-container>
         </ng-container>
     </ng-container>
 </app-modal>
