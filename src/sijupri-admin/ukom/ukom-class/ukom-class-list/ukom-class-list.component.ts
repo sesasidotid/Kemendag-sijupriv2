@@ -5,47 +5,35 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder,
+    PrimaryColumnBuilder
 } from '@/modules/base/commons/pagable/pagable-builder'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { TabService } from '@/modules/base/services/tab.service'
 import { CommonModule } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import {
-    BehaviorSubject,
-    distinctUntilChanged,
-    map,
-    Observable,
-    tap,
-} from 'rxjs'
+import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs'
 import { UkomClassAddComponent } from '../ukom-class-add/ukom-class-add.component'
 import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
 import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
 import { ApiService } from '@/modules/base/services/api.service'
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
-import {
-    FormControl,
-    FormGroup,
-    FormsModule,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms'
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { BidangJabatan } from '@/modules/maintenance/models/bidang-jabatan.model'
 import { RoomUkom } from '@/modules/ukom/models/room-ukom.model'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
-import {
-    ScheduleItem,
-    ScheduleTimelineModalComponent,
-} from '@/modules/base/components/schedule-timeline'
+import { ScheduleItem, ScheduleTimelineModalComponent } from '@/modules/base/components/schedule-timeline'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { ExamScheduleCalendar } from '@/modules/ukom/models/exam-schedule/exam-schedule-calendar.model'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
+import {
+    UkomViewScheduleExamineComponent
+} from '@/sijupri-admin/ukom/ukom-class/ukom-class-list/ukom-view-schedule-examine/ukom-view-schedule-examine.component'
 
 @Component({
     selector: 'app-ukom-class-list',
@@ -60,6 +48,7 @@ import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
         LoadingButtonComponent,
         ScheduleTimelineModalComponent,
         InvalidOnTouchDirective,
+        UkomViewScheduleExamineComponent,
     ],
     templateUrl: './ukom-class-list.component.html',
     styleUrl: './ukom-class-list.component.scss',
@@ -371,6 +360,11 @@ export class UkomClassListComponent implements OnInit {
                 icon: 'mdi-plus-circle',
                 onClick: () => this.handleTabChange(1),
             })
+            .addTab({
+                label: 'Lihat Penilian Penguji',
+                icon: 'mdi-table-eye',
+                onClick: () => this.handleTabChange(2),
+            })
     }
 
     setDefaultFormValues(data: any) {
@@ -623,12 +617,12 @@ export class UkomClassListComponent implements OnInit {
                 jenisUjian: this.ukomMiscellaneousService.getModuleDisplayName(
                     item.examSchedule?.examTypeCode,
                 ),
-                examinerName: item.examScheduleSupervised?.examinerSchedule?.examinerUkom.user.name
+                examinerName:
+                    item.examScheduleSupervised?.examinerSchedule?.examinerUkom
+                        .user.name,
             } as ScheduleItem
         })
     }
-
-
 
     // Format date to YYYY-MM-DD
     private formatDate(date: Date): string {
