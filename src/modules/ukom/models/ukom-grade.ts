@@ -43,6 +43,9 @@ export class UkomGrade extends Serializable {
     praktikGrade: Grade = undefined
     portofolioGrade: Grade = undefined
     studiKasusGrade: Grade = undefined
+
+    nbSeminarMakalah: number | null = undefined
+    scoreSeminarMakalah: number | null = undefined
     constructor(object?: Partial<UkomGrade>) {
         super()
         if (object) this.fromObject(object)

@@ -29,7 +29,9 @@ export class UkomViewScheduleExamineComponent implements OnInit {
     // TODO: update the endpoint to use query params to filter only unexamined record are returned.
     initPagable() {
         this.pagable.set(
-            new PagableBuilder('/api/v1/exam_schedule/calendar')
+            new PagableBuilder(
+                '/api/v1/exam_schedule/calendar?is_graded=false&startDate=2026-05-08&endDate=2026-05-08',
+            )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder(
                         'Kelas',
