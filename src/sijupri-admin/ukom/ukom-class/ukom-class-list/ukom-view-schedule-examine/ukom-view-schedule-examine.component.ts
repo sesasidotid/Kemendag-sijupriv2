@@ -8,30 +8,72 @@ import { ExamScheduleCalendar } from '@/modules/ukom/models/exam-schedule/exam-s
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import { CommonModule } from '@angular/common'
 
 @Component({
     selector: 'app-ukom-view-schedule-examine',
     standalone: true,
-    imports: [PagableComponent],
+    imports: [PagableComponent, CommonModule, ReactiveFormsModule],
     templateUrl: './ukom-view-schedule-examine.component.html',
     styleUrl: './ukom-view-schedule-examine.component.scss',
 })
 export class UkomViewScheduleExamineComponent implements OnInit {
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
     pagable = signal<Pagable>(null)
+    hasLoadedSchedules = signal(false)
+    dateRangeForm: FormGroup
 
     tanggalWaktuPipe = new TanggalWaktuIndoPipe()
 
+    constructor() {
+        const today = new Date()
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+
+        this.dateRangeForm = new FormGroup({
+            startDate: new FormControl(this.formatDate(firstDay), [
+                Validators.required,
+            ]),
+            endDate: new FormControl(this.formatDate(lastDay), [
+                Validators.required,
+            ]),
+            status: new FormControl('ungraded', [
+                Validators.required,
+            ]),
+        })
+    }
+
     ngOnInit() {
-        this.initPagable()
+        // Form initialized in constructor
+    }
+
+    private formatDate(date: Date): string {
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
+    }
+
+    loadSchedules() {
+        if (this.dateRangeForm.invalid) return
+
+        const { startDate, endDate, status } = this.dateRangeForm.value
+        this.initPagable(startDate, endDate, status)
+        this.hasLoadedSchedules.set(true)
     }
 
     // TODO: update the endpoint to use query params to filter only unexamined record are returned.
-    initPagable() {
+    initPagable(startDate: string, endDate: string, status: string) {
+        let url = `/api/v1/exam_schedule/calendar?startDate=${startDate}&endDate=${endDate}`
+        if (status === 'ungraded') {
+            url += '&is_graded=false'
+        } else if (status === 'graded') {
+            url += '&is_graded=true'
+        }
+
         this.pagable.set(
-            new PagableBuilder(
-                '/api/v1/exam_schedule/calendar?is_graded=false&startDate=2026-05-08&endDate=2026-05-08',
-            )
+            new PagableBuilder(url)
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder(
                         'Kelas',
