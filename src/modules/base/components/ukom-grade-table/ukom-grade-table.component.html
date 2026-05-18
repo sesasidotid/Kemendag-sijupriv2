@@ -39,10 +39,11 @@
                     <th scope="row">Skor Wawancara</th>
                     <td>{{ gradeData?.wawancaraGrade?.score ?? '-' }}</td>
                 </tr>
-<!--                TODO: Change to scoreseminarmakalah-->
                 <tr>
                     <th scope="row">Skor Seminar</th>
-                    <td>{{ gradeData?.seminarGrade?.score ?? '-' }}</td>
+                    <td>{{gradeData?.seminarMakalahScore ?? '-'}}</td>
+                    <!--                    <td>{{totalSeminarMakalahScore}}</td>-->
+                    <!--                                        <td>{{ gradeData?.seminarGrade?.score ?? '-' }}</td>-->
                 </tr>
                 <tr>
                     <th scope="row">Skor Praktik</th>
@@ -53,8 +54,8 @@
                     <td>{{ gradeData?.portofolioGrade?.score ?? '-' }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Skor Studi Kasus</th>
-                  <td>{{ gradeData?.studiKasusGrade?.score ?? '-' }}</td>
+                    <th scope="row">Skor Studi Kasus</th>
+                    <td>{{ gradeData?.studiKasusGrade?.score ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th scope="row">UKT</th>

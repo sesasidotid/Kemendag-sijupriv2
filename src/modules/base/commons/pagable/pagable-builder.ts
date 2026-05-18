@@ -7,6 +7,7 @@ export class PagableBuilder {
     private primaryColumnList: PageColumn[] = []
     private actionColumnList: PageColumn[] = []
     private filterList: PageFilter[] = []
+    private exclusionList: { label: string; value: string | number | boolean }[] = []
     private limit: number = 10
     private enablePagination: boolean = true
     private useQueryParams: boolean = false
@@ -27,6 +28,14 @@ export class PagableBuilder {
 
     addFilter(pageFilter: PageFilter): PagableBuilder {
         this.filterList.push(pageFilter)
+        return this
+    }
+
+    addExclusion(
+        label: string,
+        value: string | number | boolean,
+    ): PagableBuilder {
+        this.exclusionList.push({ label, value })
         return this
     }
 
@@ -51,6 +60,7 @@ export class PagableBuilder {
             this.primaryColumnList,
             this.actionColumnList,
             this.filterList,
+            this.exclusionList,
             this.enablePagination,
             this.limit,
             this.useQueryParams,

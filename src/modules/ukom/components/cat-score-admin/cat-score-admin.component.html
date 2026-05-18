@@ -4,6 +4,16 @@
     </div>
 </div>
 
+<div class="d-flex justify-content-end mb-3">
+    <button
+        type="button"
+        class="btn btn-outline-primary btn-sm"
+        (click)="toggleAnswerDetails()"
+    >
+        {{ showAnswerDetails() ? 'Sembunyikan' : 'Tampilkan' }} Detail Jawaban
+    </button>
+</div>
+
 <ng-container *ngFor="let competencyGroup of groupedCompetencies()">
     <div class="card mb-4 border-0 shadow-sm">
         <div class="card-header bg-primary py-3 text-white">
@@ -63,32 +73,90 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr
+                                        <ng-container
                                             *ngFor="
                                                 let question of kompetensi.questionDtoList
                                             "
                                         >
-                                            <td class="ps-3 align-middle">
-                                                {{ question.question }}
-                                            </td>
-                                            <td
-                                                class="pe-3 text-end align-middle"
-                                            >
-                                                <span
-                                                    [ngClass]="{
-                                                        'bg-success-subtle text-success': question.answerDto?.answerChoice === getCorrectAnswer(question),
-                                                        'bg-danger-subtle text-danger': question.answerDto?.answerChoice !== getCorrectAnswer(question)
-                                                    }"
-                                                    class="badge rounded-pill"
+                                            <tr>
+                                                <td class="ps-3 align-middle">
+                                                    {{ question.question }}
+                                                </td>
+                                                <td
+                                                    class="pe-3 text-end align-middle"
                                                 >
-                                                    {{
-                                                    question.answerDto?.answerChoice
-                                                    ===
-                                                    getCorrectAnswer(question) ?
-                                                    'Benar' : 'Salah' }}
-                                                </span>
-                                            </td>
-                                        </tr>
+                                                    <span
+                                                        [ngClass]="{
+                                                            'bg-success-subtle text-success': question.answerDto?.answerChoice === getCorrectAnswer(question),
+                                                            'bg-danger-subtle text-danger': question.answerDto?.answerChoice !== getCorrectAnswer(question)
+                                                        }"
+                                                        class="badge rounded-pill"
+                                                    >
+                                                        {{
+                                                        question.answerDto?.answerChoice
+                                                        ===
+                                                        getCorrectAnswer(question) ?
+                                                        'Benar' : 'Salah' }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="showAnswerDetails()">
+                                                <td
+                                                    class="ps-3 pb-3"
+                                                    colspan="2"
+                                                >
+                                                    <div
+                                                        class="small text-muted mb-1"
+                                                    >
+                                                        Jawaban peserta:
+                                                        <strong>
+                                                            {{
+                                                                question
+                                                                    .answerDto
+                                                                    ?.answerChoice ||
+                                                                '-'
+                                                            }}
+                                                        </strong>
+                                                    </div>
+                                                    <div class="small">
+                                                        <div
+                                                            *ngFor="
+                                                                let choice of question.multipleChoiceDtoList
+                                                            "
+                                                            class="d-flex align-items-center gap-2"
+                                                        >
+                                                            <span
+                                                                class="badge"
+                                                                [ngClass]="{
+                                                                    'bg-success': choice.correct,
+                                                                    'bg-secondary': !choice.correct
+                                                                }"
+                                                            >
+                                                                {{
+                                                                    choice.choiceId
+                                                                }}
+                                                            </span>
+                                                            <span>
+                                                                {{
+                                                                    choice.choiceValue
+                                                                }}
+                                                            </span>
+                                                            <span
+                                                                *ngIf="
+                                                                    choice.choiceId ===
+                                                                    question
+                                                                        .answerDto
+                                                                        ?.answerChoice
+                                                                "
+                                                                class="badge bg-info"
+                                                            >
+                                                                Dipilih Peserta
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
                                     </tbody>
                                 </table>
                             </div>

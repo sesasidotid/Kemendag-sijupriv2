@@ -64,14 +64,14 @@
                 </td>
             </tr>
             <ng-container *ngIf="!onLoad">
-                <tr *ngIf="paginator.data.length == 0">
+                <tr *ngIf="filteredData.length == 0">
                     <td colspan="100%" class="m-1 p-4">
                         <div class="d-flex justify-content-center align-items-center">
                             <span class="ms-2">Data tidak ditemukan</span>
                         </div>
                     </td>
                 </tr>
-                <tr *ngFor="let row of paginator.data; index as i" class="table-row">
+                <tr *ngFor="let row of filteredData; index as i" class="table-row">
                     <td class="fw-bold m-1 p-1">
                         {{ i + 1 + (page * 10 - 10) }}
                     </td>

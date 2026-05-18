@@ -8,7 +8,12 @@ import { ExamScheduleCalendar } from '@/modules/ukom/models/exam-schedule/exam-s
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import {
+    FormControl,
+    FormGroup,
+    ReactiveFormsModule,
+    Validators,
+} from '@angular/forms'
 import { CommonModule } from '@angular/common'
 
 @Component({
@@ -38,21 +43,12 @@ export class UkomViewScheduleExamineComponent implements OnInit {
             endDate: new FormControl(this.formatDate(lastDay), [
                 Validators.required,
             ]),
-            status: new FormControl('ungraded', [
-                Validators.required,
-            ]),
+            status: new FormControl('ungraded', [Validators.required]),
         })
     }
 
     ngOnInit() {
         // Form initialized in constructor
-    }
-
-    private formatDate(date: Date): string {
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        return `${year}-${month}-${day}`
     }
 
     loadSchedules() {
@@ -96,6 +92,12 @@ export class UkomViewScheduleExamineComponent implements OnInit {
                         )
                         .build(),
                 )
+                // .addPrimaryColumn(
+                //     new PrimaryColumnBuilder(
+                //         'Jenis Ukom',
+                //         'examSchedule|examTypeCode',
+                //     ).build(),
+                // )
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder()
                         .withDynamicValue(
@@ -168,11 +170,19 @@ export class UkomViewScheduleExamineComponent implements OnInit {
                         })
                         .build(),
                 )
+                .addExclusion('Jenis Ukom', 'CAT')
                 .build(),
         )
     }
 
     hasExaminerEvaluated(data: ExamScheduleCalendar): boolean {
         return Boolean(data.examined)
+    }
+
+    private formatDate(date: Date): string {
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
     }
 }

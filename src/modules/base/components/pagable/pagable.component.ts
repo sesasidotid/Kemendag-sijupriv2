@@ -30,6 +30,7 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
     limit: number = 10
     sortOrder: { [key: string]: 'asc' | 'desc' | '' } = {}
     paginator: any
+    filteredData: any[] = []
     onLoad: boolean = false
     enablePagination: boolean = true
     private lastFilterState: { [key: string]: any } = {}
@@ -309,17 +310,48 @@ export class PagableComponent implements OnChanges, OnInit, OnDestroy {
                     this.paginator.data =
                         this.paginator.data.roomUkomDto.examScheduleDtoList
                 }
+
+                this.filteredData = this.applyExclusions(
+                    this.paginator.data || [],
+                )
             },
             error: (e) => {
                 console.error('Error fetching data', e)
                 this.enablePagination = false
                 this.paginator = { data: [] }
+                this.filteredData = []
             },
         })
     }
 
     getPropertyValue(object: any, property: string): any {
         return property.split('|').reduce((o, i) => (o ? o[i] : null), object)
+    }
+
+    private applyExclusions(data: any[]): any[] {
+        if (!this.pagable?.exclusionList?.length) return data
+
+        return data.filter((row) => {
+            return !this.pagable.exclusionList.some((exclusion) => {
+                const normalize = (value?: string) =>
+                    value ? value.toLowerCase().trim() : ''
+                const target = normalize(exclusion.label)
+                const column = this.pagable.primaryColumnList.find((col) => {
+                    return (
+                        normalize(col.label) === target ||
+                        normalize(col.property) === target
+                    )
+                })
+
+                if (!column) return false
+
+                const value = column.property
+                    ? this.getPropertyValue(row, column.property)
+                    : column.dynamic?.(row)
+
+                return value === exclusion.value
+            })
+        })
     }
 
     getPropertyUrlValue(
