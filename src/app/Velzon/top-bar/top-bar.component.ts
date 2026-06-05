@@ -3,7 +3,7 @@ import { ConfirmationService } from './../../../modules/base/services/confirmati
 import { LoginContext } from '../../../modules/base/commons/login-context'
 import { CommonModule, DOCUMENT } from '@angular/common'
 import { Component, ElementRef, Inject } from '@angular/core'
-import { Router } from '@angular/router'
+import { Router, RouterLink } from '@angular/router'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { NotificationMessage } from '../../../modules/notification/models/notification-message.model'
 import { BehaviorSubject } from 'rxjs'
@@ -22,6 +22,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         ModalComponent,
         FormsModule,
         LoadingButtonComponent,
+        RouterLink,
     ],
     templateUrl: './top-bar.component.html',
     styleUrl: './top-bar.component.scss',
