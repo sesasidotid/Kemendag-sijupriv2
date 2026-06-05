@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { UkomGrade } from '../../../ukom/models/ukom-grade'
+import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
 
 @Component({
     selector: 'app-ukom-grade-table',
     standalone: true,
     templateUrl: './ukom-grade-table.component.html',
     styleUrls: ['./ukom-grade-table.component.scss'],
-    imports: [CommonModule],
+    imports: [CommonModule, TruncateDecimalPipe],
 })
 export class UkomGradeTableComponent {
     @Input() nip: string = ''
