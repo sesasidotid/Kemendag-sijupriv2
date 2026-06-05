@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { BehaviorSubject, finalize } from 'rxjs'
 import { RwKompetensiService } from '@/modules/siap/services/rw-kompetensi.service'
+
 @Component({
     selector: 'app-rw-kompetensi-list',
     standalone: true,

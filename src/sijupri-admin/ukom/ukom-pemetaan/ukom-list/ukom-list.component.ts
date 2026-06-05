@@ -1,6 +1,6 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import {
     ActionColumnBuilder,
     PagableBuilder,
@@ -40,6 +40,7 @@ export class UkomListComponent {
     jabatanList: Jabatan[] = []
     refresh: boolean = false
     tab$ = new BehaviorSubject<number | null>(0)
+    private activatedRoute = inject(ActivatedRoute)
 
     constructor(
         private router: Router,
@@ -52,28 +53,61 @@ export class UkomListComponent {
     ) {}
 
     ngOnInit() {
+        this.syncTabWithUrl()
         this.initTabs()
         this.getJabatanList()
         this.handlePagable()
     }
 
+    syncTabWithUrl() {
+        this.activatedRoute.queryParamMap.subscribe((params) => {
+            const tabParam = params.get('tab')
+            const tabIndex = tabParam === null ? 0 : Number(tabParam)
+
+            if (Number.isNaN(tabIndex) || tabIndex < 0 || tabIndex > 2) {
+                return
+            }
+
+            if (tabIndex === (this.tab$.value ?? 0)) {
+                return
+            }
+
+            this.handleTabChange(tabIndex)
+        })
+    }
+
+    handleTabChange(tabIndex: number) {
+        this.tab$.next(tabIndex)
+        this.tabService.changeTabActive(tabIndex)
+        this.router.navigate([], {
+            relativeTo: this.activatedRoute,
+            queryParams: { tab: tabIndex },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+        })
+    }
+
     initTabs() {
+        const activeTab = this.tab$.value ?? 0
+
         this.tabService
             .addTab({
                 label: 'Rekapitulasi Lolos Verifikasi',
                 icon: 'mdi-list-box',
-                onClick: () => this.tabService.changeTabActive(0),
-                isActive: true,
+                onClick: () => this.handleTabChange(0),
+                isActive: activeTab === 0,
             })
             .addTab({
                 label: 'Rekapitulasi Tidak Lolos Verifikasi',
                 icon: 'mdi-close',
-                onClick: () => this.tabService.changeTabActive(1),
+                onClick: () => this.handleTabChange(1),
+                isActive: activeTab === 1,
             })
             .addTab({
                 label: 'Export Rekapitulasi Verifikasi',
                 icon: 'mdi-export',
-                onClick: () => this.tabService.changeTabActive(2),
+                onClick: () => this.handleTabChange(2),
+                isActive: activeTab === 2,
             })
     }
 
