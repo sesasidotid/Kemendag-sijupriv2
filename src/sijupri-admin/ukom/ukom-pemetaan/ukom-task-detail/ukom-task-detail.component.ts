@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { CommonModule, Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import {
@@ -58,6 +58,10 @@ import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jaba
 import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
+import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
+import { UkomGrade } from '@/modules/ukom/models/ukom-grade'
+import { UkomGradeTableComponent } from '@/modules/base/components/ukom-grade-table/ukom-grade-table.component'
+import { toObservable } from '@angular/core/rxjs-interop'
 
 @Component({
     selector: 'app-ukom-task-detail',
@@ -78,6 +82,7 @@ import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
         SeminarScoreAdminComponent,
         TanggalIndoPipe,
         TanggalWaktuIndoPipe,
+        UkomGradeTableComponent,
     ],
     templateUrl: './ukom-task-detail.component.html',
     styleUrl: './ukom-task-detail.component.scss',
@@ -93,6 +98,7 @@ export class UkomTaskDetailComponent {
     provinsiService = inject(ProvinsiService)
     kabkotaService = inject(KabKotaService)
     bidangJabatanService = inject(BidangJabatanService)
+    ukomGradeService = inject(UkomGradeService)
 
     participantId: string
     dataDokumenUkom: DataDokumenUkom[] = []
@@ -126,6 +132,9 @@ export class UkomTaskDetailComponent {
 
     isToggleUpdatePasswordModal$ = new BehaviorSubject<boolean>(false)
     scheduleMap = new Map<string, ExamSchedule>()
+    participantScoreLoading = signal(false)
+    ukomGrade = signal<UkomGrade>(new UkomGrade())
+    allScoreLoading = signal(false)
     protected readonly ExamTypeCategory = ExamTypeCategory
 
     constructor(
@@ -136,9 +145,34 @@ export class UkomTaskDetailComponent {
         private confirmationService: ConfirmationService,
         public pendidikanService: PendidikanService,
     ) {
-        this.isLoading$ = combineLatest([this.ukomDetailLoading$]).pipe(
-            map((loadings) => loadings.some((isLoading) => isLoading)),
-        )
+        this.isLoading$ = combineLatest([
+            this.ukomDetailLoading$,
+            toObservable(this.allScoreLoading),
+        ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
+    }
+
+    getParticipantScore() {
+        this.participantScoreLoading.set(true)
+
+        this.ukomGradeService
+            .findGradeParticipantJF(this.participantId)
+            .pipe(
+                finalize(() => this.participantScoreLoading.set(false)),
+                catchError(() => {
+                    return of(new UkomGrade())
+                }),
+            )
+            .subscribe({
+                next: (response) => {
+                    this.ukomGrade.set(response)
+                },
+                error: (err) => {
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat score',
+                    )
+                },
+            })
     }
 
     ngOnInit() {
@@ -147,6 +181,7 @@ export class UkomTaskDetailComponent {
             this.participantId = params.get('id')
             this.getParticipantUkomDetail()
             this.getDokumenUkomList()
+            this.getParticipantScore()
         })
     }
 
@@ -544,5 +579,42 @@ export class UkomTaskDetailComponent {
 
     getScheduleStartTime(scheduleId: string): string | null {
         return this.scheduleMap.get(scheduleId)?.startTime ?? null
+    }
+
+    downloadRekomendasi(): void {
+        const url = this.participant.rekomendasiUrl
+
+        if (!url) {
+            this.handlerService.handleAlert(
+                'Warning',
+                'URL rekomendasi tidak tersedia',
+            )
+            return
+        }
+
+        console.log('Downloading rekomendasi from:', url)
+
+        try {
+            const parsedUrl = new URL(url)
+            const relativePath = parsedUrl.pathname + parsedUrl.search
+            const filename = this.participant.rekomendasi || 'rekomendasi.pdf'
+
+            this.apiService.getDownload(relativePath, filename).subscribe({
+                next: () => {},
+                error: (err) => {
+                    console.error('Download failed:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal mengunduh rekomendasi',
+                    )
+                },
+            })
+        } catch (error) {
+            console.error('Invalid URL:', error)
+            this.handlerService.handleAlert(
+                'Error',
+                'URL rekomendasi tidak valid',
+            )
+        }
     }
 }
