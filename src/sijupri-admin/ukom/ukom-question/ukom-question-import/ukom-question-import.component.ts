@@ -27,7 +27,6 @@ import {
     PageFilterBuilder,
     PrimaryColumnBuilder,
 } from '@/modules/base/commons/pagable/pagable-builder'
-import { PageFilter } from '@/modules/base/commons/pagable/page-filter'
 import { take } from 'rxjs/operators'
 import { UkomQuestion } from '@/modules/ukom/models/ukom-question'
 import { ExamQuestion } from '@/modules/ukom/models/exam/exam-question.model'
@@ -72,7 +71,7 @@ export class UkomQuestionImportComponent implements OnInit {
     pagable = signal<Pagable>(null)
 
     refresh = signal(false)
-    resetUploadComponent = signal(false)
+    resetUploadComponent = signal(0)
 
     /** TEMPLATE (EXCEL) */
     templateInputs: FIleHandler = {
@@ -184,6 +183,12 @@ export class UkomQuestionImportComponent implements OnInit {
                         .withField('Pertanyaan', 'text')
                         .build(),
                 )
+                .addFilter(
+                    new PageFilterBuilder('equal')
+                        .setProperty('moduleId')
+                        .withField('Module', 'select')
+                        .build(),
+                )
                 .addActionColumn(
                     new ActionColumnBuilder()
                         .setAction((data: ExamQuestion) => {
@@ -231,41 +236,23 @@ export class UkomQuestionImportComponent implements OnInit {
     updatePagableFilterOptions(examTypes: ExamType[]) {
         const currentPagable = this.pagable()
 
-        const existingFilterList = currentPagable.filterList.map((item) =>
-            item.key === 'eq_moduleId'
-                ? {
-                      ...item,
-                      optionList: examTypes.map((exam) => ({
-                          label: this.ukomMiscellaneousService.getModuleDisplayName(
-                              exam.name,
-                          ),
-                          value: exam.code,
-                      })),
-                  }
-                : item,
-        )
+        currentPagable.filterList.forEach((item) => {
+            if (item.key === 'eq_moduleId') {
+                item.optionList = examTypes.map((exam) => ({
+                    label: this.ukomMiscellaneousService.getModuleDisplayName(
+                        exam.name,
+                    ),
+                    value: exam.code,
+                }))
+            }
+        })
 
-        const filterList = existingFilterList.some(
-            (item) => item.key === 'eq_moduleId',
+        // Clone the Pagable instance to trigger a signal update while preserving methods
+        const updatedPagable = Object.assign(
+            Object.create(Object.getPrototypeOf(currentPagable)),
+            currentPagable
         )
-            ? existingFilterList
-            : [
-                  ...existingFilterList,
-                  new PageFilter({
-                      label: 'Module',
-                      fieldType: 'select',
-                      key: 'eq_moduleId',
-                      value: '',
-                      optionList: examTypes.map((exam) => ({
-                          label: this.ukomMiscellaneousService.getModuleDisplayName(
-                              exam.name,
-                          ),
-                          value: exam.code,
-                      })),
-                  }),
-              ]
-
-        this.pagable.set({ ...currentPagable, filterList })
+        this.pagable.set(updatedPagable)
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
@@ -320,7 +307,7 @@ export class UkomQuestionImportComponent implements OnInit {
                             this.isStudiKasusUploaded = false
 
                             // trigger a reset to the study case component
-                            this.resetUploadComponent.update(v=> !v)
+                            this.resetUploadComponent.update(v => v + 1)
                         },
                         error: () => {
                             this.handlerService.handleAlert(

@@ -76,9 +76,9 @@ export class SuratRekomService {
         )
     }
 
-    downloadRarSuratRekom(id: string) {
+    downloadRarSuratRekom(id: string, fileName: string) {
         return this.apiService
-            .getDownload(`${this.BASE_PATH}/download/${id}`)
+            .getDownload(`${this.BASE_PATH}/download/${id}`, fileName)
             .pipe(
                 catchError((err) => {
                     console.error(err)

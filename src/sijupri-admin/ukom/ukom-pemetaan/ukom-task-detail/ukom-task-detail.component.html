@@ -409,6 +409,16 @@
             </div>
         </div>
     </div>
+
+    <ng-container *ngIf="ukomGrade().id && participant.id">
+        <app-ukom-grade-table
+            (downloadFile)="downloadRekomendasi()"
+            [gradeData]="ukomGrade()"
+            [nama]="participant.name"
+            [nip]="participant.nip"
+            [rekomendasiUrl]="participant.rekomendasiUrl"
+        ></app-ukom-grade-table>
+    </ng-container>
 </ng-template>
 
 <app-modal

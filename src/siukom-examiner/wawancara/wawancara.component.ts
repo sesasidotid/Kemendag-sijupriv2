@@ -26,6 +26,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 import { ExamAssessmentLayoutComponent } from '@/siukom-examiner/_shared/components/exam-assessment-layout/exam-assessment-layout.component'
+import { CatService } from '@/modules/ukom/services/cat.service'
 
 @Component({
     selector: 'app-wawancara',
@@ -51,9 +52,12 @@ export class WawancaraComponent implements OnInit {
     examStarted = signal(false)
     visibleHints = signal<Record<string, boolean>>({})
 
+    attendanceLoading = signal(false)
+
     assessmentForm: FormGroup
     // Keep examScheduleDetail for getting roomUkomId needed for startExamByExaminer
     examScheduleDetail = signal<ExamSchedule | null>(null)
+    catService = inject(CatService)
     private router = inject(Router)
     private route = inject(ActivatedRoute)
     private handlerService = inject(HandlerService)
@@ -85,7 +89,7 @@ export class WawancaraComponent implements OnInit {
                 }
 
                 if (examId && participantId) {
-                    this.fetchQuestionsToGrade()
+                    this.getAttendace()
                 }
             },
             { allowSignalWrites: true },
@@ -101,6 +105,25 @@ export class WawancaraComponent implements OnInit {
             this.examId.set(params['id'])
             this.participantId.set(params['participantId'])
         })
+    }
+
+    getAttendace() {
+        this.attendanceLoading.set(true)
+        this.catService
+            .getExamAttendance(this.examId(), this.participantId())
+            .pipe(finalize(() => this.attendanceLoading.set(false)))
+            .subscribe({
+                next: (res) => {
+                    if (res && res.startAt) {
+                        this.examStarted.set(true)
+                        this.fetchQuestionsToGrade()
+                    }
+                },
+                error: (err) => {
+                    this.handlerService.handleException(err)
+                    console.error('Failed to get exam attendance:', err)
+                },
+            })
     }
 
     getExamScheduleDetail() {
@@ -143,9 +166,7 @@ export class WawancaraComponent implements OnInit {
                                 'Success',
                                 'Berhasil memulai ujian.',
                             )
-                            this.examStarted.set(true)
-                            // Reload questions after starting exam
-                            this.fetchQuestionsToGrade(true)
+                            this.getAttendace()
                         },
                         error: (err) => {
                             console.error(err)
@@ -163,7 +184,7 @@ export class WawancaraComponent implements OnInit {
         this.router.navigate(['/'])
     }
 
-    fetchQuestionsToGrade(afterStart: boolean = false) {
+    fetchQuestionsToGrade() {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
@@ -175,11 +196,6 @@ export class WawancaraComponent implements OnInit {
             .subscribe({
                 next: async (result) => {
                     this.questions.set(result.data)
-
-                    // If we have questions on initial load, exam has already started or finished
-                    if (!afterStart && result.data.length > 0) {
-                        this.examStarted.set(true)
-                    }
 
                     // Load draft first
                     const draft = await this.draftService.load(
@@ -325,7 +341,6 @@ export class WawancaraComponent implements OnInit {
                                 .catch((err) =>
                                     console.warn('Failed to clear draft:', err),
                                 )
-                            // this.fetchQuestionsToGrade()
                             this.backToDashboard()
                         },
                         error: (err) => {

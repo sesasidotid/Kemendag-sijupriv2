@@ -11,6 +11,7 @@ export class ExamScheduleCalendar extends Serializable {
     personalScheduleEnd: string | null = undefined
     examSchedule: ExamSchedule
     participantUkom: Participant
+    examined: boolean | null = undefined
     examScheduleSupervised: ExamScheduleSupervisedCalendar
 
     constructor(object?: Partial<ExamScheduleCalendar>) {
@@ -24,12 +25,11 @@ export interface ExamScheduleCalendarPayload {
     endDate: string // 2024-02-29
 }
 
-
 interface ExamScheduleSupervisedCalendar {
     id: string
     participantScheduleId: string
-    examinerScheduleId:string
-    examinerSchedule:examinerSchedule
+    examinerScheduleId: string
+    examinerSchedule: examinerSchedule
 }
 
 interface examinerSchedule {

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core'
+import { Component } from '@angular/core'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { HandlerService } from '../../../../modules/base/services/handler.service'
@@ -13,7 +13,6 @@ import { CommonModule } from '@angular/common'
 import {
     FormControl,
     FormGroup,
-    FormsModule,
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
@@ -24,6 +23,7 @@ import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
+
 @Component({
     selector: 'app-ukom-export-verifikasi',
     standalone: true,
@@ -87,7 +87,7 @@ export class UkomExportVerifikasiComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((report: any) => {
-                        this.handleDownload(report.id)
+                        this.handleDownload(report.id, report.fileName)
                     }, 'success')
                     .withIcon('download')
                     .addInactiveCondition((report: any) => {
@@ -113,9 +113,9 @@ export class UkomExportVerifikasiComponent {
             .build()
     }
 
-    handleDownload(reportId: string) {
+    handleDownload(reportId: string, fileName: string) {
         this.apiService
-            .getDownload(`/api/v1/report/download/${reportId}`)
+            .getDownload(`/api/v1/report/download/${reportId}`, fileName)
             .subscribe({
                 next: () => {
                     this.handlerService.handleAlert(

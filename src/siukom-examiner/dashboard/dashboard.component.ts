@@ -16,6 +16,13 @@ import { BidangJabatanService } from '@/modules/maintenance/services/bidang-jaba
 import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
 import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
 import { BidangJabatan } from '@/modules/maintenance/models/bidang-jabatan.model'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
+import { PreviewWawancaraComponent } from '@/siukom-examiner/wawancara/preview-wawancara/preview-wawancara.component'
+import { PreviewStudiKasusComponent } from '@/siukom-examiner/studi-kasus/preview-studi-kasus/preview-studi-kasus.component'
+import { PreviewMakalahComponent } from '@/siukom-examiner/makalah/preview-makalah/preview-makalah.component'
+import { PreviewPortofolioComponent } from '@/siukom-examiner/portofolio/preview-portofolio/preview-portofolio.component'
+import { PreviewPracticalWorkComponent } from '@/siukom-examiner/practical-work/preview-practical-work/preview-practical-work.component'
+import { PreviewSeminerMakalahComponent } from '@/siukom-examiner/seminer-makalah/preview-seminer-makalah/preview-seminer-makalah.component'
 
 type ExamStatus = 'ongoing' | 'upcoming' | 'completed'
 
@@ -59,11 +66,21 @@ const MONTHS = [
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule],
+    imports: [
+        CommonModule,
+        ModalComponent,
+        PreviewWawancaraComponent,
+        PreviewStudiKasusComponent,
+        PreviewMakalahComponent,
+        PreviewPortofolioComponent,
+        PreviewPracticalWorkComponent,
+        PreviewSeminerMakalahComponent,
+    ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
+    ExamTypeCategory = ExamTypeCategory
     examinerId = LoginContext.getUserId()
     loadingExamSchedule = signal(false)
     // Participant list management
@@ -71,6 +88,21 @@ export class DashboardComponent implements OnInit {
     selectedExamForParticipants = signal<GroupedExam | null>(null)
     nowGmt7 = signal<string>(this.getNowGmt7String())
     showCompletedExams = signal(false)
+    // Preview modal
+    showPreviewModal = signal(false)
+    selectedPreviewType = signal<ExamTypeCategory | null>(null)
+    selectedPreviewExam = signal<ExamSchedule | null>(null)
+    selectedPreviewParticipant = signal<any | null>(null)
+    previewModalTitle = computed(() => {
+        const exam = this.selectedPreviewExam()
+        if (!exam) {
+            return 'Pratinjau Form Penilaian'
+        }
+
+        return `Pratinjau Form Penilaian - ${this.getExamDisplayName(
+            exam.examTypeCode,
+        )}`
+    })
     // Computed values
     groupedExams = computed(() => this.groupExamsByStatus())
     ongoingExam = computed(() =>
@@ -291,6 +323,62 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    openPreviewModal(exam: GroupedExam, participantSchedule: any): void {
+        this.selectedPreviewType.set(exam.schedule.examTypeCode)
+        this.selectedPreviewExam.set(exam.schedule)
+        this.selectedPreviewParticipant.set(participantSchedule)
+        this.showPreviewModal.set(true)
+    }
+
+    openPreviewModalFromOngoing(participant: OngoingParticipant): void {
+        const examSchedule = this.schedules().find(
+            (schedule) => schedule.id === participant.examId,
+        )
+
+        if (!examSchedule) {
+            this.handlerService.handleAlert(
+                'Warning',
+                'Jadwal ujian tidak ditemukan.',
+            )
+            return
+        }
+
+        const participantSchedule =
+            examSchedule.participantScheduleList?.find(
+                (pSchedule) =>
+                    pSchedule.id === participant.participantScheduleId ||
+                    pSchedule.participantId === participant.participantId,
+            ) ?? {
+                participantId: participant.participantId,
+                participantUkom: {
+                    name: participant.participantName,
+                    nip: participant.participantNip,
+                    jenisUkom: participant.jenisUkom,
+                },
+                roomUkom: participant.roomUkom,
+            }
+
+        this.openPreviewModal(
+            {
+                schedule: examSchedule,
+                status: 'ongoing',
+                displayName: this.getExamDisplayName(
+                    examSchedule.examTypeCode,
+                ),
+                participantCount:
+                    examSchedule.participantScheduleList?.length || 0,
+            },
+            participantSchedule,
+        )
+    }
+
+    closePreviewModal(): void {
+        this.showPreviewModal.set(false)
+        this.selectedPreviewType.set(null)
+        this.selectedPreviewExam.set(null)
+        this.selectedPreviewParticipant.set(null)
+    }
+
     isParticipantListVisible(examId: string): boolean {
         return this.showParticipantList() === examId
     }
@@ -424,9 +512,7 @@ export class DashboardComponent implements OnInit {
         return isExamStarted && !isExamined
     }
 
-    private isPersonalScheduleWindowExam(
-        examType: ExamTypeCategory,
-    ): boolean {
+    private isPersonalScheduleWindowExam(examType: ExamTypeCategory): boolean {
         return (
             examType === ExamTypeCategory.WAWANCARA ||
             examType === ExamTypeCategory.SEMINAR ||
@@ -470,7 +556,10 @@ export class DashboardComponent implements OnInit {
                 status = 'upcoming'
             } else {
                 const participants = schedule.participantScheduleList || []
-                const allExamined = participants.length > 0 ? participants.every((p) => p.examined === true) : true
+                const allExamined =
+                    participants.length > 0
+                        ? participants.every((p) => p.examined === true)
+                        : true
 
                 if (!allExamined) {
                     status = 'ongoing'

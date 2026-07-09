@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - ukom/pengunduran-diri
 
 concurrency:
   group: deploy-frontend-main

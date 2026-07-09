@@ -99,14 +99,26 @@
                 </div>
 
                 <!-- Primary Action Button -->
-                <button
-                    (click)="enterExamFromOngoing(participant)"
-                    class="btn-action-primary"
-                    type="button"
-                >
-                    <span class="mdi mdi-clipboard-play-outline me-2"></span>
-                    Mulai Penilaian
-                </button>
+                <div class="action-card-actions">
+                    <button
+                        (click)="enterExamFromOngoing(participant)"
+                        class="btn-action-primary"
+                        type="button"
+                    >
+                        <span
+                            class="mdi mdi-clipboard-play-outline me-2"
+                        ></span>
+                        Mulai Penilaian
+                    </button>
+
+                    <button
+                        (click)="openPreviewModalFromOngoing(participant)"
+                        class="btn-preview-form"
+                        type="button"
+                    >
+                        Pratinjau Form Penilaian
+                    </button>
+                </div>
             </article>
         </div>
     </section>
@@ -294,9 +306,9 @@
                                     </span>
                                 </div>
                             </div>
-                            <button
-                                *ngIf="canEnterExam(pSchedule, exam)"
-                                (click)="
+                            <div class="participant-actions">
+                                <button
+                                    (click)="
                                         enterExam(
                                             pSchedule.participantId,
                                             exam.schedule.id,
@@ -304,11 +316,21 @@
                                             exam.schedule.roomUkomId
                                         )
                                     "
-                                class="btn-enter-exam"
-                                type="button"
-                            >
-                                Masuk Ujian
-                            </button>
+                                    *ngIf="canEnterExam(pSchedule, exam)"
+                                    class="btn-enter-exam"
+                                    type="button"
+                                >
+                                    Masuk Ujian
+                                </button>
+
+                                <button
+                                    (click)="openPreviewModal(exam, pSchedule)"
+                                    class="btn-preview-form"
+                                    type="button"
+                                >
+                                    Pratinjau Form Penilaian
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -449,6 +471,15 @@
                                     {{ getJenisUkomDisplay(
                                     pSchedule.participantUkom.jenisUkom ) }}
                                 </span>
+                            </div>
+                            <div class="participant-actions">
+                                <button
+                                    (click)="openPreviewModal(exam, pSchedule)"
+                                    class="btn-preview-form"
+                                    type="button"
+                                >
+                                    Pratinjau Form Penilaian
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -648,9 +679,9 @@
                                     </span>
                                 </div>
                             </div>
-                            <button
-                                *ngIf="canEnterExam(pSchedule, exam)"
-                                (click)="
+                            <div class="participant-actions">
+                                <button
+                                    (click)="
                                         enterExam(
                                             pSchedule.participantId,
                                             exam.schedule.id,
@@ -658,11 +689,13 @@
                                             exam.schedule.roomUkomId
                                         )
                                     "
-                                class="btn-enter-exam"
-                                type="button"
-                            >
-                                Masuk Ujian
-                            </button>
+                                    *ngIf="canEnterExam(pSchedule, exam)"
+                                    class="btn-enter-exam"
+                                    type="button"
+                                >
+                                    Masuk Ujian
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -689,3 +722,55 @@
         </p>
     </div>
 </ng-template>
+
+<app-modal
+    (toggle)="closePreviewModal()"
+    *ngIf="showPreviewModal()"
+    [enableFooter]="false"
+    [size]="'xl'"
+    [title]="previewModalTitle()"
+>
+    <ng-container *ngIf="selectedPreviewExam() as previewExam">
+        <ng-container
+            *ngIf="selectedPreviewParticipant() as previewParticipant"
+        >
+            <ng-container [ngSwitch]="selectedPreviewType()">
+                <app-preview-wawancara
+                    *ngSwitchCase="ExamTypeCategory.WAWANCARA"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-wawancara>
+
+                <app-preview-studi-kasus
+                    *ngSwitchCase="ExamTypeCategory.STUDI_KASUS"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-studi-kasus>
+
+                <app-preview-makalah
+                    *ngSwitchCase="ExamTypeCategory.MAKALAH"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-makalah>
+
+                <app-preview-portofolio
+                    *ngSwitchCase="ExamTypeCategory.PORTOFOLIO"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-portofolio>
+
+                <app-preview-practical-work
+                    *ngSwitchCase="ExamTypeCategory.PRAKTIK"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-practical-work>
+
+                <app-preview-seminer-makalah
+                    *ngSwitchCase="ExamTypeCategory.SEMINAR"
+                    [examScheduleId]="previewExam.id"
+                    [participantId]="previewParticipant.participantId"
+                ></app-preview-seminer-makalah>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</app-modal>

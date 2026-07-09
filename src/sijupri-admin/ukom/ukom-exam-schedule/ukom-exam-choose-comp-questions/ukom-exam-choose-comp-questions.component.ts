@@ -29,6 +29,9 @@ import { UkomExamGeneralComponent } from '@/sijupri-admin/ukom/ukom-exam-schedul
 import { UkomExamPraktikComponent } from '@/sijupri-admin/ukom/ukom-exam-schedule/ukom-exam-praktik/ukom-exam-praktik.component'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { CatService } from '@/modules/ukom/services/cat.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 
 @Component({
     selector: 'app-ukom-exam-choose-comp-questions',
@@ -45,6 +48,7 @@ import { RoomUkomDetail } from '@/modules/ukom/models/room-ukom-detail'
         ExaminerListModalComponent,
         UkomExamGeneralComponent,
         UkomExamPraktikComponent,
+        LoadingButtonComponent,
     ],
     templateUrl: './ukom-exam-choose-comp-questions.component.html',
     styleUrl: './ukom-exam-choose-comp-questions.component.scss',
@@ -98,7 +102,8 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     route = inject(ActivatedRoute)
     handlerService = inject(HandlerService)
     router = inject(Router)
-
+    catService = inject(CatService)
+    confirmationService = inject(ConfirmationService)
     protected readonly ExamTypeCategory = ExamTypeCategory
     private paramMap = toSignal(this.route.paramMap)
     examId = computed(() => this.paramMap()?.get('id'))
@@ -299,6 +304,38 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
                         'Error',
                         'Gagal mendapatkan detail ujian',
                     )
+                },
+            })
+    }
+
+    deleteExamAttendace() {
+        this.confirmationService
+            .open(
+                false,
+                'Hapus Kehadiran Ujian',
+                'Apakah Anda yakin ingin menghapus seluruh data kehadiran peserta pada ujian ini? Seluruh peserta akan dianggap belum pernah mengikuti ujian, baik yang sudah maupun belum ujian. Data kehadiran yang dihapus juga mencakup peserta yang sudah memiliki nilai maupun yang belum memiliki nilai.',
+            )
+            .subscribe({
+                next: ({ confirmed }) => {
+                    if (!confirmed) return
+
+                    if (this.examId() == null) {
+                        return
+                    }
+                    this.catService
+                        .deleteExamAttendance(this.examId())
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Data kehadiran ujian berhasil direset untuk seluruh peserta. ',
+                                )
+                            },
+                            error: (err) => {
+                                console.error(err)
+                                this.handlerService.handleException(err)
+                            },
+                        })
                 },
             })
     }

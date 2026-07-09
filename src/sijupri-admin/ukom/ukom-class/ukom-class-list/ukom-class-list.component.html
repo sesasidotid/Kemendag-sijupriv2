@@ -22,6 +22,10 @@
     ></app-ukom-class-add>
 </ng-container>
 
+<ng-container *ngIf="tab() === 2">
+    <app-ukom-view-schedule-examine></app-ukom-view-schedule-examine>
+</ng-container>
+
 <app-modal
     (toggle)="toggleModal()"
     *ngIf="isModalOpen$ | async"

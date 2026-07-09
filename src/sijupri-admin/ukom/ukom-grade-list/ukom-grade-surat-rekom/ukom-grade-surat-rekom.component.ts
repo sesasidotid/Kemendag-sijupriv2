@@ -49,7 +49,7 @@ export class UkomGradeSuratRekomComponent implements OnInit {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((data: SuratRekomModel) => {
-                        this.handleDownloadRar(data.id)
+                        this.handleDownloadRar(data.id, data.fileName)
                     }, 'success')
                     .withIcon('download')
                     .addInactiveCondition((data: SuratRekomModel) => {
@@ -65,7 +65,7 @@ export class UkomGradeSuratRekomComponent implements OnInit {
             .build()
     }
 
-    handleDownloadRar(id: string) {
+    handleDownloadRar(id: string, fileName: string) {
         // Prevent duplicate downloads
         if (this.downloadingIds.get(id)) {
             return
@@ -78,7 +78,7 @@ export class UkomGradeSuratRekomComponent implements OnInit {
         )
 
         this.suratRekomService
-            .downloadRarSuratRekom(id)
+            .downloadRarSuratRekom(id, fileName)
             .pipe(
                 finalize(() => {
                     this.downloadingIds.set(id, false)

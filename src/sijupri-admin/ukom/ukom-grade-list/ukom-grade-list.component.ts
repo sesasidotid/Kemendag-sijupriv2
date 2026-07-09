@@ -135,7 +135,8 @@ export class UkomGradeListComponent {
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Skor Seminar', (item: UkomGrade) => {
                         return this.truncateDecimalPipe.transform(
-                            item.seminarGradeScore,
+                            // item.seminarGradeScore,
+                            item.scoreSeminarMakalah
                         )
                     })
                     .build(),
@@ -194,7 +195,8 @@ export class UkomGradeListComponent {
                 new PrimaryColumnBuilder()
                     .withDynamicValue('NB Seminar', (item: UkomGrade) => {
                         return this.truncateDecimalPipe.transform(
-                            item.nbSeminar,
+                            // item.nbSeminar,
+                            item.nbSeminarMakalah
                         )
                     })
                     .build(),

@@ -43,6 +43,12 @@ export class UkomGrade extends Serializable {
     praktikGrade: Grade = undefined
     portofolioGrade: Grade = undefined
     studiKasusGrade: Grade = undefined
+    makalahGrade: Grade = undefined
+
+    nbSeminarMakalah: number | null = undefined
+    scoreSeminarMakalah: number | null = undefined
+
+    seminarMakalahScore: number | null = undefined
     constructor(object?: Partial<UkomGrade>) {
         super()
         if (object) this.fromObject(object)
@@ -53,7 +59,7 @@ type Grade = {
     examTypeCode: string
     roomUkomId: string
     participantId: string
-    score: string | null
+    score: string | number | null
     createdBy: string | null
     dateCreated?: string
     idx?: number

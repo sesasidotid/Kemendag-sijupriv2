@@ -20,6 +20,13 @@ export const routes: Routes = [
                     ),
             },
             {
+                path: 'resignation',
+                loadComponent: () =>
+                    import('./resignation/resignation.component').then(
+                        (m) => m.ResignationComponent,
+                    ),
+            },
+            {
                 path: 'seminar-paper/:examScheduleId',
                 loadComponent: () =>
                     import('./makalah-page/makalah-page.component').then(
@@ -36,9 +43,9 @@ export const routes: Routes = [
             {
                 path: 'case-study/:examScheduleId',
                 loadComponent: () =>
-                    import(
-                        './studi-kasus-page/studi-kasus-page.component'
-                    ).then((m) => m.StudiKasusPageComponent),
+                    import('./studi-kasus-page/studi-kasus-page.component').then(
+                        (m) => m.StudiKasusPageComponent,
+                    ),
             },
             {
                 path: 'portfolio/:examScheduleId',
@@ -50,9 +57,9 @@ export const routes: Routes = [
             {
                 path: 'practical-work/:examScheduleId',
                 loadComponent: () =>
-                    import(
-                        './practical-work-page/practical-work-page.component'
-                    ).then((m) => m.PracticalWorkPageComponent),
+                    import('./practical-work-page/practical-work-page.component').then(
+                        (m) => m.PracticalWorkPageComponent,
+                    ),
             },
         ],
     },

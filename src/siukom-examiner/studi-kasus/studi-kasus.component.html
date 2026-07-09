@@ -1,13 +1,11 @@
 <app-exam-assessment-layout
     (backClicked)="backToDashboard()"
     [examScheduleId]="examId()"
-    [loading]="loadingQuestions()"
+    [loading]="attendanceLoading() || loadingQuestions()"
     [participantId]="participantId()"
-    [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnsweredAndSaved() && questions().length > 0"
+    [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnsweredAndSaved() && examStarted()"
 >
-    <ng-container
-        *ngIf="!examStarted() && questions().length === 0; else examContent"
-    >
+    <ng-container *ngIf="!examStarted(); else examContent">
         <div class="assessment-container">
             <div class="header-section">
                 <h1>Form Penilaian Studi Kasus</h1>
@@ -40,7 +38,21 @@
                             Silakan isi penilaian untuk setiap pertanyaan di
                             bawah ini.
                         </p>
-                        <div class="d-flex justify-content-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <ng-container
+                                *ngIf="participantAnswer()?.attachmentUrl"
+                            >
+                                <button
+                                    (click)="openQuestionObject()"
+                                    class="btn btn-outline-primary"
+                                >
+                                    <span
+                                        class="mdi mdi-open-in-new me-2"
+                                    ></span>
+                                    Lihat Soal Studi Kasus
+                                </button>
+                            </ng-container>
+
                             <ng-container
                                 *ngIf="participantAnswer()?.answerDto?.answerUploadUrl; else noSupportingDocument"
                             >
@@ -71,12 +83,14 @@
                             class="question-card"
                         >
                             <div class="card-header">
-                                <img
-                                    *ngIf="question.attachmentUrl"
-                                    [src]="question.attachmentUrl"
-                                    alt="Question Image"
-                                    class="img-fluid img-custom-300 mb-1 rounded object-cover"
-                                />
+                                <div class="mb-4 text-center">
+                                    <img
+                                        *ngIf="question.attachmentUrl"
+                                        [src]="question.attachmentUrl"
+                                        alt="Question Image"
+                                        class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                                    />
+                                </div>
                                 <span class="question-number"
                                     >{{ question.kompetensiIndikatorName
                                     }}</span
@@ -110,6 +124,7 @@
                                             formControlName="score"
                                             min="0"
                                             placeholder="Masukkan nilai"
+                                            step="0.01"
                                             type="number"
                                         />
                                         <div

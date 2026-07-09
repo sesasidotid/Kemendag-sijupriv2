@@ -1,0 +1,107 @@
+<header
+    class="dashboard-header d-flex justify-content-between align-items-center mb-4"
+>
+    <button (click)="goBack()" class="btn btn-outline-secondary">
+        <span class="mdi mdi-arrow-left me-2"></span>Kembali
+    </button>
+</header>
+
+<section class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <!-- Status Display -->
+        <ng-container *ngIf="submissionStatus()">
+            <div
+                [class.alert-danger]="submissionStatus() === 'REJECTED'"
+                [class.alert-success]="submissionStatus() === 'APPROVED'"
+                [class.alert-warning]="submissionStatus() === 'PENDING'"
+                class="alert"
+            >
+                <div class="d-flex">
+                    <span
+                        [class.mdi-check-circle-outline]="submissionStatus() === 'APPROVED'"
+                        [class.mdi-clock-outline]="submissionStatus() === 'PENDING'"
+                        [class.mdi-close-circle-outline]="submissionStatus() === 'REJECTED'"
+                        class="mdi fs-4 me-2"
+                    ></span>
+                    <div>
+                        <h5 class="alert-heading mb-1">
+                            Status:
+                            <ng-container
+                                *ngIf="submissionStatus() === 'PENDING'"
+                                >Menunggu Persetujuan</ng-container
+                            >
+                            <ng-container
+                                *ngIf="submissionStatus() === 'APPROVED'"
+                                >Disetujui</ng-container
+                            >
+                            <ng-container
+                                *ngIf="submissionStatus() === 'REJECTED'"
+                                >Ditolak</ng-container
+                            >
+                        </h5>
+                        <p
+                            *ngIf="submissionStatus() === 'PENDING'"
+                            class="mb-0"
+                        >
+                            Pengajuan Anda sedang ditinjau oleh Admin.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- Resignation Form -->
+        <ng-container *ngIf="!submissionStatus()">
+            <div class="alert alert-danger mb-4">
+                <strong
+                    ><span class="mdi mdi-alert me-2"></span>Perhatian:</strong
+                ><br />
+                Dengan mengundurkan diri, Anda akan dibatalkan dari seluruh
+                jadwal ujian dalam kelas ini. Tindakan ini tidak dapat
+                dibatalkan secara sepihak dan membutuhkan persetujuan Admin.
+            </div>
+
+            <form (ngSubmit)="submit()" [formGroup]="form">
+                <div class="mb-4">
+                    <label class="form-label fw-bold"
+                        >Alasan Pengunduran Diri
+                        <span class="text-danger">*</span></label
+                    >
+                    <textarea
+                        [class.is-invalid]="form.get('reason')?.invalid && form.get('reason')?.touched"
+                        class="form-control"
+                        formControlName="reason"
+                        placeholder="Jelaskan alasan mengapa Anda mengundurkan diri (minimal 10 karakter)"
+                        rows="4"
+                    ></textarea>
+                    <div
+                        *ngIf="form.get('reason')?.hasError('required')"
+                        class="invalid-feedback"
+                    >
+                        Alasan pengunduran diri wajib diisi.
+                    </div>
+                    <div
+                        *ngIf="form.get('reason')?.hasError('minlength')"
+                        class="invalid-feedback"
+                    >
+                        Alasan pengunduran diri minimal 10 karakter.
+                    </div>
+                </div>
+
+                <app-file-handler
+                    [inputs]="fileHandlerInputs"
+                ></app-file-handler>
+
+                <div class="border-top pt-4 text-end">
+                    <app-loading-button
+                        (clicked)="submit()"
+                        [className]="'btn btn-danger'"
+                        [disabled]="form.invalid"
+                        [isLoading]="isSubmitting()"
+                        [label]="'Kirim Pengajuan'"
+                    ></app-loading-button>
+                </div>
+            </form>
+        </ng-container>
+    </div>
+</section>
