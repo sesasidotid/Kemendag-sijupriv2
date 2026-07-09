@@ -154,11 +154,20 @@ export class UkomListComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((ukom: any) => {
+                        this.handleUnbanTask(ukom.nip)
+                    }, 'warning')
+                    .withIcon('unban')
+                    .build(),
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((ukom: any) => {
                         this.handleDeleteTask(ukom.nip)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
             )
+
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('nip')
@@ -205,6 +214,43 @@ export class UkomListComponent {
             .build()
 
         this.pagable$.next(pagable)
+    }
+
+    handleUnbanTask(nip: string) {
+        this.confirmationService
+            .open(
+                false,
+                'Unban Peserta?',
+                'Peserta ini akan diaktifkan kembali dan bisa mengikuti UKOM.',
+                undefined,
+                'Ya, Unban',
+                'Batal',
+            )
+            .subscribe({
+                next: (res) => {
+                    if (!res.confirmed) {
+                        return
+                    }
+                    this.apiService
+                        .deleteData(`/api/v1/ukom_ban/${nip}`)
+                        .subscribe({
+                            next: (res) => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Peserta berhasil di-unban',
+                                )
+                                this.refresh = !this.refresh
+                            },
+                            error: (err) => {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal unban peserta',
+                                )
+                                this.refresh = !this.refresh
+                            },
+                        })
+                },
+            })
     }
 
     handleDeleteTask(nip: string) {

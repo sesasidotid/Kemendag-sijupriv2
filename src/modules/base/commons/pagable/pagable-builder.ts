@@ -7,7 +7,10 @@ export class PagableBuilder {
     private primaryColumnList: PageColumn[] = []
     private actionColumnList: PageColumn[] = []
     private filterList: PageFilter[] = []
-    private exclusionList: { label: string; value: string | number | boolean }[] = []
+    private exclusionList: {
+        label: string
+        value: string | number | boolean
+    }[] = []
     private limit: number = 10
     private enablePagination: boolean = true
     private useQueryParams: boolean = false
@@ -249,6 +252,7 @@ export class ActionColumnBuilder {
         navigate: 'ri-external-link-line',
         upload: 'ri-upload-line',
         password: 'ri-lock-2-line',
+        unban: 'ri-lock-unlock-line',
     }
 
     setAction(
@@ -274,7 +278,8 @@ export class ActionColumnBuilder {
             | 'download'
             | 'navigate'
             | 'upload'
-            | 'password',
+            | 'password'
+            | 'unban',
     ): ActionColumnBuilder {
         this.icon = this.icons[icon]
         return this
