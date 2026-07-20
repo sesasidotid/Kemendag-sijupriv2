@@ -1,0 +1,104 @@
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <h5 class="m-0">
+                    <i class="mdi mdi-certificate-outline me-2"></i>
+                    Detail Nilai Ukom
+                </h5>
+            </div>
+        </div>
+
+        <div class="scroll-container p-4">
+            <table class="table-hover m-0 table">
+                <tbody>
+                    <tr>
+                        <th class="w-25" scope="row">NIP</th>
+                        <td>{{ nip }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Nama</th>
+                        <td>{{ nama }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Kelas</th>
+                        <td>{{ roomUkomData.name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Skor CAT</th>
+                        <td>
+                            {{ gradeData?.catGrade?.score | truncateDecimal }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Skor Wawancara</th>
+                        <td>
+                            {{ gradeData?.wawancaraGrade?.score |
+                            truncateDecimal }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Skor Seminar</th>
+                        <td>
+                            {{gradeData?.seminarMakalahScore | truncateDecimal}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Skor Praktik</th>
+                        <td>
+                            {{ gradeData?.praktikGrade?.score | truncateDecimal
+                            }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Skor Portofolio</th>
+                        <td>
+                            {{ gradeData?.portofolioGrade?.score |
+                            truncateDecimal }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Skor Studi Kasus</th>
+                        <td>
+                            {{ gradeData?.studiKasusGrade?.score |
+                            truncateDecimal }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">UKT</th>
+                        <td>{{ gradeData?.ukt | truncateDecimal }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">UKMSK</th>
+                        <td>{{ gradeData?.jpm | truncateDecimal }}</td>
+                    </tr>
+                    <tr class="fw-bold">
+                        <th scope="row">Nilai Akhir</th>
+                        <td>{{ gradeData?.grade | truncateDecimal }}</td>
+                    </tr>
+                    <tr class="fw-bold">
+                        <th scope="row">Status UKOM</th>
+                        <td>
+                            <ng-container
+                                *ngIf="gradeData?.passed; else notPassed"
+                            >
+                                <span
+                                    class="bg-success rounded-pill small fw-semibold px-3 py-1 text-white"
+                                    >{{gradeData?.status ?? "Lulus Uji
+                                    Kompetensi"}}</span
+                                >
+                            </ng-container>
+                            <ng-template #notPassed>
+                                <span
+                                    class="bg-danger rounded-pill small fw-semibold px-3 py-1 text-white"
+                                    >{{gradeData?.status ?? "Tidak Lulus Uji
+                                    Kompetensi"}}</span
+                                >
+                            </ng-template>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
