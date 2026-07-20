@@ -1,0 +1,768 @@
+<app-landing-page [imported]="true"></app-landing-page>
+<ng-container *ngIf="isLoading$ | async; else content">
+    <div class="d-flex justify-content-center my-4 mt-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #content>
+    <div *ngIf="!pendingTask.id && !finishTask.id" class="card parent">
+        <app-empty-state
+            [buttonAction]="backToLandingPage"
+            [buttonText]="'Kembali ke halaman utama'"
+            [description]="
+                'Tolong periksa kembali link yang kamu buka, pastikan sudah benar.'
+            "
+            [iconColor]="'danger'"
+            [icon]="'mdi-package-variant-closed-remove'"
+            [title]="'Link UKom JF Perdagangan Kadaluwarsa atau Tidak Valid'"
+        ></app-empty-state>
+    </div>
+
+    <div *ngIf="pendingTask.id" class="card parent">
+        <div class="card card-profile shadow-sm">
+            <div class="card-body p-md-4 p-3">
+                <div class="col-12">
+                    <div
+                        class="d-flex justify-content-between align-items-start"
+                    >
+                        <div
+                            class="d-flex flex-column flex-md-row align-items-md-center gap-3"
+                        >
+                            <div class="profile-user">
+                                <img
+                                    [src]="profileImageSrc"
+                                    alt="user-profile-image"
+                                    class="rounded-circle avatar-md img-thumbnail user-profile-image"
+                                />
+                            </div>
+                            <div class="mt-3">
+                                <h4 class="fs-18 text-white">
+                                    {{ pendingTask.name }}
+                                </h4>
+                                <h6 class="text-muted fs-14">
+                                    NIP : {{ pendingTask.nip }}
+                                </h6>
+                                <h6 class="text-muted fs-14">
+                                    Email : {{ pendingTask.email }}
+                                </h6>
+                            </div>
+                        </div>
+                        <span class="badge rounded-pill text-bg-success"
+                            >Aktif</span
+                        >
+                    </div>
+                    <hr class="text-white" />
+
+                    <div class="row text-white">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Jenis UKom
+                            </label>
+                            <p class="text-muted">
+                                {{ pendingTask.jenisUkom ? getJenisUkomLabel(
+                                pendingTask.jenisUkom ) : '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Status Pendaftaran
+                            </label>
+                            <p class="text-muted">
+                                {{ pendingTask.isMengulang ? 'Mengulang' :
+                                'Baru' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Usia Menurut Surat Usulan
+                            </label>
+                            <p class="text-muted">
+                                {{ calculateAge( pendingTask.tanggalLahir,
+                                pendingTask.tglSuratUsulan ) }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Jabatan Saat Ini
+                            </label>
+                            <p class="text-muted">
+                                {{ pendingTask.jabatanName ?
+                                pendingTask.jabatanName : '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Jenjang Saat Ini
+                            </label>
+                            <p class="text-muted">
+                                {{ pendingTask.jenjangName ?
+                                pendingTask.jenjangName : '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput"
+                                >Pangkat Saat Ini</label
+                            >
+                            <p class="text-muted">
+                                {{ pendingTask.pangkatName ?
+                                pendingTask.pangkatName : '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Jabatan Yang Dituju
+                            </label>
+                            <p class="text-muted">
+                                {{ pendingTask.nextJabatanName ?
+                                pendingTask.nextJabatanName : '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Jenjang Yang Dituju
+                            </label>
+                            <p class="text-muted">
+                                {{ pendingTask.nextJenjangName ?
+                                pendingTask.nextJenjangName : '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Bidang Jabatan Yang Dituju
+                            </label>
+                            <p class="text-muted">
+                                {{ bidangJabatanName ?? '-' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr class="text-white" />
+                    <div class="row text-white">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Jenjang Pendidikan
+                            </label>
+                            <p class="text-muted">
+                                {{ pendidikanName ?? '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Program Studi/Jurusan
+                            </label>
+                            <p class="text-muted">
+                                {{ pendingTask.jurusan ?? '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput"
+                                >Instansi
+                            </label>
+                            <p class="text-muted">
+                                {{ transformInstansiName(
+                                pendingTask.jenisInstansi ) ?? '-' }}
+                            </p>
+                        </div>
+
+                        <div *ngIf="provinsiName" class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Provinsi
+                            </label>
+                            <p class="text-muted">{{ provinsiName ?? '-' }}</p>
+                        </div>
+
+                        <div *ngIf="kabupatenName" class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Kabupaten/Kota
+                            </label>
+                            <p class="text-muted">
+                                {{ kabupatenName ? typeKabKota + ' ' +
+                                kabupatenName : '-' }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Unit Kerja
+                            </label>
+                            <p class="text-muted">
+                                {{ pendingTask.unitKerjaName }}
+                            </p>
+                        </div>
+                    </div>
+                    <hr class="text-white" />
+                    <div class="row text-white">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Predikat Kinerja Pegawai Satu Tahun Terakhir
+                            </label>
+                            <p class="text-muted">{{ predikat1Name }}</p>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="firstnameInput">
+                                Predikat Kinerja Pegawai Dua Tahun Terakhir
+                            </label>
+                            <p class="text-muted">{{ predikat2Name }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Status Pendaftaran</h3>
+            </div>
+            <div class="stepper-wrapper text-center">
+                <div
+                    (click)="handleStepClick(1)"
+                    [ngClass]="{
+                            active: (currentUkomStep$ | async) === 1,
+                            completed: (currentUkomStep$ | async) > 1
+                        }"
+                    class="stepper-item"
+                >
+                    <div class="step-counter">
+                        <i class="mdi mdi-clipboard-check-outline"></i>
+                    </div>
+                    <div class="step-name">Verifikasi Pendaftaran Ukom</div>
+                </div>
+
+                <div
+                    (click)="handleStepClick(2)"
+                    [ngClass]="{
+                            active: (currentUkomStep$ | async) === 2,
+                            completed: (currentUkomStep$ | async) > 2
+                        }"
+                    class="stepper-item"
+                >
+                    <div class="step-counter">
+                        <i class="mdi mdi-account-multiple"></i>
+                    </div>
+                    <div class="step-name">
+                        Perbaikan Data Administrasi UKom
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ng-container
+            *ngFor="
+                    let task of groupedUkomPendingTaskHistory | keyvalue;
+                    let i = index
+                "
+        >
+            <div *ngIf="(ukomStep$ | async) === i + 1" class="mb-3">
+                <div *ngIf="task.key" class="d-flex flex-column mt-2 gap-3">
+                    <ng-container *ngFor="let history of task.value">
+                        <a
+                            (click)="
+                                    history.taskStatus === 'PENDING' &&
+                                    history.flowId === 'ukom_flow_2'
+                                        ? toggleModal()
+                                        : null
+                                "
+                            [ngClass]="{
+                                    'link-with-pointer':
+                                        history.taskStatus === 'PENDING' &&
+                                        history.flowId === 'ukom_flow_2',
+                                    'disabled-link': !(
+                                        history.taskStatus === 'PENDING' &&
+                                        history.flowId === 'ukom_flow_2'
+                                    )
+                                }"
+                        >
+                            <div
+                                class="card d-flex align-items-center justify-content-between m-0 flex-row p-4"
+                            >
+                                <div
+                                    class="d-flex flex-column flex-md-row align-items-center gap-3"
+                                >
+                                    <div
+                                        class="rounded-circle d-flex flex-column justify-content-center h-58px border p-3"
+                                    >
+                                        <i
+                                            *ngIf="
+                                                    history.flowId ===
+                                                    'ukom_flow_1'
+                                                "
+                                            class="mdi mdi-clipboard-multiple-outline mdi-24px text-muted"
+                                        ></i>
+                                        <i
+                                            *ngIf="
+                                                    history.flowId ===
+                                                    'ukom_flow_2'
+                                                "
+                                            class="mdi mdi-account-multiple mdi-24px text-muted"
+                                        ></i>
+                                    </div>
+                                    <div class="">
+                                        <ng-container
+                                            *ngIf="
+                                                    history.taskStatus ===
+                                                    'COMPLETED'
+                                                "
+                                        >
+                                            <h5 class="">
+                                                {{ history.flowName |
+                                                replaceUkomWord }}
+                                                <span
+                                                    class="badge rounded-pill text-bg-success"
+                                                >
+                                                    {{ history.flowId ===
+                                                    'ukom_flow_1' ? 'Sudah
+                                                    Diverifikasi' : '' }} {{
+                                                    history.flowId ===
+                                                    'ukom_flow_2' ? 'Sudah
+                                                    Diverifikasi' : '' }}
+                                                </span>
+                                            </h5>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="
+                                                    history.taskStatus ===
+                                                    'PENDING'
+                                                "
+                                        >
+                                            <h5 class="">
+                                                {{ history.flowName |
+                                                replaceUkomWord}}
+                                                <span
+                                                    class="badge rounded-pill text-bg-info"
+                                                    >{{ history.flowId ===
+                                                    'ukom_flow_2' ? 'Dokumen
+                                                    Perlu Diperbaiki' : '' }}{{
+                                                    history.flowId ===
+                                                    'ukom_flow_1' ? 'Belum
+                                                    Diverifikasi' : '' }}
+                                                </span>
+                                            </h5>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="
+                                                    history.taskStatus ===
+                                                    'REJECTED'
+                                                "
+                                        >
+                                            <h5 class="">
+                                                {{ history.flowName |
+                                                replaceUkomWord}}
+                                                <span
+                                                    class="badge rounded-pill text-bg-danger"
+                                                    >Ditolak</span
+                                                >
+                                            </h5>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="
+                                                    history.taskStatus ===
+                                                    'COMPLETED'
+                                                "
+                                        >
+                                            <p
+                                                *ngIf="
+                                                        history.flowId ===
+                                                        'ukom_flow_1'
+                                                    "
+                                                class="text-muted mb-0"
+                                            >
+                                                Diverifikasi Pada : {{
+                                                convertDate( history.lastUpdated
+                                                ) }}
+                                            </p>
+                                            <p
+                                                *ngIf="
+                                                        history.flowId ===
+                                                        'ukom_flow_2'
+                                                    "
+                                                class="text-muted mb-0"
+                                            >
+                                                Dinilai Pada : {{ convertDate(
+                                                history.lastUpdated ) }}
+                                            </p>
+                                        </ng-container>
+
+                                        <ng-container
+                                            *ngIf="
+                                                    history.taskStatus !==
+                                                    'COMPLETED'
+                                                "
+                                        >
+                                            <p
+                                                *ngIf="
+                                                        history.flowId ===
+                                                        'ukom_flow_1'
+                                                    "
+                                                class="text-muted mb-0"
+                                            >
+                                                Diverifikasi Pada : -
+                                            </p>
+                                            <p
+                                                *ngIf="
+                                                        history.flowId ===
+                                                        'ukom_flow_2'
+                                                    "
+                                                class="text-muted mb-0"
+                                            >
+                                                Dinilai Pada : -
+                                            </p>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="history.remark !== null"
+                                        >
+                                            <div
+                                                class="alert alert-warning mt-1"
+                                            >
+                                                <strong
+                                                    >Catatan Revisi :
+                                                </strong>
+                                                {{ history.remark }}
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <div *ngIf="finishTask.id" class="card parent">
+        <div class="card card-profile shadow-sm">
+            <div class="card-body p-md-4 p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div
+                        class="d-flex flex-column flex-md-row align-items-md-center gap-3"
+                    >
+                        <div class="profile-user">
+                            <img
+                                [src]="profileImageSrc"
+                                alt="user-profile-image"
+                                class="rounded-circle avatar-md img-thumbnail user-profile-image"
+                            />
+                        </div>
+                        <div class="mt-3">
+                            <h4 class="fs-18 text-white">
+                                {{ finishTask.name }}
+                            </h4>
+                            <h6 class="text-muted fs-14">
+                                NIP : {{ finishTask.nip }}
+                            </h6>
+                            <h6 class="text-muted fs-14">
+                                Email : {{ finishTask.email }}
+                            </h6>
+                        </div>
+                    </div>
+                    <span class="badge rounded-pill text-bg-success"
+                        >Aktif</span
+                    >
+                </div>
+                <hr class="text-white" />
+
+                <div class="row text-white">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Jenis UKom</label
+                        >
+                        <p class="text-muted">
+                            {{ finishTask.jenisUkom ? getJenisUkomLabel(
+                            finishTask.jenisUkom ) : '-' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Status Pendaftaran</label
+                        >
+                        <p class="text-muted">
+                            {{ finishTask.isMengulang ? 'Mengulang' : 'Baru' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Usia Menurut Surat Usulan</label
+                        >
+                        <p class="text-muted">
+                            {{ calculateAge( finishTask.tanggalLahir,
+                            finishTask.tglSuratUsulan ) }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Jabatan Saat Ini</label
+                        >
+                        <p class="text-muted">
+                            {{ finishTask.jabatanName ? finishTask.jabatanName :
+                            '-' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Jenjang Saat Ini</label
+                        >
+                        <p class="text-muted">
+                            {{ finishTask.jenjangName ? finishTask.jenjangName :
+                            '-' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Pangkat Saat Ini</label
+                        >
+                        <p class="text-muted">
+                            {{ finishTask.pangkatName ? finishTask.pangkatName :
+                            '-' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Jabatan Yang Dituju</label
+                        >
+                        <p class="text-muted">
+                            {{ finishTask.nextJabatanName ?
+                            finishTask.nextJabatanName : '-' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Jenjang Yang Dituju</label
+                        >
+                        <p class="text-muted">
+                            {{ finishTask.nextJenjangName ?
+                            finishTask.nextJenjangName : '-' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Bidang Jabatan Yang Dituju</label
+                        >
+                        <p class="text-muted">{{ bidangJabatanName ?? '-' }}</p>
+                    </div>
+                </div>
+
+                <hr class="text-white" />
+                <div class="row text-white">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Jenjang Pendidikan</label
+                        >
+                        <p class="text-muted">{{ pendidikanName ?? '-' }}</p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Program Studi/Jurusan</label
+                        >
+                        <p class="text-muted">
+                            {{ finishTask.jurusan ?? '-' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Instansi</label
+                        >
+                        <p class="text-muted">
+                            {{ transformInstansiName( finishTask.jenisInstansi )
+                            ?? '-' }}
+                        </p>
+                    </div>
+
+                    <div *ngIf="provinsiName" class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Provinsi</label
+                        >
+                        <p class="text-muted">{{ provinsiName ?? '-' }}</p>
+                    </div>
+
+                    <div *ngIf="kabupatenName" class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Kabupaten/Kota</label
+                        >
+                        <p class="text-muted">
+                            {{ kabupatenName ? typeKabKota + ' ' + kabupatenName
+                            : '-' }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Unit Kerja</label
+                        >
+                        <p class="text-muted">{{ finishTask.unitKerjaName }}</p>
+                    </div>
+                </div>
+                <hr class="text-white" />
+                <div class="row text-white">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Predikat Kinerja Pegawai Satu Tahun Terakhir</label
+                        >
+                        <p class="text-muted">{{ predikat1Name }}</p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="firstnameInput"
+                            >Predikat Kinerja Pegawai Dua Tahun Terakhir</label
+                        >
+                        <p class="text-muted">{{ predikat2Name }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="dataDokumenUkom.length > 0" class="card">
+            <div class="card-header bg-light">
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <h5 class="d-flex align-items-center mb-0">
+                        <i class="mdi mdi-file-document-check-outline me-2"></i>
+                        Dokumen Pendaftaran UKom
+                    </h5>
+                    <ng-container
+                        *ngIf="registrationStatus === 'finish'; else pillFailed"
+                    >
+                        <span
+                            class="bg-success rounded-pill small fw-semibold px-3 py-1 text-white"
+                        >
+                            Lolos Seleksi Administrasi
+                        </span>
+                    </ng-container>
+                    <ng-template #pillFailed>
+                        <span
+                            class="bg-danger rounded-pill small fw-semibold px-3 py-1 text-white"
+                        >
+                            Tidak Lolos Seleksi Administrasi
+                        </span>
+                    </ng-template>
+                </div>
+
+                <div
+                    *ngIf="registrationStatus === 'failed'"
+                    class="border-dark small text-dark mt-2 rounded border px-3 py-2"
+                >
+                    <strong>Alasan Penolakan:</strong> {{ finishTask.remark }}
+                </div>
+            </div>
+            <div class="card-body">
+                <app-file-handler [inputs]="fileHandlerData"></app-file-handler>
+            </div>
+        </div>
+
+        <div
+            *ngIf="(examScoresByScheduleId | keyvalue)?.length > 0 && hasAnyScores()"
+            class="card shadow-sm"
+        >
+            <div class="card-header bg-light">
+                <h5 class="m-0">
+                    <i class="mdi mdi-checkbox-marked-circle-outline me-2"></i>
+                    Detail UKom
+                </h5>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <ng-container
+                        *ngFor="let examSchedule of finishTask.examSchedule"
+                    >
+                        <div
+                            *ngIf="examScoresByScheduleId[examSchedule.id] != null"
+                            class="list-group-item py-3"
+                        >
+                            <div
+                                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+                            >
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-semibold mb-1">
+                                        {{
+                                        ukomMiscellaneousService.getModuleDisplayName(examSchedule.examTypeCode)
+                                        }}
+                                    </h6>
+
+                                    <div class="text-muted small">
+                                        {{ getScheduleStartTime(examSchedule.id)
+                                        | tanggalWaktuIndo }}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <button
+                                        (click)="toggleScoreModal(examSchedule.id, examSchedule.examTypeCode)"
+                                        class="btn btn-success"
+                                    >
+                                        Lihat Nilai
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+        <ng-container *ngIf="ukomGrade.id?.trim()">
+            <app-ukom-grade-table
+                (downloadFile)=" downloadRekomendasi()"
+                [gradeData]="ukomGrade"
+                [nama]="finishTask.name"
+                [nip]="finishTask.nip"
+                [rekomendasiUrl]="finishTask.rekomendasiUrl"
+            ></app-ukom-grade-table>
+        </ng-container>
+    </div>
+</ng-template>
+
+<app-modal
+    (toggle)="toggleModal()"
+    *ngIf="isModalOpen$ | async"
+    [enableFooter]="false"
+    [title]="'Perbaiki Data Administrasi UKom'"
+>
+    <app-nonjf-revisi-ukom
+        [key]="key"
+        [pendingTask]="pendingTask"
+    ></app-nonjf-revisi-ukom>
+</app-modal>
+<app-modal
+    (toggle)="toggleScoreModal()"
+    *ngIf="isCATModalOpen$ | async"
+    [enableFooter]="false"
+    [size]="'lg'"
+    [title]="'Hasil ' + ukomMiscellaneousService.getModuleDisplayName(getSelectedExamType())"
+>
+    <ng-container *ngIf="getSelectedScore() as selectedScore">
+        <!-- CAT Score Component -->
+        <app-cat-score
+            *ngIf="getSelectedExamType() === ExamTypeCategory.CAT"
+            [score]="selectedScore"
+        ></app-cat-score>
+
+        <!-- Generic Score Component for other types -->
+        <app-generic-score
+            *ngIf="getSelectedExamType() !== ExamTypeCategory.CAT"
+            [score]="selectedScore"
+        ></app-generic-score>
+    </ng-container>
+</app-modal>

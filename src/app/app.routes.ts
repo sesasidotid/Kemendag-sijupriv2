@@ -20,23 +20,23 @@ export const routes: Routes = [
     {
         path: 'login-cat',
         loadComponent: () =>
-            import(
-                '../modules/auth/components/login-cat/login-cat.component'
-            ).then((m) => m.LoginCatComponent),
+            import('../modules/auth/components/login-cat/login-cat.component').then(
+                (m) => m.LoginCatComponent,
+            ),
     },
     {
         path: 'forget-password',
         loadComponent: () =>
-            import(
-                '../modules/auth/components/forgot-password/forgot-password.component'
-            ).then((m) => m.ForgotPasswordComponent),
+            import('../modules/auth/components/forgot-password/forgot-password.component').then(
+                (m) => m.ForgotPasswordComponent,
+            ),
     },
     {
         path: 'forgot_password',
         loadComponent: () =>
-            import(
-                '../modules/auth/components/reset-password/reset-password.component'
-            ).then((m) => m.ResetPasswordComponent),
+            import('../modules/auth/components/reset-password/reset-password.component').then(
+                (m) => m.ResetPasswordComponent,
+            ),
     },
     {
         path: 'not-found',
@@ -48,30 +48,37 @@ export const routes: Routes = [
     {
         path: 'ukom/external',
         loadComponent: () =>
-            import(
-                '../modules/base/components/ukom-register/ukom-register.component'
-            ).then((m) => m.UkomRegisterComponent),
+            import('../modules/base/components/ukom-register/ukom-register.component').then(
+                (m) => m.UkomRegisterComponent,
+            ),
     },
     {
         path: 'ukom/external/status',
         loadComponent: () =>
-            import(
-                '../modules/base/components/status-pendaftaran-ukom/status-pendaftaran-ukom.component'
-            ).then((m) => m.StatusPendaftaranUkomComponent),
+            import('../modules/base/components/status-pendaftaran-ukom/status-pendaftaran-ukom.component').then(
+                (m) => m.StatusPendaftaranUkomComponent,
+            ),
+    },
+    {
+        path: 'ukom/detail/:id',
+        loadComponent: () =>
+            import('../modules/base/components/ukom-detail/ukom-detail.component').then(
+                (m) => m.UkomDetailComponent,
+            ),
     },
     {
         path: 'akp-grading/:whoIs/:id',
         loadComponent: () =>
-            import(
-                '../modules/base/components/akp-grading/akp-grading.component'
-            ).then((m) => m.AKPGradingComponent),
+            import('../modules/base/components/akp-grading/akp-grading.component').then(
+                (m) => m.AKPGradingComponent,
+            ),
     },
     {
         path: 'ukm-clarrify',
         loadComponent: () =>
-            import(
-                '../modules/base/components/reject-ukom-schedule/reject-ukom-schedule.component'
-            ).then((m) => m.RejectUkomScheduleComponent),
+            import('../modules/base/components/reject-ukom-schedule/reject-ukom-schedule.component').then(
+                (m) => m.RejectUkomScheduleComponent,
+            ),
     },
     {
         path: 'privacy',
@@ -105,9 +112,9 @@ function getMenus() {
             return {
                 path: '',
                 loadChildren: () =>
-                    import(
-                        '../sijupri-unit-kerja/sijupri-unit-kerja.module'
-                    ).then((m) => m.SijupriUnitKerjaModule),
+                    import('../sijupri-unit-kerja/sijupri-unit-kerja.module').then(
+                        (m) => m.SijupriUnitKerjaModule,
+                    ),
             }
         case 'sijupri-external':
             return {
@@ -145,9 +152,9 @@ function getMenus() {
             return {
                 path: '',
                 loadComponent: () =>
-                    import(
-                        '../modules/landing-page/landing-page.component'
-                    ).then((m) => m.LandingPageComponent),
+                    import('../modules/landing-page/landing-page.component').then(
+                        (m) => m.LandingPageComponent,
+                    ),
             }
     }
 }
