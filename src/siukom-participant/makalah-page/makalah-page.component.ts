@@ -1,61 +1,3 @@
-// import { Component } from '@angular/core'
-// import { RoomUkom } from '../../modules/ukom/models/room-ukom.model'
-// import { ApiService } from '../../modules/base/services/api.service'
-// import { Router } from '@angular/router'
-// import { HandlerService } from '../../modules/base/services/handler.service'
-// import { LoginContext } from '../../modules/base/commons/login-context'
-// import { tap } from 'rxjs'
-// import { UkomMakalahComponent } from '@/siukom-participant/makalah-page/ukom-makalah/ukom-makalah.component'
-// import { CommonModule } from '@angular/common'
-//
-// @Component({
-//     selector: 'app-makalah-page',
-//     standalone: true,
-//     imports: [UkomMakalahComponent, CommonModule],
-//     templateUrl: './makalah-page.component.html',
-//     styleUrl: './makalah-page.component.scss',
-// })
-// export class MakalahPageComponent {
-//     participant_id: string = ''
-//     roomUkom: RoomUkom = new RoomUkom()
-//
-//     constructor(
-//         private apiService: ApiService,
-//         private router: Router,
-//         private handlerService: HandlerService,
-//     ) {}
-//
-//     ngOnInit() {
-//         this.getRoomUkom()
-//     }
-//
-//     backToDashboard() {
-//         this.router.navigate(['/'])
-//     }
-//
-//     getRoomUkom(): void {
-//         const userId = LoginContext.getUserId().replace('PU-', '')
-//
-//         this.apiService
-//             .getData(`/api/v1/participant_ukom/nip/${userId}`)
-//             .pipe(
-//                 tap((response: any) => {
-//                     this.roomUkom = new RoomUkom(response.roomUkomDto)
-//                     this.participant_id = response.id
-//                 }),
-//             )
-//             .subscribe({
-//                 next: () => {},
-//                 error: (err) => {
-//                     console.error('Error fetching RoomUkom or scores:', err)
-//                     this.handlerService.handleAlert(
-//                         'Error',
-//                         'Gagal mengambil data.',
-//                     )
-//                 },
-//             })
-//     }
-// }
 import { Component, computed, effect, inject, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
@@ -214,9 +156,16 @@ export class MakalahPageComponent {
                     console.error('Error fetching question:', err)
                     if (!silent) {
                         this.criticalError.set(true)
-                        this.errorMessage.set(
-                            'Gagal memuat soal ujian. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
-                        )
+
+                        if (err?.error?.code == 'STRT-00003') {
+                            this.errorMessage.set(
+                                'Ujian sudah berakhir atau penguji telah melakukan penilaian.',
+                            )
+                        } else {
+                            this.errorMessage.set(
+                                'Gagal memuat soal ujian. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
+                            )
+                        }
                         this.questionLoading.set(false)
                     }
                 },

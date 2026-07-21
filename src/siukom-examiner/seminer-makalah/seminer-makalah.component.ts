@@ -25,6 +25,8 @@ import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import { UkomExamScheduleService } from '@/modules/ukom/services/ukom-exam-schedule.service'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 
+import { CatService } from '@/modules/ukom/services/cat.service'
+
 @Component({
     selector: 'app-seminer-makalah',
     standalone: true,
@@ -48,9 +50,11 @@ export class SeminerMakalahComponent implements OnInit {
     draftService = inject(SeminarMakalahDraftService)
     router = inject(Router)
     examService = inject(ExamService)
+    catService = inject(CatService)
 
     startExamLoading = signal(false)
     loadingQuestions = signal(false)
+    attendanceLoading = signal(false)
     submitting = signal(false)
     examId = signal('')
     participantId = signal('')
@@ -79,7 +83,7 @@ export class SeminerMakalahComponent implements OnInit {
                 const examId = this.examId()
                 const participantId = this.participantId()
                 if (examId && participantId) {
-                    this.fetchQuestionsToGrade()
+                    this.getAttendace()
                 }
             },
             { allowSignalWrites: true },
@@ -107,6 +111,25 @@ export class SeminerMakalahComponent implements OnInit {
         })
     }
 
+    getAttendace() {
+        this.attendanceLoading.set(true)
+        this.catService
+            .getExamAttendance(this.examId(), this.participantId())
+            .pipe(finalize(() => this.attendanceLoading.set(false)))
+            .subscribe({
+                next: (res) => {
+                    if (res && res.startAt) {
+                        this.examStarted.set(true)
+                        this.fetchQuestionsToGrade()
+                    }
+                },
+                error: (err) => {
+                    this.handlerService.handleException(err)
+                    console.error('Failed to get exam attendance:', err)
+                },
+            })
+    }
+
     startTheExam() {
         this.confirmationService.open(false).subscribe({
             next: ({ confirmed }) => {
@@ -130,9 +153,7 @@ export class SeminerMakalahComponent implements OnInit {
                                 'Success',
                                 'Berhasil memulai ujian.',
                             )
-                            this.examStarted.set(true)
-                            // Reload questions after starting exam
-                            this.fetchQuestionsToGrade(true)
+                            this.getAttendace()
                         },
                         error: (err) => {
                             console.error(err)
@@ -162,7 +183,7 @@ export class SeminerMakalahComponent implements OnInit {
                 },
             })
     }
-    fetchQuestionsToGrade(afterStart: boolean = false) {
+    fetchQuestionsToGrade() {
         this.loadingQuestions.set(true)
         this.examService
             .getExamQuestionsByScheduleAndParticipant(
@@ -174,10 +195,6 @@ export class SeminerMakalahComponent implements OnInit {
             .subscribe({
                 next: async (result) => {
                     const data = result.data
-
-                    if (!afterStart && result.data.length > 0) {
-                        this.examStarted.set(true)
-                    }
 
                     const baseQuestion = data.find(
                         (item) => item.id === 'base_makalah_question',
@@ -278,9 +295,11 @@ export class SeminerMakalahComponent implements OnInit {
             scoreControl.value !== ''
         ) {
             let score = Number(scoreControl.value)
-            if (score < 0) score = 0
-            if (score > maxScore) score = maxScore
-            scoreControl.setValue(score)
+            if (score < 0) {
+                scoreControl.setValue(0)
+            } else if (score > maxScore) {
+                scoreControl.setValue(maxScore)
+            }
         }
         scoreControl?.markAsTouched()
     }
@@ -373,41 +392,18 @@ export class SeminerMakalahComponent implements OnInit {
 
                 this.submitting.set(true)
 
-                // Start exam silently first
                 this.examService
-                    .startExamByExaminer(
-                        new ExaminerExamStartRequest({
-                            participantId: this.participantId(),
-                            examTypeCode: ExamTypeCategory.SEMINAR,
-                            roomUkomId:
-                                this.examScheduleDetail()?.roomUkomId || '',
-                            examScheduleId: this.examId(),
-                        }),
+                    .saveExamAnswersForExaminerByExamScheduleId(
+                        this.examId(),
+                        payload,
                     )
-                    .pipe(
-                        // Continue even if start exam fails (e.g. already started)
-                        catchError((err) => {
-                            console.warn(
-                                'Silent start exam failed / already started:',
-                                err,
-                            )
-                            return of(null)
-                        }),
-                        switchMap(() =>
-                            this.examService.saveExamAnswersForExaminerByExamScheduleId(
-                                this.examId(),
-                                payload,
-                            ),
-                        ),
-                        finalize(() => this.submitting.set(false)),
-                    )
+                    .pipe(finalize(() => this.submitting.set(false)))
                     .subscribe({
                         next: () => {
                             this.handlerService.handleAlert(
                                 'Success',
                                 'Penilaian berhasil disimpan.',
                             )
-                            this.examStarted.set(true)
                             // Clear draft after successful save
                             this.draftService
                                 .remove(this.examId(), this.participantId())

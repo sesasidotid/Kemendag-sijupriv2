@@ -178,9 +178,15 @@ export class PracticalWorkPageComponent implements OnInit {
                 error: (err) => {
                     console.error('Error fetching question:', err)
                     this.criticalError.set(true)
-                    this.errorMessage.set(
-                        'Gagal memuat soal praktik. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
-                    )
+                    if (err?.error?.code == 'STRT-00003') {
+                        this.errorMessage.set(
+                            'Ujian sudah berakhir atau penguji telah melakukan penilaian.',
+                        )
+                    } else {
+                        this.errorMessage.set(
+                            'Gagal memuat soal ujian. Silakan reload halaman atau hubungi panitia ujian jika masalah berlanjut.',
+                        )
+                    }
                 },
             })
     }

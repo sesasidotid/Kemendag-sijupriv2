@@ -33,39 +33,41 @@
                 <tr>
                     <th scope="row">Skor CAT</th>
                     <!-- <td>{{ gradeData.nbCat ?? '-' }}</td> -->
-                    <td>{{ gradeData?.catGrade?.score ?? '-' }}</td>
+                    <td>{{ gradeData?.catGrade?.score | truncateDecimal }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Wawancara</th>
-                    <td>{{ gradeData?.wawancaraGrade?.score ?? '-' }}</td>
+                    <td>{{ gradeData?.wawancaraGrade?.score | truncateDecimal }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Seminar</th>
-                    <td>{{ gradeData?.seminarGrade?.score ?? '-' }}</td>
+                    <td>{{gradeData?.seminarMakalahScore | truncateDecimal}}</td>
+                    <!--                    <td>{{totalSeminarMakalahScore}}</td>-->
+                    <!--                                        <td>{{ gradeData?.seminarGrade?.score ?? '-' }}</td>-->
                 </tr>
                 <tr>
                     <th scope="row">Skor Praktik</th>
-                    <td>{{ gradeData?.praktikGrade?.score ?? "-" }}</td>
+                    <td>{{ gradeData?.praktikGrade?.score | truncateDecimal }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Skor Portofolio</th>
-                    <td>{{ gradeData?.portofolioGrade?.score ?? '-' }}</td>
+                    <td>{{ gradeData?.portofolioGrade?.score | truncateDecimal }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Skor Studi Kasus</th>
-                  <td>{{ gradeData?.studiKasusGrade?.score ?? '-' }}</td>
+                    <th scope="row">Skor Studi Kasus</th>
+                    <td>{{ gradeData?.studiKasusGrade?.score | truncateDecimal }}</td>
                 </tr>
                 <tr>
                     <th scope="row">UKT</th>
-                    <td>{{ gradeData?.ukt ?? '-' }}</td>
+                    <td>{{ gradeData?.ukt | truncateDecimal }}</td>
                 </tr>
                 <tr>
                     <th scope="row">UKMSK</th>
-                    <td>{{ gradeData?.jpm ?? '-' }}</td>
+                    <td>{{ gradeData?.jpm | truncateDecimal }}</td>
                 </tr>
                 <tr class="fw-bold">
                     <th scope="row">Nilai Akhir</th>
-                    <td>{{ gradeData?.grade ?? '-' }}</td>
+                    <td>{{ gradeData?.grade | truncateDecimal }}</td>
                 </tr>
                 <tr class="fw-bold">
                     <th scope="row">File Rekomendasi UKom</th>

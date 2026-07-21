@@ -3,7 +3,7 @@
         <div class="navbar-header">
             <div class="d-flex align-items-center">
                 <!-- LOGO -->
-                <a href="/">
+                <a routerLink="/">
                     <div class="navbar-brand-box horizontal-logo">
                         <img
                             src="assets/logo/kemendag-logo-light.png"
@@ -13,9 +13,9 @@
                 </a>
                 <button
                     (click)="toggelSidebar()"
-                    type="button"
                     class="btn btn-sm fs-16 header-item vertical-menu-btn topnav-hamburger px-3"
                     id="topnav-hamburger-icon"
+                    type="button"
                 >
                     <span class="hamburger-icon">
                         <span></span>
@@ -30,13 +30,13 @@
                     id="notificationDropdown"
                 >
                     <button
-                        type="button"
-                        class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
-                        id="page-header-notifications-dropdown"
-                        data-bs-toggle="dropdown"
-                        data-bs-auto-close="outside"
-                        aria-haspopup="true"
                         aria-expanded="false"
+                        aria-haspopup="true"
+                        class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                        data-bs-auto-close="outside"
+                        data-bs-toggle="dropdown"
+                        id="page-header-notifications-dropdown"
+                        type="button"
                     >
                         <i class="bx bx-bell fs-22"></i>
                         <span
@@ -48,8 +48,8 @@
                         >
                     </button>
                     <div
-                        class="dropdown-menu dropdown-menu-lg w-xl dropdown-menu-end p-0"
                         aria-labelledby="page-header-notifications-dropdown"
+                        class="dropdown-menu dropdown-menu-lg w-xl dropdown-menu-end p-0"
                     >
                         <div class="dropdown-head card-bg rounded-top">
                             <div class="p-3">
@@ -67,18 +67,18 @@
                                     </div> -->
                                     <div class="col-auto">
                                         <button
-                                            class="btn trash-button me-2"
                                             (click)="handleCheckAllClicked()"
+                                            class="btn trash-button me-2"
                                         >
                                             <i class="mdi mdi-check fs-16"></i>
                                         </button>
                                         <button
-                                            class="btn trash-button"
+                                            (click)="handleDeleteClicked()"
                                             [disabled]="
                                                 (notificationsDeleteId$ | async)
                                                     .length === 0
                                             "
-                                            (click)="handleDeleteClicked()"
+                                            class="btn trash-button"
                                         >
                                             <i class="mdi mdi-delete fs-16"></i>
                                         </button>
@@ -97,11 +97,11 @@
                                         class="nav-item waves-effect waves-light"
                                     >
                                         <a
+                                            aria-selected="true"
                                             class="nav-link active"
                                             data-bs-toggle="tab"
                                             href="#all-noti-tab"
                                             role="tab"
-                                            aria-selected="true"
                                         >
                                             Notifikasi ({{
                                             notificationMessagePersonalList.length
@@ -112,11 +112,11 @@
                                         class="nav-item waves-effect waves-light"
                                     >
                                         <a
+                                            aria-selected="false"
                                             class="nav-link"
                                             data-bs-toggle="tab"
                                             href="#messages-tab"
                                             role="tab"
-                                            aria-selected="false"
                                         >
                                             Pengumuman
                                         </a>
@@ -130,12 +130,12 @@
                             id="notificationItemsTabContent"
                         >
                             <div
+                                aria-labelledby="all-noti-tab"
                                 class="tab-pane fade show active py-2 ps-2"
                                 id="all-noti-tab"
                                 role="tabpanel"
-                                aria-labelledby="all-noti-tab"
                             >
-                                <div data-simplebar class="max-h-300 pe-2">
+                                <div class="max-h-300 pe-2" data-simplebar>
                                     <div
                                         *ngIf="
                                             notificationMessagePersonalList.length >
@@ -193,19 +193,19 @@
                                                         class="form-check notification-check"
                                                     >
                                                         <input
-                                                            class="form-check-input"
-                                                            type="checkbox"
                                                             (click)="
                                                                 handleCheckClicked(
                                                                     notificationMessage.id
                                                                 )
                                                             "
-                                                            id="messages-notification-check01"
                                                             [checked]="
                                                                 checkNotificationsDeleteId(
                                                                     notificationMessage.id
                                                                 )
                                                             "
+                                                            class="form-check-input"
+                                                            id="messages-notification-check01"
+                                                            type="checkbox"
                                                         />
                                                         <label
                                                             class="form-check-label"
@@ -218,22 +218,22 @@
                                     </div>
                                     <ng-template #noNotifPersonal>
                                         <app-empty-state
-                                            [title]="'Belum ada notifikasi'"
-                                            [icon]="'mdi mdi-bell-off'"
                                             [description]="
                                                 'Saat ini tidak ada notifikasi yang dapat ditampilkan.'
                                             "
+                                            [icon]="'mdi mdi-bell-off'"
+                                            [title]="'Belum ada notifikasi'"
                                         ></app-empty-state>
                                     </ng-template>
                                 </div>
                             </div>
                             <div
+                                aria-labelledby="messages-tab"
                                 class="tab-pane fade py-2 ps-2"
                                 id="messages-tab"
                                 role="tabpanel"
-                                aria-labelledby="messages-tab"
                             >
-                                <div data-simplebar class="max-h-300 pe-2">
+                                <div class="max-h-300 pe-2" data-simplebar>
                                     <div
                                         *ngIf="
                                             notificationMessageGroupList.length >
@@ -250,8 +250,8 @@
                                             <div class="d-flex">
                                                 <div class="flex-grow-1">
                                                     <a
-                                                        href="#!"
                                                         class="stretched-link"
+                                                        href="#!"
                                                     >
                                                         <h6
                                                             class="fs-13 fw-semibold mb-1 mt-0"
@@ -287,9 +287,9 @@
                                                     >
                                                         <input
                                                             class="form-check-input"
+                                                            id="messages-notification-check01"
                                                             type="checkbox"
                                                             value=""
-                                                            id="messages-notification-check01"
                                                         />
                                                         <label
                                                             class="form-check-label"
@@ -302,20 +302,20 @@
                                     </div>
                                     <ng-template #noNotifGroup>
                                         <app-empty-state
-                                            [title]="'Belum ada notifikasi'"
-                                            [icon]="'mdi mdi-bell-off'"
                                             [description]="
                                                 'Saat ini tidak ada notifikasi yang dapat ditampilkan.'
                                             "
+                                            [icon]="'mdi mdi-bell-off'"
+                                            [title]="'Belum ada notifikasi'"
                                         ></app-empty-state>
                                     </ng-template>
                                 </div>
                             </div>
                             <div
+                                aria-labelledby="alerts-tab"
                                 class="tab-pane fade p-4"
                                 id="alerts-tab"
                                 role="tabpanel"
-                                aria-labelledby="alerts-tab"
                             ></div>
 
                             <div
@@ -327,17 +327,17 @@
                                 >
                                     Select
                                     <div
-                                        id="select-content"
                                         class="text-body fw-semibold px-1"
+                                        id="select-content"
                                     >
                                         0
                                     </div>
                                     Result
                                     <button
-                                        type="button"
                                         class="btn btn-link link-danger ms-3 p-0"
-                                        data-bs-toggle="modal"
                                         data-bs-target="#removeNotificationModal"
+                                        data-bs-toggle="modal"
+                                        type="button"
                                     >
                                         Remove
                                     </button>
@@ -349,18 +349,18 @@
 
                 <div class="dropdown ms-sm-3 header-item topbar-user">
                     <button
-                        type="button"
-                        class="btn"
-                        id="page-header-user-dropdown"
-                        data-bs-toggle="dropdown"
-                        aria-haspopup="true"
                         aria-expanded="false"
+                        aria-haspopup="true"
+                        class="btn"
+                        data-bs-toggle="dropdown"
+                        id="page-header-user-dropdown"
+                        type="button"
                     >
                         <span class="d-flex align-items-center">
                             <img
-                                class="rounded-circle header-profile-user"
                                 [src]="profileImageSrc"
                                 alt="Header Avatar"
+                                class="rounded-circle header-profile-user"
                             />
 
                             <span class="ms-xl-2 text-start">
@@ -400,36 +400,36 @@
                                 class="align-middle">Settings</span></a> -->
 
                         <a
-                            class="dropdown-item cursor-pointer"
-                            *ngIf="role.length > 0"
                             (click)="profile()"
+                            *ngIf="role.length > 0"
+                            class="dropdown-item cursor-pointer"
                             ><i
                                 class="mdi mdi-cog-outline text-muted fs-16 me-1 align-middle"
                             ></i>
                             <span class="align-middle">Pengaturan</span></a
                         >
                         <a
-                            class="dropdown-item cursor-pointer"
-                            *ngIf="role.length > 0"
                             (click)="toggleModal()"
+                            *ngIf="role.length > 0"
+                            class="dropdown-item cursor-pointer"
                             ><i
                                 class="mdi mdi-account-cog-outline text-muted fs-16 me-1 align-middle"
                             ></i>
                             <span class="align-middle">Ganti Password</span></a
                         >
                         <a
-                            class="dropdown-item cursor-pointer"
                             (click)="logOut()"
+                            class="dropdown-item cursor-pointer"
                             ><i
                                 class="bx bx-power-off font-size-16 me-1 align-middle"
                             ></i>
                             <span key="t-logout">Keluar</span>
                         </a>
                         <form
-                            id="logout-form"
                             action=""
-                            method="POST"
                             class="d-none"
+                            id="logout-form"
+                            method="POST"
                         ></form>
                     </div>
                 </div>
@@ -437,24 +437,24 @@
         </div>
     </div>
     <app-modal
-        *ngIf="isModalOpen$ | async"
-        [title]="'Ganti Password'"
         (toggle)="toggleModal()"
+        *ngIf="isModalOpen$ | async"
         [enableFooter]="false"
+        [title]="'Ganti Password'"
     >
-        <form (ngSubmit)="onSubmit()" #passwordForm="ngForm">
+        <form #passwordForm="ngForm" (ngSubmit)="onSubmit()">
             <div class="mb-3">
-                <label for="oldPassword" class="form-label"
+                <label class="form-label" for="oldPassword"
                     >Password Lama <span class="text-danger">*</span></label
                 >
                 <input
-                    id="oldPassword"
-                    type="password"
-                    name="oldPassword"
-                    [(ngModel)]="formData.oldPassword"
-                    required
-                    class="form-control"
                     #oldPassword="ngModel"
+                    [(ngModel)]="formData.oldPassword"
+                    class="form-control"
+                    id="oldPassword"
+                    name="oldPassword"
+                    required
+                    type="password"
                 />
                 <div
                     *ngIf="oldPassword.invalid && oldPassword.touched"
@@ -465,17 +465,17 @@
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label"
+                <label class="form-label" for="password"
                     >Password Baru <span class="text-danger">*</span></label
                 >
                 <input
-                    id="password"
-                    type="password"
-                    name="password"
-                    [(ngModel)]="formData.password"
-                    required
-                    class="form-control"
                     #password="ngModel"
+                    [(ngModel)]="formData.password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    required
+                    type="password"
                 />
                 <div
                     *ngIf="password.invalid && password.touched"
@@ -486,18 +486,18 @@
             </div>
 
             <div class="mb-3">
-                <label for="confirmPassword" class="form-label">
+                <label class="form-label" for="confirmPassword">
                     Konfirmasi Password Baru <span class="text-danger">*</span>
                 </label>
                 <input
-                    id="confirmPassword"
-                    type="password"
-                    name="confirmPassword"
-                    [(ngModel)]="formData.confirmPassword"
-                    required
-                    class="form-control"
                     #confirmPassword="ngModel"
                     (input)="checkPasswordMatch()"
+                    [(ngModel)]="formData.confirmPassword"
+                    class="form-control"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    required
+                    type="password"
                 />
                 <div
                     *ngIf="confirmPassword.invalid && confirmPassword.touched"
@@ -515,12 +515,12 @@
 
             <div class="text-end">
                 <app-loading-button
-                    [isLoading]="submitLoading$ | async"
+                    [className]="'btn btn-primary'"
                     [disabled]="passwordForm.invalid ||
                         !passwordsMatch"
-                    [type]="'submit'"
+                    [isLoading]="submitLoading$ | async"
                     [label]="'Simpan'"
-                    [className]="'btn btn-primary'"
+                    [type]="'submit'"
                 ></app-loading-button>
             </div>
         </form>

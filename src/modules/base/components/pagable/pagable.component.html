@@ -1,15 +1,26 @@
-<div class="row mb-3" *ngIf="pagable.filterList">
+<div *ngIf="pagable?.filterList" class="row mb-3">
     <form (submit)="fetchData()">
         <div class="filter-container">
             <ng-container *ngFor="let fillter of pagable.filterList">
                 <ng-container *ngIf="fillter.fieldType">
                     <div>
-                        <div class="mb-0 cursor-pointer" *ngIf="fillter.fieldType == 'select'">
-                            <label class="col-form-label p-1"><b>{{ fillter.label }}</b></label>
-                            <select class="form-select p-1 cursor-pointer" [(ngModel)]="fillter.value"
-                                (ngModelChange)="onFilterValueChange(fillter, $event)" name="{{ fillter.label }}">
+                        <div
+                            *ngIf="fillter.fieldType == 'select'"
+                            class="mb-0 cursor-pointer"
+                        >
+                            <label class="col-form-label p-1"
+                                ><b>{{ fillter.label }}</b></label
+                            >
+                            <select
+                                (ngModelChange)="onFilterValueChange(fillter, $event)"
+                                [(ngModel)]="fillter.value"
+                                class="form-select cursor-pointer p-1"
+                                name="{{ fillter.label }}"
+                            >
                                 <option [value]="''">Pilih</option>
-                                <ng-container *ngFor="let data of fillter.optionList">
+                                <ng-container
+                                    *ngFor="let data of fillter.optionList"
+                                >
                                     <option [value]="data.value">
                                         {{ data.label }}
                                     </option>
@@ -17,45 +28,61 @@
                             </select>
                         </div>
 
-                        <div class="mb-0" *ngIf="fillter.fieldType == 'text'">
-                            <label class="col-form-label p-1"><b>{{ fillter.label }}</b></label>
-                            <input class="form-control p-1" [(ngModel)]="fillter.value" name="{{ fillter.label }}" />
+                        <div *ngIf="fillter.fieldType == 'text'" class="mb-0">
+                            <label class="col-form-label p-1"
+                                ><b>{{ fillter.label }}</b></label
+                            >
+                            <input
+                                [(ngModel)]="fillter.value"
+                                class="form-control p-1"
+                                name="{{ fillter.label }}"
+                            />
                         </div>
                     </div>
                 </ng-container>
             </ng-container>
-            <button *ngIf="isSearchExist()" type="submit" class="btn btn-sm btn-outline-primary bottom-0">
+            <button
+                *ngIf="isSearchExist()"
+                class="btn btn-sm btn-outline-primary bottom-0"
+                type="submit"
+            >
                 Terapkan
             </button>
         </div>
     </form>
 </div>
 <div class="scroll-container">
-    <table class="table table-hover">
+    <table class="table-hover table">
         <thead>
             <tr>
                 <th>#No</th>
                 <ng-container *ngFor="let column of pagable.primaryColumnList">
                     <th (click)="toggleSort(column.property)">
                         {{ column.label }}
-                        <span *ngIf="column.sortable" class="float-end text-primary" [ngClass]="{
+                        <span
+                            *ngIf="column.sortable"
+                            [ngClass]="{
                         'ri-filter-3-line': getSortIcon(column.property) == '',
                         'ri-arrow-up-line': getSortIcon(column.property) == 'asc',
                         'ri-arrow-down-line': getSortIcon(column.property) == 'desc',
-                    }"></span>
+                    }"
+                            class="text-primary float-end"
+                        ></span>
                     </th>
                 </ng-container>
-                <th *ngIf="
+                <th
+                    *ngIf="
                         pagable.actionColumnList &&
                         pagable.actionColumnList.length > 0
-                    ">
+                    "
+                >
                     Action
                 </th>
             </tr>
         </thead>
         <tbody>
             <tr *ngIf="onLoad">
-                <td colspan="100%" class="m-1 p-4">
+                <td class="m-1 p-4" colspan="100%">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
@@ -64,47 +91,79 @@
                 </td>
             </tr>
             <ng-container *ngIf="!onLoad">
-                <tr *ngIf="paginator.data.length == 0">
-                    <td colspan="100%" class="m-1 p-4">
-                        <div class="d-flex justify-content-center align-items-center">
+                <tr *ngIf="filteredData.length == 0">
+                    <td class="m-1 p-4" colspan="100%">
+                        <div
+                            class="d-flex justify-content-center align-items-center"
+                        >
                             <span class="ms-2">Data tidak ditemukan</span>
                         </div>
                     </td>
                 </tr>
-                <tr *ngFor="let row of paginator.data; index as i" class="table-row">
+                <tr
+                    *ngFor="let row of filteredData; index as i"
+                    class="table-row"
+                >
                     <td class="fw-bold m-1 p-1">
                         {{ i + 1 + (page * 10 - 10) }}
                     </td>
-                    <ng-container *ngFor="let column of pagable.primaryColumnList">
-                        <td *ngIf="column.property" class="m-1 p-1 truncate-cell"
+                    <ng-container
+                        *ngFor="let column of pagable.primaryColumnList"
+                    >
+                        <td
+                            *ngIf="column.property"
                             [ngClass]="column.cellClass ? column.cellClass(row) : ''"
                             [ngStyle]="column.cellStyle ? column.cellStyle(row) : {}"
-                            [title]="column.title ? column.title(row) : ''">
+                            [title]="column.title ? column.title(row) : ''"
+                            class="truncate-cell m-1 p-1"
+                        >
                             {{ getPropertyValue(row, column.property) }}
                         </td>
-                        <td *ngIf="!column.property" class="m-1 p-1 truncate-cell"
+                        <td
+                            *ngIf="!column.property"
                             [ngClass]="column.cellClass ? column.cellClass(row) : ''"
                             [ngStyle]="column.cellStyle ? column.cellStyle(row) : {}"
-                            [title]="column.title ? column.title(row) : ''">
+                            [title]="column.title ? column.title(row) : ''"
+                            class="truncate-cell m-1 p-1"
+                        >
                             {{ column.dynamic(row) }}
                         </td>
                     </ng-container>
-                    <td *ngIf="
+                    <td
+                        *ngIf="
                             pagable.actionColumnList &&
                             pagable.actionColumnList.length > 0
-                        " class="m-1 p-1">
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <ng-container *ngFor="let action of pagable.actionColumnList">
-                                <a *ngIf="action.inputType == 'button'" (click)="action.process(row)" class="text-light btn btn-sm btn-{{
+                        "
+                        class="m-1 p-1"
+                    >
+                        <div
+                            aria-label="Basic example"
+                            class="btn-group"
+                            role="group"
+                        >
+                            <ng-container
+                                *ngFor="let action of pagable.actionColumnList"
+                            >
+                                <a
+                                    (click)="action.process(row)"
+                                    *ngIf="action.inputType == 'button'"
+                                    class="text-light btn btn-sm btn-{{
                                         action.inactive && action.inactive(row)
                                             ? 'grey disabled'
                                             : action.color
-                                    }} {{ action.icon }}">
+                                    }} {{ action.icon }}"
+                                >
                                 </a>
 
-                                <input *ngIf="action.inputType == 'checkbox'" (change)="action.process(row, $event)"
-                                    [checked]="action.checked(row)" class="form-check-input custom-checkbox ms-2 me-2"
-                                    type="checkbox" id="inlineCheckbox1" value="option1" />
+                                <input
+                                    (change)="action.process(row, $event)"
+                                    *ngIf="action.inputType == 'checkbox'"
+                                    [checked]="action.checked(row)"
+                                    class="form-check-input custom-checkbox me-2 ms-2"
+                                    id="inlineCheckbox1"
+                                    type="checkbox"
+                                    value="option1"
+                                />
                             </ng-container>
                         </div>
                     </td>
@@ -113,24 +172,37 @@
         </tbody>
     </table>
 </div>
-<nav *ngIf="paginator && pagable.enablePagination && enablePagination" aria-label="Page navigation example">
+<nav
+    *ngIf="paginator && pagable.enablePagination && enablePagination"
+    aria-label="Page navigation example"
+>
     <ul class="pagination justify-content-end">
-        <li class="page-item cursor-pointer" [ngClass]="{ disabled: page == 1 }">
-            <a class="page-link py-1 px-2" (click)="prev()">Previous</a>
+        <li
+            [ngClass]="{ disabled: page == 1 }"
+            class="page-item cursor-pointer"
+        >
+            <a (click)="prev()" class="page-link px-2 py-1">Previous</a>
         </li>
 
         <ng-container *ngFor="let item of getPages(); let i = index">
             <li *ngIf="item !== '...'" class="page-item cursor-pointer">
-                <a class="page-link py-1 px-2" [ngClass]="{ active: page == item }" (click)="select(item)">{{ item
-                    }}</a>
+                <a
+                    (click)="select(item)"
+                    [ngClass]="{ active: page == item }"
+                    class="page-link px-2 py-1"
+                    >{{ item }}</a
+                >
             </li>
             <li *ngIf="item === '...'" class="page-item disabled">
-                <a class="page-link py-1 px-2">{{ item }}</a>
+                <a class="page-link px-2 py-1">{{ item }}</a>
             </li>
         </ng-container>
 
-        <li class="page-item cursor-pointer" [ngClass]="{ disabled: page == paginator.lastPage }">
-            <a class="page-link py-1 px-2" (click)="next()">Next</a>
+        <li
+            [ngClass]="{ disabled: page == paginator.lastPage }"
+            class="page-item cursor-pointer"
+        >
+            <a (click)="next()" class="page-link px-2 py-1">Next</a>
         </li>
     </ul>
 </nav>

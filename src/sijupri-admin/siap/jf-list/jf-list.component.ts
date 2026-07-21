@@ -25,7 +25,6 @@ import { InstansiService } from '@/modules/maintenance/services/instansi.service
 import { Provinsi } from '@/modules/maintenance/models/provinsi.model'
 import { KabKota } from '@/modules/maintenance/models/kab-kota.model'
 import { Instansi } from '@/modules/maintenance/models/instansi.model'
-import { filter } from 'rxjs/operators'
 
 type FilterOption = { label: string; value: string | number | boolean }
 
@@ -91,7 +90,7 @@ export class JfListComponent {
             .findAll()
             .pipe(
                 map((instansiType) => {
-                     return instansiType.filter((type) => type.code !== "IT1")
+                    return instansiType.filter((type) => type.code !== 'IT1')
                 }),
             )
             .subscribe({
@@ -173,6 +172,7 @@ export class JfListComponent {
                         .withDefaultValue('')
                         .build(),
                 )
+                .withQueryParams()
                 .build(),
         )
 

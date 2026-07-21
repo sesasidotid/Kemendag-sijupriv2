@@ -1,13 +1,11 @@
 <app-exam-assessment-layout
     (backClicked)="backToDashboard()"
     [examScheduleId]="examId()"
-    [loading]="loadingQuestions()"
+    [loading]="attendanceLoading() || loadingQuestions()"
     [participantId]="participantId()"
-    [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnsweredAndSaved() && questions().length > 0"
+    [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnsweredAndSaved() && examStarted()"
 >
-    <ng-container
-        *ngIf="!examStarted() && questions().length === 0; else examContent"
-    >
+    <ng-container *ngIf="!examStarted(); else examContent">
         <div class="assessment-container">
             <div class="header-section">
                 <h1>Form Penilaian Seminar</h1>
@@ -69,16 +67,18 @@
                             class="question-card"
                         >
                             <div class="card-header">
-                                <img
-                                    *ngIf="question.attachmentUrl"
-                                    [src]="question.attachmentUrl"
-                                    alt="Question Image"
-                                    class="img-fluid img-custom-300 mb-1 rounded object-cover"
-                                />
-<!--                                <span class="question-number"-->
-<!--                                    >{{ question.kompetensiIndikatorName-->
-<!--                                    }}</span-->
-<!--                                >-->
+                                <div class="mb-4 text-center">
+                                    <img
+                                        *ngIf="question.attachmentUrl"
+                                        [src]="question.attachmentUrl"
+                                        alt="Question Image"
+                                        class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                                    />
+                                </div>
+                                <!--                                <span class="question-number"-->
+                                <!--                                    >{{ question.kompetensiIndikatorName-->
+                                <!--                                    }}</span-->
+                                <!--                                >-->
                                 <h2 class="question-text">
                                     {{ question.question }}
                                 </h2>
@@ -108,6 +108,7 @@
                                             formControlName="score"
                                             min="0"
                                             placeholder="Masukkan nilai"
+                                            step="0.01"
                                             type="number"
                                         />
                                         <div

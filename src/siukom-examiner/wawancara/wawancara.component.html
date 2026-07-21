@@ -1,14 +1,12 @@
 <app-exam-assessment-layout
     (backClicked)="backToDashboard()"
     [examScheduleId]="examId()"
-    [loading]="loadingQuestions()"
+    [loading]="attendanceLoading() || loadingQuestions()"
     [participantId]="participantId()"
     [showSavedIndicator]="!loadingQuestions() && isAllQuestionsAnsweredAndSaved() && examStarted()"
 >
     <!-- Start Exam Screen -->
-    <ng-container
-        *ngIf="!examStarted() && questions().length === 0; else examContent"
-    >
+    <ng-container *ngIf="!examStarted(); else examContent">
         <div class="assessment-container">
             <div class="header-section">
                 <h1>Form Penilaian Wawancara</h1>
@@ -54,12 +52,14 @@
                         >
                             <!-- Question Header -->
                             <div class="card-header">
-                                <img
-                                    *ngIf="question.attachmentUrl"
-                                    [src]="question.attachmentUrl"
-                                    alt="Question Image"
-                                    class="img-fluid img-custom-300 mb-1 rounded object-cover"
-                                />
+                                <div class="mb-4 text-center">
+                                    <img
+                                        *ngIf="question.attachmentUrl"
+                                        [src]="question.attachmentUrl"
+                                        alt="Question Image"
+                                        class="img-fluid img-custom-300 mb-1 rounded object-cover"
+                                    />
+                                </div>
                                 <span class="question-number"
                                     >{{ question.kompetensiIndikatorName
                                     }}</span

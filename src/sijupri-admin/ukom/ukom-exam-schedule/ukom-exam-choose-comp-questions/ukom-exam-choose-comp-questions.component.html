@@ -139,6 +139,26 @@
             ></app-ukom-exam-general>
         </ng-container>
     </div>
+
+    <div class="card border-danger mt-4">
+        <div class="card-header text-danger fw-semibold">Danger Zone</div>
+
+        <div class="card-body">
+            <p class="text-muted mb-3">
+                Menghapus kehadiran peserta akan membuat seluruh peserta
+                dianggap belum pernah mengikuti ujian, termasuk peserta yang
+                sudah memiliki nilai.
+            </p>
+
+            <app-loading-button
+                (clicked)="deleteExamAttendace()"
+                [className]="'btn btn-danger'"
+                [icon]="'mdi mdi-delete-alert'"
+                [label]="'Hapus Kehadiran Peserta'"
+                [type]="'button'"
+            ></app-loading-button>
+        </div>
+    </div>
 </ng-template>
 
 <!-- Examiner List Modal -->

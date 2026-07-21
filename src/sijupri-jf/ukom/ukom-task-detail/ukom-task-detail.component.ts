@@ -37,6 +37,7 @@ import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
 import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
+import { KabKota } from '@/modules/maintenance/models/kab-kota.model'
 
 @Component({
     selector: 'app-ukom-task-detail',
@@ -85,7 +86,7 @@ export class UkomTaskDetailComponent implements OnInit {
     selectedScheduleId = signal<string>(null)
     selectedExamTypeCode = signal<string>(null)
     isScoreModalOpen = signal(false)
-    typeKabKota = signal<string>(null)
+    typeKabKota = signal<string>("")
     kabKotaService = inject(KabKotaService)
     scheduleMap = computed(() => {
         const schedules =
@@ -258,6 +259,14 @@ export class UkomTaskDetailComponent implements OnInit {
                                 participant,
                                 kabupaten,
                             })),
+                            catchError(() =>
+                                of({
+                                    participant,
+                                    kabupaten: new KabKota({
+                                        type: '',
+                                    }),
+                                }),
+                            ),
                         ),
                 ),
                 finalize(() => this.ukomDetailLoading.set(false)),

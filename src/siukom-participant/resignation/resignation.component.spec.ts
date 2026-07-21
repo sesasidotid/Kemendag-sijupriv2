@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UkomPeriodeComponent } from './ukom-periode.component';
+import { ResignationComponent } from './resignation.component';
 
-describe('UkomPeriodeComponent', () => {
-  let component: UkomPeriodeComponent;
-  let fixture: ComponentFixture<UkomPeriodeComponent>;
+describe('ResignationComponent', () => {
+  let component: ResignationComponent;
+  let fixture: ComponentFixture<ResignationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UkomPeriodeComponent]
+      imports: [ResignationComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(UkomPeriodeComponent);
+    fixture = TestBed.createComponent(ResignationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

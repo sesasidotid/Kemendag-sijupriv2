@@ -8,7 +8,14 @@ import {
     SimpleChanges,
 } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { BehaviorSubject, finalize, forkJoin, Observable } from 'rxjs'
+import {
+    BehaviorSubject,
+    catchError,
+    finalize,
+    forkJoin,
+    Observable,
+    of,
+} from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { ApiService } from '@/modules/base/services/api.service'
@@ -18,6 +25,7 @@ import { ConfirmationService } from '@/modules/base/services/confirmation.servic
 import { ExamConfigService } from '@/modules/ukom/services/exam-config.service'
 import { ExamConfigRequest } from '@/modules/ukom/models/exam-config/exam-config-request.model'
 import { ExamConfigModel } from '@/modules/ukom/models/exam-config/exam-config.model'
+import { map } from 'rxjs/operators'
 
 @Component({
     selector: 'app-ukom-exam-cat',
@@ -57,7 +65,6 @@ export class UkomExamCatComponent implements OnChanges {
             this.fetchIndikatorKompetensi(this.roomUkomDetail).subscribe({
                 next: (indicators) => {
                     this.IndikatorKompetensiUkom = indicators
-                    this.groupIndicators()
                     this.initializeQuestionCounts()
                     this.fetchAvailableQuestionsCount()
                     // Fetch existing config and pre-fill counts
@@ -76,11 +83,13 @@ export class UkomExamCatComponent implements OnChanges {
     groupIndicators() {
         this.groupedIndicators.clear()
         this.IndikatorKompetensiUkom.forEach((indicator) => {
-            const competencyName = indicator.kompetensi?.name || 'Lainnya'
-            if (!this.groupedIndicators.has(competencyName)) {
-                this.groupedIndicators.set(competencyName, [])
+            if (this.getAvailableQuestionCount(indicator.id) > 0) {
+                const competencyName = indicator.kompetensi?.name || 'Lainnya'
+                if (!this.groupedIndicators.has(competencyName)) {
+                    this.groupedIndicators.set(competencyName, [])
+                }
+                this.groupedIndicators.get(competencyName)!.push(indicator)
             }
-            this.groupedIndicators.get(competencyName)!.push(indicator)
         })
     }
 
@@ -126,23 +135,30 @@ export class UkomExamCatComponent implements OnChanges {
         const type = 'MULTI_CHOICE'
         const requests = this.IndikatorKompetensiUkom.map((indikator) => {
             const url = `/api/v1/question/droplist?association_id=${indikator.id}&module_id=${this.examDetail.examTypeCode}&type=${type}`
-            return this.apiService.getData(url)
+            return this.apiService.getData(url).pipe(
+                map((res) => res || []),
+                catchError(() => of([])),
+            )
         })
 
-        forkJoin(requests).subscribe({
-            next: (results: any[]) => {
-                results.forEach((questions, index) => {
-                    const indicatorId = this.IndikatorKompetensiUkom[index].id
-                    this.indicatorAvailableQuestions.set(
-                        indicatorId,
-                        questions.length,
-                    )
-                })
-            },
-            error: (err) => {
-                console.error('Error fetching available questions:', err)
-            },
-        })
+        forkJoin(requests)
+            .pipe()
+            .subscribe({
+                next: (results: any[]) => {
+                    results.forEach((questions, index) => {
+                        const indicatorId =
+                            this.IndikatorKompetensiUkom[index].id
+                        this.indicatorAvailableQuestions.set(
+                            indicatorId,
+                            questions.length,
+                        )
+                    })
+                    this.groupIndicators()
+                },
+                error: (err) => {
+                    console.error('Error fetching available questions:', err)
+                },
+            })
     }
 
     getTotalQuestionCount(): number {

@@ -1,6 +1,6 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import {
     ActionColumnBuilder,
     PagableBuilder,
@@ -20,6 +20,7 @@ import { Jabatan } from '@/modules/maintenance/models/jabatan.model'
 import { UkomExportVerifikasiComponent } from '../ukom-export-verifikasi/ukom-export-verifikasi.component'
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { JabatanService } from '@/modules/maintenance/services/jabatan.service'
+
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
@@ -39,6 +40,7 @@ export class UkomListComponent {
     jabatanList: Jabatan[] = []
     refresh: boolean = false
     tab$ = new BehaviorSubject<number | null>(0)
+    private activatedRoute = inject(ActivatedRoute)
 
     constructor(
         private router: Router,
@@ -51,28 +53,61 @@ export class UkomListComponent {
     ) {}
 
     ngOnInit() {
+        this.syncTabWithUrl()
         this.initTabs()
         this.getJabatanList()
         this.handlePagable()
     }
 
+    syncTabWithUrl() {
+        this.activatedRoute.queryParamMap.subscribe((params) => {
+            const tabParam = params.get('tab')
+            const tabIndex = tabParam === null ? 0 : Number(tabParam)
+
+            if (Number.isNaN(tabIndex) || tabIndex < 0 || tabIndex > 2) {
+                return
+            }
+
+            if (tabIndex === (this.tab$.value ?? 0)) {
+                return
+            }
+
+            this.handleTabChange(tabIndex)
+        })
+    }
+
+    handleTabChange(tabIndex: number) {
+        this.tab$.next(tabIndex)
+        this.tabService.changeTabActive(tabIndex)
+        this.router.navigate([], {
+            relativeTo: this.activatedRoute,
+            queryParams: { tab: tabIndex },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+        })
+    }
+
     initTabs() {
+        const activeTab = this.tab$.value ?? 0
+
         this.tabService
             .addTab({
                 label: 'Rekapitulasi Lolos Verifikasi',
                 icon: 'mdi-list-box',
-                onClick: () => this.tabService.changeTabActive(0),
-                isActive: true,
+                onClick: () => this.handleTabChange(0),
+                isActive: activeTab === 0,
             })
             .addTab({
                 label: 'Rekapitulasi Tidak Lolos Verifikasi',
                 icon: 'mdi-close',
-                onClick: () => this.tabService.changeTabActive(1),
+                onClick: () => this.handleTabChange(1),
+                isActive: activeTab === 1,
             })
             .addTab({
                 label: 'Export Rekapitulasi Verifikasi',
                 icon: 'mdi-export',
-                onClick: () => this.tabService.changeTabActive(2),
+                onClick: () => this.handleTabChange(2),
+                isActive: activeTab === 2,
             })
     }
 
@@ -119,11 +154,20 @@ export class UkomListComponent {
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((ukom: any) => {
+                        this.handleUnbanTask(ukom.nip)
+                    }, 'warning')
+                    .withIcon('unban')
+                    .build(),
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((ukom: any) => {
                         this.handleDeleteTask(ukom.nip)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
             )
+
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('nip')
@@ -137,7 +181,7 @@ export class UkomListComponent {
                     .build(),
             )
             .addFilter(
-                new PageFilterBuilder('equal')
+                new PageFilterBuilder('like')
                     .setProperty('jenisUkom')
                     .withField('Jenis UKom', 'select')
                     .withDefaultValue('')
@@ -158,10 +202,55 @@ export class UkomListComponent {
                     ])
                     .build(),
             )
+            .addFilter(
+                new PageFilterBuilder('like')
+                    .setProperty('nextJabatanCode')
+                    .withField('Jabatan Yang Dituju', 'select')
+                    .withDefaultValue('')
+                    .setOptionList([])
+                    .build(),
+            )
             .withQueryParams()
             .build()
 
         this.pagable$.next(pagable)
+    }
+
+    handleUnbanTask(nip: string) {
+        this.confirmationService
+            .open(
+                false,
+                'Unban Peserta?',
+                'Peserta ini akan diaktifkan kembali dan bisa mengikuti UKOM.',
+                undefined,
+                'Ya, Unban',
+                'Batal',
+            )
+            .subscribe({
+                next: (res) => {
+                    if (!res.confirmed) {
+                        return
+                    }
+                    this.apiService
+                        .deleteData(`/api/v1/ukom_ban/${nip}`)
+                        .subscribe({
+                            next: (res) => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Peserta berhasil di-unban',
+                                )
+                                this.refresh = !this.refresh
+                            },
+                            error: (err) => {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal unban peserta',
+                                )
+                                this.refresh = !this.refresh
+                            },
+                        })
+                },
+            })
     }
 
     handleDeleteTask(nip: string) {
@@ -198,7 +287,7 @@ export class UkomListComponent {
         const currentPagable = this.pagable$.value
 
         const existingFilterList = currentPagable.filterList.map((item) =>
-            item.key === 'eq_nextJabatanCode'
+            item.key === 'like_nextJabatanCode'
                 ? {
                       ...item,
                       optionList: this.jabatanList.map((jabatan) => ({
@@ -210,7 +299,7 @@ export class UkomListComponent {
         )
 
         const filterList = existingFilterList.some(
-            (item) => item.key === 'eq_nextJabatanCode',
+            (item) => item.key === 'like_nextJabatanCode',
         )
             ? existingFilterList
             : [
@@ -218,7 +307,7 @@ export class UkomListComponent {
                   new PageFilter({
                       label: 'Jabatan Yang Dituju',
                       fieldType: 'select',
-                      key: 'eq_nextJabatanCode',
+                      key: 'like_nextJabatanCode',
                       value: '',
                       optionList: this.jabatanList.map((jabatan) => ({
                           label: jabatan.name,

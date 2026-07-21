@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core'
+import { Component, computed, input, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { CATScore } from '@/modules/ukom/models/exam/exam-score.model'
 import { CATIndicatorCompetency } from '@/modules/ukom/models/cat/cat-indicator-competency.model'
@@ -22,6 +22,11 @@ interface CompetencyGroup {
 })
 export class CatScoreAdminComponent {
     score = input<CATScore | null>(null)
+    showAnswerDetails = signal(false)
+
+    toggleAnswerDetails(): void {
+        this.showAnswerDetails.update((value) => !value)
+    }
 
     groupedCompetencies = computed(() => {
         const score = this.score()
