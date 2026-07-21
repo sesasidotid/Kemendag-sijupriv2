@@ -10,18 +10,16 @@ import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
 import {
     CATScore,
-    MakalahScore,
 } from '@/modules/ukom/models/exam/exam-score.model'
 import { UkomGrade } from '@/modules/ukom/models/ukom-grade'
 import { UkomDocumentService } from '@/modules/ukom/services/document.service'
 import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
-import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { CommonModule } from '@angular/common'
-import { Component, computed, effect, inject, signal } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { catchError, finalize, forkJoin, of, switchMap, tap } from 'rxjs'
+import { Component, computed, inject, signal } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
+import { catchError, finalize, of, switchMap } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { KabKota } from '@/modules/maintenance/models/kab-kota.model'
 import { LandingPageComponent } from '@/modules/landing-page/landing-page.component'
@@ -87,17 +85,7 @@ export class UkomDetailComponent {
     constructor(
         private handlerService: HandlerService,
         private ukomGradeService: UkomGradeService,
-    ) {
-        effect(
-            () => {
-                const ukomDetail = this.ukomDetail()
-                if (ukomDetail) {
-                    this.getAllParticipantScore()
-                }
-            },
-            { allowSignalWrites: true },
-        )
-    }
+    ) {}
 
     ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id') ?? ''
@@ -180,7 +168,6 @@ export class UkomDetailComponent {
             .subscribe({
                 next: ({ participant, kabupaten }) => {
                     this.ukomDetail.set(participant)
-                    // console.log('participant : ', participant)
                     this.classUkomRoom = new RoomUkom(participant.roomUkomDto)
                     this.typeKabKota.set(kabupaten.type)
                 },
@@ -191,12 +178,6 @@ export class UkomDetailComponent {
                     )
                 },
             })
-    }
-
-    hasAnyScores(): boolean {
-        return Object.values(this.examScoresByScheduleId).some(
-            (score) => score != null,
-        )
     }
 
     getParticipantScore() {
@@ -216,77 +197,5 @@ export class UkomDetailComponent {
                     )
                 },
             })
-    }
-
-    getAllParticipantScore() {
-        this.allParticipantScoreLoading.set(true)
-
-        if (!this.ukomDetail()?.roomUkomDto?.examScheduleDtoList?.length) {
-            this.allParticipantScoreLoading.set(false)
-            return
-        }
-
-        const requests = this.ukomDetail().roomUkomDto.examScheduleDtoList.map(
-            (examSchedule) => {
-                return this.examGradeService
-                    .getExamGradeByExamScheduleIdAndParticipantId(
-                        examSchedule.id,
-                        this.id,
-                    )
-                    .pipe(
-                        catchError((err) => {
-                            console.error('Gagal mangambil score exam', err)
-                            return of(null)
-                        }),
-                        map((res) => {
-                            let scoreInstance: ScoreValue = null
-                            if (res) {
-                                switch (examSchedule.examTypeCode) {
-                                    case ExamTypeCategory.CAT:
-                                        scoreInstance = new CATScore(res)
-                                        break
-                                    case ExamTypeCategory.MAKALAH:
-                                        scoreInstance = new MakalahScore(res)
-                                        break
-                                    default:
-                                        scoreInstance = res
-                                }
-                            }
-                            return { examSchedule, scoreInstance }
-                        }),
-                    )
-            },
-        )
-
-        forkJoin(requests)
-            .pipe(
-                tap((results) => {
-                    results.forEach((result) => {
-                        if (result?.examSchedule?.id) {
-                            this.examScoresByScheduleId[
-                                result.examSchedule.id
-                            ] = result.scoreInstance
-                        }
-                    })
-                }),
-                finalize(() => {
-                    this.allParticipantScoreLoading.set(false)
-                }),
-            )
-            .subscribe({
-                next: () => {},
-                error: (error) => {
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal memuat data nilai ujian',
-                    )
-                },
-            })
-    }
-
-    getSelectedScore() {
-        return this.selectedScheduleId()
-            ? this.examScoresByScheduleId[this.selectedScheduleId()]
-            : null
     }
 }
