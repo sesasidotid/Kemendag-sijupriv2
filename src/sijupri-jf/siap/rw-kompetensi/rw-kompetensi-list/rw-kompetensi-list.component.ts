@@ -12,6 +12,9 @@ import { CommonModule } from '@angular/common'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { BehaviorSubject, finalize } from 'rxjs'
 import { RwKompetensiService } from '@/modules/siap/services/rw-kompetensi.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ApiService } from '@/modules/base/services/api.service'
 
 @Component({
     selector: 'app-rw-kompetensi-list',
@@ -30,7 +33,12 @@ export class RwKompetensiListComponent {
 
     loading$ = new BehaviorSubject<boolean>(true)
 
-    constructor(private rwKompetensiService: RwKompetensiService) {}
+    constructor(
+        private apiService: ApiService,
+        private rwKompetensiService: RwKompetensiService,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService,
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -64,6 +72,14 @@ export class RwKompetensiListComponent {
                     .withIcon('detail')
                     .build(),
             )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((rwPangkat: any) => {
+                        this.handleDeleteRWPangkat(rwPangkat.id)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build(),
+            )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('tglSertifikat')
@@ -71,6 +87,44 @@ export class RwKompetensiListComponent {
                     .build(),
             )
             .build()
+    }
+
+    handleDeleteRWPangkat(id: string): void {
+        this.confirmationService
+            .open(
+                false,
+                'Hapus Riwayat Kompoetensi?',
+                'Data riwayat kompetensi yang dihapus tidak dapat dikembalikan.',
+                undefined,
+                'Ya, Hapus',
+                'Batal',
+            )
+            .subscribe({
+                next: (res) => {
+                    if (!res.confirmed) {
+                        return
+                    }
+
+                    this.apiService
+                        .deleteData(`/api/v1/rw_kompetensi/${id}`)
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Berhasil menghapus riwayat kompetensi.',
+                                )
+
+                                window.location.reload()
+                            },
+                            error: () => {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal menghapus riwayat kompetensi.',
+                                )
+                            },
+                        })
+                },
+            })
     }
 
     getRWKompetensi(id: string) {

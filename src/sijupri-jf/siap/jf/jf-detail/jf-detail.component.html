@@ -77,11 +77,11 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" *ngIf="!ukomPendingTask">
                 <div class="col-12 d-flex justify-content-end mt-3">
-                    <a (click)="toggleEdit()" class="btn btn-primary"
-                        >Ajukan Perubahan</a
-                    >
+                    <a (click)="toggleEdit()" class="btn btn-primary">
+                        Ajukan Perubahan
+                    </a>
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
 import { CommonModule } from '@angular/common'
@@ -15,13 +15,20 @@ import { AlertService } from '../../../../modules/base/services/alert.service'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { BehaviorSubject } from 'rxjs'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
 
 @Component({
     selector: 'app-rw-jabatan-list',
     standalone: true,
-    imports: [PagableComponent, CommonModule, FormsModule, FileHandlerComponent],
+    imports: [
+        PagableComponent,
+        CommonModule,
+        FormsModule,
+        FileHandlerComponent,
+    ],
     templateUrl: './rw-jabatan-list.component.html',
-    styleUrl: './rw-jabatan-list.component.scss'
+    styleUrl: './rw-jabatan-list.component.scss',
 })
 export class RwJabatanListComponent {
     @Input() nip?: string = ''
@@ -35,8 +42,10 @@ export class RwJabatanListComponent {
 
     constructor(
         private apiService: ApiService,
-        private alertService: AlertService
-    ) { }
+        private alertService: AlertService,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService,
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -50,13 +59,13 @@ export class RwJabatanListComponent {
 
         this.pagable = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jabatan', 'jabatan|name').build()
+                new PrimaryColumnBuilder('Jabatan', 'jabatan|name').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenjang', 'jenjang|name').build()
+                new PrimaryColumnBuilder('Jenjang', 'jenjang|name').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Terhitung Mulai', 'tmt').build()
+                new PrimaryColumnBuilder('Terhitung Mulai', 'tmt').build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -65,35 +74,84 @@ export class RwJabatanListComponent {
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((rwPangkat: any) => {
+                        this.handleDeleteRWJabatan(rwPangkat.id)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('jabatan|name')
                     .withField('Jabatan', 'text')
-                    .build()
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('jenjang|name')
                     .withField('Jenjang', 'text')
-                    .build()
+                    .build(),
             )
             .build()
+    }
+
+    handleDeleteRWJabatan(id: string): void {
+        this.confirmationService
+            .open(
+                false,
+                'Hapus Riwayat Jabatan?',
+                'Data riwayat jabatan yang dihapus tidak dapat dikembalikan.',
+                undefined,
+                'Ya, Hapus',
+                'Batal',
+            )
+            .subscribe({
+                next: (res) => {
+                    if (!res.confirmed) {
+                        return
+                    }
+
+                    this.apiService
+                        .deleteData(`/api/v1/rw_jabatan/${id}`)
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Berhasil menghapus riwayat jabatan.',
+                                )
+
+                                window.location.reload()
+                            },
+                            error: () => {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal menghapus riwayat jabatan.',
+                                )
+                            },
+                        })
+                },
+            })
     }
 
     getRWJabatan(id: string) {
         this.loading$.next(true)
         this.apiService.getData(`/api/v1/rw_jabatan/${id}`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.rwJabatan = new RWJabatan(response)
                 this.loading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data riwayat')
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data riwayat',
+                )
                 this.loading$.next(false)
-            }
+            },
         })
     }
 

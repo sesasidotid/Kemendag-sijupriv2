@@ -15,6 +15,8 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { BehaviorSubject } from 'rxjs'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 
 @Component({
     selector: 'app-rw-sertifikasi-list',
@@ -36,7 +38,9 @@ export class RwSertifikasiListComponent {
     constructor(
         private apiService: ApiService,
         private alertService: AlertService,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService,
     ) { }
 
     ngOnInit() {
@@ -73,6 +77,14 @@ export class RwSertifikasiListComponent {
                     .withIcon('detail')
                     .build()
             )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((rwPangkat: any) => {
+                        this.handleDeleteRWSertifikasi(rwPangkat.id)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build(),
+            )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('noSk')
@@ -92,6 +104,44 @@ export class RwSertifikasiListComponent {
                     .build()
             )
             .build()
+    }
+
+    handleDeleteRWSertifikasi(id: string): void {
+        this.confirmationService
+            .open(
+                false,
+                'Hapus Riwayat Sertifikasi?',
+                'Data riwayat sertifikasi yang dihapus tidak dapat dikembalikan.',
+                undefined,
+                'Ya, Hapus',
+                'Batal',
+            )
+            .subscribe({
+                next: (res) => {
+                    if (!res.confirmed) {
+                        return
+                    }
+
+                    this.apiService
+                        .deleteData(`/api/v1/rw_sertifikasi/${id}`)
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Berhasil menghapus riwayat sertifikasi.',
+                                )
+
+                                window.location.reload()
+                            },
+                            error: () => {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal menghapus riwayat sertifikasi.',
+                                )
+                            },
+                        })
+                },
+            })
     }
 
     getRWSertifikasi(id: string) {

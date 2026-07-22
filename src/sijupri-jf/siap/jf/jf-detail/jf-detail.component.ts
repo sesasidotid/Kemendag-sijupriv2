@@ -19,6 +19,8 @@ import { JenisKelamin } from '../../../../modules/maintenance/models/jenis-kelam
 import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
 import { BehaviorSubject } from 'rxjs'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
+import { UkomTaskDetail } from '@/modules/ukom/models/ukom-task-detail.modal'
+import { UkomTaskService } from '@/modules/ukom/services/ukom-task.service'
 
 @Component({
     selector: 'app-jf-detail',
@@ -36,6 +38,7 @@ export class JfDetailComponent implements OnInit {
     nip = LoginContext.getUserId()
 
     jf = new JF()
+    ukomPendingTask = new UkomTaskDetail()
     jenisKelaminList: JenisKelamin[] = []
     isEditOpen: boolean = false
     loading$ = new BehaviorSubject<boolean>(true)
@@ -49,10 +52,12 @@ export class JfDetailComponent implements OnInit {
         private confirmationService: ConfirmationService,
         private router: Router,
         private formValidationService: FormValidationService,
+        public ukomTaskService: UkomTaskService,
     ) {}
 
     ngOnInit() {
         this.getJf()
+        this.getUkomPendingTask()
         this.handleFormInit()
     }
 
@@ -62,6 +67,22 @@ export class JfDetailComponent implements OnInit {
             controlName,
             label,
         )
+    }
+
+    getUkomPendingTask(): void {
+        this.ukomTaskService.findByNip(this.nip).subscribe({
+            next: (response) => {
+                this.ukomPendingTask = response
+            },
+            error: (err) => {
+                if (err.status === 404) {
+                    this.ukomPendingTask = null
+                    return
+                }
+
+                console.error('Gagal mengambil pending task', err)
+            },
+        })
     }
 
     handleFormInit() {

@@ -5,7 +5,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { RWPendidikan } from '../../../../modules/siap/models/rw-perndidikan.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
@@ -14,13 +14,15 @@ import { CommonModule } from '@angular/common'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { BehaviorSubject } from 'rxjs'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
 
 @Component({
     selector: 'app-rw-pendidikan-list',
     standalone: true,
     imports: [PagableComponent, CommonModule, FileHandlerComponent],
     templateUrl: './rw-pendidikan-list.component.html',
-    styleUrl: './rw-pendidikan-list.component.scss'
+    styleUrl: './rw-pendidikan-list.component.scss',
 })
 export class RwPendidikanListComponent {
     @Input() nip?: string = ''
@@ -34,8 +36,10 @@ export class RwPendidikanListComponent {
 
     constructor(
         private apiService: ApiService,
-        private alertService: AlertService
-    ) { }
+        private alertService: AlertService,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService,
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -49,7 +53,10 @@ export class RwPendidikanListComponent {
 
         this.pagable = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Pendidikan', 'pendidikan|name').build()
+                new PrimaryColumnBuilder(
+                    'Pendidikan',
+                    'pendidikan|name',
+                ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
@@ -58,29 +65,78 @@ export class RwPendidikanListComponent {
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
-                    .build()
+                    .build(),
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((rwPendidikan: any) => {
+                        this.handleDeleteRWPendidikan(rwPendidikan.id)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('pendidikan|name')
                     .withField('Pendidikan', 'text')
-                    .build()
+                    .build(),
             )
             .build()
+    }
+
+    handleDeleteRWPendidikan(id: string): void {
+        this.confirmationService
+            .open(
+                false,
+                'Hapus Riwayat Pendidikan?',
+                'Data riwayat pendidikan yang dihapus tidak dapat dikembalikan.',
+                undefined,
+                'Ya, Hapus',
+                'Batal',
+            )
+            .subscribe({
+                next: (res) => {
+                    if (!res.confirmed) {
+                        return
+                    }
+
+                    this.apiService
+                        .deleteData(`/api/v1/rw_pendidikan/${id}`)
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Berhasil menghapus riwayat pendidikan.',
+                                )
+
+                                // window.location.reload()
+                            },
+                            error: () => {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal menghapus riwayat pendidikan.',
+                                )
+                            },
+                        })
+                },
+            })
     }
 
     getRWPendidikan(id: string) {
         this.loading$.next(true)
         this.apiService.getData(`/api/v1/rw_pendidikan/${id}`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.rwPendidikan = new RWPendidikan(response)
                 this.loading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data riwayat')
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data riwayat',
+                )
                 this.loading$.next(false)
-            }
+            },
         })
     }
 
