@@ -16,6 +16,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { BehaviorSubject } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 @Component({
     selector: 'app-rw-pangkat-list',
@@ -27,6 +28,7 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 export class RwPangkatListComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_pangkat/search'
+    isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
 
     pagable: Pagable
     isDetailOpen: boolean = false
@@ -51,7 +53,7 @@ export class RwPangkatListComponent {
                 ? '/api/v1/rw_pangkat/search'
                 : `/api/v1/rw_pangkat/search?eq_nip=${this.nip}`
 
-        this.pagable = new PagableBuilder(this.apiUrl)
+        const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Pangkat', 'pangkat|name').build(),
             )
@@ -67,7 +69,9 @@ export class RwPangkatListComponent {
                     .withIcon('detail')
                     .build(),
             )
-            .addActionColumn(
+
+        if (this.isAdmin) {
+            pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((rwPangkat: any) => {
                         this.handleDeleteRWPangkat(rwPangkat.id)
@@ -75,6 +79,9 @@ export class RwPangkatListComponent {
                     .withIcon('danger')
                     .build(),
             )
+        }
+
+        this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('pangkat|name')
@@ -83,7 +90,7 @@ export class RwPangkatListComponent {
             )
             .build()
     }
-
+    
     handleDeleteRWPangkat(id: string): void {
         this.confirmationService
             .open(

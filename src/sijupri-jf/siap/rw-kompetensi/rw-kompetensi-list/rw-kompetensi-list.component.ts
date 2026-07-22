@@ -15,6 +15,7 @@ import { RwKompetensiService } from '@/modules/siap/services/rw-kompetensi.servi
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { ApiService } from '@/modules/base/services/api.service'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 @Component({
     selector: 'app-rw-kompetensi-list',
@@ -26,6 +27,7 @@ import { ApiService } from '@/modules/base/services/api.service'
 export class RwKompetensiListComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_kompetensi/search'
+    isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
 
     pagable: Pagable
     isDetailOpen: boolean = false
@@ -50,7 +52,7 @@ export class RwKompetensiListComponent {
                 ? '/api/v1/rw_kompetensi/search'
                 : `/api/v1/rw_kompetensi/search?eq_nip=${this.nip}`
 
-        this.pagable = new PagableBuilder(this.apiUrl)
+        const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tgl Mulai', 'tglSertifikat').build(),
             )
@@ -72,14 +74,19 @@ export class RwKompetensiListComponent {
                     .withIcon('detail')
                     .build(),
             )
-            .addActionColumn(
+
+        if (this.isAdmin) {
+            pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwPangkat: any) => {
-                        this.handleDeleteRWPangkat(rwPangkat.id)
+                    .setAction((rwKompetensi: any) => {
+                        this.handleDeleteRWKompetensi(rwKompetensi.id)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
             )
+        }
+
+        this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('tglSertifikat')
@@ -89,7 +96,7 @@ export class RwKompetensiListComponent {
             .build()
     }
 
-    handleDeleteRWPangkat(id: string): void {
+    handleDeleteRWKompetensi(id: string): void {
         this.confirmationService
             .open(
                 false,

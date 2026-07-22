@@ -16,6 +16,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { BehaviorSubject } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 @Component({
     selector: 'app-rw-pendidikan-list',
@@ -27,6 +28,7 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 export class RwPendidikanListComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_pendidikan/search'
+    isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
 
     pagable: Pagable
     isDetailOpen: boolean = false
@@ -51,7 +53,7 @@ export class RwPendidikanListComponent {
                 ? '/api/v1/rw_pendidikan/search'
                 : `/api/v1/rw_pendidikan/search?eq_nip=${this.nip}`
 
-        this.pagable = new PagableBuilder(this.apiUrl)
+        const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder(
                     'Pendidikan',
@@ -67,7 +69,9 @@ export class RwPendidikanListComponent {
                     .withIcon('detail')
                     .build(),
             )
-            .addActionColumn(
+
+        if (this.isAdmin) {
+            pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((rwPendidikan: any) => {
                         this.handleDeleteRWPendidikan(rwPendidikan.id)
@@ -75,6 +79,9 @@ export class RwPendidikanListComponent {
                     .withIcon('danger')
                     .build(),
             )
+        }
+
+        this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('pendidikan|name')

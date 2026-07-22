@@ -28,8 +28,7 @@ import { LoginContext } from '@/modules/base/commons/login-context'
 export class RwKinerjaListComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_kinerja/search'
-
-    roles: string[] = LoginContext.getRoleCodes()
+    isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
     pagable: Pagable
     isDetailOpen: boolean = false
     rwKinerja: RWKinerja = new RWKinerja()
@@ -53,7 +52,7 @@ export class RwKinerjaListComponent {
                 ? '/api/v1/rw_kinerja/search'
                 : `/api/v1/rw_kinerja/search?eq_nip=${this.nip}`
 
-        this.pagable = new PagableBuilder(this.apiUrl)
+        const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build(),
             )
@@ -69,7 +68,6 @@ export class RwKinerjaListComponent {
                     'angkaKredit',
                 ).build(),
             )
-
             .addActionColumn(
                 new ActionColumnBuilder()
                     .setAction((rwKinerja: any) => {
@@ -79,14 +77,19 @@ export class RwKinerjaListComponent {
                     .withIcon('detail')
                     .build(),
             )
-            .addActionColumn(
+
+        if (this.isAdmin) {
+            pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwPangkat: any) => {
-                        this.handleDeleteRWKinerja(rwPangkat.id)
+                    .setAction((rwKinerja: any) => {
+                        this.handleDeleteRWKinerja(rwKinerja.id)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
             )
+        }
+
+        this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('type')

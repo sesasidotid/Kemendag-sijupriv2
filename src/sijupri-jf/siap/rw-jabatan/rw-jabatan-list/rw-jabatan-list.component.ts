@@ -17,6 +17,7 @@ import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-
 import { BehaviorSubject } from 'rxjs'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 @Component({
     selector: 'app-rw-jabatan-list',
@@ -33,6 +34,7 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 export class RwJabatanListComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_jabatan/search'
+    isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
 
     pagable: Pagable
     isDetailOpen: boolean = false
@@ -57,7 +59,7 @@ export class RwJabatanListComponent {
                 ? '/api/v1/rw_jabatan/search'
                 : `/api/v1/rw_jabatan/search?eq_nip=${this.nip}`
 
-        this.pagable = new PagableBuilder(this.apiUrl)
+        const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Jabatan', 'jabatan|name').build(),
             )
@@ -76,14 +78,19 @@ export class RwJabatanListComponent {
                     .withIcon('detail')
                     .build(),
             )
-            .addActionColumn(
+
+        if (this.isAdmin) {
+            pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwPangkat: any) => {
-                        this.handleDeleteRWJabatan(rwPangkat.id)
+                    .setAction((rwJabatan: any) => {
+                        this.handleDeleteRWJabatan(rwJabatan.id)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
             )
+        }
+
+        this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('jabatan|name')
