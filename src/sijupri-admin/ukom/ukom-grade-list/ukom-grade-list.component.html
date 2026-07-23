@@ -2,27 +2,31 @@
     <div
         class="d-flex flex-column flex-md-row justify-content-end align-items-end mb-3 gap-2"
     >
-        <app-loading-button
-            (clicked)="finishExaminerAssessment()"
-            [className]="'btn btn-primary'"
-            [icon]="'mdi mdi-check-decagram'"
-            [isLoading]="isFinishExaminerAssessmentLoading()"
-            [label]="'1. Finalisasi Penilaian Penguji'"
-        ></app-loading-button>
+        <div *ngIf="isSuperAdmin">
+            <app-loading-button
+                (clicked)="finishExaminerAssessment()"
+                [className]="'btn btn-primary'"
+                [icon]="'mdi mdi-check-decagram'"
+                [isLoading]="isFinishExaminerAssessmentLoading()"
+                [label]="'1. Finalisasi Penilaian Penguji'"
+            ></app-loading-button>
+        </div>
 
-        <app-loading-button
-            (clicked)="sendGradeToParticipants()"
-            [className]="'btn btn-primary'"
-            [icon]="'mdi mdi-send-check-outline'"
-            [isLoading]="isSendGradeToParticipantsLoading()"
-            [label]="'2. Kirim Nilai ke Peserta'"
-        ></app-loading-button>
+        <div *ngIf="isSuperAdmin">
+            <app-loading-button
+                (clicked)="sendGradeToParticipants()"
+                [className]="'btn btn-primary'"
+                [icon]="'mdi mdi-send-check-outline'"
+                [isLoading]="isSendGradeToParticipantsLoading()"
+                [label]="'2. Kirim Nilai ke Peserta'"
+            ></app-loading-button>
+        </div>
 
         <app-loading-button
             (clicked)="handleOpenBatchUploadModal()"
             [className]="'btn btn-primary'"
             [icon]="'mdi mdi-upload'"
-            [label]="'3. Upload Batch Surat Rekomendasi'"
+            [label]="(isSuperAdmin ? '3. ' : '') + 'Upload Batch Surat Rekomendasi'"
         ></app-loading-button>
     </div>
 

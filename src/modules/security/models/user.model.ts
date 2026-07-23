@@ -1,4 +1,5 @@
 import { Serializable } from "../../base/commons/serializable";
+import { Role } from "./role.model";
 
 export class User extends Serializable {
     id: string = undefined;
@@ -11,6 +12,7 @@ export class User extends Serializable {
     roleCodeList: string[] = undefined;
     applicationCode: string = undefined;
     channelCodeList: string[] = undefined;
+    userRoleList: Role[] = undefined;
 
     constructor(object?: { [key: string]: any }) {
         super();
