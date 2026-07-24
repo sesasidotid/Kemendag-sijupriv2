@@ -5,7 +5,7 @@ import { Injectable, isDevMode } from '@angular/core'
 })
 export class DebuggerTrapService {
     constructor() {
-        if (!isDevMode()) {
+        if (false) {
             this.initDebuggerTrap()
         }
     }
