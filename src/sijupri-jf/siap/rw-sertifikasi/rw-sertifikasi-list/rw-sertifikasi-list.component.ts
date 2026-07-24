@@ -77,14 +77,6 @@ export class RwSertifikasiListComponent {
                     .withIcon('detail')
                     .build()
             )
-            .addActionColumn(
-                new ActionColumnBuilder()
-                    .setAction((rwPangkat: any) => {
-                        this.handleDeleteRWSertifikasi(rwPangkat.id)
-                    }, 'danger')
-                    .withIcon('danger')
-                    .build(),
-            )
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('noSk')
@@ -104,44 +96,6 @@ export class RwSertifikasiListComponent {
                     .build()
             )
             .build()
-    }
-
-    handleDeleteRWSertifikasi(id: string): void {
-        this.confirmationService
-            .open(
-                false,
-                'Hapus Riwayat Sertifikasi?',
-                'Data riwayat sertifikasi yang dihapus tidak dapat dikembalikan.',
-                undefined,
-                'Ya, Hapus',
-                'Batal',
-            )
-            .subscribe({
-                next: (res) => {
-                    if (!res.confirmed) {
-                        return
-                    }
-
-                    this.apiService
-                        .deleteData(`/api/v1/rw_sertifikasi/${id}`)
-                        .subscribe({
-                            next: () => {
-                                this.handlerService.handleAlert(
-                                    'Success',
-                                    'Berhasil menghapus riwayat sertifikasi.',
-                                )
-
-                                window.location.reload()
-                            },
-                            error: () => {
-                                this.handlerService.handleAlert(
-                                    'Error',
-                                    'Gagal menghapus riwayat sertifikasi.',
-                                )
-                            },
-                        })
-                },
-            })
     }
 
     getRWSertifikasi(id: string) {

@@ -13,13 +13,15 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { ApiService } from '../../../modules/base/services/api.service'
 import { FilePreviewService } from '../../../modules/base/services/file-preview.service'
 import { RwUkomListComponent } from '@/sijupri-admin/siap/jf-detail/rw-ukom-list/rw-ukom-list.component'
+import { AdminRwPendidikanComponent } from './admin-rw-pendidikan/admin-rw-pendidikan.component'
+import { AdminRwPangkatComponent } from './admin-rw-pangkat/admin-rw-pangkat.component'
 
 @Component({
     selector: 'app-jf-detail',
     standalone: true,
     imports: [
-        RwPendidikanListComponent,
-        RwPangkatListComponent,
+        AdminRwPendidikanComponent,
+        AdminRwPangkatComponent,
         RwJabatanListComponent,
         RwKinerjaListComponent,
         RwKompetensiListComponent,

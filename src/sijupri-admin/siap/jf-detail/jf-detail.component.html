@@ -204,11 +204,13 @@
                 <div class="card-body">
                     <div class="tab-content">
                         @if(activeTab === 'pendidikan') {
-                        <app-rw-pendidikan-list
+                        <app-admin-rw-pendidikan
                             [nip]="nip"
-                        ></app-rw-pendidikan-list>
+                        ></app-admin-rw-pendidikan>
                         } @if (activeTab === 'pangkat') {
-                        <app-rw-pangkat-list [nip]="nip"></app-rw-pangkat-list>
+                        <app-admin-rw-pangkat
+                            [nip]="nip"
+                        ></app-admin-rw-pangkat>
                         } @if (activeTab === 'jabatan') {
                         <app-rw-jabatan-list [nip]="nip"></app-rw-jabatan-list>
                         } @if (activeTab === 'kinerja') {
