@@ -2,8 +2,6 @@ import { LoginContext } from '@/modules/base/commons/login-context'
 import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import { AlertService } from '@/modules/base/services/alert.service'
 import { ApiService } from '@/modules/base/services/api.service'
-import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { HandlerService } from '@/modules/base/services/handler.service'
 import { RWPendidikan } from '@/modules/siap/models/rw-perndidikan.model'
 import { Component, Input } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
@@ -18,6 +16,7 @@ import { CommonModule } from '@angular/common'
 import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { PendingTask } from '@/modules/workflow/models/pending-task.model'
 import { Pendidikan } from '@/modules/maintenance/models/pendidikan.model'
+import { ObjectTask } from '@/modules/workflow/models/object-task.model'
 
 @Component({
     selector: 'app-admin-rw-pendidikan-pending',
@@ -30,20 +29,18 @@ export class AdminRwPendidikanPendingComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_pendidikan/search'
     pendidikanList: Pendidikan[]
-    pendingTask: PendingTask
+    pendingTask: ObjectTask
     pagable: Pagable
     isDetailOpen: boolean = false
     rwPendidikan: RWPendidikan = new RWPendidikan()
 
     loading$ = new BehaviorSubject<boolean>(true)
     pendidikanListLoading$ = new BehaviorSubject<boolean>(false)
-    rwPendidikanLoading$ = new BehaviorSubject<boolean>(false)
+    rwPendingPendidikanLoading$ = new BehaviorSubject<boolean>(false)
 
     constructor(
         private apiService: ApiService,
         private alertService: AlertService,
-        private confirmationService: ConfirmationService,
-        private handlerService: HandlerService,
     ) {}
 
     ngOnInit() {
@@ -51,19 +48,19 @@ export class AdminRwPendidikanPendingComponent {
     }
 
     handlePagable() {
-        this.apiUrl = `/api/v1/rw_pendidikan/task/search?eq_nip=${this.nip}`
+        this.apiUrl = `/api/v1/rw_pendidikan/task/search/${this.nip}`
 
         const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder(
                     'Pendidikan',
-                    'pendidikan|name',
+                    'objectName',
                 ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwPendidikan: any) => {
-                        this.getPendingRWPendidikan(rwPendidikan.id)
+                    .setAction((rwPendingPendidikan: any) => {
+                        this.getPendingRWPendidikan(rwPendingPendidikan.objectTaskId)
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
@@ -73,7 +70,7 @@ export class AdminRwPendidikanPendingComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('pendidikan|name')
+                    .setProperty('objectName')
                     .withField('Pendidikan', 'text')
                     .build(),
             )
@@ -102,21 +99,21 @@ export class AdminRwPendidikanPendingComponent {
     }
 
     getPendingRWPendidikan(id: string) {
-        this.rwPendidikanLoading$.next(true)
-        this.apiService.getData(`/api/v1/pending_task/${id}`).subscribe({
+        this.rwPendingPendidikanLoading$.next(true)
+        this.apiService.getData(`/api/v1/object_task/${id}`).subscribe({
             next: (response) => {
-                const pendingTask = new PendingTask(response)
+                const pendingTask = new ObjectTask(response)
                 this.rwPendidikan = new RWPendidikan(
-                    pendingTask.objectTask.object,
+                    pendingTask.object,
                 )
 
-                this.rwPendidikanLoading$.next(false)
+                this.rwPendingPendidikanLoading$.next(false)
             },
             error: (error) => {
-                this.rwPendidikanLoading$.next(false)
+                this.rwPendingPendidikanLoading$.next(false)
                 this.alertService.showToast(
                     'Error',
-                    'Gagal mendapatkan data pendidikan!',
+                    'Gagal mendapatkan data pending riwayat pendidikan!',
                 )
             },
         })

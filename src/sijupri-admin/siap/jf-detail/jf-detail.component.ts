@@ -15,6 +15,9 @@ import { FilePreviewService } from '../../../modules/base/services/file-preview.
 import { RwUkomListComponent } from '@/sijupri-admin/siap/jf-detail/rw-ukom-list/rw-ukom-list.component'
 import { AdminRwPendidikanComponent } from './admin-rw-pendidikan/admin-rw-pendidikan.component'
 import { AdminRwPangkatComponent } from './admin-rw-pangkat/admin-rw-pangkat.component'
+import { AdminRwJabatanComponent } from './admin-rw-jabatan/admin-rw-jabatan.component'
+import { AdminRwKinerjaComponent } from './admin-rw-kinerja/admin-rw-kinerja.component'
+import { AdminRwKompetensiComponent } from './admin-rw-kompetensi/admin-rw-kompetensi.component'
 
 @Component({
     selector: 'app-jf-detail',
@@ -22,9 +25,9 @@ import { AdminRwPangkatComponent } from './admin-rw-pangkat/admin-rw-pangkat.com
     imports: [
         AdminRwPendidikanComponent,
         AdminRwPangkatComponent,
-        RwJabatanListComponent,
-        RwKinerjaListComponent,
-        RwKompetensiListComponent,
+        AdminRwJabatanComponent,
+        AdminRwKinerjaComponent,
+        AdminRwKompetensiComponent,
         RwSertifikasiListComponent,
         RwUkomListComponent,
         CommonModule,

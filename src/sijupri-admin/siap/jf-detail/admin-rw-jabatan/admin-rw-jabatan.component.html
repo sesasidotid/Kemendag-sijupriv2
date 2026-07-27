@@ -26,14 +26,14 @@
 
 <div class="tab-content">
     <ng-container *ngIf="activeSubTab === 'sekarang'">
-        <app-admin-rw-pangkat-list
+        <app-admin-rw-jabatan-list
             [nip]="nip"
-        ></app-admin-rw-pangkat-list>
+        ></app-admin-rw-jabatan-list>
     </ng-container>
 
     <ng-container *ngIf="activeSubTab === 'pending'">
-        <app-admin-rw-pangkat-pending
+        <app-admin-rw-jabatan-pending
             [nip]="nip"
-        ></app-admin-rw-pangkat-pending>
+        ></app-admin-rw-jabatan-pending>
     </ng-container>
 </div>

@@ -1,11 +1,16 @@
 import { CommonModule } from '@angular/common'
 import { Component, Input } from '@angular/core'
 import { AdminRwPangkatListComponent } from './admin-rw-pangkat-list/admin-rw-pangkat-list.component'
+import { AdminRwPangkatPendingComponent } from './admin-rw-pangkat-pending/admin-rw-pangkat-pending.component'
 
 @Component({
     selector: 'app-admin-rw-pangkat',
     standalone: true,
-    imports: [CommonModule, AdminRwPangkatListComponent],
+    imports: [
+        CommonModule,
+        AdminRwPangkatListComponent,
+        AdminRwPangkatPendingComponent,
+    ],
     templateUrl: './admin-rw-pangkat.component.html',
     styleUrl: './admin-rw-pangkat.component.scss',
 })

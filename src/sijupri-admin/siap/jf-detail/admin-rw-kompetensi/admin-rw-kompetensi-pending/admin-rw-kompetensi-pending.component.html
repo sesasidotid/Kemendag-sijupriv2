@@ -5,24 +5,39 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    
+
     <ng-template #hadItem>
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="firstnameInput" class="form-label">
-                    Terhitung Mulai Tanggal
+                    Kompetensi
                 </label>
-                <p class="border-bottom pb-2">{{rwPangkat.tmt}}</p>
+                <p class="border-bottom pb-2">{{rwKompetensi.name}}</p>
             </div>
             <div class="col-md-6 mb-3">
                 <label for="firstnameInput" class="form-label
-                    ">Pangkat</label>
-                <p class="border-bottom pb-2">{{rwPangkat.pangkatName}}</p>
+                    ">Tanggal Mulai</label>
+                <p class="border-bottom pb-2">{{rwKompetensi.dateStart}}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label
+                    ">Tanggal Selesai</label>
+                <p class="border-bottom pb-2">{{rwKompetensi.dateEnd}}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label
+                    ">tanggal Sertifikat</label>
+                <p class="border-bottom pb-2">{{rwKompetensi.tglSertifikat}}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label
+                    ">Kategori Pengembangan</label>
+                <p class="border-bottom pb-2">{{rwKompetensi.kategoriPengembanganName}}</p>
             </div>
             <div class="col-md-6 mb-3">
                 <app-file-handler [inputs]="{
                     files: {
-                      docEvaluas: { label: 'Preview SK Pangkat', source: this.rwPangkat.skPangkatUrl, fileName: this.rwPangkat.skPangkat},
+                      sertifikat: { label: 'Preview Sertifikat', source: this.rwKompetensi.sertifikatUrl },
                     },
                     viewOnly: true
                   }"></app-file-handler>

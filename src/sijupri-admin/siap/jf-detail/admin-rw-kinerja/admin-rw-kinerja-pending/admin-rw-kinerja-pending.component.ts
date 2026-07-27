@@ -1,8 +1,11 @@
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { AlertService } from '@/modules/base/services/alert.service'
 import { ApiService } from '@/modules/base/services/api.service'
-import { RWPangkat } from '@/modules/siap/models/rw-pangkat.model'
+import { RWKinerja } from '@/modules/siap/models/rw-kinerja.model'
+import { CommonModule } from '@angular/common'
 import { Component, Input } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import {
@@ -11,27 +14,23 @@ import {
     PageFilterBuilder,
     PrimaryColumnBuilder,
 } from '../../../../../modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
-import { CommonModule } from '@angular/common'
-import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { ObjectTask } from '@/modules/workflow/models/object-task.model'
 
 @Component({
-    selector: 'app-admin-rw-pangkat-pending',
+    selector: 'app-admin-rw-kinerja-pending',
     standalone: true,
     imports: [PagableComponent, CommonModule, FileHandlerComponent],
-    templateUrl: './admin-rw-pangkat-pending.component.html',
-    styleUrl: './admin-rw-pangkat-pending.component.scss',
+    templateUrl: './admin-rw-kinerja-pending.component.html',
+    styleUrl: './admin-rw-kinerja-pending.component.scss',
 })
-export class AdminRwPangkatPendingComponent {
+export class AdminRwKinerjaPendingComponent {
     @Input() nip?: string = ''
-    apiUrl: string = '/api/v1/rw_pangkat/search'
+    apiUrl: string = '/api/v1/rw_kinerja/search'
     isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
-    pendingTask: ObjectTask
-
     pagable: Pagable
     isDetailOpen: boolean = false
-    rwPangkat: RWPangkat = new RWPangkat()
+    rwKinerja: RWKinerja = new RWKinerja()
+    pendingTask: ObjectTask
 
     loading$ = new BehaviorSubject<boolean>(true)
 
@@ -45,22 +44,37 @@ export class AdminRwPangkatPendingComponent {
     }
 
     handlePagable() {
-        this.apiUrl = `/api/v1/rw_pangkat/task/search/${this.nip}`
+        this.apiUrl = `/api/v1/rw_kinerja/task/search/${this.nip}`
 
         const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Pangkat', 'objectName').build(),
+                new PrimaryColumnBuilder(
+                    'Tahunan/Bulanan',
+                    'objectTask|object|type',
+                ).build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder(
-                    'Terhitung Mulai',
-                    'objectTask|object|tmt',
+                    'Tgl Mulai',
+                    'objectTask|object|dateStart',
+                ).build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder(
+                    'Tgl Selesai',
+                    'objectTask|object|dateEnd',
+                ).build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder(
+                    'Akumulasi Angka Kredit',
+                    'objectTask|object|angkaKredit',
                 ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwPendingPangkat: any) => {
-                        this.getPendingRWPangkat(rwPendingPangkat.objectTaskId)
+                    .setAction((rwPendingKinerja: any) => {
+                        this.getPendingRWKinerja(rwPendingKinerja.objectTaskId)
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
@@ -70,19 +84,31 @@ export class AdminRwPangkatPendingComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('pangkat|name')
-                    .withField('Pangkat', 'text')
+                    .setProperty('type')
+                    .withField('Tahunan/Bulanan', 'text')
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('dateStart')
+                    .withField('Tgl Mulai', 'text')
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('dateEnd')
+                    .withField('Tgl Selesai', 'text')
                     .build(),
             )
             .build()
     }
 
-    getPendingRWPangkat(id: string) {
+    getPendingRWKinerja(id: string) {
         this.loading$.next(true)
         this.apiService.getData(`/api/v1/object_task/${id}`).subscribe({
             next: (response) => {
                 const pendingTask = new ObjectTask(response)
-                this.rwPangkat = new RWPangkat(pendingTask.object)
+                this.rwKinerja = new RWKinerja(pendingTask.object)
 
                 this.loading$.next(false)
             },
@@ -90,7 +116,7 @@ export class AdminRwPangkatPendingComponent {
                 this.loading$.next(false)
                 this.alertService.showToast(
                     'Error',
-                    'Gagal mendapatkan data pending riwayat pangkat!',
+                    'Gagal mendapatkan data pending riwayat kinerja!',
                 )
             },
         })
@@ -98,6 +124,6 @@ export class AdminRwPangkatPendingComponent {
 
     back() {
         this.isDetailOpen = false
-        this.rwPangkat = new RWPangkat()
+        this.rwKinerja = new RWKinerja()
     }
 }

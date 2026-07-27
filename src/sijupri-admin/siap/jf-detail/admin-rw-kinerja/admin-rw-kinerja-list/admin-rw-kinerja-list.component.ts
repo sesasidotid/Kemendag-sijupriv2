@@ -1,10 +1,13 @@
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { AlertService } from '@/modules/base/services/alert.service'
 import { ApiService } from '@/modules/base/services/api.service'
 import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { RWPendidikan } from '@/modules/siap/models/rw-perndidikan.model'
+import { RWKinerja } from '@/modules/siap/models/rw-kinerja.model'
+import { CommonModule } from '@angular/common'
 import { Component, Input } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import {
@@ -13,25 +16,21 @@ import {
     PageFilterBuilder,
     PrimaryColumnBuilder,
 } from '../../../../../modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
-import { CommonModule } from '@angular/common'
-import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 
 @Component({
-    selector: 'app-admin-rw-pendidikan-list',
+    selector: 'app-admin-rw-kinerja-list',
     standalone: true,
     imports: [PagableComponent, CommonModule, FileHandlerComponent],
-    templateUrl: './admin-rw-pendidikan-list.component.html',
-    styleUrl: './admin-rw-pendidikan-list.component.scss',
+    templateUrl: './admin-rw-kinerja-list.component.html',
+    styleUrl: './admin-rw-kinerja-list.component.scss',
 })
-export class AdminRwPendidikanListComponent {
+export class AdminRwKinerjaListComponent {
     @Input() nip?: string = ''
-    apiUrl: string = '/api/v1/rw_pendidikan/search'
+    apiUrl: string = '/api/v1/rw_kinerja/search'
     isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
-
     pagable: Pagable
     isDetailOpen: boolean = false
-    rwPendidikan: RWPendidikan = new RWPendidikan()
+    rwKinerja: RWKinerja = new RWKinerja()
 
     loading$ = new BehaviorSubject<boolean>(true)
 
@@ -47,19 +46,31 @@ export class AdminRwPendidikanListComponent {
     }
 
     handlePagable() {
-        this.apiUrl = `/api/v1/rw_pendidikan/search?eq_nip=${this.nip}`
+        this.apiUrl =
+            this.nip === ''
+                ? '/api/v1/rw_kinerja/search'
+                : `/api/v1/rw_kinerja/search?eq_nip=${this.nip}`
 
         const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
+                new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Tgl Mulai', 'dateStart').build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build(),
+            )
+            .addPrimaryColumn(
                 new PrimaryColumnBuilder(
-                    'Pendidikan',
-                    'pendidikan|name',
+                    'Akumulasi Angka Kredit',
+                    'angkaKredit',
                 ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwPendidikan: any) => {
-                        this.getRWPendidikan(rwPendidikan.id)
+                    .setAction((rwKinerja: any) => {
+                        this.getRWKinerja(rwKinerja.id)
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
@@ -69,8 +80,8 @@ export class AdminRwPendidikanListComponent {
         if (this.isAdmin) {
             pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwPendidikan: any) => {
-                        this.handleDeleteRWPendidikan(rwPendidikan.id)
+                    .setAction((rwKinerja: any) => {
+                        this.handleDeleteRWKinerja(rwKinerja.id)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
@@ -80,19 +91,31 @@ export class AdminRwPendidikanListComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('pendidikan|name')
-                    .withField('Pendidikan', 'text')
+                    .setProperty('type')
+                    .withField('Tahunan/Bulanan', 'text')
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('dateStart')
+                    .withField('Tgl Mulai', 'text')
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('dateEnd')
+                    .withField('Tgl Selesai', 'text')
                     .build(),
             )
             .build()
     }
 
-    handleDeleteRWPendidikan(id: string): void {
+    handleDeleteRWKinerja(id: string): void {
         this.confirmationService
             .open(
                 false,
-                'Hapus Riwayat Pendidikan?',
-                'Data riwayat pendidikan yang dihapus tidak dapat dikembalikan.',
+                'Hapus Riwayat Kinerja?',
+                'Data riwayat kinerja yang dihapus tidak dapat dikembalikan.',
                 undefined,
                 'Ya, Hapus',
                 'Batal',
@@ -104,12 +127,12 @@ export class AdminRwPendidikanListComponent {
                     }
 
                     this.apiService
-                        .deleteData(`/api/v1/rw_pendidikan/${id}`)
+                        .deleteData(`/api/v1/rw_kinerja/${id}`)
                         .subscribe({
                             next: () => {
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Berhasil menghapus riwayat pendidikan.',
+                                    'Berhasil menghapus riwayat kinerja.',
                                 )
 
                                 window.location.reload()
@@ -117,7 +140,7 @@ export class AdminRwPendidikanListComponent {
                             error: () => {
                                 this.handlerService.handleAlert(
                                     'Error',
-                                    'Gagal menghapus riwayat pendidikan.',
+                                    'Gagal menghapus riwayat kinerja.',
                                 )
                             },
                         })
@@ -125,11 +148,11 @@ export class AdminRwPendidikanListComponent {
             })
     }
 
-    getRWPendidikan(id: string) {
+    getRWKinerja(id: string) {
         this.loading$.next(true)
-        this.apiService.getData(`/api/v1/rw_pendidikan/${id}`).subscribe({
+        this.apiService.getData(`/api/v1/rw_kinerja/${id}`).subscribe({
             next: (response) => {
-                this.rwPendidikan = new RWPendidikan(response)
+                this.rwKinerja = new RWKinerja(response)
                 this.loading$.next(false)
             },
             error: (error) => {
@@ -145,6 +168,6 @@ export class AdminRwPendidikanListComponent {
 
     back() {
         this.isDetailOpen = false
-        this.rwPendidikan = new RWPendidikan()
+        this.rwKinerja = new RWKinerja()
     }
 }

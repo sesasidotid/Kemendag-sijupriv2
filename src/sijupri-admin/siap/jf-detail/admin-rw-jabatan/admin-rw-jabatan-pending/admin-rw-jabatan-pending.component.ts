@@ -1,9 +1,15 @@
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { AlertService } from '@/modules/base/services/alert.service'
 import { ApiService } from '@/modules/base/services/api.service'
-import { RWPangkat } from '@/modules/siap/models/rw-pangkat.model'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { RWJabatan } from '@/modules/siap/models/rw-jabatan.model'
+import { CommonModule } from '@angular/common'
 import { Component, Input } from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import { BehaviorSubject } from 'rxjs'
 import {
     ActionColumnBuilder,
@@ -11,33 +17,36 @@ import {
     PageFilterBuilder,
     PrimaryColumnBuilder,
 } from '../../../../../modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
-import { CommonModule } from '@angular/common'
-import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 import { ObjectTask } from '@/modules/workflow/models/object-task.model'
-
 @Component({
-    selector: 'app-admin-rw-pangkat-pending',
+    selector: 'app-admin-rw-jabatan-pending',
     standalone: true,
-    imports: [PagableComponent, CommonModule, FileHandlerComponent],
-    templateUrl: './admin-rw-pangkat-pending.component.html',
-    styleUrl: './admin-rw-pangkat-pending.component.scss',
+    imports: [
+        PagableComponent,
+        CommonModule,
+        FormsModule,
+        FileHandlerComponent,
+    ],
+    templateUrl: './admin-rw-jabatan-pending.component.html',
+    styleUrl: './admin-rw-jabatan-pending.component.scss',
 })
-export class AdminRwPangkatPendingComponent {
+export class AdminRwJabatanPendingComponent {
     @Input() nip?: string = ''
-    apiUrl: string = '/api/v1/rw_pangkat/search'
+    apiUrl: string = '/api/v1/rw_jabatan/search'
     isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
     pendingTask: ObjectTask
 
     pagable: Pagable
     isDetailOpen: boolean = false
-    rwPangkat: RWPangkat = new RWPangkat()
+    rwJabatan: RWJabatan = new RWJabatan()
 
     loading$ = new BehaviorSubject<boolean>(true)
 
     constructor(
         private apiService: ApiService,
         private alertService: AlertService,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService,
     ) {}
 
     ngOnInit() {
@@ -45,11 +54,20 @@ export class AdminRwPangkatPendingComponent {
     }
 
     handlePagable() {
-        this.apiUrl = `/api/v1/rw_pangkat/task/search/${this.nip}`
+        this.apiUrl = `/api/v1/rw_jabatan/task/search/${this.nip}`
 
         const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Pangkat', 'objectName').build(),
+                new PrimaryColumnBuilder(
+                    'Jabatan',
+                    'objectTask|object|jabatanName',
+                ).build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder(
+                    'Jenjang',
+                    'objectTask|object|jenjangName',
+                ).build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder(
@@ -59,8 +77,8 @@ export class AdminRwPangkatPendingComponent {
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwPendingPangkat: any) => {
-                        this.getPendingRWPangkat(rwPendingPangkat.objectTaskId)
+                    .setAction((rwPendingJabatan: any) => {
+                        this.getPendingRWJabatan(rwPendingJabatan.objectTaskId)
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
@@ -70,19 +88,25 @@ export class AdminRwPangkatPendingComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('pangkat|name')
-                    .withField('Pangkat', 'text')
+                    .setProperty('jabatan|name')
+                    .withField('Jabatan', 'text')
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('like')
+                    .setProperty('jenjang|name')
+                    .withField('Jenjang', 'text')
                     .build(),
             )
             .build()
     }
 
-    getPendingRWPangkat(id: string) {
+    getPendingRWJabatan(id: string) {
         this.loading$.next(true)
         this.apiService.getData(`/api/v1/object_task/${id}`).subscribe({
             next: (response) => {
                 const pendingTask = new ObjectTask(response)
-                this.rwPangkat = new RWPangkat(pendingTask.object)
+                this.rwJabatan = new RWJabatan(pendingTask.object)
 
                 this.loading$.next(false)
             },
@@ -90,7 +114,7 @@ export class AdminRwPangkatPendingComponent {
                 this.loading$.next(false)
                 this.alertService.showToast(
                     'Error',
-                    'Gagal mendapatkan data pending riwayat pangkat!',
+                    'Gagal mendapatkan data pending riwayat jabatan!',
                 )
             },
         })
@@ -98,6 +122,6 @@ export class AdminRwPangkatPendingComponent {
 
     back() {
         this.isDetailOpen = false
-        this.rwPangkat = new RWPangkat()
+        this.rwJabatan = new RWJabatan()
     }
 }

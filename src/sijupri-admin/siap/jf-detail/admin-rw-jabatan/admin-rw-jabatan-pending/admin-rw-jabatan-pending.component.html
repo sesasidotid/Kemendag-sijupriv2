@@ -12,17 +12,23 @@
                 <label for="firstnameInput" class="form-label">
                     Terhitung Mulai Tanggal
                 </label>
-                <p class="border-bottom pb-2">{{rwPangkat.tmt}}</p>
+                <p class="border-bottom pb-2">{{rwJabatan.tmt}}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="firstnameInput" class="form-label">
+                    Jabatan
+                </label>
+                <p class="border-bottom pb-2">{{rwJabatan.jabatanName}}</p>
             </div>
             <div class="col-md-6 mb-3">
                 <label for="firstnameInput" class="form-label
-                    ">Pangkat</label>
-                <p class="border-bottom pb-2">{{rwPangkat.pangkatName}}</p>
+                    ">Jenjang</label>
+                <p class="border-bottom pb-2">{{rwJabatan.jenjangName}}</p>
             </div>
             <div class="col-md-6 mb-3">
-                <app-file-handler [inputs]="{
+                    <app-file-handler [inputs]="{
                     files: {
-                      docEvaluas: { label: 'Preview SK Pangkat', source: this.rwPangkat.skPangkatUrl, fileName: this.rwPangkat.skPangkat},
+                      skJabatan: { label: 'Preview SK Jabatan', source: this.rwJabatan.skJabatanUrl, fileName: this.rwJabatan.skJabatan }
                     },
                     viewOnly: true
                   }"></app-file-handler>

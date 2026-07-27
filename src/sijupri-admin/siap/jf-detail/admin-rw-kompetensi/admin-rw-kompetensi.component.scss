@@ -1,0 +1,57 @@
+.sub-tab-nav {
+    gap: 0.75rem;
+
+    .nav-link {
+        position: relative;
+        border: none !important;
+        background: transparent !important;
+        color: #6c757d;
+        padding: 0.65rem 1rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+        color: var(--bs-primary);
+    }
+
+    /* Pending */
+    .verified-tab:hover {
+        color: #1388db !important;
+    }
+
+    .verified-tab.active {
+        color: #1388db !important;
+    }
+
+    .verified-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 0;
+        height: 3px;
+        border-radius: 10px;
+        color: #1388db !important;
+    }
+
+    /* Pending */
+    .pending-tab:hover {
+        color: #fd7e14;
+    }
+
+    .pending-tab.active {
+        color: #fd7e14 !important;
+    }
+
+    .pending-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 0;
+        height: 3px;
+        border-radius: 10px;
+        background: #fd7e14;
+    }
+}

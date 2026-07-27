@@ -212,13 +212,17 @@
                             [nip]="nip"
                         ></app-admin-rw-pangkat>
                         } @if (activeTab === 'jabatan') {
-                        <app-rw-jabatan-list [nip]="nip"></app-rw-jabatan-list>
-                        } @if (activeTab === 'kinerja') {
-                        <app-rw-kinerja-list [nip]="nip"></app-rw-kinerja-list>
-                        } @if (activeTab === 'kompetensi') {
-                        <app-rw-kompetensi-list
+                        <app-admin-rw-jabatan
                             [nip]="nip"
-                        ></app-rw-kompetensi-list>
+                        ></app-admin-rw-jabatan>
+                        } @if (activeTab === 'kinerja') {
+                        <app-admin-rw-kinerja
+                            [nip]="nip"
+                        ></app-admin-rw-kinerja>
+                        } @if (activeTab === 'kompetensi') {
+                        <app-admin-rw-kompetensi
+                            [nip]="nip"
+                        ></app-admin-rw-kompetensi>
                         } @if (activeTab === 'sertifikasi') {
                         <app-rw-sertifikasi-list
                             [nip]="nip"
