@@ -70,7 +70,7 @@ export class AdminRwPangkatPendingComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('pangkat|name')
+                    .setProperty('objectName')
                     .withField('Pangkat', 'text')
                     .build(),
             )

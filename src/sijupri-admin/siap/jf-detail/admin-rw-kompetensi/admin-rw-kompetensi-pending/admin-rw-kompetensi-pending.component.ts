@@ -80,7 +80,7 @@ export class AdminRwKompetensiPendingComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('tglSertifikat')
+                    .setProperty('objectTask|object|tglSertifikat')
                     .withField('Tgl Sertifikat', 'text')
                     .build(),
             )

@@ -88,7 +88,6 @@ export class AdminRwPendidikanPendingComponent {
                 this.pendidikanListLoading$.next(false)
             },
             error: (error) => {
-                console.log('error', error)
                 this.alertService.showToast(
                     'Error',
                     'Gagal mendapatkan data pendidikan!',

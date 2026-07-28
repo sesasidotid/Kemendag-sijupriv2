@@ -84,19 +84,19 @@ export class AdminRwKinerjaPendingComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('type')
+                    .setProperty('objectTask|object|type')
                     .withField('Tahunan/Bulanan', 'text')
                     .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
-                    .setProperty('dateStart')
+                    .setProperty('objectTask|object|dateStart')
                     .withField('Tgl Mulai', 'text')
                     .build(),
             )
             .addFilter(
                 new PageFilterBuilder('equal')
-                    .setProperty('dateEnd')
+                    .setProperty('objectTask|object|dateEnd')
                     .withField('Tgl Selesai', 'text')
                     .build(),
             )

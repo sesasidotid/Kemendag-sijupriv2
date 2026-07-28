@@ -45,8 +45,6 @@ export class AdminRwJabatanPendingComponent {
     constructor(
         private apiService: ApiService,
         private alertService: AlertService,
-        private confirmationService: ConfirmationService,
-        private handlerService: HandlerService,
     ) {}
 
     ngOnInit() {
@@ -88,13 +86,13 @@ export class AdminRwJabatanPendingComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('jabatan|name')
+                    .setProperty('objectTask|object|jabatanName')
                     .withField('Jabatan', 'text')
                     .build(),
             )
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('jenjang|name')
+                    .setProperty('objectTask|object|jenjangName')
                     .withField('Jenjang', 'text')
                     .build(),
             )
