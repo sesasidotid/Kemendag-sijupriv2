@@ -86,7 +86,9 @@
     color: #212529; /* Bootstrap Dark Gray */
     //   border-radius: 50px; /* Biar lebih bulat */
     //   display: inline-block;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    transition:
+        transform 0.3s ease-in-out,
+        box-shadow 0.3s ease-in-out;
 }
 
 .total-score-value:hover {
@@ -94,6 +96,48 @@
     //   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-.detail-container {
-  padding: 24px 32px; // atau sesuaikan, misal 16px 24px buat mobile
+.info-page {
+    .binbot-illustration {
+        width: 100%;
+        max-width: 220px;
+        height: auto;
+        margin: 0 auto 1rem;
+        display: block;
+    }
+
+    .title {
+        font-size: 1.25rem;
+        margin-top: 0.5rem;
+    }
+}
+
+.card {
+    border: none;
+    margin-bottom: 24px;
+    -webkit-box-shadow: 0 0 13px 0 rgba(236, 236, 241, 0.44);
+    box-shadow: 0 0 13px 0 rgba(236, 236, 241, 0.44);
+}
+
+.parent {
+    @media screen and (max-width: 768px) {
+        margin-left: 16px !important;
+        margin-right: 16px !important;
+        padding: 16px !important;
+    }
+
+    @media screen and (min-width: 768px) {
+        margin-left: 32px !important;
+        margin-right: 32px !important;
+        padding: 16px !important;
+    }
+
+    @media screen and (min-width: 1200px) {
+        margin-left: 200px !important;
+        margin-right: 200px !important;
+        padding: 32px !important;
+    }
+
+    margin-left: 160px !important;
+    margin-right: 160px !important;
+    margin-top: 24px;
 }

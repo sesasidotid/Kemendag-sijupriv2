@@ -8,9 +8,7 @@ import { ScoreValue } from '@/modules/ukom/models/cat/score-value.type'
 import { DataDokumenUkom } from '@/modules/ukom/models/data-dukung'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
 import { ExamTypeCategory } from '@/modules/ukom/models/exam-type.model'
-import {
-    CATScore,
-} from '@/modules/ukom/models/exam/exam-score.model'
+import { CATScore } from '@/modules/ukom/models/exam/exam-score.model'
 import { UkomGrade } from '@/modules/ukom/models/ukom-grade'
 import { UkomDocumentService } from '@/modules/ukom/services/document.service'
 import { ExamGradeService } from '@/modules/ukom/services/exam-grade.service'
@@ -18,13 +16,14 @@ import { UkomParticipantService } from '@/modules/ukom/services/participant.serv
 import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
 import { CommonModule } from '@angular/common'
 import { Component, computed, inject, signal } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { catchError, finalize, of, switchMap } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { KabKota } from '@/modules/maintenance/models/kab-kota.model'
 import { LandingPageComponent } from '@/modules/landing-page/landing-page.component'
 import { UkomGradeDetailTableComponent } from '@/modules/base/components/ukom-grade-detail-table/ukom-grade-detail-table.component'
 import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
+import { EmptyStateComponent } from '@/modules/base/components/empty-state/empty-state.component'
 
 @Component({
     selector: 'app-ukom-detail',
@@ -33,6 +32,7 @@ import { RoomUkom } from '@/modules/ukom/models/cat/room-ukom.model'
         CommonModule,
         UkomGradeDetailTableComponent,
         LandingPageComponent,
+        EmptyStateComponent,
     ],
     templateUrl: './ukom-detail.component.html',
     styleUrl: './ukom-detail.component.scss',
@@ -45,6 +45,7 @@ export class UkomDetailComponent {
     examGradeService = inject(ExamGradeService)
     ukomDetail = signal<Participant>(new Participant())
     ukomDetailLoading = signal(false)
+    ukomParticipantExist = signal(true)
     classUkomRoom: RoomUkom
     dataDokumenUkom: DataDokumenUkom[] = []
     dataDokumenUkomLoading = signal(false)
@@ -84,6 +85,7 @@ export class UkomDetailComponent {
 
     constructor(
         private handlerService: HandlerService,
+        private router: Router,
         private ukomGradeService: UkomGradeService,
     ) {}
 
@@ -167,15 +169,16 @@ export class UkomDetailComponent {
             )
             .subscribe({
                 next: ({ participant, kabupaten }) => {
+                    this.ukomParticipantExist.set(true)
+
                     this.ukomDetail.set(participant)
                     this.classUkomRoom = new RoomUkom(participant.roomUkomDto)
                     this.typeKabKota.set(kabupaten.type)
                 },
-                error: () => {
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal memuat detail',
-                    )
+                error: (err) => {
+                    if (err.status === 404) {
+                        this.ukomParticipantExist.set(false)
+                    }
                 },
             })
     }
@@ -191,11 +194,14 @@ export class UkomDetailComponent {
                     this.ukomGrade = new UkomGrade(response)
                 },
                 error: (err) => {
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal memuat score',
-                    )
+                    if (err.status === 404) {
+                        this.ukomParticipantExist.set(false)
+                    }
                 },
             })
+    }
+
+    backToDashboard = () => {
+        this.router.navigate(['/'])
     }
 }

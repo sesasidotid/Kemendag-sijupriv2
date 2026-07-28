@@ -12,12 +12,27 @@
 </div>
 
 <ng-template #ukomHadItem>
-    <ng-container *ngIf="ukomGrade.id">
-        <app-ukom-grade-detail-table
-            [gradeData]="ukomGrade"
-            [roomUkomData]="classUkomRoom"
-            [nama]="ukomDetail().name"
-            [nip]="ukomDetail().nip"
-        ></app-ukom-grade-detail-table>
+    <ng-container *ngIf="ukomParticipantExist(); else participantNotFound">
+        <ng-container *ngIf="ukomGrade?.id">
+            <app-ukom-grade-detail-table
+                [gradeData]="ukomGrade"
+                [roomUkomData]="classUkomRoom"
+                [nama]="ukomDetail().name"
+                [nip]="ukomDetail().nip"
+            ></app-ukom-grade-detail-table>
+        </ng-container>
     </ng-container>
+</ng-template>
+
+<ng-template #participantNotFound>
+    <div class="card parent">
+        <app-empty-state
+            [buttonAction]="backToDashboard"
+            [buttonText]="'Kembali ke Halaman Utama'"
+            [description]="'Silakan periksa kembali tautan yang Anda akses, pastikan tautan tersebut sudah benar.'"
+            [iconColor]="'danger'"
+            [icon]="'mdi-package-variant-closed-remove'"
+            [title]="'Data Peserta UKom Tidak Ditemukan'"
+        ></app-empty-state>
+    </div>
 </ng-template>
