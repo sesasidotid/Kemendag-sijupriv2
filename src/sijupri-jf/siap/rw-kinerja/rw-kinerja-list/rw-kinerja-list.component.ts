@@ -5,7 +5,7 @@ import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
-    PrimaryColumnBuilder
+    PrimaryColumnBuilder,
 } from '../../../../modules/base/commons/pagable/pagable-builder'
 import { CommonModule } from '@angular/common'
 import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
@@ -13,18 +13,22 @@ import { RWKinerja } from '../../../../modules/siap/models/rw-kinerja.model'
 import { ApiService } from '../../../../modules/base/services/api.service'
 import { AlertService } from '../../../../modules/base/services/alert.service'
 import { BehaviorSubject } from 'rxjs'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { Role } from '@/modules/security/models/role.model'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 @Component({
     selector: 'app-rw-kinerja-list',
     standalone: true,
     imports: [PagableComponent, CommonModule, FileHandlerComponent],
     templateUrl: './rw-kinerja-list.component.html',
-    styleUrl: './rw-kinerja-list.component.scss'
+    styleUrl: './rw-kinerja-list.component.scss',
 })
 export class RwKinerjaListComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_kinerja/search'
-
+    isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
     pagable: Pagable
     isDetailOpen: boolean = false
     rwKinerja: RWKinerja = new RWKinerja()
@@ -33,8 +37,10 @@ export class RwKinerjaListComponent {
 
     constructor(
         private apiService: ApiService,
-        private alertService: AlertService
-    ) { }
+        private alertService: AlertService,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService,
+    ) {}
 
     ngOnInit() {
         this.handlePagable()
@@ -46,7 +52,7 @@ export class RwKinerjaListComponent {
                 ? '/api/v1/rw_kinerja/search'
                 : `/api/v1/rw_kinerja/search?eq_nip=${this.nip}`
 
-        this.pagable = new PagableBuilder(this.apiUrl)
+        const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build(),
             )
@@ -71,6 +77,19 @@ export class RwKinerjaListComponent {
                     .withIcon('detail')
                     .build(),
             )
+
+        if (this.isAdmin) {
+            pagableBuilder.addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((rwKinerja: any) => {
+                        this.handleDeleteRWKinerja(rwKinerja.id)
+                    }, 'danger')
+                    .withIcon('danger')
+                    .build(),
+            )
+        }
+
+        this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
                     .setProperty('type')
@@ -92,18 +111,59 @@ export class RwKinerjaListComponent {
             .build()
     }
 
+    handleDeleteRWKinerja(id: string): void {
+        this.confirmationService
+            .open(
+                false,
+                'Hapus Riwayat Kinerja?',
+                'Data riwayat kinerja yang dihapus tidak dapat dikembalikan.',
+                undefined,
+                'Ya, Hapus',
+                'Batal',
+            )
+            .subscribe({
+                next: (res) => {
+                    if (!res.confirmed) {
+                        return
+                    }
+
+                    this.apiService
+                        .deleteData(`/api/v1/rw_kinerja/${id}`)
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Berhasil menghapus riwayat kinerja.',
+                                )
+
+                                window.location.reload()
+                            },
+                            error: () => {
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal menghapus riwayat kinerja.',
+                                )
+                            },
+                        })
+                },
+            })
+    }
+
     getRWKinerja(id: string) {
         this.loading$.next(true)
         this.apiService.getData(`/api/v1/rw_kinerja/${id}`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.rwKinerja = new RWKinerja(response)
                 this.loading$.next(false)
             },
-            error: error => {
+            error: (error) => {
                 console.log('error', error)
-                this.alertService.showToast('Error', 'Gagal mendapatkan data riwayat')
+                this.alertService.showToast(
+                    'Error',
+                    'Gagal mendapatkan data riwayat',
+                )
                 this.loading$.next(false)
-            }
+            },
         })
     }
 

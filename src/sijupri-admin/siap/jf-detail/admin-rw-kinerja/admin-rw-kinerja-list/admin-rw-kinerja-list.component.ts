@@ -1,44 +1,36 @@
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { AlertService } from '@/modules/base/services/alert.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { RWKinerja } from '@/modules/siap/models/rw-kinerja.model'
+import { CommonModule } from '@angular/common'
 import { Component, Input } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { BehaviorSubject } from 'rxjs'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
-import { RWJabatan } from '../../../../modules/siap/models/rw-jabatan.model'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { BehaviorSubject } from 'rxjs'
-import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { HandlerService } from '@/modules/base/services/handler.service'
-import { LoginContext } from '@/modules/base/commons/login-context'
+} from '../../../../../modules/base/commons/pagable/pagable-builder'
 
 @Component({
-    selector: 'app-rw-jabatan-list',
+    selector: 'app-admin-rw-kinerja-list',
     standalone: true,
-    imports: [
-        PagableComponent,
-        CommonModule,
-        FormsModule,
-        FileHandlerComponent,
-    ],
-    templateUrl: './rw-jabatan-list.component.html',
-    styleUrl: './rw-jabatan-list.component.scss',
+    imports: [PagableComponent, CommonModule, FileHandlerComponent],
+    templateUrl: './admin-rw-kinerja-list.component.html',
+    styleUrl: './admin-rw-kinerja-list.component.scss',
 })
-export class RwJabatanListComponent {
+export class AdminRwKinerjaListComponent {
     @Input() nip?: string = ''
-    apiUrl: string = '/api/v1/rw_jabatan/search'
+    apiUrl: string = '/api/v1/rw_kinerja/search'
     isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
-
     pagable: Pagable
     isDetailOpen: boolean = false
-    rwJabatan: RWJabatan = new RWJabatan()
+    rwKinerja: RWKinerja = new RWKinerja()
 
     loading$ = new BehaviorSubject<boolean>(true)
 
@@ -56,23 +48,29 @@ export class RwJabatanListComponent {
     handlePagable() {
         this.apiUrl =
             this.nip === ''
-                ? '/api/v1/rw_jabatan/search'
-                : `/api/v1/rw_jabatan/search?eq_nip=${this.nip}`
+                ? '/api/v1/rw_kinerja/search'
+                : `/api/v1/rw_kinerja/search?eq_nip=${this.nip}`
 
         const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jabatan', 'jabatan|name').build(),
+                new PrimaryColumnBuilder('Tahunan/Bulanan', 'type').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenjang', 'jenjang|name').build(),
+                new PrimaryColumnBuilder('Tgl Mulai', 'dateStart').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Terhitung Mulai', 'tmt').build(),
+                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder(
+                    'Akumulasi Angka Kredit',
+                    'angkaKredit',
+                ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwJabatan: any) => {
-                        this.getRWJabatan(rwJabatan.id)
+                    .setAction((rwKinerja: any) => {
+                        this.getRWKinerja(rwKinerja.id)
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
@@ -82,8 +80,8 @@ export class RwJabatanListComponent {
         if (this.isAdmin) {
             pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwJabatan: any) => {
-                        this.handleDeleteRWJabatan(rwJabatan.id)
+                    .setAction((rwKinerja: any) => {
+                        this.handleDeleteRWKinerja(rwKinerja.id)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
@@ -93,25 +91,31 @@ export class RwJabatanListComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('jabatan|name')
-                    .withField('Jabatan', 'text')
+                    .setProperty('type')
+                    .withField('Tahunan/Bulanan', 'text')
                     .build(),
             )
             .addFilter(
-                new PageFilterBuilder('like')
-                    .setProperty('jenjang|name')
-                    .withField('Jenjang', 'text')
+                new PageFilterBuilder('equal')
+                    .setProperty('dateStart')
+                    .withField('Tgl Mulai', 'text')
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('dateEnd')
+                    .withField('Tgl Selesai', 'text')
                     .build(),
             )
             .build()
     }
 
-    handleDeleteRWJabatan(id: string): void {
+    handleDeleteRWKinerja(id: string): void {
         this.confirmationService
             .open(
                 false,
-                'Hapus Riwayat Jabatan?',
-                'Data riwayat jabatan yang dihapus tidak dapat dikembalikan.',
+                'Hapus Riwayat Kinerja?',
+                'Data riwayat kinerja yang dihapus tidak dapat dikembalikan.',
                 undefined,
                 'Ya, Hapus',
                 'Batal',
@@ -123,12 +127,12 @@ export class RwJabatanListComponent {
                     }
 
                     this.apiService
-                        .deleteData(`/api/v1/rw_jabatan/${id}`)
+                        .deleteData(`/api/v1/rw_kinerja/${id}`)
                         .subscribe({
                             next: () => {
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Berhasil menghapus riwayat jabatan.',
+                                    'Berhasil menghapus riwayat kinerja.',
                                 )
 
                                 window.location.reload()
@@ -136,7 +140,7 @@ export class RwJabatanListComponent {
                             error: () => {
                                 this.handlerService.handleAlert(
                                     'Error',
-                                    'Gagal menghapus riwayat jabatan.',
+                                    'Gagal menghapus riwayat kinerja.',
                                 )
                             },
                         })
@@ -144,11 +148,11 @@ export class RwJabatanListComponent {
             })
     }
 
-    getRWJabatan(id: string) {
+    getRWKinerja(id: string) {
         this.loading$.next(true)
-        this.apiService.getData(`/api/v1/rw_jabatan/${id}`).subscribe({
+        this.apiService.getData(`/api/v1/rw_kinerja/${id}`).subscribe({
             next: (response) => {
-                this.rwJabatan = new RWJabatan(response)
+                this.rwKinerja = new RWKinerja(response)
                 this.loading$.next(false)
             },
             error: (error) => {
@@ -164,6 +168,6 @@ export class RwJabatanListComponent {
 
     back() {
         this.isDetailOpen = false
-        this.rwJabatan = new RWJabatan()
+        this.rwKinerja = new RWKinerja()
     }
 }

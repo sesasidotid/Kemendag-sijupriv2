@@ -1,31 +1,30 @@
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { AlertService } from '@/modules/base/services/alert.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { RWPendidikan } from '@/modules/siap/models/rw-perndidikan.model'
 import { Component, Input } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+import { BehaviorSubject } from 'rxjs'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { RWPendidikan } from '../../../../modules/siap/models/rw-perndidikan.model'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
+} from '../../../../../modules/base/commons/pagable/pagable-builder'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { BehaviorSubject } from 'rxjs'
-import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { HandlerService } from '@/modules/base/services/handler.service'
-import { LoginContext } from '@/modules/base/commons/login-context'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 
 @Component({
-    selector: 'app-rw-pendidikan-list',
+    selector: 'app-admin-rw-pendidikan-list',
     standalone: true,
     imports: [PagableComponent, CommonModule, FileHandlerComponent],
-    templateUrl: './rw-pendidikan-list.component.html',
-    styleUrl: './rw-pendidikan-list.component.scss',
+    templateUrl: './admin-rw-pendidikan-list.component.html',
+    styleUrl: './admin-rw-pendidikan-list.component.scss',
 })
-export class RwPendidikanListComponent {
+export class AdminRwPendidikanListComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_pendidikan/search'
     isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
@@ -48,10 +47,7 @@ export class RwPendidikanListComponent {
     }
 
     handlePagable() {
-        this.apiUrl =
-            this.nip === ''
-                ? '/api/v1/rw_pendidikan/search'
-                : `/api/v1/rw_pendidikan/search?eq_nip=${this.nip}`
+        this.apiUrl = `/api/v1/rw_pendidikan/search?eq_nip=${this.nip}`
 
         const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
@@ -116,7 +112,7 @@ export class RwPendidikanListComponent {
                                     'Berhasil menghapus riwayat pendidikan.',
                                 )
 
-                                // window.location.reload()
+                                window.location.reload()
                             },
                             error: () => {
                                 this.handlerService.handleAlert(

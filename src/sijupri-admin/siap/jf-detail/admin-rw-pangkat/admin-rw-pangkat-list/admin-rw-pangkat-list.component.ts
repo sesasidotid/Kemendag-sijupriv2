@@ -1,44 +1,37 @@
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { AlertService } from '@/modules/base/services/alert.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { RWPangkat } from '@/modules/siap/models/rw-pangkat.model'
 import { Component, Input } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { BehaviorSubject } from 'rxjs'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
+} from '../../../../../modules/base/commons/pagable/pagable-builder'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
 import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
-import { RWJabatan } from '../../../../modules/siap/models/rw-jabatan.model'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { BehaviorSubject } from 'rxjs'
-import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { HandlerService } from '@/modules/base/services/handler.service'
-import { LoginContext } from '@/modules/base/commons/login-context'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
 
 @Component({
-    selector: 'app-rw-jabatan-list',
+    selector: 'app-admin-rw-pangkat-list',
     standalone: true,
-    imports: [
-        PagableComponent,
-        CommonModule,
-        FormsModule,
-        FileHandlerComponent,
-    ],
-    templateUrl: './rw-jabatan-list.component.html',
-    styleUrl: './rw-jabatan-list.component.scss',
+    imports: [PagableComponent, CommonModule, FileHandlerComponent],
+    templateUrl: './admin-rw-pangkat-list.component.html',
+    styleUrl: './admin-rw-pangkat-list.component.scss',
 })
-export class RwJabatanListComponent {
+export class AdminRwPangkatListComponent {
     @Input() nip?: string = ''
-    apiUrl: string = '/api/v1/rw_jabatan/search'
+    apiUrl: string = '/api/v1/rw_pangkat/search'
     isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
 
     pagable: Pagable
     isDetailOpen: boolean = false
-    rwJabatan: RWJabatan = new RWJabatan()
+    rwPangkat: RWPangkat = new RWPangkat()
 
     loading$ = new BehaviorSubject<boolean>(true)
 
@@ -56,23 +49,20 @@ export class RwJabatanListComponent {
     handlePagable() {
         this.apiUrl =
             this.nip === ''
-                ? '/api/v1/rw_jabatan/search'
-                : `/api/v1/rw_jabatan/search?eq_nip=${this.nip}`
+                ? '/api/v1/rw_pangkat/search'
+                : `/api/v1/rw_pangkat/search?eq_nip=${this.nip}`
 
         const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jabatan', 'jabatan|name').build(),
-            )
-            .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenjang', 'jenjang|name').build(),
+                new PrimaryColumnBuilder('Pangkat', 'pangkat|name').build(),
             )
             .addPrimaryColumn(
                 new PrimaryColumnBuilder('Terhitung Mulai', 'tmt').build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwJabatan: any) => {
-                        this.getRWJabatan(rwJabatan.id)
+                    .setAction((rwPangkat: any) => {
+                        this.getRWPangkat(rwPangkat.id)
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
@@ -82,8 +72,8 @@ export class RwJabatanListComponent {
         if (this.isAdmin) {
             pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwJabatan: any) => {
-                        this.handleDeleteRWJabatan(rwJabatan.id)
+                    .setAction((rwPangkat: any) => {
+                        this.handleDeleteRWPangkat(rwPangkat.id)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
@@ -93,25 +83,19 @@ export class RwJabatanListComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('jabatan|name')
-                    .withField('Jabatan', 'text')
-                    .build(),
-            )
-            .addFilter(
-                new PageFilterBuilder('like')
-                    .setProperty('jenjang|name')
-                    .withField('Jenjang', 'text')
+                    .setProperty('pangkat|name')
+                    .withField('Pangkat', 'text')
                     .build(),
             )
             .build()
     }
 
-    handleDeleteRWJabatan(id: string): void {
+    handleDeleteRWPangkat(id: string): void {
         this.confirmationService
             .open(
                 false,
-                'Hapus Riwayat Jabatan?',
-                'Data riwayat jabatan yang dihapus tidak dapat dikembalikan.',
+                'Hapus Riwayat Pangkat?',
+                'Data riwayat pangkat yang dihapus tidak dapat dikembalikan.',
                 undefined,
                 'Ya, Hapus',
                 'Batal',
@@ -123,12 +107,12 @@ export class RwJabatanListComponent {
                     }
 
                     this.apiService
-                        .deleteData(`/api/v1/rw_jabatan/${id}`)
+                        .deleteData(`/api/v1/rw_pangkat/${id}`)
                         .subscribe({
                             next: () => {
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Berhasil menghapus riwayat jabatan.',
+                                    'Berhasil menghapus riwayat pangkat.',
                                 )
 
                                 window.location.reload()
@@ -136,7 +120,7 @@ export class RwJabatanListComponent {
                             error: () => {
                                 this.handlerService.handleAlert(
                                     'Error',
-                                    'Gagal menghapus riwayat jabatan.',
+                                    'Gagal menghapus riwayat pangkat.',
                                 )
                             },
                         })
@@ -144,11 +128,11 @@ export class RwJabatanListComponent {
             })
     }
 
-    getRWJabatan(id: string) {
+    getRWPangkat(id: string) {
         this.loading$.next(true)
-        this.apiService.getData(`/api/v1/rw_jabatan/${id}`).subscribe({
+        this.apiService.getData(`/api/v1/rw_pangkat/${id}`).subscribe({
             next: (response) => {
-                this.rwJabatan = new RWJabatan(response)
+                this.rwPangkat = new RWPangkat(response)
                 this.loading$.next(false)
             },
             error: (error) => {
@@ -164,6 +148,6 @@ export class RwJabatanListComponent {
 
     back() {
         this.isDetailOpen = false
-        this.rwJabatan = new RWJabatan()
+        this.rwPangkat = new RWPangkat()
     }
 }

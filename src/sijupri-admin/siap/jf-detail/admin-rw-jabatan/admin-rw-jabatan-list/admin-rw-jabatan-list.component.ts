@@ -1,26 +1,25 @@
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { AlertService } from '@/modules/base/services/alert.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { RWJabatan } from '@/modules/siap/models/rw-jabatan.model'
+import { CommonModule } from '@angular/common'
 import { Component, Input } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { FormsModule } from '@angular/forms'
+import { BehaviorSubject } from 'rxjs'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
-import { RWJabatan } from '../../../../modules/siap/models/rw-jabatan.model'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { BehaviorSubject } from 'rxjs'
-import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { HandlerService } from '@/modules/base/services/handler.service'
-import { LoginContext } from '@/modules/base/commons/login-context'
+} from '../../../../../modules/base/commons/pagable/pagable-builder'
 
 @Component({
-    selector: 'app-rw-jabatan-list',
+    selector: 'app-admin-rw-jabatan-list',
     standalone: true,
     imports: [
         PagableComponent,
@@ -28,10 +27,10 @@ import { LoginContext } from '@/modules/base/commons/login-context'
         FormsModule,
         FileHandlerComponent,
     ],
-    templateUrl: './rw-jabatan-list.component.html',
-    styleUrl: './rw-jabatan-list.component.scss',
+    templateUrl: './admin-rw-jabatan-list.component.html',
+    styleUrl: './admin-rw-jabatan-list.component.scss',
 })
-export class RwJabatanListComponent {
+export class AdminRwJabatanListComponent {
     @Input() nip?: string = ''
     apiUrl: string = '/api/v1/rw_jabatan/search'
     isAdmin = LoginContext.getRoleCodes().includes('ADMIN')

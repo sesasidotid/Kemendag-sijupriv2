@@ -1,44 +1,38 @@
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { RWKompetensi } from '@/modules/siap/models/rw-kompetensi.model'
+import { RwKompetensiService } from '@/modules/siap/services/rw-kompetensi.service'
+import { CommonModule } from '@angular/common'
 import { Component, Input } from '@angular/core'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+import { BehaviorSubject } from 'rxjs'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
-import { RWJabatan } from '../../../../modules/siap/models/rw-jabatan.model'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { AlertService } from '../../../../modules/base/services/alert.service'
-import { FileHandlerComponent } from '../../../../modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
-import { BehaviorSubject } from 'rxjs'
-import { ConfirmationService } from '@/modules/base/services/confirmation.service'
-import { HandlerService } from '@/modules/base/services/handler.service'
-import { LoginContext } from '@/modules/base/commons/login-context'
+} from '../../../../../modules/base/commons/pagable/pagable-builder'
+import { AlertService } from '@/modules/base/services/alert.service'
 
 @Component({
-    selector: 'app-rw-jabatan-list',
+    selector: 'app-admin-rw-kompetensi-list',
     standalone: true,
-    imports: [
-        PagableComponent,
-        CommonModule,
-        FormsModule,
-        FileHandlerComponent,
-    ],
-    templateUrl: './rw-jabatan-list.component.html',
-    styleUrl: './rw-jabatan-list.component.scss',
+    imports: [CommonModule, FileHandlerComponent, PagableComponent],
+    templateUrl: './admin-rw-kompetensi-list.component.html',
+    styleUrl: './admin-rw-kompetensi-list.component.scss',
 })
-export class RwJabatanListComponent {
+export class AdminRwKompetensiListComponent {
     @Input() nip?: string = ''
-    apiUrl: string = '/api/v1/rw_jabatan/search'
+    apiUrl: string = '/api/v1/rw_kompetensi/search'
     isAdmin = LoginContext.getRoleCodes().includes('ADMIN')
 
     pagable: Pagable
     isDetailOpen: boolean = false
-    rwJabatan: RWJabatan = new RWJabatan()
+    rwKompetensi: RWKompetensi
 
     loading$ = new BehaviorSubject<boolean>(true)
 
@@ -56,23 +50,26 @@ export class RwJabatanListComponent {
     handlePagable() {
         this.apiUrl =
             this.nip === ''
-                ? '/api/v1/rw_jabatan/search'
-                : `/api/v1/rw_jabatan/search?eq_nip=${this.nip}`
+                ? '/api/v1/rw_kompetensi/search'
+                : `/api/v1/rw_kompetensi/search?eq_nip=${this.nip}`
 
         const pagableBuilder = new PagableBuilder(this.apiUrl)
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jabatan', 'jabatan|name').build(),
+                new PrimaryColumnBuilder('Tgl Mulai', 'tglSertifikat').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Jenjang', 'jenjang|name').build(),
+                new PrimaryColumnBuilder('Tgl Selesai', 'dateEnd').build(),
             )
             .addPrimaryColumn(
-                new PrimaryColumnBuilder('Terhitung Mulai', 'tmt').build(),
+                new PrimaryColumnBuilder(
+                    'Tgl Sertifikat',
+                    'tglSertifikat',
+                ).build(),
             )
             .addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwJabatan: any) => {
-                        this.getRWJabatan(rwJabatan.id)
+                    .setAction((rwKompetensi: any) => {
+                        this.getRWKompetensi(rwKompetensi.id)
                         this.isDetailOpen = true
                     }, 'info')
                     .withIcon('detail')
@@ -82,8 +79,8 @@ export class RwJabatanListComponent {
         if (this.isAdmin) {
             pagableBuilder.addActionColumn(
                 new ActionColumnBuilder()
-                    .setAction((rwJabatan: any) => {
-                        this.handleDeleteRWJabatan(rwJabatan.id)
+                    .setAction((rwKompetensi: any) => {
+                        this.handleDeleteRWKompetensi(rwKompetensi.id)
                     }, 'danger')
                     .withIcon('danger')
                     .build(),
@@ -93,25 +90,19 @@ export class RwJabatanListComponent {
         this.pagable = pagableBuilder
             .addFilter(
                 new PageFilterBuilder('like')
-                    .setProperty('jabatan|name')
-                    .withField('Jabatan', 'text')
-                    .build(),
-            )
-            .addFilter(
-                new PageFilterBuilder('like')
-                    .setProperty('jenjang|name')
-                    .withField('Jenjang', 'text')
+                    .setProperty('tglSertifikat')
+                    .withField('Tgl Sertifikat', 'text')
                     .build(),
             )
             .build()
     }
 
-    handleDeleteRWJabatan(id: string): void {
+    handleDeleteRWKompetensi(id: string): void {
         this.confirmationService
             .open(
                 false,
-                'Hapus Riwayat Jabatan?',
-                'Data riwayat jabatan yang dihapus tidak dapat dikembalikan.',
+                'Hapus Riwayat Kompoetensi?',
+                'Data riwayat kompetensi yang dihapus tidak dapat dikembalikan.',
                 undefined,
                 'Ya, Hapus',
                 'Batal',
@@ -123,12 +114,12 @@ export class RwJabatanListComponent {
                     }
 
                     this.apiService
-                        .deleteData(`/api/v1/rw_jabatan/${id}`)
+                        .deleteData(`/api/v1/rw_kompetensi/${id}`)
                         .subscribe({
                             next: () => {
                                 this.handlerService.handleAlert(
                                     'Success',
-                                    'Berhasil menghapus riwayat jabatan.',
+                                    'Berhasil menghapus riwayat kompetensi.',
                                 )
 
                                 window.location.reload()
@@ -136,7 +127,7 @@ export class RwJabatanListComponent {
                             error: () => {
                                 this.handlerService.handleAlert(
                                     'Error',
-                                    'Gagal menghapus riwayat jabatan.',
+                                    'Gagal menghapus riwayat kompetensi.',
                                 )
                             },
                         })
@@ -144,11 +135,11 @@ export class RwJabatanListComponent {
             })
     }
 
-    getRWJabatan(id: string) {
+    getRWKompetensi(id: string) {
         this.loading$.next(true)
-        this.apiService.getData(`/api/v1/rw_jabatan/${id}`).subscribe({
+        this.apiService.getData(`/api/v1/rw_kompetensi/${id}`).subscribe({
             next: (response) => {
-                this.rwJabatan = new RWJabatan(response)
+                this.rwKompetensi = new RWKompetensi(response)
                 this.loading$.next(false)
             },
             error: (error) => {
@@ -164,6 +155,6 @@ export class RwJabatanListComponent {
 
     back() {
         this.isDetailOpen = false
-        this.rwJabatan = new RWJabatan()
+        this.rwKompetensi = new RWKompetensi()
     }
 }
