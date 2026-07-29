@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core'
 import { AdminRwPendidikanPendingComponent } from './admin-rw-pendidikan-pending/admin-rw-pendidikan-pending.component'
 import { AdminRwPendidikanListComponent } from './admin-rw-pendidikan-list/admin-rw-pendidikan-list.component'
 import { CommonModule } from '@angular/common'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 @Component({
     selector: 'app-admin-rw-pendidikan',
@@ -17,6 +18,7 @@ import { CommonModule } from '@angular/common'
 export class AdminRwPendidikanComponent {
     @Input() nip?: string = ''
     activeSubTab: 'sekarang' | 'pending' = 'sekarang'
+    isAdmin: boolean = LoginContext.getRoleCodes().includes('ADMIN')
 
     changeSubTab(tab: 'sekarang' | 'pending') {
         this.activeSubTab = tab

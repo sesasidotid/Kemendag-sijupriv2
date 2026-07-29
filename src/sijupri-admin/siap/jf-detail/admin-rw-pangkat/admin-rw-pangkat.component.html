@@ -1,4 +1,4 @@
-<ul class="nav sub-tab-nav justify-content-end mb-3">
+<ul class="nav sub-tab-nav justify-content-end mb-3" *ngIf="isAdmin">
     <li class="nav-item">
         <button
             type="button"
@@ -26,9 +26,7 @@
 
 <div class="tab-content">
     <ng-container *ngIf="activeSubTab === 'sekarang'">
-        <app-admin-rw-pangkat-list
-            [nip]="nip"
-        ></app-admin-rw-pangkat-list>
+        <app-admin-rw-pangkat-list [nip]="nip"></app-admin-rw-pangkat-list>
     </ng-container>
 
     <ng-container *ngIf="activeSubTab === 'pending'">
