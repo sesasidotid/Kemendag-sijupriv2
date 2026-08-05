@@ -91,6 +91,7 @@ export class StatusPendaftaranUkomComponent {
     fileHandlerData: FIleHandler = {
         files: {},
         viewOnly: true,
+        listen: () => {},
     }
     predikatKinerjaList: PredikatKinerja[] = []
     pendidikanName: string
@@ -227,16 +228,23 @@ export class StatusPendaftaranUkomComponent {
     }
 
     mapDokumenUkom() {
+        const files: FIleHandler['files'] = {}
         this.dataDokumenUkom.forEach((doc, index) => {
-            this.fileHandlerData.files[`file${index}`] = {
+            files[`file${index}`] = {
                 label: doc.dokumenPersyaratanName,
                 source: doc.dokumenUrl,
                 id: doc.id,
+                fileName: doc.dokumenPersyaratanName,
                 required: false,
             }
         })
-    }
 
+        this.fileHandlerData = {
+            ...this.fileHandlerData,
+            files,
+        }
+    }
+    
     toggleScoreModal(scheduleId?: string, examTypeCode?: string) {
         if (scheduleId && examTypeCode) {
             this.selectedScheduleId = scheduleId
@@ -418,6 +426,13 @@ export class StatusPendaftaranUkomComponent {
                         .subscribe({
                             next: (response) => {
                                 this.ukomGrade = new UkomGrade(response)
+                            },
+                            error: (err) => {
+                                console.error('Gagal load ukom grade:', err)
+                                this.handlerService.handleAlert(
+                                    'Error',
+                                    'Gagal memuat data grade UKOM',
+                                )
                             },
                         })
                 }),

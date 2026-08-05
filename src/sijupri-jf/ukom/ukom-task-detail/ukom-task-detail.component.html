@@ -367,7 +367,7 @@
         </div>
     </div>
 
-    <ng-container *ngIf="ukomGrade.id">
+    <ng-container *ngIf="ukomGrade?.id">
         <app-ukom-grade-table
             (downloadFile)=" downloadRekomendasi()"
             [gradeData]="ukomGrade"
