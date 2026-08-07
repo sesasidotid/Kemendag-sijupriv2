@@ -14,6 +14,7 @@ import {
     SquareActivity,
     FileText,
     BookOpenText,
+    UserMinus,
 } from 'lucide-angular'
 import { IsActiveMatchOptions } from '@angular/router'
 
@@ -26,6 +27,7 @@ import { IsActiveMatchOptions } from '@angular/router'
 })
 export class SideBarComponent {
     menuTree: Menu[] = LoginContext.getMenus()
+    isParticipantUkom: boolean = LoginContext.getUserId().startsWith('PU')
     isScrollV = true
 
     readonly X = X
@@ -73,6 +75,7 @@ export class SideBarComponent {
             MNU_SEC0001: UserRoundCog,
             MNU_MNT0001: Database,
             MNU_MNTI0001: Database,
+            MNU_RESIGNATION: UserMinus
         }
 
         return iconMap[menuCode] || LayoutDashboard // Default to Menu icon if no match

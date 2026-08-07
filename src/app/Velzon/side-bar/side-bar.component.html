@@ -14,6 +14,13 @@
                         <span class="fw-bold">Home</span>
                     </a>
                 </li>
+                <li *ngIf="isParticipantUkom" class="nav-item">
+                    <a class="nav-link menu-link" [ngClass]="{ 'px-3': !isScrollV }" routerLink="/resignation"
+                        routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+                        <i-lucide [img]="getIcon('MNU_RESIGNATION')" [size]="16"></i-lucide>
+                        <span class="fw-bold">Pengunduran Diri</span>
+                    </a>
+                </li>
                 <li *ngFor="let menu of menuTree" class="nav-item">
                     <a class="nav-link menu-link" [ngClass]="{ 'px-3': !isScrollV }" href="#sidebar{{ menu.code }}"
                         data-bs-toggle="collapse" role="button" [attr.aria-expanded]="isActive(menu) ? 'true' : 'false'"

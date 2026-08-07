@@ -321,6 +321,12 @@ export const routes: Routes = [
                                 (m) => m.UkomRegistrationRequirementComponent,
                             ),
                     },
+                    'Pengunduran Diri': {
+                        components: () =>
+                            import('./ukom/ukom-pemetaan/ukom-list/ukom-list.component').then(
+                                (m) => m.UkomListComponent,
+                            ),
+                    },
                 },
                 Maintenance: {
                     Instansi: {

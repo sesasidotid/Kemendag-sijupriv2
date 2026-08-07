@@ -11,6 +11,9 @@ import { FileHandlerComponent } from '@/modules/base/components/file-handler/fil
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import { HandlerService } from '@/modules/base/services/handler.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { ModalComponent } from '@/modules/base/components/modal/modal.component'
+import { UkomResignationDetailComponent } from './ukom-resignation-detail/ukom-resignation-detail.component'
+import { ParticipantResignation } from '@/modules/ukom/models/resignation/resignation.model'
 
 @Component({
     selector: 'app-resignation',
@@ -20,6 +23,8 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         ReactiveFormsModule,
         FileHandlerComponent,
         LoadingButtonComponent,
+        ModalComponent,
+        UkomResignationDetailComponent,
     ],
     templateUrl: './resignation.component.html',
     styleUrl: './resignation.component.scss',
@@ -28,10 +33,10 @@ export class ResignationComponent {
     router = inject(Router)
     fb = inject(FormBuilder)
     handlerService = inject(HandlerService)
-
+    showResignationModal: boolean = false
     form: FormGroup
     isSubmitting = signal(false)
-    submissionStatus = signal<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null)
+    resignationSubmission: ParticipantResignation = new ParticipantResignation()
 
     fileHandlerInputs: FIleHandler = {
         files: {
@@ -40,7 +45,7 @@ export class ResignationComponent {
         listen: (key: string, source: string, base64Data: string) => {
             this.form.patchValue({ fileSource: source, fileBase64: base64Data })
         },
-        maxSize: 5000000,
+        maxSize: 5242880,
         allowedExtensions: ['.pdf'],
         allowedTypes: [{ type: 'application/pdf', label: 'PDF' }],
     }
@@ -60,6 +65,14 @@ export class ResignationComponent {
         this.router.navigate(['/'])
     }
 
+    openResignationModal(): void {
+        this.showResignationModal = true
+    }
+
+    closeResignationModal(): void {
+        this.showResignationModal = false
+    }
+
     submit() {
         if (this.form.invalid) {
             this.handlerService.handleAlert(
@@ -69,12 +82,36 @@ export class ResignationComponent {
             return
         }
 
+        this.openResignationModal()
+    }
+
+    submitResignation(): void {
         this.isSubmitting.set(true)
 
-        // Mock API call to backend
+        // Mock API
         setTimeout(() => {
             this.isSubmitting.set(false)
-            this.submissionStatus.set('PENDING')
+            this.resignationSubmission = new ParticipantResignation({
+                id: crypto.randomUUID(),
+                participantUkom: {
+                    id: 'PU-2026-00123',
+                    fullName: 'Budi Santoso',
+                    nik: '3374012345670001',
+                },
+                reason: this.form.get('reason')?.value,
+                status: 'PENDING',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                documentResignationList: [
+                    {
+                        id: crypto.randomUUID(),
+                        fileName: 'surat-pengunduran-diri.pdf',
+                        fileSource: this.form.get('fileSource')?.value,
+                    },
+                ],
+            })
+            this.closeResignationModal()
+
             this.handlerService.handleAlert(
                 'Success',
                 'Pengajuan pengunduran diri berhasil dikirim dan menunggu persetujuan.',

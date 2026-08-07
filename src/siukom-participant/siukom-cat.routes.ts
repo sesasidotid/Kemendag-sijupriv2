@@ -25,6 +25,9 @@ export const routes: Routes = [
                     import('./resignation/resignation.component').then(
                         (m) => m.ResignationComponent,
                     ),
+                data: {
+                    title: 'Pengunduran Diri',
+                },
             },
             {
                 path: 'seminar-paper/:examScheduleId',
