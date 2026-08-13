@@ -323,9 +323,26 @@ export const routes: Routes = [
                     },
                     'Pengunduran Diri': {
                         components: () =>
-                            import('./ukom/ukom-pemetaan/ukom-list/ukom-list.component').then(
-                                (m) => m.UkomListComponent,
+                            import('./ukom/ukom-resignation/ukom-resignation-list/ukom-resignation-list.component').then(
+                                (m) => m.UkomResignationListComponent,
                             ),
+                        routes: [
+                            {
+                                path: ':id',
+                                loadComponent: () =>
+                                    import('./ukom/ukom-resignation/ukom-resignation-task-detail/ukom-resignation-task-detail.component').then(
+                                        (m) =>
+                                            m.UkomResignationTaskDetailComponent,
+                                    ),
+                            },
+                            {
+                                path: ':id/detail',
+                                loadComponent: () =>
+                                    import('./ukom/ukom-resignation/ukom-resignation-detail/ukom-resignation-detail.component').then(
+                                        (m) => m.UkomResignationDetailComponent,
+                                    ),
+                            },
+                        ],
                     },
                 },
                 Maintenance: {

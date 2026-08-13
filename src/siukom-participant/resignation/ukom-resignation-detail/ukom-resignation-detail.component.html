@@ -1,5 +1,15 @@
+@if (isLoadingResignationStatus()) {
+<div class="d-flex justify-content-center my-4">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+} @else if (resignationData()) {
 <!-- STATUS: PENDING -->
-<div class="alert alert-warning" *ngIf="resignationData.status === 'PENDING'">
+<div
+    class="alert alert-warning"
+    *ngIf="pendingTask.flowId === 'resignation_flow_1' && pendingTask.taskStatus === 'PENDING'"
+>
     <div class="d-flex align-items-start">
         <span class="mdi mdi-clock-outline fs-2 me-3"></span>
         <div>
@@ -12,7 +22,7 @@
 </div>
 
 <!-- STATUS: APPROVED -->
-<div class="alert alert-success" *ngIf="resignationData.status === 'APPROVED'">
+<div class="alert alert-success" *ngIf="pendingTask.taskStatus === 'COMPLETED'">
     <div class="d-flex align-items-start">
         <span class="mdi mdi-check-circle-outline fs-2 me-3"></span>
         <div>
@@ -25,14 +35,17 @@
 </div>
 
 <!-- STATUS: REJECTED -->
-<div class="alert alert-danger" *ngIf="resignationData.status === 'REJECTED'">
+<div
+    class="alert alert-danger"
+    *ngIf="pendingTask.flowId === 'resignation_flow_2' && pendingTask.taskStatus === 'PENDING'"
+>
     <div class="d-flex align-items-start">
         <span class="mdi mdi-close-circle-outline fs-2 me-3"></span>
         <div>
-            <h5 class="mb-1">Pengajuan Ditolak</h5>
+            <h5 class="mb-1">Pengajuan Perlu Perbaikan</h5>
             <p class="mb-0">
-                Pengajuan pengunduran diri Anda ditolak oleh Admin. Silakan
-                periksa catatan admin di bawah untuk detail lebih lanjut.
+                Pengajuan pengunduran diri Anda perlu perbaikan. Silakan periksa
+                catatan admin di bawah untuk detail lebih lanjut.
             </p>
         </div>
     </div>
@@ -51,28 +64,36 @@
             <div class="col-lg-6">
                 <div class="mb-3">
                     <label class="form-label">Nama Lengkap</label>
-                    <p class="border-bottom">David Dwi Nugroho</p>
+                    <p class="border-bottom">
+                        {{ resignationData()?.name || '-' }}
+                    </p>
                 </div>
             </div>
 
             <div class="col-lg-6">
                 <div class="mb-3">
                     <label class="form-label">NIP</label>
-                    <p class="border-bottom">198506122010121001</p>
+                    <p class="border-bottom">
+                        {{ resignationData()?.nip || '-' }}
+                    </p>
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="mb-3">
                     <label class="form-label">Nomor Whatsapp</label>
-                    <p class="border-bottom">081234567890</p>
+                    <p class="border-bottom">
+                        {{ resignationData()?.phone || '-' }}
+                    </p>
                 </div>
             </div>
 
             <div class="col-lg-6 mb-2">
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <p class="border-bottom">david.dwi.nugrohoexamplecom</p>
+                    <p class="border-bottom">
+                        {{ resignationData()?.email || '-' }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -94,7 +115,7 @@
             </label>
             <div class="col-sm-9">
                 <p class="mb-0 pt-2">
-                    {{ resignationData.reason || 'Tidak ada alasan yang
+                    {{ resignationData()?.reason || 'Tidak ada alasan yang
                     diberikan.' }}
                 </p>
             </div>
@@ -105,24 +126,26 @@
                 Dokumen Pengunduran Diri
             </label>
             <div class="col-sm-9">
+                @if (resignationData()?.suratPengunduranDiriUrl) {
                 <div class="d-flex align-items-center gap-2 pt-1">
                     <span class="mdi mdi-file-pdf-box fs-4 text-danger"></span>
-                    <span>{{ 'Surat Pengunduran Diri.pdf' }}</span>
+                    <span>{{ resignationData()?.suratPengunduranDiri }}</span>
                     <button
                         type="button"
                         class="btn btn-sm btn-outline-primary"
-                        (click)="preview('dada', 'd')"
+                        (click)="preview(resignationData()?.suratPengunduranDiri, resignationData()?.suratPengunduranDiriUrl)"
                     >
                         <i class="mdi mdi-eye-outline me-1"></i>Lihat
                     </button>
                 </div>
+                }
             </div>
         </div>
     </div>
 </div>
 
 <!-- SECTION 3: CATATAN REVIEW -->
-<div class="card" *ngIf="resignationData.remark">
+<div class="card" *ngIf="pendingTask?.remark">
     <div class="card-header">
         <h5 class="m-0">
             <i class="mdi mdi-file-document-check-outline me-2"></i>Catatan
@@ -131,10 +154,12 @@
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <p>
-                Catatan admin terkait pengajuan pengunduran diri Anda akan
-                ditampilkan di sini.
-            </p>
+            <p>{{ pendingTask?.remark }}</p>
         </div>
     </div>
 </div>
+} @else {
+<div class="alert alert-secondary">
+    Anda belum memiliki pengajuan pengunduran diri.
+</div>
+}

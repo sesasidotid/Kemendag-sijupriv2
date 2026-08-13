@@ -28,6 +28,38 @@ export const routes: Routes = [
                 data: {
                     title: 'Pengunduran Diri',
                 },
+                children: [
+                    {
+                        path: 'create',
+                        loadComponent: () =>
+                            import('./resignation/ukom-resignation-form/ukom-resignation-form.component').then(
+                                (m) => m.UkomResignationFormComponent,
+                            ),
+                        data: {
+                            title: 'Pengunduran Diri',
+                        },
+                    },
+                    {
+                        path: 'nip/:nip/detail',
+                        loadComponent: () =>
+                            import('./resignation/ukom-resignation-detail/ukom-resignation-detail.component').then(
+                                (m) => m.UkomResignationDetailComponent,
+                            ),
+                        data: {
+                            title: 'Pengunduran Diri',
+                        },
+                    },
+                    {
+                        path: 'nip/:nip/update',
+                        loadComponent: () =>
+                            import('./resignation/ukom-resignation-update/ukom-resignation-update.component').then(
+                                (m) => m.UkomResignationUpdateComponent,
+                            ),
+                        data: {
+                            title: 'Pengunduran Diri',
+                        },
+                    },
+                ],
             },
             {
                 path: 'seminar-paper/:examScheduleId',

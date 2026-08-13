@@ -1,0 +1,41 @@
+.empty-state-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+}
+
+.empty-state-card {
+    width: 100%;
+    max-width: 650px;
+    border: 0;
+    border-radius: 16px;
+    background-color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.info-page {
+    padding: 50px 40px;
+}
+
+.binbot-illustration {
+    width: 180px;
+    height: auto;
+    display: block;
+    margin: 0 auto 24px;
+}
+
+.title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: #1d1d1d;
+}
+
+.description {
+    max-width: 520px;
+    margin: 0 auto;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #6c757d;
+}

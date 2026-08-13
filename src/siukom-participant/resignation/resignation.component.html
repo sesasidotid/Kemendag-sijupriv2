@@ -1,113 +1,27 @@
-<header
-    class="dashboard-header d-flex justify-content-between align-items-center mb-4"
->
-    <button (click)="goBack()" class="btn btn-outline-secondary">
-        <span class="mdi mdi-arrow-left me-2"></span>
-        Kembali
-    </button>
-</header>
-
-<section class="card border-0 shadow-sm">
-    <div class="card-body">
-        <!-- Sudah mengajukan -->
-        <ng-container *ngIf="resignationSubmission.status; else resignationForm">
-            <app-ukom-resignation-detail
-                [resignationData]="resignationSubmission"
-            ></app-ukom-resignation-detail>
-        </ng-container>
-
-        <!-- Belum mengajukan -->
-        <ng-template #resignationForm>
-            <div class="alert alert-danger mb-4">
-                <strong>
-                    <span class="mdi mdi-alert me-2"></span>
-                    Perhatian:
-                </strong>
-                <br />
-                Dengan mengundurkan diri, Anda akan dibatalkan dari seluruh
-                jadwal ujian yang sedang diikuti. Tindakan ini tidak dapat
-                dibatalkan secara sepihak dan memerlukan persetujuan Admin.
-            </div>
-
-            <form [formGroup]="form" (ngSubmit)="submit()">
-                <div class="mb-4">
-                    <label class="form-label fw-bold">
-                        Alasan Pengunduran Diri
-                        <span class="text-danger">*</span>
-                    </label>
-
-                    <textarea
-                        class="form-control"
-                        rows="4"
-                        formControlName="reason"
-                        placeholder="Jelaskan alasan mengapa Anda mengundurkan diri (minimal 10 karakter)"
-                        [class.is-invalid]="form.get('reason')?.invalid && form.get('reason')?.touched"
-                    ></textarea>
-
-                    <div
-                        class="invalid-feedback"
-                        *ngIf="form.get('reason')?.hasError('required')"
-                    >
-                        Alasan pengunduran diri wajib diisi.
-                    </div>
-
-                    <div
-                        class="invalid-feedback"
-                        *ngIf="form.get('reason')?.hasError('minlength')"
-                    >
-                        Alasan pengunduran diri minimal 10 karakter.
-                    </div>
-                </div>
-
-                <app-file-handler
-                    [inputs]="fileHandlerInputs"
-                ></app-file-handler>
-
-                <div class="border-top pt-4 text-end">
-                    <app-loading-button
-                        [className]="'btn btn-primary'"
-                        [label]="'Kirim Pengajuan'"
-                        [disabled]="form.invalid"
-                        (clicked)="submit()"
-                    >
-                    </app-loading-button>
-                </div>
-            </form>
-        </ng-template>
+@if (isLoadingParticipant()) {
+<div class="d-flex justify-content-center align-items-center py-5">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Memuat...</span>
     </div>
+</div>
+} @else if (participantNotFound()) {
+<div class="empty-state-container">
+    <div class="info-page text-center">
+        <img
+            src="assets/binbot/binbot-wave.webp"
+            alt="BINBOT Mascot"
+            class="binbot-illustration"
+        />
 
-    <app-modal
-        *ngIf="showResignationModal"
-        [title]="'Pengunduran Diri'"
-        [enableFooter]="false"
-        (toggle)="showResignationModal = false"
-    >
-        <div class="px-2">
-            <h5 class="fw-semibold mb-3">Konfirmasi Pengunduran Diri</h5>
+        <h2 class="title">Tidak Ada Data Peserta UKOM Aktif</h2>
 
-            <p class="text-muted mb-4">
-                Apakah Anda yakin ingin mengajukan pengunduran diri dari proses
-                Uji Kompetensi (UKOM)? Setelah pengajuan dikirim, permohonan
-                akan diproses oleh administrator.
-            </p>
-
-            <div class="d-flex justify-content-end gap-2">
-                <button
-                    type="button"
-                    class="btn btn-light"
-                    (click)="showResignationModal = false"
-                >
-                    Batal
-                </button>
-
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="submitResignation()"
-                >
-                    Ajukan Pengunduran Diri
-                </button>
-            </div>
-        </div>
-    </app-modal>
-</section>
+        <p class="description">
+            Anda saat ini tidak memiliki data peserta UKOM yang aktif. Hal ini
+            dapat terjadi karena proses pengunduran diri Anda telah disetujui
+            atau belum terdapat pengajuan UKOM yang aktif.
+        </p>
+    </div>
+</div>
+} @else {
+<router-outlet></router-outlet>
+}

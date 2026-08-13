@@ -1,0 +1,242 @@
+<div
+    class="d-flex justify-content-center my-4"
+    *ngIf="isLoadingResignationStatus()"
+>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div #hadItem *ngIf="!isLoadingResignationStatus()">
+    <header
+        class="dashboard-header d-flex justify-content-between align-items-center mb-4"
+    >
+        <button (click)="goBack()" class="btn btn-outline-secondary">
+            <span class="mdi mdi-arrow-left me-2"></span>
+            Kembali
+        </button>
+    </header>
+
+    <div class="alert alert-danger">
+        <div class="d-flex align-items-start">
+            <span class="mdi mdi-close-circle-outline fs-2 me-3"></span>
+            <div>
+                <h5 class="mb-1">Pengajuan Perlu Perbaikan</h5>
+                <p class="mb-0">
+                    Pengajuan pengunduran diri Anda perlu perbaikan. Silakan
+                    periksa catatan admin di bawah untuk detail lebih lanjut.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 1: DATA DIRI -->
+    <div class="card">
+        <div class="card-header align-items-center d-flex">
+            <h5 class="m-0">
+                <i class="mdi mdi-account me-2"></i>Detail Peserta UKom
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <p class="border-bottom">
+                            {{ resignationData()?.name || '-'
+                            }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label">NIP</label>
+                        <p class="border-bottom">
+                            {{ resignationData()?.nip || '-' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nomor Whatsapp</label>
+                        <p class="border-bottom">
+                            {{ resignationData()?.phone || '-'
+                            }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 mb-2">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <p class="border-bottom">
+                            {{ resignationData()?.email || '-'
+                            }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="card">
+        <div class="card-header align-items-center d-flex">
+            <h5 class="m-0">
+                <i class="mdi mdi-account me-2"></i>Data Pengajuan
+            </h5>
+        </div>
+        <div class="card-body">
+            <div>
+                <ng-container *ngIf="pendingTask?.remark">
+                    <div class="alert alert-warning mt-1">
+                        <strong>Catatan Revisi Pengajuan : </strong>
+                        {{ pendingTask?.remark }}
+                    </div>
+                </ng-container>
+                <form [formGroup]="form" (ngSubmit)="submit()">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            Alasan Pengunduran Diri
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            rows="4"
+                            formControlName="reason"
+                            placeholder="Jelaskan alasan mengapa Anda mengundurkan diri (minimal 10 karakter)"
+                            [class.is-invalid]="form.get('reason')?.invalid && form.get('reason')?.touched"
+                        ></textarea>
+
+                        <div
+                            class="invalid-feedback"
+                            *ngIf="form.get('reason')?.hasError('required')"
+                        >
+                            Alasan pengunduran diri wajib diisi.
+                        </div>
+
+                        <div
+                            class="invalid-feedback"
+                            *ngIf="form.get('reason')?.hasError('minlength')"
+                        >
+                            Alasan pengunduran diri minimal 10 karakter.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"
+                            >Dokumen Pengunduran Diri</label
+                        >
+
+                        @if (resignationData()?.suratPengunduranDiriUrl) {
+                        <div class="mb-2 rounded border p-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span
+                                    class="mdi mdi-file-pdf-box fs-4 text-danger"
+                                ></span>
+                                <span class="flex-grow-1"
+                                    >{{ resignationData().suratPengunduranDiri
+                                    }}</span
+                                >
+
+                                <div class="d-flex gap-2">
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-outline-warning"
+                                        (click)="perbaiki()"
+                                    >
+                                        <i
+                                            class="mdi mdi-pencil-outline me-1"
+                                        ></i
+                                        >Perbaiki
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        (click)="preview(
+                                                    resignationData().suratPengunduranDiriUrl
+                                                )"
+                                    >
+                                        <i class="mdi mdi-eye-outline me-1"></i>
+                                        Lihat
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        <ng-container *ngIf="pendingTask?.remark">
+                            <div class="alert alert-warning mt-1">
+                                <strong>Catatan Revisi Dokumen : </strong>
+                                {{ resignationData()?.remarkDocument }}
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <div class="border-top pt-4 text-end">
+                        <app-loading-button
+                            [className]="'btn btn-primary'"
+                            [label]="'Ajukan perbaikan'"
+                            (clicked)="submit()"
+                        >
+                        </app-loading-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <app-modal
+            *ngIf="showResignationModal"
+            [title]="'Pengunduran Diri'"
+            [enableFooter]="false"
+            (toggle)="showResignationModal = false"
+        >
+            <div class="px-2">
+                <h5 class="fw-semibold mb-3">
+                    Konfirmasi Perbaikan Pengunduran Diri
+                </h5>
+
+                <p class="text-muted mb-4">
+                    Apakah Anda yakin ingin mengajukan perbaikan pengunduran
+                    diri dari proses Uji Kompetensi (UKOM)? Setelah pengajuan
+                    dikirim, permohonan akan diproses oleh administrator.
+                </p>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        (click)="showResignationModal = false"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        (click)="submitResignation()"
+                    >
+                        Kirim Perbaikan
+                    </button>
+                </div>
+            </div>
+        </app-modal>
+
+        <app-modal
+            *ngIf="isModalOpen$ | async"
+            [enableFooter]="false"
+            [title]="'Perbaiki Data Administrasi UKom'"
+            (toggle)="toggleModal()"
+        >
+            <app-ukom-resignation-revision
+                [dokumen]="selectedDokumen()"
+                [remarkDocument]=""
+                (submitted)="onRevisionSubmitted($event)"
+                (closed)="toggleModal()"
+            ></app-ukom-resignation-revision>
+        </app-modal>
+    </section>
+</div>
