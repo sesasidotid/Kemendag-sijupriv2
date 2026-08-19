@@ -38,7 +38,7 @@
             <h5 class="card-title">{{ undangan.suratUndangan }}</h5>
             <p class="card-text">
                 Dimohon kehadiranya pada tanggal
-                <span class="text-primary">{{ undangan.waktuPelaksanaan }} </span>untuk verifikasi formasi
+                <span class="text-primary">{{ undangan.waktuPelaksanaan | tanggalIndo: null : true }} </span>untuk verifikasi formasi
             </p>
             <a class="btn btn-primary" (click)="
                     preview(undangan.suratUndangan, undangan.suratUndanganUrl)

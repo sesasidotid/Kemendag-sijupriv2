@@ -29,6 +29,7 @@ import { FilePreviewService } from '../../../modules/base/services/file-preview.
 import { UndanganVerifikasiFormasi } from '../../../modules/formasi/models/undangan.model'
 import { EmptyStateComponent } from '../../../modules/base/components/empty-state/empty-state.component'
 import { LoadingButtonComponent } from '../../../modules/base/components/loading-button/loading-button.component'
+import { TanggalIndoPipe } from '@/modules/base/pipes/tanggal-indo.pipe'
 @Component({
     selector: 'app-formasi-task',
     standalone: true,
@@ -41,7 +42,8 @@ import { LoadingButtonComponent } from '../../../modules/base/components/loading
         FileHandlerComponent,
         ReactiveFormsModule,
         EmptyStateComponent,
-        LoadingButtonComponent
+        LoadingButtonComponent,
+        TanggalIndoPipe
     ],
     templateUrl: './formasi-task.component.html',
     styleUrl: './formasi-task.component.scss'

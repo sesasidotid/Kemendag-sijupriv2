@@ -175,6 +175,9 @@ export class UkomQuestionImportComponent implements OnInit {
                     new PrimaryColumnBuilder('Tipe Soal', 'type').build(),
                 )
                 .addPrimaryColumn(
+                    new PrimaryColumnBuilder('Indikator Kompetensi', 'association').build(),
+                )
+                .addPrimaryColumn(
                     new PrimaryColumnBuilder('Bobot', 'weight').build(),
                 )
                 .addFilter(

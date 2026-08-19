@@ -1,41 +1,36 @@
-import { Pipe, PipeTransform } from '@angular/core'
+import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'tanggalIndo',
-    standalone: true
+    standalone: true,
 })
 export class TanggalIndoPipe implements PipeTransform {
-    transform (start?: string | Date, end?: string | Date): string {
+    transform(
+        start?: string | Date,
+        end?: string | Date,
+        withTime = false,
+    ): string {
         const bulanIndo = [
-            'Januari',
-            'Februari',
-            'Maret',
-            'April',
-            'Mei',
-            'Juni',
-            'Juli',
-            'Agustus',
-            'September',
-            'Oktober',
-            'November',
-            'Desember'
-        ]
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+        ];
 
         const parse = (tanggal: string | Date): string => {
-            const date =
-                typeof tanggal === 'string' ? new Date(tanggal) : tanggal
-            if (isNaN(date.getTime())) return '-' // invalid date
-            return `${date.getDate()} ${
-                bulanIndo[date.getMonth()]
-            } ${date.getFullYear()}`
-        }
+            const date = typeof tanggal === 'string' ? new Date(tanggal) : tanggal;
+            if (isNaN(date.getTime())) return '-';
 
-        // Handle missing start
-        if (!start) return '-'
+            const tanggalStr = `${date.getDate()} ${bulanIndo[date.getMonth()]} ${date.getFullYear()}`;
 
-        // Handle only one valid date
-        if (!end || start === end) return parse(start)
+            if (!withTime) return tanggalStr;
 
-        return `${parse(start)} s.d. ${parse(end)}`
+            const jam = date.getHours().toString().padStart(2, '0');
+            const menit = date.getMinutes().toString().padStart(2, '0');
+            return `${tanggalStr}, ${jam}:${menit}`;
+        };
+
+        if (!start) return '-';
+        if (!end || start === end) return parse(start);
+
+        return `${parse(start)} s.d. ${parse(end)}`;
     }
 }

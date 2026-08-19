@@ -15,10 +15,10 @@
       <table class="table table-bordered">
         <thead class="table-primary">
           <tr>
-            <th scope="col" class="align-middle">No</th>
+            <th scope="col" class="align-middle text-center">No</th>
             <th scope="col" class="align-middle">Name Jabatan</th>
             <th scope="col" class="align-middle">Jenjang Jabatan</th>
-            <th scope="col" class="align-middle">
+            <th scope="col" class="align-middle text-center">
               Rekapitulasi Usulan Formasi
             </th>
           </tr>
@@ -39,7 +39,7 @@
             >
               <td
                 *ngIf="j === 0"
-                class="align-middle"
+                class="align-middle text-center"
                 [attr.rowspan]="item.formasiResultDtoList.length"
                 [class.highlight]="hoveredJabatanIndex === i"
               >
@@ -54,7 +54,7 @@
                 {{ item.jabatanName }}
               </td>
               <td class="align-middle">{{ formasi.jenjangName }}</td>
-              <td class="align-middle">
+              <td class="align-middle text-center">
                 {{ formasi.result || 0 }}
               </td>
             </tr>
@@ -64,7 +64,7 @@
             <td colspan="3" class="align-middle text-center fw-bold">
               Jumlah Usulan Formasi
             </td>
-            <td class="align-middle fw-bold">
+            <td class="align-middle text-center fw-bold">
               {{ getTotalRekapitulasi() }}
             </td>
           </tr>

@@ -17,18 +17,22 @@ import { ApiService } from '../../../../modules/base/services/api.service'
 import { PengaturanFormasiJabatan } from '../../../../modules/formasi/models/formasi-pengaturan-jabatan.model'
 import { BehaviorSubject } from 'rxjs'
 import { first } from 'rxjs/operators'
+import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
+import { Jenjang } from '@/modules/maintenance/models/jenjang.modle'
 @Component({
     selector: 'app-formasi-jabatan',
     standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './formasi-jabatan.component.html',
-    styleUrl: './formasi-jabatan.component.scss'
+    styleUrl: './formasi-jabatan.component.scss',
 })
 export class FormasiJabatanComponent {
     isModalOpen = false
+    isSavedFormasiDataOpen = false
     jabatanCode: string
     unitKerjaId = LoginContext.getUnitKerjaId()
     jabatan: Jabatan = new Jabatan()
+    jenjangList: Jenjang[] = []
 
     formasiUnsurList: FormasiUnsur[] = []
     formasiResultList: FormasiResult[] = []
@@ -38,34 +42,38 @@ export class FormasiJabatanComponent {
     unsurList: any[] = []
     formasiRequest: FormasiRequest = new FormasiRequest()
     PengaturanFormasiJabatan: PengaturanFormasiJabatan[] = []
+    selectedPengaturanFormasiJabatan: PengaturanFormasiJabatan
 
     @ViewChild(ConfirmationDialogComponent, { static: false })
     confirmationDialog!: ConfirmationDialogComponent
     isLoading$ = new BehaviorSubject<boolean>(false)
+    isLoadingFormasiData = true
 
     constructor(
         private jabatanService: JabatanService,
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private apiService: ApiService,
-        private handlerSerivce: HandlerService
-    ) { }
+        private handlerSerivce: HandlerService,
+        private jenjangService: JenjangService,
+    ) {}
 
     ngOnInit() {
-        this.activatedRoute.paramMap.subscribe(params => {
+        this.activatedRoute.paramMap.subscribe((params) => {
             this.jabatanCode = params.get('id')
         })
 
         this.getFormasiObjectTask()
         this.getFormasiId()
+        this.getAllJenjang()
     }
 
     preventMinus(event: KeyboardEvent) {
         if (event.key === '-' || event.key === 'e') {
-          event.preventDefault();
+            event.preventDefault()
         }
-      }
-      
+    }
+
     getFormasiObjectTask() {
         this.getJabatan()
         this.getFormasiTree()
@@ -75,12 +83,23 @@ export class FormasiJabatanComponent {
         this.apiService
             .getData(`/api/v1/formasi_detail/formasi/${formasi_id}`)
             .subscribe({
-                next: response => {
+                next: (response) => {
                     this.PengaturanFormasiJabatan = response
+
+                    this.selectedPengaturanFormasiJabatan =
+                        this.PengaturanFormasiJabatan.find(
+                            (jabatan) =>
+                                jabatan.jabatanCode === this.jabatanCode,
+                        )
+
+                    this.isLoadingFormasiData = false
                 },
                 error: () => {
-                    console.warn('No documents found in pendingTask.dokumenUkomList')
-                }
+                    console.warn(
+                        'No documents found in pendingTask.dokumenUkomList',
+                    )
+                    this.isLoadingFormasiData = false
+                },
             })
     }
 
@@ -91,34 +110,44 @@ export class FormasiJabatanComponent {
                 next: (response: any) => {
                     this.formasiId = response.objectId
                     this.getPengaturanFormasiJabatan(response.objectId)
-                }
+                },
+                error: (err) => {
+                    this.isLoadingFormasiData = false
+                },
             })
+    }
+
+    getAllJenjang() {
+        this.jenjangService.findAll().subscribe({
+            next: (response: Jenjang[]) => (this.jenjangList = response),
+        })
     }
 
     getFormasiTree() {
         this.apiService
             .getData(`/api/v1/unsur/tree/${this.jabatanCode}`)
             .subscribe({
-                next: (response: FormasiUnsur[]) => (this.formasiUnsurList = response)
+                next: (response: FormasiUnsur[]) =>
+                    (this.formasiUnsurList = response),
             })
     }
 
     getJabatan() {
         this.jabatanService.findById(this.jabatanCode).subscribe({
-            next: (jabatan: Jabatan) => (this.jabatan = jabatan)
+            next: (jabatan: Jabatan) => (this.jabatan = jabatan),
         })
     }
 
     isSubmitted(jabatanCode: string) {
         return this.PengaturanFormasiJabatan.some(
-            jabatan => jabatan.jabatanCode === jabatanCode
+            (jabatan) => jabatan.jabatanCode === jabatanCode,
         )
     }
 
     initiate(formasiUnsur: FormasiUnsur) {
         if (!this.unsurVolumeData[formasiUnsur.id]) {
             this.unsurVolumeData[formasiUnsur.id] = {
-                volume: formasiUnsur.volume || 0
+                volume: formasiUnsur.volume || 0,
             }
         }
 
@@ -127,9 +156,20 @@ export class FormasiJabatanComponent {
 
     totalPembulatan() {
         var total = 0
-        this.formasiResultList.forEach(formasiResult => {
+        this.formasiResultList.forEach((formasiResult) => {
             total = total + formasiResult.pembulatan
         })
+
+        return total
+    }
+
+    totalPembulatanV2() {
+        var total = 0
+        this.selectedPengaturanFormasiJabatan?.formasiResultDtoList.forEach(
+            (formasiResult) => {
+                total = total + formasiResult.pembulatan
+            },
+        )
 
         return total
     }
@@ -139,7 +179,7 @@ export class FormasiJabatanComponent {
         for (const key in this.unsurVolumeData) {
             this.unsurList.push({
                 id: key,
-                volume: this.unsurVolumeData[key].volume
+                volume: this.unsurVolumeData[key].volume,
             })
         }
 
@@ -147,21 +187,36 @@ export class FormasiJabatanComponent {
             .postData('/api/v1/formasi_detail/calculate', {
                 formasiId: this.formasiId,
                 jabatanCode: this.jabatanCode,
-                unsurDtoList: this.unsurList
+                unsurDtoList: this.unsurList,
             })
             .subscribe({
                 next: (response: FormasiResult[]) => {
                     this.formasiResultList = response
                     this.isModalOpen = true
                 },
-                error: error => {
+                error: (error) => {
                     if (error.error.code == 'VAL-00001') {
-                        this.handlerSerivce.handleAlert('Error', 'Semua volume harus diisi')
+                        this.handlerSerivce.handleAlert(
+                            'Error',
+                            'Semua volume harus diisi',
+                        )
                     } else {
-                        this.handlerSerivce.handleAlert('Error', 'Gagal menghitung formasi')
+                        this.handlerSerivce.handleAlert(
+                            'Error',
+                            'Gagal menghitung formasi',
+                        )
                     }
-                }
+                },
             })
+    }
+
+    openSavedFormasiModal() {
+        this.isSavedFormasiDataOpen = true
+    }
+
+    mappingJenjangCode(jenjangCode: string): string {
+        const jenjang = this.jenjangList?.find((j) => j.code === jenjangCode)
+        return jenjang?.name
     }
 
     submit() {
@@ -179,8 +234,11 @@ export class FormasiJabatanComponent {
                 },
                 error: () => {
                     this.isLoading$.next(false)
-                    this.handlerSerivce.handleAlert('Error', 'Gagal menyimpan data')
-                }
+                    this.handlerSerivce.handleAlert(
+                        'Error',
+                        'Gagal menyimpan data',
+                    )
+                },
             })
     }
 }
