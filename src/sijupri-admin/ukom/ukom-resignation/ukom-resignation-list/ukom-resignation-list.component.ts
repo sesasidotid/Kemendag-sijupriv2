@@ -138,7 +138,7 @@ export class UkomResignationListComponent {
                     new ActionColumnBuilder()
                         .setAction((pendingTask: any) => {
                             this.router.navigate([
-                                `/ukom/ukom-resignation/${pendingTask.id}`,
+                                `/ukom/ukom-resignation-list/${pendingTask.id}`,
                             ])
                         }, 'info')
                         .withIcon('detail')

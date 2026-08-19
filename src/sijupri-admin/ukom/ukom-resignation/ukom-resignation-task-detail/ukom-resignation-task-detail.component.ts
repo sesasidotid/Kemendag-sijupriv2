@@ -126,9 +126,9 @@ export class UkomResignationTaskDetailComponent {
     }
 
     back(tabIndex: number, menu: string) {
-        const eqFlowId = `resignation_flow_${tabIndex + 1}`
+        const eqFlowId = `resignation_flow_${tabIndex}`
 
-        this.router.navigate(['/ukom/ukom-resignation'], {
+        this.router.navigate(['/ukom/ukom-resignation-list'], {
             queryParams: {
                 eq_flowId: eqFlowId,
                 page: 1,
@@ -146,7 +146,7 @@ export class UkomResignationTaskDetailComponent {
             )
             .subscribe({
                 next: () => {
-                    this.handlerService.handleNavigate('/ukom/ukom-resignation')
+                    this.handlerService.handleNavigate('/ukom/ukom-resignation-list')
                 },
             })
     }

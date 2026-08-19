@@ -72,7 +72,7 @@ export class UkomResignationApprovedListComponent {
                         .setAction(
                             (ukomResignation: ParticipantResignation) => {
                                 this.router.navigate([
-                                    `/ukom/ukom-resignation/${ukomResignation.id}/detail`,
+                                    `/ukom/ukom-resignation-list/${ukomResignation.id}/detail`,
                                 ])
                             },
                             'info',

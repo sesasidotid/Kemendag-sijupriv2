@@ -75,7 +75,7 @@ export class UkomResignationDetailComponent {
     }
 
     back() {
-        this.router.navigate(['/ukom/ukom-resignation'], {})
+        this.router.navigate(['/ukom/ukom-resignation-list'], {})
     }
 
     getDetailUkomResignation(): void {
