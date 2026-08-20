@@ -43,15 +43,15 @@ jobs:
                   mkdir -p ~/.ssh
                   echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
                   chmod 600 ~/.ssh/id_ed25519
-                  ssh-keyscan -H 103.217.144.101 >> ~/.ssh/known_hosts
+                  ssh-keyscan -H 103.179.57.240 >> ~/.ssh/known_hosts
 
             - name: Upload dist.zip
               run: |
-                  scp -i ~/.ssh/id_ed25519 dist.zip sesasi@103.217.144.101:/sesasi/app/sijupri-fe/
+                  scp -i ~/.ssh/id_ed25519 dist.zip sesasi@103.179.57.240:/sesasi/app/sijupri-fe/
 
             - name: Deploy on server
               run: |
-                  ssh -i ~/.ssh/id_ed25519 sesasi@103.217.144.101 << 'EOF'
+                  ssh -i ~/.ssh/id_ed25519 sesasi@103.179.57.240 << 'EOF'
                     set -e
                     cd /sesasi/app/sijupri-fe/
 
