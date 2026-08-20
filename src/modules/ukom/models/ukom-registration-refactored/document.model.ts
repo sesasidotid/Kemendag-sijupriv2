@@ -16,6 +16,7 @@ export class DokumenUkom extends Serializable {
     isMengulang: boolean = undefined
     specification: string | null = undefined
     participantUkomId: string | null = undefined
+    ukomResignationId?: string|null = undefined
     remark: string | null = undefined
 
     constructor(object?: { [key: string]: any }) {

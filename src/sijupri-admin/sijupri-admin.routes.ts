@@ -321,6 +321,12 @@ export const routes: Routes = [
                                 (m) => m.UkomRegistrationRequirementComponent,
                             ),
                     },
+                    'Syarat Pengunduran': {
+                        components: () =>
+                            import('./ukom/ukom-resignation-document/ukom-resignation-document-list/ukom-resignation-document-list.component').then(
+                                (m) => m.UkomResignationDocumentListComponent,
+                            ),
+                    },
                     'Pengunduran Diri': {
                         components: () =>
                             import('./ukom/ukom-resignation/ukom-resignation-list/ukom-resignation-list.component').then(
