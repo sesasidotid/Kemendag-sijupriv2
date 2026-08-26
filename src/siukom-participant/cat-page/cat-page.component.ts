@@ -142,6 +142,11 @@ export class CatPageComponent {
         this.securityService.handleFullscreenExit()
     }
 
+    @HostListener('window:focus', [])
+    onFocus() {
+        this.securityService.handleFocus()
+    }
+
     backWithConfirmation() {
         const title = 'Konfirmasi Kembali'
         const message =
