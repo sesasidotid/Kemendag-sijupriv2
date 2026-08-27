@@ -1,5 +1,7 @@
-import { Injectable, signal } from '@angular/core'
+import { inject, Injectable, signal } from '@angular/core'
 import { HandlerService } from '@/modules/base/services/handler.service'
+import { ApiService } from '@/modules/base/services/api.service'
+import { SystemConfig } from '@/modules/base/models/system-config.model'
 
 /**
  * Service responsible for managing exam timer, countdown, and time-based auto-submission
@@ -10,8 +12,10 @@ import { HandlerService } from '@/modules/base/services/handler.service'
 export class CatExamTimerService {
     readonly remainingTime = signal('00:00:00')
     readonly remainingSeconds = signal(0)
+    private api = inject(ApiService)
 
     private countdownInterval: any
+    private additionalTimeMinutes: number = 0 
     private onTimeExpiredCallback?: () => void
 
     constructor(private handler: HandlerService) {}
@@ -38,11 +42,12 @@ export class CatExamTimerService {
 
         const now = new Date().getTime()
         const startTime = new Date(startAt).getTime()
-        const durationMs = duration * 60 * 60 * 1000 // duration in hours
+        const extraMs = this.additionalTimeMinutes * 60 * 1000 // <-- BARU
+        const durationMs = duration * 60 * 60 * 1000 + extraMs // <-- tambahin ke alokasi personal
         const elapsedTime = now - startTime // Time already spent
         const remainingDuration = durationMs - elapsedTime // Time left from allocated duration
         const calculatedEndTime = now + remainingDuration // When duration would end
-        const hardEndTime = examEndTime.getTime()
+        const hardEndTime = examEndTime.getTime() + extraMs
         const effectiveEndTime = Math.min(calculatedEndTime, hardEndTime)
 
         const initialTimeLeft = effectiveEndTime - now
@@ -124,5 +129,15 @@ export class CatExamTimerService {
         if (this.onTimeExpiredCallback) {
             this.onTimeExpiredCallback()
         }
+    }
+
+    loadSystemConfig() {
+        this.api.getData('/api/v1/sys_conf/UKM_ADDITIONAL_TIME').subscribe({
+            next: (res: SystemConfig) => {
+                if (res && res.value) {
+                    this.additionalTimeMinutes = parseInt(res.value, 10)
+                }
+            },
+        })
     }
 }

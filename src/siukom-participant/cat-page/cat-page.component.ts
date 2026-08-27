@@ -317,7 +317,10 @@ export class CatPageComponent {
                         this.securityService.setExamScheduleId(
                             this.examScheduleId,
                         )
+
+                        this.timerService.loadSystemConfig()
                     }
+
 
                     if (!catSchedule?.endTime) {
                         this.handler.handleAlert(
