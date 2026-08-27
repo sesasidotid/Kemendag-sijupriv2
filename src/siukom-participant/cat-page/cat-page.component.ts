@@ -142,6 +142,11 @@ export class CatPageComponent {
         this.securityService.handleFullscreenExit()
     }
 
+    @HostListener('window:focus', [])
+    onFocus() {
+        this.securityService.handleFocus()
+    }
+
     backWithConfirmation() {
         const title = 'Konfirmasi Kembali'
         const message =
@@ -312,7 +317,10 @@ export class CatPageComponent {
                         this.securityService.setExamScheduleId(
                             this.examScheduleId,
                         )
+
+                        this.timerService.loadSystemConfig()
                     }
+
 
                     if (!catSchedule?.endTime) {
                         this.handler.handleAlert(
