@@ -1,7 +1,13 @@
-<ng-container *ngIf="(tabService.activeTab$| async) !== 2">
+<ng-container
+    *ngIf="(tabService.activeTab$| async) === 0 || (tabService.activeTab$| async) === 1"
+>
     <app-pagable [pagable]="pagable$ | async" [refresh]="refresh"></app-pagable>
 </ng-container>
 
 <ng-container *ngIf="(tabService.activeTab$ | async) === 2">
     <app-ukom-resignation-approved-list></app-ukom-resignation-approved-list>
+</ng-container>
+
+<ng-container *ngIf="(tabService.activeTab$ | async) === 3">
+    <app-ukom-export-resignation></app-ukom-export-resignation>
 </ng-container>

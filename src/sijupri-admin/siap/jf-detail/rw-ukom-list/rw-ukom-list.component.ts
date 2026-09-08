@@ -13,6 +13,7 @@ import { PagableComponent } from '@/modules/base/components/pagable/pagable.comp
 import { CommonModule } from '@angular/common'
 import { Router } from '@angular/router'
 import { FailedTask } from '@/modules/ukom/models/ukom-registration-refactored/failed-task.model'
+import { ParticipantResignation } from '@/modules/ukom/models/resignation/resignation.model'
 
 @Component({
     selector: 'app-rw-ukom-list',
@@ -25,6 +26,7 @@ export class RwUkomListComponent {
     jfNip = input<string>(null)
     pagable = signal<Pagable>(null)
     rejectedPagable = signal<Pagable>(null)
+    resignationPagable = signal<Pagable>(null)
 
     jenisUkomService = inject(JenisUkomService)
     router = inject(Router)
@@ -37,6 +39,7 @@ export class RwUkomListComponent {
                 if (jfNip) {
                     this.initRWUkomPagable()
                     this.initRWRejectedPagable()
+                    this.initRWResignationPagable()
                 }
             },
             { allowSignalWrites: true },
@@ -121,6 +124,50 @@ export class RwUkomListComponent {
         this.rejectedPagable.set(rejectedPagable)
     }
 
+    initRWResignationPagable() {
+        const endpoint = `/api/v1/ukom_resignation/search/${this.jfNip()}`
+
+        const resignationPagable = new PagableBuilder(endpoint)
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Jenis Ukom', (data: ParticipantResignation) => {
+                        return this.jenisUkomService.getLabelByValue(
+                            data.jenisUkom,
+                        )
+                    })
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue('Tanggal', (data: ParticipantResignation) => {
+                        const formattedDate = this.TanggalWaktuIndo.transform(
+                            data.dateCreated,
+                        )
+
+                        return formattedDate
+                    })
+                    .build(),
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: ParticipantResignation) => {
+                        this.goToRWResignationUkomDetail(data.id)
+                    }, 'info')
+                    .withIcon('detail')
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('nip')
+                    .withDefaultValue(this.jfNip())
+                    .build(),
+            )
+            .build()
+            
+
+        this.resignationPagable.set(resignationPagable)
+    }
+
     goToRWUkomDetail(participantId: string) {
         this.router.navigate([
             `/ukom/ukom-list/${this.jfNip()}/${participantId}`,
@@ -130,6 +177,12 @@ export class RwUkomListComponent {
     goToRWRejectedUkomDetail(participantId: string) {
         this.router.navigate([
             `/ukom/ukom-list/rejected/detail/${participantId}`,
+        ])
+    }
+
+    goToRWResignationUkomDetail(resignationId: string) {
+        this.router.navigate([
+            `/ukom/ukom-resignation-list/${resignationId}/detail`,
         ])
     }
 }

@@ -1,10 +1,10 @@
-@if (isLoadingParticipant()) {
+@if (isLoadingParticipant() || isLoadingResignationStatus()) {
 <div class="d-flex justify-content-center align-items-center py-5">
     <div class="spinner-border" role="status">
         <span class="visually-hidden">Memuat...</span>
     </div>
 </div>
-} @else if (participantNotFound()) {
+} @else if (isParticipantAllowToResign) {
 <div class="empty-state-container">
     <div class="info-page text-center">
         <img
@@ -13,15 +13,28 @@
             class="binbot-illustration"
         />
 
-        <h2 class="title">Tidak Ada Data Peserta UKOM Aktif</h2>
+        <h2 class="title">Pengunduran Diri Tidak Dapat Dilakukan</h2>
 
         <p class="description">
-            Anda saat ini tidak memiliki data peserta UKOM yang aktif. Hal ini
-            dapat terjadi karena proses pengunduran diri Anda telah disetujui
-            atau belum terdapat pengajuan UKOM yang aktif.
+            Pengunduran diri tidak dapat dilakukan karena hasil UKOM telah
+            dikirim kepada peserta.
         </p>
     </div>
 </div>
-} @else {
-<router-outlet></router-outlet>
+
+} @else if (!pendingTask) {
+<app-ukom-resignation-form></app-ukom-resignation-form>
+} @else if ( pendingTask.flowId === 'resignation_flow_1' && (
+pendingTask.taskStatus === 'COMPLETED' || pendingTask.taskStatus === 'PENDING' )
+) {
+<app-ukom-resignation-detail
+    [participant]="participant()"
+    [pendingTask]="pendingTask"
+/>
+} @else if ( pendingTask.flowId === 'resignation_flow_2' &&
+pendingTask.taskStatus === 'PENDING' ) {
+<app-ukom-resignation-update
+    [participant]="participant()"
+    [pendingTask]="pendingTask"
+/>
 }

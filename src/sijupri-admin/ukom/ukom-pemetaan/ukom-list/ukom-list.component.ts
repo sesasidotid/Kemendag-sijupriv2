@@ -139,7 +139,11 @@ export class UkomListComponent {
             .addPrimaryColumn(
                 new PrimaryColumnBuilder()
                     .withDynamicValue('Status', (data: any) =>
-                        data.ukomBan != null ? 'Banned' : 'Active',
+                        data.ukomBan != null
+                            ? 'Banned'
+                            : data.inactiveFlag
+                                ? 'Inactive'
+                                : 'Active',
                     )
                     .build(),
             )

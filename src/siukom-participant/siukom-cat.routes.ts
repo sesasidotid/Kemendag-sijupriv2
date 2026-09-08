@@ -21,42 +21,35 @@ export const routes: Routes = [
             },
             {
                 path: 'resignation',
-                loadComponent: () =>
-                    import('./resignation/resignation.component').then(
-                        (m) => m.ResignationComponent,
-                    ),
                 data: {
                     title: 'Pengunduran Diri',
                 },
                 children: [
                     {
-                        path: 'create',
+                        path: '',
                         loadComponent: () =>
-                            import('./resignation/ukom-resignation-form/ukom-resignation-form.component').then(
-                                (m) => m.UkomResignationFormComponent,
+                            import('./resignation/resignation.component').then(
+                                (m) => m.ResignationComponent,
+                            ),
+                    },
+                    {
+                        path: 'riwayat',
+                        loadComponent: () =>
+                            import('./resignation/rw-resignation-list/rw-resignation-list.component').then(
+                                (m) => m.RwResignationListComponent,
                             ),
                         data: {
-                            title: 'Pengunduran Diri',
+                            title: 'Riwayat',
                         },
                     },
                     {
-                        path: 'nip/:nip/detail',
+                        path: 'detail/:id',
                         loadComponent: () =>
-                            import('./resignation/ukom-resignation-detail/ukom-resignation-detail.component').then(
-                                (m) => m.UkomResignationDetailComponent,
+                            import('./resignation/rw-resignation-detail/rw-resignation-detail.component').then(
+                                (m) => m.RwResignationDetailComponent,
                             ),
                         data: {
-                            title: 'Pengunduran Diri',
-                        },
-                    },
-                    {
-                        path: 'nip/:nip/update',
-                        loadComponent: () =>
-                            import('./resignation/ukom-resignation-update/ukom-resignation-update.component').then(
-                                (m) => m.UkomResignationUpdateComponent,
-                            ),
-                        data: {
-                            title: 'Pengunduran Diri',
+                            title: 'Riwayat',
                         },
                     },
                 ],

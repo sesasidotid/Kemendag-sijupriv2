@@ -1,29 +1,12 @@
-<div
-    *ngIf="pendingTask.taskStatus !== 'FAILED'"
-    class="d-flex justify-content-between align-items-center mb-3"
->
+<div class="d-flex justify-content-between align-items-center mb-3">
     <!-- Back button -->
-    <button
-        (click)="back(tabIndex, 'pengajuan-ukom')"
-        class="btn btn-sm btn-outline-secondary"
-    >
+    <button (click)="back()" class="btn btn-sm btn-outline-secondary">
         <i class="mdi mdi-chevron-left"></i> Kembali
     </button>
-
-    <!-- Open Detail button -->
-    <ng-container *ngIf="pesertaUkom?.participantStatus === 'jf'">
-        <a
-            [href]="'siap/user-jf/' + pesertaUkom.nip"
-            class="btn btn-primary"
-            target="_blank"
-        >
-            <i class="mdi mdi-open-in-new"></i> Lihat Detail
-        </a>
-    </ng-container>
 </div>
 
 <div
-    *ngIf="isLoading$ | async; else content"
+    *ngIf="isLoading(); else content"
     class="d-flex justify-content-center my-5"
 >
     <div class="spinner-border" role="status">
@@ -53,8 +36,9 @@
                                     >Status Pendaftar</label
                                 >
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.participantStatus == 'jf' ?
-                                    'JF Perdagangan' : 'Non-JF Perdagangan' }}
+                                    {{ ukomResignationDetail.participantStatus
+                                    == 'jf' ? 'JF Perdagangan' : 'Non-JF
+                                    Perdagangan' }}
                                 </p>
                             </div>
                         </div>
@@ -63,7 +47,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenis UKom</label>
                                 <p class="border-bottom">
-                                    {{jenisUkomService.getLabelByValue(pesertaUkom.jenisUkom)
+                                    {{jenisUkomService.getLabelByValue(ukomResignationDetail.jenisUkom)
                                     ?? '-'}}
                                 </p>
                             </div>
@@ -73,7 +57,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Nama Lengkap</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.name ?? '-' }}
+                                    {{ ukomResignationDetail.name ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -82,7 +66,7 @@
                             <div class="mb-3">
                                 <label class="form-label">NIP</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.nip ?? '-' }}
+                                    {{ ukomResignationDetail.nip ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -91,7 +75,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Nomor Whatsapp</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.phone ?? '-' }}
+                                    {{ ukomResignationDetail.phone ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -100,7 +84,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.email ?? '-' }}
+                                    {{ ukomResignationDetail.email ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -109,7 +93,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Tempat Lahir</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.tempatLahir ?? '-' }}
+                                    {{ ukomResignationDetail.tempatLahir ?? '-'
+                                    }}
                                 </p>
                             </div>
                         </div>
@@ -118,7 +103,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Lahir</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.tanggalLahir | tanggalIndo }}
+                                    {{ ukomResignationDetail.tanggalLahir |
+                                    tanggalIndo }}
                                 </p>
                             </div>
                         </div>
@@ -127,7 +113,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Instansi</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.jenisInstansi | prettyName }}
+                                    {{ ukomResignationDetail.jenisInstansi |
+                                    prettyName }}
                                 </p>
                             </div>
                         </div>
@@ -136,8 +123,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Provinsi</label>
                                 <p class="border-bottom">
-                                    {{ (pesertaUkom.provinsiName | prettyName)
-                                    ?? '-' }}
+                                    {{ (ukomResignationDetail.provinsiName |
+                                    prettyName) ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -156,17 +143,18 @@
                         <div
                             [ngClass]="{
                                 'col-lg-6':
-                                    pesertaUkom.jenisInstansi !=
+                                    ukomResignationDetail.jenisInstansi !=
                                     'PEMERINTAH_PROVINSI',
                                 'col-lg-12':
-                                    pesertaUkom.jenisInstansi ==
+                                    ukomResignationDetail.jenisInstansi ==
                                     'PEMERINTAH_PROVINSI'
                             }"
                         >
                             <div class="mb-3">
                                 <label class="form-label">Unit Kerja</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.unitKerjaName ?? '-' }}
+                                    {{ ukomResignationDetail.unitKerjaName ??
+                                    '-' }}
                                 </p>
                             </div>
                         </div>
@@ -175,7 +163,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Jabatan</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.jabatanName ?? '-' }}
+                                    {{ ukomResignationDetail.jabatanName ?? '-'
+                                    }}
                                 </p>
                             </div>
                         </div>
@@ -186,7 +175,8 @@
                                     >Jabatan Yang Dituju</label
                                 >
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.nextJabatanName ?? '-' }}
+                                    {{ ukomResignationDetail.nextJabatanName ??
+                                    '-' }}
                                 </p>
                             </div>
                         </div>
@@ -195,7 +185,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenjang</label>
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.jenjangName ?? '-' }}
+                                    {{ ukomResignationDetail.jenjangName ?? '-'
+                                    }}
                                 </p>
                             </div>
                         </div>
@@ -206,7 +197,8 @@
                                     >Jenjang Yang Dituju</label
                                 >
                                 <p class="border-bottom">
-                                    {{ pesertaUkom.nextJenjangName ?? '-' }}
+                                    {{ ukomResignationDetail.nextJenjangName ??
+                                    '-' }}
                                 </p>
                             </div>
                         </div>
@@ -223,24 +215,7 @@
                             ></i>
                             Data Pengajuan Pengunduran Diri
                         </h5>
-
-                        <span
-                            *ngIf="(pendingTaskDetail$ | async).flowId === 'resignation_flow_2'"
-                            class="bg-danger rounded-pill small fw-semibold px-3 py-1 text-white"
-                        >
-                            Menunggu Perbaikan
-                        </span>
                     </div>
-
-                    <ng-container *ngIf="pendingTaskDetail$ | async as detail">
-                        <div
-                            *ngIf="pendingTask.flowId === 'resignation_flow_2'"
-                            class="border-dark small text-dark mt-2 rounded border px-3 py-2"
-                        >
-                            <strong>Alasan Penolakan:</strong>
-                            {{ detail.remark ?? '-' }}
-                        </div>
-                    </ng-container>
 
                     <div class="col-lg-12">
                         <h5 class="fw-bold mt-3">Informasi Pengajuan</h5>
@@ -254,8 +229,7 @@
                                     >Alasan Pengunduran Diri</label
                                 >
                                 <p class="border-bottom mb-0">
-                                    {{ pendingTask?.objectTask?.object?.reason
-                                    }}
+                                    {{ ukomResignationDetail?.reason }}
                                 </p>
                             </div>
                         </div>
@@ -266,7 +240,7 @@
                                     >Tangal Pengajuan</label
                                 >
                                 <p class="border-bottom mb-0">
-                                    {{ pendingTask?.dateCreated | tanggalIndo}}
+                                    {{ ukomResignationDetail?.dateCreated | tanggalIndo }}
                                 </p>
                             </div>
                         </div>
@@ -292,10 +266,8 @@
                                     <a
                                         (click)="
                         preview(
-                            pendingTask?.objectTask?.object
-                                ?.suratPengunduranDiri,
-                            pendingTask?.objectTask?.object
-                                ?.suratPengunduranDiriUrl
+                            ukomResignationDetail?.suratPengunduranDiri,
+                            ukomResignationDetail?.suratPengunduranDiriUrl
                         )
                     "
                                         class="btn btn-sm btn-info ms-2"
@@ -303,128 +275,7 @@
                                         Lihat
                                     </a>
                                 </div>
-
-                                <div
-                                    *ngIf="pendingTask.taskStatus !== 'FAILED'"
-                                    class="col"
-                                >
-                                    <!-- Sedang menunggu perbaikan -->
-                                    <div
-                                        *ngIf="pendingTask.flowId === 'resignation_flow_2'; else reviewDocument"
-                                    >
-                                        <label
-                                            aria-disabled="true"
-                                            class="btn btn-sm btn-soft-warning"
-                                        >
-                                            Menunggu Perbaikan
-                                        </label>
-                                    </div>
-
-                                    <!-- Review dokumen -->
-                                    <ng-template #reviewDocument>
-                                        <div
-                                            *ngIf="
-                            pendingTask.flowId === 'resignation_flow_1';
-                            else approvedDocument
-                        "
-                                        >
-                                            <input
-                                                (ngModelChange)="onFIleSwitch($event)"
-                                                [(ngModel)]="remarkDocumentStatus"
-                                                [value]="'APPROVE'"
-                                                autocomplete="off"
-                                                class="btn-check"
-                                                id="btn-approve-toggle"
-                                                name="options-outlined"
-                                                type="radio"
-                                            />
-
-                                            <label
-                                                class="btn btn-sm btn-soft-success"
-                                                for="btn-approve-toggle"
-                                            >
-                                                Terima
-                                            </label>
-
-                                            <input
-                                                (ngModelChange)="onFIleSwitch($event)"
-                                                [(ngModel)]="remarkDocumentStatus"
-                                                [value]="'REJECT'"
-                                                autocomplete="off"
-                                                class="btn-check"
-                                                id="btn-reject-toggle"
-                                                name="options-outlined"
-                                                type="radio"
-                                            />
-
-                                            <label
-                                                class="btn btn-sm btn-soft-danger"
-                                                for="btn-reject-toggle"
-                                            >
-                                                Tolak
-                                            </label>
-
-                                            <!-- <div
-                                                *ngIf="remarkDocumentStatus === 'REJECT'"
-                                                class="mt-2"
-                                            >
-                                                <input
-                                                    [(ngModel)]="remarkDocument"
-                                                    class="form-control"
-                                                    placeholder="Masukkan alasan penolakan"
-                                                    type="text"
-                                                />
-                                            </div> -->
-                                        </div>
-                                    </ng-template>
-
-                                    <!-- Sudah disetujui -->
-                                    <ng-template #approvedDocument>
-                                        <label
-                                            aria-disabled="true"
-                                            class="btn btn-sm btn-soft-success"
-                                        >
-                                            Disetujui
-                                        </label>
-                                    </ng-template>
-                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div
-                        *ngIf="pendingTask.taskStatus !== 'FAILED'"
-                        class="col-lg-12"
-                    >
-                        <div class="hstack justify-content-end gap-2">
-                            <ng-container
-                                *ngIf="remarkDocumentStatus !== 'REJECT' &&
-                                    pendingTask.flowId == flowId.UkomResignationFlowId1
-                                "
-                            >
-                                <app-loading-button
-                                    (clicked)="submitApprove()"
-                                    [isLoading]="hadItemsLoading$ | async"
-                                    [label]="'Disetujui'"
-                                    className="btn btn-success me-1"
-                                >
-                                </app-loading-button>
-                            </ng-container>
-
-                            <!-- <ng-container
-                                *ngIf="pendingTask.flowId == flowId.UkomFlowId1 && !isApproveEnable"
-                            > -->
-                            <ng-container
-                                *ngIf="pendingTask.flowId == flowId.UkomResignationFlowId1"
-                            >
-                                <app-loading-button
-                                    (clicked)="submitAmend()"
-                                    [isLoading]="hadItemsLoading$ | async"
-                                    [label]="'Perbaikan'"
-                                    className="btn btn-warning"
-                                >
-                                </app-loading-button>
-                            </ng-container>
                         </div>
                     </div>
                 </div>

@@ -209,14 +209,18 @@
                             <label class="form-label" for="firstnameInput">
                                 Predikat Kinerja Pegawai Satu Tahun Terakhir
                             </label>
-                            <p class="text-muted">{{ getPredikatKinerja(null, predikat1Id) }}
+                            <p class="text-muted">
+                                {{ getPredikatKinerja(null, predikat1Id) }}
+                            </p>
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label" for="firstnameInput">
                                 Predikat Kinerja Pegawai Dua Tahun Terakhir
                             </label>
-                            <p class="text-muted">{{ getPredikatKinerja(null, predikat2Id) }}</p>
+                            <p class="text-muted">
+                                {{ getPredikatKinerja(null, predikat2Id) }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -721,6 +725,102 @@
                 </div>
             </div>
         </div>
+
+        <div *ngIf="resignationPendingTask" class="card">
+            <div class="card-header bg-light">
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <h5 class="d-flex align-items-center mb-0">
+                        <i class="mdi mdi-file-document-check-outline me-2"></i>
+                        Data Pengunduran Diri UKom
+                    </h5>
+                    <ng-container
+                        *ngIf="
+        resignationPendingTask.flowId === 'resignation_flow_1' &&
+        resignationPendingTask.taskStatus === 'PENDING';
+        else checkApproved
+    "
+                    >
+                        <span
+                            class="bg-primary rounded-pill small fw-semibold px-3 py-1 text-white"
+                        >
+                            Menunggu
+                        </span>
+                    </ng-container>
+
+                    <ng-template #checkApproved>
+                        <ng-container
+                            *ngIf="
+            resignationPendingTask.flowId === 'resignation_flow_1' &&
+            resignationPendingTask.taskStatus === 'COMPLETED';
+            else checkRevision
+        "
+                        >
+                            <span
+                                class="bg-success rounded-pill small fw-semibold px-3 py-1 text-white"
+                            >
+                                Disetujui
+                            </span>
+                        </ng-container>
+                    </ng-template>
+
+                    <ng-template #checkRevision>
+                        <ng-container
+                            *ngIf="
+            resignationPendingTask.flowId === 'resignation_flow_2' &&
+            resignationPendingTask.taskStatus === 'PENDING'
+        "
+                        >
+                            <span
+                                class="bg-warning rounded-pill small fw-semibold px-3 py-1 text-white"
+                            >
+                                Perlu Perbaikan
+                            </span>
+                        </ng-container>
+                    </ng-template>
+                </div>
+
+                <div
+                    *ngIf="
+        resignationPendingTask.flowId === 'resignation_flow_2' &&
+        resignationPendingTask.taskStatus === 'PENDING'"
+                    class="border-dark small text-dark mt-2 rounded border px-3 py-2"
+                >
+                    <strong>Alasan Penolakan:</strong> {{
+                    resignationPendingTask?.remark }}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3 flex-wrap gap-1">
+                    <h6 class="medium fw-semibold mb-0">Alasan :</h6>
+                    <p class="mb-0">
+                        {{ resignationPendingTask?.objectTask?.object?.reason }}
+                    </p>
+                </div>
+
+                <hr class="my-3" />
+
+                <app-file-handler
+                    [inputs]="resignationFileHandlerData"
+                ></app-file-handler>
+            </div>
+        </div>
+
+        @if (pagable()) {
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center">
+                        <h5 class="d-flex align-items-center mb-0">
+                            <i class="mdi mdi-history me-2"></i>
+                            Riwayat Pengunduran Diri
+                        </h5>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <app-pagable [pagable]="pagable()"></app-pagable>
+                </div>
+            </div>
+        }
 
         <ng-container *ngIf="ukomGrade?.id?.trim()">
             <app-ukom-grade-table

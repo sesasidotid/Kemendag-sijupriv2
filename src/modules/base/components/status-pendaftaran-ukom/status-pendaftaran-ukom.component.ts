@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { UkomTaskDetail } from '@/modules/ukom/models/ukom-task-detail.modal'
 import {
     BehaviorSubject,
@@ -15,6 +15,13 @@ import {
     takeUntil,
     tap,
 } from 'rxjs'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
+import {
+    ActionColumnBuilder,
+    PagableBuilder,
+    PageFilterBuilder,
+    PrimaryColumnBuilder,
+} from '@/modules/base/commons/pagable/pagable-builder'
 import { ModalComponent } from '../modal/modal.component'
 import { CommonModule } from '@angular/common'
 import { ConverterService } from '@/modules/base/services/converter.service'
@@ -47,6 +54,10 @@ import { Pendidikan } from '@/modules/maintenance/models/pendidikan.model'
 import { UkomMiscellaneousService } from '@/modules/ukom/services/ukom-miscellaneous.service'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
 import { ExamSchedule } from '@/modules/ukom/models/exam-schedule/exam-schedule.model'
+import { UkomResignationPendingTask } from '@/modules/ukom/models/ukom-registration-refactored/resignation-pending-task.model'
+import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
+import { ParticipantResignation } from '@/modules/ukom/models/resignation/resignation.model'
+import { PagableComponent } from '../pagable/pagable.component'
 
 export enum JenisUkomEnum {
     PERPINDAHAN_JABATAN = 'Perpindahan Jabatan',
@@ -58,6 +69,7 @@ export enum JenisUkomEnum {
     selector: 'app-status-pendaftaran-ukom',
     standalone: true,
     imports: [
+        PagableComponent,
         ModalComponent,
         CommonModule,
         NonjfRevisiUkomComponent,
@@ -77,6 +89,7 @@ export class StatusPendaftaranUkomComponent {
     ukomMiscellaneousService = inject(UkomMiscellaneousService)
     pendingTask = new UkomTaskDetail()
     finishTask = new UkomTaskDetail()
+    resignationPendingTask = new UkomResignationPendingTask()
 
     groupedUkomPendingTaskHistory: {
         [key: string]: any[]
@@ -93,6 +106,14 @@ export class StatusPendaftaranUkomComponent {
         viewOnly: true,
         listen: () => {},
     }
+    resignationFileHandlerData: FIleHandler = {
+        files: {},
+        viewOnly: true,
+        listen: () => {},
+    }
+    pagable = signal<Pagable>(null)
+    jenisUkomService = inject(JenisUkomService)
+    TanggalWaktuIndo = new TanggalWaktuIndoPipe()
     predikatKinerjaList: PredikatKinerja[] = []
     pendidikanName: string
     provinsiName: string
@@ -105,6 +126,7 @@ export class StatusPendaftaranUkomComponent {
     bidangJabatanName: string
     key: string
     participantId: string
+    participantNip: string
     examScoresByScheduleId: Record<string, any> = {}
     selectedScheduleId: string | null = null
     selectedExamTypeCode: string | null = null
@@ -244,7 +266,7 @@ export class StatusPendaftaranUkomComponent {
             files,
         }
     }
-    
+
     toggleScoreModal(scheduleId?: string, examTypeCode?: string) {
         if (scheduleId && examTypeCode) {
             this.selectedScheduleId = scheduleId
@@ -361,26 +383,36 @@ export class StatusPendaftaranUkomComponent {
                 }),
                 tap((response: NonJFParticipant) => {
                     this.getPendidikanList(response.data.pendidikanTerakhirCode)
+
                     if (response.data.provinsiId) {
                         this.getProvinsiNameByCode(response.data.provinsiId)
                     }
+
                     if (response.data.kabupatenKotaId) {
                         this.getKabupatenNameByCode(
                             response.data.kabupatenKotaId,
                         )
                     }
+
                     if (response.data.bidangJabatanCode) {
                         this.getBidangjabatanNameByCode(
                             response.data.bidangJabatanCode,
                         )
                     }
+
                     this.predikat1Id = response.data.predikatKinerja1Id ?? '-'
                     this.predikat2Id = response.data.predikatKinerja2Id ?? '-'
                     this.predikat1Name =
                         response.data.predikatKinerja1Name ?? '-'
                     this.predikat2Name =
                         response.data.predikatKinerja2Name ?? '-'
+
                     this.participantId = response.data.id
+                    this.participantNip = response.data.nip
+
+                    this.fetchResignationStatus()
+                    
+                    this.initRWResignationPagable()
                 }),
                 tap((response: NonJFParticipant) => {
                     // console.log('response ukom  : ', response)
@@ -442,6 +474,106 @@ export class StatusPendaftaranUkomComponent {
                 error: (error) => {
                     this.isLoadingPendingTask$.next(false)
                     console.error(error)
+                },
+            })
+    }
+
+    initRWResignationPagable() {
+        const endpoint = `/api/v1/ukom_resignation/search/${this.participantNip}`
+
+        const resignationPagable = new PagableBuilder(endpoint)
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue(
+                        'Jenis Ukom',
+                        (data: ParticipantResignation) => {
+                            return this.jenisUkomService.getLabelByValue(
+                                data.jenisUkom,
+                            )
+                        },
+                    )
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue(
+                        'Tanggal Pengajuan',
+                        (data: ParticipantResignation) => {
+                            const formattedDate =
+                                this.TanggalWaktuIndo.transform(data.createdAt)
+
+                            return formattedDate
+                        },
+                    )
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue(
+                        'Tanggal Disetujui',
+                        (data: ParticipantResignation) => {
+                            const formattedDate =
+                                this.TanggalWaktuIndo.transform(
+                                    data.lastUpdated,
+                                )
+
+                            return formattedDate
+                        },
+                    )
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('nip')
+                    .withDefaultValue(this.participantNip)
+                    .build(),
+            )
+            .build()
+
+        this.pagable.set(resignationPagable)
+    }
+
+    private fetchResignationStatus(): void {
+        this.apiService
+            .getData(
+                `/api/v1/ukom_resignation/task/participant/${this.participantId}`,
+            )
+            .subscribe({
+                next: (res: any) => {
+                    this.resignationPendingTask = res
+
+                    const resignation = res?.objectTask?.object
+
+                    if (
+                        resignation?.suratPengunduranDiri &&
+                        resignation?.suratPengunduranDiriUrl
+                    ) {
+                        this.resignationFileHandlerData = {
+                            ...this.resignationFileHandlerData,
+                            files: {
+                                file0: {
+                                    label: 'Surat Pengunduran Diri',
+                                    source: resignation.suratPengunduranDiriUrl,
+                                    id: resignation.id,
+                                    fileName: 'Surat Pengunduran Diri',
+                                    required: true,
+                                },
+                            },
+                        }
+                    }
+                },
+
+                error: (err) => {
+                    console.log(
+                        'peserta belum memiliki record pengunduran diri',
+                    )
+
+                    this.resignationPendingTask = null
+
+                    this.resignationFileHandlerData = {
+                        ...this.resignationFileHandlerData,
+                        files: {},
+                    }
                 },
             })
     }

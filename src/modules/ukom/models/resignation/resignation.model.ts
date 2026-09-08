@@ -88,6 +88,7 @@ export class ParticipantResignation extends Serializable {
     suratPengunduranDiri: string | null | undefined = undefined
 
     dateCreated: string | null | undefined = undefined
+    lastUpdated: string | null | undefined = undefined
 
     participantId: string | null | undefined = undefined
 

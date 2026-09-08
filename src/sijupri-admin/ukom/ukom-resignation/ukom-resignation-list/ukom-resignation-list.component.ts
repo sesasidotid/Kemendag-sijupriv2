@@ -21,6 +21,7 @@ import { Component, inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { BehaviorSubject, finalize } from 'rxjs'
 import { UkomResignationApprovedListComponent } from '../ukom-resignation-approved-list/ukom-resignation-approved-list.component'
+import { UkomExportResignationComponent } from '../ukom-export-resignation/ukom-export-resignation.component'
 
 @Component({
     selector: 'app-ukom-resignation-list',
@@ -29,6 +30,7 @@ import { UkomResignationApprovedListComponent } from '../ukom-resignation-approv
         PagableComponent,
         CommonModule,
         UkomResignationApprovedListComponent,
+        UkomExportResignationComponent
     ],
     templateUrl: './ukom-resignation-list.component.html',
     styleUrl: './ukom-resignation-list.component.scss',
@@ -216,6 +218,12 @@ export class UkomResignationListComponent {
                 icon: 'mdi-check',
                 isActive: this.tabIndex.value == 2,
                 onClick: () => this.tabService.changeTabActive(2),
+            })
+            .addTab({
+                label: 'Export Pengunduran Diri UKom',
+                icon: 'mdi-export',
+                isActive: this.tabIndex.value == 3,
+                onClick: () => this.tabService.changeTabActive(3),
             })
     }
 

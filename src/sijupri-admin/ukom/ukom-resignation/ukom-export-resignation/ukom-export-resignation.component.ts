@@ -1,31 +1,30 @@
-import { Component } from '@angular/core'
-import { ApiService } from '../../../../modules/base/services/api.service'
-import { ConfirmationService } from '../../../../modules/base/services/confirmation.service'
-import { HandlerService } from '../../../../modules/base/services/handler.service'
+import { Pagable } from '@/modules/base/commons/pagable/pagable'
 import {
     ActionColumnBuilder,
     PagableBuilder,
     PageFilterBuilder,
     PrimaryColumnBuilder,
-} from '../../../../modules/base/commons/pagable/pagable-builder'
-import { PagableComponent } from '../../../../modules/base/components/pagable/pagable.component'
+} from '@/modules/base/commons/pagable/pagable-builder'
+import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { PagableComponent } from '@/modules/base/components/pagable/pagable.component'
+import { ApiService } from '@/modules/base/services/api.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
+import { FormValidationService } from '@/modules/base/services/form-validation.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ReportGenerate } from '@/modules/report/models/report-generate.model'
+import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 import { CommonModule } from '@angular/common'
+import { Component } from '@angular/core'
 import {
     FormControl,
     FormGroup,
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
-import { ReportGenerate } from '../../../../modules/report/models/report-generate.model'
 import { BehaviorSubject } from 'rxjs'
-import { Pagable } from '../../../../modules/base/commons/pagable/pagable'
-import { Jabatan } from '../../../../modules/maintenance/models/jabatan.model'
-import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
-import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
-import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
 
 @Component({
-    selector: 'app-ukom-export-verifikasi',
+    selector: 'app-ukom-export-resignation',
     standalone: true,
     imports: [
         PagableComponent,
@@ -34,16 +33,15 @@ import { InvalidOnTouchDirective } from '@/shared/invalid-on-touch.directive'
         LoadingButtonComponent,
         InvalidOnTouchDirective,
     ],
-    templateUrl: './ukom-export-verifikasi.component.html',
-    styleUrl: './ukom-export-verifikasi.component.scss',
+    templateUrl: './ukom-export-resignation.component.html',
+    styleUrl: './ukom-export-resignation.component.scss',
 })
-export class UkomExportVerifikasiComponent {
+export class UkomExportResignationComponent {
     pagable: Pagable
     isLoading$: BehaviorSubject<boolean>
     hasilVerifikasiForm!: FormGroup
     reportId: string
     payload: ReportGenerate
-    jabatanList: Jabatan[]
     refresh: boolean
 
     constructor(
@@ -53,14 +51,12 @@ export class UkomExportVerifikasiComponent {
         private formValidationService: FormValidationService,
     ) {
         this.isLoading$ = new BehaviorSubject<boolean>(false)
-        this.reportId = 'ukomVerification'
+        this.reportId = 'ukomResignation'
         this.payload = new ReportGenerate()
-        this.jabatanList = []
         this.refresh = false
     }
 
     ngOnInit() {
-        this.getJabatanList()
         this.handleFormInit()
         this.handlePagable()
     }
@@ -164,20 +160,8 @@ export class UkomExportVerifikasiComponent {
         this.hasilVerifikasiForm = new FormGroup({
             fileType: new FormControl('', [Validators.required]),
             taskStatus: new FormControl('', [Validators.required]),
-            jabatanCode: new FormControl(''),
             dateFrom: new FormControl(''),
             dateTo: new FormControl(''),
-        })
-    }
-
-    getJabatanList() {
-        this.apiService.getData('/api/v1/jabatan').subscribe({
-            next: (res: Jabatan[]) => {
-                this.jabatanList = res
-            },
-            error: (err) => {
-                this.jabatanList = []
-            },
         })
     }
 

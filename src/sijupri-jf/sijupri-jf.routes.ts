@@ -291,6 +291,13 @@ export const routes: Routes = [
                                         (m) => m.UkomTaskDetailFailedComponent,
                                     ),
                             },
+                            {
+                                path: 'resignation/:id',
+                                loadComponent: () =>
+                                    import(
+                                        '../sijupri-jf/ukom/ukom-resignation-detail/ukom-resignation-detail.component'
+                                    ).then((m) => m.UkomResignationDetailComponent),
+                            },
                         ],
                     },
                 },

@@ -1,5 +1,5 @@
 import { LoginContext } from './../../../modules/base/commons/login-context'
-import { Component } from '@angular/core'
+import { Component, signal } from '@angular/core'
 import {
     ActionColumnBuilder,
     PagableBuilder,
@@ -19,6 +19,7 @@ import { TanggalWaktuIndoPipe } from '../../../modules/base/pipes/tangga-waktu.p
 import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.service'
 import { PesertaUkom } from '@/modules/ukom/models/peserta-ukom.model'
 import { FailedTask } from '@/modules/ukom/models/ukom-registration-refactored/failed-task.model'
+import { ParticipantResignation } from '@/modules/ukom/models/resignation/resignation.model'
 @Component({
     selector: 'app-ukom-list',
     standalone: true,
@@ -29,6 +30,7 @@ import { FailedTask } from '@/modules/ukom/models/ukom-registration-refactored/f
 export class UkomListComponent {
     pagable: Pagable
     rejectedPagable: Pagable
+    resignationPagable = signal<Pagable>(null)
     schedulePagable$: Observable<Pagable>
     id: string = LoginContext.getUserId()
     ukomSchedule: UkomExamScheduleJF
@@ -46,6 +48,7 @@ export class UkomListComponent {
     ngOnInit() {
         this.handlePagable()
         this.initRejectedPagable()
+        this.initRWResignationPagable()
         this.getUkomSchedule()
     }
 
@@ -152,6 +155,58 @@ export class UkomListComponent {
             //     new PrimaryColumnBuilder('Catatan', 'comment').build(),
             // )
             .build()
+    }
+
+    initRWResignationPagable() {
+        const endpoint = `/api/v1/ukom_resignation/search/${this.id}`
+
+        const resignationPagable = new PagableBuilder(endpoint)
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue(
+                        'Jenis Ukom',
+                        (data: ParticipantResignation) => {
+                            return this.jenisUkomService.getLabelByValue(
+                                data.jenisUkom,
+                            )
+                        },
+                    )
+                    .build(),
+            )
+            .addPrimaryColumn(
+                new PrimaryColumnBuilder()
+                    .withDynamicValue(
+                        'Tanggal',
+                        (data: ParticipantResignation) => {
+                            const formattedDate =
+                                this.TanggalWaktuIndo.transform(
+                                    data.dateCreated,
+                                )
+
+                            return formattedDate
+                        },
+                    )
+                    .build(),
+            )
+            .addActionColumn(
+                new ActionColumnBuilder()
+                    .setAction((data: ParticipantResignation) => {
+                        this.router.navigate([
+                            `/ukom/ukom-list/resignation/${data.id}`,
+                        ])
+                    }, 'info')
+                    .withIcon('detail')
+                    .build(),
+            )
+            .addFilter(
+                new PageFilterBuilder('equal')
+                    .setProperty('nip')
+                    .withDefaultValue(this.id)
+                    .build(),
+            )
+            .build()
+
+        this.resignationPagable.set(resignationPagable)
     }
 
     getUkomSchedule() {

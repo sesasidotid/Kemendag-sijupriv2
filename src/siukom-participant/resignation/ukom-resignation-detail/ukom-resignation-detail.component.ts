@@ -4,7 +4,7 @@ import { FilePreviewService } from '@/modules/base/services/file-preview.service
 import { ParticipantResignation } from '@/modules/ukom/models/resignation/resignation.model'
 import { LoginContext } from '@/modules/base/commons/login-context'
 import { CommonModule } from '@angular/common'
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core'
+import { Component, DestroyRef, Inject, inject, Input, OnChanges, OnInit, signal, SimpleChanges } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { EMPTY, finalize, Observable, tap } from 'rxjs'
 import { UkomResignationPendingTask } from '@/modules/ukom/models/ukom-registration-refactored/resignation-pending-task.model'
@@ -25,102 +25,24 @@ interface PendingTaskResponse {
     templateUrl: './ukom-resignation-detail.component.html',
     styleUrl: './ukom-resignation-detail.component.scss',
 })
-export class UkomResignationDetailComponent {
-    private handlerService = inject(HandlerService)
-    private apiService = inject(ApiService)
-    private filePreviewService = inject(FilePreviewService)
-    private destroyRef = inject(DestroyRef)
-    private userLogin = LoginContext.getUserId()
-    participant = signal<Participant | null>(null)
-    isLoadingParticipant = signal(true)
-    isLoadingResignationStatus = signal(true)
-    resignationData = signal<ParticipantResignation | null>(null)
-    pendingTask: UkomResignationPendingTask | null = null
+export class UkomResignationDetailComponent implements OnChanges {
+    @Input() participant: Participant | null = null
+    @Input() pendingTask: UkomResignationPendingTask | null = null
 
-    ngOnInit(): void {
-        this.buildParticipantPayload().subscribe({
-            next: () => {
-                this.fetchResignationStatus()
-            },
-        })
+    filePreviewService = inject(FilePreviewService)
+    resignationData: ParticipantResignation | null = null
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['pendingTask']) {
+            const object = this.pendingTask?.objectTask?.object
+
+            this.resignationData = object
+                ? new ParticipantResignation(object)
+                : null
+        }
     }
 
     preview(fileName: string, source: string) {
         this.filePreviewService.open(fileName, source)
-    }
-
-    buildParticipantPayload(): Observable<any> {
-        const userId = this.userLogin
-
-        if (!userId) {
-            this.handlerService.handleAlert(
-                'Error',
-                'Sesi login tidak ditemukan.',
-            )
-            this.isLoadingParticipant.set(false)
-
-            return EMPTY
-        }
-
-        const nip = userId.replace(/^PU-/, '')
-
-        this.isLoadingParticipant.set(true)
-
-        return this.apiService
-            .getData(`/api/v1/participant_ukom/nip/${nip}`)
-            .pipe(
-                tap((res: any) => {
-                    this.participant.set(res?.data ?? res)
-
-                    console.log('ada participant :? ', this.participant()?.id)
-                }),
-                finalize(() => this.isLoadingParticipant.set(false)),
-            )
-    }
-
-    private fetchResignationStatus(): void {
-        const userId = this.userLogin
-        if (!userId) {
-            this.handlerService.handleAlert(
-                'Error',
-                'Sesi login tidak ditemukan.',
-            )
-            this.isLoadingResignationStatus.set(false)
-            return
-        }
-        const nip = userId.replace(/^PU-/, '')
-
-        this.isLoadingResignationStatus.set(true)
-
-        this.apiService
-            .getData(
-                `${RESIGNATION_ENDPOINT}/task/participant/${this.participant()?.id}`,
-            )
-            .pipe(
-                finalize(() => this.isLoadingResignationStatus.set(false)),
-                takeUntilDestroyed(this.destroyRef),
-            )
-            .subscribe({
-                next: (res: PendingTaskResponse) => {
-                    this.pendingTask = res as UkomResignationPendingTask
-
-                    const resignationDataObject =
-                        this.pendingTask.objectTask?.object
-
-                    this.resignationData.set(
-                        resignationDataObject
-                            ? new ParticipantResignation(resignationDataObject)
-                            : null,
-                    )
-                    console.log('resignationdata : ', this.resignationData())
-                },
-                error: (err) => {
-                    this.handlerService.handleAlert(
-                        'Error',
-                        err?.error?.message ??
-                            'Gagal memuat status pengunduran diri.',
-                    )
-                },
-            })
     }
 }
