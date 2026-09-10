@@ -214,7 +214,7 @@ export class UkomResignationListComponent {
                     this.handlePagableTabChange('resignation_flow_2', 1),
             })
             .addTab({
-                label: 'Pengajuan Diterima',
+                label: 'Pengajuan Disetujui',
                 icon: 'mdi-check',
                 isActive: this.tabIndex.value == 2,
                 onClick: () => this.tabService.changeTabActive(2),

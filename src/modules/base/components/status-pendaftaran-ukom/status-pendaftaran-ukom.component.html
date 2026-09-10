@@ -805,8 +805,18 @@
             </div>
         </div>
 
+        <ng-container *ngIf="ukomGrade?.id?.trim()">
+            <app-ukom-grade-table
+                (downloadFile)=" downloadRekomendasi()"
+                [gradeData]="ukomGrade"
+                [nama]="finishTask.name"
+                [nip]="finishTask.nip"
+                [rekomendasiUrl]="finishTask.rekomendasiUrl"
+            ></app-ukom-grade-table>
+        </ng-container>
+
         @if (pagable()) {
-            <div class="card mt-4">
+            <div class="card mt-2">
                 <div class="card-header bg-light">
                     <div class="d-flex align-items-center">
                         <h5 class="d-flex align-items-center mb-0">
@@ -821,16 +831,6 @@
                 </div>
             </div>
         }
-
-        <ng-container *ngIf="ukomGrade?.id?.trim()">
-            <app-ukom-grade-table
-                (downloadFile)=" downloadRekomendasi()"
-                [gradeData]="ukomGrade"
-                [nama]="finishTask.name"
-                [nip]="finishTask.nip"
-                [rekomendasiUrl]="finishTask.rekomendasiUrl"
-            ></app-ukom-grade-table>
-        </ng-container>
     </div>
 </ng-template>
 

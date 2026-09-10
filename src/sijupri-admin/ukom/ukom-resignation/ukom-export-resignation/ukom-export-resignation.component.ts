@@ -159,7 +159,6 @@ export class UkomExportResignationComponent {
     handleFormInit() {
         this.hasilVerifikasiForm = new FormGroup({
             fileType: new FormControl('', [Validators.required]),
-            taskStatus: new FormControl('', [Validators.required]),
             dateFrom: new FormControl(''),
             dateTo: new FormControl(''),
         })
@@ -184,10 +183,6 @@ export class UkomExportResignationComponent {
                     }
                 }
 
-                addIfTruthy(
-                    'taskStatus',
-                    this.hasilVerifikasiForm.get('taskStatus')?.value,
-                )
                 addIfTruthy(
                     'dateFrom',
                     this.hasilVerifikasiForm.get('dateFrom')?.value ||

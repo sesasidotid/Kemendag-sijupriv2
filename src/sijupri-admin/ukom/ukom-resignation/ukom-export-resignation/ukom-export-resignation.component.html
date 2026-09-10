@@ -25,31 +25,6 @@
     </div>
 
     <div class="row mb-3">
-        <label class="col-sm-2 col-form-label fw-bold" for="taskStatus"
-            >Status Verifikasi <span class="text-danger">*</span></label
-        >
-        <div class="col-sm-10">
-            <select
-                appInvalidOnTouch
-                class="form-select"
-                formControlName="taskStatus"
-                id="taskStatus"
-                name="taskStatus"
-            >
-                <option selected value="">Pilih Status Verifikasi</option>
-                <option selected value="COMPLETED">Disetujui</option>
-                <option selected value="FAILED">Perlu Perbaikan</option>
-            </select>
-            <div
-                *ngIf="getErrorMessage('taskStatus', 'Status') as error"
-                class="invalid-feedback"
-            >
-                {{ error }}
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-3">
         <label class="col-sm-2 col-form-label fw-bold" for="inputfileType"
             >Format File <span class="text-danger">*</span></label
         >
