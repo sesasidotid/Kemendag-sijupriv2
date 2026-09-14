@@ -26,6 +26,7 @@ import { UkomGradeSuratRekomSetupComponent } from './ukom-grade-surat-rekom-setu
 import { UkomGradeSuratRekomComponent } from '@/sijupri-admin/ukom/ukom-grade-list/ukom-grade-surat-rekom/ukom-grade-surat-rekom.component'
 import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
 import { TruncateDecimalPipe } from '@/modules/base/pipes/truncate-decimal.pipe'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 type UkomGradeTabKey =
     | 'list'
@@ -55,6 +56,7 @@ type UkomGradeTabKey =
 })
 export class UkomGradeListComponent {
     @ViewChild(FileHandlerComponent) fileHandler: FileHandlerComponent
+    isSuperAdmin: boolean = LoginContext.getRoleCodes().includes('ADMIN')
 
     examGradeService = inject(ExamGradeService)
     ukomGradeService = inject(UkomGradeService)

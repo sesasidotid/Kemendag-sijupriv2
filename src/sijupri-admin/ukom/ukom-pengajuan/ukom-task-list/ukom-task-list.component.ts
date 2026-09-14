@@ -20,6 +20,7 @@ import { JenjangService } from '@/modules/maintenance/services/jenjang.service'
 import { UkomTaskService } from '@/modules/ukom/services/ukom-task.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/pending-task.model'
+import { LoginContext } from '@/modules/base/commons/login-context'
 
 @Component({
     selector: 'app-ukom-task-list',
@@ -30,7 +31,7 @@ import { UkomFlowId } from '@/modules/ukom/models/ukom-registration-refactored/p
 })
 export class UkomTaskListComponent implements OnInit {
     public flowId = UkomFlowId
-
+    isSuperAdmin: boolean = LoginContext.getRoleCodes().includes('ADMIN')
     pagable$ = new BehaviorSubject<Pagable | null>(null)
     jabatanList: Jabatan[] = []
     refresh: boolean

@@ -99,6 +99,8 @@ export class StatusPendaftaranUkomComponent {
     typeKabKota: string
     predikat1Name: string
     predikat2Name: string
+    predikat1Id: string
+    predikat2Id: string
     bidangJabatanName: string
     key: string
     participantId: string
@@ -310,8 +312,7 @@ export class StatusPendaftaranUkomComponent {
     }
 
     getPredikatKinerja(name: string | null, code: string | null): string {
-        console.log(name, code)
-        if (name != null || code != null) return '-'
+        if (name == null && code == null) return '-'
 
         if (name) {
             return name
@@ -323,12 +324,33 @@ export class StatusPendaftaranUkomComponent {
         }
     }
 
+    private toCamelCase(obj: any): any {
+        if (Array.isArray(obj)) {
+            return obj.map((item) => this.toCamelCase(item))
+        }
+        if (obj !== null && typeof obj === 'object') {
+            return Object.keys(obj).reduce((acc, key) => {
+                const camelKey = key.replace(/_([a-z0-9])/g, (_, c) =>
+                    c.toUpperCase(),
+                )
+                acc[camelKey] = this.toCamelCase(obj[key])
+                return acc
+            }, {} as any)
+        }
+        return obj
+    }
+
     getPendingTask(key: string) {
         this.isLoadingPendingTask$.next(true)
 
         this.apiService
             .getData(`/api/v1/participant_ukom_detail?key=${key}`)
             .pipe(
+                map((response: any) => {
+                    // convert cuma di sini, khusus endpoint ini
+                    response.data = this.toCamelCase(response.data)
+                    return new NonJFParticipant(response)
+                }),
                 tap((response: NonJFParticipant) => {
                     this.getPendidikanList(response.data.pendidikanTerakhirCode)
                     if (response.data.provinsiId) {
@@ -344,14 +366,8 @@ export class StatusPendaftaranUkomComponent {
                             response.data.bidangJabatanCode,
                         )
                     }
-                    // this.predikat1Name = this.getPredikatKinerja(
-                    //     response.data.predikatKinerja1Name,
-                    //     response.data.predikatKinerja1Id,
-                    // )
-                    // this.predikat2Name = this.getPredikatKinerja(
-                    //     response.data.predikatKinerja2Name,
-                    //     response.data.predikatKinerja2Id,
-                    // )
+                    this.predikat1Id = response.data.predikatKinerja1Id ?? '-'
+                    this.predikat2Id = response.data.predikatKinerja2Id ?? '-'
                     this.predikat1Name =
                         response.data.predikatKinerja1Name ?? '-'
                     this.predikat2Name =
@@ -359,6 +375,8 @@ export class StatusPendaftaranUkomComponent {
                     this.participantId = response.data.id
                 }),
                 tap((response: NonJFParticipant) => {
+                    // console.log('response ukom  : ', response)
+
                     if (response.status === 'pending') {
                         this.registrationStatus = response.status
                         this.pendingTask = response.data

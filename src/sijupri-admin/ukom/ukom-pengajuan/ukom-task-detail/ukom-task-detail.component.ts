@@ -180,6 +180,8 @@ export class UkomTaskDetailComponent {
     }
 
     onFIleSwitch(index: number, status: 'APPROVE' | 'REJECT') {
+        this.pesertaUkom.dokumenUkomList[index].dokumenStatus = status
+
         if (status === 'APPROVE') {
             this.pesertaUkom.dokumenUkomList[index].remark = ''
         }
