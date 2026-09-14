@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core'
+import { Component, HostListener, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ChartConfiguration, ChartOptions } from 'chart.js'
 import { ApiService } from '../../modules/base/services/api.service'
@@ -8,6 +8,27 @@ import { Pagable } from '../../modules/base/commons/pagable/pagable'
 import { Router } from '@angular/router'
 import { BehaviorSubject, catchError, finalize, forkJoin, of } from 'rxjs'
 import { LoginContext } from '../../modules/base/commons/login-context'
+import { PendingTask } from '@/modules/workflow/models/pending-task.model'
+
+interface PendingCardConfig {
+    key: keyof AdminDashboardComponent['pendingCounts']
+    role: string
+    title: string
+    icon: string
+    color: 'primary' | 'warning' | 'info' | 'success' | 'danger'
+    route: string
+}
+
+interface UserStatConfig {
+    key:
+        | 'totalUserAdmin'
+        | 'totalUserInstansi'
+        | 'totalUserUnitKerja'
+        | 'totalUserJF'
+    title: string
+    icon: string
+    route: string
+}
 
 @Component({
     selector: 'app-admin-dashboard',
@@ -21,9 +42,14 @@ export class AdminDashboardComponent {
 
     userRole: string[] = []
     pagable: Pagable
-    startMonth: number = 1
-    endMonth: number = 12
+    pendingTaskList: PendingTask[]
     year: number = new Date().getFullYear()
+    fromDate = this.toInputDate(this.subDays(new Date(), 6))
+    toDate = this.toInputDate(new Date())
+    rangeType: string = 'daily'
+    activePreset: '7d' | 'month' | '3month' | 'year' | 'custom' = '7d'
+    showFilterPopover = false
+    selectedApplication: string = ''
 
     months = [
         { id: 'Januari', eng: 'January' },
@@ -49,9 +75,11 @@ export class AdminDashboardComponent {
             {
                 data: [],
                 label: 'Jumlah Peserta UKom',
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                backgroundColor: 'rgba(54, 162, 235, 0.55)',
                 borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
+                borderWidth: 1.5,
+                borderRadius: 6,
+                maxBarThickness: 48,
             },
         ],
     }
@@ -59,36 +87,117 @@ export class AdminDashboardComponent {
     barChartOptions: ChartOptions<'bar'> = {
         responsive: true,
         maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#1f2937',
+                padding: 10,
+                cornerRadius: 8,
+            },
+        },
         scales: {
-            x: {},
-            y: { beginAtZero: true },
+            x: { grid: { display: false } },
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0 },
+                grid: { color: 'rgba(0,0,0,0.06)' },
+            },
         },
     }
 
-    allMenuItems = [
+    // Konfigurasi kartu "pending" — tambah/ubah item di sini saja,
+    // tidak perlu duplikasi blok HTML untuk tiap kartu.
+    pendingCardConfigs: PendingCardConfig[] = [
         {
+            key: 'akpVerifikasi',
             role: 'ADMIN_AKP',
-            label: 'AKP',
+            title: 'Verifikasi Pengajuan AKP',
+            icon: 'mdi-file-check-outline',
+            color: 'primary',
             route: '/akp/akp-task-list',
-            count: 'totalAKPPending',
         },
         {
+            key: 'akpPenilaianAtasan',
+            role: 'ADMIN_AKP',
+            title: 'Penilaian Atasan/Rekan Kerja AKP',
+            icon: 'mdi-account-check-outline',
+            color: 'info',
+            route: '/akp/akp-task-list',
+        },
+        {
+            key: 'akpPenilaianPribadi',
+            role: 'ADMIN_AKP',
+            title: 'Penilaian Pribadi AKP',
+            icon: 'mdi-clipboard-account-outline',
+            color: 'info',
+            route: '/akp/akp-task-list',
+        },
+        {
+            key: 'verifikasiUKom',
             role: 'ADMIN_UKOM',
-            label: 'UKom',
+            title: 'Verifikasi Pengajuan UKom',
+            icon: 'mdi-certificate-outline',
+            color: 'warning',
             route: '/ukom/ukom-task-list',
-            count: 'totalUKOMPending',
         },
         {
+            key: 'perbaikanDokumenUKom',
+            role: 'ADMIN_UKOM',
+            title: 'Perbaikan Dokumen UKom',
+            icon: 'mdi-file-edit-outline',
+            color: 'warning',
+            route: '/ukom/ukom-task-list',
+        },
+        {
+            key: 'formasi',
             role: 'ADMIN_FORMASI',
-            label: 'FORMASI',
+            title: 'Formasi',
+            icon: 'mdi-briefcase-outline',
+            color: 'success',
             route: '/formasi/formasi-task-list',
-            count: 'totalFormasiPending',
         },
         {
+            key: 'pak',
             role: 'ADMIN_PAK',
-            label: 'PAK',
+            title: 'PAK',
+            icon: 'mdi-file-star-outline',
+            color: 'danger',
             route: '/pak/pak-task-list',
-            count: 'totalPAKPending',
+        },
+        {
+            key: 'pengunduranDiriUKom',
+            role: 'ADMIN_PAK',
+            title: 'Pengunduran Diri',
+            icon: 'mdi-file-star-outline',
+            color: 'danger',
+            route: '/pak/pak-task-list',
+        },
+    ]
+
+    userStatConfigs: UserStatConfig[] = [
+        {
+            key: 'totalUserAdmin',
+            title: 'Admin Sijupri',
+            icon: 'mdi-account-key-outline',
+            route: '/security/user',
+        },
+        {
+            key: 'totalUserInstansi',
+            title: 'Admin Instansi',
+            icon: 'mdi-account-outline',
+            route: '/siap/user-instansi',
+        },
+        {
+            key: 'totalUserUnitKerja',
+            title: 'Admin Unit Kerja',
+            icon: 'mdi-account-supervisor-outline',
+            route: '/siap/user-unit-kerja',
+        },
+        {
+            key: 'totalUserJF',
+            title: 'User JF',
+            icon: 'mdi-account-group-outline',
+            route: '/siap/user-jf',
         },
     ]
 
@@ -96,6 +205,31 @@ export class AdminDashboardComponent {
     totalUserUnitKerja: number = 0
     totalUserAdmin: number = 0
     totalUserInstansi: number = 0
+
+    totalNeedsVerification = 17
+
+    priorityPending = [
+        {
+            title: 'Pengajuan Formasi Guru',
+            applicant: 'Dinas Pendidikan Kab. X',
+            daysPending: 14,
+            icon: 'mdi-file-document-outline',
+            route: '/pengajuan/123',
+        },
+        {
+            title: 'Pengajuan Mutasi Pegawai',
+            applicant: 'BKD Provinsi Y',
+            daysPending: 9,
+            icon: 'mdi-account-switch-outline',
+            route: '/pengajuan/124',
+        },
+    ]
+
+    getUrgencyClass(days: number): string {
+        if (days >= 10) return 'badge--danger'
+        if (days >= 5) return 'badge--warning'
+        return 'badge--success'
+    }
 
     pendingCounts = {
         akpVerifikasi: 0,
@@ -105,12 +239,17 @@ export class AdminDashboardComponent {
         pak: 0,
         verifikasiUKom: 0,
         perbaikanDokumenUKom: 0,
+        pengunduranDiriUKom: 0,
     }
 
     pendingLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
         false,
     )
     userLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
+    chartLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+        false,
+    )
+
     constructor(
         private apiService: ApiService,
         private router: Router,
@@ -119,9 +258,42 @@ export class AdminDashboardComponent {
     }
 
     ngOnInit() {
+        this.getPendingTaskList()
         this.fetchData()
-        this.getUserStats()
+        // this.getUserStats()
         this.getPendingCount()
+    }
+
+    hasRole(role: string): boolean {
+        return this.userRole?.includes(role) || this.userRole?.includes('ADMIN')
+    }
+
+    get visiblePendingCards(): PendingCardConfig[] {
+        return this.pendingCardConfigs.filter((c) => this.hasRole(c.role))
+    }
+
+    get totalPending(): number {
+        return Object.values(this.pendingCounts).reduce((a, b) => a + b, 0)
+    }
+
+    getUserStatValue(key: UserStatConfig['key']): number {
+        return this[key]
+    }
+
+    getPendingTaskList() {
+        this.apiService
+            .getData(
+                '/api/v1/pending_task/search?eq_task_status=PENDING&desc_date_created'
+            )
+            .pipe(finalize(() => this.chartLoading$.next(false)))
+            .subscribe({
+                next: (res: any) => {
+                    this.pendingTaskList = res.data || res
+                },
+                error: (err) => {
+                    console.error('Error fetching data', err)
+                },
+            })
     }
 
     getPendingCount() {
@@ -148,6 +320,9 @@ export class AdminDashboardComponent {
             totalPerbaikanDokumenUKom: this.apiService.getData(
                 '/api/v1/participant_ukom/task/search?page=1&limit=1&eq_flowId=ukom_flow_2',
             ),
+            totalPengunduranDiriUKom: this.apiService.getData(
+                '/api/v1/ukom_resignation/task/search?page=1&limit=1&eq_flowId=ukom_resignation_flow_1',
+            ),
         })
             .pipe(
                 finalize(() => {
@@ -160,15 +335,18 @@ export class AdminDashboardComponent {
                 }),
             )
             .subscribe({
-                next: ({
-                    totalAKPVerifikasi,
-                    totalAKPPenliaianAtasan,
-                    totalAKPPenilaianPribadi,
-                    totalFormasi,
-                    totalPAK,
-                    totalVerifikasiUKom,
-                    totalPerbaikanDokumenUKom,
-                }) => {
+                next: (result) => {
+                    if (!result) return
+                    const {
+                        totalAKPVerifikasi,
+                        totalAKPPenliaianAtasan,
+                        totalAKPPenilaianPribadi,
+                        totalFormasi,
+                        totalPAK,
+                        totalVerifikasiUKom,
+                        totalPerbaikanDokumenUKom,
+                        totalPengunduranDiriUKom,
+                    } = result
                     this.pendingCounts.akpVerifikasi =
                         totalAKPVerifikasi.total ?? 0
                     this.pendingCounts.akpPenilaianAtasan =
@@ -181,6 +359,8 @@ export class AdminDashboardComponent {
                         totalVerifikasiUKom.total ?? 0
                     this.pendingCounts.perbaikanDokumenUKom =
                         totalPerbaikanDokumenUKom.total ?? 0
+                    this.pendingCounts.pengunduranDiriUKom =
+                        totalPengunduranDiriUKom?.total ?? 0
                 },
             })
     }
@@ -201,14 +381,22 @@ export class AdminDashboardComponent {
                 '/api/v1/user_instansi/search?page=1&limit=1',
             ),
         })
-            .pipe(finalize(() => this.userLoading$.next(false)))
+            .pipe(
+                finalize(() => this.userLoading$.next(false)),
+                catchError((err) => {
+                    console.error('Error fetching user stats', err)
+                    return of(null)
+                }),
+            )
             .subscribe({
-                next: ({
-                    totalUserJF,
-                    totalUserUnitKerja,
-                    totalUserAdmin,
-                    totalUserInstansi,
-                }) => {
+                next: (result) => {
+                    if (!result) return
+                    const {
+                        totalUserJF,
+                        totalUserUnitKerja,
+                        totalUserAdmin,
+                        totalUserInstansi,
+                    } = result
                     this.totalUserJF = totalUserJF.total
                     this.totalUserUnitKerja = totalUserUnitKerja.total
                     this.totalUserAdmin = totalUserAdmin.total
@@ -221,13 +409,21 @@ export class AdminDashboardComponent {
         this.router.navigate([path])
     }
 
-    fetchData() {
+    fetchData(from?: string, to?: string, selectedApplication?: string) {
+        this.chartLoading$.next(true)
+
+        let endpoint = '/api/v1/dashboard/participant_ukom_count'
+        if (from && to) {
+            endpoint += `?from=${from}&to=${to}&range_type=${this.rangeType}&application_type=${this.selectedApplication}`
+        }
+
         this.apiService
-            .getData('/api/v1/dashboard/participant_ukom_count')
+            .getData(endpoint)
+            .pipe(finalize(() => this.chartLoading$.next(false)))
             .subscribe({
-                next: (res) => {
-                    this.apiData = res
-                    this.applyFilters()
+                next: (res: any) => {
+                    this.apiData = res.data || res
+                    this.updateChartData()
                 },
                 error: (err) => {
                     console.error('Error fetching data', err)
@@ -235,25 +431,131 @@ export class AdminDashboardComponent {
             })
     }
 
-    applyFilters() {
-        this.filteredData = this.apiData.filter((item: any) => {
-            const monthObj = this.months.find((m) => m.eng === item.month)
-            const monthIndex = monthObj ? this.months.indexOf(monthObj) + 1 : 0
-            return (
-                monthIndex >= this.startMonth &&
-                monthIndex <= this.endMonth &&
-                item.year == this.year.toString()
-            )
-        })
-
-        this.barChartData.labels = this.filteredData.map((item) => {
-            const monthObj = this.months.find((m) => m.eng === item.month)
-            return monthObj ? monthObj.id : item.month
-        })
-        this.barChartData.datasets[0].data = this.filteredData.map(
-            (item) => item.count,
-        )
+    updateChartData() {
+        this.barChartData = {
+            ...this.barChartData,
+            labels: this.apiData.map((item: any) =>
+                this.formatDateLabel(item.date),
+            ),
+            datasets: [
+                {
+                    ...this.barChartData.datasets[0],
+                    data: this.apiData.map(
+                        (item: any) => item.total ?? item.count ?? 0,
+                    ),
+                },
+            ],
+        }
 
         this.chart?.update()
+    }
+
+    private formatDateLabel(dateStr: string): string {
+        if (!dateStr) return ''
+
+        const parts = dateStr.split('-')
+
+        // Mode Yearly ('2026')
+        if (parts.length === 1) {
+            return parts[0]
+        }
+
+        // Mode Monthly ('2026-07')
+        if (parts.length === 2) {
+            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1)
+            return new Intl.DateTimeFormat('id-ID', {
+                month: 'long',
+                year: 'numeric',
+            }).format(date)
+        }
+
+        // Mode Daily/Weekly ('2026-07-17')
+        if (parts.length === 3) {
+            const date = new Date(
+                parseInt(parts[0]),
+                parseInt(parts[1]) - 1,
+                parseInt(parts[2]),
+            )
+            return new Intl.DateTimeFormat('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+            }).format(date)
+        }
+
+        return dateStr
+    }
+
+    toggleFilterPopover(event: MouseEvent) {
+        event.stopPropagation()
+        this.showFilterPopover = !this.showFilterPopover
+    }
+
+    @HostListener('document:click')
+    closeFilterPopover() {
+        this.showFilterPopover = false
+    }
+
+    applyFilters() {
+        if (!this.fromDate || !this.toDate) {
+            return
+        }
+
+        if (this.fromDate > this.toDate) {
+            ;[this.fromDate, this.toDate] = [this.toDate, this.fromDate]
+        }
+
+        this.activePreset = 'custom'
+        this.fetchData(this.fromDate, this.toDate, this.selectedApplication)
+    }
+
+    applyPreset(preset: '7d' | 'month' | '3month' | 'year') {
+        const now = new Date()
+        this.activePreset = preset
+
+        switch (preset) {
+            case '7d':
+                this.fromDate = this.toInputDate(this.subDays(now, 6))
+                this.toDate = this.toInputDate(now)
+                this.rangeType = 'daily'
+                break
+            case 'month':
+                this.fromDate = this.toInputDate(
+                    new Date(now.getFullYear(), now.getMonth(), 1),
+                )
+                this.toDate = this.toInputDate(
+                    new Date(now.getFullYear(), now.getMonth() + 1, 0),
+                )
+                this.rangeType = 'monthly'
+                break
+            case '3month':
+                this.fromDate = this.toInputDate(
+                    new Date(now.getFullYear(), now.getMonth() - 2, 1),
+                )
+                this.toDate = this.toInputDate(
+                    new Date(now.getFullYear(), now.getMonth() + 1, 0),
+                )
+                this.rangeType = 'monthly'
+                break
+            case 'year':
+                this.fromDate = this.toInputDate(
+                    new Date(now.getFullYear() - 1, now.getMonth() + 1, 1),
+                )
+                this.toDate = this.toInputDate(now)
+                this.rangeType = 'yearly'
+                break
+        }
+
+        this.applyFilters()
+    }
+
+    private subDays(date: Date, days: number): Date {
+        const result = new Date(date)
+        result.setDate(result.getDate() - days)
+        return result
+    }
+
+    private toInputDate(date: Date): string {
+        return date.toISOString().split('T')[0]
     }
 }

@@ -1,184 +1,441 @@
-<section class="container-fluid">
-    <p class="h3">Pengajuan Dengan Status Pending</p>
-    <ng-container *ngIf="pendingLoading$ | async; else content">
-        <div class="d-flex justify-content-center my-5">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-    </ng-container>
-    <ng-template #content>
-        <div class="row">
-            <div *ngIf="userRole?.includes('ADMIN_AKP') || userRole?.includes('ADMIN')"
-                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/akp/akp-task-list')">
-                <div class="card text-center p-3 mb-0 h-100 w-100">
-                    <h5>Verfikasi Pengajuan AKP</h5>
-                    <h2>{{ pendingCounts.akpVerifikasi }}</h2>
-                </div>
-            </div>
-
-            <div *ngIf="userRole?.includes('ADMIN_AKP') || userRole?.includes('ADMIN')"
-                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/akp/akp-task-list')">
-                <div class="card text-center p-3 mb-0 h-100 w-100">
-                    <h5>Penilaian Atasan/Rekan Kerja AKP</h5>
-                    <h2>{{ pendingCounts.akpPenilaianAtasan }}</h2>
-                </div>
-            </div>
-
-            <div *ngIf="userRole?.includes('ADMIN_AKP') || userRole?.includes('ADMIN')"
-                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/akp/akp-task-list')">
-                <div class="card text-center p-3 mb-0 h-100 w-100">
-                    <h5>Penilai Pribadi AKP</h5>
-                    <h2>{{ pendingCounts.akpPenilaianPribadi }}</h2>
-                </div>
-            </div>
-
-            <div *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/ukom/ukom-task-list')">
-                <div class="card text-center p-3 mb-0 h-100 w-100">
-                    <h5>Verifikasi Pengajuan UKom</h5>
-                    <h2>{{ pendingCounts.verifikasiUKom }}</h2>
-                </div>
-            </div>
-
-            <div *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/ukom/ukom-task-list')">
-                <div class="card text-center p-3 mb-0 h-100 w-100">
-                    <h5>Perbaikan Dokumen Ukom</h5>
-                    <h2>{{ pendingCounts.perbaikanDokumenUKom }}</h2>
-                </div>
-            </div>
-
-            <div *ngIf="userRole?.includes('ADMIN_FORMASI') || userRole?.includes('ADMIN')"
-                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/formasi/formasi-task-list')">
-                <div class="card text-center p-3 mb-0 h-100 w-100">
-                    <h5>Formasi</h5>
-                    <h2>{{ pendingCounts.formasi }}</h2>
-                </div>
-            </div>
-
-            <div *ngIf="userRole?.includes('ADMIN_PAK') || userRole?.includes('ADMIN')"
-                class="col-lg-3 col-md-6 col-12 cursor-pointer mb-4" (click)="navigateTo('/pak/pak-task-list')">
-                <div class="card text-center p-3 mb-0 h-100 w-100">
-                    <h5>PAK</h5>
-                    <h2>{{ pendingCounts.pak }}</h2>
-                </div>
-            </div>
-        </div>
-    </ng-template>
-
-    <br />
-    <ng-container *ngIf="userLoading$ | async; else userCount">
-        <div class="d-flex justify-content-center my-5">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-    </ng-container>
-    <ng-template #userCount>
-        <div *ngIf="userRole?.includes('ADMIN')">
-            <p class="h3">User Sijupri</p>
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/security/user')">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="media d-flex justify-content-between">
-                                <div class="media-body text-left">
-                                    <h3 class="success">{{ totalUserAdmin }}</h3>
-                                    <span>Admin Sijupri</span>
-                                </div>
-                                <div class="align-self-center">
-                                    <span class="mdi mdi-account-key-outline fs-1"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-instansi')">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="media d-flex justify-content-between">
-                                <div class="media-body text-left">
-                                    <h3 class="success">{{ totalUserInstansi }}</h3>
-                                    <span>Admin Instansi</span>
-                                </div>
-                                <div class="align-self-center">
-                                    <span class="mdi mdi-account-outline fs-1"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-unit-kerja')">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="media d-flex justify-content-between">
-                                <div class="media-body text-left">
-                                    <h3 class="success">{{ totalUserUnitKerja }}</h3>
-                                    <span>Admin Unit Kerja</span>
-                                </div>
-                                <div class="align-self-center">
-                                    <span class="mdi mdi-account-supervisor-outline fs-1"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6 col-12 cursor-pointer" (click)="navigateTo('/siap/user-jf')">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="media d-flex justify-content-between">
-                                <div class="media-body text-left">
-                                    <h3 class="success">{{ totalUserJF }}</h3>
-                                    <span>User JF</span>
-                                </div>
-                                <div class="align-self-center">
-                                    <span class="mdi mdi-account-group-outline fs-1"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ng-template>
-
-    <br />
-    <p class="h3" *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')">
-        Statistik Pendaftaran UKom
-    </p>
-    <div class="row mb-3" *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')">
-        <div class="col-md-4">
-            <label for="startMonth">Bulan Awal</label>
-            <select [(ngModel)]="startMonth" (change)="applyFilters()" class="form-control mx-0 mb-1 mt-0">
-                <option *ngFor="let month of months; let i = index" [value]="i + 1">
-                    {{ month.id }}
-                </option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label for="endMonth">Bulan Akhir</label>
-            <select [(ngModel)]="endMonth" (change)="applyFilters()" class="form-control mx-0 mb-1 mt-0">
-                <option *ngFor="let month of months; let i = index" [value]="i + 1">
-                    {{ month.id }}
-                </option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label for="year">Tahun</label>
-            <select [(ngModel)]="year" (change)="applyFilters()" class="form-control mx-0 mb-1 mt-0">
-                <option *ngFor="let y of [2024, 2025, 2026]" [value]="y">
-                    {{ y }}
-                </option>
-            </select>
+<section class="container-fluid admin-dashboard py-2">
+    <!-- ================= PENDING TASKS ================= -->
+    <div class="section-header">
+        <div>
+            <p class="h4 mb-0">Pengajuan Dengan Status Pending</p>
         </div>
     </div>
 
-    <div class="chart-container position-relative w-100"
-        *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')">
-        <canvas baseChart [data]="barChartData" [options]="barChartOptions" chartType="bar"></canvas>
+    <ng-container *ngIf="pendingLoading$ | async; else pendingContent">
+        <div class="row g-3">
+            <div class="col-lg-3 col-md-6 col-12" *ngFor="let i of [1,2,3,4]">
+                <div class="stat-card skeleton"></div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #pendingContent>
+        <div class="row g-3" *ngIf="visiblePendingCards.length; else noPending">
+            <!-- kiri: stat cards existing (bisa disusutin jadi col-lg-8 kalau nanti digabung sama donut) -->
+            <div class="col-lg-8 col-12">
+                <div class="row g-3">
+                    <div
+                        class="col-lg-4 col-md-6 col-12"
+                        *ngFor="let card of visiblePendingCards"
+                    >
+                        <div
+                            class="stat-card stat-card--{{ card.color }} cursor-pointer"
+                            (click)="navigateTo(card.route)"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="stat-card__icon">
+                                <span class="mdi {{ card.icon }}"></span>
+                            </div>
+                            <div class="stat-card__body">
+                                <h2 class="stat-card__value">
+                                    {{ pendingCounts[card.key] }}
+                                </h2>
+                                <p class="stat-card__title">{{ card.title }}</p>
+                            </div>
+                            <span
+                                class="mdi mdi-chevron-right stat-card__chevron"
+                            ></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- kanan: reminder card -->
+            <div class="col-lg-4 col-12">
+                <!-- ================= REMINDER CARD ================= -->
+                <div class="reminder-card">
+                    <div class="reminder-card__header">
+                        <span
+                            class="mdi mdi-alert-circle-outline text-danger reminder-card__icon"
+                        ></span>
+                        <div>
+                            <p class="reminder-card__title mb-0">
+                                <strong>{{ totalNeedsVerification }}</strong>
+                                pengajuan perlu diverifikasi
+                            </p>
+                            <span class="text-muted small"
+                                >2 prioritas teratas berdasarkan lama
+                                menunggu</span
+                            >
+                        </div>
+                    </div>
+
+                    <div
+                        class="reminder-list"
+                        *ngIf="priorityPending.length; else noPriority"
+                    >
+                        <div
+                            class="reminder-item"
+                            *ngFor="let item of priorityPending"
+                            (click)="navigateTo(item.route)"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="reminder-item__icon">
+                                <span class="mdi {{ item.icon }}"></span>
+                            </div>
+                            <div class="reminder-item__body">
+                                <p class="reminder-item__title mb-0">
+                                    {{ item?.title }}
+                                </p>
+                                <span class="text-muted small"
+                                    >{{ item.applicant }}</span
+                                >
+                            </div>
+                            <span
+                                class="badge reminder-item__badge"
+                                [ngClass]="getUrgencyClass(item.daysPending)"
+                            >
+                                {{ item.daysPending }} hari
+                            </span>
+                        </div>
+                    </div>
+
+                    <ng-template #noPriority>
+                        <div class="empty-state empty-state--sm">
+                            <span class="mdi mdi-check-circle-outline"></span>
+                            <p class="small mb-0">
+                                Tidak ada pengajuan prioritas saat ini.
+                            </p>
+                        </div>
+                    </ng-template>
+
+                    <a
+                        class="reminder-card__footer"
+                        *ngIf="totalNeedsVerification > 2"
+                        (click)="navigateTo('/pengajuan/pending')"
+                    >
+                        Lihat semua ({{ totalNeedsVerification }})
+                        <span class="mdi mdi-arrow-right"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <ng-template #noPending>
+            <div class="empty-state">
+                <span class="mdi mdi-check-circle-outline"></span>
+                <p class="mb-0">
+                    Tidak ada pengajuan yang menunggu tindakan Anda.
+                </p>
+            </div>
+        </ng-template>
+    </ng-template>
+
+    <!-- ================= USER STATS ================= -->
+    <!-- <div *ngIf="userRole?.includes('ADMIN')" class="mt-5">
+        <div class="section-header">
+            <p class="h4 mb-0">User Sijupri</p>
+        </div>
+
+        <ng-container *ngIf="userLoading$ | async; else userCount">
+            <div class="row g-3">
+                <div
+                    class="col-lg-3 col-md-6 col-12"
+                    *ngFor="let i of [1,2,3,4]"
+                >
+                    <div class="user-card skeleton"></div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-template #userCount>
+            <div class="row g-3">
+                <div
+                    class="col-lg-3 col-md-6 col-12"
+                    *ngFor="let stat of userStatConfigs"
+                >
+                    <div
+                        class="user-card cursor-pointer"
+                        (click)="navigateTo(stat.route)"
+                        role="button"
+                        tabindex="0"
+                    >
+                        <div class="user-card__icon">
+                            <span class="mdi {{ stat.icon }}"></span>
+                        </div>
+                        <div>
+                            <h3 class="user-card__value">
+                                {{ getUserStatValue(stat.key) }}
+                            </h3>
+                            <span class="user-card__title"
+                                >{{ stat.title }}</span
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </div> -->
+
+    <!-- ================= CHART ================= -->
+    <div
+        class="mt-3"
+        *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
+    >
+        <div class="chart-card">
+            <div class="chart-card__header">
+                <div>
+                    <p class="h4 mb-0">Tren Permohonan</p>
+                    <span class="text-muted small"
+                        >Jumlah peserta per bulan, tahun {{ year }}</span
+                    >
+                </div>
+
+                <div class="position-relative">
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Filter Status -->
+                        <select
+                            class="form-select form-select-sm"
+                            [(ngModel)]="selectedApplication"
+                            (change)="applyFilters()"
+                            style="width: 200px"
+                        >
+                            <option value="">Semua Permohonan</option>
+                            <option value="ukom_resignation_task">
+                                Permohonan Pengunduran Diri
+                            </option>
+                            <option value="formasi_task">
+                                Permohonan Formasi
+                            </option>
+                            <option value="participant_ukom_task">
+                                Permohonan UKom
+                            </option>
+                            <option value="siap_task">Permohonan SIAP</option>
+                            <option value="akp_task">Permohonan AKP</option>
+                        </select>
+
+                        <!-- Filter Rentang -->
+                        <div class="position-relative">
+                            <button
+                                type="button"
+                                class="filter-trigger"
+                                [class.filter-trigger--active]="showFilterPopover"
+                                (click)="toggleFilterPopover($event)"
+                            >
+                                <span class="mdi mdi-filter-variant"></span>
+
+                                <span class="filter-trigger__label"
+                                    >Rentang</span
+                                >
+
+                                <span class="filter-trigger__date">
+                                    {{ fromDate | date: 'dd/MM/yy' }}
+                                    <span class="mx-1">–</span>
+                                    {{ toDate | date: 'dd/MM/yy' }}
+                                </span>
+
+                                <span
+                                    class="mdi mdi-chevron-down filter-trigger__chevron"
+                                    [class.rotate]="showFilterPopover"
+                                ></span>
+                            </button>
+
+                            <!-- popover tetap di sini -->
+                        </div>
+                    </div>
+
+                    <div
+                        class="filter-popover"
+                        *ngIf="showFilterPopover"
+                        (click)="$event.stopPropagation()"
+                    >
+                        <div class="filter-popover__arrow"></div>
+
+                        <div class="filter-popover__body">
+                            <!-- Custom range -->
+                            <div
+                                class="filter-popover__col filter-popover__custom"
+                            >
+                                <div class="filter-section-title">
+                                    <span class="mdi mdi-calendar-range"></span>
+                                    Rentang Tanggal
+                                </div>
+
+                                <div class="filter-date-row">
+                                    <div class="filter-date-field">
+                                        <label for="fromDate">
+                                            Dari tanggal
+                                        </label>
+
+                                        <input
+                                            id="fromDate"
+                                            type="date"
+                                            [(ngModel)]="fromDate"
+                                            [max]="toDate"
+                                            class="form-control"
+                                        />
+                                    </div>
+
+                                    <span class="filter-date-separator">→</span>
+
+                                    <div class="filter-date-field">
+                                        <label for="toDate">
+                                            Sampai tanggal
+                                        </label>
+
+                                        <input
+                                            id="toDate"
+                                            type="date"
+                                            [(ngModel)]="toDate"
+                                            [min]="fromDate"
+                                            class="form-control"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary w-100 mt-3"
+                                    (click)="applyFilters(); showFilterPopover = false"
+                                >
+                                    <span class="mdi mdi-check me-1"></span>
+                                    Terapkan Filter
+                                </button>
+                            </div>
+
+                            <div class="filter-popover__divider"></div>
+
+                            <!-- Preset -->
+                            <div class="filter-popover__col">
+                                <div class="filter-section-title">
+                                    <span class="mdi mdi-clock-outline"></span>
+                                    Periode Cepat
+                                </div>
+
+                                <div class="filter-presets">
+                                    <button
+                                        type="button"
+                                        class="filter-preset"
+                                        [class.filter-preset--active]="activePreset === '7d'"
+                                        (click)="applyPreset('7d'); showFilterPopover = false"
+                                    >
+                                        <span>
+                                            <strong>7 Hari Terakhir</strong>
+                                            <small>7 hari terakhir</small>
+                                        </span>
+
+                                        <span
+                                            class="mdi"
+                                            [ngClass]="
+                                activePreset === '7d'
+                                    ? 'mdi-check-circle'
+                                    : 'mdi-chevron-right'
+                            "
+                                        ></span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="filter-preset"
+                                        [class.filter-preset--active]="activePreset === 'month'"
+                                        (click)="applyPreset('month'); showFilterPopover = false"
+                                    >
+                                        <span>
+                                            <strong>Bulan Ini</strong>
+                                            <small
+                                                >Periode bulan berjalan</small
+                                            >
+                                        </span>
+
+                                        <span
+                                            class="mdi"
+                                            [ngClass]="
+                                activePreset === 'month'
+                                    ? 'mdi-check-circle'
+                                    : 'mdi-chevron-right'
+                            "
+                                        ></span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="filter-preset"
+                                        [class.filter-preset--active]="activePreset === '3month'"
+                                        (click)="applyPreset('3month'); showFilterPopover = false"
+                                    >
+                                        <span>
+                                            <strong>3 Bulan Terakhir</strong>
+                                            <small>90 hari terakhir</small>
+                                        </span>
+
+                                        <span
+                                            class="mdi"
+                                            [ngClass]="
+                                activePreset === '3month'
+                                    ? 'mdi-check-circle'
+                                    : 'mdi-chevron-right'
+                            "
+                                        ></span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="filter-preset"
+                                        [class.filter-preset--active]="activePreset === 'year'"
+                                        (click)="applyPreset('year'); showFilterPopover = false"
+                                    >
+                                        <span>
+                                            <strong>Tahun Ini</strong>
+                                            <small>Januari – Desember</small>
+                                        </span>
+
+                                        <span
+                                            class="mdi"
+                                            [ngClass]="
+                                activePreset === 'year'
+                                    ? 'mdi-check-circle'
+                                    : 'mdi-chevron-right'
+                            "
+                                        ></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card__body">
+                <ng-container *ngIf="chartLoading$ | async; else chartContent">
+                    <div
+                        class="d-flex justify-content-center align-items-center chart-container"
+                    >
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-template #chartContent>
+                    <div
+                        class="chart-container position-relative w-100"
+                        *ngIf="barChartData; else noData"
+                    >
+                        <canvas
+                            baseChart
+                            [data]="barChartData"
+                            [options]="barChartOptions"
+                            chartType="bar"
+                        >
+                        </canvas>
+                    </div>
+                    <ng-template #noData>
+                        <div class="empty-state">
+                            <span class="mdi mdi-chart-bar"></span>
+                            <p class="mb-0">
+                                Tidak ada data untuk rentang bulan/tahun yang
+                                dipilih.
+                            </p>
+                        </div>
+                    </ng-template>
+                </ng-template>
+            </div>
+        </div>
     </div>
 </section>
