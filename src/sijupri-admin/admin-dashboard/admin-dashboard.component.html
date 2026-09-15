@@ -56,7 +56,9 @@
                         ></span>
                         <div>
                             <p class="reminder-card__title mb-0">
-                                <strong>{{ totalNeedsVerification }}</strong>
+                                <strong
+                                    >{{ priorityPending.length ?? 0 }}</strong
+                                >
                                 pengajuan perlu diverifikasi
                             </p>
                             <span class="text-muted small"
@@ -72,7 +74,8 @@
                     >
                         <div
                             class="reminder-item"
-                            *ngFor="let item of priorityPending"
+                            [ngClass]="getUrgencyClass(item.daysPending)"
+                            *ngFor="let item of priorityPending.slice(0, 2)"
                             (click)="navigateTo(item.route)"
                             role="button"
                             tabindex="0"
@@ -85,13 +88,10 @@
                                     {{ item?.title }}
                                 </p>
                                 <span class="text-muted small"
-                                    >{{ item.applicant }}</span
+                                    >NIP: {{ item.applicant }}</span
                                 >
                             </div>
-                            <span
-                                class="badge reminder-item__badge"
-                                [ngClass]="getUrgencyClass(item.daysPending)"
-                            >
+                            <span class="reminder-item__badge">
                                 {{ item.daysPending }} hari
                             </span>
                         </div>
@@ -108,10 +108,10 @@
 
                     <a
                         class="reminder-card__footer"
-                        *ngIf="totalNeedsVerification > 2"
-                        (click)="navigateTo('/pengajuan/pending')"
+                        *ngIf="priorityPending.length > 2"
+                        (click)="openPendingTaskListModal()"
                     >
-                        Lihat semua ({{ totalNeedsVerification }})
+                        Lihat semua ({{ priorityPending.length }})
                         <span class="mdi mdi-arrow-right"></span>
                     </a>
                 </div>
@@ -183,9 +183,9 @@
             <div class="chart-card__header">
                 <div>
                     <p class="h4 mb-0">Tren Permohonan</p>
-                    <span class="text-muted small"
-                        >Jumlah peserta per bulan, tahun {{ year }}</span
-                    >
+                    <span class="text-muted small">
+                        Tinjau perkembangan jumlah permohonan
+                    </span>
                 </div>
 
                 <div class="position-relative">
@@ -439,3 +439,10 @@
         </div>
     </div>
 </section>
+
+<app-pending-task-list-modal
+    (close)="closePendingTaskListModal()"
+    *ngIf="showPendingTaskListModal()"
+    [pendingTaskList]="pendingTaskList"
+>
+</app-pending-task-list-modal>

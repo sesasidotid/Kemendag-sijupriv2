@@ -1,0 +1,46 @@
+<app-modal
+    (toggle)="onClose()"
+    [enableFooter]="false"
+    [size]="'2lg'"
+    [title]="'Daftar Permohonan'"
+>
+    <div class="participant-list-content">
+        <div class="list-header">
+            <div class="alert alert-info mb-0">
+                <i class="mdi mdi-information-outline me-2"></i>
+                <strong>Total Pengajuan:</strong> {{ pendingTaskList.length }}
+                permohonan
+            </div>
+
+            <div class="search-box" *ngIf="pendingTaskList.length > 0">
+                <span class="mdi mdi-magnify search-box__icon"></span>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Cari NIP atau jenis permohonan..."
+                    [(ngModel)]="quickFilterText"
+                    (ngModelChange)="onQuickFilterChanged()"
+                />
+            </div>
+        </div>
+
+        <div *ngIf="pendingTaskList.length === 0" class="empty-state">
+            <span class="mdi mdi-check-circle-outline"></span>
+            <p class="mb-0">Tidak ada permohonan diajukan untuk sekarang.</p>
+        </div>
+
+        <ag-grid-angular
+            (gridReady)="onGridReady($event)"
+            *ngIf="pendingTaskList.length > 0"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [pagination]="true"
+            [paginationPageSize]="20"
+            [rowData]="pendingTaskList"
+            [suppressCellFocus]="true"
+            class="ag-theme-alpine"
+            style="height: 500px; width: 100%"
+        >
+        </ag-grid-angular>
+    </div>
+</app-modal>

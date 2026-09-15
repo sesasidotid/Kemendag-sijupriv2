@@ -1,4 +1,4 @@
-import { Component, HostListener, ViewChild } from '@angular/core'
+import { Component, HostListener, signal, ViewChild } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ChartConfiguration, ChartOptions } from 'chart.js'
 import { ApiService } from '../../modules/base/services/api.service'
@@ -9,6 +9,7 @@ import { Router } from '@angular/router'
 import { BehaviorSubject, catchError, finalize, forkJoin, of } from 'rxjs'
 import { LoginContext } from '../../modules/base/commons/login-context'
 import { PendingTask } from '@/modules/workflow/models/pending-task.model'
+import { PendingTaskListModalComponent } from './pending-task-list-modal/pending-task-list-modal.component'
 
 interface PendingCardConfig {
     key: keyof AdminDashboardComponent['pendingCounts']
@@ -33,7 +34,12 @@ interface UserStatConfig {
 @Component({
     selector: 'app-admin-dashboard',
     standalone: true,
-    imports: [CommonModule, NgChartsModule, FormsModule],
+    imports: [
+        CommonModule,
+        NgChartsModule,
+        FormsModule,
+        PendingTaskListModalComponent,
+    ],
     templateUrl: './admin-dashboard.component.html',
     styleUrl: './admin-dashboard.component.scss',
 })
@@ -50,6 +56,8 @@ export class AdminDashboardComponent {
     activePreset: '7d' | 'month' | '3month' | 'year' | 'custom' = '7d'
     showFilterPopover = false
     selectedApplication: string = ''
+    priorityPending: any[] = []
+    showPendingTaskListModal = signal<boolean>(false)
 
     months = [
         { id: 'Januari', eng: 'January' },
@@ -208,23 +216,6 @@ export class AdminDashboardComponent {
 
     totalNeedsVerification = 17
 
-    priorityPending = [
-        {
-            title: 'Pengajuan Formasi Guru',
-            applicant: 'Dinas Pendidikan Kab. X',
-            daysPending: 14,
-            icon: 'mdi-file-document-outline',
-            route: '/pengajuan/123',
-        },
-        {
-            title: 'Pengajuan Mutasi Pegawai',
-            applicant: 'BKD Provinsi Y',
-            daysPending: 9,
-            icon: 'mdi-account-switch-outline',
-            route: '/pengajuan/124',
-        },
-    ]
-
     getUrgencyClass(days: number): string {
         if (days >= 10) return 'badge--danger'
         if (days >= 5) return 'badge--warning'
@@ -282,13 +273,22 @@ export class AdminDashboardComponent {
 
     getPendingTaskList() {
         this.apiService
-            .getData(
-                '/api/v1/pending_task/search?eq_task_status=PENDING&desc_date_created'
-            )
+            .getData('/api/v1/pending_task/list?desc_date_created')
             .pipe(finalize(() => this.chartLoading$.next(false)))
             .subscribe({
                 next: (res: any) => {
                     this.pendingTaskList = res.data || res
+                    this.priorityPending = this.pendingTaskList.map(
+                        (task: any) => ({
+                            title: task.flowName,
+                            applicant: task.objectGroup,
+                            daysPending: this.calculateDaysPending(
+                                task.dateCreated,
+                            ),
+                            icon: this.getTaskIcon(task.workflowName),
+                            route: this.getTaskRoute(task),
+                        }),
+                    )
                 },
                 error: (err) => {
                     console.error('Error fetching data', err)
@@ -321,7 +321,7 @@ export class AdminDashboardComponent {
                 '/api/v1/participant_ukom/task/search?page=1&limit=1&eq_flowId=ukom_flow_2',
             ),
             totalPengunduranDiriUKom: this.apiService.getData(
-                '/api/v1/ukom_resignation/task/search?page=1&limit=1&eq_flowId=ukom_resignation_flow_1',
+                '/api/v1/ukom_resignation/task/search?page=1&limit=1',
             ),
         })
             .pipe(
@@ -557,5 +557,59 @@ export class AdminDashboardComponent {
 
     private toInputDate(date: Date): string {
         return date.toISOString().split('T')[0]
+    }
+
+    calculateDaysPending(dateCreated: string): number {
+        const created = new Date(dateCreated)
+        const now = new Date()
+
+        const diffTime = now.getTime() - created.getTime()
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+        return Math.max(0, diffDays)
+    }
+
+    getTaskIcon(workflowName: string): string {
+        switch (workflowName) {
+            case 'participant_ukom_task':
+                return 'mdi-account-check-outline' // peserta ukom — verifikasi kelayakan peserta
+            case 'rw_kinerja_task':
+                return 'mdi-user' // riwayat kinerja pegawai
+            case 'akp_task':
+                return 'mdi-chart-box-outline' // Analisis Kebutuhan Pegawai — analisis/data kebutuhan
+            case 'formasi_task':
+                return 'mdi-briefcase-outline' // pengajuan formasi jabatan
+            case 'ukom_resignation_task':
+                return 'mdi-account-remove-outline' // pengunduran diri peserta ukom
+            default:
+                return 'mdi-file-document-outline'
+        }
+    }
+
+    getTaskRoute(task: PendingTask): string {
+        switch (task.workflowName) {
+            case 'participant_ukom_task':
+                return `/ukom/ukom-task-list/${task.id}`
+            case 'ukom_resignation_task':
+                return `/ukom/ukom-resignation-list/${task.id}`
+            case 'formasi_task':
+                return `/formasi/formasi-task-list/${task.id}`
+            case 'akp_task':
+                return `/akp/akp-task-list/${task.id}`
+            case 'rw_kinerja_task':
+                return `/pak/pak-task-list/${task.objectGroup}`
+            case 'formasi_task':
+                return `/formasi/formasi-task-list/${task.id}`
+            default:
+                return '/akp/akp-task-list'
+        }
+    }
+
+    openPendingTaskListModal() {
+        this.showPendingTaskListModal.set(true)
+    }
+
+    closePendingTaskListModal() {
+        this.showPendingTaskListModal.set(false)
     }
 }

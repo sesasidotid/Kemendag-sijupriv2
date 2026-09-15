@@ -1,0 +1,136 @@
+::ng-deep .action-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+::ng-deep .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid #dbeafe;
+    background: #eff6ff;
+    color: #2563eb;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+
+    .mdi {
+        font-size: 15px;
+        line-height: 1;
+    }
+
+    &:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35);
+    }
+}
+
+.search-box {
+    position: relative;
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+
+    &__icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 17px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 38px;
+        padding: 0 12px 0 34px;
+        font-size: 0.85rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f9fafb;
+        transition: all 0.15s ease;
+
+        &::placeholder {
+            color: #9ca3af;
+        }
+
+        &:focus {
+            background: #fff;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+    }
+}
+
+.list-header {
+    display: flex;
+    flex-direction: column; // stacked, bukan row lagi
+    gap: 10px;
+    margin-bottom: 14px;
+
+    .alert {
+        display: flex;
+        align-items: center;
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+}
+
+.search-box {
+    position: relative;
+    width: 100%; // full width karena sekarang di bawah, bukan sempit di samping
+    max-width: 320px; // opsional: batasi biar nggak terlalu lebar kalau modal besar
+
+    &__icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 17px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 38px;
+        padding: 0 12px 0 34px;
+        font-size: 0.85rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f9fafb;
+        transition: all 0.15s ease;
+
+        &::placeholder {
+            color: #9ca3af;
+        }
+
+        &:focus {
+            background: #fff;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+    }
+}
