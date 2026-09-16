@@ -178,22 +178,10 @@ export class UkomClassDetailComponent implements OnInit {
                 icon: 'mdi-plus-circle',
                 onClick: () => this.handleTabChange(),
             })
-            .addTab({
-                label: 'Import Nilai UKom',
-                icon: 'mdi-plus-circle',
-                onClick: () => this.handleGradeTabChange(),
-            })
     }
 
     handleTabChange() {
         this.router.navigate([`add-ukom-schedule`], {
-            relativeTo: this.activatedRoute,
-            replaceUrl: true,
-        })
-    }
-
-    handleGradeTabChange() {
-        this.router.navigate([`import-grade-class`], {
             relativeTo: this.activatedRoute,
             replaceUrl: true,
         })
