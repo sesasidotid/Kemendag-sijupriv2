@@ -76,6 +76,8 @@ export class Participant extends Serializable {
 
     documentUkomList: DokumenUkom[] | null | undefined = undefined
 
+    secretKey: string | null | undefined = undefined
+
     constructor(object?: { [key: string]: any }) {
         super()
 
