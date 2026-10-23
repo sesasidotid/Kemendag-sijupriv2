@@ -89,8 +89,13 @@ export class JfListComponent {
         this.instansiTypeService
             .findAll()
             .pipe(
-                map((instansiType) => {
-                    return instansiType.filter((type) => type.code !== 'IT1')
+                map((instansiTypes) => {
+                    instansiTypes.forEach((type) => {
+                        if (type.code === 'IT1') {
+                            type.name = 'Kementerian Perdagangan'
+                        }
+                    })
+                    return instansiTypes
                 }),
             )
             .subscribe({
@@ -114,6 +119,21 @@ export class JfListComponent {
                 .addPrimaryColumn(
                     new PrimaryColumnBuilder('Email', 'email', [
                         'user',
+                    ]).build(),
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder('Unit Kerja', 'name', [
+                        'unitKerja',
+                    ]).build(),
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder('Jabatan', 'jabatan|name', [
+                        'riwayatJabatan',
+                    ]).build(),
+                )
+                .addPrimaryColumn(
+                    new PrimaryColumnBuilder('Jenjang', 'jenjang|name', [
+                        'riwayatJabatan',
                     ]).build(),
                 )
                 .addPrimaryColumn(
@@ -212,6 +232,15 @@ export class JfListComponent {
             )
         }
 
+        if (this.selectedInstansiType === 'IT1') {
+            filterList = this.ensureFilter(
+                filterList,
+                'eq_instansiId',
+                'Instansi Perdagangan',
+                this.instansiToOptions(),
+            )
+        }
+
         if (this.selectedInstansiType === 'IT2') {
             filterList = this.ensureFilter(
                 filterList,
@@ -287,7 +316,7 @@ export class JfListComponent {
             return
         }
 
-        if (this.selectedInstansiType === 'IT2') {
+        if (['IT1', 'IT2'].includes(this.selectedInstansiType)) {
             this.fetchInstansiByType(this.selectedInstansiType)
             return
         }

@@ -20,6 +20,19 @@
             <i class="mdi mdi-open-in-new"></i> Lihat Detail
         </a>
     </ng-container>
+
+    <button
+        *ngIf="pendingTask.secretKey"
+        type="button"
+        (click)="toggleSecretKey()"
+        class="btn btn-outline-primary"
+    >
+        <i
+            class="mdi me-1"
+            [ngClass]="showSecretKey ? 'mdi-eye-off' : 'mdi-key'"
+        ></i>
+        {{ showSecretKey ? 'Sembunyikan Kode' : 'Lihat Kode Pendaftaran' }}
+    </button>
 </div>
 
 <div
@@ -32,6 +45,38 @@
 </div>
 
 <ng-template #content>
+    <!-- Secret Key -->
+    <ng-container *ngIf="!(isLoading$ | async) && showSecretKey">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="mb-1">
+                            <i class="mdi mdi-key me-1"></i>
+                            Kode Pendaftaran
+                        </h6>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        (click)="copySecretKey()"
+                    >
+                        <i class="mdi mdi-content-copy me-1"></i>
+                        Copy
+                    </button>
+                </div>
+
+                <div class="mt-3">
+                    <code
+                        class="d-block bg-light text-primary fw-bold text-break fs-5 rounded p-3"
+                    >
+                        {{ pendingTask.secretKey }}
+                    </code>
+                </div>
+            </div>
+        </div>
+    </ng-container>
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
@@ -169,8 +214,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Provinsi</label>
                                 <p class="border-bottom">
-                                    {{ (pesertaUkom.provinsiName | prettyName)
-                                    ?? '-' }}
+                                    {{ (pesertaUkom.provinsiName ?? provinsiName
+                                    | prettyName) ?? '-' }}
                                 </p>
                             </div>
                         </div>

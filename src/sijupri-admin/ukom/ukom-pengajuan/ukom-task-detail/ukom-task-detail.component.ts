@@ -34,6 +34,7 @@ import {
 
 import { PrettyNamePipe } from '@/modules/base/pipes/pretty-name.pipe'
 import { KabKotaService } from '@/modules/maintenance/services/kab-kota.service'
+import { ProvinsiService } from '@/modules/maintenance/services/provinsi.service'
 @Component({
     selector: 'app-ukom-task-detail',
     standalone: true,
@@ -67,6 +68,7 @@ export class UkomTaskDetailComponent {
     predikat1Name: string
     predikat2Name: string
     bidangJabatanName: string
+    showSecretKey = false;
 
     tabIndex: number
 
@@ -87,6 +89,7 @@ export class UkomTaskDetailComponent {
         public pendidikanService: PendidikanService,
         public ukomPendingTaskService: UkomPendingTaskService,
         private kabKotaService: KabKotaService,
+        private provinsiService: ProvinsiService,
         public bidangJabatanService: BidangJabatanService,
     ) {
         this.isLoading$ = combineLatest([
@@ -110,6 +113,10 @@ export class UkomTaskDetailComponent {
                 this.pendingTask.objectTask.object.kabupatenKotaId &&
                     this.getKabupatenNameByCode(
                         pendingTask.objectTask.object.kabupatenKotaId,
+                    )
+                this.pendingTask.objectTask.object.provinsiId &&
+                    this.getProvinsiNameByCode(
+                        pendingTask.objectTask.object.provinsiId,
                     )
                 this.predikat1Name =
                     this.kinerjaService.getPredikatKinerjaNameById(
@@ -146,11 +153,40 @@ export class UkomTaskDetailComponent {
             })
     }
 
+
+    getProvinsiNameByCode(provinsiCode: string) {
+        this.provinsiService
+            .findById(provinsiCode)
+            .pipe(
+                catchError(() => {
+                    return of({ name: '-', type: '' })
+                }),
+            )
+            .subscribe({
+                next: (res) => {
+                    this.provinsiName = res.name
+                },
+            })
+    }
+
     getPendidikanName(pendidikanCode: string) {
         this.pendidikanName =
             (this.pendidikanService.getPendidikanById(pendidikanCode)?.name ||
                 this.pesertaUkom.pendidikanTerakhirName) ??
             '-'
+    }
+
+    toggleSecretKey(): void {
+        this.showSecretKey = !this.showSecretKey
+    }
+
+
+    copySecretKey(): void {
+        if (!this.pendingTask?.secretKey) {
+            return
+        }
+
+        navigator.clipboard.writeText(this.pendingTask?.secretKey)
     }
 
     getBidangJabatanName(bidangJabatanCode: string | null) {
