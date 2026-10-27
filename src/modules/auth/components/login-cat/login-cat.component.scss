@@ -1,117 +1,48 @@
-.feedback {
-  color: red;
-  font-size: 0.8rem;
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+// Gaya utama diambil dari ../login/login.component.scss.
+// Berkas ini hanya berisi pilihan peran Peserta / Penguji.
+$blue: #2967be;
+$green: #49ab49;
+$ink: #1b2236;
+$muted: #4a5468;
+
+.role-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 6px;
+    margin-bottom: 20px;
+    border-radius: 999px;
+    background: #e8edf5;
 }
 
-.cursor-pointer {
-  cursor: pointer;
-}
+.role-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: $muted;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 
-.text-subtitle {
-  opacity: 0.6;
-}
-
-main {
-  background-color: #13182b;
-  /* SVG pattern overlay */
-  background-image: url('/assets/wave.svg');
-
-  /* Cover styling */
-  background-size: contain;
-  background-repeat: repeat;
-  background-blend-mode: overlay;
-}
-
-.grad-button {
-  color: white !important;
-  background: linear-gradient(45deg, #2967be, #49ab49) !important;
-  border: none !important;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: linear-gradient(90deg, #49ab49, #2967be) !important;
-  }
-}
-
-.w-fit {
-  width: fit-content;
-}
-
-.role-selector {
-  overflow: hidden;
-
-  .btn {
-    padding: 0.75rem 1.5rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    border-radius: 0;
-
-    &:first-child {
-      border-top-left-radius: 8px;
-      border-bottom-left-radius: 8px;
+    &:hover:not(.is-active) {
+        color: $blue;
+        background: rgba(255, 255, 255, 0.6);
     }
 
-    &:last-child {
-      border-top-right-radius: 8px;
-      border-bottom-right-radius: 8px;
+    &:focus-visible {
+        outline: 3px solid rgba($blue, 0.5);
+        outline-offset: 2px;
     }
 
-    &.btn-primary {
-      background: linear-gradient(45deg, #2967be, #49ab49);
-      border-color: transparent;
+    &.is-active {
+        color: #fff;
+        background: linear-gradient(45deg, $blue, $green);
+        box-shadow: 0 6px 16px rgba($blue, 0.3);
     }
-
-    &.btn-outline-primary {
-      background-color: white;
-      border-color: #dee2e6;
-      color: #6c757d;
-
-      &:hover {
-        background-color: #f8f9fa;
-        color: #2967be;
-      }
-    }
-  }
-}
-
-.recaptcha-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.recaptcha-container > div {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-.g-recaptcha {
-  width: 100% !important;
-  transform: scale(1);
-  transform-origin: center;
-}
-
-.g-recaptcha iframe {
-  width: 100% !important;
-  min-width: 100% !important;
-}
-
-.grad-button-secondary {
-  color: #2967be !important; /* Use primary color for text */
-  background: linear-gradient(
-    45deg,
-    #dbeafe,
-    #e5f5e5
-  ) !important; /* Lighter shades */
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: linear-gradient(90deg, #e5f5e5, #dbeafe) !important;
-    color: #1d4ed8 !important; /* Darker text on hover */
-    border-color: #1d4ed8 !important;
-  }
 }

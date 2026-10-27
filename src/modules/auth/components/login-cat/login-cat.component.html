@@ -1,204 +1,224 @@
-<main>
-    <div class="container">
-        <section
-            class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4"
-        >
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div
-                        class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center"
-                    >
-                        <div class="card mb-3">
-                            <div class="card-body py-4">
-                                <div
-                                    class="rounded-circle mx-auto mb-3 w-fit border p-3"
-                                >
-                                    <img
-                                        src="assets/logo/kemendag-logo.svg"
-                                        alt=""
-                                        width="32"
-                                    />
-                                </div>
-                                <div class="pb-2">
-                                    <h5
-                                        class="card-title fs-3 pb-0 text-center"
-                                    >
-                                        Masuk ke akun anda
-                                    </h5>
-                                    <p
-                                        class="small text-subtitle mt-2 text-center"
-                                    >
-                                        Silahkan isi data dibawah untuk masuk
-                                    </p>
-                                </div>
+<main class="login-page">
+    <!-- Pita dekoratif latar belakang -->
+    <div class="ribbon ribbon-blue" aria-hidden="true"></div>
+    <div class="ribbon ribbon-green" aria-hidden="true"></div>
+    <div class="glow glow-top" aria-hidden="true"></div>
+    <div class="glow glow-bottom" aria-hidden="true"></div>
 
-                                <!-- Role Selector -->
-                                <div class="d-flex justify-content-center mb-3">
-                                    <div
-                                        class="btn-group role-selector"
-                                        role="group"
-                                        aria-label="Role selection"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            [ngClass]="selectedRole() === 'participant' ? 'btn-primary' : 'btn-outline-primary'"
-                                            (click)="selectRole('participant')"
-                                        >
-                                            <i class="mdi mdi-account me-2"></i
-                                            >Peserta
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            [ngClass]="selectedRole() === 'examiner' ? 'btn-primary' : 'btn-outline-primary'"
-                                            (click)="selectRole('examiner')"
-                                        >
-                                            <i
-                                                class="mdi mdi-account-star me-2"
-                                            ></i
-                                            >Penguji
-                                        </button>
-                                    </div>
-                                </div>
+    <!-- Identitas aplikasi di pojok kiri atas -->
+    <header class="login-header">
+        <div class="brand">
+            <img src="assets/logo/kemendag-logo.svg" alt="Logo Kementerian Perdagangan" class="brand-logo" />
+            <span class="brand-name">SIJUPRI</span>
+            <span class="brand-divider" aria-hidden="true"></span>
+            <span class="brand-sub">Uji Kompetensi<br />Jabatan Fungsional</span>
+        </div>
+    </header>
 
-                                <div *ngIf="loginMessage()">
-                                    <div
-                                        *ngIf="loginMessage().status !== ''"
-                                        class="alert"
-                                        [ngClass]="
-                      loginMessage().status === 'error'
-                        ? 'alert-danger'
-                        : 'alert-success'
-                    "
-                                        role="alert"
-                                    >
-                                        {{ loginMessage().message }}
-                                    </div>
-                                </div>
-                                <form
-                                    [formGroup]="loginForm"
-                                    (ngSubmit)="onSubmit()"
-                                    class="row g-3 needs-validation"
-                                >
-                                    <div class="col-12">
-                                        <label for="nip" class="form-label">
-                                            {{ selectedRole() === 'participant'
-                                            ? 'NIP' : 'Username' }}
-                                            <span class="text-danger">*</span>
-                                        </label>
+    <div class="login-shell">
+        <!-- Kolom kiri: maskot & tahapan UKom -->
+        <section class="brand-panel">
+            <div class="hero">
+                <div class="float-chip chip-services">
+                    <p class="services-title">
+                        <span class="chip-dot" aria-hidden="true"></span>
+                        Tahapan UKom
+                    </p>
+                    <ul class="services-list">
+                        <li>
+                            <span class="services-icon" aria-hidden="true">
+                                <i-lucide [img]="ClipboardCheck" [size]="18"></i-lucide>
+                            </span>
+                            Ujian CAT
+                        </li>
+                        <li>
+                            <span class="services-icon" aria-hidden="true">
+                                <i-lucide [img]="FileText" [size]="18"></i-lucide>
+                            </span>
+                            Studi Kasus &amp; Makalah
+                        </li>
+                        <li>
+                            <span class="services-icon" aria-hidden="true">
+                                <i-lucide [img]="FolderOpen" [size]="18"></i-lucide>
+                            </span>
+                            Portofolio &amp; Praktik Kerja
+                        </li>
+                        <li>
+                            <span class="services-icon" aria-hidden="true">
+                                <i-lucide [img]="MessagesSquare" [size]="18"></i-lucide>
+                            </span>
+                            Wawancara
+                        </li>
+                    </ul>
+                </div>
 
-                                        <div class="input-group has-validation">
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                id="nip"
-                                                formControlName="nip"
-                                                [placeholder]="
-        selectedRole() === 'participant'
-            ? 'Masukkan NIP'
-            : 'Masukkan Username'
-    "
-                                            />
-                                        </div>
-                                        <div
-                                            *ngIf="getErrorMessage('nip', selectedRole() === 'participant' ? 'NIP' : 'Username') as error"
-                                            class="text-danger"
-                                        >
-                                            {{ error }}
-                                        </div>
-                                    </div>
+                <img src="assets/binbot/binbot-cheerful.webp" alt="" class="mascot" />
+            </div>
 
-                                    <div class="col-12">
-                                        <label for="password" class="form-label"
-                                            >Kata Sandi
-                                            <span class="text-danger"
-                                                >*</span
-                                            ></label
-                                        >
-                                        <div class="input-group has-validation">
-                                            <input
-                                                [type]="isPasswordVisible ? 'text' : 'password'"
-                                                name="password"
-                                                class="form-control"
-                                                id="password"
-                                                formControlName="password"
-                                            />
-                                            <span
-                                                class="input-group-text cursor-pointer"
-                                                (click)="togglePasswordVisibility()"
-                                                ><i-lucide
-                                                    [img]="isPasswordVisible ? Eye : EyeOff"
-                                                    [size]="16"
-                                                    class="my-icon"
-                                                ></i-lucide
-                                            ></span>
-                                        </div>
-                                        <div
-                                            *ngIf="
-                                getErrorMessage(
-                                    'password',
-                                    'Password'
-                                ) as error
-                            "
-                                            class="text-danger"
-                                        >
-                                            {{ error }}
-                                        </div>
-                                    </div>
+            <h1 class="hero-title">
+                Siap diuji.<br />
+                Siap melayani.
+            </h1>
+            <p class="hero-desc">
+                Halaman Uji Kompetensi Jabatan Fungsional Perdagangan untuk
+                peserta dan penguji.
+            </p>
+        </section>
 
-                                    <div class="col-12">
-                                        <div class="recaptcha-container">
-                                            <re-captcha
-                                                [siteKey]="recaptchaSiteKey"
-                                                formControlName="recaptcha"
-                                                [size]="'normal'"
-                                            ></re-captcha>
-                                        </div>
-                                        <div
-                                            *ngIf="
-                                getErrorMessage(
-                                    'recaptcha',
-                                    'reCAPTCHA'
-                                ) as error
-                            "
-                                            class="text-danger"
-                                        >
-                                            {{ error }}
-                                        </div>
-                                    </div>
+        <!-- Kolom kanan: kartu-kartu -->
+        <section class="cards-panel">
+            <!-- Kartu login -->
+            <div class="glass-card login-card">
+                <h2 class="login-title">Masuk UKom,</h2>
+                <p class="login-subtitle">Pilih peran Anda terlebih dahulu.</p>
 
-                                    <div class="col-12">
-                                        <app-loading-button
-                                            [disabled]="loginForm.invalid"
-                                            [isLoading]="isLoginLoading()"
-                                            [label]="'Masuk Sekarang'"
-                                            [className]="'btn grad-button w-100'"
-                                            [type]="'submit'"
-                                        ></app-loading-button>
-                                        <a
-                                            class="btn grad-button-secondary w-100 mt-1"
-                                            [routerLink]="['/']"
-                                        >
-                                            Kembali
-                                        </a>
-                                    </div>
+                <div class="role-switch" role="group" aria-label="Pilih peran">
+                    <button type="button" class="role-option" [class.is-active]="selectedRole() === 'participant'"
+                        [attr.aria-pressed]="selectedRole() === 'participant'" (click)="selectRole('participant')">
+                        <i-lucide [img]="UserRound" [size]="20"></i-lucide>
+                        Peserta
+                    </button>
+                    <button type="button" class="role-option" [class.is-active]="selectedRole() === 'examiner'"
+                        [attr.aria-pressed]="selectedRole() === 'examiner'" (click)="selectRole('examiner')">
+                        <i-lucide [img]="BadgeCheck" [size]="20"></i-lucide>
+                        Penguji
+                    </button>
+                </div>
 
-                                    <a
-                                        [routerLink]="['/login']"
-                                        class="btn btn-link text-primary"
-                                        >Masuk halaman Sijupri</a
-                                    >
-                                </form>
+                <div *ngIf="loginMessage().status !== ''" class="login-alert" [ngClass]="
+                        loginMessage().status === 'error'
+                            ? 'is-error'
+                            : 'is-success'
+                    " role="alert">
+                    {{ loginMessage().message }}
+                </div>
+
+                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+                    <ng-container *ngIf="selectedRole() === 'participant'; else examinerField">
+                        <div class="field">
+                            <label for="nip" class="field-label">NIP</label>
+                            <div class="pill-input" [class.is-invalid]="getErrorMessage('nip', 'NIP')">
+                                <span class="pill-icon" aria-hidden="true">
+                                    <i-lucide [img]="UserRound" [size]="20"></i-lucide>
+                                </span>
+                                <input type="text" inputmode="numeric" autocomplete="username" name="nip" id="nip"
+                                    formControlName="nip" maxlength="18" placeholder="Masukkan 18 angka" />
+                                <span class="pill-counter" aria-live="polite">
+                                    {{ loginForm.value.nip?.length || 0 }}/18
+                                </span>
+                            </div>
+                            <div *ngIf="getErrorMessage('nip', 'NIP') as error" class="field-error">
+                                {{ error }}
                             </div>
                         </div>
-                        <small class="text-muted text-center"
-                            >Copyright &copy; Kementerian Perdagangan Republik
-                            Indonesia</small
-                        >
+                    </ng-container>
+
+                    <ng-template #examinerField>
+                        <div class="field">
+                            <label for="nip" class="field-label">Username</label>
+                            <div class="pill-input" [class.is-invalid]="getErrorMessage('nip', 'Username')">
+                                <span class="pill-icon" aria-hidden="true">
+                                    <i-lucide [img]="BadgeCheck" [size]="20"></i-lucide>
+                                </span>
+                                <input type="text" autocomplete="username" name="nip" id="nip" formControlName="nip"
+                                    placeholder="Masukkan username penguji" />
+                            </div>
+                            <div *ngIf="getErrorMessage('nip', 'Username') as error" class="field-error">
+                                {{ error }}
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <div class="field">
+                        <label for="password" class="field-label">Kata Sandi</label>
+                        <div class="pill-input" [class.is-invalid]="getErrorMessage('password', 'Password')">
+                            <span class="pill-icon" aria-hidden="true">
+                                <i-lucide [img]="LockKeyhole" [size]="20"></i-lucide>
+                            </span>
+                            <input [type]="isPasswordVisible ? 'text' : 'password'" autocomplete="current-password"
+                                name="password" id="password" formControlName="password"
+                                placeholder="Masukkan kata sandi" />
+                            <button type="button" class="pill-eye" (click)="togglePasswordVisibility()"
+                                [attr.aria-label]="isPasswordVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'">
+                                <i-lucide [img]="isPasswordVisible ? Eye : EyeOff" [size]="20"></i-lucide>
+                            </button>
+                        </div>
+                        <div *ngIf="getErrorMessage('password', 'Password') as error" class="field-error">
+                            {{ error }}
+                        </div>
                     </div>
+
+                    <div class="field">
+                        <div class="recaptcha-box">
+                            <re-captcha [siteKey]="recaptchaSiteKey" formControlName="recaptcha"
+                                [size]="'normal'"></re-captcha>
+                        </div>
+                        <div *ngIf="getErrorMessage('recaptcha', 'reCAPTCHA') as error" class="field-error">
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || isLoginLoading()">
+                        <ng-container *ngIf="!isLoginLoading(); else loading">
+                            <span>Masuk sebagai {{ selectedRole() === 'participant' ? 'Peserta' : 'Penguji' }}</span>
+                            <span class="submit-arrow" aria-hidden="true">
+                                <i-lucide [img]="ArrowRight" [size]="18"></i-lucide>
+                            </span>
+                        </ng-container>
+                        <ng-template #loading>
+                            <span class="spinner-border spinner-sm-custom" role="status"></span>
+                            <span>Memproses...</span>
+                        </ng-template>
+                    </button>
+                </form>
+
+                <p class="login-footer">
+                    Bukan peserta atau penguji UKom?
+                    <a [routerLink]="['/login']">Masuk halaman SIJUPRI</a>
+                </p>
+            </div>
+
+            <!-- Kartu tanggal & sapaan -->
+            <div class="glass-card date-card">
+                <div class="sun" aria-hidden="true"></div>
+                <div class="date-head">
+                    <span class="date-greeting">
+                        <i-lucide [img]="clock.greeting().icon" [size]="20"></i-lucide>
+                        {{ clock.greeting().text }}
+                    </span>
+                    <span class="date-time">{{ clock.today().time }}</span>
                 </div>
+                <p class="date-day">{{ clock.today().day }}</p>
+                <p class="date-full">{{ clock.today().date }}</p>
+            </div>
+
+            <!-- Kartu petunjuk, menyesuaikan peran yang dipilih -->
+            <div class="guide-card">
+                <p class="guide-eyebrow">
+                    <i-lucide [img]="Info" [size]="16"></i-lucide>
+                    Petunjuk {{ selectedRole() === 'participant' ? 'peserta' : 'penguji' }}
+                </p>
+                <ol class="guide-list">
+                    <li>Pastikan pilihan <strong>{{ selectedRole() === 'participant' ? 'Peserta' : 'Penguji' }}</strong>
+                        sudah aktif.</li>
+                    <li *ngIf="selectedRole() === 'participant'; else examinerStep">
+                        Ketik <strong>NIP</strong> Anda (18 angka, tanpa spasi).
+                    </li>
+                    <ng-template #examinerStep>
+                        <li>Ketik <strong>username penguji</strong> yang diberikan panitia.</li>
+                    </ng-template>
+                    <li>Ketik <strong>kata sandi</strong>, centang <strong>"Saya bukan robot"</strong>, lalu tekan
+                        <strong>Masuk</strong>.
+                    </li>
+                </ol>
+                <p class="guide-help">
+                    Mengalami kendala saat ujian? Segera hubungi panitia atau pengawas UKom.
+                </p>
             </div>
         </section>
     </div>
+
+    <footer class="login-copyright">
+        Copyright &copy; Kementerian Perdagangan Republik Indonesia
+    </footer>
 </main>

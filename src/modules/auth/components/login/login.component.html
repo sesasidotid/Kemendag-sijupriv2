@@ -1,112 +1,184 @@
-<main>
-    <div class="container">
-        <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                        <div class="card mb-3">
-                            <div class="card-body py-4">
-                                <div class="rounded-circle mx-auto mb-3 w-fit border p-3">
-                                    <img src="assets/logo/kemendag-logo.svg" alt="" width="32" />
-                                </div>
+<main class="login-page">
+    <!-- Pita dekoratif latar belakang -->
+    <div class="ribbon ribbon-blue" aria-hidden="true"></div>
+    <div class="ribbon ribbon-green" aria-hidden="true"></div>
+    <div class="glow glow-top" aria-hidden="true"></div>
+    <div class="glow glow-bottom" aria-hidden="true"></div>
 
-                                <div class="pb-2">
-                                    <h5 class="card-title fs-3 pb-0 text-center">
-                                        Masuk ke akun anda
-                                    </h5>
-                                    <p class="small text-subtitle mt-2 text-center">
-                                        Silahkan isi data dibawah untuk masuk
-                                    </p>
-                                </div>
+    <!-- Identitas aplikasi di pojok kiri atas -->
+    <header class="login-header">
+        <div class="brand">
+            <img src="assets/logo/kemendag-logo.svg" alt="Logo Kementerian Perdagangan" class="brand-logo" />
+            <span class="brand-name">SIJUPRI</span>
+            <span class="brand-divider" aria-hidden="true"></span>
+            <span class="brand-sub">Jabatan Fungsional<br />Perdagangan</span>
+        </div>
+    </header>
 
-                                <div *ngIf="loginMessage()">
-                                    <div *ngIf="loginMessage().status !== ''" class="alert" [ngClass]="
-                        loginMessage().status === 'error'
-                          ? 'alert-danger'
-                          : 'alert-success'
-                      " role="alert">
-                                        {{ loginMessage().message }}
-                                    </div>
-                                </div>
-
-                                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="row g-3 needs-validation">
-                                    <div class="col-12">
-                                        <label for="nip" class="form-label">NIP
-                                            <span class="text-danger">*</span></label>
-                                        <div class="input-group has-validation">
-                                            <input type="text" name="nip" class="form-control" id="nip"
-                                                formControlName="nip" />
-                                        </div>
-                                        <div *ngIf="
-                                getErrorMessage(
-                                    'nip',
-                                    'NIP'
-                                ) as error
-                            " class="text-danger">
-                                            {{ error }}
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <label for="password" class="form-label">Kata Sandi
-                                            <span class="text-danger">*</span></label>
-                                        <div class="input-group has-validation">
-                                            <input [type]="isPasswordVisible ? 'text' : 'password'" name="password"
-                                                class="form-control" id="password" formControlName="password" />
-                                            <span class="input-group-text cursor-pointer"
-                                                (click)="togglePasswordVisibility()"><i-lucide
-                                                    [img]="isPasswordVisible ? Eye : EyeOff" [size]="16"
-                                                    class="my-icon"></i-lucide></span>
-                                        </div>
-                                        <div *ngIf="
-                                getErrorMessage(
-                                    'password',
-                                    'Password'
-                                ) as error
-                            " class="text-danger">
-                                            {{ error }}
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="recaptcha-container">
-                                            <re-captcha [siteKey]="recaptchaSiteKey" formControlName="recaptcha"
-                                                [size]="'normal'"></re-captcha>
-                                        </div>
-                                        <div *ngIf="
-                                getErrorMessage(
-                                    'recaptcha',
-                                    'reCAPTCHA'
-                                ) as error
-                            " class="text-danger">
-                                            {{ error }}
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <app-loading-button [disabled]="loginForm.invalid"
-                                            [isLoading]="isLoginLoading()" [label]="'Masuk Sekarang'"
-                                            [className]="'btn grad-button w-100'"
-                                            [type]="'submit'"></app-loading-button>
-
-                                        <a class="btn grad-button-secondary w-100 mt-1" [routerLink]="['']">
-                                            Kembali
-                                        </a>
-                                    </div>
-
-                                    <a [routerLink]="['/login-cat']" class="btn btn-link text-primary">Masuk halaman
-                                        UKom</a>
-
-                                    <a [routerLink]="['/forget-password']"
-                                        class="btn btn-sm btn-link text-primary m-0">Lupa Password?</a>
-                                </form>
-                            </div>
-                        </div>
-                        <small class="text-muted text-center">Copyright &copy; Kementerian Perdagangan Republik
-                            Indonesia</small>
-                    </div>
+    <div class="login-shell">
+        <!-- Kolom kiri: maskot & layanan -->
+        <section class="brand-panel">
+            <div class="hero">
+                <div class="float-chip chip-services">
+                    <p class="services-title">
+                        <span class="chip-dot" aria-hidden="true"></span>
+                        Layanan SIJUPRI
+                    </p>
+                    <ul class="services-list">
+                        <li>
+                            <span class="services-icon" aria-hidden="true">
+                                <i-lucide [img]="ClipboardList" [size]="18"></i-lucide>
+                            </span>
+                            Pengajuan Formasi
+                        </li>
+                        <li>
+                            <span class="services-icon" aria-hidden="true">
+                                <i-lucide [img]="TrendingUp" [size]="18"></i-lucide>
+                            </span>
+                            Monitoring Kinerja
+                        </li>
+                        <li>
+                            <span class="services-icon" aria-hidden="true">
+                                <i-lucide [img]="Award" [size]="18"></i-lucide>
+                            </span>
+                            Uji Kompetensi (UKom)
+                        </li>
+                    </ul>
                 </div>
+
+                <img src="assets/binbot/binbot-wave.webp" alt="" class="mascot" />
+            </div>
+
+            <h1 class="hero-title">
+                Kompeten melayani.<br />
+                Maju bersama.
+            </h1>
+            <p class="hero-desc">
+                Sistem Informasi Jabatan Fungsional Perdagangan, Kementerian
+                Perdagangan Republik Indonesia.
+            </p>
+        </section>
+
+        <!-- Kolom kanan: kartu-kartu -->
+        <section class="cards-panel">
+            <!-- Kartu login -->
+            <div class="glass-card login-card">
+                <h2 class="login-title">Selamat datang,</h2>
+                <p class="login-subtitle">
+                    Silakan isi NIP dan kata sandi Anda untuk masuk.
+                </p>
+
+                <div *ngIf="loginMessage().status !== ''" class="login-alert" [ngClass]="
+                        loginMessage().status === 'error'
+                            ? 'is-error'
+                            : 'is-success'
+                    " role="alert">
+                    {{ loginMessage().message }}
+                </div>
+
+                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+                    <div class="field">
+                        <label for="nip" class="field-label">NIP</label>
+                        <div class="pill-input" [class.is-invalid]="getErrorMessage('nip', 'NIP')">
+                            <span class="pill-icon" aria-hidden="true">
+                                <i-lucide [img]="UserRound" [size]="20"></i-lucide>
+                            </span>
+                            <input type="text" inputmode="numeric" autocomplete="username" name="nip" id="nip"
+                                formControlName="nip" maxlength="18" placeholder="Masukkan 18 angka" />
+                            <span class="pill-counter" aria-live="polite">
+                                {{ loginForm.value.nip?.length || 0 }}/18
+                            </span>
+                        </div>
+                        <div *ngIf="getErrorMessage('nip', 'NIP') as error" class="field-error">
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label-row">
+                            <label for="password" class="field-label">Kata Sandi</label>
+                            <a [routerLink]="['/forget-password']" class="pill-link">Lupa kata sandi?</a>
+                        </div>
+                        <div class="pill-input" [class.is-invalid]="getErrorMessage('password', 'Password')">
+                            <span class="pill-icon" aria-hidden="true">
+                                <i-lucide [img]="LockKeyhole" [size]="20"></i-lucide>
+                            </span>
+                            <input [type]="isPasswordVisible ? 'text' : 'password'" autocomplete="current-password"
+                                name="password" id="password" formControlName="password"
+                                placeholder="Masukkan kata sandi" />
+                            <button type="button" class="pill-eye" (click)="togglePasswordVisibility()"
+                                [attr.aria-label]="isPasswordVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'">
+                                <i-lucide [img]="isPasswordVisible ? Eye : EyeOff" [size]="20"></i-lucide>
+                            </button>
+                        </div>
+                        <div *ngIf="getErrorMessage('password', 'Password') as error" class="field-error">
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="recaptcha-box">
+                            <re-captcha [siteKey]="recaptchaSiteKey" formControlName="recaptcha"
+                                [size]="'normal'"></re-captcha>
+                        </div>
+                        <div *ngIf="getErrorMessage('recaptcha', 'reCAPTCHA') as error" class="field-error">
+                            {{ error }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || isLoginLoading()">
+                        <ng-container *ngIf="!isLoginLoading(); else loading">
+                            <span>Masuk</span>
+                            <span class="submit-arrow" aria-hidden="true">
+                                <i-lucide [img]="ArrowRight" [size]="18"></i-lucide>
+                            </span>
+                        </ng-container>
+                        <ng-template #loading>
+                            <span class="spinner-border spinner-sm-custom" role="status"></span>
+                            <span>Memproses...</span>
+                        </ng-template>
+                    </button>
+                </form>
+
+                <p class="login-footer">
+                    Peserta atau penguji UKom?
+                    <a [routerLink]="['/login-cat']">Masuk halaman UKom</a>
+                </p>
+            </div>
+
+            <!-- Kartu tanggal & sapaan -->
+            <div class="glass-card date-card">
+                <div class="sun" aria-hidden="true"></div>
+                <div class="date-head">
+                    <span class="date-greeting">
+                        <i-lucide [img]="clock.greeting().icon" [size]="20"></i-lucide>
+                        {{ clock.greeting().text }}
+                    </span>
+                    <span class="date-time">{{ clock.today().time }}</span>
+                </div>
+                <p class="date-day">{{ clock.today().day }}</p>
+                <p class="date-full">{{ clock.today().date }}</p>
+            </div>
+
+            <!-- Kartu petunjuk -->
+            <div class="guide-card">
+                <p class="guide-eyebrow">
+                    <i-lucide [img]="Info" [size]="16"></i-lucide>
+                    Petunjuk masuk
+                </p>
+                <ol class="guide-list">
+                    <li>Ketik <strong>NIP</strong> Anda (18 angka, tanpa spasi).</li>
+                    <li>Ketik <strong>kata sandi</strong>. Tekan ikon mata untuk melihatnya.</li>
+                    <li>Centang kotak <strong>"Saya bukan robot"</strong>, lalu tekan <strong>Masuk</strong>.</li>
+                </ol>
+                <p class="guide-help">
+                    Lupa NIP atau akun terkunci? Hubungi admin unit kerja Anda.
+                </p>
             </div>
         </section>
     </div>
+
+    <footer class="login-copyright">
+        Copyright &copy; Kementerian Perdagangan Republik Indonesia
+    </footer>
 </main>

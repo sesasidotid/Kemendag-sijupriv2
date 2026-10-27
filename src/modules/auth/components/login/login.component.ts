@@ -1,4 +1,10 @@
-import { Component, inject, signal, ViewChild } from '@angular/core'
+import {
+    Component,
+    inject,
+    OnDestroy,
+    signal,
+    ViewChild,
+} from '@angular/core'
 import { ApplicationService } from '../../../security/services/application.service'
 import { CommonModule } from '@angular/common'
 import {
@@ -12,7 +18,18 @@ import { AuthService } from '../../services/auth.service'
 import { AuthResponse } from '../../models/auth-response.model'
 import { LoginContext } from '../../../base/commons/login-context'
 import { Router, RouterModule } from '@angular/router'
-import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
+import {
+    ArrowRight,
+    Award,
+    ClipboardList,
+    Eye,
+    EyeOff,
+    LockKeyhole,
+    Info,
+    LucideAngularModule,
+    TrendingUp,
+    UserRound,
+} from 'lucide-angular'
 import { finalize } from 'rxjs'
 import {
     RecaptchaModule,
@@ -22,7 +39,7 @@ import {
 import { environment } from '../../../../environments/environment'
 
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
-import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { createLoginClock } from './login-clock'
 @Component({
     selector: 'app-login',
     standalone: true,
@@ -33,13 +50,12 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         LucideAngularModule,
         RecaptchaModule,
         RecaptchaFormsModule,
-        LoadingButtonComponent,
         RouterModule,
     ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
     @ViewChild(RecaptchaComponent) recaptcha: RecaptchaComponent
 
     auth = new Auth()
@@ -54,6 +70,15 @@ export class LoginComponent {
 
     readonly Eye = Eye
     readonly EyeOff = EyeOff
+    readonly UserRound = UserRound
+    readonly LockKeyhole = LockKeyhole
+    readonly ArrowRight = ArrowRight
+    readonly Info = Info
+    readonly ClipboardList = ClipboardList
+    readonly TrendingUp = TrendingUp
+    readonly Award = Award
+
+    clock = createLoginClock()
 
     applicationServce = inject(ApplicationService)
     authService = inject(AuthService)
@@ -81,6 +106,10 @@ export class LoginComponent {
         if (LoginContext.isLogin()) {
             this.router.navigate(['/'])
         }
+    }
+
+    ngOnDestroy() {
+        this.clock.stop()
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
