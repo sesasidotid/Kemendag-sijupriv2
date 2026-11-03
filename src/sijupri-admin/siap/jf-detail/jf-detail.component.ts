@@ -18,6 +18,7 @@ import { AdminRwPangkatComponent } from './admin-rw-pangkat/admin-rw-pangkat.com
 import { AdminRwJabatanComponent } from './admin-rw-jabatan/admin-rw-jabatan.component'
 import { AdminRwKinerjaComponent } from './admin-rw-kinerja/admin-rw-kinerja.component'
 import { AdminRwKompetensiComponent } from './admin-rw-kompetensi/admin-rw-kompetensi.component'
+import { AdminRwSertifikasiComponent } from './admin-rw-sertifikasi/admin-rw-sertifikasi.component'
 
 @Component({
     selector: 'app-jf-detail',
@@ -28,7 +29,7 @@ import { AdminRwKompetensiComponent } from './admin-rw-kompetensi/admin-rw-kompe
         AdminRwJabatanComponent,
         AdminRwKinerjaComponent,
         AdminRwKompetensiComponent,
-        RwSertifikasiListComponent,
+        AdminRwSertifikasiComponent,
         RwUkomListComponent,
         CommonModule,
     ],
