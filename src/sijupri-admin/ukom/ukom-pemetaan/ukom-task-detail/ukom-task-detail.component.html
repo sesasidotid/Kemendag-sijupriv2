@@ -6,16 +6,64 @@
     </button>
 
     <ng-container *ngIf="!(isLoading$ | async)">
-        <button
-            (click)="toggleUpdatePasswordModal()"
-            class="btn btn-primary mb-3"
-        >
-            <i class="mdi mdi-lock-reset me-1"></i>
-            Lupa password akun UKom? <strong>Reset di sini</strong>
-        </button>
+        <div class="d-flex align-items-center gap-2">
+            <button
+                (click)="toggleUpdatePasswordModal()"
+                class="btn btn-primary"
+            >
+                <i class="mdi mdi-lock-reset me-1"></i>
+                Lupa password akun UKom? <strong>Reset di sini</strong>
+            </button>
+
+            <button
+                *ngIf="participant.secretKey"
+                type="button"
+                (click)="toggleSecretKey()"
+                class="btn btn-outline-primary"
+            >
+                <i
+                    class="mdi me-1"
+                    [ngClass]="showSecretKey ? 'mdi-eye-off' : 'mdi-key'"
+                ></i>
+                {{ showSecretKey ? 'Sembunyikan Kode' : 'Lihat Kode Pendaftaran'
+                }}
+            </button>
+        </div>
     </ng-container>
 </div>
 
+<!-- Secret Key -->
+<ng-container *ngIf="!(isLoading$ | async) && showSecretKey">
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="mb-1">
+                        <i class="mdi mdi-key me-1"></i>
+                        Kode Pendaftaran
+                    </h6>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    (click)="copySecretKey()"
+                >
+                    <i class="mdi mdi-content-copy me-1"></i>
+                    Copy
+                </button>
+            </div>
+
+            <div class="mt-3">
+                <code
+                    class="d-block bg-light text-primary fw-bold text-break fs-5 rounded p-3"
+                >
+                    {{ participant.secretKey }}
+                </code>
+            </div>
+        </div>
+    </div>
+</ng-container>
 <ng-container *ngIf="isLoading$ | async; else ukomHadItem">
     <div class="d-flex justify-content-center my-5">
         <div class="spinner-border" role="status">

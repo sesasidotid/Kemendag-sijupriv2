@@ -37,6 +37,7 @@ export class PendingTask extends Serializable {
     createdBy: string | null = undefined
     dateCreated: string = undefined
     idx: number = undefined
+    secretKey: string | null | undefined = undefined
 
     objectTask: ObjectTask = undefined
 

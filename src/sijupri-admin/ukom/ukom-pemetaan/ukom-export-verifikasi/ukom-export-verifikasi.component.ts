@@ -205,18 +205,6 @@ export class UkomExportVerifikasiComponent {
                     this.hasilVerifikasiForm.get('taskStatus')?.value,
                 )
                 addIfTruthy(
-                    'jabatanCode',
-                    this.hasilVerifikasiForm.get('jabatanCode')?.value,
-                )
-                addIfTruthy(
-                    'jabatanName',
-                    this.jabatanList.find(
-                        (jabatan) =>
-                            jabatan.code ==
-                            this.hasilVerifikasiForm.get('jabatanCode')?.value,
-                    )?.name,
-                )
-                addIfTruthy(
                     'dateFrom',
                     this.hasilVerifikasiForm.get('dateFrom')?.value ||
                         '2024-01-01',
