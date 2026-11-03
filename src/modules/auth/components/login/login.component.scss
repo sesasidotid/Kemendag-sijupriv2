@@ -1,80 +1,988 @@
-.feedback {
-  color: red;
-  font-size: 0.8rem;
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+// Warna utama SIJUPRI
+$navy: #13182b;
+$blue: #2967be;
+$blue-dark: #1d4ed8;
+$green: #49ab49;
+// Bahan terang kebiruan yang dipakai bersama oleh semua kartu
+$surface-bg: linear-gradient(160deg, rgba(#f3f7fd, 0.96), rgba(#e4ecf8, 0.93));
+$surface-border: rgba(255, 255, 255, 0.7);
+$surface-line: #d6dfec;
+$surface-text: #1b2236;
+$surface-muted: #4a5468;
+$surface-faint: #8a93a6;
+$field-bg: #fff;
+$accent: $blue;
+$radius-lg: 28px;
+// Ukuran fleksibel: membesar mengikuti layar agar konten tidak mengumpul di tengah
+$card-w: clamp(340px, 20vw, 390px);
+
+.login-page {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    font-size: 16px;
+    background-color: $navy;
+    background-image: url('/assets/wave.svg');
+    background-size: contain;
+    background-repeat: repeat;
+    background-blend-mode: overlay;
 }
 
-.cursor-pointer {
-  cursor: pointer;
+// ---------- Dekorasi latar ----------
+.ribbon {
+    position: absolute;
+    left: -15%;
+    width: 130%;
+    height: 220px;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(2px);
 }
 
-.text-subtitle {
-  opacity: 0.6;
+.ribbon-blue {
+    top: 18%;
+    transform: rotate(-14deg);
+    animation: drift-blue 18s ease-in-out infinite alternate;
+    background: linear-gradient(90deg, rgba($blue, 0) 0%, rgba($blue, 0.55) 35%, rgba($blue, 0) 75%);
 }
 
-main {
-  background-color: #13182b;
-  /* SVG pattern overlay */
-  background-image: url('/assets/wave.svg');
-
-  /* Cover styling */
-  background-size: contain;
-  background-repeat: repeat;
-  background-blend-mode: overlay;
+.ribbon-green {
+    top: 42%;
+    transform: rotate(12deg);
+    animation: drift-green 22s ease-in-out infinite alternate;
+    background: linear-gradient(90deg, rgba($green, 0.6) 0%, rgba($green, 0.35) 40%, rgba($green, 0) 70%);
 }
 
-.grad-button {
-  color: white !important;
-  background: linear-gradient(45deg, #2967be, #49ab49) !important;
-  border: none !important;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: linear-gradient(90deg, #49ab49, #2967be) !important;
-  }
+.glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(80px);
 }
 
-.w-fit {
-  width: fit-content;
+.glow-top {
+    top: -120px;
+    right: -80px;
+    width: 420px;
+    height: 420px;
+    background: rgba($blue, 0.45);
 }
 
-.recaptcha-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
+.glow-bottom {
+    bottom: -160px;
+    left: -100px;
+    width: 380px;
+    height: 380px;
+    background: rgba($green, 0.3);
 }
 
-.recaptcha-container > div {
-  width: 100% !important;
-  max-width: 100% !important;
+// ---------- Tata letak ----------
+.login-shell {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: clamp(32px, 5vh, 64px) clamp(40px, 5vw, 96px) 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(48px, 6vw, 140px);
+    align-items: center;
 }
 
-.g-recaptcha {
-  width: 100% !important;
-  transform: scale(1);
-  transform-origin: center;
+.brand-panel {
+    justify-self: center;
+    width: 100%;
+    max-width: clamp(560px, 40vw, 760px);
+    text-align: center;
 }
 
-.g-recaptcha iframe {
-  width: 100% !important;
-  min-width: 100% !important;
+// ---------- Identitas ----------
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 28px;
 }
 
-.grad-button-secondary {
-  color: #2967be !important; /* Use primary color for text */
-  background: linear-gradient(
-    45deg,
-    #dbeafe,
-    #e5f5e5
-  ) !important; /* Lighter shades */
-  transition: all 0.3s ease;
+.brand-logo {
+    position: relative;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    padding: 8px;
+    border-radius: 50%;
+    background: #fff;
+    overflow: hidden;
+    animation: logo-halo 5s ease-out 1s infinite;
 
-  &:hover {
-    background: linear-gradient(90deg, #e5f5e5, #dbeafe) !important;
-    color: #1d4ed8 !important; /* Darker text on hover */
-    border-color: #1d4ed8 !important;
-  }
+    img {
+        width: 100%;
+        height: 100%;
+    }
+
+    // Kilau yang menyapu diagonal melintasi logo
+    &::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -80%;
+        width: 45%;
+        height: 200%;
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.95) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(25deg);
+        pointer-events: none;
+        animation: logo-shine 5s ease-in-out 1s infinite;
+    }
+}
+
+.brand-name {
+    margin: 0;
+    color: #fff;
+    font-size: 2.8rem;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+
+.brand-divider {
+    width: 1px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.brand-sub {
+    text-align: left;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    line-height: 2.2;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+// ---------- Kolom kiri ----------
+.hero-desc {
+    max-width: 520px;
+    margin: 0 auto;
+    font-size: clamp(0.95rem, 0.9vw, 1.1rem);
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.shortcut-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.outline-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: #fff;
+        color: #fff;
+    }
+}
+
+// ---------- Kolom kanan ----------
+.cards-panel {
+    display: grid;
+    grid-template-columns: $card-w $card-w;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        'login date'
+        'guide date';
+    gap: clamp(20px, 1.5vw, 28px);
+}
+
+.glass-card {
+    background: $surface-bg;
+    color: $surface-text;
+    border-radius: $radius-lg;
+    border: 1px solid $surface-border;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+// Kartu login
+.login-card {
+    grid-area: login;
+    padding: clamp(24px, 2.6vh, 30px) clamp(22px, 1.6vw, 28px) clamp(20px, 2vh, 24px);
+}
+
+.login-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $surface-text;
+    margin: 0 0 4px;
+}
+
+.login-subtitle {
+    font-size: 0.85rem;
+    color: $surface-muted;
+    margin: 0 0 16px;
+}
+
+.login-alert {
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    &.is-error {
+        background: #fdecec;
+        color: #a4161a;
+        border: 1px solid #f5b5b5;
+    }
+
+    &.is-success {
+        background: #e9f7e9;
+        color: #1f6b1f;
+        border: 1px solid #b6e0b6;
+    }
+}
+
+.field {
+    margin-bottom: 12px;
+}
+
+.field-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $surface-text;
+    margin: 0 0 6px 14px;
+}
+
+.field-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+
+    .field-label {
+        margin-bottom: 0;
+    }
+}
+
+.field-error {
+    margin: 4px 0 0 14px;
+    font-size: 0.8rem;
+    color: #c0262d;
+}
+
+.pill-input {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 52px;
+    padding: 5px;
+    border-radius: 999px;
+    background: $field-bg;
+    border: 1px solid $surface-line;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+    &:focus-within {
+        border-color: $accent;
+        box-shadow: 0 0 0 4px rgba($accent, 0.15);
+    }
+
+    &.is-invalid {
+        border-color: #e0868a;
+    }
+
+    input {
+        flex: 1;
+        min-width: 0;
+        height: 40px;
+        padding-left: 6px;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 0.9rem;
+        color: $surface-text;
+
+        &::placeholder {
+            color: $surface-faint;
+        }
+
+
+    }
+}
+
+.pill-icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    color: $surface-muted;
+}
+
+.pill-counter {
+    flex-shrink: 0;
+    padding-right: 12px;
+    font-size: 0.75rem;
+    color: $surface-faint;
+    font-variant-numeric: tabular-nums;
+}
+
+.pill-eye {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: $surface-faint;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        background: #eef2f8;
+        color: $accent;
+    }
+}
+
+.pill-link {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: $surface-text;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+        color: $accent;
+    }
+}
+
+.recaptcha-box {
+    display: flex;
+    justify-content: center;
+}
+
+.submit-btn {
+    width: 100%;
+    height: 48px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: none;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(45deg, $blue, $green);
+    box-shadow: 0 12px 24px rgba($blue, 0.35);
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(90deg, $green, $blue);
+        transform: translateY(-1px);
+
+        .submit-arrow {
+            transform: translateX(3px);
+        }
+    }
+
+    &:focus-visible {
+        outline: 3px solid rgba($blue, 0.5);
+        outline-offset: 3px;
+    }
+
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+}
+
+.submit-arrow {
+    transition: transform 0.25s ease;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.login-footer {
+    margin: 16px 0 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: $surface-muted;
+
+    a {
+        font-weight: 700;
+        color: $surface-text;
+        text-decoration: none;
+
+        &:hover {
+            color: $accent;
+        }
+    }
+}
+
+// Kartu petunjuk (bahan yang sama dengan kartu lain)
+.guide-card {
+    grid-area: guide;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 20px;
+    border-radius: $radius-lg;
+    background: $surface-bg;
+    border: 1px solid $surface-border;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.guide-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: $surface-faint;
+}
+
+.guide-list {
+    margin: 0 0 10px;
+    padding-left: 18px;
+    font-size: 0.82rem;
+    font-weight: 300;
+    line-height: 1.5;
+    color: $surface-muted;
+
+    li + li {
+        margin-top: 4px;
+    }
+
+    strong {
+        font-weight: 600;
+        color: $surface-text;
+    }
+}
+
+.guide-help {
+    margin: auto 0 0;
+    padding-top: 10px;
+    border-top: 1px solid $surface-line;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: $surface-muted;
+}
+
+// Kartu tanggal (tinggi, di sisi kanan)
+.date-card {
+    grid-area: date;
+    position: relative;
+    overflow: hidden;
+    padding: 10px;
+}
+
+// Langit di belakang lembar tanggal: warna, posisi matahari/bulan mengikuti jam
+.sky {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    // Pastel lembut agar senada dengan bahan kartu yang terang kebiruan
+    background: linear-gradient(180deg, #a9c8ee 0%, #e1ecf9 80%);
+    transition: background 1.2s ease;
+
+    &[data-phase='pagi'] {
+        background: linear-gradient(180deg, #b5c9ec 0%, #f4dccd 80%);
+    }
+
+    &[data-phase='sore'] {
+        background: linear-gradient(180deg, #e6ae93 0%, #f5dcc2 80%);
+    }
+
+    &[data-phase='malam'] {
+        background: linear-gradient(180deg, #0d1530 0%, #24345f 75%);
+    }
+}
+
+.orb-pos {
+    position: absolute;
+    transform: translate(-50%, 50%);
+    transition: left 1.5s ease, bottom 1.5s ease;
+}
+
+.orb {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    // Matahari siang: putih-kuning terang; pagi/sore lebih jingga (lihat di bawah)
+    background: radial-gradient(circle at 35% 35%, #fffdf2, #ffe066 50%, #fbbf24 100%);
+    box-shadow: 0 0 50px rgba(#ffe066, 0.75), 0 0 120px rgba(#fff3b0, 0.6);
+    animation: sun-breathe 8s ease-in-out infinite;
+
+    [data-phase='pagi'] &,
+    [data-phase='sore'] & {
+        background: radial-gradient(circle at 35% 35%, #fff1c2, #f5b03c 55%, #eb6834 100%);
+        box-shadow: 0 0 70px rgba(#f5b03c, 0.55);
+    }
+
+    // Bulan sabit: lingkaran terang dengan bayangan di sisi kanan
+    [data-phase='malam'] & {
+        width: 90px;
+        height: 90px;
+        background: radial-gradient(circle at 40% 40%, #fdfcf6, #d9dde8 70%);
+        box-shadow: inset -22px -6px 0 0 rgba(13, 21, 48, 0.55), 0 0 40px rgba(255, 255, 255, 0.25);
+    }
+}
+
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 1s ease;
+
+    [data-phase='malam'] & {
+        opacity: 0.9;
+        animation: twinkle 3.2s ease-in-out infinite;
+    }
+}
+
+// Laut di dasar kartu dengan kapal kargo yang berlayar perlahan
+.sea {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+}
+
+.wave {
+    position: absolute;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background-repeat: repeat-x;
+    background-size: 50% 100%;
+}
+
+.wave-back {
+    top: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q25 0 50 10 T100 10 T150 10 T200 10 V40 H0 Z' fill='%232967be' fill-opacity='0.25'/%3E%3C/svg%3E");
+    animation: wave-move 14s linear infinite reverse;
+}
+
+.wave-front {
+    top: 12px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q25 0 50 10 T100 10 T150 10 T200 10 V40 H0 Z' fill='%232967be' fill-opacity='0.45'/%3E%3C/svg%3E");
+    animation: wave-move 9s linear infinite;
+}
+
+.ship {
+    position: absolute;
+    z-index: 1;
+    bottom: 40px;
+    left: 0;
+    width: 64px;
+    animation: ship-sail 26s linear infinite, ship-bob 3s ease-in-out infinite;
+}
+
+// Ombak malam lebih terang dari langit agar tetap terlihat
+[data-phase='malam'] .wave {
+    filter: brightness(1.5) saturate(0.6);
+}
+
+// Lembar putih di kiri yang menutupi separuh matahari
+.date-sheet {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    height: 100%;
+    padding: 22px 16px;
+    border-radius: 20px;
+    background: rgba(#f3f7fd, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    p {
+        margin: 0;
+    }
+}
+
+.sky[data-phase='malam'] + .date-sheet {
+    background: rgba(#f3f7fd, 0.88);
+}
+
+.date-day {
+    font-size: 1.9rem;
+    font-weight: 300;
+    line-height: 1.1;
+    color: $surface-text;
+    margin-bottom: 14px !important;
+}
+
+.date-num,
+.date-month,
+.date-year {
+    font-size: 1.4rem;
+    font-weight: 300;
+    line-height: 1.3;
+    color: $surface-faint;
+}
+
+.date-full {
+    display: none;
+}
+
+.date-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.date-greeting {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: $accent;
+}
+
+.date-time {
+    font-size: 1.6rem;
+    font-weight: 300;
+    line-height: 1;
+    color: $surface-text;
+    font-variant-numeric: tabular-nums;
+}
+
+.login-copyright {
+    position: relative;
+    z-index: 1;
+    padding: 16px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+// ---------- Animasi ----------
+// Gerakan dibuat pelan dan halus; dimatikan bila pengguna memilih "kurangi gerakan"
+.brand-panel > *,
+.cards-panel > * {
+    animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.brand-panel > :nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.brand-panel > :nth-child(n + 3) {
+    animation-delay: 0.2s;
+}
+
+.cards-panel > .login-card {
+    animation-delay: 0.1s;
+}
+
+.cards-panel > .guide-card {
+    animation-delay: 0.2s;
+}
+
+.cards-panel > .date-card {
+    animation-delay: 0.3s;
+}
+
+.date-card,
+.guide-card {
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes drift-blue {
+    from {
+        transform: rotate(-14deg) translateX(-4%);
+    }
+    to {
+        transform: rotate(-11deg) translateX(4%);
+    }
+}
+
+@keyframes drift-green {
+    from {
+        transform: rotate(12deg) translateX(3%);
+    }
+    to {
+        transform: rotate(9deg) translateX(-3%);
+    }
+}
+
+// Kilau lewat sekali di awal siklus, lalu jeda
+@keyframes logo-shine {
+    0% {
+        left: -80%;
+    }
+    25%,
+    100% {
+        left: 140%;
+    }
+}
+
+// Cincin cahaya biru muda yang memudar keluar, seirama dengan kilau
+@keyframes logo-halo {
+    0% {
+        box-shadow: 0 0 6px 0 rgba(#8fbcf3, 0.7);
+    }
+    35%,
+    100% {
+        box-shadow: 0 0 28px 16px rgba(#8fbcf3, 0);
+    }
+}
+
+@keyframes twinkle {
+    0%,
+    100% {
+        opacity: 0.9;
+    }
+    50% {
+        opacity: 0.25;
+    }
+}
+
+@keyframes wave-move {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+// Kapal muncul dari balik lembar tanggal, berlayar ke kanan, lalu mengulang
+@keyframes ship-sail {
+    from {
+        left: 45%;
+    }
+    to {
+        left: calc(100% + 10px);
+    }
+}
+
+@keyframes ship-bob {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-1.5deg);
+    }
+    50% {
+        transform: translateY(-3px) rotate(1.5deg);
+    }
+}
+
+@keyframes sun-breathe {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.06);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+// ---------- Responsif ----------
+// Di bawah 1280px: satu kolom di tengah, tanggal menjadi strip ringkas
+@media (max-width: 1279.98px) {
+    .login-shell {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 24px 16px 16px;
+    }
+
+    .brand-panel {
+        max-width: 480px;
+    }
+
+    .brand {
+        margin-bottom: 16px;
+    }
+
+    .shortcut-pills {
+        margin-top: 16px;
+    }
+
+    .cards-panel {
+        justify-content: center;
+        grid-template-columns: minmax(0, 420px);
+        grid-template-rows: auto;
+        grid-template-areas:
+            'date'
+            'login'
+            'guide';
+    }
+
+    .sky,
+    .date-num,
+    .date-month,
+    .date-year {
+        display: none;
+    }
+
+    .date-card {
+        padding: 8px;
+    }
+
+    .date-sheet {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 18px;
+    }
+
+    .date-day {
+        display: none;
+    }
+
+    .date-full {
+        display: block;
+        font-weight: 600;
+        color: $surface-text;
+        white-space: nowrap;
+    }
+
+    .date-foot {
+        order: 2;
+        flex-direction: row-reverse;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+    }
+
+    .date-time {
+        font-size: 1.8rem;
+    }
+}
+
+// Ponsel: cukup logo & nama aplikasi, langsung ke form login
+@media (max-width: 767.98px) {
+    .hero-desc,
+    .shortcut-pills {
+        display: none;
+    }
+
+    .brand {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .brand-name {
+        font-size: 1.8rem;
+    }
+
+    .brand-divider {
+        height: 40px;
+    }
+
+    .brand-sub {
+        font-size: 0.6rem;
+        white-space: normal;
+    }
+
+    .login-card {
+        padding: 24px 16px 20px;
+    }
+
+    // Jam disembunyikan di ponsel agar tanggal & sapaan tetap satu baris
+    .date-time {
+        display: none;
+    }
+
+    .recaptcha-box {
+        transform: scale(0.92);
+        transform-origin: center;
+    }
 }

@@ -26,7 +26,8 @@ import {
 
 import { ModalComponent } from '@/modules/base/components/modal/modal.component'
 import { DataDokumenUkom } from '@/modules/ukom/models/data-dukung'
-import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
+import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component' 
+
 import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
 import {
     ExamType,
@@ -136,7 +137,8 @@ export class UkomTaskDetailComponent {
     ukomGrade = signal<UkomGrade>(new UkomGrade())
     allScoreLoading = signal(false)
     protected readonly ExamTypeCategory = ExamTypeCategory
-
+    showSecretKey = false;
+    
     constructor(
         private activatedRoute: ActivatedRoute,
         private apiService: ApiService,
@@ -149,6 +151,18 @@ export class UkomTaskDetailComponent {
             this.ukomDetailLoading$,
             toObservable(this.allScoreLoading),
         ]).pipe(map((loadings) => loadings.some((isLoading) => isLoading)))
+    }
+
+    copySecretKey(): void {
+        if (!this.participant?.secretKey) {
+            return
+        }
+
+        navigator.clipboard.writeText(this.participant?.secretKey)
+    }
+
+    toggleSecretKey(): void {
+        this.showSecretKey = !this.showSecretKey
     }
 
     getParticipantScore() {

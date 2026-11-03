@@ -1,0 +1,174 @@
+@if (resignationData) {
+
+<!-- STATUS: PENDING -->
+@if ( pendingTask?.flowId === 'resignation_flow_1' && pendingTask?.taskStatus
+=== 'PENDING' ) {
+<div class="alert alert-warning">
+    <div class="d-flex align-items-start">
+        <span class="mdi mdi-clock-outline fs-2 me-3"></span>
+        <div>
+            <h5 class="mb-1">Menunggu Persetujuan</h5>
+            <p class="mb-0">
+                Pengajuan pengunduran diri Anda sedang diverifikasi oleh Admin.
+            </p>
+        </div>
+    </div>
+</div>
+}
+
+<!-- STATUS: APPROVED -->
+@if (pendingTask?.taskStatus === 'COMPLETED') {
+<div class="alert alert-success">
+    <div class="d-flex align-items-start">
+        <span class="mdi mdi-check-circle-outline fs-2 me-3"></span>
+        <div>
+            <h5 class="mb-1">Pengajuan Disetujui</h5>
+            <p class="mb-0">
+                Pengajuan pengunduran diri Anda telah disetujui oleh Admin.
+            </p>
+        </div>
+    </div>
+</div>
+}
+
+<!-- STATUS: REJECTED / NEED REVISION -->
+@if ( pendingTask?.flowId === 'resignation_flow_2' && pendingTask?.taskStatus
+=== 'PENDING' ) {
+<div class="alert alert-danger">
+    <div class="d-flex align-items-start">
+        <span class="mdi mdi-close-circle-outline fs-2 me-3"></span>
+        <div>
+            <h5 class="mb-1">Pengajuan Perlu Perbaikan</h5>
+            <p class="mb-0">
+                Pengajuan pengunduran diri Anda perlu perbaikan. Silakan periksa
+                catatan admin di bawah untuk detail lebih lanjut.
+            </p>
+        </div>
+    </div>
+</div>
+}
+
+<!-- SECTION 1: DATA DIRI -->
+<div class="card">
+    <div class="card-header align-items-center d-flex">
+        <h5 class="m-0">
+            <i class="mdi mdi-account me-2"></i>
+            Detail Peserta UKom
+        </h5>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label class="form-label">Nama Lengkap</label>
+                    <p class="border-bottom">
+                        {{ resignationData?.name || '-' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <label class="form-label">NIP</label>
+                    <p class="border-bottom">
+                        {{ resignationData?.nip || '-' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Nomor Whatsapp</label>
+                    <p class="border-bottom">
+                        {{ resignationData?.phone || '-' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <p class="border-bottom">
+                        {{ resignationData?.email || '-' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 2: DATA PENGAJUAN -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="m-0">
+            <i class="mdi mdi-file-document-outline me-2"></i>
+            Data Pengajuan Pengunduran Diri
+        </h5>
+    </div>
+
+    <div class="card-body">
+        <div class="row mb-3">
+            <label class="col-sm-3 col-form-label fw-bold">
+                Alasan Pengunduran Diri
+            </label>
+
+            <div class="col-sm-9">
+                <p class="mb-0 pt-2">
+                    {{ resignationData?.reason || 'Tidak ada alasan yang
+                    diberikan.' }}
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-sm-3 col-form-label fw-bold">
+                Dokumen Pengunduran Diri
+            </label>
+
+            <div class="col-sm-9">
+                @if (resignationData?.suratPengunduranDiriUrl) {
+                <div class="d-flex align-items-center gap-2 pt-1">
+                    <span class="mdi mdi-file-pdf-box fs-4 text-danger"></span>
+
+                    <span> {{ resignationData?.suratPengunduranDiri }} </span>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        (click)="preview(
+                                    resignationData?.suratPengunduranDiri,
+                                    resignationData?.suratPengunduranDiriUrl
+                                )"
+                    >
+                        <i class="mdi mdi-eye-outline me-1"></i>
+                        Lihat
+                    </button>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 3: CATATAN REVIEW -->
+@if (pendingTask?.remark) {
+<div class="card">
+    <div class="card-header">
+        <h5 class="m-0">
+            <i class="mdi mdi-file-document-check-outline me-2"></i>
+            Catatan Review Admin
+        </h5>
+    </div>
+
+    <div class="card-body">
+        <div class="mb-3">
+            <p>{{ pendingTask?.remark }}</p>
+        </div>
+    </div>
+</div>
+} } @else {
+<div class="alert alert-secondary">
+    Anda belum memiliki pengajuan pengunduran diri.
+</div>
+}
