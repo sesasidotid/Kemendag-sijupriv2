@@ -2,17 +2,15 @@
 // Berkas ini hanya berisi pilihan peran Peserta / Penguji.
 $blue: #2967be;
 $green: #49ab49;
-$ink: #1b2236;
-$muted: #4a5468;
 
 .role-switch {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding: 6px;
-    margin-bottom: 20px;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 16px;
     border-radius: 999px;
-    background: #e8edf5;
+    background: #dfe7f3;
 }
 
 .role-option {
@@ -20,13 +18,13 @@ $muted: #4a5468;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 52px;
+    min-height: 42px;
     border: none;
     border-radius: 999px;
     background: transparent;
-    font-size: 1.05rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    color: $muted;
+    color: #4a5468;
     cursor: pointer;
     transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 

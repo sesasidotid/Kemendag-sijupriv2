@@ -3,10 +3,18 @@ $navy: #13182b;
 $blue: #2967be;
 $blue-dark: #1d4ed8;
 $green: #49ab49;
-$ink: #1b2236;
-$muted: #4a5468;
-$card-bg: rgba(255, 255, 255, 0.94);
+// Bahan terang kebiruan yang dipakai bersama oleh semua kartu
+$surface-bg: linear-gradient(160deg, rgba(#f3f7fd, 0.96), rgba(#e4ecf8, 0.93));
+$surface-border: rgba(255, 255, 255, 0.7);
+$surface-line: #d6dfec;
+$surface-text: #1b2236;
+$surface-muted: #4a5468;
+$surface-faint: #8a93a6;
+$field-bg: #fff;
+$accent: $blue;
 $radius-lg: 28px;
+// Ukuran fleksibel: membesar mengikuti layar agar konten tidak mengumpul di tengah
+$card-w: clamp(340px, 20vw, 390px);
 
 .login-page {
     position: relative;
@@ -15,7 +23,7 @@ $radius-lg: 28px;
     display: flex;
     flex-direction: column;
     color: #fff;
-    font-size: 17px;
+    font-size: 16px;
     background-color: $navy;
     background-image: url('/assets/wave.svg');
     background-size: contain;
@@ -72,233 +80,182 @@ $radius-lg: 28px;
 }
 
 // ---------- Tata letak ----------
-// Header selebar layar agar logo menempel di pojok kiri atas
-.login-header {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    padding: 20px 32px 0;
-}
-
 .login-shell {
     position: relative;
     z-index: 1;
     flex: 1;
     width: 100%;
-    max-width: 1600px;
+    max-width: 1920px;
     margin: 0 auto;
-    padding: 16px 48px 16px;
+    padding: clamp(32px, 5vh, 64px) clamp(40px, 5vw, 96px) 16px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 40px;
+    gap: clamp(48px, 6vw, 140px);
     align-items: center;
 }
 
-// Konten kiri diletakkan di tengah kolomnya agar tidak ada celah kosong
 .brand-panel {
     justify-self: center;
     width: 100%;
-    max-width: 620px;
+    max-width: clamp(560px, 40vw, 760px);
+    text-align: center;
 }
 
 // ---------- Identitas ----------
 .brand {
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 28px;
 }
 
 .brand-logo {
-    width: 46px;
-    height: 46px;
+    position: relative;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
     padding: 8px;
     border-radius: 50%;
     background: #fff;
+    overflow: hidden;
+    animation: logo-halo 5s ease-out 1s infinite;
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
+
+    // Kilau yang menyapu diagonal melintasi logo
+    &::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -80%;
+        width: 45%;
+        height: 200%;
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.95) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(25deg);
+        pointer-events: none;
+        animation: logo-shine 5s ease-in-out 1s infinite;
+    }
 }
 
 .brand-name {
-    font-size: 2rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    margin: 0;
+    color: #fff;
+    font-size: 2.8rem;
+    font-weight: 300;
+    letter-spacing: 0.04em;
     line-height: 1;
 }
 
 .brand-divider {
     width: 1px;
-    height: 40px;
+    height: 56px;
     background: rgba(255, 255, 255, 0.4);
 }
 
 .brand-sub {
-    font-size: 0.78rem;
-    letter-spacing: 0.18em;
+    text-align: left;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    line-height: 1.7;
+    line-height: 2.2;
     white-space: nowrap;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.8);
 }
 
 // ---------- Kolom kiri ----------
-.hero {
-    position: relative;
-    height: 360px;
-    margin: 0 0 16px;
-}
-
-.mascot {
-    position: absolute;
-    left: 68%;
-    top: 0;
-    height: 100%;
-    transform: translateX(-50%);
-    filter: drop-shadow(0 24px 24px rgba(0, 0, 0, 0.35));
-    animation: mascot-float 5s ease-in-out infinite;
-}
-
-.float-chip {
-    position: absolute;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
-    border-radius: 16px;
-    background: $card-bg;
-    color: $ink;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-
-    strong {
-        display: block;
-        font-size: 1rem;
-    }
-
-    small {
-        display: block;
-        font-size: 0.85rem;
-        color: $muted;
-    }
-}
-
-.chip-services {
-    top: 0;
-    left: 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    padding: 16px 18px;
-}
-
-.services-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: $muted;
-}
-
-.services-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-
-    li {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1rem;
-        font-weight: 600;
-        color: $ink;
-        white-space: nowrap;
-    }
-}
-
-.services-icon {
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-    background: linear-gradient(45deg, rgba($blue, 0.14), rgba($green, 0.14));
-    color: $blue;
-}
-
-
-.chip-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: $green;
-    box-shadow: 0 0 0 4px rgba($green, 0.25);
-}
-
-.hero-title {
-    font-size: clamp(2rem, 2.8vw, 2.6rem);
-    font-weight: 300;
-    line-height: 1.2;
-    color: #fff;
-    margin: 0 0 16px;
-}
-
 .hero-desc {
-    max-width: 480px;
-    font-size: 1.05rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.85);
-    margin: 0;
+    max-width: 520px;
+    margin: 0 auto;
+    font-size: clamp(0.95rem, 0.9vw, 1.1rem);
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.shortcut-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.outline-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: #fff;
+        color: #fff;
+    }
 }
 
 // ---------- Kolom kanan ----------
 .cards-panel {
     display: grid;
-    grid-template-columns: 420px 280px;
+    grid-template-columns: $card-w $card-w;
     grid-template-rows: auto 1fr;
     grid-template-areas:
         'login date'
-        'login guide';
-    gap: 20px;
+        'guide date';
+    gap: clamp(20px, 1.5vw, 28px);
 }
 
 .glass-card {
-    background: $card-bg;
-    color: $ink;
+    background: $surface-bg;
+    color: $surface-text;
     border-radius: $radius-lg;
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid $surface-border;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 // Kartu login
 .login-card {
     grid-area: login;
-    padding: 32px 28px 24px;
+    padding: clamp(24px, 2.6vh, 30px) clamp(22px, 1.6vw, 28px) clamp(20px, 2vh, 24px);
 }
 
 .login-title {
-    font-size: 2.1rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: $ink;
-    margin: 0 0 6px;
+    color: $surface-text;
+    margin: 0 0 4px;
 }
 
 .login-subtitle {
-    font-size: 1rem;
-    color: $muted;
-    margin: 0 0 20px;
+    font-size: 0.85rem;
+    color: $surface-muted;
+    margin: 0 0 16px;
 }
 
 .login-alert {
-    padding: 14px 16px;
-    margin-bottom: 16px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
     border-radius: 14px;
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 500;
 
     &.is-error {
@@ -315,15 +272,15 @@ $radius-lg: 28px;
 }
 
 .field {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .field-label {
     display: block;
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    color: $ink;
-    margin: 0 0 6px 6px;
+    color: $surface-text;
+    margin: 0 0 6px 14px;
 }
 
 .field-label-row {
@@ -339,8 +296,8 @@ $radius-lg: 28px;
 }
 
 .field-error {
-    margin: 6px 0 0 6px;
-    font-size: 0.95rem;
+    margin: 4px 0 0 14px;
+    font-size: 0.8rem;
     color: #c0262d;
 }
 
@@ -348,16 +305,16 @@ $radius-lg: 28px;
     display: flex;
     align-items: center;
     gap: 6px;
-    min-height: 60px;
-    padding: 6px;
+    height: 52px;
+    padding: 5px;
     border-radius: 999px;
-    background: #fff;
-    border: 2px solid #d5dbe6;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: $field-bg;
+    border: 1px solid $surface-line;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 
     &:focus-within {
-        border-color: $blue;
-        box-shadow: 0 0 0 4px rgba($blue, 0.18);
+        border-color: $accent;
+        box-shadow: 0 0 0 4px rgba($accent, 0.15);
     }
 
     &.is-invalid {
@@ -367,16 +324,19 @@ $radius-lg: 28px;
     input {
         flex: 1;
         min-width: 0;
-        height: 44px;
+        height: 40px;
+        padding-left: 6px;
         border: none;
         outline: none;
         background: transparent;
-        font-size: 1.1rem;
-        color: $ink;
+        font-size: 0.9rem;
+        color: $surface-text;
 
         &::placeholder {
-            color: #8a93a6;
+            color: $surface-faint;
         }
+
+
     }
 }
 
@@ -384,18 +344,20 @@ $radius-lg: 28px;
     flex-shrink: 0;
     display: grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: #eef2f8;
-    color: $blue;
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    color: $surface-muted;
 }
 
 .pill-counter {
     flex-shrink: 0;
     padding-right: 12px;
-    font-size: 0.9rem;
-    color: $muted;
+    font-size: 0.75rem;
+    color: $surface-faint;
     font-variant-numeric: tabular-nums;
 }
 
@@ -403,36 +365,36 @@ $radius-lg: 28px;
     flex-shrink: 0;
     display: grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border: none;
     border-radius: 50%;
     background: transparent;
-    color: $muted;
+    color: $surface-faint;
     cursor: pointer;
 
     &:hover,
     &:focus-visible {
         background: #eef2f8;
-        color: $blue;
+        color: $accent;
     }
 }
 
 .pill-link {
     flex-shrink: 0;
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 999px;
-    background: #f3f6fb;
-    border: 1px solid #dde3ee;
-    font-size: 0.9rem;
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    font-size: 0.72rem;
     font-weight: 600;
-    color: $blue;
+    color: $surface-text;
     text-decoration: none;
     white-space: nowrap;
 
     &:hover {
-        color: $blue-dark;
-        background: #e6edf8;
+        color: $accent;
     }
 }
 
@@ -443,15 +405,15 @@ $radius-lg: 28px;
 
 .submit-btn {
     width: 100%;
-    min-height: 60px;
-    margin-top: 4px;
+    height: 48px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
     border: none;
     border-radius: 999px;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     color: #fff;
     background: linear-gradient(45deg, $blue, $green);
@@ -463,7 +425,7 @@ $radius-lg: 28px;
         transform: translateY(-1px);
 
         .submit-arrow {
-            transform: translateX(4px);
+            transform: translateX(3px);
         }
     }
 
@@ -483,139 +445,271 @@ $radius-lg: 28px;
     transition: transform 0.25s ease;
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.25);
 }
 
 .login-footer {
-    margin: 18px 0 0;
+    margin: 16px 0 0;
     text-align: center;
-    font-size: 1rem;
-    color: $muted;
+    font-size: 0.75rem;
+    color: $surface-muted;
 
     a {
         font-weight: 700;
-        color: $blue;
-        text-decoration: underline;
-        text-underline-offset: 3px;
+        color: $surface-text;
+        text-decoration: none;
+
+        &:hover {
+            color: $accent;
+        }
     }
 }
 
-// Kartu tanggal
-.date-card {
-    grid-area: date;
-    position: relative;
-    overflow: hidden;
-    padding: 22px 24px 24px;
-
-    p {
-        position: relative;
-        margin: 0;
-    }
-}
-
-.sun {
-    position: absolute;
-    top: -70px;
-    right: -70px;
-    width: 190px;
-    height: 190px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #8fbcf3, $blue 55%, $green 100%);
-    opacity: 0.85;
-    animation: sun-breathe 8s ease-in-out infinite;
-}
-
-.date-head {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    margin-bottom: 18px;
-}
-
-.date-greeting {
-    display: inline-flex;
-    white-space: nowrap;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px 6px 10px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.85);
-    font-size: 1rem;
-    font-weight: 600;
-    color: $blue;
-}
-
-.date-time {
-    margin-top: 12px;
-    font-size: 2.8rem;
-    font-weight: 300;
-    line-height: 1;
-    color: $ink;
-    font-variant-numeric: tabular-nums;
-}
-
-.date-day {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: $ink;
-}
-
-.date-full {
-    font-size: 1.1rem;
-    color: $muted;
-}
-
-// Kartu petunjuk
+// Kartu petunjuk (bahan yang sama dengan kartu lain)
 .guide-card {
     grid-area: guide;
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    padding: 18px 20px;
     border-radius: $radius-lg;
-    background: #0c1020;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: $surface-bg;
+    border: 1px solid $surface-border;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .guide-eyebrow {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0 0 14px;
-    font-size: 0.85rem;
-    letter-spacing: 0.2em;
+    margin: 0 0 10px;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: #8fb5ec;
+    color: $surface-faint;
 }
 
 .guide-list {
-    margin: 0 0 18px;
-    padding-left: 22px;
-    font-size: 1.05rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.92);
+    margin: 0 0 10px;
+    padding-left: 18px;
+    font-size: 0.82rem;
+    font-weight: 300;
+    line-height: 1.5;
+    color: $surface-muted;
 
     li + li {
-        margin-top: 10px;
+        margin-top: 4px;
     }
 
     strong {
-        color: #fff;
+        font-weight: 600;
+        color: $surface-text;
     }
 }
 
 .guide-help {
     margin: auto 0 0;
-    padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    font-size: 0.95rem;
+    padding-top: 10px;
+    border-top: 1px solid $surface-line;
+    font-size: 0.75rem;
     line-height: 1.5;
-    color: rgba(255, 255, 255, 0.75);
+    color: $surface-muted;
+}
+
+// Kartu tanggal (tinggi, di sisi kanan)
+.date-card {
+    grid-area: date;
+    position: relative;
+    overflow: hidden;
+    padding: 10px;
+}
+
+// Langit di belakang lembar tanggal: warna, posisi matahari/bulan mengikuti jam
+.sky {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    // Pastel lembut agar senada dengan bahan kartu yang terang kebiruan
+    background: linear-gradient(180deg, #a9c8ee 0%, #e1ecf9 80%);
+    transition: background 1.2s ease;
+
+    &[data-phase='pagi'] {
+        background: linear-gradient(180deg, #b5c9ec 0%, #f4dccd 80%);
+    }
+
+    &[data-phase='sore'] {
+        background: linear-gradient(180deg, #e6ae93 0%, #f5dcc2 80%);
+    }
+
+    &[data-phase='malam'] {
+        background: linear-gradient(180deg, #0d1530 0%, #24345f 75%);
+    }
+}
+
+.orb-pos {
+    position: absolute;
+    transform: translate(-50%, 50%);
+    transition: left 1.5s ease, bottom 1.5s ease;
+}
+
+.orb {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    // Matahari siang: putih-kuning terang; pagi/sore lebih jingga (lihat di bawah)
+    background: radial-gradient(circle at 35% 35%, #fffdf2, #ffe066 50%, #fbbf24 100%);
+    box-shadow: 0 0 50px rgba(#ffe066, 0.75), 0 0 120px rgba(#fff3b0, 0.6);
+    animation: sun-breathe 8s ease-in-out infinite;
+
+    [data-phase='pagi'] &,
+    [data-phase='sore'] & {
+        background: radial-gradient(circle at 35% 35%, #fff1c2, #f5b03c 55%, #eb6834 100%);
+        box-shadow: 0 0 70px rgba(#f5b03c, 0.55);
+    }
+
+    // Bulan sabit: lingkaran terang dengan bayangan di sisi kanan
+    [data-phase='malam'] & {
+        width: 90px;
+        height: 90px;
+        background: radial-gradient(circle at 40% 40%, #fdfcf6, #d9dde8 70%);
+        box-shadow: inset -22px -6px 0 0 rgba(13, 21, 48, 0.55), 0 0 40px rgba(255, 255, 255, 0.25);
+    }
+}
+
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 1s ease;
+
+    [data-phase='malam'] & {
+        opacity: 0.9;
+        animation: twinkle 3.2s ease-in-out infinite;
+    }
+}
+
+// Laut di dasar kartu dengan kapal kargo yang berlayar perlahan
+.sea {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+}
+
+.wave {
+    position: absolute;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background-repeat: repeat-x;
+    background-size: 50% 100%;
+}
+
+.wave-back {
+    top: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q25 0 50 10 T100 10 T150 10 T200 10 V40 H0 Z' fill='%232967be' fill-opacity='0.25'/%3E%3C/svg%3E");
+    animation: wave-move 14s linear infinite reverse;
+}
+
+.wave-front {
+    top: 12px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q25 0 50 10 T100 10 T150 10 T200 10 V40 H0 Z' fill='%232967be' fill-opacity='0.45'/%3E%3C/svg%3E");
+    animation: wave-move 9s linear infinite;
+}
+
+.ship {
+    position: absolute;
+    z-index: 1;
+    bottom: 40px;
+    left: 0;
+    width: 64px;
+    animation: ship-sail 26s linear infinite, ship-bob 3s ease-in-out infinite;
+}
+
+// Ombak malam lebih terang dari langit agar tetap terlihat
+[data-phase='malam'] .wave {
+    filter: brightness(1.5) saturate(0.6);
+}
+
+// Lembar putih di kiri yang menutupi separuh matahari
+.date-sheet {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    height: 100%;
+    padding: 22px 16px;
+    border-radius: 20px;
+    background: rgba(#f3f7fd, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    p {
+        margin: 0;
+    }
+}
+
+.sky[data-phase='malam'] + .date-sheet {
+    background: rgba(#f3f7fd, 0.88);
+}
+
+.date-day {
+    font-size: 1.9rem;
+    font-weight: 300;
+    line-height: 1.1;
+    color: $surface-text;
+    margin-bottom: 14px !important;
+}
+
+.date-num,
+.date-month,
+.date-year {
+    font-size: 1.4rem;
+    font-weight: 300;
+    line-height: 1.3;
+    color: $surface-faint;
+}
+
+.date-full {
+    display: none;
+}
+
+.date-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.date-greeting {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: $accent;
+}
+
+.date-time {
+    font-size: 1.6rem;
+    font-weight: 300;
+    line-height: 1;
+    color: $surface-text;
+    font-variant-numeric: tabular-nums;
 }
 
 .login-copyright {
@@ -623,14 +717,12 @@ $radius-lg: 28px;
     z-index: 1;
     padding: 16px;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.7);
 }
 
-// ---------- Responsif ----------
 // ---------- Animasi ----------
 // Gerakan dibuat pelan dan halus; dimatikan bila pengguna memilih "kurangi gerakan"
-.login-header,
 .brand-panel > *,
 .cards-panel > * {
     animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
@@ -640,7 +732,7 @@ $radius-lg: 28px;
     animation-delay: 0.1s;
 }
 
-.brand-panel > :nth-child(3) {
+.brand-panel > :nth-child(n + 3) {
     animation-delay: 0.2s;
 }
 
@@ -648,44 +740,12 @@ $radius-lg: 28px;
     animation-delay: 0.1s;
 }
 
-.cards-panel > .date-card {
+.cards-panel > .guide-card {
     animation-delay: 0.2s;
 }
 
-.cards-panel > .guide-card {
+.cards-panel > .date-card {
     animation-delay: 0.3s;
-}
-
-.services-list li {
-    animation: slide-in 0.5s ease-out backwards;
-
-    &:nth-child(1) {
-        animation-delay: 0.4s;
-    }
-
-    &:nth-child(2) {
-        animation-delay: 0.55s;
-    }
-
-    &:nth-child(3) {
-        animation-delay: 0.7s;
-    }
-
-    &:nth-child(4) {
-        animation-delay: 0.85s;
-    }
-}
-
-.services-title .chip-dot {
-    animation: dot-pulse 2.4s ease-out infinite;
-}
-
-.services-icon {
-    transition: transform 0.25s ease;
-}
-
-.services-list li:hover .services-icon {
-    transform: scale(1.1) rotate(-6deg);
 }
 
 .date-card,
@@ -708,27 +768,6 @@ $radius-lg: 28px;
     }
 }
 
-@keyframes slide-in {
-    from {
-        opacity: 0;
-        transform: translateX(-12px);
-    }
-    to {
-        opacity: 1;
-        transform: none;
-    }
-}
-
-@keyframes mascot-float {
-    0%,
-    100% {
-        transform: translateX(-50%) translateY(0);
-    }
-    50% {
-        transform: translateX(-50%) translateY(-14px);
-    }
-}
-
 @keyframes drift-blue {
     from {
         transform: rotate(-14deg) translateX(-4%);
@@ -747,22 +786,74 @@ $radius-lg: 28px;
     }
 }
 
+// Kilau lewat sekali di awal siklus, lalu jeda
+@keyframes logo-shine {
+    0% {
+        left: -80%;
+    }
+    25%,
+    100% {
+        left: 140%;
+    }
+}
+
+// Cincin cahaya biru muda yang memudar keluar, seirama dengan kilau
+@keyframes logo-halo {
+    0% {
+        box-shadow: 0 0 6px 0 rgba(#8fbcf3, 0.7);
+    }
+    35%,
+    100% {
+        box-shadow: 0 0 28px 16px rgba(#8fbcf3, 0);
+    }
+}
+
+@keyframes twinkle {
+    0%,
+    100% {
+        opacity: 0.9;
+    }
+    50% {
+        opacity: 0.25;
+    }
+}
+
+@keyframes wave-move {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+// Kapal muncul dari balik lembar tanggal, berlayar ke kanan, lalu mengulang
+@keyframes ship-sail {
+    from {
+        left: 45%;
+    }
+    to {
+        left: calc(100% + 10px);
+    }
+}
+
+@keyframes ship-bob {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-1.5deg);
+    }
+    50% {
+        transform: translateY(-3px) rotate(1.5deg);
+    }
+}
+
 @keyframes sun-breathe {
     0%,
     100% {
         transform: scale(1);
     }
     50% {
-        transform: scale(1.08);
-    }
-}
-
-@keyframes dot-pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba($green, 0.5);
-    }
-    100% {
-        box-shadow: 0 0 0 10px rgba($green, 0);
+        transform: scale(1.06);
     }
 }
 
@@ -775,48 +866,9 @@ $radius-lg: 28px;
     }
 }
 
-// Layar besar: perbesar konten agar mengisi ruang
-@media (min-width: 1600px) {
-    .login-shell {
-        gap: 64px;
-    }
-
-    .brand-panel {
-        max-width: 660px;
-    }
-
-    .hero {
-        height: 440px;
-    }
-
-    .hero-title {
-        font-size: 3.2rem;
-    }
-
-    .hero-desc {
-        font-size: 1.15rem;
-    }
-
-    .cards-panel {
-        grid-template-columns: 480px 320px;
-        gap: 24px;
-    }
-
-    .login-card {
-        padding: 40px 36px 32px;
-    }
-
-    .login-title {
-        font-size: 2.4rem;
-    }
-}
-
+// ---------- Responsif ----------
 // Di bawah 1280px: satu kolom di tengah, tanggal menjadi strip ringkas
 @media (max-width: 1279.98px) {
-    .login-header {
-        padding: 16px 16px 0;
-    }
-
     .login-shell {
         grid-template-columns: 1fr;
         gap: 28px;
@@ -825,34 +877,19 @@ $radius-lg: 28px;
 
     .brand-panel {
         max-width: 480px;
-        text-align: center;
     }
 
-    .hero-desc,
-    .mascot {
-        display: none;
+    .brand {
+        margin-bottom: 16px;
     }
 
-    // Hanya kartu layanan yang tetap tampil
-    .hero {
-        height: auto;
-        margin: 20px 0 0;
-    }
-
-    .chip-services {
-        position: static;
-        display: inline-flex;
-        text-align: left;
-    }
-
-    .hero-title {
-        margin-top: 20px;
-        font-size: 1.8rem;
+    .shortcut-pills {
+        margin-top: 16px;
     }
 
     .cards-panel {
         justify-content: center;
-        grid-template-columns: minmax(0, 480px);
+        grid-template-columns: minmax(0, 420px);
         grid-template-rows: auto;
         grid-template-areas:
             'date'
@@ -860,15 +897,38 @@ $radius-lg: 28px;
             'guide';
     }
 
+    .sky,
+    .date-num,
+    .date-month,
+    .date-year {
+        display: none;
+    }
+
     .date-card {
-        display: flex;
+        padding: 8px;
+    }
+
+    .date-sheet {
+        width: 100%;
+        flex-direction: row;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding: 18px 22px;
+        padding: 14px 18px;
     }
 
-    .date-head {
+    .date-day {
+        display: none;
+    }
+
+    .date-full {
+        display: block;
+        font-weight: 600;
+        color: $surface-text;
+        white-space: nowrap;
+    }
+
+    .date-foot {
         order: 2;
         flex-direction: row-reverse;
         align-items: center;
@@ -877,25 +937,19 @@ $radius-lg: 28px;
     }
 
     .date-time {
-        margin: 0;
         font-size: 1.8rem;
-    }
-
-    .date-day {
-        display: none;
-    }
-
-    .date-full {
-        font-weight: 600;
-        color: $ink;
-        white-space: nowrap;
     }
 }
 
-// Ponsel: langsung tampilkan form login tanpa kartu layanan & judul
+// Ponsel: cukup logo & nama aplikasi, langsung ke form login
 @media (max-width: 767.98px) {
-    .brand-panel {
+    .hero-desc,
+    .shortcut-pills {
         display: none;
+    }
+
+    .brand {
+        margin-bottom: 0;
     }
 }
 
@@ -906,16 +960,20 @@ $radius-lg: 28px;
     }
 
     .brand-name {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
+    }
+
+    .brand-divider {
+        height: 40px;
     }
 
     .brand-sub {
-        font-size: 0.68rem;
+        font-size: 0.6rem;
         white-space: normal;
     }
 
     .login-card {
-        padding: 24px 18px 20px;
+        padding: 24px 16px 20px;
     }
 
     // Jam disembunyikan di ponsel agar tanggal & sapaan tetap satu baris

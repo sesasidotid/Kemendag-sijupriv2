@@ -21,15 +21,13 @@ import { Router, RouterModule } from '@angular/router'
 import {
     ArrowRight,
     BadgeCheck,
-    ClipboardCheck,
     Eye,
     EyeOff,
-    FileText,
-    FolderOpen,
     Info,
     LockKeyhole,
     LucideAngularModule,
-    MessagesSquare,
+    Search,
+    UserPlus,
     UserRound,
 } from 'lucide-angular'
 import {
@@ -77,11 +75,9 @@ export class LoginCatComponent implements OnDestroy {
     readonly BadgeCheck = BadgeCheck
     readonly LockKeyhole = LockKeyhole
     readonly ArrowRight = ArrowRight
+    readonly UserPlus = UserPlus
+    readonly Search = Search
     readonly Info = Info
-    readonly ClipboardCheck = ClipboardCheck
-    readonly FileText = FileText
-    readonly FolderOpen = FolderOpen
-    readonly MessagesSquare = MessagesSquare
 
     clock = createLoginClock()
 

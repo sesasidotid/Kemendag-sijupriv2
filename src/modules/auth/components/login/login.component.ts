@@ -20,14 +20,13 @@ import { LoginContext } from '../../../base/commons/login-context'
 import { Router, RouterModule } from '@angular/router'
 import {
     ArrowRight,
-    Award,
-    ClipboardList,
     Eye,
     EyeOff,
     LockKeyhole,
     Info,
     LucideAngularModule,
-    TrendingUp,
+    Search,
+    UserPlus,
     UserRound,
 } from 'lucide-angular'
 import { finalize } from 'rxjs'
@@ -73,10 +72,9 @@ export class LoginComponent implements OnDestroy {
     readonly UserRound = UserRound
     readonly LockKeyhole = LockKeyhole
     readonly ArrowRight = ArrowRight
+    readonly UserPlus = UserPlus
+    readonly Search = Search
     readonly Info = Info
-    readonly ClipboardList = ClipboardList
-    readonly TrendingUp = TrendingUp
-    readonly Award = Award
 
     clock = createLoginClock()
 
