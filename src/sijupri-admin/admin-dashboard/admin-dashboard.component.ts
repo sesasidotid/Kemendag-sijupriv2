@@ -1,615 +1,883 @@
-import { Component, HostListener, signal, ViewChild } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ChartConfiguration, ChartOptions } from 'chart.js'
 import { ApiService } from '../../modules/base/services/api.service'
-import { BaseChartDirective, NgChartsModule } from 'ng2-charts'
+import { NgChartsModule } from 'ng2-charts'
 import { FormsModule } from '@angular/forms'
-import { Pagable } from '../../modules/base/commons/pagable/pagable'
 import { Router } from '@angular/router'
-import { BehaviorSubject, catchError, finalize, forkJoin, of } from 'rxjs'
+import { Observable, catchError, finalize, forkJoin, map, of } from 'rxjs'
 import { LoginContext } from '../../modules/base/commons/login-context'
-import { PendingTask } from '@/modules/workflow/models/pending-task.model'
-import { PendingTaskListModalComponent } from './pending-task-list-modal/pending-task-list-modal.component'
 
-interface PendingCardConfig {
-    key: keyof AdminDashboardComponent['pendingCounts']
-    role: string
-    title: string
-    icon: string
-    color: 'primary' | 'warning' | 'info' | 'success' | 'danger'
+type RangeType = 'daily' | 'monthly' | 'yearly' | 'custom'
+
+interface PendingItem {
+    key: string
+    label: string
+    module: string
     route: string
+    roles: string[]
+    url: string
+    total: number
 }
 
-interface UserStatConfig {
-    key:
-        | 'totalUserAdmin'
-        | 'totalUserInstansi'
-        | 'totalUserUnitKerja'
-        | 'totalUserJF'
-    title: string
+interface PendingGroup {
+    module: string
     icon: string
+    color: string
     route: string
+    items: PendingItem[]
+}
+
+interface ShareRow {
+    code?: string
+    name: string
+    total: number
+    color?: string
+    kategori?: string
+}
+
+interface ApplicationSummary {
+    workflowName: string
+    label: string
+    pending: number
+    approve: number
+    reject: number
+    total: number
+}
+
+// palet kategorikal & status (urutan tetap, divalidasi untuk CVD)
+const COLOR = {
+    blue: '#2a78d6',
+    blueSoft: 'rgba(42, 120, 214, 0.12)',
+    orange: '#eb6834',
+    aqua: '#1baf7a',
+    yellow: '#eda100',
+    violet: '#6250d6',
+    good: '#0ca30c',
+    warning: '#fab219',
+    critical: '#d03b3b',
+    grid: 'rgba(135, 138, 153, 0.15)',
+    tick: '#878a99',
+}
+
+// ramp sekuensial (terang -> gelap) untuk data berurutan
+const BLUE_RAMP = ['#86b6ef', '#5598e7', '#2a78d6', '#1c5cab', '#104281']
+const ORANGE_RAMP = ['#f7c3a9', '#f29a72', '#eb6834', '#c4511f']
+
+const MODULE_META: Record<string, { icon: string; color: string }> = {
+    AKP: { icon: 'mdi-clipboard-check-outline', color: COLOR.blue },
+    UKom: { icon: 'mdi-file-certificate-outline', color: COLOR.orange },
+    Formasi: { icon: 'mdi-sitemap-outline', color: COLOR.aqua },
+    PAK: { icon: 'mdi-chart-box-outline', color: COLOR.yellow },
+}
+
+// tipe instansi daerah: wajib pilih provinsi dulu agar daftar instansi tidak terlalu besar
+const REGIONAL_INSTANSI_TYPES = ['IT3', 'IT4', 'IT5']
+
+const MONTHS = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+    'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+]
+
+const WORKFLOW_LABELS: Record<string, string> = {
+    akp_task: 'AKP',
+    participant_ukom_task: 'UKom',
+    ukom_resignation_task: 'Pengunduran Diri UKom',
+    formasi_task: 'Formasi',
+    jf_task: 'Data JF',
+    rw_kinerja_task: 'Kinerja / PAK',
+    rw_pendidikan_task: 'Riwayat Pendidikan',
+    rw_kompetensi_task: 'Riwayat Kompetensi',
+    rw_pangkat_task: 'Riwayat Pangkat',
+    rw_sertifikasi_task: 'Riwayat Sertifikasi',
+    rw_jabatan_task: 'Riwayat Jabatan',
+    user_task: 'User',
+    role_task: 'Role',
 }
 
 @Component({
     selector: 'app-admin-dashboard',
     standalone: true,
-    imports: [
-        CommonModule,
-        NgChartsModule,
-        FormsModule,
-        PendingTaskListModalComponent,
-    ],
+    imports: [CommonModule, NgChartsModule, FormsModule],
     templateUrl: './admin-dashboard.component.html',
     styleUrl: './admin-dashboard.component.scss',
 })
-export class AdminDashboardComponent {
-    @ViewChild(BaseChartDirective) chart?: BaseChartDirective
-
+export class AdminDashboardComponent implements OnInit {
     userRole: string[] = []
-    pagable: Pagable
-    pendingTaskList: PendingTask[]
-    year: number = new Date().getFullYear()
-    fromDate = this.toInputDate(this.subDays(new Date(), 6))
-    toDate = this.toInputDate(new Date())
-    rangeType: string = 'daily'
-    activePreset: '7d' | 'month' | '3month' | 'year' | 'custom' = '7d'
-    showFilterPopover = false
-    selectedApplication: string = ''
-    priorityPending: any[] = []
-    showPendingTaskListModal = signal<boolean>(false)
+    userName: string = ''
+    today = new Date()
+    lastUpdated: Date | null = null
 
-    months = [
-        { id: 'Januari', eng: 'January' },
-        { id: 'Februari', eng: 'February' },
-        { id: 'Maret', eng: 'March' },
-        { id: 'April', eng: 'April' },
-        { id: 'Mei', eng: 'May' },
-        { id: 'Juni', eng: 'June' },
-        { id: 'Juli', eng: 'July' },
-        { id: 'Agustus', eng: 'August' },
-        { id: 'September', eng: 'September' },
-        { id: 'Oktober', eng: 'October' },
-        { id: 'November', eng: 'November' },
-        { id: 'Desember', eng: 'December' },
+    // ===== Pengajuan pending =====
+    pendingItems: PendingItem[] = [
+        {
+            key: 'akpVerifikasi',
+            label: 'Verifikasi Pengajuan',
+            module: 'AKP',
+            route: '/akp/akp-task-list',
+            roles: ['ADMIN_AKP'],
+            url: '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_1',
+            total: 0,
+        },
+        {
+            key: 'akpPenilaianAtasan',
+            label: 'Penilaian Atasan / Rekan',
+            module: 'AKP',
+            route: '/akp/akp-task-list',
+            roles: ['ADMIN_AKP'],
+            url: '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_2',
+            total: 0,
+        },
+        {
+            key: 'akpPenilaianPribadi',
+            label: 'Penilaian Pribadi',
+            module: 'AKP',
+            route: '/akp/akp-task-list',
+            roles: ['ADMIN_AKP'],
+            url: '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_3',
+            total: 0,
+        },
+        {
+            key: 'verifikasiUKom',
+            label: 'Verifikasi Pengajuan',
+            module: 'UKom',
+            route: '/ukom/ukom-task-list',
+            roles: ['ADMIN_UKOM'],
+            url: '/api/v1/participant_ukom/task/search?page=1&limit=1&eq_flowId=ukom_flow_1',
+            total: 0,
+        },
+        {
+            key: 'perbaikanDokumenUKom',
+            label: 'Perbaikan Dokumen',
+            module: 'UKom',
+            route: '/ukom/ukom-task-list',
+            roles: ['ADMIN_UKOM'],
+            url: '/api/v1/participant_ukom/task/search?page=1&limit=1&eq_flowId=ukom_flow_2',
+            total: 0,
+        },
+        {
+            key: 'formasi',
+            label: 'Pengajuan Formasi',
+            module: 'Formasi',
+            route: '/formasi/formasi-task-list',
+            roles: ['ADMIN_FORMASI'],
+            url: '/api/v1/formasi/task/search?page=1&limit=1',
+            total: 0,
+        },
+        {
+            key: 'pak',
+            label: 'Pengajuan Kinerja',
+            module: 'PAK',
+            route: '/pak/pak-task-list',
+            roles: ['ADMIN_PAK'],
+            url: '/api/v1/jf/task/kinerja/search?page=1&limit=1',
+            total: 0,
+        },
     ]
+    visiblePendingItems: PendingItem[] = []
+    pendingGroups: PendingGroup[] = []
+    pendingLoading = false
 
-    apiData: any[] = []
-    filteredData: any[] = []
+    // ===== Tren & ringkasan pengajuan =====
+    rangeOptions: { value: RangeType; label: string }[] = [
+        { value: 'daily', label: '7 Hari' },
+        { value: 'monthly', label: 'Bulan Ini' },
+        { value: 'yearly', label: '12 Bulan' },
+        { value: 'custom', label: 'Kustom' },
+    ]
+    applicationTypeOptions = [
+        { value: '', label: 'Semua Layanan' },
+        { value: 'akp_task', label: 'AKP' },
+        { value: 'participant_ukom_task', label: 'UKom' },
+        { value: 'formasi_task', label: 'Formasi' },
+        { value: 'rw_kinerja_task', label: 'Kinerja / PAK' },
+        { value: 'siap_task', label: 'Riwayat SIAP' },
+        { value: 'jf_task', label: 'Data JF' },
+    ]
+    rangeType: RangeType = 'daily'
+    applicationType = ''
+    customFrom = this.toIsoDate(new Date(Date.now() - 29 * 86400000))
+    customTo = this.toIsoDate(new Date())
 
-    barChartData: ChartConfiguration<'bar'>['data'] = {
+    trendLoading = false
+    trendGranularity = 'daily'
+    trendTotal = 0
+    trendAverage = 0
+    trendPeak: { label: string; total: number } | null = null
+
+    summaryLoading = false
+    summaryRows: ApplicationSummary[] = []
+    summaryTotals = { pending: 0, approve: 0, reject: 0, total: 0 }
+
+    trendChartData: ChartConfiguration<'line'>['data'] = {
         labels: [],
         datasets: [
             {
                 data: [],
-                label: 'Jumlah Peserta UKom',
-                backgroundColor: 'rgba(54, 162, 235, 0.55)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1.5,
-                borderRadius: 6,
-                maxBarThickness: 48,
+                label: 'Pengajuan Masuk',
+                borderColor: COLOR.blue,
+                backgroundColor: COLOR.blueSoft,
+                pointBackgroundColor: COLOR.blue,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 6,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
             },
         ],
     }
+    trendChartOptions: ChartOptions<'line'> = this.baseOptions<'line'>({
+        plugins: { legend: { display: false } },
+    })
 
-    barChartOptions: ChartOptions<'bar'> = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                backgroundColor: '#1f2937',
-                padding: 10,
-                cornerRadius: 8,
+    // ===== Statistik UKom =====
+    ukomLoading = false
+    ukomPassRate = 0
+    ukomTotalLulus = 0
+    ukomTotalTidakLulus = 0
+    ukomAverageAge = 0
+    ukomParticipantTotal = 0
+
+    ukomGradeChartData: ChartConfiguration<'bar'>['data'] = {
+        labels: [],
+        datasets: [
+            {
+                data: [],
+                label: 'Lulus',
+                backgroundColor: COLOR.good,
+                borderRadius: 4,
+                borderSkipped: 'start',
+                maxBarThickness: 28,
+                stack: 'status',
             },
-        },
+            {
+                data: [],
+                label: 'Tidak Lulus',
+                backgroundColor: COLOR.critical,
+                borderRadius: 4,
+                borderSkipped: 'start',
+                maxBarThickness: 28,
+                stack: 'status',
+            },
+        ],
+    }
+    ukomGradeChartOptions: ChartOptions<'bar'> = this.baseOptions<'bar'>({
         scales: {
-            x: { grid: { display: false } },
+            x: { stacked: true, grid: { display: false }, ticks: { color: COLOR.tick } },
             y: {
+                stacked: true,
                 beginAtZero: true,
-                ticks: { precision: 0 },
-                grid: { color: 'rgba(0,0,0,0.06)' },
+                grid: { color: COLOR.grid },
+                border: { display: false },
+                ticks: { color: COLOR.tick, precision: 0 },
             },
         },
-    }
+        plugins: {
+            legend: {
+                position: 'top',
+                align: 'end',
+                labels: { usePointStyle: true, pointStyle: 'rectRounded', boxWidth: 8, color: COLOR.tick },
+            },
+        },
+    })
 
-    // Konfigurasi kartu "pending" — tambah/ubah item di sini saja,
-    // tidak perlu duplikasi blok HTML untuk tiap kartu.
-    pendingCardConfigs: PendingCardConfig[] = [
-        {
-            key: 'akpVerifikasi',
-            role: 'ADMIN_AKP',
-            title: 'Verifikasi Pengajuan AKP',
-            icon: 'mdi-file-check-outline',
-            color: 'primary',
-            route: '/akp/akp-task-list',
-        },
-        {
-            key: 'akpPenilaianAtasan',
-            role: 'ADMIN_AKP',
-            title: 'Penilaian Atasan/Rekan Kerja AKP',
-            icon: 'mdi-account-check-outline',
-            color: 'info',
-            route: '/akp/akp-task-list',
-        },
-        {
-            key: 'akpPenilaianPribadi',
-            role: 'ADMIN_AKP',
-            title: 'Penilaian Pribadi AKP',
-            icon: 'mdi-clipboard-account-outline',
-            color: 'info',
-            route: '/akp/akp-task-list',
-        },
-        {
-            key: 'verifikasiUKom',
-            role: 'ADMIN_UKOM',
-            title: 'Verifikasi Pengajuan UKom',
-            icon: 'mdi-certificate-outline',
-            color: 'warning',
-            route: '/ukom/ukom-task-list',
-        },
-        {
-            key: 'perbaikanDokumenUKom',
-            role: 'ADMIN_UKOM',
-            title: 'Perbaikan Dokumen UKom',
-            icon: 'mdi-file-edit-outline',
-            color: 'warning',
-            route: '/ukom/ukom-task-list',
-        },
-        {
-            key: 'formasi',
-            role: 'ADMIN_FORMASI',
-            title: 'Formasi',
-            icon: 'mdi-briefcase-outline',
-            color: 'success',
-            route: '/formasi/formasi-task-list',
-        },
-        {
-            key: 'pak',
-            role: 'ADMIN_PAK',
-            title: 'PAK',
-            icon: 'mdi-file-star-outline',
-            color: 'danger',
-            route: '/pak/pak-task-list',
-        },
-        {
-            key: 'pengunduranDiriUKom',
-            role: 'ADMIN_PAK',
-            title: 'Pengunduran Diri',
-            icon: 'mdi-file-star-outline',
-            color: 'danger',
-            route: '/pak/pak-task-list',
-        },
-    ]
+    ageRows: ShareRow[] = []
+    ageChartData: ChartConfiguration<'doughnut'>['data'] = { labels: [], datasets: [{ data: [] }] }
+    ageChartOptions: ChartOptions<'doughnut'> = this.doughnutOptions()
 
-    userStatConfigs: UserStatConfig[] = [
-        {
-            key: 'totalUserAdmin',
-            title: 'Admin Sijupri',
-            icon: 'mdi-account-key-outline',
-            route: '/security/user',
-        },
-        {
-            key: 'totalUserInstansi',
-            title: 'Admin Instansi',
-            icon: 'mdi-account-outline',
-            route: '/siap/user-instansi',
-        },
-        {
-            key: 'totalUserUnitKerja',
-            title: 'Admin Unit Kerja',
-            icon: 'mdi-account-supervisor-outline',
-            route: '/siap/user-unit-kerja',
-        },
-        {
-            key: 'totalUserJF',
-            title: 'User JF',
-            icon: 'mdi-account-group-outline',
-            route: '/siap/user-jf',
-        },
-    ]
+    educationRows: ShareRow[] = []
+    educationTotal = 0
+    readonly educationTopCount = 5
 
-    totalUserJF: number = 0
-    totalUserUnitKerja: number = 0
-    totalUserAdmin: number = 0
-    totalUserInstansi: number = 0
+    // ===== Statistik JF per instansi =====
+    instansiTypeList: { code: string; name: string }[] = []
+    provinsiList: { id: string; name: string }[] = []
+    instansiList: { id: string; name: string }[] = []
+    selectedInstansiType = ''
+    selectedProvinsi = ''
+    selectedInstansi = ''
+    instansiLoading = false
+    jfInstansiLoading = false
+    jfInstansiTotal = 0
+    jfUnitKerjaTotal = 0
+    jfWithoutJabatan = 0
+    jfGender: { name: string; total: number; color: string }[] = []
 
-    totalNeedsVerification = 17
-
-    getUrgencyClass(days: number): string {
-        if (days >= 10) return 'badge--danger'
-        if (days >= 5) return 'badge--warning'
-        return 'badge--success'
-    }
-
-    pendingCounts = {
-        akpVerifikasi: 0,
-        akpPenilaianAtasan: 0,
-        akpPenilaianPribadi: 0,
-        formasi: 0,
-        pak: 0,
-        verifikasiUKom: 0,
-        perbaikanDokumenUKom: 0,
-        pengunduranDiriUKom: 0,
-    }
-
-    pendingLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-        false,
-    )
-    userLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
-    chartLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-        false,
-    )
+    jfJabatanRows: ShareRow[] = []
+    selectedJfJabatan = ''
+    jfJenjangLoading = false
+    jfJenjangRows: ShareRow[] = []
+    jfJenjangTotal = 0
+    jfJenjangChartData: ChartConfiguration<'doughnut'>['data'] = { labels: [], datasets: [{ data: [] }] }
+    jfJenjangChartOptions: ChartOptions<'doughnut'> = this.doughnutOptions()
 
     constructor(
         private apiService: ApiService,
         private router: Router,
     ) {
-        this.userRole = LoginContext.getRoleCodes()
+        this.userRole = LoginContext.getRoleCodes() ?? []
+        this.userName = LoginContext.getName() ?? ''
     }
 
     ngOnInit() {
-        this.getPendingTaskList()
-        this.fetchData()
-        // this.getUserStats()
-        this.getPendingCount()
+        this.visiblePendingItems = this.pendingItems.filter((item) =>
+            this.hasRole(...item.roles),
+        )
+        this.pendingGroups = this.buildPendingGroups()
+        this.refreshAll()
     }
 
-    hasRole(role: string): boolean {
-        return this.userRole?.includes(role) || this.userRole?.includes('ADMIN')
+    get isSuperAdmin(): boolean {
+        return this.userRole.includes('ADMIN')
     }
 
-    get visiblePendingCards(): PendingCardConfig[] {
-        return this.pendingCardConfigs.filter((c) => this.hasRole(c.role))
+    get canSeeUkom(): boolean {
+        return this.hasRole('ADMIN_UKOM')
     }
 
     get totalPending(): number {
-        return Object.values(this.pendingCounts).reduce((a, b) => a + b, 0)
+        return this.visiblePendingItems.reduce((sum, item) => sum + item.total, 0)
     }
 
-    getUserStatValue(key: UserStatConfig['key']): number {
-        return this[key]
+    get greeting(): string {
+        const hour = new Date().getHours()
+        if (hour < 11) return 'Selamat pagi'
+        if (hour < 15) return 'Selamat siang'
+        if (hour < 18) return 'Selamat sore'
+        return 'Selamat malam'
     }
 
-    getPendingTaskList() {
-        this.apiService
-            .getData('/api/v1/pending_task/list?desc_date_created')
-            .pipe(finalize(() => this.chartLoading$.next(false)))
-            .subscribe({
-                next: (res: any) => {
-                    this.pendingTaskList = res.data || res
-                    this.priorityPending = this.pendingTaskList.map(
-                        (task: any) => ({
-                            title: task.flowName,
-                            applicant: task.objectGroup,
-                            daysPending: this.calculateDaysPending(
-                                task.dateCreated,
-                            ),
-                            icon: this.getTaskIcon(task.workflowName),
-                            route: this.getTaskRoute(task),
-                        }),
-                    )
-                },
-                error: (err) => {
-                    console.error('Error fetching data', err)
-                },
-            })
+    groupTotal(group: PendingGroup): number {
+        return group.items.reduce((sum, item) => sum + item.total, 0)
     }
 
-    getPendingCount() {
-        this.pendingLoading$.next(true)
-        forkJoin({
-            totalAKPVerifikasi: this.apiService.getData(
-                '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_1',
-            ),
-            totalAKPPenliaianAtasan: this.apiService.getData(
-                '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_2',
-            ),
-            totalAKPPenilaianPribadi: this.apiService.getData(
-                '/api/v1/akp/task/search?page=1&limit=1&eq_flowId=akp_flow_3',
-            ),
-            totalFormasi: this.apiService.getData(
-                '/api/v1/formasi/task/search?page=1&limit=1',
-            ),
-            totalPAK: this.apiService.getData(
-                '/api/v1/jf/task/kinerja/search?page=1&limit=1',
-            ),
-            totalVerifikasiUKom: this.apiService.getData(
-                '/api/v1/participant_ukom/task/search?page=1&limit=1&eq_flowId=ukom_flow_1',
-            ),
-            totalPerbaikanDokumenUKom: this.apiService.getData(
-                '/api/v1/participant_ukom/task/search?page=1&limit=1&eq_flowId=ukom_flow_2',
-            ),
-            totalPengunduranDiriUKom: this.apiService.getData(
-                '/api/v1/ukom_resignation/task/search?page=1&limit=1',
-            ),
-        })
-            .pipe(
-                finalize(() => {
-                    this.pendingLoading$.next(false)
-                }),
-                catchError((err) => {
-                    console.error('Error fetching pending counts', err)
-                    this.pendingLoading$.next(false)
-                    return of(null)
-                }),
-            )
-            .subscribe({
-                next: (result) => {
-                    if (!result) return
-                    const {
-                        totalAKPVerifikasi,
-                        totalAKPPenliaianAtasan,
-                        totalAKPPenilaianPribadi,
-                        totalFormasi,
-                        totalPAK,
-                        totalVerifikasiUKom,
-                        totalPerbaikanDokumenUKom,
-                        totalPengunduranDiriUKom,
-                    } = result
-                    this.pendingCounts.akpVerifikasi =
-                        totalAKPVerifikasi.total ?? 0
-                    this.pendingCounts.akpPenilaianAtasan =
-                        totalAKPPenliaianAtasan.total ?? 0
-                    this.pendingCounts.akpPenilaianPribadi =
-                        totalAKPPenilaianPribadi.total ?? 0
-                    this.pendingCounts.formasi = totalFormasi.total ?? 0
-                    this.pendingCounts.pak = totalPAK.total ?? 0
-                    this.pendingCounts.verifikasiUKom =
-                        totalVerifikasiUKom.total ?? 0
-                    this.pendingCounts.perbaikanDokumenUKom =
-                        totalPerbaikanDokumenUKom.total ?? 0
-                    this.pendingCounts.pengunduranDiriUKom =
-                        totalPengunduranDiriUKom?.total ?? 0
-                },
-            })
+    hasRole(...roles: string[]): boolean {
+        return this.isSuperAdmin || roles.some((role) => this.userRole.includes(role))
     }
 
-    getUserStats() {
-        this.userLoading$.next(true)
-        forkJoin({
-            totalUserJF: this.apiService.getData(
-                '/api/v1/jf/search?page=1&limit=1',
-            ),
-            totalUserUnitKerja: this.apiService.getData(
-                '/api/v1/user_unit_kerja/search?page=1&limit=1',
-            ),
-            totalUserAdmin: this.apiService.getData(
-                '/api/v1/user/search?page=1&limit=10&eq_userApplicationChannel|applicationCode=sijupri-admin&eq_userApplicationChannel|channelCode=WEB',
-            ),
-            totalUserInstansi: this.apiService.getData(
-                '/api/v1/user_instansi/search?page=1&limit=1',
-            ),
-        })
-            .pipe(
-                finalize(() => this.userLoading$.next(false)),
-                catchError((err) => {
-                    console.error('Error fetching user stats', err)
-                    return of(null)
-                }),
-            )
-            .subscribe({
-                next: (result) => {
-                    if (!result) return
-                    const {
-                        totalUserJF,
-                        totalUserUnitKerja,
-                        totalUserAdmin,
-                        totalUserInstansi,
-                    } = result
-                    this.totalUserJF = totalUserJF.total
-                    this.totalUserUnitKerja = totalUserUnitKerja.total
-                    this.totalUserAdmin = totalUserAdmin.total
-                    this.totalUserInstansi = totalUserInstansi.total
-                },
-            })
+    refreshAll() {
+        this.today = new Date()
+        this.getPendingCount()
+        if (this.isSuperAdmin) {
+            this.loadApplicationStatistics()
+            this.getInstansiTypeList()
+        }
+        if (this.canSeeUkom) {
+            this.getUkomStatistics()
+        }
+        this.lastUpdated = new Date()
     }
 
     navigateTo(path: string) {
         this.router.navigate([path])
     }
 
-    fetchData(from?: string, to?: string, selectedApplication?: string) {
-        this.chartLoading$.next(true)
+    sharePercent(value: number, total: number): number {
+        return total > 0 ? Math.round((value / total) * 100) : 0
+    }
 
-        let endpoint = '/api/v1/dashboard/participant_ukom_count'
-        if (from && to) {
-            endpoint += `?from=${from}&to=${to}&range_type=${this.rangeType}&application_type=${this.selectedApplication}`
-        }
+    // ===== Pengajuan pending =====
+    getPendingCount() {
+        if (this.visiblePendingItems.length === 0) return
 
-        this.apiService
-            .getData(endpoint)
-            .pipe(finalize(() => this.chartLoading$.next(false)))
-            .subscribe({
-                next: (res: any) => {
-                    this.apiData = res.data || res
-                    this.updateChartData()
-                },
-                error: (err) => {
-                    console.error('Error fetching data', err)
-                },
+        this.pendingLoading = true
+        const requests: Record<string, Observable<number>> = {}
+        this.visiblePendingItems.forEach((item) => {
+            requests[item.key] = this.countOf(item.url)
+        })
+
+        forkJoin(requests)
+            .pipe(finalize(() => (this.pendingLoading = false)))
+            .subscribe((result) => {
+                this.visiblePendingItems.forEach((item) => {
+                    item.total = result[item.key] ?? 0
+                })
             })
     }
 
-    updateChartData() {
-        this.barChartData = {
-            ...this.barChartData,
-            labels: this.apiData.map((item: any) =>
-                this.formatDateLabel(item.date),
-            ),
-            datasets: [
-                {
-                    ...this.barChartData.datasets[0],
-                    data: this.apiData.map(
-                        (item: any) => item.total ?? item.count ?? 0,
-                    ),
-                },
-            ],
-        }
-
-        this.chart?.update()
+    private buildPendingGroups(): PendingGroup[] {
+        const groups = new Map<string, PendingGroup>()
+        this.visiblePendingItems.forEach((item) => {
+            if (!groups.has(item.module)) {
+                const meta = MODULE_META[item.module]
+                groups.set(item.module, {
+                    module: item.module,
+                    icon: meta?.icon ?? 'mdi-folder-outline',
+                    color: meta?.color ?? COLOR.blue,
+                    route: item.route,
+                    items: [],
+                })
+            }
+            groups.get(item.module)!.items.push(item)
+        })
+        return Array.from(groups.values())
     }
 
-    private formatDateLabel(dateStr: string): string {
-        if (!dateStr) return ''
+    // ===== Tren & ringkasan pengajuan =====
+    setRange(range: RangeType) {
+        this.rangeType = range
+        if (range !== 'custom') this.loadApplicationStatistics()
+    }
 
-        const parts = dateStr.split('-')
+    applyCustomRange() {
+        if (!this.customFrom || !this.customTo || this.customFrom > this.customTo) return
+        this.loadApplicationStatistics()
+    }
 
-        // Mode Yearly ('2026')
-        if (parts.length === 1) {
-            return parts[0]
+    onApplicationTypeChange() {
+        this.getApplicationDistribution()
+    }
+
+    loadApplicationStatistics() {
+        this.getApplicationDistribution()
+        this.getApplicationSummary()
+    }
+
+    getApplicationDistribution() {
+        this.trendLoading = true
+        const query = this.buildRangeQuery()
+        if (this.applicationType) {
+            query.push(`applicationType=${this.applicationType}`)
         }
 
-        // Mode Monthly ('2026-07')
-        if (parts.length === 2) {
-            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1)
-            return new Intl.DateTimeFormat('id-ID', {
-                month: 'long',
-                year: 'numeric',
-            }).format(date)
-        }
-
-        // Mode Daily/Weekly ('2026-07-17')
-        if (parts.length === 3) {
-            const date = new Date(
-                parseInt(parts[0]),
-                parseInt(parts[1]) - 1,
-                parseInt(parts[2]),
+        this.apiService
+            .getData(`/api/v1/dashboard/application-distribution?${query.join('&')}`)
+            .pipe(
+                catchError(() => of(null)),
+                finalize(() => (this.trendLoading = false)),
             )
-            return new Intl.DateTimeFormat('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-            }).format(date)
+            .subscribe((res) => {
+                const rows: { date: string; total: number }[] = res?.data ?? []
+                this.trendGranularity = res?.granularity ?? 'daily'
+
+                const labels = rows.map((row) => this.formatBucket(row.date, this.trendGranularity))
+                const values = rows.map((row) => Number(row.total) || 0)
+
+                this.trendTotal = values.reduce((a, b) => a + b, 0)
+                this.trendAverage = values.length
+                    ? Math.round((this.trendTotal / values.length) * 10) / 10
+                    : 0
+
+                const peakIndex = values.indexOf(Math.max(...values, 0))
+                this.trendPeak =
+                    this.trendTotal > 0 && peakIndex >= 0
+                        ? { label: labels[peakIndex], total: values[peakIndex] }
+                        : null
+
+                this.trendChartData = {
+                    ...this.trendChartData,
+                    labels,
+                    datasets: [{ ...this.trendChartData.datasets[0], data: values }],
+                }
+            })
+    }
+
+    getApplicationSummary() {
+        this.summaryLoading = true
+        this.apiService
+            .getData(`/api/v1/dashboard/application-summary?${this.buildRangeQuery().join('&')}`)
+            .pipe(
+                catchError(() => of(null)),
+                finalize(() => (this.summaryLoading = false)),
+            )
+            .subscribe((res) => {
+                const rows: any[] = res?.data ?? []
+                this.summaryRows = rows.map((row) => ({
+                    workflowName: row.workflowName,
+                    label: WORKFLOW_LABELS[row.workflowName] ?? row.workflowName,
+                    pending: Number(row.pending) || 0,
+                    approve: Number(row.approve) || 0,
+                    reject: Number(row.reject) || 0,
+                    total: Number(row.total) || 0,
+                }))
+                this.summaryTotals = this.summaryRows.reduce(
+                    (acc, row) => ({
+                        pending: acc.pending + row.pending,
+                        approve: acc.approve + row.approve,
+                        reject: acc.reject + row.reject,
+                        total: acc.total + row.total,
+                    }),
+                    { pending: 0, approve: 0, reject: 0, total: 0 },
+                )
+            })
+    }
+
+    get rangeLabel(): string {
+        switch (this.rangeType) {
+            case 'daily':
+                return '7 hari terakhir'
+            case 'monthly':
+                return 'bulan ini'
+            case 'yearly':
+                return '12 bulan terakhir'
+            default:
+                return `${this.formatDate(this.customFrom)} – ${this.formatDate(this.customTo)}`
         }
-
-        return dateStr
     }
 
-    toggleFilterPopover(event: MouseEvent) {
-        event.stopPropagation()
-        this.showFilterPopover = !this.showFilterPopover
+    // ===== Statistik UKom =====
+    getUkomStatistics() {
+        this.ukomLoading = true
+        forkJoin({
+            grade: this.safeGet('/api/v1/dashboard/statistic/ukom-grade-status'),
+            age: this.safeGet('/api/v1/dashboard/statistic/participant-ukom-age'),
+            education: this.safeGet('/api/v1/dashboard/statistic/participant-ukom-education'),
+        })
+            .pipe(finalize(() => (this.ukomLoading = false)))
+            .subscribe(({ grade, age, education }) => {
+                const gradeRows: any[] = grade ?? []
+                const lulus = gradeRows.map((row) => Number(row.lulus) || 0)
+                const tidakLulus = gradeRows.map((row) => Number(row.tidakLulus) || 0)
+                this.ukomTotalLulus = lulus.reduce((a, b) => a + b, 0)
+                this.ukomTotalTidakLulus = tidakLulus.reduce((a, b) => a + b, 0)
+                this.ukomPassRate = this.sharePercent(
+                    this.ukomTotalLulus,
+                    this.ukomTotalLulus + this.ukomTotalTidakLulus,
+                )
+                this.ukomGradeChartData = {
+                    labels: gradeRows.map((row) => this.formatBucket(row.date, 'monthly')),
+                    datasets: [
+                        { ...this.ukomGradeChartData.datasets[0], data: lulus },
+                        { ...this.ukomGradeChartData.datasets[1], data: tidakLulus },
+                    ],
+                }
+
+                const ranges: any[] = age?.ranges ?? []
+                this.ukomAverageAge = Number(age?.average) || 0
+                this.ukomParticipantTotal = ranges.reduce(
+                    (sum, row) => sum + (Number(row.total) || 0),
+                    0,
+                )
+                this.ageRows = ranges.map((row, index) => ({
+                    name: `${row.range} th`,
+                    total: Number(row.total) || 0,
+                    color: BLUE_RAMP[Math.min(index, BLUE_RAMP.length - 1)],
+                }))
+                this.ageChartData = this.toDoughnutData(this.ageRows)
+
+                // urutkan dari terbanyak, sisanya setelah 5 teratas digabung ke "Lainnya"
+                const educationRows: ShareRow[] = ((education as any[]) ?? [])
+                    .map((row) => ({ name: row.pendidikanName, total: Number(row.total) || 0 }))
+                    .filter((row) => row.total > 0)
+                    .sort((a, b) => b.total - a.total)
+                this.educationTotal = educationRows.reduce((sum, row) => sum + row.total, 0)
+                const others = educationRows.slice(this.educationTopCount)
+                this.educationRows = educationRows.slice(0, this.educationTopCount)
+                if (others.length > 0) {
+                    this.educationRows.push({
+                        name: `Lainnya (${others.length} jenjang)`,
+                        total: others.reduce((sum, row) => sum + row.total, 0),
+                    })
+                }
+            })
     }
 
-    @HostListener('document:click')
-    closeFilterPopover() {
-        this.showFilterPopover = false
+    get educationMax(): number {
+        return Math.max(0, ...this.educationRows.map((row) => row.total))
     }
 
-    applyFilters() {
-        if (!this.fromDate || !this.toDate) {
+    // ===== Statistik JF per instansi =====
+    getInstansiTypeList() {
+        if (this.instansiTypeList.length > 0) {
+            this.getJfInstansiStatistic()
             return
         }
 
-        if (this.fromDate > this.toDate) {
-            ;[this.fromDate, this.toDate] = [this.toDate, this.fromDate]
+        this.safeGet('/api/v1/instansi_type').subscribe((res) => {
+            this.instansiTypeList = (res ?? []).map((item: any) => ({
+                code: item.code,
+                name: item.name,
+            }))
+            this.getJfInstansiStatistic()
+        })
+    }
+
+    get isRegionalInstansiType(): boolean {
+        return REGIONAL_INSTANSI_TYPES.includes(this.selectedInstansiType)
+    }
+
+    onInstansiTypeChange() {
+        this.selectedProvinsi = ''
+        this.selectedInstansi = ''
+        this.instansiList = []
+        this.getJfInstansiStatistic()
+
+        if (!this.selectedInstansiType) return
+
+        if (this.isRegionalInstansiType) {
+            this.getProvinsiList()
+            return
         }
 
-        this.activePreset = 'custom'
-        this.fetchData(this.fromDate, this.toDate, this.selectedApplication)
+        this.loadInstansiList(`/api/v1/instansi/type/${encodeURIComponent(this.selectedInstansiType)}`)
     }
 
-    applyPreset(preset: '7d' | 'month' | '3month' | 'year') {
-        const now = new Date()
-        this.activePreset = preset
+    onProvinsiChange() {
+        this.selectedInstansi = ''
+        this.instansiList = []
+        this.getJfInstansiStatistic()
 
-        switch (preset) {
-            case '7d':
-                this.fromDate = this.toInputDate(this.subDays(now, 6))
-                this.toDate = this.toInputDate(now)
-                this.rangeType = 'daily'
-                break
-            case 'month':
-                this.fromDate = this.toInputDate(
-                    new Date(now.getFullYear(), now.getMonth(), 1),
-                )
-                this.toDate = this.toInputDate(
-                    new Date(now.getFullYear(), now.getMonth() + 1, 0),
-                )
-                this.rangeType = 'monthly'
-                break
-            case '3month':
-                this.fromDate = this.toInputDate(
-                    new Date(now.getFullYear(), now.getMonth() - 2, 1),
-                )
-                this.toDate = this.toInputDate(
-                    new Date(now.getFullYear(), now.getMonth() + 1, 0),
-                )
-                this.rangeType = 'monthly'
-                break
-            case 'year':
-                this.fromDate = this.toInputDate(
-                    new Date(now.getFullYear() - 1, now.getMonth() + 1, 1),
-                )
-                this.toDate = this.toInputDate(now)
-                this.rangeType = 'yearly'
-                break
+        if (!this.selectedProvinsi) return
+
+        this.loadInstansiList(`/api/v1/instansi/provinsi/${encodeURIComponent(this.selectedProvinsi)}`)
+    }
+
+    resetInstansiFilter() {
+        this.selectedInstansiType = ''
+        this.selectedProvinsi = ''
+        this.selectedInstansi = ''
+        this.instansiList = []
+        this.getJfInstansiStatistic()
+    }
+
+    get selectedInstansiLabel(): string {
+        if (this.selectedInstansi) {
+            return this.instansiList.find((i) => i.id === this.selectedInstansi)?.name ?? ''
+        }
+        const type = this.instansiTypeList.find((t) => t.code === this.selectedInstansiType)
+        const provinsi = this.provinsiList.find((p) => String(p.id) === String(this.selectedProvinsi))
+        if (type && provinsi) {
+            return `Semua instansi ${type.name} di ${provinsi.name}`
+        }
+        if (type) {
+            return `Semua instansi ${type.name}`
+        }
+        return 'Semua instansi'
+    }
+
+    private getProvinsiList() {
+        if (this.provinsiList.length > 0) return
+
+        this.safeGet('/api/v1/provinsi').subscribe((res) => {
+            this.provinsiList = ((res ?? []) as any[])
+                .map((item) => ({ id: String(item.id), name: item.name }))
+                .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+        })
+    }
+
+    private loadInstansiList(url: string) {
+        const instansiType = this.selectedInstansiType
+
+        this.instansiLoading = true
+        this.safeGet(url)
+            .pipe(finalize(() => (this.instansiLoading = false)))
+            .subscribe((res) => {
+                // endpoint per provinsi mengembalikan semua tipe, saring sesuai tipe terpilih
+                this.instansiList = ((res ?? []) as any[])
+                    .filter((item) => !item.instansiTypeCode || item.instansiTypeCode === instansiType)
+                    .map((item) => ({ id: item.id, name: item.name }))
+                    .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+            })
+    }
+
+    toggleJfJabatan(code: string | undefined) {
+        if (!code) return
+        this.selectedJfJabatan = this.selectedJfJabatan === code ? '' : code
+        this.getJfInstansiStatistic(true)
+    }
+
+    get selectedJfJabatanName(): string {
+        return this.jfJabatanRows.find((row) => row.code === this.selectedJfJabatan)?.name ?? ''
+    }
+
+    get jfJabatanMax(): number {
+        return Math.max(0, ...this.jfJabatanRows.map((row) => row.total))
+    }
+
+    // jenjangOnly: hanya perbarui donut jenjang (dipakai saat memilih jabatan)
+    getJfInstansiStatistic(jenjangOnly = false) {
+        if (!jenjangOnly) this.selectedJfJabatan = ''
+
+        const query: string[] = []
+        if (this.selectedInstansiType) {
+            query.push(`instansiTypeCode=${encodeURIComponent(this.selectedInstansiType)}`)
+        }
+        if (this.selectedProvinsi) {
+            query.push(`provinsiId=${encodeURIComponent(this.selectedProvinsi)}`)
+        }
+        if (this.selectedInstansi) {
+            query.push(`instansiId=${encodeURIComponent(this.selectedInstansi)}`)
+        }
+        if (this.selectedJfJabatan) {
+            query.push(`jabatanCode=${encodeURIComponent(this.selectedJfJabatan)}`)
         }
 
-        this.applyFilters()
+        if (jenjangOnly) {
+            this.jfJenjangLoading = true
+        } else {
+            this.jfInstansiLoading = true
+        }
+        this.safeGet(`/api/v1/dashboard/statistic/jf-by-instansi?${query.join('&')}`)
+            .pipe(
+                finalize(() => {
+                    this.jfInstansiLoading = false
+                    this.jfJenjangLoading = false
+                }),
+            )
+            .subscribe((res) => {
+                this.setJfJenjang(res?.byJenjang ?? [])
+                if (jenjangOnly) return
+
+                const byJabatan: any[] = res?.byJabatan ?? []
+                const genderColors = [COLOR.blue, COLOR.orange, COLOR.tick]
+
+                this.jfInstansiTotal = Number(res?.total) || 0
+                this.jfUnitKerjaTotal = Number(res?.unitKerjaTotal) || 0
+                this.jfGender = ((res?.byGender ?? []) as any[]).map((row, index) => ({
+                    name: this.titleCase(row.name),
+                    total: Number(row.total) || 0,
+                    color: genderColors[Math.min(index, genderColors.length - 1)],
+                }))
+
+                const jabatanValues = byJabatan.map((row) => Number(row.total) || 0)
+                this.jfWithoutJabatan = Math.max(
+                    0,
+                    this.jfInstansiTotal - jabatanValues.reduce((a, b) => a + b, 0),
+                )
+
+                this.jfJabatanRows = byJabatan.map((row) => ({
+                    code: row.code,
+                    name: row.name,
+                    total: Number(row.total) || 0,
+                }))
+            })
     }
 
-    private subDays(date: Date, days: number): Date {
-        const result = new Date(date)
-        result.setDate(result.getDate() - days)
-        return result
+    private setJfJenjang(rows: any[]) {
+        // keahlian = ramp biru, keterampilan = ramp oranye; makin tinggi jenjang makin gelap
+        const counters: Record<string, number> = { keahlian: 0, keterampilan: 0 }
+        this.jfJenjangRows = rows.map((row) => {
+            const kategori = row.kategori === 'keterampilan' ? 'keterampilan' : 'keahlian'
+            const ramp = kategori === 'keterampilan' ? ORANGE_RAMP : BLUE_RAMP
+            const color = ramp[Math.min(counters[kategori]++, ramp.length - 1)]
+            return { code: row.code, name: row.name, kategori, total: Number(row.total) || 0, color }
+        })
+        this.jfJenjangTotal = this.jfJenjangRows.reduce((sum, row) => sum + row.total, 0)
+        this.jfJenjangChartData = this.toDoughnutData(this.jfJenjangRows)
     }
 
-    private toInputDate(date: Date): string {
-        return date.toISOString().split('T')[0]
+    jenjangKategoriTotal(kategori: string): number {
+        return this.jfJenjangRows
+            .filter((row) => row.kategori === kategori)
+            .reduce((sum, row) => sum + row.total, 0)
     }
 
-    calculateDaysPending(dateCreated: string): number {
-        const created = new Date(dateCreated)
-        const now = new Date()
-
-        const diffTime = now.getTime() - created.getTime()
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-
-        return Math.max(0, diffDays)
+    // ===== Helpers =====
+    private countOf(url: string): Observable<number> {
+        return this.apiService.getData(url).pipe(
+            map((res) => Number(res?.total) || 0),
+            catchError(() => of(0)),
+        )
     }
 
-    getTaskIcon(workflowName: string): string {
-        switch (workflowName) {
-            case 'participant_ukom_task':
-                return 'mdi-account-check-outline' // peserta ukom — verifikasi kelayakan peserta
-            case 'rw_kinerja_task':
-                return 'mdi-user' // riwayat kinerja pegawai
-            case 'akp_task':
-                return 'mdi-chart-box-outline' // Analisis Kebutuhan Pegawai — analisis/data kebutuhan
-            case 'formasi_task':
-                return 'mdi-briefcase-outline' // pengajuan formasi jabatan
-            case 'ukom_resignation_task':
-                return 'mdi-account-remove-outline' // pengunduran diri peserta ukom
+    private safeGet(url: string): Observable<any> {
+        return this.apiService.getData(url).pipe(catchError(() => of(null)))
+    }
+
+    private buildRangeQuery(): string[] {
+        if (this.rangeType === 'custom') {
+            return [`from=${this.customFrom}`, `to=${this.customTo}`]
+        }
+        return [`rangeType=${this.rangeType}`]
+    }
+
+    private formatBucket(key: string, granularity: string): string {
+        if (!key) return ''
+        const [year, month, day] = key.split('-').map(Number)
+        switch (granularity) {
+            case 'daily':
+                return `${day} ${MONTHS[month - 1]}`
+            case 'weekly':
+                return `Mg ${day} ${MONTHS[month - 1]}`
+            case 'monthly':
+                return `${MONTHS[month - 1]} ${String(year).slice(2)}`
             default:
-                return 'mdi-file-document-outline'
+                return String(year)
         }
     }
 
-    getTaskRoute(task: PendingTask): string {
-        switch (task.workflowName) {
-            case 'participant_ukom_task':
-                return `/ukom/ukom-task-list/${task.id}`
-            case 'ukom_resignation_task':
-                return `/ukom/ukom-resignation-list/${task.id}`
-            case 'formasi_task':
-                return `/formasi/formasi-task-list/${task.id}`
-            case 'akp_task':
-                return `/akp/akp-task-list/${task.id}`
-            case 'rw_kinerja_task':
-                return `/pak/pak-task-list/${task.objectGroup}`
-            case 'formasi_task':
-                return `/formasi/formasi-task-list/${task.id}`
-            default:
-                return '/akp/akp-task-list'
+    private titleCase(value: string): string {
+        return (value ?? '').replace(/\b\w/g, (char) => char.toUpperCase())
+    }
+
+    private formatDate(iso: string): string {
+        const [year, month, day] = iso.split('-').map(Number)
+        return `${day} ${MONTHS[month - 1]} ${year}`
+    }
+
+    private toIsoDate(date: Date): string {
+        const pad = (n: number) => String(n).padStart(2, '0')
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+    }
+
+    private toDoughnutData(rows: ShareRow[]): ChartConfiguration<'doughnut'>['data'] {
+        return {
+            labels: rows.map((row) => row.name),
+            datasets: [
+                {
+                    data: rows.map((row) => row.total),
+                    backgroundColor: rows.map((row) => row.color ?? COLOR.blue),
+                    hoverOffset: 6,
+                    borderWidth: 0,
+                    spacing: 2,
+                },
+            ],
         }
     }
 
-    openPendingTaskListModal() {
-        this.showPendingTaskListModal.set(true)
+    private doughnutOptions(): ChartOptions<'doughnut'> {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '72%',
+            layout: { padding: 6 },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(33, 37, 41, 0.92)',
+                    padding: 10,
+                    cornerRadius: 6,
+                    boxPadding: 4,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: (ctx) => {
+                            const values = ctx.dataset.data as number[]
+                            const total = values.reduce((a, b) => a + b, 0)
+                            return ` ${ctx.label}: ${ctx.parsed} (${this.sharePercent(ctx.parsed, total)}%)`
+                        },
+                    },
+                },
+            },
+        }
     }
 
-    closePendingTaskListModal() {
-        this.showPendingTaskListModal.set(false)
+    private baseOptions<T extends 'bar' | 'line'>(overrides: any = {}): ChartOptions<T> {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            ...overrides,
+            scales: overrides.scales ?? {
+                x: { grid: { display: false }, ticks: { color: COLOR.tick, maxRotation: 0, autoSkip: true } },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: COLOR.grid },
+                    border: { display: false },
+                    ticks: { color: COLOR.tick, precision: 0 },
+                },
+            },
+            plugins: {
+                tooltip: {
+                    backgroundColor: 'rgba(33, 37, 41, 0.92)',
+                    padding: 10,
+                    cornerRadius: 6,
+                    boxPadding: 4,
+                    usePointStyle: true,
+                },
+                ...(overrides.plugins ?? {}),
+            },
+        } as ChartOptions<T>
     }
 }

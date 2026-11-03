@@ -1,448 +1,409 @@
-<section class="container-fluid admin-dashboard py-2">
-    <!-- ================= PENDING TASKS ================= -->
-    <div class="section-header">
+<section class="container-fluid admin-dashboard">
+    <!-- Header -->
+    <div class="dash-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
-            <p class="h4 mb-0">Pengajuan Dengan Status Pending</p>
+            <h4 class="mb-1">{{ greeting }}<span *ngIf="userName">, {{ userName }}</span> 👋</h4>
+            <p class="text-muted mb-0">
+                Ringkasan aktivitas SIJUPRI per {{ today | date: 'EEEE, d MMMM y' : '' : 'id' }}
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <small class="text-muted" *ngIf="lastUpdated">
+                Diperbarui {{ lastUpdated | date: 'HH:mm' }}
+            </small>
+            <button type="button" class="btn btn-soft-primary btn-sm" (click)="refreshAll()">
+                <i class="mdi mdi-refresh me-1"></i>Perbarui
+            </button>
         </div>
     </div>
 
-    <ng-container *ngIf="pendingLoading$ | async; else pendingContent">
-        <div class="row g-3">
-            <div class="col-lg-3 col-md-6 col-12" *ngFor="let i of [1,2,3,4]">
-                <div class="stat-card skeleton"></div>
+    <!-- Pengajuan pending -->
+    <div class="card dash-card mb-4" *ngIf="pendingGroups.length > 0">
+        <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                <div class="me-auto">
+                    <h5 class="card-title mb-1">Perlu Tindakan</h5>
+                    <p class="text-muted mb-0 small">Pengajuan berstatus pending. Klik baris untuk membuka daftar tugas.</p>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <span class="hero-number">
+                        <ng-container *ngIf="!pendingLoading; else miniSpinner">{{ totalPending | number }}</ng-container>
+                    </span>
+                    <small class="text-muted">total pending</small>
+                </div>
+            </div>
+
+            <!-- komposisi antrean per modul -->
+            <div class="queue-bar mb-3" *ngIf="!pendingLoading && totalPending > 0">
+                <div *ngFor="let group of pendingGroups" class="queue-segment"
+                    [style.width.%]="sharePercent(groupTotal(group), totalPending)"
+                    [style.background]="group.color"
+                    [title]="group.module + ': ' + groupTotal(group) + ' (' + sharePercent(groupTotal(group), totalPending) + '%)'">
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-xl-3 col-sm-6" *ngFor="let group of pendingGroups">
+                    <div class="module-group h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="legend-dot" [style.background]="group.color"></i>
+                            <span class="fw-semibold">{{ group.module }}</span>
+                            <span class="ms-auto fw-semibold">{{ groupTotal(group) | number }}</span>
+                            <small class="text-muted" *ngIf="!pendingLoading">{{ sharePercent(groupTotal(group), totalPending) }}%</small>
+                        </div>
+                        <button type="button" *ngFor="let item of group.items" class="pending-row"
+                            [class.is-zero]="!pendingLoading && item.total === 0" (click)="navigateTo(item.route)">
+                            <span class="text-truncate">{{ item.label }}</span>
+                            <span class="pending-count">
+                                <ng-container *ngIf="!pendingLoading; else miniSpinner">{{ item.total | number }}</ng-container>
+                            </span>
+                            <i class="mdi mdi-chevron-right row-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tren & ringkasan pengajuan -->
+    <ng-container *ngIf="isSuperAdmin">
+        <div class="filter-bar d-flex flex-wrap align-items-center gap-2 mb-3">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Rentang waktu">
+                <button type="button" class="btn" *ngFor="let opt of rangeOptions"
+                    [class.btn-primary]="rangeType === opt.value"
+                    [class.btn-light]="rangeType !== opt.value"
+                    (click)="setRange(opt.value)">{{ opt.label }}</button>
+            </div>
+            <ng-container *ngIf="rangeType === 'custom'">
+                <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="customFrom" [max]="customTo" />
+                <span class="text-muted">s/d</span>
+                <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="customTo" [min]="customFrom" />
+                <button type="button" class="btn btn-sm btn-primary" (click)="applyCustomRange()"
+                    [disabled]="!customFrom || !customTo || customFrom > customTo">Terapkan</button>
+            </ng-container>
+            <span class="ms-auto small text-muted"><i class="mdi mdi-calendar-range me-1"></i>{{ rangeLabel }}</span>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-xl-8">
+                <div class="card dash-card h-100 mb-0">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                            <div>
+                                <h5 class="card-title mb-1">Tren Pengajuan Masuk</h5>
+                                <p class="text-muted small mb-0">Jumlah pengajuan baru per {{ trendGranularity === 'daily' ? 'hari' : trendGranularity === 'weekly' ? 'minggu' : trendGranularity === 'monthly' ? 'bulan' : 'tahun' }}</p>
+                            </div>
+                            <select class="form-select form-select-sm w-auto" [(ngModel)]="applicationType"
+                                (ngModelChange)="onApplicationTypeChange()" aria-label="Jenis layanan">
+                                <option *ngFor="let opt of applicationTypeOptions" [value]="opt.value">{{ opt.label }}</option>
+                            </select>
+                        </div>
+
+                        <div class="row g-2 mb-3 text-center">
+                            <div class="col-4">
+                                <div class="kpi-mini">
+                                    <small class="text-muted">Total</small>
+                                    <div class="fw-semibold fs-5">{{ trendTotal | number }}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="kpi-mini">
+                                    <small class="text-muted">Rata-rata</small>
+                                    <div class="fw-semibold fs-5">{{ trendAverage | number: '1.0-1' }}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="kpi-mini">
+                                    <small class="text-muted">Puncak</small>
+                                    <div class="fw-semibold fs-5">
+                                        <ng-container *ngIf="trendPeak; else dash">{{ trendPeak.total | number }}
+                                            <small class="text-muted fs-6 fw-normal">({{ trendPeak.label }})</small>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-box" style="height: 300px">
+                            <div class="chart-overlay" *ngIf="trendLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
+                            <canvas baseChart [type]="'line'" [data]="trendChartData" [options]="trendChartOptions"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4">
+                <div class="card dash-card h-100 mb-0">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">Status Pengajuan per Layanan</h5>
+                        <p class="text-muted small mb-3">{{ summaryTotals.total | number }} pengajuan, {{ rangeLabel }}</p>
+
+                        <div class="d-flex gap-3 small mb-3 legend-inline">
+                            <span><i class="legend-dot bg-approve"></i>Disetujui {{ summaryTotals.approve | number }}</span>
+                            <span><i class="legend-dot bg-pending"></i>Pending {{ summaryTotals.pending | number }}</span>
+                            <span><i class="legend-dot bg-reject"></i>Ditolak {{ summaryTotals.reject | number }}</span>
+                        </div>
+
+                        <div class="position-relative summary-list">
+                            <div class="chart-overlay" *ngIf="summaryLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
+                            <div *ngFor="let row of summaryRows" class="summary-row">
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="fw-medium">{{ row.label }}</span>
+                                    <span class="text-muted">{{ row.total | number }}</span>
+                                </div>
+                                <div class="progress stacked-bar">
+                                    <div class="progress-bar bg-approve" [style.width.%]="sharePercent(row.approve, row.total)"
+                                        [title]="'Disetujui: ' + row.approve"></div>
+                                    <div class="progress-bar bg-pending" [style.width.%]="sharePercent(row.pending, row.total)"
+                                        [title]="'Pending: ' + row.pending"></div>
+                                    <div class="progress-bar bg-reject" [style.width.%]="sharePercent(row.reject, row.total)"
+                                        [title]="'Ditolak: ' + row.reject"></div>
+                                </div>
+                            </div>
+                            <div *ngIf="!summaryLoading && summaryRows.length === 0" class="empty-state">
+                                <i class="mdi mdi-inbox-outline"></i>
+                                <p class="mb-0">Belum ada pengajuan pada rentang ini</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </ng-container>
 
-    <ng-template #pendingContent>
-        <div class="row g-3" *ngIf="visiblePendingCards.length; else noPending">
-            <!-- kiri: stat cards existing (bisa disusutin jadi col-lg-8 kalau nanti digabung sama donut) -->
-            <div class="col-lg-8 col-12">
-                <div class="row g-3">
-                    <div
-                        class="col-lg-4 col-md-6 col-12"
-                        *ngFor="let card of visiblePendingCards"
-                    >
-                        <div
-                            class="stat-card stat-card--{{ card.color }} cursor-pointer"
-                            (click)="navigateTo(card.route)"
-                            role="button"
-                            tabindex="0"
-                        >
-                            <div class="stat-card__icon">
-                                <span class="mdi {{ card.icon }}"></span>
+    <!-- Statistik UKom -->
+    <ng-container *ngIf="canSeeUkom">
+        <h5 class="section-title mb-3"><i class="mdi mdi-school-outline me-1"></i>Statistik Uji Kompetensi</h5>
+        <div class="row g-3 mb-4">
+            <div class="col-xl-6">
+                <div class="card dash-card h-100 mb-0">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+                            <div>
+                                <h5 class="card-title mb-1">Hasil UKom 12 Bulan Terakhir</h5>
+                                <p class="text-muted small mb-0">Lulus vs tidak lulus per bulan</p>
                             </div>
-                            <div class="stat-card__body">
-                                <h2 class="stat-card__value">
-                                    {{ pendingCounts[card.key] }}
-                                </h2>
-                                <p class="stat-card__title">{{ card.title }}</p>
+                            <div class="d-flex gap-4 text-end">
+                                <div>
+                                    <small class="text-muted d-block">Tingkat kelulusan</small>
+                                    <span class="fs-4 fw-semibold">{{ ukomPassRate }}%</span>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block"><i class="mdi mdi-check-circle text-approve"></i> Lulus</small>
+                                    <span class="fs-5 fw-semibold">{{ ukomTotalLulus | number }}</span>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block"><i class="mdi mdi-close-circle text-reject"></i> Tidak lulus</small>
+                                    <span class="fs-5 fw-semibold">{{ ukomTotalTidakLulus | number }}</span>
+                                </div>
                             </div>
-                            <span
-                                class="mdi mdi-chevron-right stat-card__chevron"
-                            ></span>
+                        </div>
+                        <div class="chart-box" style="height: 300px">
+                            <div class="chart-overlay" *ngIf="ukomLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
+                            <canvas baseChart [type]="'bar'" [data]="ukomGradeChartData" [options]="ukomGradeChartOptions"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- kanan: reminder card -->
-            <div class="col-lg-4 col-12">
-                <!-- ================= REMINDER CARD ================= -->
-                <div class="reminder-card">
-                    <div class="reminder-card__header">
-                        <span
-                            class="mdi mdi-alert-circle-outline text-danger reminder-card__icon"
-                        ></span>
-                        <div>
-                            <p class="reminder-card__title mb-0">
-                                <strong
-                                    >{{ priorityPending.length ?? 0 }}</strong
-                                >
-                                pengajuan perlu diverifikasi
-                            </p>
-                            <span class="text-muted small"
-                                >2 prioritas teratas berdasarkan lama
-                                menunggu</span
-                            >
+            <div class="col-xl-3 col-md-6">
+                <div class="card dash-card h-100 mb-0">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">Usia Peserta</h5>
+                        <p class="text-muted small mb-3">Saat surat usulan, {{ ukomParticipantTotal | number }} peserta</p>
+
+                        <div class="donut-box mb-3">
+                            <div class="chart-overlay" *ngIf="ukomLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
+                            <canvas baseChart [type]="'doughnut'" [data]="ageChartData" [options]="ageChartOptions"></canvas>
+                            <div class="donut-center">
+                                <span class="donut-value">{{ ukomAverageAge | number: '1.0-1' }}</span>
+                                <small class="text-muted">rata-rata (th)</small>
+                            </div>
+                        </div>
+
+                        <div *ngFor="let row of ageRows" class="d-flex align-items-center small mb-1">
+                            <i class="legend-dot" [style.background]="row.color"></i>
+                            <span>{{ row.name }}</span>
+                            <span class="ms-auto fw-semibold">{{ row.total | number }}</span>
+                            <span class="text-muted ms-2 pct">{{ sharePercent(row.total, ukomParticipantTotal) }}%</span>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div
-                        class="reminder-list"
-                        *ngIf="priorityPending.length; else noPriority"
-                    >
-                        <div
-                            class="reminder-item"
-                            [ngClass]="getUrgencyClass(item.daysPending)"
-                            *ngFor="let item of priorityPending.slice(0, 2)"
-                            (click)="navigateTo(item.route)"
-                            role="button"
-                            tabindex="0"
-                        >
-                            <div class="reminder-item__icon">
-                                <span class="mdi {{ item.icon }}"></span>
+            <div class="col-xl-3 col-md-6">
+                <div class="card dash-card h-100 mb-0">
+                    <div class="card-body position-relative">
+                        <div class="chart-overlay" *ngIf="ukomLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
+                        <h5 class="card-title mb-1">Pendidikan Terakhir</h5>
+                        <p class="text-muted small mb-3">{{ educationTotal | number }} peserta, {{ educationTopCount }} terbanyak</p>
+
+                        <div *ngFor="let row of educationRows; let i = index" class="rank-row">
+                            <span class="rank-no">{{ i < educationTopCount ? i + 1 : '·' }}</span>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex small mb-1">
+                                    <span class="text-truncate me-2" [title]="row.name">{{ row.name }}</span>
+                                    <span class="ms-auto fw-semibold">{{ row.total | number }}</span>
+                                    <span class="text-muted ms-2 pct">{{ sharePercent(row.total, educationTotal) }}%</span>
+                                </div>
+                                <div class="progress progress-thin">
+                                    <div class="progress-bar bg-aqua" [style.width.%]="sharePercent(row.total, educationMax)"></div>
+                                </div>
                             </div>
-                            <div class="reminder-item__body">
-                                <p class="reminder-item__title mb-0">
-                                    {{ item?.title }}
-                                </p>
-                                <span class="text-muted small"
-                                    >NIP: {{ item.applicant }}</span
-                                >
-                            </div>
-                            <span class="reminder-item__badge">
-                                {{ item.daysPending }} hari
-                            </span>
+                        </div>
+                        <div *ngIf="!ukomLoading && educationRows.length === 0" class="empty-state">
+                            <i class="mdi mdi-school-outline"></i>
+                            <p class="mb-0">Belum ada data pendidikan</p>
                         </div>
                     </div>
-
-                    <ng-template #noPriority>
-                        <div class="empty-state empty-state--sm">
-                            <span class="mdi mdi-check-circle-outline"></span>
-                            <p class="small mb-0">
-                                Tidak ada pengajuan prioritas saat ini.
-                            </p>
-                        </div>
-                    </ng-template>
-
-                    <a
-                        class="reminder-card__footer"
-                        *ngIf="priorityPending.length > 2"
-                        (click)="openPendingTaskListModal()"
-                    >
-                        Lihat semua ({{ priorityPending.length }})
-                        <span class="mdi mdi-arrow-right"></span>
-                    </a>
                 </div>
             </div>
         </div>
+    </ng-container>
 
-        <ng-template #noPending>
-            <div class="empty-state">
-                <span class="mdi mdi-check-circle-outline"></span>
-                <p class="mb-0">
-                    Tidak ada pengajuan yang menunggu tindakan Anda.
-                </p>
-            </div>
-        </ng-template>
-    </ng-template>
-
-    <!-- ================= USER STATS ================= -->
-    <!-- <div *ngIf="userRole?.includes('ADMIN')" class="mt-5">
-        <div class="section-header">
-            <p class="h4 mb-0">User Sijupri</p>
-        </div>
-
-        <ng-container *ngIf="userLoading$ | async; else userCount">
-            <div class="row g-3">
-                <div
-                    class="col-lg-3 col-md-6 col-12"
-                    *ngFor="let i of [1,2,3,4]"
-                >
-                    <div class="user-card skeleton"></div>
+    <!-- Statistik JF per instansi -->
+    <div class="card dash-card mb-4" *ngIf="isSuperAdmin">
+        <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <div class="me-auto">
+                    <h5 class="card-title mb-1">Statistik Pejabat Fungsional</h5>
+                    <p class="text-muted small mb-0">
+                        <i class="mdi mdi-office-building-outline me-1"></i>{{ selectedInstansiLabel }}
+                    </p>
                 </div>
+                <select class="form-select form-select-sm w-auto" [(ngModel)]="selectedInstansiType"
+                    (ngModelChange)="onInstansiTypeChange()" aria-label="Tipe instansi">
+                    <option value="">Semua Tipe Instansi</option>
+                    <option *ngFor="let type of instansiTypeList" [value]="type.code">{{ type.name }}</option>
+                </select>
+                <select *ngIf="isRegionalInstansiType" class="form-select form-select-sm w-auto instansi-select"
+                    [(ngModel)]="selectedProvinsi" (ngModelChange)="onProvinsiChange()" aria-label="Provinsi">
+                    <option value="">{{ provinsiList.length ? 'Semua Provinsi' : 'Memuat provinsi...' }}</option>
+                    <option *ngFor="let provinsi of provinsiList" [value]="provinsi.id">{{ provinsi.name }}</option>
+                </select>
+                <select class="form-select form-select-sm w-auto instansi-select" [(ngModel)]="selectedInstansi"
+                    (ngModelChange)="getJfInstansiStatistic()"
+                    [disabled]="!selectedInstansiType || (isRegionalInstansiType && !selectedProvinsi) || instansiLoading"
+                    [title]="isRegionalInstansiType && !selectedProvinsi ? 'Pilih provinsi terlebih dahulu' : ''"
+                    aria-label="Instansi">
+                    <option value="">{{ instansiLoading ? 'Memuat instansi...' : isRegionalInstansiType && !selectedProvinsi ? 'Pilih provinsi dulu' : 'Semua Instansi' }}</option>
+                    <option *ngFor="let instansi of instansiList" [value]="instansi.id">{{ instansi.name }}</option>
+                </select>
+                <button type="button" class="btn btn-sm btn-light" (click)="resetInstansiFilter()"
+                    *ngIf="selectedInstansiType" title="Reset filter">
+                    <i class="mdi mdi-filter-remove-outline"></i>
+                </button>
             </div>
-        </ng-container>
 
-        <ng-template #userCount>
-            <div class="row g-3">
-                <div
-                    class="col-lg-3 col-md-6 col-12"
-                    *ngFor="let stat of userStatConfigs"
-                >
-                    <div
-                        class="user-card cursor-pointer"
-                        (click)="navigateTo(stat.route)"
-                        role="button"
-                        tabindex="0"
-                    >
-                        <div class="user-card__icon">
-                            <span class="mdi {{ stat.icon }}"></span>
+            <div class="row g-3 position-relative">
+                <div class="chart-overlay" *ngIf="jfInstansiLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
+
+                <div class="col-lg-3">
+                    <div class="kpi-mini h-100">
+                        <small class="text-muted">Total JF</small>
+                        <div class="hero-number mb-1">{{ jfInstansiTotal | number }}</div>
+                        <small class="text-muted">tersebar di {{ jfUnitKerjaTotal | number }} unit kerja</small>
+
+                        <hr class="my-3" />
+
+                        <small class="text-muted d-block mb-2">Jenis kelamin</small>
+                        <div class="queue-bar mb-2" *ngIf="jfInstansiTotal > 0">
+                            <div *ngFor="let g of jfGender" class="queue-segment"
+                                [style.width.%]="sharePercent(g.total, jfInstansiTotal)" [style.background]="g.color"
+                                [title]="g.name + ': ' + g.total"></div>
                         </div>
-                        <div>
-                            <h3 class="user-card__value">
-                                {{ getUserStatValue(stat.key) }}
-                            </h3>
-                            <span class="user-card__title"
-                                >{{ stat.title }}</span
-                            >
+                        <div *ngFor="let g of jfGender" class="d-flex align-items-center small mb-1">
+                            <i class="legend-dot" [style.background]="g.color"></i>
+                            <span>{{ g.name }}</span>
+                            <span class="ms-auto fw-semibold">{{ g.total | number }}</span>
+                            <span class="text-muted ms-2 pct">{{ sharePercent(g.total, jfInstansiTotal) }}%</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </ng-template>
-    </div> -->
+                        <span class="text-muted small" *ngIf="jfGender.length === 0">–</span>
 
-    <!-- ================= CHART ================= -->
-    <div
-        class="mt-3"
-        *ngIf="userRole?.includes('ADMIN_UKOM') || userRole?.includes('ADMIN')"
-    >
-        <div class="chart-card">
-            <div class="chart-card__header">
-                <div>
-                    <p class="h4 mb-0">Tren Permohonan</p>
-                    <span class="text-muted small">
-                        Tinjau perkembangan jumlah permohonan
-                    </span>
-                </div>
-
-                <div class="position-relative">
-                    <div class="d-flex align-items-center gap-2">
-                        <!-- Filter Status -->
-                        <select
-                            class="form-select form-select-sm"
-                            [(ngModel)]="selectedApplication"
-                            (change)="applyFilters()"
-                            style="width: 200px"
-                        >
-                            <option value="">Semua Permohonan</option>
-                            <option value="ukom_resignation_task">
-                                Permohonan Pengunduran Diri
-                            </option>
-                            <option value="formasi_task">
-                                Permohonan Formasi
-                            </option>
-                            <option value="participant_ukom_task">
-                                Permohonan UKom
-                            </option>
-                            <option value="siap_task">Permohonan SIAP</option>
-                            <option value="akp_task">Permohonan AKP</option>
-                        </select>
-
-                        <!-- Filter Rentang -->
-                        <div class="position-relative">
-                            <button
-                                type="button"
-                                class="filter-trigger"
-                                [class.filter-trigger--active]="showFilterPopover"
-                                (click)="toggleFilterPopover($event)"
-                            >
-                                <span class="mdi mdi-filter-variant"></span>
-
-                                <span class="filter-trigger__label"
-                                    >Rentang</span
-                                >
-
-                                <span class="filter-trigger__date">
-                                    {{ fromDate | date: 'dd/MM/yy' }}
-                                    <span class="mx-1">–</span>
-                                    {{ toDate | date: 'dd/MM/yy' }}
-                                </span>
-
-                                <span
-                                    class="mdi mdi-chevron-down filter-trigger__chevron"
-                                    [class.rotate]="showFilterPopover"
-                                ></span>
-                            </button>
-
-                            <!-- popover tetap di sini -->
+                        <div class="alert alert-warning py-2 px-2 small mt-3 mb-0" *ngIf="jfWithoutJabatan > 0">
+                            <i class="mdi mdi-alert-outline me-1"></i>
+                            {{ jfWithoutJabatan | number }} JF belum memiliki riwayat jabatan
                         </div>
                     </div>
+                </div>
 
-                    <div
-                        class="filter-popover"
-                        *ngIf="showFilterPopover"
-                        (click)="$event.stopPropagation()"
-                    >
-                        <div class="filter-popover__arrow"></div>
-
-                        <div class="filter-popover__body">
-                            <!-- Custom range -->
-                            <div
-                                class="filter-popover__col filter-popover__custom"
-                            >
-                                <div class="filter-section-title">
-                                    <span class="mdi mdi-calendar-range"></span>
-                                    Rentang Tanggal
+                <div class="col-lg-5">
+                    <div class="d-flex align-items-center mb-2">
+                        <h6 class="fw-semibold mb-0">Per Jabatan</h6>
+                        <small class="text-muted ms-auto">Klik untuk melihat jenjangnya</small>
+                    </div>
+                    <div class="rank-list">
+                        <button type="button" *ngFor="let row of jfJabatanRows; let i = index" class="rank-row rank-button"
+                            [class.active]="selectedJfJabatan === row.code"
+                            [class.dimmed]="selectedJfJabatan && selectedJfJabatan !== row.code"
+                            (click)="toggleJfJabatan(row.code)" [attr.aria-pressed]="selectedJfJabatan === row.code">
+                            <span class="rank-no">{{ i + 1 }}</span>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex small mb-1">
+                                    <span class="text-truncate me-2" [title]="row.name">{{ row.name }}</span>
+                                    <span class="ms-auto fw-semibold">{{ row.total | number }}</span>
+                                    <span class="text-muted ms-2 pct">{{ sharePercent(row.total, jfInstansiTotal - jfWithoutJabatan) }}%</span>
                                 </div>
-
-                                <div class="filter-date-row">
-                                    <div class="filter-date-field">
-                                        <label for="fromDate">
-                                            Dari tanggal
-                                        </label>
-
-                                        <input
-                                            id="fromDate"
-                                            type="date"
-                                            [(ngModel)]="fromDate"
-                                            [max]="toDate"
-                                            class="form-control"
-                                        />
-                                    </div>
-
-                                    <span class="filter-date-separator">→</span>
-
-                                    <div class="filter-date-field">
-                                        <label for="toDate">
-                                            Sampai tanggal
-                                        </label>
-
-                                        <input
-                                            id="toDate"
-                                            type="date"
-                                            [(ngModel)]="toDate"
-                                            [min]="fromDate"
-                                            class="form-control"
-                                        />
-                                    </div>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    class="btn btn-primary w-100 mt-3"
-                                    (click)="applyFilters(); showFilterPopover = false"
-                                >
-                                    <span class="mdi mdi-check me-1"></span>
-                                    Terapkan Filter
-                                </button>
-                            </div>
-
-                            <div class="filter-popover__divider"></div>
-
-                            <!-- Preset -->
-                            <div class="filter-popover__col">
-                                <div class="filter-section-title">
-                                    <span class="mdi mdi-clock-outline"></span>
-                                    Periode Cepat
-                                </div>
-
-                                <div class="filter-presets">
-                                    <button
-                                        type="button"
-                                        class="filter-preset"
-                                        [class.filter-preset--active]="activePreset === '7d'"
-                                        (click)="applyPreset('7d'); showFilterPopover = false"
-                                    >
-                                        <span>
-                                            <strong>7 Hari Terakhir</strong>
-                                            <small>7 hari terakhir</small>
-                                        </span>
-
-                                        <span
-                                            class="mdi"
-                                            [ngClass]="
-                                activePreset === '7d'
-                                    ? 'mdi-check-circle'
-                                    : 'mdi-chevron-right'
-                            "
-                                        ></span>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        class="filter-preset"
-                                        [class.filter-preset--active]="activePreset === 'month'"
-                                        (click)="applyPreset('month'); showFilterPopover = false"
-                                    >
-                                        <span>
-                                            <strong>Bulan Ini</strong>
-                                            <small
-                                                >Periode bulan berjalan</small
-                                            >
-                                        </span>
-
-                                        <span
-                                            class="mdi"
-                                            [ngClass]="
-                                activePreset === 'month'
-                                    ? 'mdi-check-circle'
-                                    : 'mdi-chevron-right'
-                            "
-                                        ></span>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        class="filter-preset"
-                                        [class.filter-preset--active]="activePreset === '3month'"
-                                        (click)="applyPreset('3month'); showFilterPopover = false"
-                                    >
-                                        <span>
-                                            <strong>3 Bulan Terakhir</strong>
-                                            <small>90 hari terakhir</small>
-                                        </span>
-
-                                        <span
-                                            class="mdi"
-                                            [ngClass]="
-                                activePreset === '3month'
-                                    ? 'mdi-check-circle'
-                                    : 'mdi-chevron-right'
-                            "
-                                        ></span>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        class="filter-preset"
-                                        [class.filter-preset--active]="activePreset === 'year'"
-                                        (click)="applyPreset('year'); showFilterPopover = false"
-                                    >
-                                        <span>
-                                            <strong>Tahun Ini</strong>
-                                            <small>Januari – Desember</small>
-                                        </span>
-
-                                        <span
-                                            class="mdi"
-                                            [ngClass]="
-                                activePreset === 'year'
-                                    ? 'mdi-check-circle'
-                                    : 'mdi-chevron-right'
-                            "
-                                        ></span>
-                                    </button>
+                                <div class="progress progress-thin">
+                                    <div class="progress-bar" [style.width.%]="sharePercent(row.total, jfJabatanMax)"></div>
                                 </div>
                             </div>
-                        </div>
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <div class="chart-card__body">
-                <ng-container *ngIf="chartLoading$ | async; else chartContent">
-                    <div
-                        class="d-flex justify-content-center align-items-center chart-container"
-                    >
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <h6 class="fw-semibold mb-0 text-truncate">
+                            Per Jenjang<span *ngIf="selectedJfJabatan" class="text-muted fw-normal"> · {{ selectedJfJabatanName }}</span>
+                        </h6>
+                        <button type="button" class="btn btn-link btn-sm p-0 ms-auto" *ngIf="selectedJfJabatan"
+                            (click)="toggleJfJabatan(selectedJfJabatan)">Semua jabatan</button>
+                    </div>
+
+                    <div class="donut-box mb-3">
+                        <div class="chart-overlay" *ngIf="jfJenjangLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
+                        <canvas baseChart [type]="'doughnut'" [data]="jfJenjangChartData" [options]="jfJenjangChartOptions"></canvas>
+                        <div class="donut-center">
+                            <span class="donut-value">{{ jfJenjangTotal | number }}</span>
+                            <small class="text-muted">JF</small>
                         </div>
                     </div>
-                </ng-container>
-                <ng-template #chartContent>
-                    <div
-                        class="chart-container position-relative w-100"
-                        *ngIf="barChartData; else noData"
-                    >
-                        <canvas
-                            baseChart
-                            [data]="barChartData"
-                            [options]="barChartOptions"
-                            chartType="bar"
-                        >
-                        </canvas>
-                    </div>
-                    <ng-template #noData>
-                        <div class="empty-state">
-                            <span class="mdi mdi-chart-bar"></span>
-                            <p class="mb-0">
-                                Tidak ada data untuk rentang bulan/tahun yang
-                                dipilih.
-                            </p>
+
+                    <ng-container *ngFor="let kategori of ['keahlian', 'keterampilan']">
+                        <div *ngIf="jenjangKategoriTotal(kategori) > 0" class="mb-2">
+                            <div class="d-flex small text-muted text-uppercase kategori-label mb-1">
+                                <span>{{ kategori }}</span>
+                                <span class="ms-auto">{{ jenjangKategoriTotal(kategori) | number }}</span>
+                            </div>
+                            <ng-container *ngFor="let row of jfJenjangRows">
+                                <div *ngIf="row.kategori === kategori" class="d-flex align-items-center small mb-1">
+                                    <i class="legend-dot" [style.background]="row.color"></i>
+                                    <span>{{ row.name }}</span>
+                                    <span class="ms-auto fw-semibold">{{ row.total | number }}</span>
+                                    <span class="text-muted ms-2 pct">{{ sharePercent(row.total, jfJenjangTotal) }}%</span>
+                                </div>
+                            </ng-container>
                         </div>
-                    </ng-template>
-                </ng-template>
+                    </ng-container>
+                </div>
+
+                <div class="col-12" *ngIf="!jfInstansiLoading && jfInstansiTotal === 0">
+                    <div class="empty-state">
+                        <i class="mdi mdi-account-off-outline"></i>
+                        <p class="mb-0">Tidak ada JF pada instansi yang dipilih</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
 </section>
 
-<app-pending-task-list-modal
-    (close)="closePendingTaskListModal()"
-    *ngIf="showPendingTaskListModal()"
-    [pendingTaskList]="pendingTaskList"
->
-</app-pending-task-list-modal>
+<ng-template #miniSpinner>
+    <span class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">Memuat...</span>
+    </span>
+</ng-template>
+
+<ng-template #dash><span class="text-muted">–</span></ng-template>
