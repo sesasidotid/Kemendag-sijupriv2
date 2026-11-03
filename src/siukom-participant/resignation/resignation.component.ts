@@ -1,16 +1,22 @@
 import { Component, inject, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import {
-    FormBuilder,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-} from '@angular/forms'
-import { Router } from '@angular/router'
-import { FileHandlerComponent } from '@/modules/base/components/file-handler/file-handler.component'
-import { FIleHandler } from '@/modules/base/commons/file-handler/file-handler'
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms'
+import { ActivatedRoute, Router } from '@angular/router'
 import { HandlerService } from '@/modules/base/services/handler.service'
-import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { UkomResignationDetailComponent } from './ukom-resignation-detail/ukom-resignation-detail.component'
+import { ParticipantResignation } from '@/modules/ukom/models/resignation/resignation.model'
+import { ApiService } from '@/modules/base/services/api.service'
+import { EMPTY, catchError, finalize, Observable, tap } from 'rxjs'
+import { LoginContext } from '@/modules/base/commons/login-context'
+import { Participant } from '@/modules/ukom/models/cat/participant.model'
+import { UkomResignationPendingTask } from '@/modules/ukom/models/ukom-registration-refactored/resignation-pending-task.model'
+import { UkomResignationUpdateComponent } from './ukom-resignation-update/ukom-resignation-update.component'
+import { UkomResignationFormComponent } from './ukom-resignation-form/ukom-resignation-form.component'
+import { SystemConfigService } from '@/modules/base/services/system-config.service'
+import { UkomGradeService } from '@/modules/ukom/services/ukom-grade.service'
+import { UkomGrade } from '@/modules/ukom/models/ukom-grade'
+
+const RESIGNATION_ENDPOINT = '/api/v1/ukom_resignation' // TODO: sesuaikan path asli
 
 @Component({
     selector: 'app-resignation',
@@ -18,67 +24,147 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        FileHandlerComponent,
-        LoadingButtonComponent,
+        UkomResignationDetailComponent,
+        UkomResignationUpdateComponent,
+        UkomResignationFormComponent,
     ],
     templateUrl: './resignation.component.html',
     styleUrl: './resignation.component.scss',
 })
 export class ResignationComponent {
     router = inject(Router)
+    route = inject(ActivatedRoute)
     fb = inject(FormBuilder)
     handlerService = inject(HandlerService)
-
-    form: FormGroup
+    apiService = inject(ApiService)
+    ukomGradeService = inject(UkomGradeService)
+    userLogin = LoginContext.getUserId()
+    participant = signal<Participant | null>(null)
+    isLoadingParticipant = signal(true)
+    isLoadingResignationStatus = signal(true)
     isSubmitting = signal(false)
-    submissionStatus = signal<'PENDING' | 'APPROVED' | 'REJECTED' | null>(null)
+    resignationSubmission = signal<ParticipantResignation | null>(null)
+    pendingTask: UkomResignationPendingTask | null = null
+    participantNotFound = signal<boolean>(false)
+    showResignationModal: boolean = false
+    isParticipantAllowToResign = false
+    ukomGrade: UkomGrade
 
-    fileHandlerInputs: FIleHandler = {
-        files: {
-            resignationLetter: { label: 'Surat Pengunduran Diri', source: '' },
-        },
-        listen: (key: string, source: string, base64Data: string) => {
-            this.form.patchValue({ fileSource: source, fileBase64: base64Data })
-        },
-        maxSize: 5000000,
-        allowedExtensions: ['.pdf'],
-        allowedTypes: [{ type: 'application/pdf', label: 'PDF' }],
-    }
-
-    constructor() {
-        this.form = this.fb.group({
-            reason: ['', [Validators.required, Validators.minLength(10)]],
-            fileSource: ['', Validators.required],
-            fileBase64: [''],
+    ngOnInit(): void {
+        this.buildParticipantPayload().subscribe({
+            next: () => {
+                this.getParticipantGrade()
+                this.fetchResignationStatus()
+            },
         })
-
-        // Mock to get existing status if resuming, let's keep it minimal
-        // In real app, fetch status from server
     }
 
-    goBack() {
-        this.router.navigate(['/'])
-    }
+    buildParticipantPayload(): Observable<any> {
+        const userId = this.userLogin
 
-    submit() {
-        if (this.form.invalid) {
+        if (!userId) {
             this.handlerService.handleAlert(
                 'Error',
-                'Harap lengkapi alasan dan unggah surat pengunduran diri.',
+                'Sesi login tidak ditemukan.',
             )
+            this.isLoadingParticipant.set(false)
+
+            return EMPTY
+        }
+
+        const nip = userId.replace(/^PU-/, '')
+
+        this.isLoadingParticipant.set(true)
+        this.participantNotFound.set(false)
+
+        return this.apiService
+            .getData(`/api/v1/participant_ukom/nip/${nip}`)
+            .pipe(
+                tap((res: any) => {
+                    const participant = res?.data ?? res
+
+                    this.participant.set(participant)
+                }),
+                catchError((err) => {
+                    if (err?.status === 404) {
+                        this.participant.set(null)
+                        this.participantNotFound.set(true)
+
+                        return EMPTY
+                    }
+
+                    this.handlerService.handleAlert(
+                        'Error',
+                        err?.error?.message ??
+                            'Gagal memuat data peserta UKOM.',
+                    )
+
+                    return EMPTY
+                }),
+                finalize(() => this.isLoadingParticipant.set(false)),
+            )
+    }
+
+    private getParticipantGrade(): void {
+        this.ukomGradeService
+            .findGradeParticipantJF(this.participant()?.id)
+            .subscribe({
+                next: (response) => {
+                    this.ukomGrade = new UkomGrade(response)
+                    console.log('grade : ', this.ukomGrade)
+
+                    if (this.ukomGrade) {
+                        this.isParticipantAllowToResign = true
+                    }
+                },
+                error: (err) => {
+                    console.error('Gagal load ukom grade:', err)
+                    this.handlerService.handleAlert(
+                        'Error',
+                        'Gagal memuat data grade UKOM',
+                    )
+                },
+            })
+    }
+
+    private fetchResignationStatus(): void {
+        const userId = this.userLogin
+
+        if (!userId) {
+            this.handlerService.handleAlert(
+                'Error',
+                'Sesi login tidak ditemukan.',
+            )
+            this.isLoadingResignationStatus.set(false)
             return
         }
 
-        this.isSubmitting.set(true)
+        this.isLoadingResignationStatus.set(true)
 
-        // Mock API call to backend
-        setTimeout(() => {
-            this.isSubmitting.set(false)
-            this.submissionStatus.set('PENDING')
-            this.handlerService.handleAlert(
-                'Success',
-                'Pengajuan pengunduran diri berhasil dikirim dan menunggu persetujuan.',
+        const participantId = this.participant()?.id
+
+        if (!participantId) {
+            this.isLoadingResignationStatus.set(false)
+            return
+        }
+
+        this.apiService
+            .getData(
+                `${RESIGNATION_ENDPOINT}/task/participant/${participantId}`,
             )
-        }, 1500)
+            .pipe(finalize(() => this.isLoadingResignationStatus.set(false)))
+            .subscribe({
+                next: (res: any) => {
+                    this.pendingTask = res?.data ?? res
+                    console.log('ada data pending : ', this.pendingTask)
+                },
+                error: (err) => {
+                    console.log(
+                        'peserta belum memiliki record pengunduran diri',
+                    )
+
+                    this.pendingTask = null
+                },
+            })
     }
 }
