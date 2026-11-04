@@ -6,7 +6,10 @@ export class ParticipantScheduleList extends Serializable {
     participantId: string = undefined
     examScheduleId: string = undefined
     personalSchedule: string = undefined
-    examScheduleSupervised: ExamScheduleSupervised[] = []
+    /** Backend relation `hasOne` — only the first examiner (legacy, single-examiner exams) */
+    examScheduleSupervised: ExamScheduleSupervised | ExamScheduleSupervised[] | null = undefined
+    /** Backend relation `hasMany` — all examiners (multi-examiner exams, e.g. wawancara) */
+    examScheduleSupervisedList: ExamScheduleSupervised[] = []
     participantUkom: Participant = undefined
     examined: boolean | null = undefined
 
@@ -16,8 +19,13 @@ export class ParticipantScheduleList extends Serializable {
     }
 }
 
-interface ExamScheduleSupervised {
+export interface ExamScheduleSupervised {
     id: string
     participantScheduleId: string
     examinerScheduleId: string
+    examinerSchedule?: {
+        id: string
+        examinerId: string
+        examinerUkom?: { name?: string; user?: { name?: string } }
+    }
 }

@@ -98,7 +98,7 @@ export class UkomExamWawancaraComponent implements OnInit {
 
                 const hasExaminerReference = participants.some(
                     (participant) =>
-                        !!this.resolveExaminerScheduleId(participant),
+                        this.resolveExaminerScheduleIds(participant).length > 0,
                 )
 
                 if (hasExaminerReference && examiners.length === 0) {
@@ -225,14 +225,14 @@ export class UkomExamWawancaraComponent implements OnInit {
      */
     confirmExaminerUpdate(event: {
         participant: ParticipantSchedule
-        examinerId: string
+        examinerIds: string[]
     }): void {
-        const { participant, examinerId } = event
+        const { participant, examinerIds } = event
 
-        // Prepare request
+        // Wawancara mendukung lebih dari satu penguji (lihat MAX di modal & backend)
         const request = new UpdateExaminerForParticipantRequest({
             participantScheduleId: participant.id,
-            examinerScheduleIdList: [examinerId], // For wawancara, only one examiner
+            examinerScheduleIdList: examinerIds,
         })
 
         this.performExaminerUpdate(request)
@@ -338,7 +338,7 @@ export class UkomExamWawancaraComponent implements OnInit {
 
         const participantSchedules: ParticipantSchedule[] =
             participantScheduleList.map((p) => {
-                const examinerScheduleId = this.resolveExaminerScheduleId(p)
+                const examinerScheduleIds = this.resolveExaminerScheduleIds(p)
 
                 return {
                     id: p.id,
@@ -349,9 +349,12 @@ export class UkomExamWawancaraComponent implements OnInit {
                         : null,
                     participantName: p.participantUkom?.name || 'Unknown',
                     participantNip: p.participantUkom?.nip || 'Unknown',
-                    examinerName: examinerScheduleId
-                        ? (examinerMap.get(examinerScheduleId) ?? 'Unknown')
-                        : 'Unknown',
+                    examinerName: examinerScheduleIds.length
+                        ? examinerScheduleIds
+                              .map((id) => examinerMap.get(id) ?? 'Unknown')
+                              .join(', ')
+                        : '',
+                    examinerIds: examinerScheduleIds,
                 }
             }) || []
 
@@ -398,13 +401,29 @@ export class UkomExamWawancaraComponent implements OnInit {
         })
     }
 
-    private resolveExaminerScheduleId(
+    private resolveExaminerScheduleIds(
         participant: ParticipantScheduleList,
-    ): string | undefined {
+    ): string[] {
+        // Wawancara bisa punya lebih dari satu penguji: backend mengirim semuanya
+        // lewat relasi hasMany `examScheduleSupervisedList`. Relasi
+        // `examScheduleSupervised` (hasOne) hanya berisi satu penguji.
+        const list = participant.examScheduleSupervisedList
+        if (Array.isArray(list) && list.length > 0) {
+            return [
+                ...new Set(
+                    list
+                        .map((s) => s?.examinerScheduleId)
+                        .filter((id): id is string => !!id),
+                ),
+            ]
+        }
+
         const supervised = participant.examScheduleSupervised as unknown
 
         if (Array.isArray(supervised)) {
-            return supervised[0]?.examinerScheduleId
+            return supervised
+                .map((s) => s?.examinerScheduleId)
+                .filter((id): id is string => !!id)
         }
 
         if (
@@ -412,11 +431,12 @@ export class UkomExamWawancaraComponent implements OnInit {
             typeof supervised === 'object' &&
             'examinerScheduleId' in supervised
         ) {
-            return (supervised as { examinerScheduleId?: string })
+            const id = (supervised as { examinerScheduleId?: string })
                 .examinerScheduleId
+            return id ? [id] : []
         }
 
-        return undefined
+        return []
     }
 
     /**
