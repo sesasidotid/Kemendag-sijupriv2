@@ -9,7 +9,7 @@ import {
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { CommonModule } from '@angular/common'
-import { finalize, forkJoin, of } from 'rxjs'
+import { finalize, forkJoin, map, of, switchMap } from 'rxjs'
 import { FormsModule } from '@angular/forms'
 import { UkomExamCatComponent } from '../ukom-exam-cat/ukom-exam-cat.component'
 import { TanggalWaktuIndoPipe } from '@/modules/base/pipes/tangga-waktu.pipe'
@@ -208,32 +208,56 @@ export class UkomExamChooseCompQuestionsComponent implements OnInit {
     }
 
     getParticipantList() {
-        // For MAKALAH: fetch from child (seminar) schedule
-        // For other types: fetch from main schedule
-        const participantScheduleId = this.childExamId() ?? this.examId()
-        if (!participantScheduleId) return
+    // For MAKALAH: fetch from child (seminar) schedule
+    // For other types: fetch from main schedule
+    const participantScheduleId = this.childExamId() ?? this.examId()
+    if (!participantScheduleId) return
 
-        this.isLoadingParticipant.set(true)
-        this.ukomExamScheduleService
-            .getParticipantListByExamScheduleId(participantScheduleId)
-            .pipe(
-                finalize(() => {
-                    this.isLoadingParticipant.set(false)
-                }),
-            )
-            .subscribe({
-                next: (res) => {
-                    this.participantList.set(res)
-                },
-                error: (err) => {
-                    console.error(err)
-                    this.handlerService.handleAlert(
-                        'Error',
-                        'Gagal mendapatkan daftar peserta',
-                    )
-                },
-            })
-    }
+    this.isLoadingParticipant.set(true)
+    this.ukomExamScheduleService
+        .getParticipantListByExamScheduleId(participantScheduleId)
+        .pipe(
+            switchMap((participants) => {
+                if (!participants.length) {
+                    return of([])
+                }
+
+                const attendanceRequests = participants.map((participant) =>
+                    this.catService.getExamAttendance(
+                        this.examId(),
+                        participant.participantUkom.id,
+                    ),
+                )
+
+                return forkJoin(
+                    attendanceRequests.map((request, index) =>
+                        request.pipe(
+                            map((examAttendance) => ({
+                                ...participants[index],
+                                examAttendance,
+                            })),
+                        ),
+                    ),
+                )
+            }),
+            finalize(() => {
+                this.isLoadingParticipant.set(false)
+            }),
+        )
+        .subscribe({
+            next: (participants) => {
+                this.participantList.set(participants)
+            },
+            error: (err) => {
+                console.error(err)
+
+                this.handlerService.handleAlert(
+                    'Error',
+                    'Gagal mendapatkan daftar peserta',
+                )
+            },
+        })
+}
 
     getRoomDetail() {
         this.isLoadingRoomDetail.set(true)

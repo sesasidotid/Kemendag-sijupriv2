@@ -4,10 +4,12 @@ import { Jenjang } from '../../../maintenance/models/jenjang.modle'
 import { Pangkat } from '../../../maintenance/models/pangkat.model'
 import { FileHandlerComponent } from '../file-handler/file-handler.component'
 import {
+    AbstractControl,
     FormBuilder,
     FormControl,
     FormsModule,
     ReactiveFormsModule,
+    ValidationErrors,
     Validators,
 } from '@angular/forms'
 import {
@@ -15,6 +17,7 @@ import {
     combineLatest,
     forkJoin,
     Observable,
+    of,
     startWith,
 } from 'rxjs'
 import { DokumenUkomPersyaratan } from '../../../maintenance/models/dokumen-persyaratan-ukom'
@@ -23,7 +26,14 @@ import { ApiService } from '../../services/api.service'
 import { HandlerService } from '../../services/handler.service'
 import { ConfirmationService } from '../../services/confirmation.service'
 import { CommonModule } from '@angular/common'
-import { filter, finalize, map, tap } from 'rxjs/operators'
+import {
+    catchError,
+    filter,
+    finalize,
+    map,
+    switchMap,
+    tap,
+} from 'rxjs/operators'
 import { QRCodeModule } from 'angularx-qrcode'
 import { Router, RouterModule } from '@angular/router'
 import { LandingPageComponent } from '../../../landing-page/landing-page.component'
@@ -39,6 +49,10 @@ import {
 } from '@/modules/ukom/models/ukom-registration-refactored/non-jf-participant-ukom-task.model'
 import { UkomParticipantService } from '@/modules/ukom/services/participant.service'
 import { UkomDocumentService } from '@/modules/ukom/services/document.service'
+import {
+    cekBatasUsiaUkom,
+    getBatasUsiaUkomMessage,
+} from '@/modules/base/commons/validators/batas-usia-ukom'
 
 @Component({
     selector: 'app-ukom-register',
@@ -84,7 +98,10 @@ export class UkomRegisterComponent {
         // Informasi Kenaikan Jabatan
         jenisUkom: ['', Validators.required],
         nextJabatanCode: ['', Validators.required],
-        nextJenjangCode: ['', Validators.required],
+        nextJenjangCode: [
+            '',
+            [Validators.required, this.batasUsiaValidator.bind(this)],
+        ],
         bidangJabatanCode: [''],
 
         // Dokumen Pendukung
@@ -110,6 +127,7 @@ export class UkomRegisterComponent {
 
     jabatanList$: Observable<Jabatan[]>
     jenjangList$: Observable<Jenjang[]>
+    jenjangList: Jenjang[] = []
     pangkatList$: Observable<Pangkat[]>
     NextjabatanList$: Observable<Jabatan[]>
     bidangJabatanList$ = new BehaviorSubject<BidangJabatan[]>([])
@@ -236,6 +254,16 @@ export class UkomRegisterComponent {
                 }
             })
 
+        // confirmPassword harus divalidasi ulang ketika password berubah
+        this.nonJFForm.get('password')?.valueChanges.subscribe(() => {
+            this.nonJFForm.get('confirmPassword')?.updateValueAndValidity()
+        })
+
+        // Validasi batas usia bergantung pada NIP (tanggal lahir dari 8 digit awal)
+        this.nonJFForm.get('nip')?.valueChanges.subscribe(() => {
+            this.nonJFForm.get('nextJenjangCode')?.updateValueAndValidity()
+        })
+
         this.nonJFForm.get('jenisUkom')?.valueChanges.subscribe((value) => {
             this.clearFilesName()
             this.nonJFForm.patchValue({
@@ -288,14 +316,30 @@ export class UkomRegisterComponent {
                 tap(() => {
                     this.clearFilesName()
                 }),
+                // switchMap membatalkan request sebelumnya sehingga hanya
+                // hasil dari pilihan terakhir yang dipakai
+                switchMap(([jenis_ukom, jabatan, jenjang, isMengulang]) =>
+                    this.getDokumenPersyaratan(
+                        jenis_ukom,
+                        jabatan,
+                        jenjang,
+                        isMengulang,
+                    ),
+                ),
             )
-            .subscribe(([jenis_ukom, jabatan, jenjang, isMengulang]) => {
-                this.getDokumenPersyaratan(
-                    jenis_ukom,
-                    jabatan,
-                    jenjang,
-                    isMengulang,
-                )
+            .subscribe({
+                next: (filteredList) => {
+                    this.dokumenPersyaratanList = filteredList
+                    this.detectedDokumen = {}
+                    this.inputs.files = {}
+                    filteredList.forEach((dokumen) => {
+                        const key = dokumen.dokumenPersyaratanId
+                        this.inputs.files[key] = {
+                            label: dokumen.dokumenPersyaratanName,
+                            id: dokumen.dokumenPersyaratanId,
+                        }
+                    })
+                },
             })
     }
 
@@ -401,6 +445,9 @@ export class UkomRegisterComponent {
         if (errors['mismatch']) {
             return `Password dan Konfirmasi Password tidak cocok.`
         }
+        if (errors['batasUsia']) {
+            return getBatasUsiaUkomMessage(errors['batasUsia'])
+        }
 
         return null // Default case
     }
@@ -495,6 +542,20 @@ export class UkomRegisterComponent {
         return null
     }
 
+    batasUsiaValidator(control: AbstractControl): ValidationErrors | null {
+        if (!this.nonJFForm) return null
+
+        const jenjang = this.jenjangList.find((j) => j.code === control.value)
+        if (!jenjang) return null
+
+        const error = cekBatasUsiaUkom({
+            nip: this.nonJFForm.get('nip')?.value,
+            jenisUkom: this.nonJFForm.get('jenisUkom')?.value,
+            targetJenjangName: jenjang.name,
+        })
+        return error ? { batasUsia: error } : null
+    }
+
     isAnyFileMissing(): boolean {
         if (!this.inputs.files || Object.keys(this.inputs.files).length === 0) {
             return true
@@ -514,13 +575,14 @@ export class UkomRegisterComponent {
         jabatan: string,
         jenjang: string,
         isMengulang: boolean,
-    ) {
-        this.ukomDocumentService.getDocumentByJenisUkom(jenis_ukom)
-        this.ukomDocumentService.documentByJenisUkom$
+    ): Observable<DokumenUkomPersyaratan[]> {
+        return this.apiService
+            .getData(
+                `${this.ukomDocumentService.BASE_PATH}/jenis_ukom/${jenis_ukom}`,
+            )
             .pipe(
-                filter((docs) => docs.length > 0),
-                map((docs) =>
-                    docs
+                map((docs: any[]) =>
+                    (docs || [])
                         .filter((dokumen) => {
                             const specificationMatch =
                                 dokumen.specification === 'null' ||
@@ -555,77 +617,14 @@ export class UkomRegisterComponent {
                                 }),
                         ),
                 ),
-            )
-            .subscribe({
-                next: (filteredList) => {
-                    this.dokumenPersyaratanList = filteredList
-                    this.detectedDokumen = {}
-                    this.inputs.files = {}
-                    filteredList.forEach((dokumen) => {
-                        const key = dokumen.dokumenPersyaratanId
-                        this.inputs.files[key] = {
-                            label: dokumen.dokumenPersyaratanName,
-                            id: dokumen.dokumenPersyaratanId,
-                        }
-                    })
-                },
-                error: (error) => {
+                catchError(() => {
                     this.handlerService.handleAlert(
                         'Error',
                         'Gagal mengambil dokumen persyaratan',
                     )
-                },
-            })
-        // this.apiService
-        //     .getData(`/api/v1/document_ukom/jenis_ukom/${jenis_ukom}`)
-        //     .subscribe({
-        //         next: (response) => {
-        //             this.dokumenPersyaratanList = response
-        //                 .filter((dokumen: any) => {
-        //                     const jabatanMatch =
-        //                         !dokumen.jabatanCode ||
-        //                         dokumen.jabatanCode === jabatan
-        //                     const jenjangMatch =
-        //                         !dokumen.jenjangCode ||
-        //                         dokumen.jenjangCode === jenjang
-
-        //                     const isMengulangMatch = isMengulang
-        //                         ? true
-        //                         : dokumen.isMengulang === false
-
-        //                     return (
-        //                         jabatanMatch && jenjangMatch && isMengulangMatch
-        //                     )
-        //                 })
-        //                 .map(
-        //                     (dokumen: any) =>
-        //                         new DokumenUkomPersyaratan({
-        //                             dokumenPersyaratanId:
-        //                                 dokumen.dokumenPersyaratanId,
-        //                             dokumenPersyaratanName:
-        //                                 dokumen.dokumenPersyaratanName,
-        //                         }),
-        //                 )
-
-        //             this.detectedDokumen = {}
-        //             this.inputs.files = {}
-
-        //             this.dokumenPersyaratanList.forEach((dokumen, index) => {
-        //                 // const key = `dokumenPersyaratan_${index + 1}`;
-        //                 const key = dokumen.dokumenPersyaratanId
-        //                 this.inputs.files[key] = {
-        //                     label: dokumen.dokumenPersyaratanName,
-        //                     id: dokumen.dokumenPersyaratanId,
-        //                 }
-        //             })
-        //         },
-        //         error: (error) => {
-        //             this.handlerService.handleAlert(
-        //                 'Error',
-        //                 'Gagal mengambil dokumen persyaratan',
-        //             )
-        //         },
-        //     })
+                    return of([])
+                }),
+            )
     }
 
     getListJabatan() {
@@ -654,6 +653,12 @@ export class UkomRegisterComponent {
                             new Jenjang(jenjang),
                     ),
                 ),
+                tap((list: Jenjang[]) => {
+                    this.jenjangList = list
+                    this.nonJFForm
+                        .get('nextJenjangCode')
+                        ?.updateValueAndValidity({ emitEvent: false })
+                }),
             )
     }
 

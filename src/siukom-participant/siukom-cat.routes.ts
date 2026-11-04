@@ -21,10 +21,38 @@ export const routes: Routes = [
             },
             {
                 path: 'resignation',
-                loadComponent: () =>
-                    import('./resignation/resignation.component').then(
-                        (m) => m.ResignationComponent,
-                    ),
+                data: {
+                    title: 'Pengunduran Diri',
+                },
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () =>
+                            import('./resignation/resignation.component').then(
+                                (m) => m.ResignationComponent,
+                            ),
+                    },
+                    {
+                        path: 'riwayat',
+                        loadComponent: () =>
+                            import('./resignation/rw-resignation-list/rw-resignation-list.component').then(
+                                (m) => m.RwResignationListComponent,
+                            ),
+                        data: {
+                            title: 'Riwayat',
+                        },
+                    },
+                    {
+                        path: 'detail/:id',
+                        loadComponent: () =>
+                            import('./resignation/rw-resignation-detail/rw-resignation-detail.component').then(
+                                (m) => m.RwResignationDetailComponent,
+                            ),
+                        data: {
+                            title: 'Riwayat',
+                        },
+                    },
+                ],
             },
             {
                 path: 'seminar-paper/:examScheduleId',

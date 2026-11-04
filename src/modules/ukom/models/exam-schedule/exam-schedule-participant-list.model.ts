@@ -1,5 +1,6 @@
 import { Serializable } from '@/modules/base/commons/serializable'
 import { Participant } from '@/modules/ukom/models/cat/participant.model'
+import { ExamAttendance } from '../cat/exam-attendance'
 
 export class ParticipantScheduleList extends Serializable {
     id: string = undefined
@@ -12,6 +13,7 @@ export class ParticipantScheduleList extends Serializable {
     examScheduleSupervisedList: ExamScheduleSupervised[] = []
     participantUkom: Participant = undefined
     examined: boolean | null = undefined
+    examAttendance?: ExamAttendance
 
     constructor(object?: Partial<ParticipantScheduleList>) {
         super()

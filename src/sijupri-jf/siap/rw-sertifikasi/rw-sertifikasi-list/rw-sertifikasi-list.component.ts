@@ -15,6 +15,8 @@ import { FileHandlerComponent } from '../../../../modules/base/components/file-h
 import { FIleHandler } from '../../../../modules/base/commons/file-handler/file-handler'
 import { BehaviorSubject } from 'rxjs'
 import { FilePreviewService } from '../../../../modules/base/services/file-preview.service'
+import { HandlerService } from '@/modules/base/services/handler.service'
+import { ConfirmationService } from '@/modules/base/services/confirmation.service'
 
 @Component({
     selector: 'app-rw-sertifikasi-list',
@@ -36,7 +38,9 @@ export class RwSertifikasiListComponent {
     constructor(
         private apiService: ApiService,
         private alertService: AlertService,
-        private filePreviewService: FilePreviewService
+        private filePreviewService: FilePreviewService,
+        private confirmationService: ConfirmationService,
+        private handlerService: HandlerService,
     ) { }
 
     ngOnInit() {

@@ -1,0 +1,13 @@
+<ng-container *ngIf="(tabService.activeTab$| async) === 0">
+    <app-pagable [pagable]="pagable" [refresh]="refresh"></app-pagable>
+</ng-container>
+
+<ng-container *ngIf="(tabService.activeTab$ | async) === 1">
+    <app-ukom-resignation-document-add (created)="tabService.changeTabActive(0)"></app-ukom-resignation-document-add>
+</ng-container>
+
+<app-modal *ngIf="isUpdateModalOpen" [title]="'Update Dokumen Pengunduran Ukom'" (toggle)="closeUpdateModal() "
+    [enableFooter]="false">
+    <app-ukom-resignation-document-update [document]="selectedDocument" (updated)="closeUpdateModal(); refreshPagable()">
+    </app-ukom-resignation-document-update>
+</app-modal>

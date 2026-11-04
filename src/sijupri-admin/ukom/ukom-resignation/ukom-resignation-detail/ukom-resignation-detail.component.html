@@ -1,0 +1,296 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Back button -->
+    <button (click)="back()" class="btn btn-sm btn-outline-secondary">
+        <i class="mdi mdi-chevron-left"></i> Kembali
+    </button>
+
+    <!-- Open Detail button -->
+    <ng-container *ngIf="ukomResignationDetail?.participantStatus === 'jf'">
+        <a
+            [href]="'siap/user-jf/' + ukomResignationDetail.nip"
+            class="btn btn-primary"
+            target="_blank"
+        >
+            <i class="mdi mdi-open-in-new"></i> Lihat Detail
+        </a>
+    </ng-container>
+</div>
+
+<div
+    *ngIf="isLoading(); else content"
+    class="d-flex justify-content-center my-5"
+>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<ng-template #content>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h5 class="m-0">
+                        <i class="mdi mdi-account me-2"></i>Detail Peserta UKom
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h5 class="fw-bold">Identitas Peserta</h5>
+                            <hr />
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Status Pendaftar</label
+                                >
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.participantStatus
+                                    == 'jf' ? 'JF Perdagangan' : 'Non-JF
+                                    Perdagangan' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Jenis UKom</label>
+                                <p class="border-bottom">
+                                    {{jenisUkomService.getLabelByValue(ukomResignationDetail.jenisUkom)
+                                    ?? '-'}}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Lengkap</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.name ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">NIP</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.nip ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nomor Whatsapp</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.phone ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.email ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tempat Lahir</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.tempatLahir ?? '-'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal Lahir</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.tanggalLahir |
+                                    tanggalIndo }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Instansi</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.jenisInstansi |
+                                    prettyName }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Provinsi</label>
+                                <p class="border-bottom">
+                                    {{ (ukomResignationDetail.provinsiName |
+                                    prettyName) ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Kabupaten/Kota</label>
+                                <p class="border-bottom">
+                                    {{ kabupatenName ? (typeKabKota + ' ' +
+                                    kabupatenName | prettyName) : '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-lg-6"> -->
+                        <div
+                            [ngClass]="{
+                                'col-lg-6':
+                                    ukomResignationDetail.jenisInstansi !=
+                                    'PEMERINTAH_PROVINSI',
+                                'col-lg-12':
+                                    ukomResignationDetail.jenisInstansi ==
+                                    'PEMERINTAH_PROVINSI'
+                            }"
+                        >
+                            <div class="mb-3">
+                                <label class="form-label">Unit Kerja</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.unitKerjaName ??
+                                    '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Jabatan</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.jabatanName ?? '-'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Jabatan Yang Dituju</label
+                                >
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.nextJabatanName ??
+                                    '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label">Jenjang</label>
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.jenjangName ?? '-'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Jenjang Yang Dituju</label
+                                >
+                                <p class="border-bottom">
+                                    {{ ukomResignationDetail.nextJenjangName ??
+                                    '-' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <h5 class="d-flex align-items-center mb-0">
+                            <i
+                                class="mdi mdi-file-document-check-outline me-2"
+                            ></i>
+                            Data Pengajuan Pengunduran Diri
+                        </h5>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <h5 class="fw-bold mt-3">Informasi Pengajuan</h5>
+                        <hr />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Alasan Pengunduran Diri</label
+                                >
+                                <p class="border-bottom mb-0">
+                                    {{ ukomResignationDetail?.reason }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="form-label"
+                                    >Tangal Pengajuan</label
+                                >
+                                <p class="border-bottom mb-0">
+                                    {{ ukomResignationDetail?.dateCreated | tanggalIndo }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="col-lg-12">
+                        <h5 class="fw-bold mt-3">
+                            Dokumen Pengajuan Pengunduran Diri
+                        </h5>
+                        <hr />
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label fw-bold">
+                            Surat Pengunduran Diri
+                        </label>
+
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col">
+                                    <a
+                                        (click)="
+                        preview(
+                            ukomResignationDetail?.suratPengunduranDiri,
+                            ukomResignationDetail?.suratPengunduranDiriUrl
+                        )
+                    "
+                                        class="btn btn-sm btn-info ms-2"
+                                    >
+                                        Lihat
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
