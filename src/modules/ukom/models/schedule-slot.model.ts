@@ -31,6 +31,7 @@ export interface ParticipantSchedule {
     seminarParticipantScheduleId?: string // participant_schedule ID on the seminar exam schedule
     examinerIdKomponenA?: string // examiner_schedule ID for Komponen A
     examinerIdKomponenBC?: string // examiner_schedule ID for Komponen B & C
+    examinerIds?: string[] // examiner_schedule IDs currently assigned (multi-examiner exams)
 }
 
 export interface ScheduleSlot {
