@@ -339,6 +339,12 @@ export class UkomExamWawancaraComponent implements OnInit {
         const participantSchedules: ParticipantSchedule[] =
             participantScheduleList.map((p) => {
                 const examinerScheduleIds = this.resolveExaminerScheduleIds(p)
+                // Penguji yang sudah menyimpan penilaian (wawancara multi-penguji)
+                const submittedIds = new Set(
+                    (p.examScheduleSupervisedList ?? [])
+                        .filter((s) => !!s?.submittedAt)
+                        .map((s) => s.examinerScheduleId),
+                )
 
                 return {
                     id: p.id,
@@ -351,7 +357,12 @@ export class UkomExamWawancaraComponent implements OnInit {
                     participantNip: p.participantUkom?.nip || 'Unknown',
                     examinerName: examinerScheduleIds.length
                         ? examinerScheduleIds
-                              .map((id) => examinerMap.get(id) ?? 'Unknown')
+                              .map((id) => {
+                                  const name = examinerMap.get(id) ?? 'Unknown'
+                                  return submittedIds.has(id)
+                                      ? `${name} ✓`
+                                      : name
+                              })
                               .join(', ')
                         : '',
                     examinerIds: examinerScheduleIds,
