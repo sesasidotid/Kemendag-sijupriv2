@@ -307,6 +307,13 @@ export const routes: Routes = [
                                             m.UkomExamChooseCompQuestionsComponent,
                                     ),
                             },
+                            {
+                                path: ':id/import-grade-class',
+                                loadComponent: () =>
+                                    import('./ukom/ukom-class/ukom-import-grade/ukom-import-grade.component').then(
+                                        (m) => m.UkomImportGradeComponent,
+                                    ),
+                            },
                         ],
                     },
                     'Penguji Ukom': {
