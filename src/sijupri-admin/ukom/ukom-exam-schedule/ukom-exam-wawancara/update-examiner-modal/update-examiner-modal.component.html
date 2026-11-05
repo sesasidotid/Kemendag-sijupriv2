@@ -68,8 +68,11 @@
             class="alert alert-light border mt-3 mb-0"
         >
             <i class="bi bi-check2-square me-2"></i>
-            {{ selectedExaminerIds.length }} dari maksimal
-            {{ maxExaminerCount }} penguji dipilih:
+            {{ selectedExaminerIds.length }}
+            <ng-container *ngIf="maxExaminerCount !== null">
+                dari maksimal {{ maxExaminerCount }}
+            </ng-container>
+            penguji dipilih:
             <strong>{{ selectedExaminerNames.join(', ') }}</strong>
             <span *ngIf="isUnchanged" class="text-muted">
                 (tidak ada perubahan)</span
@@ -78,8 +81,14 @@
 
         <div *ngIf="!isSelectionValid" class="alert alert-warning mt-3">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            Silakan pilih {{ minExaminerCount }} sampai
-            {{ maxExaminerCount }} penguji sebelum menyimpan
+            <ng-container *ngIf="maxExaminerCount !== null; else noMax">
+                Silakan pilih {{ minExaminerCount }} sampai
+                {{ maxExaminerCount }} penguji sebelum menyimpan
+            </ng-container>
+            <ng-template #noMax>
+                Silakan pilih minimal {{ minExaminerCount }} penguji sebelum
+                menyimpan
+            </ng-template>
             ({{ selectedExaminerIds.length }} dipilih).
         </div>
     </div>

@@ -36,7 +36,8 @@ export class UpdateExaminerModalComponent implements OnInit {
 
     /** Batas jumlah penguji wawancara — harus sama dengan maxExaminerFor() di backend */
     @Input() minExaminerCount = 1
-    @Input() maxExaminerCount = 2
+    /** null = tanpa batas (wawancara boleh banyak penguji) */
+    @Input() maxExaminerCount: number | null = null
 
     selectedExaminerIds: string[] = []
     currentExaminerIds: string[] = []
@@ -110,16 +111,21 @@ export class UpdateExaminerModalComponent implements OnInit {
                 .map((e) => e.id)
         }
 
-        this.currentExaminerIds = this.currentExaminerIds.slice(
-            0,
-            this.maxExaminerCount,
-        )
+        if (this.maxExaminerCount !== null) {
+            this.currentExaminerIds = this.currentExaminerIds.slice(
+                0,
+                this.maxExaminerCount,
+            )
+        }
         this.selectedExaminerIds = [...this.currentExaminerIds]
     }
 
     get isSelectionValid(): boolean {
         const count = this.selectedExaminerIds.length
-        return count >= this.minExaminerCount && count <= this.maxExaminerCount
+        return (
+            count >= this.minExaminerCount &&
+            (this.maxExaminerCount === null || count <= this.maxExaminerCount)
+        )
     }
 
     get isUnchanged(): boolean {
@@ -172,7 +178,10 @@ export class UpdateExaminerModalComponent implements OnInit {
             event.api.getSelectedRows() as ExaminerScheduleList[]
         ).map((row) => row.id)
 
-        if (selectedIds.length > this.maxExaminerCount) {
+        if (
+            this.maxExaminerCount !== null &&
+            selectedIds.length > this.maxExaminerCount
+        ) {
             // Keep previous selection, deselect the newly added row(s)
             const newlyAdded = selectedIds.filter(
                 (id) => !this.selectedExaminerIds.includes(id),
