@@ -131,26 +131,40 @@ export class SeminarScore extends BaseScore {
 /**
  * Model for Wawancara: ESSAY questions with answerChoice (kompeten/tidak kompeten) and answerText.
  */
-export class WawancaraScore extends BaseScore {
-    questionDtoList: Array<{
+export interface WawancaraQuestionDto {
+    id: string
+    question: string
+    type: string
+    weight: number
+    hint: string | null
+    parentQuestionId: string | null
+    answerDto: {
         id: string
-        question: string
-        type: string
-        weight: number
-        hint: string | null
-        parentQuestionId: string | null
-        answerDto: {
-            id: string
-            answerText: string | null
-            answerUpload: string | null
-            answerUploadUrl: string | null
-            answerChoice: string | null
-            participantId: string
-            questionId: string
-            isUncertain: boolean
-            score: number | null
-        }
-    }> = []
+        answerText: string | null
+        answerUpload: string | null
+        answerUploadUrl: string | null
+        answerChoice: string | null
+        participantId: string
+        questionId: string
+        isUncertain: boolean
+        score: number | null
+    }
+}
+
+/** Rincian nilai satu penguji (wawancara multi-penguji) */
+export interface WawancaraExaminerGrade {
+    examinerId: string
+    examinerName: string
+    submittedAt: string | null
+    /** null = penguji belum menilai */
+    score: number | null
+    questionDtoList: WawancaraQuestionDto[]
+}
+
+export class WawancaraScore extends BaseScore {
+    questionDtoList: WawancaraQuestionDto[] = []
+    /** Kosong untuk data lama (satu lembar nilai bersama) */
+    examinerGradeDtoList: WawancaraExaminerGrade[] = []
 
     constructor(object?: { [key: string]: any }) {
         super()

@@ -25,6 +25,8 @@ export interface ExamScheduleSupervised {
     id: string
     participantScheduleId: string
     examinerScheduleId: string
+    /** Waktu penguji ini menyimpan penilaian (null = belum menilai) */
+    submittedAt?: string | null
     examinerSchedule?: {
         id: string
         examinerId: string
