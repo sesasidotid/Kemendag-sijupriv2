@@ -6,13 +6,23 @@ $green: #49ab49;
 $bg-blue: #1751a4;
 $bg-deep: #16407f;
 $bg-teal: #1b5a55;
-// Bahan terang kebiruan yang dipakai bersama oleh semua kartu
-$surface-bg: linear-gradient(160deg, rgba(#f3f7fd, 0.96), rgba(#e4ecf8, 0.93));
+// Bahan kartu bersama: kaca transparan untuk kartu login, kutipan & tanggal
+// (72% → 65%, dasar putih).
+// Batas aman: teks muted di bawah tetap ≥4,5:1 walau latar gelap ada di belakangnya.
+$surface-bg: linear-gradient(160deg, rgba(#fff, 0.72), rgba(#fff, 0.65));
+// Langit di kartu tanggal ikut sedikit tembus agar senada dengan kartu lain
+$sky-alpha: 0.8;
+// Blur lebih kuat agar detail foto di balik kartu halus dan tidak mengganggu teks
+$surface-blur: blur(20px);
 $surface-border: rgba(255, 255, 255, 0.7);
 $surface-line: #d6dfec;
 $surface-text: #1b2236;
-$surface-muted: #4a5468;
-$surface-faint: #8a93a6;
+// Sedikit lebih gelap dari sebelumnya (#4a5468) karena kartu lebih transparan:
+// ≥4,8:1 di bagian kartu yang paling tembus
+$surface-muted: #3f4859;
+// Abu sekunder (label kecil, placeholder, penghitung, ikon mata).
+// ≥4,5:1 di kartu & ±5,8:1 di input putih (WCAG AA); sebelumnya #8a93a6 hanya 2,4:1.
+$surface-faint: #586275;
 $field-bg: #fff;
 $accent: $blue;
 $radius-lg: 28px;
@@ -33,8 +43,20 @@ $page-zoom: 0.95;
     color: #fff;
     font-size: 16px;
     background-color: $bg-deep;
-    // Kontras dengan kartu terang ±6,4–9,4:1 dan teks putih ±7,6–10:1 (lolos WCAG AAA)
-    background-image: linear-gradient(150deg, $bg-blue 0%, $bg-deep 50%, $bg-teal 100%);
+    // Foto Kemendag ditimpa lapisan warna brand (52–64%) agar foto tetap terlihat.
+    // Keterbacaan teks putih dijaga oleh sorotan biru di backdrop + text-shadow
+    // pada .brand-panel. Foto memakai versi 1920px (±270 KB), bukan berkas asli 3,2 MB.
+    background-image:
+        linear-gradient(
+            150deg,
+            rgba($bg-blue, 0.64) 0%,
+            rgba($bg-deep, 0.52) 50%,
+            rgba($bg-teal, 0.62) 100%
+        ),
+        url('/assets/backgroud/kemendag_background-1920.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 // ---------- Tata letak ----------
@@ -57,6 +79,11 @@ $page-zoom: 0.95;
     width: 100%;
     max-width: clamp(560px, 40vw, 760px);
     text-align: center;
+    // Lapisan warna kini lebih tipis: bayangan lembut menjaga teks putih tetap
+    // terbaca di bagian foto yang terang
+    text-shadow:
+        0 1px 2px rgba(5, 12, 30, 0.45),
+        0 2px 14px rgba(5, 12, 30, 0.35);
 }
 
 // ---------- Identitas ----------
@@ -186,8 +213,8 @@ $page-zoom: 0.95;
     border-radius: $radius-lg;
     border: 1px solid $surface-border;
     box-shadow: 0 24px 60px rgba(6, 14, 36, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: $surface-blur;
+    -webkit-backdrop-filter: $surface-blur;
 }
 
 // Kartu login
@@ -436,8 +463,8 @@ $page-zoom: 0.95;
     background: $surface-bg;
     border: 1px solid $surface-border;
     box-shadow: 0 24px 60px rgba(6, 14, 36, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: $surface-blur;
+    -webkit-backdrop-filter: $surface-blur;
 }
 
 .guide-eyebrow {
@@ -448,7 +475,8 @@ $page-zoom: 0.95;
     font-size: 0.65rem;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: $surface-faint;
+    // Muted (bukan faint): kartu kini transparan, faint hanya ±3,8:1 di sini
+    color: $surface-muted;
 }
 
 // Kartu kutipan: teks berganti tiap beberapa detik dengan efek memudar
@@ -538,20 +566,20 @@ $page-zoom: 0.95;
     overflow: hidden;
     border-radius: inherit;
     // Pastel lembut agar senada dengan bahan kartu yang terang kebiruan
-    background: linear-gradient(180deg, #a9c8ee 0%, #e1ecf9 80%);
+    background: linear-gradient(180deg, rgba(#a9c8ee, $sky-alpha) 0%, rgba(#e1ecf9, $sky-alpha) 80%);
     transition: background 1.2s ease;
 
     &[data-phase='pagi'] {
-        background: linear-gradient(180deg, #b5c9ec 0%, #f4dccd 80%);
+        background: linear-gradient(180deg, rgba(#b5c9ec, $sky-alpha) 0%, rgba(#f4dccd, $sky-alpha) 80%);
     }
 
     &[data-phase='sore'] {
-        background: linear-gradient(180deg, #e6ae93 0%, #f5dcc2 80%);
+        background: linear-gradient(180deg, rgba(#e6ae93, $sky-alpha) 0%, rgba(#f5dcc2, $sky-alpha) 80%);
     }
 
     &[data-phase='malam'] {
         // Nila (bukan biru) agar beda rona dengan latar halaman
-        background: linear-gradient(180deg, #232861 0%, #454c92 75%);
+        background: linear-gradient(180deg, rgba(#232861, $sky-alpha) 0%, rgba(#454c92, $sky-alpha) 75%);
     }
 }
 
@@ -636,7 +664,8 @@ $page-zoom: 0.95;
     bottom: 40px;
     left: 0;
     width: 64px;
-    animation: ship-sail 26s linear infinite, ship-bob 3s ease-in-out infinite;
+    // 48s: jarak tempuh kini dari tepi kiri, kecepatan sama seperti sebelumnya
+    animation: ship-sail 48s linear infinite, ship-bob 3s ease-in-out infinite;
 }
 
 // Ombak malam lebih terang dari langit agar tetap terlihat
@@ -814,9 +843,10 @@ $page-zoom: 0.95;
 }
 
 // Kapal muncul dari balik lembar tanggal, berlayar ke kanan, lalu mengulang
+// Berlayar dari luar tepi kiri kartu sampai keluar di tepi kanan
 @keyframes ship-sail {
     from {
-        left: 45%;
+        left: -70px;
     }
     to {
         left: calc(100% + 10px);

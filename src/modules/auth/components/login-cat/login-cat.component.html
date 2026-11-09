@@ -247,18 +247,18 @@
 
             <!-- Kartu kutipan, berganti otomatis -->
             <div class="guide-card quote-card">
-                <p class="guide-eyebrow">
+                <!-- <p class="guide-eyebrow">
                     <i-lucide [img]="QuoteIcon" [size]="14"></i-lucide>
                     Kutipan
-                </p>
+                </p> -->
                 <blockquote class="quote-body" [class.is-changing]="quotes.fading()" aria-live="polite">
                     <p class="quote-text">{{ quotes.current().text }}</p>
                     <footer class="quote-author">{{ quotes.current().author }}</footer>
                 </blockquote>
-                <div class="quote-dots" aria-hidden="true">
+                <!-- <div class="quote-dots" aria-hidden="true">
                     <span *ngFor="let q of quotes.list(); let i = index" class="quote-dot"
                         [class.is-active]="i === quotes.index()"></span>
-                </div>
+                </div> -->
             </div>
 
             <!-- Kartu tanggal & sapaan -->
