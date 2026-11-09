@@ -23,7 +23,7 @@ import {
     BadgeCheck,
     Eye,
     EyeOff,
-    Info,
+    Quote,
     LockKeyhole,
     LucideAngularModule,
     Search,
@@ -39,6 +39,8 @@ import { environment } from '@/environments/environment'
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { finalize } from 'rxjs'
 import { createLoginClock } from '../login/login-clock'
+import { createQuoteRotator } from '../login/login-quotes'
+import { LoginBackdropComponent } from '../login/login-backdrop.component'
 
 @Component({
     selector: 'app-login-cat',
@@ -51,6 +53,7 @@ import { createLoginClock } from '../login/login-clock'
         RecaptchaModule,
         RecaptchaFormsModule,
         RouterModule,
+        LoginBackdropComponent,
     ],
     templateUrl: './login-cat.component.html',
     // Tampilan sama dengan halaman login SIJUPRI; berkas kedua hanya berisi pilihan peran
@@ -77,9 +80,10 @@ export class LoginCatComponent implements OnDestroy {
     readonly ArrowRight = ArrowRight
     readonly UserPlus = UserPlus
     readonly Search = Search
-    readonly Info = Info
+    readonly QuoteIcon = Quote
 
     clock = createLoginClock()
+    quotes = createQuoteRotator()
 
     authService = inject(AuthService)
     router = inject(Router)
@@ -126,6 +130,7 @@ export class LoginCatComponent implements OnDestroy {
 
     ngOnDestroy() {
         this.clock.stop()
+        this.quotes.stop()
     }
 
     getErrorMessage(controlName: string, label: string): string | null {

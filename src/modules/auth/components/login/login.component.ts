@@ -23,7 +23,7 @@ import {
     Eye,
     EyeOff,
     LockKeyhole,
-    Info,
+    Quote,
     LucideAngularModule,
     Search,
     UserPlus,
@@ -39,6 +39,8 @@ import { environment } from '../../../../environments/environment'
 
 import { FormValidationService } from '@/modules/base/services/form-validation.service'
 import { createLoginClock } from './login-clock'
+import { createQuoteRotator } from './login-quotes'
+import { LoginBackdropComponent } from './login-backdrop.component'
 @Component({
     selector: 'app-login',
     standalone: true,
@@ -50,6 +52,7 @@ import { createLoginClock } from './login-clock'
         RecaptchaModule,
         RecaptchaFormsModule,
         RouterModule,
+        LoginBackdropComponent,
     ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
@@ -74,9 +77,10 @@ export class LoginComponent implements OnDestroy {
     readonly ArrowRight = ArrowRight
     readonly UserPlus = UserPlus
     readonly Search = Search
-    readonly Info = Info
+    readonly QuoteIcon = Quote
 
     clock = createLoginClock()
+    quotes = createQuoteRotator()
 
     applicationServce = inject(ApplicationService)
     authService = inject(AuthService)
@@ -108,6 +112,7 @@ export class LoginComponent implements OnDestroy {
 
     ngOnDestroy() {
         this.clock.stop()
+        this.quotes.stop()
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
