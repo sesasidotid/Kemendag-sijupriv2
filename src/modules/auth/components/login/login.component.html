@@ -1,9 +1,6 @@
 <main class="login-page">
-    <!-- Pita dekoratif latar belakang -->
-    <div class="ribbon ribbon-blue" aria-hidden="true"></div>
-    <div class="ribbon ribbon-green" aria-hidden="true"></div>
-    <div class="glow glow-top" aria-hidden="true"></div>
-    <div class="glow glow-bottom" aria-hidden="true"></div>
+    <!-- Latar animasi: grid, ubin ikon & garis cahaya -->
+    <app-login-backdrop aria-hidden="true"></app-login-backdrop>
 
     <div class="login-shell">
         <!-- Kolom kiri: identitas, maskot & judul -->
@@ -52,13 +49,13 @@
 
                 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
                     <div class="field">
-                        <label for="nip" class="field-label">NIP</label>
+                        <!-- <label for="nip" class="field-label">NIP</label> -->
                         <div class="pill-input" [class.is-invalid]="getErrorMessage('nip', 'NIP')">
                             <span class="pill-icon" aria-hidden="true">
                                 <i-lucide [img]="UserRound" [size]="18"></i-lucide>
                             </span>
                             <input type="text" inputmode="numeric" autocomplete="username" name="nip" id="nip"
-                                formControlName="nip" maxlength="18" placeholder="Masukkan 18 angka" />
+                                formControlName="nip" maxlength="18" placeholder="Masukkan NIP 18 angka" />
                             <span class="pill-counter" aria-live="polite">
                                 {{ loginForm.value.nip?.length || 0 }}/18
                             </span>
@@ -70,8 +67,8 @@
 
                     <div class="field">
                         <div class="field-label-row">
-                            <label for="password" class="field-label">Kata Sandi</label>
-                            <a [routerLink]="['/forget-password']" class="pill-link">Lupa kata sandi?</a>
+                            <!-- <label for="password" class="field-label">Kata Sandi</label> -->
+                            <!-- <a [routerLink]="['/forget-password']" class="pill-link">Lupa kata sandi?</a> -->
                         </div>
                         <div class="pill-input" [class.is-invalid]="getErrorMessage('password', 'Password')">
                             <span class="pill-icon" aria-hidden="true">
@@ -120,18 +117,20 @@
                 </p>
             </div>
 
-            <!-- Kartu petunjuk -->
-            <div class="guide-card">
-                <p class="guide-eyebrow">
-                    <i-lucide [img]="Info" [size]="14"></i-lucide>
-                    Petunjuk masuk
-                </p>
-                <ol class="guide-list">
-                    <li>Ketik <strong>NIP</strong> (18 angka).</li>
-                    <li>Ketik <strong>kata sandi</strong>.</li>
-                    <li>Centang <strong>"Saya bukan robot"</strong>, tekan <strong>Masuk</strong>.</li>
-                </ol>
-                <p class="guide-help">Akun terkunci? Hubungi admin unit kerja.</p>
+            <!-- Kartu kutipan, berganti otomatis -->
+            <div class="guide-card quote-card">
+                <!-- <p class="guide-eyebrow">
+                    <i-lucide [img]="QuoteIcon" [size]="14"></i-lucide>
+                    Kutipan
+                </p> -->
+                <blockquote class="quote-body" [class.is-changing]="quotes.fading()" aria-live="polite">
+                    <p class="quote-text">{{ quotes.current().text }}</p>
+                    <footer class="quote-author">{{ quotes.current().author }}</footer>
+                </blockquote>
+                <div class="quote-dots" aria-hidden="true">
+                    <span *ngFor="let q of quotes.list(); let i = index" class="quote-dot"
+                        [class.is-active]="i === quotes.index()"></span>
+                </div>
             </div>
 
             <!-- Kartu tanggal & sapaan -->

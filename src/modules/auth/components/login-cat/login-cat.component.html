@@ -1,9 +1,6 @@
 <main class="login-page">
-    <!-- Pita dekoratif latar belakang -->
-    <div class="ribbon ribbon-blue" aria-hidden="true"></div>
-    <div class="ribbon ribbon-green" aria-hidden="true"></div>
-    <div class="glow glow-top" aria-hidden="true"></div>
-    <div class="glow glow-bottom" aria-hidden="true"></div>
+    <!-- Latar animasi: grid, ubin ikon & garis cahaya -->
+    <app-login-backdrop aria-hidden="true"></app-login-backdrop>
 
     <div class="login-shell">
         <!-- Kolom kiri: identitas, maskot & tahapan UKom -->
@@ -90,7 +87,7 @@
                         *ngIf="selectedRole() === 'participant'; else examinerField"
                     >
                         <div class="field">
-                            <label for="nip" class="field-label">NIP</label>
+                            <!-- <label for="nip" class="field-label">NIP</label> -->
                             <div
                                 class="pill-input"
                                 [class.is-invalid]="getErrorMessage('nip', 'NIP')"
@@ -109,7 +106,7 @@
                                     id="nip"
                                     formControlName="nip"
                                     maxlength="18"
-                                    placeholder="Masukkan 18 angka"
+                                    placeholder="Masukkan NIP 18 angka"
                                 />
                                 <span class="pill-counter" aria-live="polite">
                                     {{ loginForm.value.nip?.length || 0 }}/18
@@ -126,9 +123,9 @@
 
                     <ng-template #examinerField>
                         <div class="field">
-                            <label for="nip" class="field-label"
+                            <!-- <label for="nip" class="field-label"
                                 >Username</label
-                            >
+                            > -->
                             <div
                                 class="pill-input"
                                 [class.is-invalid]="getErrorMessage('nip', 'Username')"
@@ -158,9 +155,9 @@
                     </ng-template>
 
                     <div class="field">
-                        <label for="password" class="field-label"
+                        <!-- <label for="password" class="field-label"
                             >Kata Sandi</label
-                        >
+                        > -->
                         <div
                             class="pill-input"
                             [class.is-invalid]="getErrorMessage('password', 'Password')"
@@ -243,39 +240,25 @@
                 </form>
 
                 <p class="login-footer">
-                    Bukan peserta atau penguji UKom?
+                    Bukan Peserta/Penguji?
                     <a [routerLink]="['/login']">Masuk halaman SIJUPRI</a>
                 </p>
             </div>
 
-            <!-- Kartu petunjuk, menyesuaikan peran yang dipilih -->
-            <div class="guide-card">
+            <!-- Kartu kutipan, berganti otomatis -->
+            <div class="guide-card quote-card">
                 <p class="guide-eyebrow">
-                    <i-lucide [img]="Info" [size]="14"></i-lucide>
-                    Petunjuk {{ selectedRole() === 'participant' ? 'peserta' :
-                    'penguji' }}
+                    <i-lucide [img]="QuoteIcon" [size]="14"></i-lucide>
+                    Kutipan
                 </p>
-                <ol class="guide-list">
-                    <li>
-                        Pilih peran
-                        <strong
-                            >{{ selectedRole() === 'participant' ? 'Peserta' :
-                            'Penguji' }}</strong
-                        >.
-                    </li>
-                    <li>
-                        Ketik
-                        <strong
-                            >{{ selectedRole() === 'participant' ? 'NIP (18
-                            angka)' : 'username penguji' }}</strong
-                        >.
-                    </li>
-                    <li>
-                        Isi <strong>kata sandi</strong>, centang
-                        <strong>"Saya bukan robot"</strong>.
-                    </li>
-                </ol>
-                <p class="guide-help">Ada kendala? Hubungi panitia UKom.</p>
+                <blockquote class="quote-body" [class.is-changing]="quotes.fading()" aria-live="polite">
+                    <p class="quote-text">{{ quotes.current().text }}</p>
+                    <footer class="quote-author">{{ quotes.current().author }}</footer>
+                </blockquote>
+                <div class="quote-dots" aria-hidden="true">
+                    <span *ngFor="let q of quotes.list(); let i = index" class="quote-dot"
+                        [class.is-active]="i === quotes.index()"></span>
+                </div>
             </div>
 
             <!-- Kartu tanggal & sapaan -->

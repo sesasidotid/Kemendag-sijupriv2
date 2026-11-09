@@ -1,8 +1,11 @@
-// Warna utama SIJUPRI
-$navy: #13182b;
+// Warna utama SIJUPRI (biru & hijau logo Kemendag, sama dengan .grad-button)
 $blue: #2967be;
 $blue-dark: #1d4ed8;
 $green: #49ab49;
+// Latar halaman: biru logo → biru tua → hijau toska tua (arah biru → hijau brand)
+$bg-blue: #1751a4;
+$bg-deep: #16407f;
+$bg-teal: #1b5a55;
 // Bahan terang kebiruan yang dipakai bersama oleh semua kartu
 $surface-bg: linear-gradient(160deg, rgba(#f3f7fd, 0.96), rgba(#e4ecf8, 0.93));
 $surface-border: rgba(255, 255, 255, 0.7);
@@ -16,67 +19,22 @@ $radius-lg: 28px;
 // Ukuran fleksibel: membesar mengikuti layar agar konten tidak mengumpul di tengah
 $card-w: clamp(340px, 20vw, 390px);
 
+// Skala tampilan halaman login (0.95 = zoom out 5%)
+$page-zoom: 0.95;
+
 .login-page {
     position: relative;
-    min-height: 100vh;
+    zoom: $page-zoom;
+    // vh ikut terskala oleh zoom, jadi dikompensasi agar tetap setinggi layar
+    min-height: calc(100vh / #{$page-zoom});
     overflow: hidden;
     display: flex;
     flex-direction: column;
     color: #fff;
     font-size: 16px;
-    background-color: $navy;
-    background-image: url('/assets/wave.svg');
-    background-size: contain;
-    background-repeat: repeat;
-    background-blend-mode: overlay;
-}
-
-// ---------- Dekorasi latar ----------
-.ribbon {
-    position: absolute;
-    left: -15%;
-    width: 130%;
-    height: 220px;
-    border-radius: 50%;
-    pointer-events: none;
-    filter: blur(2px);
-}
-
-.ribbon-blue {
-    top: 18%;
-    transform: rotate(-14deg);
-    animation: drift-blue 18s ease-in-out infinite alternate;
-    background: linear-gradient(90deg, rgba($blue, 0) 0%, rgba($blue, 0.55) 35%, rgba($blue, 0) 75%);
-}
-
-.ribbon-green {
-    top: 42%;
-    transform: rotate(12deg);
-    animation: drift-green 22s ease-in-out infinite alternate;
-    background: linear-gradient(90deg, rgba($green, 0.6) 0%, rgba($green, 0.35) 40%, rgba($green, 0) 70%);
-}
-
-.glow {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    filter: blur(80px);
-}
-
-.glow-top {
-    top: -120px;
-    right: -80px;
-    width: 420px;
-    height: 420px;
-    background: rgba($blue, 0.45);
-}
-
-.glow-bottom {
-    bottom: -160px;
-    left: -100px;
-    width: 380px;
-    height: 380px;
-    background: rgba($green, 0.3);
+    background-color: $bg-deep;
+    // Kontras dengan kartu terang ±6,4–9,4:1 dan teks putih ±7,6–10:1 (lolos WCAG AAA)
+    background-image: linear-gradient(150deg, $bg-blue 0%, $bg-deep 50%, $bg-teal 100%);
 }
 
 // ---------- Tata letak ----------
@@ -227,7 +185,7 @@ $card-w: clamp(340px, 20vw, 390px);
     color: $surface-text;
     border-radius: $radius-lg;
     border: 1px solid $surface-border;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 24px 60px rgba(6, 14, 36, 0.4);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
 }
@@ -477,7 +435,7 @@ $card-w: clamp(340px, 20vw, 390px);
     border-radius: $radius-lg;
     background: $surface-bg;
     border: 1px solid $surface-border;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 24px 60px rgba(6, 14, 36, 0.4);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
 }
@@ -493,31 +451,65 @@ $card-w: clamp(340px, 20vw, 390px);
     color: $surface-faint;
 }
 
-.guide-list {
-    margin: 0 0 10px;
-    padding-left: 18px;
-    font-size: 0.82rem;
-    font-weight: 300;
-    line-height: 1.5;
-    color: $surface-muted;
+// Kartu kutipan: teks berganti tiap beberapa detik dengan efek memudar
+.quote-body {
+    margin: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
 
-    li + li {
-        margin-top: 4px;
-    }
-
-    strong {
-        font-weight: 600;
-        color: $surface-text;
+    &.is-changing {
+        opacity: 0;
+        transform: translateY(6px);
     }
 }
 
-.guide-help {
-    margin: auto 0 0;
-    padding-top: 10px;
-    border-top: 1px solid $surface-line;
-    font-size: 0.75rem;
+.quote-text {
+    position: relative;
+    // Tinggi tetap ±4 baris agar kartu tidak naik-turun saat kutipan berganti
+    min-height: calc(1.5em * 4);
+    margin: 0 0 8px;
+    font-size: 0.88rem;
+    font-style: italic;
     line-height: 1.5;
+    color: $surface-text;
+
+    &::before {
+        content: '\201C';
+    }
+
+    &::after {
+        content: '\201D';
+    }
+}
+
+.quote-author {
+    font-size: 0.75rem;
+    font-weight: 600;
     color: $surface-muted;
+
+    &::before {
+        content: '\2014\00a0';
+    }
+}
+
+.quote-dots {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid $surface-line;
+}
+
+.quote-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: $surface-line;
+    transition: width 0.4s ease, background 0.4s ease;
+
+    &.is-active {
+        width: 18px;
+        background: $accent;
+    }
 }
 
 // Kartu tanggal (tinggi, di sisi kanan)
@@ -526,6 +518,17 @@ $card-w: clamp(340px, 20vw, 390px);
     position: relative;
     overflow: hidden;
     padding: 10px;
+    transition: border-color 1.2s ease, box-shadow 1.2s ease;
+
+    // Malam: langit gelap senada dengan latar, jadi tepi kartu diberi garis
+    // biru terang + pendar agar bentuk kartu tetap terlihat
+    &:has(.sky[data-phase='malam']) {
+        border-color: rgba(143, 188, 243, 0.65);
+        box-shadow:
+            0 0 0 1px rgba(143, 188, 243, 0.25),
+            0 0 32px rgba(143, 188, 243, 0.22),
+            0 24px 60px rgba(6, 14, 36, 0.4);
+    }
 }
 
 // Langit di belakang lembar tanggal: warna, posisi matahari/bulan mengikuti jam
@@ -547,7 +550,8 @@ $card-w: clamp(340px, 20vw, 390px);
     }
 
     &[data-phase='malam'] {
-        background: linear-gradient(180deg, #0d1530 0%, #24345f 75%);
+        // Nila (bukan biru) agar beda rona dengan latar halaman
+        background: linear-gradient(180deg, #232861 0%, #454c92 75%);
     }
 }
 
@@ -765,24 +769,6 @@ $card-w: clamp(340px, 20vw, 390px);
     to {
         opacity: 1;
         transform: none;
-    }
-}
-
-@keyframes drift-blue {
-    from {
-        transform: rotate(-14deg) translateX(-4%);
-    }
-    to {
-        transform: rotate(-11deg) translateX(4%);
-    }
-}
-
-@keyframes drift-green {
-    from {
-        transform: rotate(12deg) translateX(3%);
-    }
-    to {
-        transform: rotate(9deg) translateX(-3%);
     }
 }
 
