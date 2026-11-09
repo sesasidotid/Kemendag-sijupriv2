@@ -16,11 +16,24 @@
                     class="btn btn-sm fs-16 header-item vertical-menu-btn topnav-hamburger px-3"
                     id="topnav-hamburger-icon"
                     type="button"
+                    [attr.aria-label]="isSidebarCollapsed ? 'Tampilkan menu' : 'Sembunyikan menu'"
+                    [attr.aria-expanded]="!isSidebarCollapsed"
                 >
-                    <span class="hamburger-icon">
+                    <!-- Mobile: hamburger -->
+                    <span class="hamburger-icon d-md-none">
                         <span></span>
                         <span></span>
                         <span></span>
+                    </span>
+                    <!-- Desktop: panel toggle -->
+                    <span
+                        class="sidebar-toggle-icon d-none d-md-inline-flex"
+                        [title]="isSidebarCollapsed ? 'Tampilkan menu' : 'Sembunyikan menu'"
+                    >
+                        <i-lucide
+                            [img]="isSidebarCollapsed ? PanelLeftOpen : PanelLeftClose"
+                            [size]="22"
+                        ></i-lucide>
                     </span>
                 </button>
             </div>

@@ -12,6 +12,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { ModalComponent } from '../../../modules/base/components/modal/modal.component'
 import { FormsModule } from '@angular/forms'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
+import { LucideAngularModule, PanelLeftClose, PanelLeftOpen } from 'lucide-angular'
 
 @Component({
     selector: 'app-top-bar',
@@ -23,6 +24,7 @@ import { LoadingButtonComponent } from '@/modules/base/components/loading-button
         FormsModule,
         LoadingButtonComponent,
         RouterLink,
+        LucideAngularModule,
     ],
     templateUrl: './top-bar.component.html',
     styleUrl: './top-bar.component.scss',
@@ -71,6 +73,38 @@ export class TopBarComponent {
 
     ngOnInit() {
         this.fetchPhotoProfile()
+        this.restoreSidebarState()
+    }
+
+    private readonly SIDEBAR_COLLAPSED_KEY = 'sidebar-collapsed'
+    isSidebarCollapsed = false
+
+    readonly PanelLeftClose = PanelLeftClose
+    readonly PanelLeftOpen = PanelLeftOpen
+
+    private restoreSidebarState() {
+        try {
+            this.isSidebarCollapsed =
+                localStorage.getItem(this.SIDEBAR_COLLAPSED_KEY) === '1'
+        } catch {}
+        this.document.body.classList.toggle(
+            'sidebar-collapsed',
+            this.isSidebarCollapsed,
+        )
+        // Enable transitions only after the initial state is applied,
+        // so the page doesn't animate on load.
+        setTimeout(() => this.document.body.classList.add('sidebar-animate'))
+    }
+
+    private setSidebarCollapsed(collapsed: boolean) {
+        this.isSidebarCollapsed = collapsed
+        this.document.body.classList.toggle('sidebar-collapsed', collapsed)
+        try {
+            localStorage.setItem(
+                this.SIDEBAR_COLLAPSED_KEY,
+                collapsed ? '1' : '0',
+            )
+        } catch {}
     }
 
     checkPasswordMatch() {
@@ -163,6 +197,18 @@ export class TopBarComponent {
 
     toggelSidebar() {
         const windowSize = this.document.documentElement.clientWidth
+
+        // Desktop/tablet (vertical layout): hide/show the whole sidebar
+        if (
+            windowSize > 767 &&
+            this.document.documentElement.getAttribute('data-layout') ===
+                'vertical'
+        ) {
+            this.setSidebarCollapsed(
+                !this.document.body.classList.contains('sidebar-collapsed'),
+            )
+            return
+        }
 
         if (windowSize > 767) {
             this.document
