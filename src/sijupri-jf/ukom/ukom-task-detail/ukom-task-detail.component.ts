@@ -86,7 +86,7 @@ export class UkomTaskDetailComponent implements OnInit {
     selectedScheduleId = signal<string>(null)
     selectedExamTypeCode = signal<string>(null)
     isScoreModalOpen = signal(false)
-    typeKabKota = signal<string>("")
+    typeKabKota = signal<string>('')
     kabKotaService = inject(KabKotaService)
     scheduleMap = computed(() => {
         const schedules =
@@ -211,16 +211,21 @@ export class UkomTaskDetailComponent implements OnInit {
     }
 
     mapDokumenUkom() {
-        this.fileHandlerData.files = {}
-
+        const files: FIleHandler['files'] = {}
         this.dataDokumenUkom.forEach((doc, index) => {
-            this.fileHandlerData.files[`file${index}`] = {
+            files[`file${index}`] = {
                 label: doc.dokumenPersyaratanName,
                 source: doc.dokumenUrl,
                 id: doc.id,
+                fileName: doc.dokumenPersyaratanName,
                 required: false,
             }
         })
+
+        this.fileHandlerData = {
+            ...this.fileHandlerData,
+            files,
+        }
     }
 
     getDokumenUkomList() {
@@ -308,9 +313,7 @@ export class UkomTaskDetailComponent implements OnInit {
 
         this.ukomGradeService
             .findGradeParticipantJF(this.id)
-            .pipe(
-                finalize(() => this.participantScoreLoading.set(false)),
-            )
+            .pipe(finalize(() => this.participantScoreLoading.set(false)))
             .subscribe({
                 next: (response) => {
                     this.ukomGrade = new UkomGrade(response)

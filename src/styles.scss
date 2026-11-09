@@ -34,3 +34,80 @@
   }
 }
 
+
+/* Desktop sidebar collapse (toggled by the topbar button).
+   Collapsed = icon-only rail; hovering the rail expands it over the content. */
+@media (min-width: 768px) {
+    [data-layout='vertical'] body.sidebar-animate {
+        .app-menu,
+        #page-topbar,
+        .main-content,
+        .footer {
+            transition:
+                width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s ease;
+        }
+    }
+
+    [data-layout='vertical'] body.sidebar-collapsed {
+        #page-topbar,
+        .footer {
+            left: var(--vz-vertical-menu-width-sm);
+        }
+
+        .main-content {
+            margin-left: var(--vz-vertical-menu-width-sm);
+        }
+
+        .app-menu {
+            width: var(--vz-vertical-menu-width-sm);
+            overflow: hidden;
+
+            /* Keep the inner content at full width so expanding the rail
+               just reveals it, without text reflowing mid-animation. */
+            > div:first-child {
+                width: var(--vz-vertical-menu-width);
+            }
+
+            &:hover {
+                width: var(--vz-vertical-menu-width);
+                box-shadow: 0 0 24px rgba(0, 0, 0, 0.25);
+            }
+
+            .nav-link.menu-link > span,
+            .nav-link.menu-link[data-bs-toggle='collapse']::after {
+                transition:
+                    opacity 0.2s ease,
+                    transform 0.2s;
+            }
+
+            &:not(:hover) {
+                .menu-title {
+                    padding-left: 19px;
+
+                    .logo-full,
+                    .x-button {
+                        display: none;
+                    }
+
+                    .logo-mini {
+                        display: block;
+                    }
+                }
+
+                /* Icons already sit inside the 70px rail (padding-left 1.5rem),
+                   so only the labels need hiding. */
+                .nav-link.menu-link > span,
+                .nav-link.menu-link[data-bs-toggle='collapse']::after {
+                    opacity: 0;
+                }
+
+                .menu-dropdown {
+                    display: none !important;
+                }
+            }
+        }
+    }
+}

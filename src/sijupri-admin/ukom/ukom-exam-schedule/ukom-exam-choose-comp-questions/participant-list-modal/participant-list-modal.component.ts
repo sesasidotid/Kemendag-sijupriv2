@@ -120,6 +120,52 @@ export class ParticipantListModalComponent implements OnInit {
     private gridApi!: GridApi
 
     ngOnInit(): void {
+        if (this.examTypeCode === ExamTypeCategory.CAT) {
+            this.columnDefs = [
+                ...this.columnDefs,
+                {
+                    headerName: 'Waktu Mulai',
+                    field: 'examAttendance.startAt',
+                    width: 150,
+                    valueGetter: (params) => {
+                        const participant =
+                            params.data as ParticipantScheduleList
+                        return participant.examAttendance?.startAt || '—'
+                    },
+                },
+                {
+                    headerName: 'Waktu Selesai',
+                    field: 'examAttendance?.finishAt ',
+                    width: 150,
+                    valueGetter: (params) => {
+                        const participant =
+                            params.data as ParticipantScheduleList
+                        return participant.examAttendance?.finishAt || '—'
+                    },
+                },
+                        {
+                    headerName: 'Jumlah Pelanggaran',
+                    field: 'examAttendance?.violationCount',
+                    width: 150,
+                    valueGetter: (params) => {
+                        const participant =
+                            params.data as ParticipantScheduleList
+                        return participant.examAttendance?.violationCount || '—'
+                    },
+                },
+                {
+                    headerName: 'Status Ujian',
+                    field: 'examAttendance?.status',
+                    width: 150,
+                    valueGetter: (params) => {
+                        const participant =
+                            params.data as ParticipantScheduleList
+                        return participant.examAttendance?.status || '—'
+                    },
+                },
+            ]
+        }
+
         if (
             this.examTypeCode &&
             ![

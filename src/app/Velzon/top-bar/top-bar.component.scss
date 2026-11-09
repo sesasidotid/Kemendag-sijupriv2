@@ -1,7 +1,31 @@
-.topnav-hamburger {
-    @media (min-width: 768px) {
-        display: none;
+.sidebar-toggle-icon {
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    color: var(--vz-header-item-color, #545a6d);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Align the toggle glyph with the page title below it.
+   Title text starts at .page-content (0.75rem) + .container-fluid (0.75rem);
+   .navbar-header already gives 0.75rem, so the button adds another 0.75rem.
+   The negative margin offsets the glyph's inset inside its 36px hover box
+   (7px box padding + ~2px icon stroke inset), so the hover pill overhangs left. */
+@media (min-width: 768px) {
+    .topnav-hamburger {
+        padding-left: 0.75rem !important;
+
+        .sidebar-toggle-icon {
+            margin-left: -9px;
+        }
     }
+}
+
+.topnav-hamburger:hover .sidebar-toggle-icon {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--vz-primary, #2967be);
 }
 
 .dropdown-header-lg {
