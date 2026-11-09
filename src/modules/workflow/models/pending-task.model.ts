@@ -23,6 +23,7 @@ export class PendingTask extends Serializable {
     lastUpdated?: Date = undefined
     pendingTaskHistory: any[] = undefined
     formasiDokumenList: any[] = undefined
+    flowName: string = undefined
 
     objectTask: ObjectTask = undefined;
     [key: string]: any

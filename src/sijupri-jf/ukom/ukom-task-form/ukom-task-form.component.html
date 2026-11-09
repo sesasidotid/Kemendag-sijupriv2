@@ -152,6 +152,9 @@
                         >
                             {{ error }}
                         </div>
+                        <div *ngIf="batasUsiaMessage as message" class="text-danger">
+                            {{ message }}
+                        </div>
                     </div>
                 </div>
 

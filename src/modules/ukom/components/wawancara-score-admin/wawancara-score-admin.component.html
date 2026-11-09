@@ -2,16 +2,104 @@
     <div class="total-score-value">
         {{ score()?.score | truncateDecimal:2 }}
     </div>
+    <div *ngIf="examinerGrades().length > 1" class="text-muted small mt-1">
+        Nilai akhir = rata-rata nilai {{ examinerGrades().length }} penguji
+    </div>
+</div>
+
+<!-- Ringkasan nilai per penguji (wawancara multi-penguji) -->
+<div *ngIf="examinerGrades().length" class="card mb-4 border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h6 class="fw-bold mb-0">Nilai per Penguji</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-hover mb-0 table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Penguji</th>
+                        <th>Status</th>
+                        <th class="text-end">Nilai</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let examiner of examinerGrades()">
+                        <td>{{ examiner.examinerName }}</td>
+                        <td>
+                            <span
+                                *ngIf="examiner.submittedAt; else notSubmitted"
+                                class="badge bg-success"
+                            >
+                                Sudah menilai
+                            </span>
+                            <ng-template #notSubmitted>
+                                <span class="badge bg-warning text-dark">
+                                    Belum menilai
+                                </span>
+                            </ng-template>
+                        </td>
+                        <td class="fw-semibold text-end">
+                            {{ examiner.score !== null ? (examiner.score |
+                            truncateDecimal:2) : '-' }}
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot *ngIf="examinerGrades().length > 1">
+                    <tr class="table-light">
+                        <td class="fw-bold" colspan="2">
+                            Nilai Akhir (rata-rata)
+                        </td>
+                        <td class="fw-bold text-end">
+                            {{ score()?.score | truncateDecimal:2 }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
 </div>
 
 <div class="card mb-4 border-0 shadow-sm">
     <div class="card-header bg-primary py-3 text-white">
         <h5 class="fw-bold mb-0 text-white">Detail Wawancara</h5>
     </div>
+
+    <!-- Tab penguji: detail penilaian masing-masing penguji -->
+    <ul
+        *ngIf="examinerGrades().length > 1"
+        class="nav nav-tabs bg-white px-3 pt-2"
+    >
+        <li *ngFor="let examiner of examinerGrades(); let idx = index" class="nav-item">
+            <button
+                (click)="selectExaminer(idx)"
+                [class.active]="selectedExaminerIndex() === idx"
+                class="nav-link"
+                type="button"
+            >
+                {{ examiner.examinerName }}
+                <span *ngIf="examiner.score !== null" class="badge bg-secondary ms-1">
+                    {{ examiner.score | truncateDecimal:2 }}
+                </span>
+            </button>
+        </li>
+    </ul>
+
     <div class="card-body bg-light">
+        <div
+            *ngIf="examinerGrades().length === 1 && selectedExaminer() as examiner"
+            class="text-muted small mb-3"
+        >
+            Penilaian oleh <strong>{{ examiner.examinerName }}</strong>
+        </div>
+        <div
+            *ngIf="selectedExaminer() && selectedExaminer()!.score === null"
+            class="alert alert-warning"
+        >
+            {{ selectedExaminer()!.examinerName }} belum memberikan penilaian.
+        </div>
         <div class="row">
             <ng-container
-                *ngFor="let item of score()?.questionDtoList; let i = index"
+                *ngFor="let item of displayedQuestions(); let i = index"
             >
                 <div class="col-12 mb-3">
                     <div class="card h-100 border-0 shadow-sm">
@@ -85,7 +173,7 @@
                 </div>
             </ng-container>
 
-            <ng-container *ngIf="!score()?.questionDtoList?.length">
+            <ng-container *ngIf="!displayedQuestions().length">
                 <div class="col-12 py-5 text-center">
                     <i
                         class="mdi mdi-microphone-outline text-muted"
