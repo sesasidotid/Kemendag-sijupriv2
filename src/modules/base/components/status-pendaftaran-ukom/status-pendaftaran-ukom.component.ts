@@ -267,12 +267,6 @@ export class StatusPendaftaranUkomComponent {
         }
     }
 
-        this.fileHandlerData = {
-            ...this.fileHandlerData,
-            files,
-        }
-    }
-    
     toggleScoreModal(scheduleId?: string, examTypeCode?: string) {
         if (scheduleId && examTypeCode) {
             this.selectedScheduleId = scheduleId
