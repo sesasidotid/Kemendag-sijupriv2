@@ -12,14 +12,17 @@ import { Ukom } from '../../../modules/ukom/models/ukom.model'
 import { JF } from '../../../modules/siap/models/jf.model'
 import { DokumenUkomPersyaratan } from '../../../modules/maintenance/models/dokumen-persyaratan-ukom'
 import {
+    AbstractControl,
     FormControl,
     FormGroup,
+    ValidationErrors,
     FormsModule,
     ReactiveFormsModule,
     Validators,
 } from '@angular/forms'
 import {
     BehaviorSubject,
+    catchError,
     combineLatest,
     EMPTY,
     filter,
@@ -41,6 +44,11 @@ import { JenisUkomService } from '@/modules/complement/services/jenis-ukom.servi
 import { UkomTaskService } from '@/modules/ukom/services/ukom-task.service'
 import { LoadingButtonComponent } from '@/modules/base/components/loading-button/loading-button.component'
 import { UkomDocumentService } from '@/modules/ukom/services/document.service'
+import {
+    BatasUsiaUkomError,
+    cekBatasUsiaUkom,
+    getBatasUsiaUkomMessage,
+} from '@/modules/base/commons/validators/batas-usia-ukom'
 
 @Component({
     selector: 'app-ukom-task-form',
@@ -88,6 +96,8 @@ export class UkomTaskFormComponent {
     }
     hadItemsLoading$ = new BehaviorSubject<boolean>(false)
     destroy$ = new Subject<void>()
+    // Dipicu setiap form di-init ulang agar subscription lama tidak menumpuk
+    reinit$ = new Subject<void>()
     isMengulang$ = new BehaviorSubject<boolean>(false)
     jabatanCodeArgument$ = new BehaviorSubject<string | null>(null)
     jenjangCodeArgument$ = new BehaviorSubject<string | null>(null)
@@ -110,6 +120,7 @@ export class UkomTaskFormComponent {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['ukom'] || changes['jf']) {
+            this.reinit$.next()
             this.handleFormInit()
             this.handleSubscribe()
             this.setupInstansiValidation()
@@ -129,6 +140,16 @@ export class UkomTaskFormComponent {
         const bidangJabatanControl = this.passwordForm.get(
             'bidang_jabatan_code',
         )
+
+        // confirmPassword harus divalidasi ulang ketika password berubah
+        this.passwordForm
+            .get('password')
+            .valueChanges.pipe(takeUntil(this.destroy$))
+            .subscribe(() => {
+                this.passwordForm
+                    .get('confirmPassword')
+                    ?.updateValueAndValidity()
+            })
 
         isMengulangControl.valueChanges
             .pipe(
@@ -203,6 +224,8 @@ export class UkomTaskFormComponent {
     }
 
     ngOnDestroy() {
+        this.reinit$.next()
+        this.reinit$.complete()
         this.destroy$.next()
         this.destroy$.complete()
     }
@@ -216,23 +239,53 @@ export class UkomTaskFormComponent {
     }
 
     handleFormInit() {
-        this.passwordForm = new FormGroup({
-            password: new FormControl('', [
-                Validators.required,
-                Validators.minLength(8),
-            ]),
-            confirmPassword: new FormControl('', [
-                Validators.required,
-                this.passwordMatchValidator.bind(this),
-            ]),
-            isMengulang: new FormControl('', [Validators.required]),
-            jenis_ukom: new FormControl('', Validators.required),
-            next_jabatan_code: new FormControl('', Validators.required),
-            next_jenjang_code: new FormControl('', Validators.required),
-            bidang_jabatan_code: new FormControl(''),
-            no_surat_usulan: new FormControl('', Validators.required),
-            tglSuratUsulan: new FormControl('', Validators.required),
+        this.passwordForm = new FormGroup(
+            {
+                password: new FormControl('', [
+                    Validators.required,
+                    Validators.minLength(8),
+                ]),
+                confirmPassword: new FormControl('', [
+                    Validators.required,
+                    this.passwordMatchValidator.bind(this),
+                ]),
+                isMengulang: new FormControl('', [Validators.required]),
+                jenis_ukom: new FormControl('', Validators.required),
+                next_jabatan_code: new FormControl('', Validators.required),
+                next_jenjang_code: new FormControl('', Validators.required),
+                bidang_jabatan_code: new FormControl(''),
+                no_surat_usulan: new FormControl('', Validators.required),
+                tglSuratUsulan: new FormControl('', Validators.required),
+            },
+            // Validator level group karena next_jenjang_code bisa disabled
+            // (validator control yang disabled tidak dijalankan)
+            { validators: this.batasUsiaValidator.bind(this) },
+        )
+    }
+
+    batasUsiaValidator(group: AbstractControl): ValidationErrors | null {
+        if (!this.jf) return null
+
+        const jenisUkom = group.get('jenis_ukom')?.value
+        const targetCode = group.get('next_jenjang_code')?.value
+        const targetJenjang =
+            this.nextJenjang?.code === targetCode
+                ? this.nextJenjang
+                : this.jenjangList.find((j) => j.code === targetCode)
+
+        const error = cekBatasUsiaUkom({
+            nip: this.jf.nip,
+            jenisUkom,
+            currentJenjangName: this.jf.jenjangName,
+            targetJenjangName: targetJenjang?.name,
         })
+        return error ? { batasUsia: error } : null
+    }
+
+    get batasUsiaMessage(): string | null {
+        const error: BatasUsiaUkomError =
+            this.passwordForm?.errors?.['batasUsia']
+        return error ? getBatasUsiaUkomMessage(error) : null
     }
 
     setupInstansiValidation() {
@@ -284,14 +337,34 @@ export class UkomTaskFormComponent {
                 tap(() => {
                     this.clearFilesName()
                 }),
+                // switchMap membatalkan request sebelumnya sehingga hanya
+                // hasil dari pilihan terakhir yang dipakai
+                switchMap(
+                    ([jenisUkom, jabatanCode, JenjangCode, isMengulang]) =>
+                        this.getDokumenPersyaratan(
+                            jenisUkom,
+                            jabatanCode,
+                            JenjangCode,
+                            isMengulang,
+                        ),
+                ),
+                takeUntil(this.reinit$),
             )
-            .subscribe(([jenisUkom, jabatanCode, JenjangCode, isMengulang]) => {
-                this.getDokumenPersyaratan(
-                    jenisUkom,
-                    jabatanCode,
-                    JenjangCode,
-                    isMengulang,
-                )
+            .subscribe({
+                next: (filteredList: DokumenUkomPersyaratan[]) => {
+                    this.dokumenPersyaratanList = filteredList
+
+                    this.detectedDokumen = {}
+                    this.inputs.files = {}
+
+                    filteredList.forEach((dokumen) => {
+                        const key = dokumen.dokumenPersyaratanId
+                        this.inputs.files[key] = {
+                            label: dokumen.dokumenPersyaratanName,
+                            id: dokumen.dokumenPersyaratanId,
+                        }
+                    })
+                },
             })
     }
 
@@ -344,13 +417,14 @@ export class UkomTaskFormComponent {
         jabatan: string,
         jenjang: string,
         isMengulang: boolean,
-    ) {
-        this.ukomDocumentService.getDocumentByJenisUkom(jenisUkom)
-        this.ukomDocumentService.documentByJenisUkom$
+    ): Observable<DokumenUkomPersyaratan[]> {
+        return this.apiService
+            .getData(
+                `${this.ukomDocumentService.BASE_PATH}/jenis_ukom/${jenisUkom}`,
+            )
             .pipe(
-                filter((docs) => docs.length > 0),
-                map((docs) =>
-                    docs
+                map((docs: any[]) =>
+                    (docs || [])
                         .filter((dokumen) => {
                             const specificationMatch =
                                 dokumen.specification === 'null' ||
@@ -384,28 +458,14 @@ export class UkomTaskFormComponent {
                                 }),
                         ),
                 ),
-            )
-            .subscribe({
-                next: (filteredList: DokumenUkomPersyaratan[]) => {
-                    this.dokumenPersyaratanList = filteredList
-
-                    this.detectedDokumen = {}
-                    this.inputs.files = {}
-
-                    filteredList.forEach((dokumen) => {
-                        const key = dokumen.dokumenPersyaratanId
-                        this.inputs.files[key] = {
-                            label: dokumen.dokumenPersyaratanName,
-                            id: dokumen.dokumenPersyaratanId,
-                        }
-                    })
-                },
-                error: (error) =>
+                catchError(() => {
                     this.handlerService.handleAlert(
                         'Error',
                         'Gagal mengambil dokumen persyaratan',
-                    ),
-            })
+                    )
+                    return of([])
+                }),
+            )
     }
 
     getNextJenjang() {

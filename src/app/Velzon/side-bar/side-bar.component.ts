@@ -14,8 +14,10 @@ import {
     SquareActivity,
     FileText,
     BookOpenText,
+    UserMinus,
 } from 'lucide-angular'
 import { IsActiveMatchOptions } from '@angular/router'
+import { Role } from '@/modules/security/models/role.model'
 
 @Component({
     selector: 'app-side-bar',
@@ -26,6 +28,8 @@ import { IsActiveMatchOptions } from '@angular/router'
 })
 export class SideBarComponent {
     menuTree: Menu[] = LoginContext.getMenus()
+    roles: string[] = LoginContext.getRoleCodes()
+    isParticipantUkom: boolean = LoginContext.getUserId().startsWith('PU')
     isScrollV = true
 
     readonly X = X
@@ -43,6 +47,11 @@ export class SideBarComponent {
             this.isScrollV = false
         } else {
             this.isScrollV = true
+        }
+
+        if (this.isParticipantUkom) {
+            //built tree for resignation
+            this.buildResignationMenu()
         }
     }
 
@@ -73,6 +82,7 @@ export class SideBarComponent {
             MNU_SEC0001: UserRoundCog,
             MNU_MNT0001: Database,
             MNU_MNTI0001: Database,
+            MNU_RESIGNATION: UserMinus,
         }
 
         return iconMap[menuCode] || LayoutDashboard // Default to Menu icon if no match
@@ -93,5 +103,45 @@ export class SideBarComponent {
             }
         }
         return false
+    }
+
+    private buildResignationMenu(): void {
+        const resignationMenu = new Menu({
+            code: 'MNU_RESIGNATION',
+            name: 'Pengunduran Diri',
+            level: 1,
+            type: 'MENU',
+            path: 'resignation',
+            fullPath: '/resignation',
+            active: false,
+            icon: 'UserMinus',
+            parentMenuCode: null,
+            child: [
+                new Menu({
+                    code: 'MNU_RESIGNATION_SUBMIT',
+                    name: 'Pengajuan Pengunduran Diri',
+                    level: 2,
+                    type: 'MENU',
+                    path: '',
+                    fullPath: '/resignation',
+                    active: false,
+                    parentMenuCode: 'MNU_RESIGNATION',
+                    child: [],
+                }),
+                new Menu({
+                    code: 'MNU_RESIGNATION_HISTORY',
+                    name: 'Riwayat Pengunduran Diri',
+                    level: 2,
+                    type: 'MENU',
+                    path: 'riwayat',
+                    fullPath: '/resignation/riwayat',
+                    active: false,
+                    parentMenuCode: 'MNU_RESIGNATION',
+                    child: [],
+                }),
+            ],
+        })
+
+        this.menuTree = [...this.menuTree, resignationMenu]
     }
 }

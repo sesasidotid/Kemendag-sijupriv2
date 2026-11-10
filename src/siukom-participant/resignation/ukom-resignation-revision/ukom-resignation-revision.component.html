@@ -1,0 +1,102 @@
+<div class="mb-4">
+    <label class="form-label fw-semibold d-block mb-1">
+        Surat Pengunduran Diri
+        <span class="text-danger">*</span>
+    </label>
+
+    <small class="text-muted d-block">
+        Unggah surat pengunduran diri dalam format PDF dengan ukuran maksimal 5
+        MB.
+    </small>
+</div>
+
+<div class="mb-3">
+    <!-- Upload Area -->
+    <div
+        *ngIf="!selectedFileName"
+        class="file-upload-area"
+        [class.dragging]="isDragging"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+    >
+        <input
+            (change)="onFileSelected($event)"
+            id="resignationFileInput"
+            class="hidden-input"
+            type="file"
+            accept=".pdf,application/pdf"
+        />
+
+        <label for="resignationFileInput" class="file-upload-content">
+            <!-- <div class="file-upload-icon">
+                <i class="mdi mdi-file-pdf-box"></i>
+            </div> -->
+
+            <div class="file-upload-text">
+                <span class="fw-semibold">
+                    Pilih file surat pengunduran diri
+                </span>
+
+                <small class="text-muted d-block mt-1">
+                    atau seret file ke area ini
+                </small>
+            </div>
+
+            <span class="btn btn-outline-primary btn-sm mt-2">
+                Pilih File
+            </span>
+        </label>
+    </div>
+
+    <!-- Selected File -->
+    <div
+        *ngIf="selectedFileName"
+        class="selected-file d-flex align-items-center justify-content-between gap-3"
+    >
+        <div class="d-flex align-items-center gap-3 overflow-hidden">
+            <div class="selected-file-icon">
+                <i class="mdi mdi-check-circle-outline"></i>
+            </div>
+
+            <div class="overflow-hidden">
+                <div
+                    class="fw-semibold text-truncate"
+                    [title]="selectedFileName"
+                >
+                    {{ selectedFileName }}
+                </div>
+
+                <small class="text-muted"> File berhasil dipilih </small>
+            </div>
+        </div>
+
+        <button
+            type="button"
+            (click)="removeFile()"
+            class="btn btn-soft-danger btn-sm flex-shrink-0"
+        >
+            <i class="bi bi-trash me-1"></i>
+            Hapus
+        </button>
+    </div>
+
+    <!-- Error -->
+    <div class="invalid-feedback d-block mt-2" *ngIf="fileError">
+        {{ fileError }}
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="d-flex justify-content-end border-top mt-4 gap-2 pt-4">
+    <button type="button" class="btn btn-light" (click)="onClose()">
+        Batal
+    </button>
+
+    <app-loading-button
+        [className]="'btn btn-primary'"
+        [label]="'Simpan Perbaikan'"
+        [disabled]="isFileMissing()"
+        (clicked)="onSave()"
+    ></app-loading-button>
+</div>

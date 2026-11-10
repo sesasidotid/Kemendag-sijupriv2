@@ -64,7 +64,7 @@ export class UkomGradeImportComponent {
 
     downloadTemplate() {
         this.apiService
-            .getDownload(`/api/v1/exam_grade/download`, 'template_grade.xlsx')
+            .getDownload(`/api/v1/ukom_grade/download`, 'template_grade_class.xlsx')
             .subscribe({
                 error: (err) => {
                     console.error(err)

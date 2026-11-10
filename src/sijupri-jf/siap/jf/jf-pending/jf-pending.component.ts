@@ -13,7 +13,7 @@ import {
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
-    Validators
+    Validators,
 } from '@angular/forms'
 import { CommonModule } from '@angular/common'
 import { Task } from '../../../../modules/workflow/models/task.model'
@@ -23,6 +23,8 @@ import { EmptyStateComponent } from '../../../../modules/base/components/empty-s
 import { Router } from '@angular/router'
 import { fileValidator } from '../../../../modules/base/validators/file-format.validator'
 import { FormValidationService } from '../../../../modules/base/services/form-validation.service'
+import { UkomTaskDetail } from '@/modules/ukom/models/ukom-task-detail.modal'
+import { UkomTaskService } from '@/modules/ukom/services/ukom-task.service'
 
 @Component({
     selector: 'app-jf-pending',
@@ -32,13 +34,14 @@ import { FormValidationService } from '../../../../modules/base/services/form-va
         FormsModule,
         FileHandlerComponent,
         ReactiveFormsModule,
-        EmptyStateComponent
+        EmptyStateComponent,
     ],
     templateUrl: './jf-pending.component.html',
-    styleUrl: './jf-pending.component.scss'
+    styleUrl: './jf-pending.component.scss',
 })
 export class JfPendingComponent {
     jf: JF = new JF()
+    ukomPendingTask = new UkomTaskDetail()
     jenisKelaminList: JenisKelamin[] = []
     pendingTask: PendingTask
     nip: string = LoginContext.getUserId()
@@ -57,16 +60,22 @@ export class JfPendingComponent {
         private alertService: AlertService,
         private router: Router,
         private formValidationService: FormValidationService,
-    ) { }
+        public ukomTaskService: UkomTaskService,
+    ) {}
 
     ngOnInit() {
         this.getPendingTask()
+        this.getUkomPendingTask()
         this.getJenisKelamin()
         this.handleFormInit()
     }
 
     getErrorMessage(controlName: string, label: string): string | null {
-        return this.formValidationService.getErrorMessage(this.jfDetailForm.get(controlName), controlName, label);
+        return this.formValidationService.getErrorMessage(
+            this.jfDetailForm.get(controlName),
+            controlName,
+            label,
+        )
     }
 
     handleFormInit() {
@@ -74,27 +83,29 @@ export class JfPendingComponent {
             name: new FormControl(this.jf.name, [Validators.required]),
             phone: new FormControl(this.jf.phone, [
                 Validators.required,
-                Validators.pattern(/^\d{10,15}$/)
+                Validators.pattern(/^\d{10,15}$/),
             ]),
             email: new FormControl(this.jf.email, [
                 Validators.required,
-                Validators.email
+                Validators.email,
             ]),
-            tempatLahir: new FormControl(this.jf.tempatLahir, [Validators.required]),
+            tempatLahir: new FormControl(this.jf.tempatLahir, [
+                Validators.required,
+            ]),
             tanggalLahir: new FormControl(this.jf.tanggalLahir, [
-                Validators.required
+                Validators.required,
             ]),
             jenisKelaminCode: new FormControl(this.jf.jenisKelaminCode, [
-                Validators.required
+                Validators.required,
             ]),
             nik: new FormControl(this.jf.nik, [
                 Validators.required,
-                Validators.pattern(/^\d{16}$/)
+                Validators.pattern(/^\d{16}$/),
             ]),
             fileKtp: new FormControl('', [
                 Validators.required,
-                fileValidator(['application/pdf'], 2)
-            ])
+                fileValidator(['application/pdf'], 2),
+            ]),
         })
     }
 
@@ -104,66 +115,85 @@ export class JfPendingComponent {
                 ktp: {
                     label: 'Upload Dokumen KTP',
                     fileName: this.jf.ktp,
-                    source: this.jf.ktpUrl
-                }
+                    source: this.jf.ktpUrl,
+                },
             },
             viewOnly: true,
             listen: (key: string, source: string, base64Data: string) => {
                 this.jfDetailForm.patchValue({ fileKtp: base64Data })
-            }
+            },
         }
+    }
+
+    getUkomPendingTask(): void {
+        this.ukomTaskService.findByNip(this.nip).subscribe({
+            next: (response) => {
+                this.ukomPendingTask = response
+            },
+            error: (err) => {
+                if (err.status === 404) {
+                    this.ukomPendingTask = null
+                    return
+                }
+
+                console.error('Gagal mengambil pending task', err)
+            },
+        })
     }
 
     getPendingTask() {
         this.loading$.next(true)
-        this.apiService.getData(`/api/v1/jf/expect_pending/${this.nip}`).subscribe({
-            next: response => {
-                this.pendingTask = new PendingTask(response)
-                this.jf = new JF(this.pendingTask.objectTask.object)
+        this.apiService
+            .getData(`/api/v1/jf/expect_pending/${this.nip}`)
+            .subscribe({
+                next: (response) => {
+                    this.pendingTask = new PendingTask(response)
+                    this.jf = new JF(this.pendingTask.objectTask.object)
 
-                this.jfDetailForm.patchValue({
-                    name: this.jf.name,
-                    phone: this.jf.phone,
-                    email: this.jf.email,
-                    tempatLahir: this.jf.tempatLahir,
-                    tanggalLahir: this.jf.tanggalLahir,
-                    jenisKelaminCode: this.jf.jenisKelaminCode,
-                    nik: this.jf.nik
-                })
+                    this.jfDetailForm.patchValue({
+                        name: this.jf.name,
+                        phone: this.jf.phone,
+                        email: this.jf.email,
+                        tempatLahir: this.jf.tempatLahir,
+                        tanggalLahir: this.jf.tanggalLahir,
+                        jenisKelaminCode: this.jf.jenisKelaminCode,
+                        nik: this.jf.nik,
+                    })
 
-                this.fileLoadHandler()
-                this.inputs.viewOnly = this.pendingTask.flowId == 'siap_flow_1'
+                    this.fileLoadHandler()
+                    this.inputs.viewOnly =
+                        this.pendingTask.flowId == 'siap_flow_1'
 
-                if (this.pendingTask.flowId == 'siap_flow_1') {
-                    this.jfDetailForm.get('name')?.disable()
-                    this.jfDetailForm.get('phone')?.disable()
-                    this.jfDetailForm.get('email')?.disable()
-                    this.jfDetailForm.get('tempatLahir')?.disable()
-                    this.jfDetailForm.get('tanggalLahir')?.disable()
-                    this.jfDetailForm.get('jenisKelaminCode')?.disable()
-                    this.jfDetailForm.get('nik')?.disable()
-                }
-                this.loading$.next(false)
-            },
-            error: error => {
-                // this.alertService.showToast('Error', "Gagal mendapatkan data profil!");
-                // this.handlerService.handleException(error);
-                this.loading$.next(false)
-            }
-        })
+                    if (this.pendingTask.flowId == 'siap_flow_1') {
+                        this.jfDetailForm.get('name')?.disable()
+                        this.jfDetailForm.get('phone')?.disable()
+                        this.jfDetailForm.get('email')?.disable()
+                        this.jfDetailForm.get('tempatLahir')?.disable()
+                        this.jfDetailForm.get('tanggalLahir')?.disable()
+                        this.jfDetailForm.get('jenisKelaminCode')?.disable()
+                        this.jfDetailForm.get('nik')?.disable()
+                    }
+                    this.loading$.next(false)
+                },
+                error: (error) => {
+                    // this.alertService.showToast('Error', "Gagal mendapatkan data profil!");
+                    // this.handlerService.handleException(error);
+                    this.loading$.next(false)
+                },
+            })
     }
 
     getJenisKelamin() {
         this.apiService.getData(`/api/v1/jenis_kelamin`).subscribe({
-            next: response => {
+            next: (response) => {
                 this.jenisKelaminList = response.map(
                     (jenisKelamin: { [key: string]: any }) =>
-                        new JenisKelamin(jenisKelamin)
+                        new JenisKelamin(jenisKelamin),
                 )
             },
-            error: error => {
+            error: (error) => {
                 this.handlerService.handleException(error)
-            }
+            },
         })
     }
 
@@ -183,7 +213,7 @@ export class JfPendingComponent {
             this.jf.ktpUrl = this.jfDetailForm.value.fileKtp
 
             this.confirmationService.open(false).subscribe({
-                next: result => {
+                next: (result) => {
                     if (!result.confirmed) return
                     this.submitLoading$.next(true)
 
@@ -192,17 +222,19 @@ export class JfPendingComponent {
                     task.taskAction = 'approve'
                     task.object = this.jf
 
-                    this.apiService.postData(`/api/v1/jf/task/submit`, task).subscribe({
-                        next: () => {
-                            this.handlerService.handleAlert(
-                                'Success',
-                                'Berhasil mengajukan perubahan data.'
-                            )
-                            this.submitLoading$.next(false)
-                            window.location.reload()
-                        }
-                    })
-                }
+                    this.apiService
+                        .postData(`/api/v1/jf/task/submit`, task)
+                        .subscribe({
+                            next: () => {
+                                this.handlerService.handleAlert(
+                                    'Success',
+                                    'Berhasil mengajukan perubahan data.',
+                                )
+                                this.submitLoading$.next(false)
+                                window.location.reload()
+                            },
+                        })
+                },
             })
         }
     }

@@ -35,6 +35,9 @@ export class CatExamSecurityService {
     readonly violationCount = this._violationCount.asReadonly()
     private lastViolationReason = signal<string>('')
     private lastViolationTime = 0
+    private isCurrentlyAway = false // BARU
+    private returnGraceTimer: ReturnType<typeof setTimeout> | undefined // BARU
+    private readonly RETURN_GRACE_PERIOD_MS = 3000 // BARU — 3 detik, bisa disesuaikan
     private _isFullscreen = signal(false)
     readonly isFullscreen = this._isFullscreen.asReadonly()
     /**
@@ -114,12 +117,31 @@ export class CatExamSecurityService {
         )
             return
 
-        const now = Date.now()
-        if (now - this.lastViolationTime < 1000) {
+        // Kalau status masih "away" dari kejadian sebelumnya, ini bukan
+        // pelanggaran baru — masih bagian dari kejadian yang sama
+        // (misal: beberapa event blur/hidden/fullscreen-exit yang muncul
+        // beruntun akibat 1 insiden, seperti laptop mati/lock screen).
+        if (this.isCurrentlyAway) {
+            // console.warn(
+            //     '[VIOLATION-DEBUG] diblokir, masih dalam status away',
+            //     new Date().toISOString(),
+            // )
             return
         }
 
-        this.lastViolationTime = now
+        // Batalkan grace period yang mungkin lagi jalan — user belum beneran balik
+        if (this.returnGraceTimer) {
+            clearTimeout(this.returnGraceTimer)
+            this.returnGraceTimer = undefined
+        }
+
+        this.isCurrentlyAway = true
+        // console.warn(
+        //     '[VIOLATION-DEBUG] violation baru dihitung',
+        //     reason,
+        //     new Date().toISOString(),
+        // )
+
         if (reason) this.lastViolationReason.set(reason)
 
         if (this._violationCount() < this.MAX_VIOLATIONS) {
@@ -132,7 +154,7 @@ export class CatExamSecurityService {
             if (this.examScheduleId) {
                 this.queueService.addViolation(this.examScheduleId, {
                     reason,
-                    timestamp: now,
+                    timestamp: Date.now(),
                 })
             }
         }
@@ -187,19 +209,44 @@ export class CatExamSecurityService {
      * Only adds violation - the effect will handle alerts and auto-submit
      */
     handleVisibilityChange() {
+        // console.warn(
+        //     '[SEC-DEBUG] visibilitychange | hidden=',
+        //     document.hidden,
+        //     '|',
+        //     new Date().toISOString(),
+        // )
         if (document.hidden) {
             this.addViolation(
                 'Anda meninggalkan halaman ujian (berpindah tab/window)',
             )
+        } else {
+            this.markReturned()
         }
     }
 
     handleBlur() {
-        // If blur happens but tab is NOT hidden, it's suspicious ALT+TAB or OS switch
+        // console.warn(
+        //     '[SEC-DEBUG] blur | document.hidden=',
+        //     document.hidden,
+        //     '|',
+        //     new Date().toISOString(),
+        // )
         if (!document.hidden) {
             this.addViolation(
                 'Anda meninggalkan halaman ujian (berpindah tab/window atau aktivitas mencurigakan lainya). Jika merasa tidak sesuai, segera hubungi panitia',
             )
+        }
+    }
+
+    handleFocus() {
+        // console.warn(
+        //     '[SEC-DEBUG] focus | document.hidden=',
+        //     document.hidden,
+        //     '|',
+        //     new Date().toISOString(),
+        // )
+        if (!document.hidden) {
+            this.markReturned()
         }
     }
 
@@ -225,14 +272,20 @@ export class CatExamSecurityService {
     }
 
     handleFullscreenExit() {
+        // console.warn(
+        //     '[SEC-DEBUG] fullscreenchange | fullscreenElement=',
+        //     !!document.fullscreenElement,
+        //     '|',
+        //     new Date().toISOString(),
+        // )
         if (!document.fullscreenElement) {
             this._isFullscreen.set(false)
-
             this.addViolation(
                 'Anda keluar dari fullscreen, mohon tetap berada dalam model fullscreen saat waktu ujian berlangsung',
             )
         } else {
             this._isFullscreen.set(true)
+            this.markReturned()
         }
     }
 
@@ -244,9 +297,29 @@ export class CatExamSecurityService {
     }
 
     /**
+     * Mark that the user has returned to the exam (focus regained,
+     * tab visible again, and fullscreen restored). Allows the next
+     * departure to be counted as a new violation.
+     */
+    markReturned() {
+        if (this.returnGraceTimer) {
+            clearTimeout(this.returnGraceTimer)
+        }
+        this.returnGraceTimer = setTimeout(() => {
+            this.isCurrentlyAway = false
+            this.returnGraceTimer = undefined
+        }, this.RETURN_GRACE_PERIOD_MS)
+    }
+
+    /**
      * Mark that exam is submitted
      */
     markSubmitted() {
+        // console.warn(
+        //     '[CAT-DEBUG] markSubmitted terpanggil!',
+        //     new Date().toISOString(),
+        // )
+        // console.trace()
         this.isSubmitted.set(true)
     }
 

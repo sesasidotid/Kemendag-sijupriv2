@@ -307,6 +307,13 @@ export const routes: Routes = [
                                             m.UkomExamChooseCompQuestionsComponent,
                                     ),
                             },
+                            {
+                                path: ':id/import-grade-class',
+                                loadComponent: () =>
+                                    import('./ukom/ukom-class/ukom-import-grade/ukom-import-grade.component').then(
+                                        (m) => m.UkomImportGradeComponent,
+                                    ),
+                            },
                         ],
                     },
                     'Penguji Ukom': {
@@ -320,6 +327,35 @@ export const routes: Routes = [
                             import('./ukom/ukom-registration-requirement/ukom-registration-requirement.component').then(
                                 (m) => m.UkomRegistrationRequirementComponent,
                             ),
+                    },
+                    'Syarat Pengunduran': {
+                        components: () =>
+                            import('./ukom/ukom-resignation-document/ukom-resignation-document-list/ukom-resignation-document-list.component').then(
+                                (m) => m.UkomResignationDocumentListComponent,
+                            ),
+                    },
+                    'Pengunduran Diri': {
+                        components: () =>
+                            import('./ukom/ukom-resignation/ukom-resignation-list/ukom-resignation-list.component').then(
+                                (m) => m.UkomResignationListComponent,
+                            ),
+                        routes: [
+                            {
+                                path: ':id',
+                                loadComponent: () =>
+                                    import('./ukom/ukom-resignation/ukom-resignation-task-detail/ukom-resignation-task-detail.component').then(
+                                        (m) =>
+                                            m.UkomResignationTaskDetailComponent,
+                                    ),
+                            },
+                            {
+                                path: ':id/detail',
+                                loadComponent: () =>
+                                    import('./ukom/ukom-resignation/ukom-resignation-detail/ukom-resignation-detail.component').then(
+                                        (m) => m.UkomResignationDetailComponent,
+                                    ),
+                            },
+                        ],
                     },
                 },
                 Maintenance: {

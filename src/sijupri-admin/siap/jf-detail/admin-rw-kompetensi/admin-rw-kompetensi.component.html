@@ -1,0 +1,39 @@
+<ul class="nav sub-tab-nav justify-content-end mb-3">
+    <li class="nav-item">
+        <button
+            type="button"
+            class="nav-link pending-tab"
+            [class.active]="activeSubTab === 'sekarang'"
+            (click)="changeSubTab('sekarang')"
+        >
+            <i class="mdi mdi-home-account me-1"></i>
+            Data Terverifikasi
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button
+            type="button"
+            class="nav-link pending-tab"
+            [class.active]="activeSubTab === 'pending'"
+            (click)="changeSubTab('pending')"
+        >
+            <i class="mdi mdi-account-clock me-1"></i>
+            Data Pending
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <ng-container *ngIf="activeSubTab === 'sekarang'">
+        <app-admin-rw-kompetensi-list
+            [nip]="nip"
+        ></app-admin-rw-kompetensi-list>
+    </ng-container>
+
+    <ng-container *ngIf="activeSubTab === 'pending'">
+        <app-admin-rw-kompetensi-pending
+            [nip]="nip"
+        ></app-admin-rw-kompetensi-pending>
+    </ng-container>
+</div>

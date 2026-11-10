@@ -31,12 +31,25 @@ export class UpdateExaminerModalComponent implements OnInit {
     @Output() close = new EventEmitter<void>()
     @Output() confirm = new EventEmitter<{
         participant: ParticipantSchedule
-        examinerId: string
+        examinerIds: string[]
     }>()
 
-    selectedExaminerId: string | null = null
-    currentExaminerId: string | null = null
+    /** Batas jumlah penguji wawancara — harus sama dengan maxExaminerFor() di backend */
+    @Input() minExaminerCount = 1
+    /** null = tanpa batas (wawancara boleh banyak penguji) */
+    @Input() maxExaminerCount: number | null = null
+
+    selectedExaminerIds: string[] = []
+    currentExaminerIds: string[] = []
     columnDefs: ColDef[] = [
+        {
+            checkboxSelection: true,
+            width: 50,
+            maxWidth: 50,
+            sortable: false,
+            filter: false,
+            resizable: false,
+        },
         {
             headerName: 'Nama Penguji',
             field: 'examinerUkom.user.name',
@@ -61,7 +74,9 @@ export class UpdateExaminerModalComponent implements OnInit {
             cellClass: 'text-center',
             valueGetter: (params) => {
                 const examiner = params.data as ExaminerScheduleList
-                return this.currentExaminerId === examiner.id ? 'Saat Ini' : ''
+                return this.currentExaminerIds.includes(examiner.id)
+                    ? 'Saat Ini'
+                    : ''
             },
             cellRenderer: (params: any) => {
                 if (params.value === 'Saat Ini') {
@@ -79,27 +94,65 @@ export class UpdateExaminerModalComponent implements OnInit {
     private gridApi!: GridApi
 
     ngOnInit(): void {
-        // Find current examiner ID based on participant's examiner name
-        if (this.participant.examinerName) {
-            const currentExaminer = this.examinerList.find(
-                (e) =>
-                    e.examinerUkom?.user?.name ===
-                    this.participant.examinerName,
+        const availableIds = new Set(this.examinerList.map((e) => e.id))
+
+        if (this.participant.examinerIds?.length) {
+            // Preferred: use examiner_schedule IDs resolved by the parent
+            this.currentExaminerIds = this.participant.examinerIds.filter(
+                (id) => availableIds.has(id),
             )
-            if (currentExaminer) {
-                this.currentExaminerId = currentExaminer.id
-                this.selectedExaminerId = currentExaminer.id
-            }
+        } else if (this.participant.examinerName) {
+            // Fallback: match by examiner name(s)
+            const names = this.participant.examinerName
+                .split(',')
+                .map((n) => n.trim())
+            this.currentExaminerIds = this.examinerList
+                .filter((e) => names.includes(e.examinerUkom?.user?.name ?? ''))
+                .map((e) => e.id)
         }
+
+        if (this.maxExaminerCount !== null) {
+            this.currentExaminerIds = this.currentExaminerIds.slice(
+                0,
+                this.maxExaminerCount,
+            )
+        }
+        this.selectedExaminerIds = [...this.currentExaminerIds]
+    }
+
+    get isSelectionValid(): boolean {
+        const count = this.selectedExaminerIds.length
+        return (
+            count >= this.minExaminerCount &&
+            (this.maxExaminerCount === null || count <= this.maxExaminerCount)
+        )
+    }
+
+    get isUnchanged(): boolean {
+        const a = [...this.selectedExaminerIds].sort()
+        const b = [...this.currentExaminerIds].sort()
+        return a.length === b.length && a.every((id, i) => id === b[i])
+    }
+
+    get selectedExaminerNames(): string[] {
+        return this.selectedExaminerIds.map(
+            (id) =>
+                this.examinerList.find((e) => e.id === id)?.examinerUkom?.user
+                    ?.name ?? 'Unknown',
+        )
     }
 
     onConfirm(): void {
-        if (this.selectedExaminerId) {
-            this.confirm.emit({
-                participant: this.participant,
-                examinerId: this.selectedExaminerId,
-            })
+        if (!this.isSelectionValid) return
+        if (this.isUnchanged) {
+            this.close.emit()
+            return
         }
+
+        this.confirm.emit({
+            participant: this.participant,
+            examinerIds: [...this.selectedExaminerIds],
+        })
     }
 
     onClose(): void {
@@ -110,10 +163,10 @@ export class UpdateExaminerModalComponent implements OnInit {
         this.gridApi = params.api
         this.gridApi.sizeColumnsToFit()
 
-        // Pre-select current examiner in grid
-        if (this.currentExaminerId) {
+        // Pre-select current examiners in grid
+        if (this.currentExaminerIds.length > 0) {
             this.gridApi.forEachNode((node) => {
-                if (node.data?.id === this.currentExaminerId) {
+                if (this.currentExaminerIds.includes(node.data?.id)) {
                     node.setSelected(true)
                 }
             })
@@ -121,14 +174,32 @@ export class UpdateExaminerModalComponent implements OnInit {
     }
 
     onSelectionChanged(event: SelectionChangedEvent): void {
-        const selectedRows = event.api.getSelectedRows()
-        this.selectedExaminerId =
-            selectedRows.length > 0 ? selectedRows[0].id : null
+        const selectedIds = (
+            event.api.getSelectedRows() as ExaminerScheduleList[]
+        ).map((row) => row.id)
+
+        if (
+            this.maxExaminerCount !== null &&
+            selectedIds.length > this.maxExaminerCount
+        ) {
+            // Keep previous selection, deselect the newly added row(s)
+            const newlyAdded = selectedIds.filter(
+                (id) => !this.selectedExaminerIds.includes(id),
+            )
+            event.api.forEachNode((node) => {
+                if (newlyAdded.includes(node.data?.id)) {
+                    node.setSelected(false)
+                }
+            })
+            return
+        }
+
+        this.selectedExaminerIds = selectedIds
     }
 
     getRowClass(params: RowClassParams): string | undefined {
         const examiner = params.data as ExaminerScheduleList
-        if (examiner.id === this.currentExaminerId) {
+        if (this.currentExaminerIds.includes(examiner.id)) {
             return 'current-examiner'
         }
         return undefined

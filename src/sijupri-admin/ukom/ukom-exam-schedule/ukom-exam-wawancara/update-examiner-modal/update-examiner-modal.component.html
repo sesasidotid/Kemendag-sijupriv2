@@ -55,16 +55,41 @@
                 [defaultColDef]="defaultColDef"
                 [getRowClass]="getRowClass.bind(this)"
                 [rowData]="examinerList"
-                [rowSelection]="'single'"
+                [rowMultiSelectWithClick]="true"
+                [rowSelection]="'multiple'"
                 [style.height]="calculateGridHeight()"
                 class="ag-theme-alpine"
             >
             </ag-grid-angular>
         </div>
 
-        <div *ngIf="!selectedExaminerId" class="alert alert-warning mt-3">
+        <div
+            *ngIf="isSelectionValid"
+            class="alert alert-light border mt-3 mb-0"
+        >
+            <i class="bi bi-check2-square me-2"></i>
+            {{ selectedExaminerIds.length }}
+            <ng-container *ngIf="maxExaminerCount !== null">
+                dari maksimal {{ maxExaminerCount }}
+            </ng-container>
+            penguji dipilih:
+            <strong>{{ selectedExaminerNames.join(', ') }}</strong>
+            <span *ngIf="isUnchanged" class="text-muted">
+                (tidak ada perubahan)</span
+            >
+        </div>
+
+        <div *ngIf="!isSelectionValid" class="alert alert-warning mt-3">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            Silakan pilih penguji sebelum menyimpan.
+            <ng-container *ngIf="maxExaminerCount !== null; else noMax">
+                Silakan pilih {{ minExaminerCount }} sampai
+                {{ maxExaminerCount }} penguji sebelum menyimpan
+            </ng-container>
+            <ng-template #noMax>
+                Silakan pilih minimal {{ minExaminerCount }} penguji sebelum
+                menyimpan
+            </ng-template>
+            ({{ selectedExaminerIds.length }} dipilih).
         </div>
     </div>
 </app-modal>
