@@ -60,6 +60,13 @@ export const routes: Routes = [
             ).then((m) => m.StatusPendaftaranUkomComponent),
     },
     {
+        path: 'ukom/detail/:id',
+        loadComponent: () => 
+            import(
+                '../../src/siukom-participant/ukom-detail/ukom-detail.component'
+            ).then((m) => m.UkomDetailComponent),
+    },
+    {
         path: 'akp-grading/:whoIs/:id',
         loadComponent: () =>
             import(

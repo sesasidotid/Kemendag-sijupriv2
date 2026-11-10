@@ -1,0 +1,23 @@
+<app-landing-page [imported]="true"></app-landing-page>
+
+<script src="ukom-detail.component.ts"></script>
+
+<div
+    *ngIf="isLoading(); else ukomHadItem"
+    class="d-flex justify-content-center my-5"
+>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<ng-template #ukomHadItem>
+    <ng-container *ngIf="ukomGrade.id">
+        <app-ukom-grade-detail-table
+            [gradeData]="ukomGrade"
+            [roomUkomData]="classUkomRoom"
+            [nama]="ukomDetail().name"
+            [nip]="ukomDetail().nip"
+        ></app-ukom-grade-detail-table>
+    </ng-container>
+</ng-template>

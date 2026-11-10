@@ -21,6 +21,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
                 '/ukom/external/status',
                 '/akp-grading',
                 '/ukm-clarrify',
+                '/ukom/detail',
             ]
 
             // --- role check ---
