@@ -124,7 +124,7 @@
                             </div>
                         </div>
 
-                        <div class="chart-box" style="height: 300px">
+                        <div class="chart-box">
                             <div class="chart-overlay" *ngIf="trendLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
                             <canvas baseChart [type]="'line'" [data]="trendChartData" [options]="trendChartOptions"></canvas>
                         </div>
@@ -198,7 +198,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="chart-box" style="height: 300px">
+                        <div class="chart-box">
                             <div class="chart-overlay" *ngIf="ukomLoading"><ng-container *ngTemplateOutlet="miniSpinner"></ng-container></div>
                             <canvas baseChart [type]="'bar'" [data]="ukomGradeChartData" [options]="ukomGradeChartOptions"></canvas>
                         </div>

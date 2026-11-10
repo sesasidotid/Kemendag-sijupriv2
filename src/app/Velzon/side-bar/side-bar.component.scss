@@ -11,7 +11,7 @@
   justify-content: space-between;
   padding-right: 8px;
   padding-left: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   // background-color: #0D1120;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -42,4 +42,33 @@
 
 .container-fluid {
   padding: 0;
+}
+
+// Compact sizing (overrides Velzon defaults: 15px / 14px text, 18px icons)
+.navbar-menu .navbar-nav {
+  .nav-link {
+    font-size: 0.8125rem; // 13px
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      margin-right: 0.6rem;
+    }
+
+    &[data-bs-toggle='collapse']::after {
+      font-size: 0.95rem;
+    }
+  }
+
+  .nav-sm .nav-link {
+    font-size: 0.78125rem; // 12.5px
+    padding: 0.4rem 1.5rem !important;
+
+    &::before {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
 }
