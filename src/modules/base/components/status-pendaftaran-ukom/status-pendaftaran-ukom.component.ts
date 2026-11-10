@@ -267,6 +267,12 @@ export class StatusPendaftaranUkomComponent {
         }
     }
 
+        this.fileHandlerData = {
+            ...this.fileHandlerData,
+            files,
+        }
+    }
+    
     toggleScoreModal(scheduleId?: string, examTypeCode?: string) {
         if (scheduleId && examTypeCode) {
             this.selectedScheduleId = scheduleId
@@ -437,7 +443,10 @@ export class StatusPendaftaranUkomComponent {
                     if (response.status === 'finish') {
                         this.registrationStatus = response.status
                         this.finishTask = response.data
-                        this.dataDokumenUkom = response.data.documentUkomList
+                        this.dataDokumenUkom =
+                            response.data.documentUkomList ??
+                            response.data.dokumenUkomList ??
+                            []
                         this.mapDokumenUkom()
 
                         this.buildScheduleMap() // <-- HERE
@@ -448,7 +457,10 @@ export class StatusPendaftaranUkomComponent {
                     if (response.status === 'failed') {
                         this.registrationStatus = response.status
                         this.finishTask = response.data
-                        this.dataDokumenUkom = response.data.documentUkomList
+                        this.dataDokumenUkom =
+                            response.data.documentUkomList ??
+                            response.data.dokumenUkomList ??
+                            []
                         this.mapDokumenUkom()
                     }
                 }),
