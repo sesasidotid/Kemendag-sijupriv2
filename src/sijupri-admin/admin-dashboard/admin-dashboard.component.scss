@@ -3,11 +3,63 @@ $approve: #0ca30c;
 $pending: #fab219;
 $reject: #d03b3b;
 
+// skala ukuran dashboard (1 = ukuran tema). Dipakai sebagai pengganti `zoom`
+// supaya modal & perhitungan posisi JS (tooltip chart, dropdown) tidak terpengaruh.
+$dash-scale: 0.86;
+
+// ukuran default tema Velzon
+$base-font: 0.875rem;
+$base-sm-font: 0.765625rem;
+
 .admin-dashboard {
     --dash-border: var(--vz-border-color, #e9ebec);
     --dash-soft: var(--vz-light, #f3f6f9);
     --dash-primary: var(--vz-primary, #2967be);
     --dash-primary-rgb: var(--vz-primary-rgb, 41, 103, 190);
+
+    font-size: $base-font * $dash-scale;
+
+    h4,
+    .h4 {
+        font-size: 1.25625rem * $dash-scale;
+    }
+
+    h5,
+    .h5 {
+        font-size: 1.09375rem * $dash-scale;
+    }
+
+    h6,
+    .h6 {
+        font-size: $base-font * $dash-scale;
+    }
+
+    .fs-4 {
+        font-size: 1.25625rem * $dash-scale !important;
+    }
+
+    .fs-5 {
+        font-size: 1.09375rem * $dash-scale !important;
+    }
+
+    .fs-6 {
+        font-size: $base-font * $dash-scale !important;
+    }
+
+    .btn-sm,
+    .btn-group-sm > .btn {
+        --vz-btn-font-size: #{$base-sm-font * $dash-scale};
+    }
+
+    .form-select-sm,
+    .form-control-sm {
+        font-size: $base-sm-font * $dash-scale;
+    }
+
+    .card {
+        --vz-card-spacer-x: #{1rem * $dash-scale};
+        --vz-card-spacer-y: #{1rem * $dash-scale};
+    }
 }
 
 .dash-card {
@@ -16,13 +68,13 @@ $reject: #d03b3b;
     box-shadow: 0 1px 2px rgba(56, 65, 74, 0.06);
 
     .card-title {
-        font-size: 1rem;
+        font-size: 1rem * $dash-scale;
         font-weight: 600;
     }
 }
 
 .hero-number {
-    font-size: 2rem;
+    font-size: 2rem * $dash-scale;
     font-weight: 700;
     line-height: 1.1;
     font-variant-numeric: tabular-nums;
@@ -63,7 +115,7 @@ $reject: #d03b3b;
     border-radius: 6px;
     background: transparent;
     color: inherit;
-    font-size: 0.8125rem;
+    font-size: 0.8125rem * $dash-scale;
     text-align: left;
     transition: background-color 0.15s ease;
 
@@ -124,6 +176,7 @@ $reject: #d03b3b;
 .chart-box {
     position: relative;
     width: 100%;
+    height: 300px * $dash-scale;
 
     canvas {
         max-width: 100%;
@@ -208,7 +261,7 @@ $reject: #d03b3b;
 // ===== Donut =====
 .donut-box {
     position: relative;
-    height: 190px;
+    height: 190px * $dash-scale;
 }
 
 .donut-center {
@@ -221,7 +274,7 @@ $reject: #d03b3b;
     pointer-events: none;
 
     .donut-value {
-        font-size: 1.6rem;
+        font-size: 1.6rem * $dash-scale;
         font-weight: 700;
         line-height: 1.1;
         font-variant-numeric: tabular-nums;
