@@ -21,6 +21,18 @@
         </a>
     </ng-container>
 
+    <ng-container *ngTemplateOutlet="secretKeyButton"></ng-container>
+</div>
+
+<!-- Rejected (FAILED) tasks: header above is hidden, parent renders its own -->
+<div
+    *ngIf="pendingTask.taskStatus === 'FAILED' && pendingTask.secretKey"
+    class="d-flex justify-content-end mb-3"
+>
+    <ng-container *ngTemplateOutlet="secretKeyButton"></ng-container>
+</div>
+
+<ng-template #secretKeyButton>
     <button
         *ngIf="pendingTask.secretKey"
         type="button"
@@ -33,7 +45,7 @@
         ></i>
         {{ showSecretKey ? 'Sembunyikan Kode' : 'Lihat Kode Pendaftaran' }}
     </button>
-</div>
+</ng-template>
 
 <div
     *ngIf="isLoading$ | async; else content"
