@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common'
-import { Component } from '@angular/core'
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    HostListener,
+    OnDestroy,
+} from '@angular/core'
 import {
     FormControl,
     FormGroup,
@@ -8,7 +14,24 @@ import {
     Validators,
 } from '@angular/forms'
 import { Router, RouterModule } from '@angular/router'
-import { LucideAngularModule, SquareX, SquareCheck } from 'lucide-angular'
+import {
+    LucideAngularModule,
+    SquareX,
+    SquareCheck,
+    ArrowRight,
+    ArrowUp,
+    ClipboardList,
+    QrCode,
+    ShieldCheck,
+    FileText,
+    UserCheck,
+    TrendingUp,
+    Repeat,
+    Search,
+    MapPin,
+    Phone,
+    Headset,
+} from 'lucide-angular'
 import * as L from 'leaflet'
 import { DataDokumenUkom } from '../ukom/models/data-dukung'
 import { ApiService } from '../base/services/api.service'
@@ -27,7 +50,7 @@ import { Input } from '@angular/core'
     templateUrl: './landing-page.component.html',
     styleUrl: './landing-page.component.scss',
 })
-export class LandingPageComponent {
+export class LandingPageComponent implements AfterViewInit, OnDestroy {
     @Input() imported?: boolean
 
     currentYear: number = new Date().getFullYear()
@@ -46,6 +69,22 @@ export class LandingPageComponent {
 
     readonly SquareX = SquareX
     readonly SquareCheck = SquareCheck
+    readonly ArrowRight = ArrowRight
+    readonly ArrowUp = ArrowUp
+    readonly ClipboardList = ClipboardList
+    readonly QrCode = QrCode
+    readonly ShieldCheck = ShieldCheck
+    readonly FileText = FileText
+    readonly UserCheck = UserCheck
+    readonly TrendingUp = TrendingUp
+    readonly Repeat = Repeat
+    readonly Search = Search
+    readonly MapPin = MapPin
+    readonly Phone = Phone
+    readonly Headset = Headset
+
+    isScrolled = false
+    private revealObserver?: IntersectionObserver
 
     dokumenPromosi: DataDokumenUkom[] = []
     dokumenPindahJabatan: DataDokumenUkom[] = []
@@ -56,7 +95,46 @@ export class LandingPageComponent {
     constructor(
         private router: Router,
         private service: ApiService,
+        private el: ElementRef<HTMLElement>,
     ) {}
+
+    /** Header transparan (menyatu dengan hero) sebelum halaman di-scroll */
+    get isOnHero(): boolean {
+        return !this.imported && !this.isScrolled && !this.isMenuOpen
+    }
+
+    @HostListener('window:scroll')
+    onWindowScroll() {
+        this.isScrolled = window.scrollY > 40
+    }
+
+    ngAfterViewInit() {
+        this.onWindowScroll()
+        const targets = this.el.nativeElement.querySelectorAll('.reveal')
+        if (!targets.length) return
+
+        if (!('IntersectionObserver' in window)) {
+            targets.forEach((t) => t.classList.add('visible'))
+            return
+        }
+
+        this.revealObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible')
+                        this.revealObserver?.unobserve(entry.target)
+                    }
+                })
+            },
+            { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+        )
+        targets.forEach((t) => this.revealObserver!.observe(t))
+    }
+
+    ngOnDestroy() {
+        this.revealObserver?.disconnect()
+    }
 
     ngOnInit() {
         this.ukomForm = new FormGroup({
@@ -188,6 +266,15 @@ export class LandingPageComponent {
 
     toggleMenu() {
         this.isMenuOpen = !this.isMenuOpen
+    }
+
+    closeMenu() {
+        this.isMenuOpen = false
+    }
+
+    scrollToTop(event: Event) {
+        event.preventDefault()
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     onSubmit() {

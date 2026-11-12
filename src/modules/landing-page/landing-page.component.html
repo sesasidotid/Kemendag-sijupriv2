@@ -1,55 +1,246 @@
-<nav class="navbar">
-    <a href="./">
-        <img src="./assets/logo/kemendag-logo-light.png" width="120"
+<nav
+    [class.on-hero]="isOnHero"
+    [class.scrolled]="isScrolled"
+    class="navbar"
+>
+    <a class="brand" href="./">
+        <img
+            [src]="
+                isOnHero
+                    ? './assets/logo/kemendag-logo-dark.png'
+                    : './assets/logo/kemendag-logo-light.png'
+            "
+            alt="Kemendag"
+            width="120"
     /></a>
-    <div (click)="toggleMenu()" class="toggle">
+    <div
+        (click)="toggleMenu()"
+        [class.open]="isMenuOpen"
+        aria-label="Menu"
+        class="toggle"
+    >
         <span></span>
         <span></span>
         <span></span>
     </div>
-    <ul [ngClass]="{ active: isMenuOpen }" class="nav-links">
-        <li><a href="#beranda">Beranda</a></li>
-        <li><a href="#layanan">Layanan</a></li>
-        <li><a href="#lokasi">Lokasi</a></li>
-        <li><a href="#kontak">Kontak</a></li>
-        <li>
-            <a [routerLink]="['/login']" class="btn btn-secondary grad-button"
-                >Masuk Sekarang</a
+    <div [class.active]="isMenuOpen" class="nav-menu">
+        <ul class="nav-links">
+            <li><a (click)="closeMenu()" href="#beranda">Beranda</a></li>
+            <li><a (click)="closeMenu()" href="#alur">Alur</a></li>
+            <li><a (click)="closeMenu()" href="#layanan">Layanan</a></li>
+            <li><a (click)="closeMenu()" href="#lokasi">Lokasi</a></li>
+            <li><a (click)="closeMenu()" href="#kontak">Kontak</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a [routerLink]="['/login-cat']" class="btn nav-btn nav-btn-outline"
+                >Masuk UKom</a
             >
-        </li>
-    </ul>
+            <a [routerLink]="['/login']" class="btn grad-button nav-btn"
+                >Masuk</a
+            >
+        </div>
+    </div>
 </nav>
 
 <div *ngIf="!imported">
+    <!-- HERO -->
     <section class="hero-section" id="beranda">
-        <h1>
-            Selamat Datang di Sistem Informasi Jabatan Fungsional Perdagangan
-            Republik Indonesia
-            <span class="gradient-text">(SIjuPRI)</span>
-        </h1>
-        <p>
-            Solusi cerdas untuk mendukung kinerja Kementrian Perdagangan
-            Republik Indonesia
-        </p>
-        <a [routerLink]="['/login']" class="btn btn-secondary grad-button w-fit"
-            >Masuk Sekarang</a
-        >
+        <div aria-hidden="true" class="hero-bg">
+            <span class="blob blob-1"></span>
+            <span class="blob blob-2"></span>
+            <span class="blob blob-3"></span>
+            <span class="grid-overlay"></span>
+        </div>
+
+        <div class="hero-content">
+            <!-- KIRI: teks -->
+            <div class="hero-text">
+                <span class="hero-badge reveal">
+                    <span class="dot"></span>
+                    Pusat Pembinaan JF Perdagangan
+                </span>
+                <h1 class="reveal delay-1">
+                    Selamat Datang di Sistem Informasi Jabatan Fungsional
+                    Perdagangan Republik Indonesia
+                    <span class="gradient-text">(SIjuPRI)</span>
+                </h1>
+                <p class="hero-lead reveal delay-2">
+                    Solusi cerdas untuk mendukung kinerja Kementerian
+                    Perdagangan Republik Indonesia
+                </p>
+                <div class="hero-actions reveal delay-3">
+                    <a
+                        [routerLink]="['/login']"
+                        class="btn grad-button btn-lg-pill"
+                    >
+                        Masuk Sekarang
+                        <i-lucide [img]="ArrowRight" [size]="18"></i-lucide>
+                    </a>
+                    <a class="btn btn-ghost btn-lg-pill" href="#layanan">
+                        Daftar UKom
+                    </a>
+                </div>
+
+                <div class="hero-highlights reveal delay-4">
+                    <div class="highlight">
+                        <i-lucide [img]="ClipboardList" [size]="20"></i-lucide>
+                        <span>Pendaftaran UKom Online</span>
+                    </div>
+                    <div class="highlight">
+                        <i-lucide [img]="QrCode" [size]="20"></i-lucide>
+                        <span>Cek Status via QR</span>
+                    </div>
+                    <div class="highlight">
+                        <i-lucide [img]="ShieldCheck" [size]="20"></i-lucide>
+                        <span>Terintegrasi &amp; Aman</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KANAN: cek status -->
+            <div class="hero-panel reveal delay-2">
+                <div class="panel-head">
+                    <div class="panel-icon">
+                        <i-lucide [img]="Search" [size]="24"></i-lucide>
+                    </div>
+                    <div>
+                        <h5>Cek Status Pendaftaran</h5>
+                        <p>Lihat detail &amp; perbaiki dokumen UKom Anda</p>
+                    </div>
+                </div>
+
+                <form (ngSubmit)="onSubmit()" [formGroup]="ukomForm">
+                    <label class="panel-label" for="ukomCode">Kode UKom</label>
+                    <div
+                        [class.invalid]="
+                            ukomForm.get('ukomCode').invalid &&
+                            ukomForm.get('ukomCode').touched
+                        "
+                        class="panel-input"
+                    >
+                        <i-lucide [img]="FileText" [size]="18"></i-lucide>
+                        <input
+                            autocomplete="off"
+                            formControlName="ukomCode"
+                            id="ukomCode"
+                            name="ukomCode"
+                            placeholder="Masukkan Kode UKom"
+                            type="text"
+                        />
+                    </div>
+                    <div
+                        *ngIf="
+                            ukomForm.get('ukomCode').invalid &&
+                            ukomForm.get('ukomCode').touched
+                        "
+                        class="panel-feedback"
+                    >
+                        <small
+                            *ngIf="ukomForm.get('ukomCode').errors?.['required']"
+                            >Kode UKom perlu diisi.</small
+                        >
+                        <small
+                            *ngIf="ukomForm.get('ukomCode').errors?.['minlength']"
+                            >Kode UKom minimal 5 karakter.</small
+                        >
+                    </div>
+
+                    <button
+                        [disabled]="ukomForm.invalid"
+                        class="btn grad-button panel-btn"
+                        type="submit"
+                    >
+                        Cek Status
+                        <i-lucide [img]="ArrowRight" [size]="18"></i-lucide>
+                    </button>
+                </form>
+
+                <div class="panel-divider"><span>atau</span></div>
+
+                <div class="panel-qr">
+                    <i-lucide [img]="QrCode" [size]="22"></i-lucide>
+                    <span
+                        >Scan QR yang telah Anda unduh saat mendaftar untuk
+                        langsung membuka detail pendaftaran.</span
+                    >
+                </div>
+
+                <p class="panel-foot">
+                    Belum mendaftar?
+                    <a href="#layanan">Lihat layanan pendaftaran →</a>
+                </p>
+            </div>
+        </div>
+
+        <a aria-label="Gulir ke bawah" class="scroll-indicator" href="#alur">
+            <span></span>
+        </a>
     </section>
 
+    <!-- ALUR -->
+    <section class="steps-section" id="alur">
+        <span class="section-eyebrow reveal">Alur Pendaftaran</span>
+        <h2 class="reveal delay-1">Mudah dalam 3 Langkah</h2>
+        <p class="section-subtitle reveal delay-2">
+            Ikuti langkah berikut untuk mendaftar Uji Kompetensi melalui SIjuPRI
+        </p>
+        <div class="steps">
+            <div class="step reveal delay-1">
+                <div class="step-icon">
+                    <i-lucide [img]="FileText" [size]="26"></i-lucide>
+                </div>
+                <span class="step-number">01</span>
+                <h5>Siapkan Dokumen</h5>
+                <p>
+                    Lengkapi dokumen persyaratan sesuai jenis uji kompetensi
+                    yang dipilih.
+                </p>
+            </div>
+            <div class="step reveal delay-2">
+                <div class="step-icon">
+                    <i-lucide [img]="UserCheck" [size]="26"></i-lucide>
+                </div>
+                <span class="step-number">02</span>
+                <h5>Daftar UKom</h5>
+                <p>
+                    Isi formulir pendaftaran dan unggah dokumen secara online.
+                </p>
+            </div>
+            <div class="step reveal delay-3">
+                <div class="step-icon">
+                    <i-lucide [img]="QrCode" [size]="26"></i-lucide>
+                </div>
+                <span class="step-number">03</span>
+                <h5>Pantau Status</h5>
+                <p>
+                    Simpan QR / kode pendaftaran untuk memantau status dan
+                    memperbaiki dokumen.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LAYANAN -->
     <section class="feature-section" id="layanan">
-        <h2>Menyediakan Fitur Pendaftaran Uji Kompetensi</h2>
-        <p>Berikut adalah beberapa fitur layanan yang tersedia pada SIjuPRI</p>
+        <span class="section-eyebrow reveal">Layanan</span>
+        <h2 class="reveal delay-1">Menyediakan Fitur Pendaftaran Uji Kompetensi</h2>
+        <p class="section-subtitle reveal delay-2">
+            Berikut adalah beberapa fitur layanan yang tersedia pada SIjuPRI
+        </p>
         <div class="feature-list">
-            <div class="feature feature-1">
-                <div class="image">
-                    <img alt="" src="./assets/doc-icon.svg" />
+            <div class="feature feature-1 reveal delay-1">
+                <div class="feature-head">
+                    <div class="image">
+                        <i-lucide [img]="TrendingUp" [size]="26"></i-lucide>
+                    </div>
+                    <span class="feature-tag">Promosi</span>
                 </div>
                 <h4>
                     Pendaftaran Uji Kompetensi Promosi ke Dalam JF Bidang
                     Perdagangan
                 </h4>
                 <div class="req-parent">
-                    <!-- <h6 class="req-title">Dokumen Promosi</h6> -->
+                    <h6 class="req-title">Dokumen Persyaratan</h6>
                     <div class="req-items">
                         <div
                             *ngIf="
@@ -62,8 +253,9 @@
                                 class="req-item"
                             >
                                 <i-lucide
-                                    [color]="'#49AB49'"
+                                    [color]="'#6fd36f'"
                                     [img]="SquareCheck"
+                                    [size]="18"
                                 ></i-lucide>
                                 <p class="capitalize">
                                     {{ item.dokumenPersyaratanName }}
@@ -72,7 +264,7 @@
                         </div>
 
                         <ng-template #noKenaikanJenjangDokumenInternal>
-                            <p class="text-gray-500">-</p>
+                            <p class="text-muted-light">-</p>
                         </ng-template>
                     </div>
                 </div>
@@ -90,8 +282,9 @@
                                 class="req-item"
                             >
                                 <i-lucide
-                                    [color]="'#49AB49'"
+                                    [color]="'#6fd36f'"
                                     [img]="SquareCheck"
+                                    [size]="18"
                                 ></i-lucide>
                                 <p class="capitalize">
                                     {{ item.dokumenPersyaratanName +
@@ -104,21 +297,25 @@
                 </div>
                 <a
                     [routerLink]="['/ukom/external']"
-                    class="btn btn-secondary grad-button"
-                    >Daftar Sekarang</a
-                >
+                    class="btn grad-button feature-cta"
+                    >Daftar Sekarang
+                    <i-lucide [img]="ArrowRight" [size]="16"></i-lucide
+                ></a>
             </div>
 
-            <div class="feature feature-2">
-                <div class="image">
-                    <img alt="" src="./assets/doc-icon.svg" />
+            <div class="feature feature-2 reveal delay-2">
+                <div class="feature-head">
+                    <div class="image">
+                        <i-lucide [img]="Repeat" [size]="26"></i-lucide>
+                    </div>
+                    <span class="feature-tag">Perpindahan</span>
                 </div>
                 <h4>
                     Pendaftaran Uji Kompetensi Perpindahan dari Jabatan Lain
                     (Non JF Perdagangan)
                 </h4>
                 <div class="req-parent">
-                    <!-- <h6 class="req-title">Dokumen Perpindahan Jabatan</h6> -->
+                    <h6 class="req-title">Dokumen Persyaratan</h6>
                     <div class="req-items">
                         <div
                             *ngIf="
@@ -131,8 +328,9 @@
                                 class="req-item"
                             >
                                 <i-lucide
-                                    [color]="'#49AB49'"
+                                    [color]="'#6fd36f'"
                                     [img]="SquareCheck"
+                                    [size]="18"
                                 ></i-lucide>
                                 <p class="capitalize">
                                     {{ item.dokumenPersyaratanName }}
@@ -141,7 +339,7 @@
                         </div>
 
                         <ng-template #noDokumenPindahJabatanExternal>
-                            <p class="text-gray-500">-</p>
+                            <p class="text-muted-light">-</p>
                         </ng-template>
                     </div>
                 </div>
@@ -160,8 +358,9 @@
                                 class="req-item"
                             >
                                 <i-lucide
-                                    [color]="'#49AB49'"
+                                    [color]="'#6fd36f'"
                                     [img]="SquareCheck"
+                                    [size]="18"
                                 ></i-lucide>
                                 <p class="capitalize">
                                     {{ item.dokumenPersyaratanName +
@@ -174,102 +373,82 @@
                 </div>
                 <a
                     [routerLink]="['/ukom/external']"
-                    class="btn btn-secondary grad-button"
-                    >Daftar Sekarang</a
-                >
-            </div>
-
-            <div class="feature feature-3">
-                <div class="image">
-                    <img alt="" src="./assets/doc-icon.svg" />
-                </div>
-                <h4>Detail Pendaftaran dan Perbaikan Dokumen</h4>
-                <p>
-                    Anda dapat melihat detail dan memperbaiki dokumen
-                    pendaftaran UKom anda dengan melakukan scan QR yang telah
-                    anda download atau dengan menginputkan kode pendaftaran
-                    dibawah ini
-                </p>
-                <form
-                    (ngSubmit)="onSubmit()"
-                    [formGroup]="ukomForm"
-                    class="row"
-                >
-                    <div class="w-100">
-                        <label class="form-label" for="nip">Kode UKom</label>
-                        <div class="input-group has-validation">
-                            <input
-                                class="form-control"
-                                formControlName="ukomCode"
-                                id="ukomCode"
-                                name="ukomCode"
-                                placeholder="Masukkan Kode UKom"
-                                type="text"
-                            />
-                        </div>
-                        <div
-                            *ngIf="
-                                ukomForm.get('ukomCode').invalid &&
-                                ukomForm.get('ukomCode').touched
-                            "
-                            class="feedback"
-                        >
-                            <small
-                                *ngIf="ukomForm.get('ukomCode').errors?.['required']"
-                                >Kode UKom perlu diisi.</small
-                            >
-                            <small
-                                *ngIf="ukomForm.get('ukomCode').errors?.['minlength']"
-                                >Kode UKom minimal 5 karakter.</small
-                            >
-                        </div>
-
-                        <button
-                            [disabled]="ukomForm.invalid"
-                            class="btn btn-secondary grad-button mt-4"
-                            type="submit"
-                        >
-                            Ikuti UKom
-                        </button>
-                    </div>
-                </form>
+                    class="btn grad-button feature-cta"
+                    >Daftar Sekarang
+                    <i-lucide [img]="ArrowRight" [size]="16"></i-lucide
+                ></a>
             </div>
         </div>
     </section>
 
-    <section class="pb-0 pt-0 text-center" id="lokasi">
-        <h2>Lokasi Kementerian Perdagangan Republik Indonesia</h2>
-        <p class="mb-5">Berikut adalah lokasi dimana gedung kemendag berada</p>
-        <iframe
-            allowfullscreen
-            class="w-100 border-0"
-            height="600"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d573.7930201627036!2d106.83318637558038!3d-6.181469988094899!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f433dff0a1f7%3A0x600a7ff8254f640d!2sMinistry%20of%20Trade%20of%20The%20Republic%20of%20Indonesia!5e0!3m2!1sen!2sid!4v1730204663845!5m2!1sen!2sid"
-        ></iframe>
+    <!-- LOKASI -->
+    <section class="location-section" id="lokasi">
+        <span class="section-eyebrow reveal">Lokasi</span>
+        <h2 class="reveal delay-1">
+            Lokasi Kementerian Perdagangan Republik Indonesia
+        </h2>
+        <p class="section-subtitle reveal delay-2">
+            Berikut adalah lokasi dimana gedung kemendag berada
+        </p>
+        <div class="map-card reveal delay-2">
+            <iframe
+                allowfullscreen
+                class="w-100 border-0"
+                height="480"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d573.7930201627036!2d106.83318637558038!3d-6.181469988094899!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f433dff0a1f7%3A0x600a7ff8254f640d!2sMinistry%20of%20Trade%20of%20The%20Republic%20of%20Indonesia!5e0!3m2!1sen!2sid!4v1730204663845!5m2!1sen!2sid"
+            ></iframe>
+        </div>
     </section>
 
+    <!-- CTA BANNER -->
+    <section class="cta-section">
+        <div class="cta-card reveal">
+            <div>
+                <h3>Siap mengembangkan karier JF Perdagangan Anda?</h3>
+                <p>
+                    Masuk ke SIjuPRI untuk mengakses layanan SIAP, Formasi, AKP,
+                    Kinerja, dan UKom.
+                </p>
+            </div>
+            <a [routerLink]="['/login']" class="btn btn-light-pill">
+                Masuk Sekarang
+                <i-lucide [img]="ArrowRight" [size]="18"></i-lucide>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
     <footer class="footer-landing" id="kontak">
         <div class="footer-content">
             <div class="footer-left">
-                <img src="./assets/logo/kemendag-logo-dark.png" width="160" />
+                <img alt="Kemendag" src="./assets/logo/kemendag-logo-dark.png" width="160" />
                 <p class="footer-description">
                     Pusat Pembinaan Jabatan Fungsional Perdagangan, Kementerian
                     Perdagangan Republik Indonesia
                 </p>
-                <p>
-                    Jln Daeng Muhammad Ardiwinata, km 3.4, Cihanjuang, Bandung
-                    Barat
+                <p class="contact-line">
+                    <i-lucide [img]="MapPin" [size]="16"></i-lucide>
+                    <span
+                        >Jln Daeng Muhammad Ardiwinata, km 3.4, Cihanjuang,
+                        Bandung Barat</span
+                    >
                 </p>
-                <p>Hotline : 0821 1868 7772</p>
-                <p>
-                    Layanan Konsultasi :
-                    <a
-                        class="footer-a"
-                        href="https://pusbinjfdag-kemendag.zohobookings.com/#/customer/4489137000000031016"
-                        target="_blank"
-                        >Selami</a
+                <p class="contact-line">
+                    <i-lucide [img]="Phone" [size]="16"></i-lucide>
+                    <span>Hotline : 0821 1868 7772</span>
+                </p>
+                <p class="contact-line">
+                    <i-lucide [img]="Headset" [size]="16"></i-lucide>
+                    <span
+                        >Layanan Konsultasi :
+                        <a
+                            class="footer-a"
+                            href="https://pusbinjfdag-kemendag.zohobookings.com/#/customer/4489137000000031016"
+                            target="_blank"
+                            >Selami</a
+                        ></span
                     >
                 </p>
             </div>
@@ -310,4 +489,14 @@
             © {{ currentYear }} Kementerian Perdagangan Republik Indonesia
         </p>
     </footer>
+
+    <a
+        (click)="scrollToTop($event)"
+        [class.show]="isScrolled"
+        aria-label="Kembali ke atas"
+        class="back-to-top"
+        href="#beranda"
+    >
+        <i-lucide [img]="ArrowUp" [size]="20"></i-lucide>
+    </a>
 </div>
